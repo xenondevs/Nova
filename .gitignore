@@ -1,0 +1,66 @@
+# Local pydev project properties file
+*.pydevproject
+
+# Eclipse Metadata
+.metadata
+
+# Gradle temporarily build directory
+.gradle
+
+# Eclipse Build Directory
+bin/
+
+# Temp files should never be added to git
+tmp/
+*.tmp
+*.swp
+
+# Backup files also shouldn't be saved
+*.bak
+
+# Interface Builders shouldn't be added to git
+*~.nib
+
+# As the name says, it's only local
+local.properties
+
+# IDE Settings shouldn't be added to git
+.settings/
+.loadpath
+*.iml
+
+## Main Jetbrains  directory with lots of local settings
+.idea/
+
+## File-based project format:
+*.ipr
+*.iws
+
+## Plugin-specific files:
+
+# IntelliJ
+/out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Target directories shouldn't be added to git
+target/
+
+# Eclipse Recommenders are really unnecessary for git
+.recommenders/
+
+# Local Libraries shouldn't be added to git
+.libs/
+
+# Test Directory
+src/test/
+
+# Logs
+logs/
+
+# output folder if not defined in command line
+${dir}/
