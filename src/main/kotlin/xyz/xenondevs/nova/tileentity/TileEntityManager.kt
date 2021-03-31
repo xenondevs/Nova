@@ -18,6 +18,9 @@ import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.particle.ParticleBuilder
+import xyz.xenondevs.particle.ParticleEffect
+import xyz.xenondevs.particle.data.texture.BlockTexture
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.roundToInt
@@ -86,6 +89,17 @@ object TileEntityManager : Listener {
         tileEntityMap[chunk]?.remove(location)
         tileEntity.armorStand.remove()
         tileEntity.handleRemove()
+        
+        val novaMaterial = tileEntity.material
+        val breakMaterial = novaMaterial.breakParticles!!
+        ParticleBuilder(ParticleEffect.BLOCK_CRACK, dropLocation)
+            .setParticleData(BlockTexture(breakMaterial))
+            .setOffsetX(0.2f)
+            .setOffsetY(0.2f)
+            .setOffsetZ(0.2f)
+            .setAmount(50)
+            .setSpeed(1f)
+            .display()
     }
     
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)

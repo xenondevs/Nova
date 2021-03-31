@@ -48,6 +48,11 @@
             <artifactId>InvUI</artifactId>
             <version>f0d1ac5eaf</version>
         </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs</groupId>
+            <artifactId>particle</artifactId>
+            <version>1.5.1</version>
+        </dependency>
     </dependencies>
 
     <build>
