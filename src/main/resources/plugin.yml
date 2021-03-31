@@ -1,0 +1,10 @@
+name: Nova
+version: 0.1
+main: xyz.xenondevs.nova.Nova
+api-version: 1.16
+
+commands:
+  test:
+    
+  getNovaMaterial:
+    

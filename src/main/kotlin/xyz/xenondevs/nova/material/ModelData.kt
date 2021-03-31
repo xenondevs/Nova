@@ -1,0 +1,20 @@
+package xyz.xenondevs.nova.material
+
+import de.studiocode.invui.item.ItemBuilder
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
+
+class ModelData(val material: Material, vararg val dataArray: Int) {
+    
+    val data: Int
+        get() = dataArray[0]
+    
+    fun getItem(name: String, dataIndex: Int = 0): ItemStack =
+        getItemBuilder(name, dataIndex).build()
+    
+    fun getItemBuilder(name: String, dataIndex: Int = 0): ItemBuilder =
+        ItemBuilder(material)
+            .setDisplayName("§r$name : ${dataArray[dataIndex]}")
+            .setCustomModelData(dataArray[dataIndex])
+    
+}
