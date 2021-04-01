@@ -75,7 +75,6 @@ class Cable(
     
     init {
         // update models of neighboring cables so they connect to this cable
-        updateHitbox()
         updateNeighboringCables()
         
         // TODO: notify something like an EnergyNetworkManager of this cable
