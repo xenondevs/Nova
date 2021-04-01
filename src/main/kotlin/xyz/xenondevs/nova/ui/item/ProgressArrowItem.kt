@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
 
-class ProgressItem : BaseItem() {
+class ProgressArrowItem : BaseItem() {
     
     var state: Int = 0
         set(value) {
@@ -14,7 +14,7 @@ class ProgressItem : BaseItem() {
             notifyWindows()
         }
     
-    override fun getItemBuilder() = NovaMaterial.FURNACE_PROGRESS.item.getItemBuilder("", state)
+    override fun getItemBuilder() = NovaMaterial.PROGRESS_ARROW.item.getItemBuilder("", state)
     
     override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
     

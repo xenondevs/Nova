@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova
 
-import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -8,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.TestUI
+import xyz.xenondevs.nova.ui.setGlobalIngredients
 
 lateinit var NOVA: Nova
 
@@ -19,6 +19,7 @@ class Nova : JavaPlugin() {
         NOVA = this
         
         TileEntityManager // init TileEntityManager
+        setGlobalIngredients()
         
         getCommand("test")!!.setExecutor(this)
         getCommand("getNovaMaterial")!!.setExecutor(this)

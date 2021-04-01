@@ -3,23 +3,21 @@ package xyz.xenondevs.nova.tileentity.impl
 import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
-import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.window.impl.single.SimpleWindow
-import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.ui.item.ProgressItem
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.item.EnergyProgressItem
+import xyz.xenondevs.nova.util.fuel
+import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.util.seed
+import xyz.xenondevs.nova.util.toItemStack
 import java.util.*
 import kotlin.math.min
 
@@ -30,6 +28,7 @@ class CoalGenerator(material: NovaMaterial, uuid: UUID, armorStand: ArmorStand) 
     
     private var energy: Int = retrieveData(0, "energy")
     private var burnTime: Int = retrieveData(0, "burnTime")
+    private var totalBurnTime: Int = retrieveData(0, "totalBurnTime")
     
     private val inventory = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("inventory"), 1)
         .also { it.setItemUpdateHandler(this::handleInventoryUpdate) }
@@ -47,20 +46,24 @@ class CoalGenerator(material: NovaMaterial, uuid: UUID, armorStand: ArmorStand) 
         if (burnTime != 0) {
             burnTime--
             energy = min(MAX_ENERGY, energy + ENERGY_PER_TICK)
+            
+            gui.progressItem.percentage = burnTime.toDouble() / totalBurnTime.toDouble()
+            gui.energyBar.percentage = energy.toDouble() / MAX_ENERGY.toDouble()
         } else burnItem()
-        
-        gui.energyItem.notifyWindows()
     }
     
     private fun burnItem() {
         val fuelStack = inventory.getItemStack(0)
-        if (fuelStack != null) {
-            val fuel = fuelStack.type.fuel!!
-            burnTime += fuel.burnTime
-            if (fuel.remains == null) {
-                inventory.removeOne(null, 0)
-            } else {
-                inventory.setItemStack(null, 0, fuel.remains.toItemStack())
+        if (energy < MAX_ENERGY && fuelStack != null) {
+            val fuel = fuelStack.type.fuel
+            if (fuel != null) {
+                burnTime += fuel.burnTime
+                totalBurnTime = burnTime
+                if (fuel.remains == null) {
+                    inventory.removeOne(null, 0)
+                } else {
+                    inventory.setItemStack(null, 0, fuel.remains.toItemStack())
+                }
             }
         }
     }
@@ -81,6 +84,7 @@ class CoalGenerator(material: NovaMaterial, uuid: UUID, armorStand: ArmorStand) 
     override fun handleDisable() {
         storeData("energy", energy)
         storeData("burnTime", burnTime)
+        storeData("totalBurnTime", totalBurnTime)
     }
     
     override fun handleRemove() {
@@ -88,28 +92,26 @@ class CoalGenerator(material: NovaMaterial, uuid: UUID, armorStand: ArmorStand) 
         saveFile.delete()
     }
     
+    private fun getEnergyValues() = energy to MAX_ENERGY
+    
     inner class CoalGeneratorGUI {
+    
+        val progressItem = EnergyProgressItem()
         
-        val progressItem = ProgressItem()
-        val energyItem = EnergyItem()
-        
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 3)
+        private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
-                "e # # # # # # # #" +
-                "# # i # > # # # #" +
-                "# # # # # # # # #")
-            .addIngredient('#', Icon.BACKGROUND.item)
+                "1 - - - - - - - 2" +
+                "| # # # # # # # |" +
+                "| # # # i # # # |" +
+                "| # # # ! # # # |" +
+                "| # # # # # # # |" +
+                "3 - - - - - - - 4")
             .addIngredient('i', SlotElement.VISlotElement(inventory, 0))
-            .addIngredient('e', energyItem)
-            .addIngredient('>', progressItem)
+            .addIngredient('!', progressItem)
             .build()
         
-        init {
-            runTaskTimer(0, 10) {
-                if (progressItem.state + 1 > 16) progressItem.state = 0
-                else progressItem.state++
-            }
-        }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, ::getEnergyValues)
+            .apply { percentage = energy.toDouble() / MAX_ENERGY.toDouble() }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Coal Generator", gui).show()
@@ -117,13 +119,4 @@ class CoalGenerator(material: NovaMaterial, uuid: UUID, armorStand: ArmorStand) 
         
     }
     
-    inner class EnergyItem : BaseItem() {
-        
-        override fun getItemBuilder(): ItemBuilder {
-            return Icon.LIGHT_BOX.itemBuilder.setDisplayName("§rEnergy: §b$energy").addLoreLines("§rBurn time left: $burnTime")
-        }
-        
-        override fun handleClick(p0: ClickType?, p1: Player?, p2: InventoryClickEvent?) = Unit
-        
-    }
 }
