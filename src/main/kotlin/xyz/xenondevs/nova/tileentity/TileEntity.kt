@@ -12,6 +12,7 @@ import java.util.*
 abstract class TileEntity(
     val material: NovaMaterial,
     val armorStand: ArmorStand,
+    private val keepData: Boolean
 ) {
     
     protected val data: JsonObject = if (armorStand.hasTileEntityData()) armorStand.getTileEntityData() else JsonObject()
@@ -33,20 +34,20 @@ abstract class TileEntity(
         if (dropItems) {
             saveData()
             val item = createItem()
-            item.setTileEntityData(data)
+            if (keepData) item.setTileEntityData(data)
             drops += item
         }
         
         return drops
     }
     
+    open fun createItem() = material.createItemStack()
+    
     abstract fun saveData()
     
     abstract fun handleTick()
     
     abstract fun handleRightClick(event: PlayerInteractEvent)
-    
-    abstract fun createItem(): ItemStack
     
     protected inline fun <reified T> retrieveData(alternative: T, key: String): T {
         return retrieveOrNull(key) ?: alternative

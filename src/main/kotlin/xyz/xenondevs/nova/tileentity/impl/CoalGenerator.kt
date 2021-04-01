@@ -28,7 +28,7 @@ private const val ENERGY_PER_TICK = 5
 class CoalGenerator(
     material: NovaMaterial,
     armorStand: ArmorStand
-) : TileEntity(material, armorStand) {
+) : TileEntity(material, armorStand, keepData = true) {
     
     private var energy: Int = retrieveData(0, "energy")
     private var burnTime: Int = retrieveData(0, "burnTime")
@@ -74,6 +74,8 @@ class CoalGenerator(
     }
     
     override fun handleRightClick(event: PlayerInteractEvent) {
+        event.isCancelled = true
+        
         runAsyncTaskLater(1) {
             when (event.hand) {
                 EquipmentSlot.HAND -> event.player.swingMainHand()

@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
+import java.lang.IllegalStateException
 import kotlin.math.roundToInt
 
 private val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
@@ -103,11 +104,11 @@ object TileEntityManager : Listener {
         chunkMap[location] = tileEntity
         
         // set hitbox block there (1 tick later or it collides with the cancelled event which removes the block)
-        runTaskLater(1) { block.type = material.hitbox!! }
+        if (material.hitbox != null) runTaskLater(1) { block.type = material.hitbox }
     }
     
     fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean) {
-        val location = tileEntity.armorStand.location.clone().subtract(0.5, 0.0, 0.5)
+        val location = tileEntity.armorStand.location.getBlockLocation()
         val chunk = location.chunk
         
         location.block.type = Material.AIR
@@ -161,10 +162,13 @@ object TileEntityManager : Listener {
         if (material != null) {
             event.isCancelled = true
             if (material.isBlock) {
-                val data = if (placedItem.hasTileEntityData()) placedItem.getTileEntityData()!! else JsonObject()
-                placeTileEntity(event.block.location, player.location.yaw, material, data)
-                
-                if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
+                val location = event.block.location
+                if (getTileEntityAt(location) == null) {
+                    val data = if (placedItem.hasTileEntityData()) placedItem.getTileEntityData()!! else JsonObject()
+                    placeTileEntity(event.block.location, player.location.yaw, material, data)
+    
+                    if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
+                }
             }
         }
     }
@@ -184,10 +188,7 @@ object TileEntityManager : Listener {
         if (action == Action.RIGHT_CLICK_BLOCK && !event.player.isSneaking) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
-            if (tileEntity != null) {
-                event.isCancelled = true
-                tileEntity.handleRightClick(event)
-            }
+            tileEntity?.handleRightClick(event)
         }
     }
     
