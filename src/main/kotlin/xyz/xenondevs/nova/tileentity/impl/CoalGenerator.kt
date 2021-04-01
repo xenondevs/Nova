@@ -12,10 +12,10 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.tileentity.addUUID
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.util.fuel
-import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.seed
 import xyz.xenondevs.nova.util.toItemStack
 import java.util.*
@@ -24,7 +24,11 @@ import kotlin.math.min
 private const val MAX_ENERGY = 10_000
 private const val ENERGY_PER_TICK = 5
 
-class CoalGenerator(material: NovaMaterial, uuid: UUID, armorStand: ArmorStand) : TileEntity(material, uuid, armorStand) {
+class CoalGenerator(
+    material: NovaMaterial,
+    uuid: UUID,
+    armorStand: ArmorStand
+) : TileEntity(material, uuid, armorStand) {
     
     private var energy: Int = retrieveData(0, "energy")
     private var burnTime: Int = retrieveData(0, "burnTime")
@@ -33,14 +37,6 @@ class CoalGenerator(material: NovaMaterial, uuid: UUID, armorStand: ArmorStand) 
     private val inventory = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("inventory"), 1)
         .also { it.setItemUpdateHandler(this::handleInventoryUpdate) }
     private val gui by lazy { CoalGeneratorGUI() }
-    
-    override val drops: MutableList<ItemStack>
-        get() {
-            val drops = super.drops
-            val fuel = inventory.getItemStack(0)
-            if (fuel != null) drops += fuel
-            return drops
-        }
     
     override fun handleTick() {
         if (burnTime != 0) {
@@ -81,21 +77,39 @@ class CoalGenerator(material: NovaMaterial, uuid: UUID, armorStand: ArmorStand) 
         gui.openWindow(event.player)
     }
     
-    override fun handleDisable() {
+    override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
+        val drops = super.destroy(dropItems)
+        
+        // add items from inventory if there are any
+        if (inventory.hasItemStack(0)) {
+            drops += inventory.getItemStack(0)
+        }
+        
+        // delete the inventory since the items will be dropped
+        VirtualInventoryManager.getInstance().remove(inventory)
+        
+        return drops
+    }
+    
+    override fun createItem(): ItemStack {
+        return if (energy != 0) {
+            material.createItemBuilder()
+                .addLoreLines("§7Energy: $energy/$MAX_ENERGY")
+                .build()
+                .apply { addUUID(uuid) }
+        } else material.createItemStack()
+    }
+    
+    override fun saveData() {
         storeData("energy", energy)
         storeData("burnTime", burnTime)
         storeData("totalBurnTime", totalBurnTime)
     }
     
-    override fun handleRemove() {
-        VirtualInventoryManager.getInstance().remove(inventory)
-        saveFile.delete()
-    }
-    
     private fun getEnergyValues() = energy to MAX_ENERGY
     
     inner class CoalGeneratorGUI {
-    
+        
         val progressItem = EnergyProgressItem()
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)

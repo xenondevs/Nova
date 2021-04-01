@@ -10,22 +10,48 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.serialization.TileEntitySerialization
-import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.dropItems
-import xyz.xenondevs.nova.util.runTask
-import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.particle.ParticleBuilder
-import xyz.xenondevs.particle.ParticleEffect
-import xyz.xenondevs.particle.data.texture.BlockTexture
+import xyz.xenondevs.nova.tileentity.serialization.UUIDDataType
+import xyz.xenondevs.nova.util.*
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
+val UUID_KEY = NamespacedKey(NOVA, "tileEntityUUID")
 private val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
+
+fun ItemStack.addUUID(uuid: UUID) {
+    if (hasItemMeta()) {
+        val itemMeta = this.itemMeta!!
+        val dataContainer = itemMeta.persistentDataContainer
+        dataContainer.set(UUID_KEY, UUIDDataType, uuid)
+        this.itemMeta = itemMeta
+    }
+}
+
+fun ItemStack.getUUID(): UUID? {
+    if (hasItemMeta()) {
+        val dataContainer = itemMeta!!.persistentDataContainer
+        if (dataContainer.has(UUID_KEY, UUIDDataType)) {
+            return dataContainer.get(UUID_KEY, UUIDDataType)
+        }
+    }
+    
+    return null
+}
+
+fun ItemStack.hasUUID(): Boolean {
+    if (hasItemMeta()) {
+        val dataContainer = itemMeta!!.persistentDataContainer
+        return dataContainer.has(UUID_KEY, UUIDDataType)
+    }
+    
+    return false
+}
 
 object TileEntityManager : Listener {
     
@@ -40,7 +66,7 @@ object TileEntityManager : Listener {
         runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
     }
     
-    fun placeTileEntity(location: Location, rotation: Float, material: NovaMaterial) {
+    fun placeTileEntity(location: Location, rotation: Float, material: NovaMaterial, uuid: UUID?) {
         val block = location.block
         
         // spawn ArmorStand there
@@ -61,7 +87,7 @@ object TileEntityManager : Listener {
         )
         
         // create TileEntity instance
-        val tileEntity = material.tileEntityConstructor!!(material, UUID.randomUUID(), armorStand)
+        val tileEntity = material.tileEntityConstructor!!(material, uuid ?: UUID.randomUUID(), armorStand)
         
         // save identifying TileEntity data to ArmorStand
         armorStand.persistentDataContainer.set(
@@ -76,30 +102,23 @@ object TileEntityManager : Listener {
         chunkMap[location] = tileEntity
         
         // set hitbox block there (1 tick later or it collides with the cancelled event which removes the block)
-        runTask { block.type = material.hitbox!! }
+        runTaskLater(1) { block.type = material.hitbox!! }
     }
     
     fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean) {
         val location = tileEntity.armorStand.location.clone().subtract(0.5, 0.0, 0.5)
-        val dropLocation = location.clone().add(0.5, 0.5, 0.5)
         val chunk = location.chunk
         
         location.block.type = Material.AIR
-        if (dropItems) dropLocation.dropItems(tileEntity.drops)
+        
+        val drops = tileEntity.destroy(dropItems) // destroy tileEntity and save drops for later
+        
+        // remove TileEntity and ArmorStand
         tileEntityMap[chunk]?.remove(location)
         tileEntity.armorStand.remove()
-        tileEntity.handleRemove()
         
-        val novaMaterial = tileEntity.material
-        val breakMaterial = novaMaterial.breakParticles!!
-        ParticleBuilder(ParticleEffect.BLOCK_CRACK, dropLocation)
-            .setParticleData(BlockTexture(breakMaterial))
-            .setOffsetX(0.2f)
-            .setOffsetY(0.2f)
-            .setOffsetZ(0.2f)
-            .setAmount(50)
-            .setSpeed(1f)
-            .display()
+        // drop items a tick later to prevent interference with the cancellation of the break event
+        runTaskLater(1) { location.clone().dropItems(drops) }
     }
     
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)
@@ -144,7 +163,7 @@ object TileEntityManager : Listener {
         if (material != null) {
             event.isCancelled = true
             if (material.isBlock) {
-                placeTileEntity(event.block.location, player.location.yaw, material)
+                placeTileEntity(event.block.location, player.location.yaw, material, placedItem.getUUID())
                 
                 if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
             }

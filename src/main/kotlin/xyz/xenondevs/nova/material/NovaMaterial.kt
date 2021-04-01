@@ -16,20 +16,21 @@ enum class NovaMaterial(
     val item: ModelData,
     val block: ModelData?, // should only be different from item if it actually needs to be a different material because of minecraft's restrictions
     val hitbox: Material?,
-    val breakParticles: Material?,
     val tileEntityConstructor: ((NovaMaterial, UUID, ArmorStand) -> TileEntity)?
 ) {
     
-    COAL_GENERATOR("Coal Generator", itemOf(1), itemOf(1), BARRIER, COAL_BLOCK, ::CoalGenerator), // TODO: make barriers breakable
+    COAL_GENERATOR("Coal Generator", itemOf(1), itemOf(1), COBBLESTONE, ::CoalGenerator),
     PROGRESS_ARROW("", itemOf(*(10_000..10_016).toIntArray())),
     ENERGY_PROGRESS("", itemOf(*(10_100..10_116).toIntArray())),
     ENERGY_BAR("", itemOf(*(10_200..10_216).toIntArray()));
     
-    val isBlock = block != null && hitbox != null && breakParticles != null && tileEntityConstructor != null
+    val isBlock = block != null && hitbox != null && tileEntityConstructor != null
     
-    constructor(itemName: String, item: ModelData) : this(itemName, item, null, null, null, null)
+    constructor(itemName: String, item: ModelData) : this(itemName, item, null, null, null)
     
     fun createItemStack() = item.getItem(itemName)
+    
+    fun createItemBuilder() = item.getItemBuilder(itemName)
     
     companion object {
         
