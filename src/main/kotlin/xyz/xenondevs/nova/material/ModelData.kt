@@ -4,7 +4,7 @@ import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-class ModelData(val material: Material, vararg val dataArray: Int) {
+class ModelData(val material: Material, val dataArray: IntArray) {
     
     val data: Int
         get() = dataArray[0]

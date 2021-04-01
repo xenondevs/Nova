@@ -15,7 +15,10 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.fuel
+import xyz.xenondevs.nova.util.runAsyncTaskLater
+import xyz.xenondevs.nova.util.seed
+import xyz.xenondevs.nova.util.toItemStack
 import java.util.*
 import kotlin.math.min
 

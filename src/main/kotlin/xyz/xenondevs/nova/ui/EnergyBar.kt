@@ -44,7 +44,7 @@ class EnergyBar(
             val energy = energyValues.first
             val maxEnergy = energyValues.second
             
-            return NovaMaterial.ENERGY_BAR.item.getItemBuilder("§c$energy§8/§7$maxEnergy Energy", state)
+            return NovaMaterial.RED_BAR.item.getItemBuilder("§c$energy§8/§7$maxEnergy Energy", state)
         }
         
         override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit

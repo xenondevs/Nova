@@ -9,7 +9,9 @@ import xyz.xenondevs.nova.tileentity.impl.CoalGenerator
 import xyz.xenondevs.nova.util.toIntArray
 import java.util.*
 
-private fun itemOf(vararg data: Int) = ModelData(STRUCTURE_VOID, *data)
+private fun itemOf(data: IntArray) = ModelData(STRUCTURE_VOID, data)
+
+private fun itemOf(data: Int) = ModelData(STRUCTURE_VOID, intArrayOf(data))
 
 enum class NovaMaterial(
     val itemName: String,
@@ -20,9 +22,12 @@ enum class NovaMaterial(
 ) {
     
     COAL_GENERATOR("Coal Generator", itemOf(1), itemOf(1), COBBLESTONE, ::CoalGenerator),
-    PROGRESS_ARROW("", itemOf(*(10_000..10_016).toIntArray())),
-    ENERGY_PROGRESS("", itemOf(*(10_100..10_116).toIntArray())),
-    ENERGY_BAR("", itemOf(*(10_200..10_216).toIntArray()));
+    PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),
+    ENERGY_PROGRESS("", itemOf((10_100..10_116).toIntArray())),
+    RED_BAR("", itemOf((10_200..10_216).toIntArray())),
+    GREEN_BAR("", itemOf((10_300..10_316).toIntArray())),
+    BLUE_BAR("", itemOf((10_400..10_416).toIntArray()));
+    
     
     val isBlock = block != null && hitbox != null && tileEntityConstructor != null
     
