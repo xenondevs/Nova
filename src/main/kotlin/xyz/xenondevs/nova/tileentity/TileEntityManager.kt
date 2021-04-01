@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
+import com.google.gson.JsonObject
 import org.bukkit.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.EventHandler
@@ -11,47 +12,51 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.serialization.TileEntitySerialization
-import xyz.xenondevs.nova.tileentity.serialization.UUIDDataType
+import xyz.xenondevs.nova.tileentity.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
-import java.util.*
-import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
-val UUID_KEY = NamespacedKey(NOVA, "tileEntityUUID")
 private val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
 
-fun ItemStack.addUUID(uuid: UUID) {
+fun ItemStack.setTileEntityData(data: JsonObject) {
     if (hasItemMeta()) {
         val itemMeta = this.itemMeta!!
         val dataContainer = itemMeta.persistentDataContainer
-        dataContainer.set(UUID_KEY, UUIDDataType, uuid)
+        dataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, data)
         this.itemMeta = itemMeta
     }
 }
 
-fun ItemStack.getUUID(): UUID? {
+fun ItemStack.getTileEntityData(): JsonObject? {
     if (hasItemMeta()) {
         val dataContainer = itemMeta!!.persistentDataContainer
-        if (dataContainer.has(UUID_KEY, UUIDDataType)) {
-            return dataContainer.get(UUID_KEY, UUIDDataType)
+        if (dataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)) {
+            return dataContainer.get(TILE_ENTITY_KEY, JsonElementDataType) as JsonObject
         }
     }
     
     return null
 }
 
-fun ItemStack.hasUUID(): Boolean {
+fun ItemStack.hasTileEntityData(): Boolean {
     if (hasItemMeta()) {
         val dataContainer = itemMeta!!.persistentDataContainer
-        return dataContainer.has(UUID_KEY, UUIDDataType)
+        return dataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
     }
     
     return false
 }
+
+fun ArmorStand.setTileEntityData(data: JsonObject) =
+    persistentDataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, data)
+
+fun ArmorStand.getTileEntityData() =
+    persistentDataContainer.get(TILE_ENTITY_KEY, JsonElementDataType) as JsonObject
+
+fun ArmorStand.hasTileEntityData(): Boolean =
+    persistentDataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
 
 object TileEntityManager : Listener {
     
@@ -66,7 +71,7 @@ object TileEntityManager : Listener {
         runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
     }
     
-    fun placeTileEntity(location: Location, rotation: Float, material: NovaMaterial, uuid: UUID?) {
+    fun placeTileEntity(location: Location, rotation: Float, material: NovaMaterial, data: JsonObject) {
         val block = location.block
         
         // spawn ArmorStand there
@@ -86,15 +91,11 @@ object TileEntityManager : Listener {
             headItem
         )
         
-        // create TileEntity instance
-        val tileEntity = material.tileEntityConstructor!!(material, uuid ?: UUID.randomUUID(), armorStand)
+        // set TileEntity data
+        armorStand.setTileEntityData(data)
         
-        // save identifying TileEntity data to ArmorStand
-        armorStand.persistentDataContainer.set(
-            TILE_ENTITY_KEY,
-            PersistentDataType.STRING,
-            TileEntitySerialization.serialize(tileEntity)
-        )
+        // create TileEntity instance
+        val tileEntity = material.tileEntityConstructor!!(material, armorStand)
         
         // add to tileEntities map
         val chunk = block.chunk
@@ -128,13 +129,10 @@ object TileEntityManager : Listener {
         
         chunk.entities
             .filterIsInstance<ArmorStand>()
+            .filter { it.hasTileEntityData() }
             .forEach { armorStand ->
-                val dataContainer = armorStand.persistentDataContainer
-                if (dataContainer.has(TILE_ENTITY_KEY, PersistentDataType.STRING)) {
-                    val data = dataContainer.get(TILE_ENTITY_KEY, PersistentDataType.STRING)!!
-                    val tileEntity = TileEntitySerialization.deserialize(armorStand, data)
-                    chunkMap[armorStand.location.clone().subtract(0.5, 0.0, 0.5)] = tileEntity
-                }
+                val tileEntity = TileEntity.newInstance(armorStand)
+                chunkMap[armorStand.location.clone().apply { removeOrientation() }.subtract(0.5, 0.0, 0.5)] = tileEntity
             }
         
         tileEntityMap[chunk] = chunkMap
@@ -163,7 +161,8 @@ object TileEntityManager : Listener {
         if (material != null) {
             event.isCancelled = true
             if (material.isBlock) {
-                placeTileEntity(event.block.location, player.location.yaw, material, placedItem.getUUID())
+                val data = if (placedItem.hasTileEntityData()) placedItem.getTileEntityData()!! else JsonObject()
+                placeTileEntity(event.block.location, player.location.yaw, material, data)
                 
                 if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
             }

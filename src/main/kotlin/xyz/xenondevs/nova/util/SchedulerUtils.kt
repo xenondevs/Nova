@@ -14,3 +14,6 @@ fun runTaskTimer(delay: Long, period: Long, run: () -> Unit) =
 
 fun runAsyncTask(run: () -> Unit) =
     Bukkit.getScheduler().runTaskAsynchronously(NOVA, run)
+
+fun runAsyncTaskLater(delay: Long, run: () -> Unit) =
+    Bukkit.getScheduler().runTaskLaterAsynchronously(NOVA, run, delay)

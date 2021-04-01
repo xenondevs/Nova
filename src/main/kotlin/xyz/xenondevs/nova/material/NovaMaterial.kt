@@ -16,7 +16,7 @@ enum class NovaMaterial(
     val item: ModelData,
     val block: ModelData?, // should only be different from item if it actually needs to be a different material because of minecraft's restrictions
     val hitbox: Material?,
-    val tileEntityConstructor: ((NovaMaterial, UUID, ArmorStand) -> TileEntity)?
+    val tileEntityConstructor: ((NovaMaterial, ArmorStand) -> TileEntity)?
 ) {
     
     COAL_GENERATOR("Coal Generator", itemOf(1), itemOf(1), COBBLESTONE, ::CoalGenerator),

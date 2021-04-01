@@ -9,15 +9,13 @@ import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.addUUID
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
-import xyz.xenondevs.nova.util.fuel
-import xyz.xenondevs.nova.util.seed
-import xyz.xenondevs.nova.util.toItemStack
+import xyz.xenondevs.nova.util.*
 import java.util.*
 import kotlin.math.min
 
@@ -26,9 +24,8 @@ private const val ENERGY_PER_TICK = 5
 
 class CoalGenerator(
     material: NovaMaterial,
-    uuid: UUID,
     armorStand: ArmorStand
-) : TileEntity(material, uuid, armorStand) {
+) : TileEntity(material, armorStand) {
     
     private var energy: Int = retrieveData(0, "energy")
     private var burnTime: Int = retrieveData(0, "burnTime")
@@ -74,6 +71,14 @@ class CoalGenerator(
     }
     
     override fun handleRightClick(event: PlayerInteractEvent) {
+        runAsyncTaskLater(1) {
+            when (event.hand) {
+                EquipmentSlot.HAND -> event.player.swingMainHand()
+                EquipmentSlot.OFF_HAND -> event.player.swingOffHand()
+                else -> Unit
+            }
+        }
+        
         gui.openWindow(event.player)
     }
     
@@ -91,14 +96,10 @@ class CoalGenerator(
         return drops
     }
     
-    override fun createItem(): ItemStack {
-        return if (energy != 0) {
-            material.createItemBuilder()
-                .addLoreLines("§7Energy: $energy/$MAX_ENERGY")
-                .build()
-                .apply { addUUID(uuid) }
-        } else material.createItemStack()
-    }
+    override fun createItem(): ItemStack =
+        material.createItemBuilder()
+            .addLoreLines("§7Energy: $energy/$MAX_ENERGY")
+            .build()
     
     override fun saveData() {
         storeData("energy", energy)
