@@ -16,12 +16,11 @@ abstract class TileEntity(
 ) {
     
     protected val data: JsonObject = if (armorStand.hasTileEntityData()) armorStand.getTileEntityData() else JsonObject()
-    protected val uuid: UUID = retrieveData(UUID.randomUUID(), "uuid")
+    protected val uuid: UUID = armorStand.uniqueId
     
     init {
         if (data.size() == 0) {
             storeData("material", material)
-            storeData("uuid", uuid)
         }
     }
     
@@ -63,7 +62,7 @@ abstract class TileEntity(
     }
     
     override fun toString(): String {
-        return "${javaClass.name}(Material: $material, UUID: $uuid)"
+        return "${javaClass.name}(Material: $material, ArmorStand UUID: $uuid)"
     }
     
     companion object {
