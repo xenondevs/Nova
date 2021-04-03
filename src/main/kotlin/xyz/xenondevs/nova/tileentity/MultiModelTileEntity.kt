@@ -14,16 +14,11 @@ private val MULTI_MODEL_KEY = NamespacedKey(NOVA, "multiModel")
 abstract class MultiModelTileEntity(
     material: NovaMaterial,
     armorStand: ArmorStand,
-    additionalModels: List<Pair<ItemStack, Float>>,
     keepData: Boolean
 ) : TileEntity(material, armorStand, keepData) {
     
-    init {
-        setModels(additionalModels)
-    }
-    
-    override fun handleDisable() {
-        super.handleDisable()
+    override fun handleDisabled() {
+        super.handleDisabled()
         removeModels()
     }
     

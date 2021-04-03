@@ -6,7 +6,8 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.Cable
-import xyz.xenondevs.nova.tileentity.impl.CoalGenerator
+import xyz.xenondevs.nova.tileentity.impl.FurnaceGenerator
+import xyz.xenondevs.nova.tileentity.impl.PowerCell
 import xyz.xenondevs.nova.util.toIntArray
 
 private fun itemOf(data: IntArray) = ModelData(STRUCTURE_VOID, data)
@@ -21,7 +22,8 @@ enum class NovaMaterial(
     val tileEntityConstructor: ((NovaMaterial, ArmorStand) -> TileEntity)?
 ) {
     
-    COAL_GENERATOR("Coal Generator", itemOf(1), itemOf(1), COBBLESTONE, ::CoalGenerator),
+    FURNACE_GENERATOR("Furnace Generator", itemOf(1), itemOf(1), COBBLESTONE, ::FurnaceGenerator),
+    POWER_CELL("Power Cell", itemOf(2), itemOf(2), IRON_BLOCK, ::PowerCell),
     CABLE("Cable", itemOf(5000), itemOf(intArrayOf(0) + (5000..5003).toIntArray()), null, ::Cable),
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),
     ENERGY_PROGRESS("", itemOf((10_100..10_116).toIntArray())),

@@ -1,38 +1,83 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.common.base.Preconditions
 import org.bukkit.Axis
-import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Orientable
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.energy.*
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.MultiModelTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.getBlockLocation
+import xyz.xenondevs.nova.util.blockLocation
 import xyz.xenondevs.nova.util.runTaskLater
+import xyz.xenondevs.particle.ParticleBuilder
+import xyz.xenondevs.particle.ParticleEffect
 
 private const val CONNECTOR = 1
 private const val HORIZONTAL = 2
 private const val DOWN = 3
 private const val UP = 4
 
-private fun getModelsNeeded(cableLocation: Location, material: NovaMaterial): List<Pair<ItemStack, Float>> {
-    val items = ArrayList<Pair<ItemStack, Float>>()
+class Cable(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : MultiModelTileEntity(
+    material,
+    armorStand,
+    keepData = false
+), EnergyBridge {
     
-    val neighboringCables = getNeighboringCables(cableLocation, material)
+    override var network: EnergyNetwork? = null
+    override val transferRate = 100
+    override val bridgeFaces = CUBE_FACES.toSet() // TODO: allow players to enable / disable cable faces
     
-    // only show connector if connections aren't on two opposite sides
-    if (neighboringCables.size != 2 || neighboringCables[0].first != neighboringCables[1].first.oppositeFace) {
-        items += material.block!!.getItem(CONNECTOR) to 0f
+    override fun handleTick() {
+        if (network != null) {
+            ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location)
+                .setParticleData(network!!.color)
+                .display()
+        }
     }
     
-    // add all connections
-    getNeighboringCables(cableLocation, material)
-        .forEach { (blockFace, _) ->
+    override fun handleNetworkUpdate() {
+        if (NOVA.isEnabled) {
+            replaceModels(getModelsNeeded())
+            updateHitbox()
+        }
+    }
+    
+    override fun handleInitialized() {
+        EnergyNetworkManager.handleBridgeAdd(this)
+        replaceModels(getModelsNeeded())
+        updateHitbox()
+    }
+    
+    override fun handleRemoved(unload: Boolean) {
+        EnergyNetworkManager.handleBridgeRemove(this, unload)
+    }
+    
+    private fun getModelsNeeded(): List<Pair<ItemStack, Float>> {
+        Preconditions.checkState(network != null, "Network is not initialized")
+        
+        val items = ArrayList<Pair<ItemStack, Float>>()
+        
+        // get all nodes that are connected to the same network as this cable
+        val neighboringNodes = armorStand.location.blockLocation.getNearbyNodes().filter { (face, node) ->
+            node.getNetwork(face.oppositeFace) == network
+        }.keys.toList()
+        
+        // only show connector if connections aren't on two opposite sides
+        if (neighboringNodes.size != 2 || neighboringNodes[0] != neighboringNodes[1].oppositeFace) {
+            items += material.block!!.getItem(CONNECTOR) to 0f
+        }
+        
+        // add all connections
+        neighboringNodes.forEach { blockFace ->
             val dataIndex = when (blockFace) {
                 BlockFace.DOWN -> DOWN
                 BlockFace.UP -> UP
@@ -50,49 +95,14 @@ private fun getModelsNeeded(cableLocation: Location, material: NovaMaterial): Li
             val itemStack = material.block!!.getItem(dataIndex)
             items += itemStack to rotation
         }
-    
-    return items
-}
-
-private fun getNeighboringCables(cableLocation: Location, material: NovaMaterial): List<Pair<BlockFace, Cable>> {
-    return CUBE_FACES
-        .mapNotNull {
-            val location = cableLocation.clone().add(it.modX.toDouble(), it.modY.toDouble(), it.modZ.toDouble())
-            val tileEntity = TileEntityManager.getTileEntityAt(location)
-            if (tileEntity is Cable && tileEntity.material == material) it to tileEntity else null
-        }
-}
-
-class Cable(
-    material: NovaMaterial,
-    armorStand: ArmorStand
-) : MultiModelTileEntity(
-    material,
-    armorStand,
-    getModelsNeeded(armorStand.location.getBlockLocation(), material),
-    keepData = false
-) {
-    
-    init {
-        // update models of neighboring cables so they connect to this cable
-        updateNeighboringCables()
         
-        // TODO: notify something like an EnergyNetworkManager of this cable
-    }
-    
-    private fun updateNeighboringCables() {
-        runTaskLater(1) { // needs to be a tick later or this cable won't visible for the other ones
-            getNeighboringCables(armorStand.location.getBlockLocation(), material).forEach { (_, cable) ->
-                val models = getModelsNeeded(cable.armorStand.location.getBlockLocation(), cable.material)
-                cable.replaceModels(models)
-            }
-        }
+        return items
     }
     
     private fun updateHitbox() {
         val block = armorStand.location.block
         
-        val neighborFaces = getNeighboringCables(block.location, material)
+        val neighborFaces = block.location.getNearbyNodes()
             .map { (blockFace, _) -> blockFace }
         val axis = when {
             neighborFaces.contains(BlockFace.NORTH) && neighborFaces.contains(BlockFace.SOUTH) -> Axis.Z
@@ -109,26 +119,8 @@ class Cable(
         }
     }
     
-    override fun setModels(models: List<Pair<ItemStack, Float>>) {
-        super.setModels(models)
-        
-        // set hitbox
-        updateHitbox()
-    }
-    
-    override fun destroy(dropItems: Boolean): java.util.ArrayList<ItemStack> {
-        updateNeighboringCables()
-        
-        // TODO: notify something like an EnergyNetworkManager of the destruction of this cable
-        
-        return super.destroy(dropItems)
-    }
-    
     override fun saveData() = Unit
     
-    override fun handleTick() = Unit
-    
     override fun handleRightClick(event: PlayerInteractEvent) = Unit // TODO: Configuration Menu
-    
     
 }

@@ -26,6 +26,7 @@ object EntityUtils {
         // set other properties
         armorStand.isMarker = true
         armorStand.isVisible = false
+        armorStand.fireTicks = Int.MAX_VALUE
         
         // set data
         if (modify != null) armorStand.modify()

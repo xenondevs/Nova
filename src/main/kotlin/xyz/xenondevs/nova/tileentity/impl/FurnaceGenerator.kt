@@ -6,29 +6,36 @@ import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.energy.EnergyNetwork
+import xyz.xenondevs.nova.energy.EnergyNetworkManager
+import xyz.xenondevs.nova.energy.EnergyProvider
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
-import xyz.xenondevs.nova.util.fuel
-import xyz.xenondevs.nova.util.runAsyncTaskLater
-import xyz.xenondevs.nova.util.seed
-import xyz.xenondevs.nova.util.toItemStack
+import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.particle.ParticleBuilder
+import xyz.xenondevs.particle.ParticleEffect
+import xyz.xenondevs.particle.data.color.RegularColor
+import java.awt.Color
 import java.util.*
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 private const val MAX_ENERGY = 10_000
-private const val ENERGY_PER_TICK = 5
+private const val ENERGY_PER_TICK = 20
+private const val BURN_TIME_MULTIPLIER = 0.1
 
-class CoalGenerator(
+class FurnaceGenerator(
     material: NovaMaterial,
     armorStand: ArmorStand
-) : TileEntity(material, armorStand, keepData = true) {
+) : TileEntity(material, armorStand, keepData = true), EnergyProvider {
     
     private var energy: Int = retrieveData(0, "energy")
     private var burnTime: Int = retrieveData(0, "burnTime")
@@ -38,6 +45,15 @@ class CoalGenerator(
         .also { it.setItemUpdateHandler(this::handleInventoryUpdate) }
     private val gui by lazy { CoalGeneratorGUI() }
     
+    override val provideNetworks = CUBE_FACES.map { it to null }.toMap(EnumMap<BlockFace, EnergyNetwork>(BlockFace::class.java))
+    override val providedEnergyAmount: Int
+        get() = energy
+    
+    override fun takeEnergy(energyAmount: Int) {
+        energy -= energyAmount
+        gui.energyBar.percentage = energy.toDouble() / MAX_ENERGY.toDouble()
+    }
+    
     override fun handleTick() {
         if (burnTime != 0) {
             burnTime--
@@ -46,6 +62,20 @@ class CoalGenerator(
             gui.progressItem.percentage = burnTime.toDouble() / totalBurnTime.toDouble()
             gui.energyBar.percentage = energy.toDouble() / MAX_ENERGY.toDouble()
         } else burnItem()
+        
+        provideNetworks.forEach { (face, network) ->
+            ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
+                .setParticleData(network?.color ?: RegularColor(Color(Color.HSBtoRGB(0f, 0f, 0f))))
+                .display()
+        }
+    }
+    
+    override fun handleInitialized() {
+        EnergyNetworkManager.handleProviderAdd(this)
+    }
+    
+    override fun handleRemoved(unload: Boolean) {
+        EnergyNetworkManager.handleProviderRemove(this, unload)
     }
     
     private fun burnItem() {
@@ -53,7 +83,7 @@ class CoalGenerator(
         if (energy < MAX_ENERGY && fuelStack != null) {
             val fuel = fuelStack.type.fuel
             if (fuel != null) {
-                burnTime += fuel.burnTime
+                burnTime += (fuel.burnTime * BURN_TIME_MULTIPLIER).roundToInt()
                 totalBurnTime = burnTime
                 if (fuel.remains == null) {
                     inventory.removeOne(null, 0)
@@ -134,9 +164,8 @@ class CoalGenerator(
             .apply { percentage = energy.toDouble() / MAX_ENERGY.toDouble() }
         
         fun openWindow(player: Player) {
-            SimpleWindow(player, "Coal Generator", gui).show()
+            SimpleWindow(player, "Furnace Generator", gui).show()
         }
-        
     }
     
 }

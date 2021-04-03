@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
-import java.lang.IllegalStateException
 import kotlin.math.roundToInt
 
 private val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
@@ -103,12 +102,15 @@ object TileEntityManager : Listener {
         val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>().also { tileEntityMap[chunk] = it }
         chunkMap[location] = tileEntity
         
-        // set hitbox block there (1 tick later or it collides with the cancelled event which removes the block)
-        if (material.hitbox != null) runTaskLater(1) { block.type = material.hitbox }
+        // 1 tick later or it collides with the cancelled event which removes the block
+        runTaskLater(1) {
+            if (material.hitbox != null) block.type = material.hitbox
+            tileEntity.handleInitialized()
+        }
     }
     
     fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean) {
-        val location = tileEntity.armorStand.location.getBlockLocation()
+        val location = tileEntity.armorStand.location.blockLocation
         val chunk = location.chunk
         
         location.block.type = Material.AIR
@@ -118,6 +120,8 @@ object TileEntityManager : Listener {
         // remove TileEntity and ArmorStand
         tileEntityMap[chunk]?.remove(location)
         tileEntity.armorStand.remove()
+        
+        tileEntity.handleRemoved(unload = false)
         
         // drop items a tick later to prevent interference with the cancellation of the break event
         runTaskLater(1) { location.clone().dropItems(drops) }
@@ -137,11 +141,13 @@ object TileEntityManager : Listener {
             }
         
         tileEntityMap[chunk] = chunkMap
+        chunkMap.values.forEach(TileEntity::handleInitialized)
     }
     
     private fun handleChunkUnload(chunk: Chunk) {
-        tileEntityMap[chunk]?.forEach { (_, tileEntity) -> tileEntity.handleDisable() }
+        val tileEntities = tileEntityMap[chunk]
         tileEntityMap.remove(chunk)
+        tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleDisabled(); tileEntity.handleRemoved(unload = true) }
     }
     
     @EventHandler
@@ -166,7 +172,7 @@ object TileEntityManager : Listener {
                 if (getTileEntityAt(location) == null) {
                     val data = if (placedItem.hasTileEntityData()) placedItem.getTileEntityData()!! else JsonObject()
                     placeTileEntity(event.block.location, player.location.yaw, material, data)
-    
+                    
                     if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
                 }
             }
