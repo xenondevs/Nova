@@ -8,6 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.energy.EnergyNetworkManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.recipe.NovaRecipes
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.blockLocation
@@ -24,6 +25,7 @@ class Nova : JavaPlugin() {
         
         TileEntityManager // init TileEntityManager
         EnergyNetworkManager // init EnergyNetworkManager
+        NovaRecipes // init Recipes
         
         getCommand("test")!!.setExecutor(this)
         getCommand("getNovaMaterial")!!.setExecutor(this)
