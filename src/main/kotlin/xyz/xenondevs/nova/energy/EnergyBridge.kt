@@ -7,10 +7,10 @@ import kotlin.collections.HashSet
 import kotlin.collections.Map.Entry
 
 /**
- * Gets the nodes directly connected to this [EnergyBridge] on each side
+ * Finds the nodes directly connected to this [EnergyBridge] on each side
  * of the block.
  */
-fun EnergyBridge.getConnectedNodes(): Map<BlockFace, EnergyNode> =
+fun EnergyBridge.findConnectedNodes(): Map<BlockFace, EnergyNode> =
     getNearbyNodes().filterTo(EnumMap(BlockFace::class.java)) { (face, node) -> node.getNetwork(face.oppositeFace) == network }
 
 /**
@@ -19,15 +19,13 @@ fun EnergyBridge.getConnectedNodes(): Map<BlockFace, EnergyNode> =
  * [EnergyBridge]s are used to connect the same [EnergyNode]s.
  */
 fun EnergyBridge.getNetworkedNodes(): Map<BlockFace, Set<Entry<BlockFace, EnergyNode>>> {
-    // TODO: optimize, this crashes the server if there are many cables that all connect to each other
-    
-    // using Map.Entry instead of Pair for performance so no new Pairs need to be created
     val networkedNodes = EnumMap<BlockFace, Set<Entry<BlockFace, EnergyNode>>>(BlockFace::class.java)
     
-    getConnectedNodes().forEach { (face, startNode) ->
-        val exploredNodes = HashSet<Entry<BlockFace, EnergyNode>>()
+    for ((face, startNode) in connectedNodes) {
+        val exploredNodes = HashSet<EnergyNode>()
+        val connectedNodeFaces = HashSet<Entry<BlockFace, EnergyNode>>()
         
-        var unexploredNodes = ArrayList<Entry<BlockFace, EnergyNode>>(1) // not using CopyOnWriteArrayList for performance
+        var unexploredNodes = ArrayList<Entry<BlockFace, EnergyNode>>(1)
         unexploredNodes.add(AbstractMap.SimpleEntry(face, startNode))
         
         while (unexploredNodes.size != 0) { // loop until all nodes are explored
@@ -37,20 +35,25 @@ fun EnergyBridge.getNetworkedNodes(): Map<BlockFace, Set<Entry<BlockFace, Energy
                 val nodeToExplore = unexploredEntry.value
                 
                 if (nodeToExplore is EnergyBridge) {
-                    nodeToExplore.getConnectedNodes().forEach { connectedEntry ->
-                        if (!exploredNodes.contains(connectedEntry)) newUnexploredNodes += connectedEntry
+                    for (connectedEntry in nodeToExplore.connectedNodes) {
+                        val node = connectedEntry.value
+                        if (node == this) continue
+                        
+                        if (exploredNodes.contains(node)) {
+                            connectedNodeFaces += connectedEntry
+                        } else {
+                            newUnexploredNodes += connectedEntry
+                            exploredNodes += node
+                        }
                     }
                 }
-                
                 // node is now explored
-                exploredNodes += unexploredEntry
+                connectedNodeFaces += unexploredEntry
             }
-            
             unexploredNodes = newUnexploredNodes
         }
-        
         // all nodes that are connected to this bridge in this direction
-        networkedNodes[face] = exploredNodes
+        networkedNodes[face] = connectedNodeFaces
     }
     
     return networkedNodes
@@ -78,6 +81,12 @@ interface EnergyBridge : EnergyNode {
      * an [EnergyNetwork].
      */
     val bridgeFaces: Set<BlockFace>
+    
+    /**
+     * Caches the directly connected nodes.
+     * Should be updated when handleNetworkUpdate is called.
+     */
+    val connectedNodes: Map<BlockFace, EnergyNode>
     
     /**
      * Called when another [EnergyNode] has ben placed

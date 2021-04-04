@@ -71,7 +71,7 @@ object TileEntityManager : Listener {
         runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
     }
     
-    fun placeTileEntity(location: Location, rotation: Float, material: NovaMaterial, data: JsonObject) {
+    fun placeTileEntity(location: Location, rotation: Float, material: NovaMaterial, data: JsonObject = JsonObject()) {
         val block = location.block
         
         // spawn ArmorStand there

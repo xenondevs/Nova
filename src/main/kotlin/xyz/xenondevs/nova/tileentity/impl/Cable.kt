@@ -36,6 +36,13 @@ class Cable(
     override val transferRate = 100
     override val bridgeFaces = CUBE_FACES.toSet() // TODO: allow players to enable / disable cable faces
     
+    private var _connectedNodes: Map<BlockFace, EnergyNode>? = null
+    override val connectedNodes: Map<BlockFace, EnergyNode>
+        get() {
+            if (_connectedNodes == null) _connectedNodes = findConnectedNodes()
+            return _connectedNodes!!
+        }
+    
     override fun handleTick() {
         if (network != null) {
             ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location)
@@ -45,6 +52,7 @@ class Cable(
     }
     
     override fun handleNetworkUpdate() {
+        _connectedNodes = findConnectedNodes()
         if (NOVA.isEnabled) {
             replaceModels(getModelsNeeded())
             updateHitbox()

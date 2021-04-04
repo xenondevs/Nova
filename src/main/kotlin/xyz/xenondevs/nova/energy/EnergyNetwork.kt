@@ -11,11 +11,13 @@ import kotlin.math.min
  *
  * Cables connect EnergyProviders to EnergyConsumers.
  */
-class EnergyNetwork() {
+class EnergyNetwork {
     
     val color: RegularColor = RegularColor.random() // TODO: remove
     
-    private val nodes = HashSet<EnergyNode>()
+    private val _nodes = HashSet<EnergyNode>()
+    val nodes: Set<EnergyNode>
+        get() = _nodes
     
     private val providers = HashSet<EnergyStorage>()
     private val consumers = HashSet<EnergyStorage>()
@@ -27,14 +29,14 @@ class EnergyNetwork() {
         get() = bridges.map { it.transferRate }.minOrNull() ?: 0
     
     fun addAll(network: EnergyNetwork) {
-        nodes += network.nodes
+        _nodes += network._nodes
         providers += network.providers
         consumers += network.consumers
         bridges += network.bridges
     }
     
     fun addBridge(bridge: EnergyBridge) {
-        nodes += bridge
+        _nodes += bridge
         bridges += bridge
     }
     
@@ -48,23 +50,21 @@ class EnergyNetwork() {
             }
             else -> throw IllegalArgumentException("Illegal ConnectionType: $connectionType")
         }
-        nodes += storage
+        _nodes += storage
     }
     
     operator fun minusAssign(node: EnergyNode) =
         removeNode(node)
     
     fun removeNode(node: EnergyNode) {
-        nodes -= node
+        _nodes -= node
         if (node is EnergyStorage) {
             providers -= node
             consumers -= node
         }
     }
     
-    fun getNodes() = ArrayList(nodes)
-    
-    fun isEmpty() = nodes.isEmpty()
+    fun isEmpty() = _nodes.isEmpty()
     
     /**
      * Called every tick to transfer energy.

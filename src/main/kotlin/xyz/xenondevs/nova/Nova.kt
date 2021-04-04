@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova
 
+import com.google.gson.JsonObject
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.ArmorStand
@@ -9,6 +10,7 @@ import xyz.xenondevs.nova.energy.EnergyNetworkManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
+import xyz.xenondevs.nova.util.blockLocation
 
 lateinit var NOVA: Nova
 
@@ -25,6 +27,7 @@ class Nova : JavaPlugin() {
         
         getCommand("test")!!.setExecutor(this)
         getCommand("getNovaMaterial")!!.setExecutor(this)
+        getCommand("stressTest")!!.setExecutor(this)
     }
     
     override fun onDisable() {
@@ -33,13 +36,29 @@ class Nova : JavaPlugin() {
     
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         sender as Player
-        if (label == "test") {
-            val count = sender.location.chunk.entities.filterIsInstance<ArmorStand>().count()
-            sender.sendMessage("Amount of ArmorStands in Chunk: $count")
-        } else if (label == "getnovamaterial") {
-            val materialName = args[0]
-            val material = NovaMaterial.valueOf(materialName)
-            sender.inventory.addItem(material.createItemStack())
+        when {
+            
+            label.equals("test", true) -> {
+                val count = sender.location.chunk.entities.filterIsInstance<ArmorStand>().count()
+                sender.sendMessage("Amount of ArmorStands in Chunk: $count")
+            }
+            
+            label.equals("getnovamaterial", true) -> {
+                val materialName = args[0]
+                val material = NovaMaterial.valueOf(materialName)
+                sender.inventory.addItem(material.createItemStack())
+            }
+            
+            label.equals("stresstest", true) -> {
+                for (x in 0..7) {
+                    for (y in 0..7) {
+                        for (z in 0..7) {
+                            val location = sender.location.clone().add(x.toDouble(), y.toDouble(), z.toDouble()).blockLocation
+                            TileEntityManager.placeTileEntity(location, 0f, NovaMaterial.CABLE, JsonObject())
+                        }
+                    }
+                }
+            }
         }
         
         return false
