@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.energy
 
+import xyz.xenondevs.nova.energy.EnergyConnectionType.*
 import xyz.xenondevs.particle.data.color.RegularColor
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
@@ -14,50 +15,50 @@ class EnergyNetwork() {
     
     val color: RegularColor = RegularColor.random() // TODO: remove
     
-    private val nodes = HashSet<NetworkNode>()
+    private val nodes = HashSet<EnergyNode>()
     
-    private val providers = HashSet<EnergyProvider>()
-    private val consumers = HashSet<EnergyConsumer>()
+    private val providers = HashSet<EnergyStorage>()
+    private val consumers = HashSet<EnergyStorage>()
     private val bridges = HashSet<EnergyBridge>()
     
     private val availableEnergy: Int
-        get() = providers.map { it.providedEnergyAmount }.sum()
+        get() = providers.map { it.providedEnergy }.sum()
     private val transferRate: Int
         get() = bridges.map { it.transferRate }.minOrNull() ?: 0
     
-    constructor(nodes: List<NetworkNode>) : this() {
-        addNodes(nodes)
+    fun addAll(network: EnergyNetwork) {
+        nodes += network.nodes
+        providers += network.providers
+        consumers += network.consumers
+        bridges += network.bridges
     }
     
-    operator fun plusAssign(nodes: List<NetworkNode>) =
-        addNodes(nodes)
+    fun addBridge(bridge: EnergyBridge) {
+        nodes += bridge
+        bridges += bridge
+    }
     
-    fun addNodes(nodes: List<NetworkNode>) =
-        nodes.forEach(::addNode)
-    
-    operator fun plusAssign(node: NetworkNode) =
-        addNode(node)
-    
-    fun addNode(node: NetworkNode) {
-        nodes += node
-        
-        when (node) {
-            is EnergyProvider -> providers += node
-            is EnergyConsumer -> consumers += node
-            is EnergyBridge -> bridges += node
+    fun addStorage(storage: EnergyStorage, connectionType: EnergyConnectionType) {
+        when (connectionType) {
+            PROVIDE -> providers += storage
+            CONSUME -> consumers += storage
+            BUFFER -> {
+                providers += storage
+                consumers += storage
+            }
+            else -> throw IllegalArgumentException("Illegal ConnectionType: $connectionType")
         }
+        nodes += storage
     }
     
-    operator fun minusAssign(node: NetworkNode) =
+    operator fun minusAssign(node: EnergyNode) =
         removeNode(node)
     
-    fun removeNode(node: NetworkNode) {
+    fun removeNode(node: EnergyNode) {
         nodes -= node
-        
-        when (node) {
-            is EnergyProvider -> providers -= node
-            is EnergyConsumer -> consumers -= node
-            is EnergyBridge -> bridges -= node
+        if (node is EnergyStorage) {
+            providers -= node
+            consumers -= node
         }
     }
     
@@ -74,10 +75,10 @@ class EnergyNetwork() {
         // equally distribute available energy
         var availableEnergy = providedEnergy
         
-        val consumers = ConcurrentHashMap<EnergyConsumer, Int>()
+        val consumers = ConcurrentHashMap<EnergyStorage, Int>()
         consumers += this.consumers
-            .filterNot { it.requestedEnergyAmount == 0 }
-            .map { it to it.requestedEnergyAmount }
+            .filterNot { it.requestedEnergy == 0 }
+            .map { it to it.requestedEnergy }
             .toMap()
         
         while (availableEnergy != 0 && consumers.isNotEmpty()) {
@@ -85,7 +86,7 @@ class EnergyNetwork() {
             if (distribution == 0) break
             for ((consumer, requestedAmount) in consumers) {
                 val energyToGive = min(distribution, requestedAmount)
-                consumer.consumeEnergy(energyToGive)
+                consumer.addEnergy(energyToGive)
                 if (energyToGive == requestedAmount) consumers -= consumer // consumer is satisfied
                 else consumers[consumer] = requestedAmount - energyToGive // consumer is not satisfied
                 availableEnergy -= energyToGive
@@ -97,8 +98,8 @@ class EnergyNetwork() {
         
         while (energyTaken != 0) {
             for (provider in providers) {
-                val energyToTake = min(energyTaken, provider.providedEnergyAmount)
-                provider.takeEnergy(energyToTake)
+                val energyToTake = min(energyTaken, provider.providedEnergy)
+                provider.removeEnergy(energyToTake)
                 energyTaken -= energyToTake
                 
                 if (energyTaken == 0) break

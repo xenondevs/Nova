@@ -12,9 +12,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.energy.EnergyNetwork
-import xyz.xenondevs.nova.energy.EnergyNetworkManager
-import xyz.xenondevs.nova.energy.EnergyProvider
+import xyz.xenondevs.nova.energy.*
+import xyz.xenondevs.nova.energy.EnergyConnectionType.PROVIDE
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -24,6 +23,8 @@ import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.color.RegularColor
 import java.awt.Color
+import java.lang.IllegalStateException
+import java.lang.UnsupportedOperationException
 import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -35,7 +36,7 @@ private const val BURN_TIME_MULTIPLIER = 0.1
 class FurnaceGenerator(
     material: NovaMaterial,
     armorStand: ArmorStand
-) : TileEntity(material, armorStand, keepData = true), EnergyProvider {
+) : TileEntity(material, armorStand, keepData = true), EnergyStorage {
     
     private var energy: Int = retrieveData(0, "energy")
     private var burnTime: Int = retrieveData(0, "burnTime")
@@ -45,12 +46,18 @@ class FurnaceGenerator(
         .also { it.setItemUpdateHandler(this::handleInventoryUpdate) }
     private val gui by lazy { CoalGeneratorGUI() }
     
-    override val provideNetworks = CUBE_FACES.map { it to null }.toMap(EnumMap<BlockFace, EnergyNetwork>(BlockFace::class.java))
-    override val providedEnergyAmount: Int
+    override val networks = EnumMap<BlockFace, EnergyNetwork>(BlockFace::class.java)
+    override val configuration = CUBE_FACES.map { it to PROVIDE }.toMap(EnumMap(BlockFace::class.java))
+    override val requestedEnergy = 0
+    override val providedEnergy: Int
         get() = energy
     
-    override fun takeEnergy(energyAmount: Int) {
-        energy -= energyAmount
+    override fun addEnergy(energy: Int) {
+        throw UnsupportedOperationException()
+    }
+    
+    override fun removeEnergy(energy: Int) {
+        this.energy -= energy
         gui.energyBar.percentage = energy.toDouble() / MAX_ENERGY.toDouble()
     }
     
@@ -63,7 +70,8 @@ class FurnaceGenerator(
             gui.energyBar.percentage = energy.toDouble() / MAX_ENERGY.toDouble()
         } else burnItem()
         
-        provideNetworks.forEach { (face, network) ->
+        configuration.forEach { (face, _) ->
+            val network = networks[face]
             ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
                 .setParticleData(network?.color ?: RegularColor(Color(Color.HSBtoRGB(0f, 0f, 0f))))
                 .display()
@@ -71,11 +79,11 @@ class FurnaceGenerator(
     }
     
     override fun handleInitialized() {
-        EnergyNetworkManager.handleProviderAdd(this)
+        EnergyNetworkManager.handleStorageAdd(this)
     }
     
     override fun handleRemoved(unload: Boolean) {
-        EnergyNetworkManager.handleProviderRemove(this, unload)
+        EnergyNetworkManager.handleStorageRemove(this, unload)
     }
     
     private fun burnItem() {

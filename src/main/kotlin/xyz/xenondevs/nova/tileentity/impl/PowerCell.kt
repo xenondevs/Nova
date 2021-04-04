@@ -6,9 +6,10 @@ import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.player.PlayerInteractEvent
-import xyz.xenondevs.nova.energy.EnergyConsumer
+import xyz.xenondevs.nova.energy.EnergyConnectionType
 import xyz.xenondevs.nova.energy.EnergyNetwork
 import xyz.xenondevs.nova.energy.EnergyNetworkManager
+import xyz.xenondevs.nova.energy.EnergyStorage
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -26,7 +27,7 @@ private const val MAX_ENERGY = 100_000
 class PowerCell(
     material: NovaMaterial,
     armorStand: ArmorStand,
-) : TileEntity(material, armorStand, true), EnergyConsumer {
+) : TileEntity(material, armorStand, true), EnergyStorage {
     
     private var storedEnergy = retrieveData(0, "storedEnergy")
     
@@ -41,21 +42,26 @@ class PowerCell(
     
     private val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, ::getEnergyValues)
     
-    override val consumeNetworks = CUBE_FACES.map { it to null }.toMap(EnumMap<BlockFace, EnergyNetwork>(BlockFace::class.java))
-    override val requestedEnergyAmount: Int
-        get() = MAX_ENERGY - storedEnergy
+    override val networks = EnumMap<BlockFace, EnergyNetwork>(BlockFace::class.java)
+    override val configuration = CUBE_FACES.map { it to EnergyConnectionType.CONSUME }.toMap(EnumMap(BlockFace::class.java))
+    override val providedEnergy = 0
+    override val requestedEnergy = MAX_ENERGY - storedEnergy
     
-    override fun consumeEnergy(energyAmount: Int) {
-        storedEnergy += energyAmount
+    override fun addEnergy(energy: Int) {
+        storedEnergy += energy
         energyBar.percentage = storedEnergy.toDouble() / MAX_ENERGY.toDouble()
     }
     
+    override fun removeEnergy(energy: Int) {
+        throw UnsupportedOperationException()
+    }
+    
     override fun handleInitialized() {
-        EnergyNetworkManager.handleConsumerAdd(this)
+        EnergyNetworkManager.handleStorageAdd(this)
     }
     
     override fun handleRemoved(unload: Boolean) {
-        EnergyNetworkManager.handleConsumerRemove(this, unload)
+        EnergyNetworkManager.handleStorageRemove(this, unload)
     }
     
     override fun saveData() {
@@ -69,7 +75,8 @@ class PowerCell(
     
     private fun getEnergyValues() = storedEnergy to MAX_ENERGY
     override fun handleTick() {
-        consumeNetworks.forEach { (face, network) ->
+        configuration.forEach { (face, _) ->
+            val network = networks[face]
             ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
                 .setParticleData(network?.color ?: RegularColor(Color(Color.HSBtoRGB(0f, 0f, 0f))))
                 .display()

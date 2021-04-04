@@ -17,25 +17,13 @@ object EnergyNetworkManager {
         }
     }
     
-    fun handleProviderAdd(provider: EnergyProvider) {
-        val allowedFaces = provider.provideNetworks.keys
-        provider.getNearbyBridges().forEach { (face, bridge) ->
+    fun handleStorageAdd(storage: EnergyStorage) {
+        val allowedFaces = storage.configuration.filter { (_, type) -> type != EnergyConnectionType.NONE }
+        storage.getNearbyBridges().forEach { (face, bridge) ->
             if (allowedFaces.contains(face)) {
                 val network = bridge.network!!
-                provider.provideNetworks[face] = bridge.network
-                network += provider
-                bridge.handleNetworkUpdate()
-            }
-        }
-    }
-    
-    fun handleConsumerAdd(consumer: EnergyConsumer) {
-        val allowedFaces = consumer.consumeNetworks.keys
-        consumer.getNearbyBridges().forEach { (face, bridge) ->
-            if (allowedFaces.contains(face)) {
-                val network = bridge.network!!
-                consumer.consumeNetworks[face] = bridge.network
-                network += consumer
+                storage.networks[face] = bridge.network!!
+                network.addStorage(storage, storage.configuration[face]!!)
                 bridge.handleNetworkUpdate()
             }
         }
@@ -51,39 +39,36 @@ object EnergyNetworkManager {
         
         // create new network and add new bridge to it
         val newNetwork = EnergyNetwork()
-        newNetwork += bridge
+        newNetwork.addBridge(bridge)
         bridge.network = newNetwork
         
         // move nodes from previous network to new network
         previousNetworks.forEach { network ->
-            network.getNodes().forEach { node ->
-                node.move(network, newNetwork)
-                newNetwork += node
-            }
+            network.getNodes().forEach { node -> node.move(network, newNetwork) }
+            newNetwork.addAll(network)
         }
         
         // remove old networks, add new network
         networks -= previousNetworks
         networks += newNetwork
         
-        // Connect EndPoints
-        bridge.getNearbyEndPoints().forEach { (face, endPoint) ->
-            endPoint.setNetworkIfAllowed(face.oppositeFace, newNetwork)
-            newNetwork += endPoint
+        // Connect Storages
+        bridge.getNearbyStorages().forEach { (face, storage) ->
+            val oppositeFace = face.oppositeFace
+            val connectionType = storage.configuration[oppositeFace]!!
+            if (connectionType != EnergyConnectionType.NONE) {
+                storage.networks[oppositeFace] = newNetwork
+                newNetwork.addStorage(storage, connectionType)
+            }
         }
         
         // update nearby bridges
         bridge.updateNearbyBridges()
     }
     
-    fun handleProviderRemove(provider: EnergyProvider, unload: Boolean) {
-        provider.provideNetworks.forEach { (_, network) -> if (network != null) network -= provider }
-        if (!unload) provider.updateNearbyBridges()
-    }
-    
-    fun handleConsumerRemove(consumer: EnergyConsumer, unload: Boolean) {
-        consumer.consumeNetworks.forEach { (_, network) -> if (network != null) network -= consumer }
-        if (!unload) consumer.updateNearbyBridges()
+    fun handleStorageRemove(storage: EnergyStorage, unload: Boolean) {
+        storage.networks.forEach { (_, network) -> network -= storage }
+        if (!unload) storage.updateNearbyBridges()
     }
     
     // TODO: optimize
@@ -92,16 +77,18 @@ object EnergyNetworkManager {
         
         // disconnect nearby consumers and providers
         bridge.getConnectedNodes()
-            .filter { (_, node) -> node is NetworkEndPoint }
+            .filter { (_, node) -> node is EnergyStorage }
             .forEach { (face, node) ->
-                node as NetworkEndPoint
+                node as EnergyStorage
                 
                 // there is no longer a network connection at this block face
-                node.removeNetwork(face.oppositeFace)
+                node.networks.remove(face.oppositeFace)
                 
                 // if there is no other connection to this network, remove the node from the network
-                if (!node.getNetworks().contains(previousNetwork)) previousNetwork -= node
+                if (node.networks.isEmpty()) previousNetwork -= node
             }
+        
+        // TODO: if connected bridges size == 1, no reason for split calculation
         
         // remove previous network from networks
         networks -= previousNetwork
@@ -113,8 +100,18 @@ object EnergyNetworkManager {
             val nodes = nodesSet.map { it.value }
             // check that the same network doesn't already exist
             if (networks.none { network -> network.getNodes().contentEquals(nodes) }) {
-                val network = EnergyNetwork(nodesSet.map { it.value })
-                nodesSet.forEach { (face, node) -> node.setNetworkIfAllowed(face.oppositeFace, network) }
+                val network = EnergyNetwork()
+                
+                nodesSet.forEach { (face, node) ->
+                    if (node is EnergyBridge) {
+                        network.addBridge(node)
+                        node.network = network
+                    } else if (node is EnergyStorage) {
+                        val oppositeFace = face.oppositeFace
+                        network.addStorage(node, node.configuration[oppositeFace]!!)
+                        node.networks[oppositeFace] = network
+                    }
+                }
                 
                 networks += network
             }
