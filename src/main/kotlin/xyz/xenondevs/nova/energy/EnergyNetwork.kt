@@ -21,10 +21,15 @@ class EnergyNetwork {
     
     private val providers = HashSet<EnergyStorage>()
     private val consumers = HashSet<EnergyStorage>()
+    private val buffers = HashSet<EnergyStorage>()
     private val bridges = HashSet<EnergyBridge>()
     
-    private val availableEnergy: Int
+    private val availableProviderEnergy: Int
         get() = providers.map { it.providedEnergy }.sum()
+    private val availableBufferEnergy: Int
+        get() = buffers.map { it.providedEnergy }.sum()
+    private val requestedConsumerEnergy: Int
+        get() = consumers.map { it.requestedEnergy }.sum()
     private val transferRate: Int
         get() = bridges.map { it.transferRate }.minOrNull() ?: 0
     
@@ -44,10 +49,7 @@ class EnergyNetwork {
         when (connectionType) {
             PROVIDE -> providers += storage
             CONSUME -> consumers += storage
-            BUFFER -> {
-                providers += storage
-                consumers += storage
-            }
+            BUFFER -> buffers += storage
             else -> throw IllegalArgumentException("Illegal ConnectionType: $connectionType")
         }
         _nodes += storage
@@ -61,6 +63,7 @@ class EnergyNetwork {
         if (node is EnergyStorage) {
             providers -= node
             consumers -= node
+            buffers -= node
         }
     }
     
@@ -69,42 +72,105 @@ class EnergyNetwork {
     /**
      * Called every tick to transfer energy.
      */
-    fun handleTick() { // TODO: prioritize provider / consumer before buffer
-        val providedEnergy = min(transferRate, availableEnergy)
+    fun handleTick() {
+        val providerEnergy = min(transferRate, availableProviderEnergy)
+        val bufferEnergy = min(transferRate - providerEnergy, availableBufferEnergy)
+        val requestedEnergy = min(transferRate, requestedConsumerEnergy)
         
-        // equally distribute available energy
-        var availableEnergy = providedEnergy
+        val useBuffers = requestedEnergy > providerEnergy
         
-        val consumers = ConcurrentHashMap<EnergyStorage, Int>()
-        consumers += this.consumers
+        val availableEnergy = providerEnergy + if (useBuffers) bufferEnergy else 0
+        
+        var energy = availableEnergy
+        energy = distributeEqually(energy, consumers)
+        if (!useBuffers && energy > 0) energy = distributeEqually(energy, buffers) // didn't take energy from buffers, can fill them up
+        
+        var energyDeficit = availableEnergy - energy
+        energyDeficit = takeEqually(energyDeficit, providers)
+        if (energyDeficit != 0 && useBuffers) energyDeficit = takeEqually(energyDeficit, buffers)
+        
+        if (energyDeficit != 0) throw ArithmeticException("Not enough energy: $energyDeficit") // should never happen
+    }
+    
+    private fun distributeEqually(energy: Int, consumers: Iterable<EnergyStorage>): Int {
+        var availableEnergy = energy
+        
+        val consumerMap = ConcurrentHashMap<EnergyStorage, Int>()
+        consumerMap += consumers
             .filterNot { it.requestedEnergy == 0 }
             .map { it to it.requestedEnergy }
-            .toMap()
         
-        while (availableEnergy != 0 && consumers.isNotEmpty()) {
-            val distribution = availableEnergy / consumers.size
+        while (availableEnergy != 0 && consumerMap.isNotEmpty()) {
+            val distribution = availableEnergy / consumerMap.size
             if (distribution == 0) break
-            for ((consumer, requestedAmount) in consumers) {
-                val energyToGive = min(distribution, requestedAmount)
-                consumer.addEnergy(energyToGive)
-                if (energyToGive == requestedAmount) consumers -= consumer // consumer is satisfied
-                else consumers[consumer] = requestedAmount - energyToGive // consumer is not satisfied
-                availableEnergy -= energyToGive
+            if (distribution != 0) {
+                for ((consumer, requestedAmount) in consumerMap) {
+                    val energyToGive = min(distribution, requestedAmount)
+                    consumer.addEnergy(energyToGive)
+                    if (energyToGive == requestedAmount) consumerMap -= consumer // consumer is satisfied
+                    else consumerMap[consumer] = requestedAmount - energyToGive // consumer is not satisfied
+                    availableEnergy -= energyToGive
+                }
+            } else {
+                // can't split up equally
+                return giveFirst(availableEnergy, consumers)
             }
         }
         
-        // take the energy that was actually consumed from the providers
-        var energyTaken = providedEnergy - availableEnergy
+        return availableEnergy
+    }
+    
+    private fun giveFirst(energy: Int, consumers: Iterable<EnergyStorage>): Int {
+        var availableEnergy = energy
+        for (consumer in consumers) {
+            val energyToGive = min(availableEnergy, consumer.requestedEnergy)
+            availableEnergy -= energyToGive
+            consumer.addEnergy(energyToGive)
+            
+            if (availableEnergy == 0) break
+        }
         
-        while (energyTaken != 0) {
-            for (provider in providers) {
-                val energyToTake = min(energyTaken, provider.providedEnergy)
-                provider.removeEnergy(energyToTake)
-                energyTaken -= energyToTake
-                
-                if (energyTaken == 0) break
+        return availableEnergy
+    }
+    
+    private fun takeEqually(energy: Int, providers: Iterable<EnergyStorage>): Int {
+        var energyDeficit = energy
+        
+        val providerMap = ConcurrentHashMap<EnergyStorage, Int>()
+        providerMap += providers
+            .filterNot { it.providedEnergy == 0 }
+            .map { it to it.providedEnergy }
+        
+        while (energyDeficit != 0 && providerMap.isNotEmpty()) {
+            val distribution = energyDeficit / providerMap.size
+            if (distribution != 0) {
+                for ((provider, providedAmount) in providerMap) {
+                    val take = min(distribution, providedAmount)
+                    energyDeficit -= take
+                    provider.removeEnergy(take)
+                    if (take == providedAmount) providerMap -= provider // provider has no more energy
+                    else providerMap[provider] = providedAmount - take // provider has less energy
+                }
+            } else {
+                // can't split up equally
+                return takeFirst(energyDeficit, providers)
             }
         }
+        
+        return energyDeficit
+    }
+    
+    private fun takeFirst(energy: Int, providers: Iterable<EnergyStorage>): Int {
+        var energyDeficit = energy
+        for (provider in providers) {
+            val take = min(energyDeficit, provider.providedEnergy)
+            energyDeficit -= take
+            provider.removeEnergy(take)
+            
+            if (energyDeficit == 0) break
+        }
+        
+        return energyDeficit
     }
     
 }
