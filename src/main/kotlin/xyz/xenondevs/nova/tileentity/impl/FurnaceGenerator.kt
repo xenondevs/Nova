@@ -12,6 +12,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.energy.EnergyConnectionType.PROVIDE
 import xyz.xenondevs.nova.energy.EnergyNetwork
 import xyz.xenondevs.nova.energy.EnergyNetworkManager
@@ -19,8 +20,11 @@ import xyz.xenondevs.nova.energy.EnergyStorage
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.BlockSide.FRONT
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.color.RegularColor
@@ -45,10 +49,12 @@ class FurnaceGenerator(
     private val inventory = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("inventory"), 1)
         .also { it.setItemUpdateHandler(this::handleInventoryUpdate) }
     private val gui by lazy { CoalGeneratorGUI() }
+    private var updateEnergyBar = true
     
     override val networks = EnumMap<BlockFace, EnergyNetwork>(BlockFace::class.java)
-    override val configuration = CUBE_FACES.map { it to PROVIDE }.toMap(EnumMap(BlockFace::class.java))
+    override val configuration = retrieveData(createSideConfig(PROVIDE, FRONT), "sideConfig")
     override val requestedEnergy = 0
+    
     override val providedEnergy: Int
         get() = energy
     
@@ -58,17 +64,24 @@ class FurnaceGenerator(
     
     override fun removeEnergy(energy: Int) {
         this.energy -= energy
-        gui.energyBar.percentage = energy.toDouble() / MAX_ENERGY.toDouble()
+        updateEnergyBar = true
     }
     
     override fun handleTick() {
+        if (burnTime == 0) burnItem()
+        
         if (burnTime != 0) {
             burnTime--
             energy = min(MAX_ENERGY, energy + ENERGY_PER_TICK)
             
             gui.progressItem.percentage = burnTime.toDouble() / totalBurnTime.toDouble()
-            gui.energyBar.percentage = energy.toDouble() / MAX_ENERGY.toDouble()
-        } else burnItem()
+            updateEnergyBar = true
+        }
+        
+        if (updateEnergyBar) {
+            gui.energyBar.update()
+            updateEnergyBar = false
+        }
         
         configuration.forEach { (face, _) ->
             val network = networks[face]
@@ -148,28 +161,31 @@ class FurnaceGenerator(
         storeData("energy", energy)
         storeData("burnTime", burnTime)
         storeData("totalBurnTime", totalBurnTime)
+        storeData("sideConfig", configuration)
     }
     
     private fun getEnergyValues() = energy to MAX_ENERGY
+    
     
     inner class CoalGeneratorGUI {
         
         val progressItem = EnergyProgressItem()
         
+        private val sideConfigGUI = SideConfigGUI(this@FurnaceGenerator, NONE, PROVIDE) { openWindow(it) }
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| # # # # # # # |" +
+                "| s # # # # # # |" +
                 "| # # # i # # # |" +
                 "| # # # ! # # # |" +
                 "| # # # # # # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', SlotElement.VISlotElement(inventory, 0))
             .addIngredient('!', progressItem)
+            .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, ::getEnergyValues)
-            .apply { percentage = energy.toDouble() / MAX_ENERGY.toDouble() }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Furnace Generator", gui).show()

@@ -5,7 +5,7 @@ import org.bukkit.block.BlockFace
 interface EnergyStorage : EnergyNode {
     
     val networks: MutableMap<BlockFace, EnergyNetwork>
-    val configuration: Map<BlockFace, EnergyConnectionType>
+    val configuration: MutableMap<BlockFace, EnergyConnectionType>
     val providedEnergy: Int
     val requestedEnergy: Int
     

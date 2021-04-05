@@ -2,12 +2,17 @@ package xyz.xenondevs.nova.util
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
+import xyz.xenondevs.nova.tileentity.serialization.EnumMapInstanceCreator
+import xyz.xenondevs.nova.tileentity.serialization.UUIDTypeAdapter
 import java.io.File
 import java.lang.reflect.Type
+import java.util.*
 import kotlin.reflect.KProperty
 
 val GSON: Gson = GsonBuilder()
     .setPrettyPrinting()
+    .registerTypeAdapter(UUIDTypeAdapter)
+    .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
     .create()
 
 fun JsonElement.writeToFile(file: File) =

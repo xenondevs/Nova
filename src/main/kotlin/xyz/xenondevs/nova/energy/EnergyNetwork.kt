@@ -69,7 +69,7 @@ class EnergyNetwork {
     /**
      * Called every tick to transfer energy.
      */
-    fun handleTick() {
+    fun handleTick() { // TODO: prioritize provider / consumer before buffer
         val providedEnergy = min(transferRate, availableEnergy)
         
         // equally distribute available energy

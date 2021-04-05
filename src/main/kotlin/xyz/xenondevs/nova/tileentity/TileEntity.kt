@@ -1,13 +1,13 @@
 package xyz.xenondevs.nova.tileentity
 
 import com.google.gson.JsonObject
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.energy.EnergyConnectionType
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.util.GSON
-import xyz.xenondevs.nova.util.blockLocation
-import xyz.xenondevs.nova.util.fromJson
+import xyz.xenondevs.nova.util.*
 import java.util.*
 
 abstract class TileEntity(
@@ -91,6 +91,23 @@ abstract class TileEntity(
      * is performed in that method.
      */
     abstract fun handleRightClick(event: PlayerInteractEvent)
+    
+    /**
+     * Gets the correct direction a block side.
+     */
+    fun getFace(blockSide: BlockSide) = blockSide.getBlockFace(armorStand.location.yaw)
+    
+    /**
+     * Creates a side config
+     */
+    fun createSideConfig(default: EnergyConnectionType, vararg blocked: BlockSide): EnumMap<BlockFace, EnergyConnectionType> {
+        val sideConfig = EnumMap<BlockFace, EnergyConnectionType>(BlockFace::class.java)
+        val blockedFaces = blocked.map { getFace(it) }
+        CUBE_FACES.forEach {
+            sideConfig[it] = if (blockedFaces.contains(it)) EnergyConnectionType.NONE else default
+        }
+        return sideConfig
+    }
     
     /**
      * Retrieves data using GSON deserialization from the

@@ -5,7 +5,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import java.util.*
 
-class UUIDTypeAdapter : TypeAdapter<UUID>() {
+object UUIDTypeAdapter : TypeAdapter<UUID>() {
     
     override fun write(writer: JsonWriter, value: UUID) {
         writer.value(value.toString())

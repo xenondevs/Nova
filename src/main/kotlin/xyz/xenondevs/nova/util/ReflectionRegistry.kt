@@ -10,6 +10,8 @@ import xyz.xenondevs.nova.util.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.ReflectionUtils.getMethod
 import xyz.xenondevs.nova.util.ReflectionUtils.getNMS
 import xyz.xenondevs.nova.util.ReflectionUtils.getNMSClass
+import java.lang.reflect.Field
+import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
 object ReflectionRegistry {
@@ -53,6 +55,7 @@ object ReflectionRegistry {
     val CB_CRAFT_META_SKULL_PROFILE_FIELD = getField(CB_CRAFT_META_SKULL_CLASS, true, "profile")
     
     // other fields
+    val ENUM_MAP_KEY_TYPE = getField(EnumMap::class.java, true, "keyType")
 //    val COMMAND_DISPATCHER_ROOT_FIELD = getField(CommandDispatcher::class.java, true, "root")
 //    val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class.java, true, "children")
 //    val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class.java, true, "literals")

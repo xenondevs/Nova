@@ -74,18 +74,15 @@ class Cable(
         
         val items = ArrayList<Pair<ItemStack, Float>>()
         
-        // get all nodes that are connected to the same network as this cable
-        val neighboringNodes = armorStand.location.blockLocation.getNearbyNodes().filter { (face, node) ->
-            node.getNetwork(face.oppositeFace) == network
-        }.keys.toList()
+        val connections = connectedNodes.keys.toList()
         
         // only show connector if connections aren't on two opposite sides
-        if (neighboringNodes.size != 2 || neighboringNodes[0] != neighboringNodes[1].oppositeFace) {
+        if (connections.size != 2 || connections[0] != connections[1].oppositeFace) {
             items += material.block!!.getItem(CONNECTOR) to 0f
         }
         
         // add all connections
-        neighboringNodes.forEach { blockFace ->
+        connections.forEach { blockFace ->
             val dataIndex = when (blockFace) {
                 BlockFace.DOWN -> DOWN
                 BlockFace.UP -> UP

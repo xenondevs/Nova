@@ -20,14 +20,25 @@ class EnergyBar(
 ) {
     
     private val energyItems = Array(height) { EnergyBarItem(it, height) }
-    var percentage: Double = 0.0
-        set(value) {
-            field = value
-            energyItems.forEach(Item::notifyWindows)
-        }
+    private var energy: Int = 0
+    private var maxEnergy: Int = 0
+    private var percentage: Double = 0.0
     
     init {
+        updateEnergyValues()
         (height downTo y).withIndex().forEach { (index, y) -> gui.setItem(x, y, energyItems[index]) }
+    }
+    
+    fun update() {
+        updateEnergyValues()
+        energyItems.forEach(Item::notifyWindows)
+    }
+    
+    private fun updateEnergyValues() {
+        val energyValues = getEnergyValues()
+        energy = energyValues.first
+        maxEnergy = energyValues.second
+        percentage = energy.toDouble() / maxEnergy.toDouble()
     }
     
     private inner class EnergyBarItem(
@@ -39,10 +50,6 @@ class EnergyBar(
             val displayPercentageStart = (1.0 / totalSections) * section
             val displayPercentage = max(min((percentage - displayPercentageStart) * totalSections, 1.0), 0.0)
             val state = round(displayPercentage * 16).toInt()
-            
-            val energyValues = getEnergyValues()
-            val energy = energyValues.first
-            val maxEnergy = energyValues.second
             
             return NovaMaterial.RED_BAR.item.getItemBuilder("§c$energy§8/§7$maxEnergy Energy", state)
         }

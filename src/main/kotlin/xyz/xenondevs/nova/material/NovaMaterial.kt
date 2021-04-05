@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.Cable
 import xyz.xenondevs.nova.tileentity.impl.FurnaceGenerator
+import xyz.xenondevs.nova.tileentity.impl.MechanicalPress
 import xyz.xenondevs.nova.tileentity.impl.PowerCell
 import xyz.xenondevs.nova.util.toIntArray
 
@@ -22,14 +23,39 @@ enum class NovaMaterial(
     val tileEntityConstructor: ((NovaMaterial, ArmorStand) -> TileEntity)?
 ) {
     
+    // 1 - 1000: Blocks
     FURNACE_GENERATOR("Furnace Generator", itemOf(1), itemOf(1), COBBLESTONE, ::FurnaceGenerator),
     POWER_CELL("Power Cell", itemOf(2), itemOf(2), IRON_BLOCK, ::PowerCell),
+    MECHANICAL_PRESS("Mechanical Press", itemOf(3), itemOf(3), IRON_BLOCK, ::MechanicalPress),
+    
+    // 1000 - 2000: Crafting Items
+    IRON_PLATE("Iron Plate", itemOf(1000)),
+    GOLD_PLATE("Gold Plate", itemOf(1001)),
+    DIAMOND_PLATE("Diamond Plate", itemOf(1002)),
+    NETHERITE_PLATE("Netherite Plate", itemOf(1003)),
+    EMERALD_PLATE("Emerald Plate", itemOf(1004)),
+    REDSTONE_PLATE("Redstone Plate", itemOf(1005)),
+    LAPIS_PLATE("Lapis Plate", itemOf(1006)),
+    
+    // 2000 - 3000: Upgrades and similar
+    
+    // 5000 - 10.000 MultiModel Blocks
     CABLE("Cable", itemOf(5000), itemOf(intArrayOf(0) + (5000..5003).toIntArray()), null, ::Cable),
+    
+    // 9.000 - 10.000 UI Elements
+    SIDE_CONFIG_BUTTON("", itemOf(9000)),
+    GRAY_BUTTON("", itemOf(9001)),
+    ORANGE_BUTTON("", itemOf(9002)),
+    BLUE_BUTTON("", itemOf(9003)),
+    GREEN_BUTTON("", itemOf(9004)),
+    
+    // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),
     ENERGY_PROGRESS("", itemOf((10_100..10_116).toIntArray())),
     RED_BAR("", itemOf((10_200..10_216).toIntArray())),
     GREEN_BAR("", itemOf((10_300..10_316).toIntArray())),
-    BLUE_BAR("", itemOf((10_400..10_416).toIntArray()));
+    BLUE_BAR("", itemOf((10_400..10_416).toIntArray())),
+    PRESS_PROGRESS("", itemOf((10_500..10_508).toIntArray()));
     
     
     val isBlock = block != null && tileEntityConstructor != null

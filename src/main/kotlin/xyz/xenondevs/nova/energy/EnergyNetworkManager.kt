@@ -62,7 +62,7 @@ object EnergyNetworkManager {
             
             else -> {
                 // MAKE A NEW NETWORK
-                EnergyNetwork()
+                EnergyNetwork().also { networks += it }
             }
         }
         
@@ -86,6 +86,7 @@ object EnergyNetworkManager {
     
     fun handleStorageRemove(storage: EnergyStorage, unload: Boolean) {
         storage.networks.forEach { (_, network) -> network -= storage }
+        storage.networks.clear()
         if (!unload) storage.updateNearbyBridges()
     }
     
@@ -123,8 +124,12 @@ object EnergyNetworkManager {
             // split attached networks
             val networks = ArrayList<EnergyNetwork>()
             
-            bridge.getNetworkedNodes().forEach { (_, entrySet) ->
+            for ((_, entrySet) in bridge.getNetworkedNodes()) {
                 val nodes = entrySet.mapTo(HashSet()) { it.value }
+                
+                // prevent networks with only one EnergyStorage and nothing else
+                if (nodes.size == 1 && nodes.first() !is EnergyBridge) continue
+                
                 // check that the same network doesn't already exist
                 if (networks.none { network -> network.nodes.contentEquals(nodes) }) {
                     val network = EnergyNetwork()
