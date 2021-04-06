@@ -136,6 +136,7 @@ object TileEntityManager : Listener {
             .filterIsInstance<ArmorStand>()
             .filter { it.hasTileEntityData() }
             .forEach { armorStand ->
+                armorStand.fireTicks = Int.MAX_VALUE
                 val tileEntity = TileEntity.newInstance(armorStand)
                 chunkMap[armorStand.location.clone().apply { removeOrientation() }.subtract(0.5, 0.0, 0.5)] = tileEntity
             }
