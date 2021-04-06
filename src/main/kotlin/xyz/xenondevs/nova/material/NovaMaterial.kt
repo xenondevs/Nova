@@ -36,6 +36,13 @@ enum class NovaMaterial(
     EMERALD_PLATE("Emerald Plate", itemOf(1004)),
     REDSTONE_PLATE("Redstone Plate", itemOf(1005)),
     LAPIS_PLATE("Lapis Plate", itemOf(1006)),
+    IRON_GEAR("Iron Gear", itemOf(1010)),
+    GOLD_GEAR("Gold Gear", itemOf(1011)),
+    DIAMOND_GEAR("Diamond Gear", itemOf(1012)),
+    NETHERITE_GEAR("Netherite Gear", itemOf(1013)),
+    EMERALD_GEAR("Emerald Gear", itemOf(1014)),
+    REDSTONE_GEAR("Redstone Gear", itemOf(1015)),
+    LAPIS_GEAR("Lapis Gear", itemOf(1016)),
     
     // 2000 - 3000: Upgrades and similar
     
@@ -48,6 +55,10 @@ enum class NovaMaterial(
     ORANGE_BUTTON("", itemOf(9002)),
     BLUE_BUTTON("", itemOf(9003)),
     GREEN_BUTTON("", itemOf(9004)),
+    PLATE_ON_BUTTON("", itemOf(9005)),
+    PLATE_OFF_BUTTON("", itemOf(9006)),
+    GEAR_ON_BUTTON("", itemOf(9007)),
+    GEAR_OFF_BUTTON("", itemOf(9008)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),

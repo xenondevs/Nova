@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.energy.*
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.MultiModelTileEntity
 import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.blockLocation
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect

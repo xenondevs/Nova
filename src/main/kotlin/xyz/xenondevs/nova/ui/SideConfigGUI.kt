@@ -90,7 +90,7 @@ class SideConfigGUI(
     
 }
 
-class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterial.SIDE_CONFIG_BUTTON.createItemBuilder()) {
+class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterial.SIDE_CONFIG_BUTTON.item.getItemBuilder("Side Config")) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

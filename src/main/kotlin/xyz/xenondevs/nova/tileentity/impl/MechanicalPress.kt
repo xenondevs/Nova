@@ -3,12 +3,18 @@ package xyz.xenondevs.nova.tileentity.impl
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.item.Item
+import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.energy.EnergyConnectionType.CONSUME
@@ -41,6 +47,7 @@ private const val PRESS_TIME = 200
 class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(material, armorStand, false), EnergyStorage {
     
     private var energy = retrieveData(0, "energy")
+    private var type: PressType = retrieveData(PressType.PLATE, "pressType")
     private val inputInv = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("input"), 1).apply { setItemUpdateHandler(::handleInputUpdate) }
     private val outputInv = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("output"), 1).apply { setItemUpdateHandler(::handleOutputUpdate) }
     private val gui = MechanicalPressUI()
@@ -75,7 +82,7 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
             gui.energyBar.update()
             updateEnergyBar = false
         }
-    
+        
         configuration.forEach { (face, _) ->
             val network = networks[face]
             ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
@@ -88,7 +95,7 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
             val outputItem = outputInv.getItemStack(0)
-            val recipeOutput = PressRecipe.getOutputFor(inputItem.type, PressType.PLATE)
+            val recipeOutput = PressRecipe.getOutputFor(inputItem.type, type)
             if (outputItem == null || outputItem.novaMaterial == recipeOutput) {
                 inputInv.removeOne(null, 0)
                 currentItem = recipeOutput.createItemStack()
@@ -105,7 +112,7 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     private fun handleInputUpdate(event: ItemUpdateEvent) {
         if (event.player != null && event.newItemStack != null) {
             val material = event.newItemStack.type
-            if (!PressRecipe.isPressable(material, PressType.PLATE)) {
+            if (!PressRecipe.isPressable(material, type)) {
                 event.isCancelled = true
             }
         }
@@ -126,6 +133,7 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     
     override fun saveData() {
         storeData("energy", energy)
+        storeData("pressType", pressTime)
         storeData("sideConfig", configuration)
     }
     
@@ -140,20 +148,23 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     private fun getEnergyValues() = energy to MAX_ENERGY
     
     inner class MechanicalPressUI {
-    
+        
         private val pressProgress = PressProgressItem()
+        private val pressTypeItems = ArrayList<PressTypeItem>()
         private val sideConfigGUI = SideConfigGUI(this@MechanicalPress, NONE, CONSUME) { openWindow(it) }
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # i # # . |" +
+                "| p g # i # # . |" +
                 "| # # # , # # . |" +
-                "| # # # o # # . |" +
+                "| s # # o # # . |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', VISlotElement(inputInv, 0))
             .addIngredient('o', VISlotElement(outputInv, 0))
             .addIngredient(',', pressProgress)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('p', PressTypeItem(PressType.PLATE).apply(pressTypeItems::add))
+            .addIngredient('g', PressTypeItem(PressType.GEAR).apply(pressTypeItems::add))
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, ::getEnergyValues)
@@ -164,6 +175,28 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Mechanical Press", gui).show()
+        }
+        
+        private inner class PressTypeItem(private val type: PressType) : BaseItem() {
+            
+            override fun getItemBuilder(): ItemBuilder {
+                return if (type == PressType.PLATE) {
+                    if (this@MechanicalPress.type == PressType.PLATE) NovaMaterial.PLATE_OFF_BUTTON.createItemBuilder()
+                    else NovaMaterial.PLATE_ON_BUTTON.item.getItemBuilder("Press Plates")
+                } else {
+                    if (this@MechanicalPress.type == PressType.GEAR) NovaMaterial.GEAR_OFF_BUTTON.createItemBuilder()
+                    else NovaMaterial.GEAR_ON_BUTTON.item.getItemBuilder("Press Gears")
+                }
+            }
+            
+            override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+                if (this@MechanicalPress.type != type) {
+                    player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                    this@MechanicalPress.type = type
+                    pressTypeItems.forEach(Item::notifyWindows)
+                }
+            }
+            
         }
         
     }

@@ -38,6 +38,7 @@ class EnergyNetwork {
         providers += network.providers
         consumers += network.consumers
         bridges += network.bridges
+        buffers += network.buffers
     }
     
     fun addBridge(bridge: EnergyBridge) {
