@@ -10,7 +10,7 @@ class ModelData(val material: Material, val dataArray: IntArray) {
         get() = dataArray[0]
     
     fun getItem(name: String, dataIndex: Int = 0): ItemStack =
-        getItemBuilder(name, dataIndex).build()
+        getItemBuilder(name, dataIndex).build().apply { maxStackSize }
     
     fun getItem(dataIndex: Int = 0): ItemStack =
         getItem("", dataIndex)

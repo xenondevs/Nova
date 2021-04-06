@@ -11,9 +11,13 @@ import xyz.xenondevs.nova.tileentity.impl.MechanicalPress
 import xyz.xenondevs.nova.tileentity.impl.PowerCell
 import xyz.xenondevs.nova.util.toIntArray
 
-private fun itemOf(data: IntArray) = ModelData(STRUCTURE_VOID, data)
+private fun blockOf(data: IntArray) = ModelData(STRUCTURE_VOID, data)
 
-private fun itemOf(data: Int) = ModelData(STRUCTURE_VOID, intArrayOf(data))
+private fun blockOf(data: Int) = ModelData(STRUCTURE_VOID, intArrayOf(data))
+
+private fun itemOf(data: IntArray) = ModelData(BOWL, data)
+
+private fun itemOf(data: Int) = ModelData(BOWL, intArrayOf(data))
 
 enum class NovaMaterial(
     val itemName: String,
@@ -24,9 +28,9 @@ enum class NovaMaterial(
 ) {
     
     // 1 - 1000: Blocks
-    FURNACE_GENERATOR("Furnace Generator", itemOf(1), itemOf(1), COBBLESTONE, ::FurnaceGenerator),
-    POWER_CELL("Power Cell", itemOf(2), itemOf(2), IRON_BLOCK, ::PowerCell),
-    MECHANICAL_PRESS("Mechanical Press", itemOf(3), itemOf(3), IRON_BLOCK, ::MechanicalPress),
+    FURNACE_GENERATOR("Furnace Generator", blockOf(1), blockOf(1), COBBLESTONE, ::FurnaceGenerator),
+    POWER_CELL("Power Cell", blockOf(2), blockOf(2), IRON_BLOCK, ::PowerCell),
+    MECHANICAL_PRESS("Mechanical Press", blockOf(3), blockOf(3), IRON_BLOCK, ::MechanicalPress),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
@@ -47,7 +51,7 @@ enum class NovaMaterial(
     // 2000 - 3000: Upgrades and similar
     
     // 5000 - 10.000 MultiModel Blocks
-    CABLE("Cable", itemOf(5000), itemOf(intArrayOf(0) + (5000..5003).toIntArray()), null, ::Cable),
+    CABLE("Cable", blockOf(5000), blockOf(intArrayOf(0) + (5000..5003).toIntArray()), null, ::Cable),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),
