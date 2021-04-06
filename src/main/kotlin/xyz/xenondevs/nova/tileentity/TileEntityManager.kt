@@ -2,12 +2,11 @@ package xyz.xenondevs.nova.tileentity
 
 import com.google.gson.JsonObject
 import org.bukkit.*
+import org.bukkit.block.Block
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
-import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.block.*
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
@@ -16,6 +15,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
+import java.lang.UnsupportedOperationException
 import kotlin.math.roundToInt
 
 private val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
@@ -197,6 +197,16 @@ object TileEntityManager : Listener {
             val tileEntity = getTileEntityAt(block.location)
             tileEntity?.handleRightClick(event)
         }
+    }
+    
+    @EventHandler
+    fun handlePistonExtend(event: BlockPistonExtendEvent) {
+        if (event.blocks.any { getTileEntityAt(it.location) != null }) event.isCancelled = true
+    }
+    
+    @EventHandler
+    fun handlePistonRetract(event: BlockPistonRetractEvent) {
+        if (event.blocks.any { getTileEntityAt(it.location) != null }) event.isCancelled = true
     }
     
 }

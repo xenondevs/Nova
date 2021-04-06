@@ -74,12 +74,11 @@ object NovaRecipes : Listener {
     
     @EventHandler
     fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
-        if (!event.isRepair && event.recipe != null) {
-            if (event.inventory.contents.any { it.novaMaterial != null } 
-                && !recipes.contains(event.recipe!!.key)) {
-                
-                event.inventory.result = ItemStack(Material.AIR)
-            }
+        if (event.recipe != null
+            && event.inventory.contents.any { it.novaMaterial != null }
+            && !recipes.contains(event.recipe!!.key)) {
+            
+            event.inventory.result = ItemStack(Material.AIR)
         }
     }
     
