@@ -9,13 +9,17 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.energy.*
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.network.*
+import xyz.xenondevs.nova.network.energy.EnergyBridge
+import xyz.xenondevs.nova.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.tileentity.MultiModelTileEntity
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
+import java.util.*
+import kotlin.collections.ArrayList
 
 private const val CONNECTOR = 1
 private const val HORIZONTAL = 2
@@ -31,21 +35,22 @@ class Cable(
     keepData = false
 ), EnergyBridge {
     
-    override var network: EnergyNetwork? = null
     override val transferRate = 100
+    override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = CUBE_FACES.toSet() // TODO: allow players to enable / disable cable faces
     
-    private var _connectedNodes: Map<BlockFace, EnergyNode>? = null
-    override val connectedNodes: Map<BlockFace, EnergyNode>
+    private var _connectedNodes: Map<NetworkType, Map<BlockFace, NetworkNode>>? = null
+    override val connectedNodes: Map<NetworkType, Map<BlockFace, NetworkNode>>
         get() {
             if (_connectedNodes == null) _connectedNodes = findConnectedNodes()
             return _connectedNodes!!
         }
     
     override fun handleTick() {
+        val network = networks[NetworkType.ENERGY]
         if (network != null) {
             ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location)
-                .setParticleData(network!!.color)
+                .setParticleData((network as EnergyNetwork).color)
                 .display()
         }
     }
@@ -59,29 +64,29 @@ class Cable(
     }
     
     override fun handleInitialized() {
-        EnergyNetworkManager.handleBridgeAdd(this)
+        NetworkManager.handleBridgeAdd(this, NetworkType.ENERGY)
         replaceModels(getModelsNeeded())
         updateHitbox()
     }
     
     override fun handleRemoved(unload: Boolean) {
-        EnergyNetworkManager.handleBridgeRemove(this, unload)
+        NetworkManager.handleBridgeRemove(this, unload)
     }
     
     private fun getModelsNeeded(): List<Pair<ItemStack, Float>> {
-        Preconditions.checkState(network != null, "Network is not initialized")
+        Preconditions.checkState(networks.isNotEmpty(), "No network is initialized")
         
         val items = ArrayList<Pair<ItemStack, Float>>()
         
-        val connections = connectedNodes.keys.toList()
+        val connectedFaces = connectedNodes.values.flatMap { it.keys }
         
         // only show connector if connections aren't on two opposite sides
-        if (connections.size != 2 || connections[0] != connections[1].oppositeFace) {
+        if (connectedFaces.size != 2 || connectedFaces[0] != connectedFaces[1].oppositeFace) {
             items += material.block!!.getItem(CONNECTOR) to 0f
         }
         
         // add all connections
-        connections.forEach { blockFace ->
+        connectedFaces.forEach { blockFace ->
             val dataIndex = when (blockFace) {
                 BlockFace.DOWN -> DOWN
                 BlockFace.UP -> UP

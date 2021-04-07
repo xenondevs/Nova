@@ -1,6 +1,9 @@
-package xyz.xenondevs.nova.energy
+package xyz.xenondevs.nova.network.energy
 
-import xyz.xenondevs.nova.energy.EnergyConnectionType.*
+import com.google.common.base.Preconditions
+import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.network.*
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.particle.data.color.RegularColor
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
@@ -11,14 +14,16 @@ import kotlin.math.min
  *
  * Cables connect EnergyProviders to EnergyConsumers.
  */
-class EnergyNetwork {
+class EnergyNetwork : Network {
     
     val color: RegularColor = RegularColor.random() // TODO: remove
     
-    private val _nodes = HashSet<EnergyNode>()
-    val nodes: Set<EnergyNode>
+    override val type = NetworkType.ENERGY
+    
+    override val nodes: Set<NetworkNode>
         get() = _nodes
     
+    private val _nodes = HashSet<NetworkNode>()
     private val providers = HashSet<EnergyStorage>()
     private val consumers = HashSet<EnergyStorage>()
     private val buffers = HashSet<EnergyStorage>()
@@ -33,7 +38,10 @@ class EnergyNetwork {
     private val transferRate: Int
         get() = bridges.map { it.transferRate }.minOrNull() ?: 0
     
-    fun addAll(network: EnergyNetwork) {
+    override fun addAll(network: Network) {
+        Preconditions.checkArgument(network is EnergyNetwork, "Illegal Network Type")
+        network as EnergyNetwork
+        
         _nodes += network._nodes
         providers += network.providers
         consumers += network.consumers
@@ -41,25 +49,31 @@ class EnergyNetwork {
         buffers += network.buffers
     }
     
-    fun addBridge(bridge: EnergyBridge) {
+    override fun addBridge(bridge: NetworkBridge) {
+        Preconditions.checkArgument(bridge is EnergyBridge, "Illegal Bridge Type")
         _nodes += bridge
-        bridges += bridge
+        bridges += bridge as EnergyBridge
     }
     
-    fun addStorage(storage: EnergyStorage, connectionType: EnergyConnectionType) {
-        when (connectionType) {
-            PROVIDE -> providers += storage
-            CONSUME -> consumers += storage
-            BUFFER -> buffers += storage
+    override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
+        Preconditions.checkArgument(endPoint is EnergyStorage, "Illegal EndPoint Type")
+        
+        when (val connectionType = (endPoint as EnergyStorage).energyConfig[face]!!) {
+            
+            PROVIDE -> if (!buffers.contains(endPoint)) providers += endPoint
+            CONSUME -> if (!buffers.contains(endPoint)) consumers += endPoint
+            BUFFER -> {
+                removeNode(endPoint) // remove from provider / consumer set
+                buffers += endPoint
+            }
             else -> throw IllegalArgumentException("Illegal ConnectionType: $connectionType")
+            
         }
-        _nodes += storage
+        
+        _nodes += endPoint
     }
     
-    operator fun minusAssign(node: EnergyNode) =
-        removeNode(node)
-    
-    fun removeNode(node: EnergyNode) {
+    override fun removeNode(node: NetworkNode) {
         _nodes -= node
         if (node is EnergyStorage) {
             providers -= node
@@ -68,12 +82,12 @@ class EnergyNetwork {
         }
     }
     
-    fun isEmpty() = _nodes.isEmpty()
+    override fun isEmpty() = _nodes.isEmpty()
     
     /**
      * Called every tick to transfer energy.
      */
-    fun handleTick() {
+    override fun handleTick() {
         val providerEnergy = min(transferRate, availableProviderEnergy)
         val bufferEnergy = min(transferRate - providerEnergy, availableBufferEnergy)
         val requestedEnergy = min(transferRate, requestedConsumerEnergy)

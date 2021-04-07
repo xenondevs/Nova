@@ -12,12 +12,15 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.energy.EnergyConnectionType.NONE
-import xyz.xenondevs.nova.energy.EnergyConnectionType.PROVIDE
-import xyz.xenondevs.nova.energy.EnergyNetwork
-import xyz.xenondevs.nova.energy.EnergyNetworkManager
-import xyz.xenondevs.nova.energy.EnergyStorage
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.network.Network
+import xyz.xenondevs.nova.network.NetworkManager
+import xyz.xenondevs.nova.network.NetworkType
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
+import xyz.xenondevs.nova.network.energy.EnergyNetwork
+import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenSideConfigItem
@@ -51,8 +54,10 @@ class FurnaceGenerator(
     private val gui by lazy { CoalGeneratorGUI() }
     private var updateEnergyBar = true
     
-    override val networks = EnumMap<BlockFace, EnergyNetwork>(BlockFace::class.java)
-    override val configuration = retrieveData(createSideConfig(PROVIDE, FRONT), "sideConfig")
+    override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
+    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createSideConfig(PROVIDE, FRONT), "sideConfig")
+    override val allowedFaces: Map<NetworkType, List<BlockFace>>
+        get() = mapOf(NetworkType.ENERGY to energyConfig.filterNot { it.value == NONE }.map { it.key })
     override val requestedEnergy = 0
     
     override val providedEnergy: Int
@@ -83,20 +88,22 @@ class FurnaceGenerator(
             updateEnergyBar = false
         }
         
-        configuration.forEach { (face, _) ->
-            val network = networks[face]
+        energyConfig.forEach { (face, _) ->
+            val color = networks[NetworkType.ENERGY]?.get(face)
+                .let { if (it == null) RegularColor(Color(0, 0, 0)) else (it as EnergyNetwork).color }
+            
             ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
-                .setParticleData(network?.color ?: RegularColor(Color(Color.HSBtoRGB(0f, 0f, 0f))))
+                .setParticleData(color)
                 .display()
         }
     }
     
     override fun handleInitialized() {
-        EnergyNetworkManager.handleStorageAdd(this)
+        NetworkManager.handleEndPointAdd(this)
     }
     
     override fun handleRemoved(unload: Boolean) {
-        EnergyNetworkManager.handleStorageRemove(this, unload)
+        NetworkManager.handleEndPointRemove(this, unload)
     }
     
     private fun burnItem() {
@@ -161,7 +168,7 @@ class FurnaceGenerator(
         storeData("energy", energy)
         storeData("burnTime", burnTime)
         storeData("totalBurnTime", totalBurnTime)
-        storeData("sideConfig", configuration)
+        storeData("sideConfig", energyConfig)
     }
     
     private fun getEnergyValues() = energy to MAX_ENERGY

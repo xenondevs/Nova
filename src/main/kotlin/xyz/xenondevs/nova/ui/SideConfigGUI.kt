@@ -12,18 +12,18 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.energy.EnergyConnectionType
-import xyz.xenondevs.nova.energy.EnergyNetworkManager
-import xyz.xenondevs.nova.energy.EnergyStorage
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.network.NetworkManager
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.BlockSide
 
 class SideConfigGUI(
     val energyStorage: EnergyStorage,
-    vararg val allowedTypes: EnergyConnectionType,
-    val openPrevious: (Player) -> Unit,
-    ) : SimpleGUI(9, 3) {
+    private vararg val allowedTypes: EnergyConnectionType,
+    private val openPrevious: (Player) -> Unit,
+) : SimpleGUI(9, 3) {
     
     private val structure = Structure("" +
         "~ # # # u # # # #" +
@@ -42,16 +42,16 @@ class SideConfigGUI(
     }
     
     private fun changeConnectionType(blockFace: BlockFace, forward: Boolean) {
-        EnergyNetworkManager.handleStorageRemove(energyStorage, false)
+        NetworkManager.handleEndPointRemove(energyStorage, false)
         
-        val currentType = energyStorage.configuration[blockFace]!!
+        val currentType = energyStorage.energyConfig[blockFace]!!
         var index = allowedTypes.indexOf(currentType)
         if (forward) index++ else index--
         if (index < 0) index = allowedTypes.lastIndex
         else if (index == allowedTypes.size) index = 0
-        energyStorage.configuration[blockFace] = allowedTypes[index]
+        energyStorage.energyConfig[blockFace] = allowedTypes[index]
         
-        EnergyNetworkManager.handleStorageAdd(energyStorage)
+        NetworkManager.handleEndPointAdd(energyStorage)
     }
     
     private inner class SideConfigItem(val blockSide: BlockSide) : BaseItem() {
@@ -60,7 +60,7 @@ class SideConfigGUI(
         
         override fun getItemBuilder(): ItemBuilder {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).toLowerCase()
-            return when (energyStorage.configuration[blockFace]!!) {
+            return when (energyStorage.energyConfig[blockFace]!!) {
                 EnergyConnectionType.NONE ->
                     NovaMaterial.GRAY_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§7None")
                 EnergyConnectionType.PROVIDE ->

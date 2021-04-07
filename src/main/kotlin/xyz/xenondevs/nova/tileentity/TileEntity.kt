@@ -5,8 +5,8 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.energy.EnergyConnectionType
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.util.*
 import java.util.*
 

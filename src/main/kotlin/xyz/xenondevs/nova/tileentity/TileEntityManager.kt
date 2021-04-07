@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.tileentity
 
 import com.google.gson.JsonObject
 import org.bukkit.*
-import org.bukkit.block.Block
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -15,7 +14,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
-import java.lang.UnsupportedOperationException
 import kotlin.math.roundToInt
 
 private val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")

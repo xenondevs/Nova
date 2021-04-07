@@ -1,11 +1,11 @@
-package xyz.xenondevs.nova.energy
+package xyz.xenondevs.nova.network.energy
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.network.NetworkEndPoint
 
-interface EnergyStorage : EnergyNode {
+interface EnergyStorage : NetworkEndPoint {
     
-    val networks: MutableMap<BlockFace, EnergyNetwork>
-    val configuration: MutableMap<BlockFace, EnergyConnectionType>
+    val energyConfig: MutableMap<BlockFace, EnergyConnectionType>
     val providedEnergy: Int
     val requestedEnergy: Int
     

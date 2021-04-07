@@ -17,12 +17,13 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.energy.EnergyConnectionType.CONSUME
-import xyz.xenondevs.nova.energy.EnergyConnectionType.NONE
-import xyz.xenondevs.nova.energy.EnergyNetwork
-import xyz.xenondevs.nova.energy.EnergyNetworkManager
-import xyz.xenondevs.nova.energy.EnergyStorage
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.network.*
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType.CONSUME
+import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
+import xyz.xenondevs.nova.network.energy.EnergyNetwork
+import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.recipe.PressRecipe
 import xyz.xenondevs.nova.recipe.PressType
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -56,8 +57,10 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     private var pressTime: Int = 0
     private var currentItem: ItemStack? = null
     
-    override val networks = EnumMap<BlockFace, EnergyNetwork>(BlockFace::class.java)
-    override val configuration = retrieveData(createSideConfig(CONSUME, FRONT), "sideConfig")
+    override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
+    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createSideConfig(CONSUME, FRONT), "sideConfig")
+    override val allowedFaces: Map<NetworkType, List<BlockFace>>
+        get() = mapOf(NetworkType.ENERGY to energyConfig.filterNot { it.value == NONE }.map { it.key })
     override val providedEnergy = 0
     override val requestedEnergy: Int
         get() = MAX_ENERGY - energy
@@ -83,10 +86,12 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
             updateEnergyBar = false
         }
         
-        configuration.forEach { (face, _) ->
-            val network = networks[face]
+        energyConfig.forEach { (face, _) ->
+            val color = networks[NetworkType.ENERGY]?.get(face)
+                .let { if (it == null) RegularColor(Color(0, 0, 0)) else (it as EnergyNetwork).color }
+            
             ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
-                .setParticleData(network?.color ?: RegularColor(Color(Color.HSBtoRGB(0f, 0f, 0f))))
+                .setParticleData(color)
                 .display()
         }
     }
@@ -134,15 +139,15 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     override fun saveData() {
         storeData("energy", energy)
         storeData("pressType", pressTime)
-        storeData("sideConfig", configuration)
+        storeData("sideConfig", energyConfig)
     }
     
     override fun handleInitialized() {
-        EnergyNetworkManager.handleStorageAdd(this)
+        NetworkManager.handleEndPointAdd(this)
     }
     
     override fun handleRemoved(unload: Boolean) {
-        EnergyNetworkManager.handleStorageRemove(this, unload)
+        NetworkManager.handleEndPointRemove(this, unload)
     }
     
     private fun getEnergyValues() = energy to MAX_ENERGY
