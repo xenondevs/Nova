@@ -51,7 +51,7 @@ enum class NovaMaterial(
     // 2000 - 3000: Upgrades and similar
     
     // 5000 - 10.000 MultiModel Blocks
-    CABLE("Cable", blockOf(5000), blockOf(intArrayOf(0) + (5000..5003).toIntArray()), null, ::Cable),
+    CABLE("Cable", blockOf(5000), blockOf(intArrayOf(-1) + (5000..5003).toIntArray()), null, ::Cable),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),
