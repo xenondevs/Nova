@@ -33,7 +33,7 @@ object NovaRecipes : Listener {
     
     private val recipes = ArrayList<NamespacedKey>()
     
-    init {
+    fun loadRecipes() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         
         addRecipes(

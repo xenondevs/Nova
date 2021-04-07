@@ -7,7 +7,7 @@ object NetworkManager {
     
     private val networks = ArrayList<Network>()
     
-    init {
+    fun init() {
         runTaskTimer(0, 1) {
             networks.removeIf { it.isEmpty() }
             networks.forEach(Network::handleTick)

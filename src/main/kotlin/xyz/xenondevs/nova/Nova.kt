@@ -23,9 +23,9 @@ class Nova : JavaPlugin() {
         NOVA = this
         setGlobalIngredients()
         
-        TileEntityManager // init TileEntityManager
-        NetworkManager // init NetworkManager
-        NovaRecipes // init Recipes
+        TileEntityManager.init()
+        NetworkManager.init()
+        NovaRecipes.loadRecipes()
         
         getCommand("test")!!.setExecutor(this)
         getCommand("getNovaMaterial")!!.setExecutor(this)

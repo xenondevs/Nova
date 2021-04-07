@@ -62,7 +62,7 @@ object TileEntityManager : Listener {
     private val tileEntities: List<TileEntity>
         get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
     
-    init {
+    fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkLoad)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkUnload) }
