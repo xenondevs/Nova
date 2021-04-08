@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.material
 
+import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.Material.*
 import org.bukkit.entity.ArmorStand
@@ -18,19 +19,19 @@ private fun blockOf(data: Int) = ModelData(STRUCTURE_VOID, intArrayOf(data))
 private fun itemOf(data: IntArray) = ModelData(BOWL, data)
 
 private fun itemOf(data: Int) = ModelData(BOWL, intArrayOf(data))
-
 enum class NovaMaterial(
     val itemName: String,
     val item: ModelData,
-    val block: ModelData?, // should only be different from item if it actually needs to be a different material because of minecraft's restrictions
+    createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> ItemBuilder)?,
+    val block: ModelData?,
     val hitbox: Material?,
-    val tileEntityConstructor: ((NovaMaterial, ArmorStand) -> TileEntity)?
+    val createTileEntity: ((NovaMaterial, ArmorStand) -> TileEntity)?
 ) {
     
     // 1 - 1000: Blocks
-    FURNACE_GENERATOR("Furnace Generator", blockOf(1), blockOf(1), COBBLESTONE, ::FurnaceGenerator),
-    POWER_CELL("Power Cell", blockOf(2), blockOf(2), IRON_BLOCK, ::PowerCell),
-    MECHANICAL_PRESS("Mechanical Press", blockOf(3), blockOf(3), IRON_BLOCK, ::MechanicalPress),
+    FURNACE_GENERATOR("Furnace Generator", blockOf(1), FurnaceGenerator::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
+    POWER_CELL("Power Cell", blockOf(2), PowerCell::createItemBuilder, blockOf(2), IRON_BLOCK, ::PowerCell),
+    MECHANICAL_PRESS("Mechanical Press", blockOf(3), null, blockOf(3), IRON_BLOCK, ::MechanicalPress),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
@@ -51,7 +52,7 @@ enum class NovaMaterial(
     // 2000 - 3000: Upgrades and similar
     
     // 5000 - 10.000 MultiModel Blocks
-    CABLE("Cable", blockOf(5000), blockOf(intArrayOf(-1) + (5000..5003).toIntArray()), null, ::Cable),
+    CABLE("Cable", blockOf(5000), null, blockOf(intArrayOf(-1) + (5000..5003).toIntArray()), null, ::Cable),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),
@@ -73,13 +74,43 @@ enum class NovaMaterial(
     PRESS_PROGRESS("", itemOf((10_500..10_508).toIntArray()));
     
     
-    val isBlock = block != null && tileEntityConstructor != null
+    val isBlock = block != null && createTileEntity != null
+    private val createItemBuilderFunction: ((TileEntity?) -> ItemBuilder)? = if (createItemBuilderFunction != null) {
+        { createItemBuilderFunction(this, it) }
+    } else null
     
-    constructor(itemName: String, item: ModelData) : this(itemName, item, null, null, null)
+    constructor(itemName: String, item: ModelData) : this(itemName, item, null, null, null, null)
     
-    fun createItemStack() = item.getItem(itemName)
+    /**
+     * Creates a basic [ItemBuilder] without any additional information
+     * like an energy bar added to the [ItemStack].
+     * 
+     * Can be used for just previewing the item type or as a base in
+     * a `createItemBuilder` function for a [TileEntity].
+     */
+    fun createBasicItemBuilder(): ItemBuilder = item.getItemBuilder(itemName)
     
-    fun createItemBuilder() = item.getItemBuilder(itemName)
+    /**
+     * Creates an [ItemBuilder] for this [NovaMaterial].
+     *
+     * The [TileEntity] provided must be of the same type as the [TileEntity]
+     * returned in the [createTileEntity] function.
+     * 
+     * If there is no custom [createItemBuilderFunction] for this [NovaMaterial],
+     * it will return the result of [createBasicItemBuilder].
+     */
+    fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder {
+        return if (createItemBuilderFunction != null) {
+            createItemBuilderFunction!!(tileEntity)
+        } else createBasicItemBuilder()
+    }
+    
+    /**
+     * Creates an [ItemStack] for this [NovaMaterial].
+     *
+     * This is the same as calling `createItemBuilder.build()`
+     */
+    fun createItemStack(): ItemStack = createItemBuilder().build()
     
     companion object {
         

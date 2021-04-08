@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.tileentity.impl
 import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.window.impl.single.SimpleWindow
@@ -43,7 +44,7 @@ private const val BURN_TIME_MULTIPLIER = 0.1
 class FurnaceGenerator(
     material: NovaMaterial,
     armorStand: ArmorStand
-) : TileEntity(material, armorStand, keepData = true), EnergyStorage {
+) : TileEntity(material, armorStand), EnergyStorage {
     
     private var energy: Int = retrieveData(0, "energy")
     private var burnTime: Int = retrieveData(0, "burnTime")
@@ -159,20 +160,14 @@ class FurnaceGenerator(
         return drops
     }
     
-    override fun createItem(): ItemStack =
-        material.createItemBuilder()
-            .addLoreLines("§7Energy: $energy/$MAX_ENERGY")
-            .build()
-    
     override fun saveData() {
-        storeData("energy", energy)
+        storeData("energy", energy, true)
         storeData("burnTime", burnTime)
         storeData("totalBurnTime", totalBurnTime)
         storeData("sideConfig", energyConfig)
     }
     
     private fun getEnergyValues() = energy to MAX_ENERGY
-    
     
     inner class CoalGeneratorGUI {
         
@@ -197,6 +192,17 @@ class FurnaceGenerator(
         fun openWindow(player: Player) {
             SimpleWindow(player, "Furnace Generator", gui).show()
         }
+    }
+    
+    companion object {
+        
+        fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
+            val builder = material.createBasicItemBuilder()
+            val energy = tileEntity?.let { (tileEntity as FurnaceGenerator).energy } ?: 0
+            builder.addLoreLines("§7Energy: $energy/$MAX_ENERGY")
+            return builder
+        }
+        
     }
     
 }

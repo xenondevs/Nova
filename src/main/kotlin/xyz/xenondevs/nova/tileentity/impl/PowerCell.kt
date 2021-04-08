@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.impl
 
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
@@ -29,7 +30,7 @@ private const val MAX_ENERGY = 100_000
 class PowerCell(
     material: NovaMaterial,
     armorStand: ArmorStand,
-) : TileEntity(material, armorStand, true), EnergyStorage {
+) : TileEntity(material, armorStand), EnergyStorage {
     
     private var storedEnergy = retrieveData(0, "storedEnergy")
     private val gui = PowerCellUI()
@@ -63,8 +64,8 @@ class PowerCell(
     }
     
     override fun saveData() {
-        storeData("storedEnergy", storedEnergy)
-        storeData("sideConfig", energyConfig) // TODO: don't save sideConfig in item
+        storeData("storedEnergy", storedEnergy, true)
+        storeData("sideConfig", energyConfig)
     }
     
     override fun handleRightClick(event: PlayerInteractEvent) {
@@ -107,6 +108,17 @@ class PowerCell(
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Power Cell", gui).show()
+        }
+        
+    }
+    
+    companion object {
+    
+        fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
+            val builder = material.createBasicItemBuilder()
+            val energy = tileEntity?.let { (tileEntity as PowerCell).storedEnergy } ?: 0
+            builder.addLoreLines("§7Energy: $energy/$MAX_ENERGY")
+            return builder
         }
         
     }

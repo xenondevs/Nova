@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
+import com.google.common.base.Preconditions
 import com.google.gson.JsonObject
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
@@ -13,16 +14,18 @@ import java.util.*
 abstract class TileEntity(
     val material: NovaMaterial,
     val armorStand: ArmorStand,
-    private val keepData: Boolean
 ) {
     
-    protected val data: JsonObject = if (armorStand.hasTileEntityData()) armorStand.getTileEntityData() else JsonObject()
+    protected val mainDataObject: JsonObject = if (armorStand.hasTileEntityData()) armorStand.getTileEntityData() else JsonObject()
+    protected val globalDataObject: JsonObject = mainDataObject.get("global")?.let { it as JsonObject }
+        ?: JsonObject().also { mainDataObject.add("global", it) }
+    
     val uuid: UUID = armorStand.uniqueId
     val location = armorStand.location.blockLocation
     val chunk = location.chunk
     
     init {
-        if (data.size() == 0) {
+        if (mainDataObject.size() <= 1) {
             storeData("material", material)
         }
     }
@@ -39,8 +42,8 @@ abstract class TileEntity(
         val drops = ArrayList<ItemStack>()
         if (dropItems) {
             saveData()
-            val item = createItem()
-            if (keepData) item.setTileEntityData(data)
+            val item = material.createItemBuilder(this).build()
+            item.setTileEntityData(globalDataObject)
             drops += item
         }
         
@@ -54,11 +57,6 @@ abstract class TileEntity(
     open fun handleDisabled() {
         saveData()
     }
-    
-    /**
-     * Called to create the [ItemStack] to this TileEntity.
-     */
-    open fun createItem() = material.createItemStack()
     
     /**
      * Called to save all data using the [storeData] method.
@@ -124,16 +122,25 @@ abstract class TileEntity(
      * ArmorStand of this TileEntity.
      */
     protected inline fun <reified T> retrieveOrNull(key: String): T? {
-        return GSON.fromJson<T>(data.get(key))
+        return GSON.fromJson<T>(mainDataObject.get(key) ?: globalDataObject.get(key))
     }
     
     /**
      * Serializes objects using GSON and stores them under the given key in
      * the ArmorStand of this TileEntity.
+     *
+     * @param global If the data should also be stored in the [ItemStack]
+     * of this [TileEntity].
      */
-    fun storeData(key: String, value: Any) {
-        data.add(key, GSON.toJsonTree(value))
-        armorStand.setTileEntityData(data)
+    fun storeData(key: String, value: Any, global: Boolean = false) {
+        if (global) {
+            Preconditions.checkArgument(!mainDataObject.has(key), "$key is already a non-global value")
+            globalDataObject.add(key, GSON.toJsonTree(value))
+        } else {
+            Preconditions.checkArgument(!globalDataObject.has(key), "$key is already a global value")
+            mainDataObject.add(key, GSON.toJsonTree(value))
+        }
+        armorStand.setTileEntityData(mainDataObject)
     }
     
     override fun equals(other: Any?): Boolean {
@@ -154,7 +161,7 @@ abstract class TileEntity(
             val data = armorStand.getTileEntityData()
             val material: NovaMaterial = GSON.fromJson(data.get("material"))!!
             
-            return material.tileEntityConstructor!!(material, armorStand)
+            return material.createTileEntity!!(material, armorStand)
         }
         
     }

@@ -45,7 +45,7 @@ private const val MAX_ENERGY = 5_000
 private const val ENERGY_PER_TICK = 100
 private const val PRESS_TIME = 200
 
-class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(material, armorStand, false), EnergyStorage {
+class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(material, armorStand), EnergyStorage {
     
     private var energy = retrieveData(0, "energy")
     private var type: PressType = retrieveData(PressType.PLATE, "pressType")
@@ -137,7 +137,7 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     }
     
     override fun saveData() {
-        storeData("energy", energy)
+        storeData("energy", energy, true)
         storeData("pressType", pressTime)
         storeData("sideConfig", energyConfig)
     }

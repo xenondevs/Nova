@@ -90,10 +90,10 @@ object TileEntityManager : Listener {
         )
         
         // set TileEntity data
-        armorStand.setTileEntityData(data)
+        armorStand.setTileEntityData(data.let { JsonObject().apply { add("global", it) } })
         
         // create TileEntity instance
-        val tileEntity = material.tileEntityConstructor!!(material, armorStand)
+        val tileEntity = material.createTileEntity!!(material, armorStand)
         
         // add to tileEntities map
         val chunk = block.chunk

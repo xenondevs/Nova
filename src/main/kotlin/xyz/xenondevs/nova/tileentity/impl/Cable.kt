@@ -32,7 +32,6 @@ class Cable(
 ) : MultiModelTileEntity(
     material,
     armorStand,
-    keepData = false
 ), EnergyBridge {
     
     override val transferRate = 100

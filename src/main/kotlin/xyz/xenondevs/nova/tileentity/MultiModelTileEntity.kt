@@ -14,8 +14,7 @@ private val MULTI_MODEL_KEY = NamespacedKey(NOVA, "multiModel")
 abstract class MultiModelTileEntity(
     material: NovaMaterial,
     armorStand: ArmorStand,
-    keepData: Boolean
-) : TileEntity(material, armorStand, keepData) {
+) : TileEntity(material, armorStand) {
     
     override fun handleDisabled() {
         super.handleDisabled()
