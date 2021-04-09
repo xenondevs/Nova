@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.util
 
+import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.tree.CommandNode
+import com.mojang.brigadier.tree.RootCommandNode
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason
 import org.bukkit.inventory.ItemStack
@@ -30,7 +34,6 @@ object ReflectionRegistry {
     val CB_CRAFT_ENTITY_CLASS = getCBClass("entity.CraftEntity")
     val CB_CRAFT_WORLD_CLASS = getCBClass("CraftWorld")
     val CB_CRAFT_ITEM_STACK_CLASS = getCBClass("inventory.CraftItemStack")
-    val CB_CRAFT_META_SKULL_CLASS = getCBClass("inventory.CraftMetaSkull")
     
     // NMS methods
     val NMS_COMMAND_DISPATCHER_GET_BRIGADIER_COMMAND_DISPATCHER_METHOD = getMethod(NMS_COMMAND_DISPATCHER_CLASS, false, "a")
@@ -50,15 +53,15 @@ object ReflectionRegistry {
     val NMS_ENTITY_ARMOR_STAND_ARMOR_ITEMS_FIELD = getField(NMS_ENTITY_ARMOR_STAND_CLASS, true, "armorItems")
     
     // other fields
-//    val COMMAND_DISPATCHER_ROOT_FIELD = getField(CommandDispatcher::class.java, true, "root")
-//    val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class.java, true, "children")
-//    val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class.java, true, "literals")
-//    val COMMAND_NODE_ARGUMENTS_FIELD = getField(CommandNode::class.java, true, "arguments")
+    val COMMAND_DISPATCHER_ROOT_FIELD = getField(CommandDispatcher::class.java, true, "root")
+    val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class.java, true, "children")
+    val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class.java, true, "literals")
+    val COMMAND_NODE_ARGUMENTS_FIELD = getField(CommandNode::class.java, true, "arguments")
     
     // objects
-//    val NMS_DEDICATED_SERVER = CB_CRAFT_SERVER_GET_SERVER_METHOD.invoke(Bukkit.getServer())!!
-//    val NMS_COMMAND_DISPATCHER = NMS_MINECRAFT_SERVER_VANILLA_COMMAND_DISPATCHER_FIELD.get(NMS_DEDICATED_SERVER)!!
-//    val COMMAND_DISPATCHER = NMS_COMMAND_DISPATCHER_GET_BRIGADIER_COMMAND_DISPATCHER_METHOD.invoke(NMS_COMMAND_DISPATCHER)!! as CommandDispatcher<Any>
-//    val COMMAND_DISPATCHER_ROOT_NODE = COMMAND_DISPATCHER_ROOT_FIELD.get(COMMAND_DISPATCHER)!! as RootCommandNode<Any>
+    val NMS_DEDICATED_SERVER = CB_CRAFT_SERVER_GET_SERVER_METHOD.invoke(Bukkit.getServer())!!
+    val NMS_COMMAND_DISPATCHER = NMS_MINECRAFT_SERVER_VANILLA_COMMAND_DISPATCHER_FIELD.get(NMS_DEDICATED_SERVER)!!
+    val COMMAND_DISPATCHER = NMS_COMMAND_DISPATCHER_GET_BRIGADIER_COMMAND_DISPATCHER_METHOD.invoke(NMS_COMMAND_DISPATCHER)!! as CommandDispatcher<Any>
+    val COMMAND_DISPATCHER_ROOT_NODE = COMMAND_DISPATCHER_ROOT_FIELD.get(COMMAND_DISPATCHER)!! as RootCommandNode<Any>
     
 }

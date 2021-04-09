@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
@@ -10,9 +11,16 @@ import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_ENTITY_GET_HANDLE_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_ITEM_STACK_AS_NMS_COPY_METHOD
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_SERVER_SYNC_COMMANDS_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_WORLD_ADD_ENTITY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_WORLD_CREATE_ENTITY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_PACKAGE_PATH
+import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_DISPATCHER
+import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_DISPATCHER_ROOT_NODE
+import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_ARGUMENTS_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_CHILDREN_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_LITERALS_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_COMMAND_LISTENER_WRAPPER_GET_ENTITY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_ARMOR_STAND_ARMOR_ITEMS_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_GET_BUKKIT_ENTITY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKAGE_PATH
@@ -67,23 +75,23 @@ object ReflectionUtils {
         return field
     }
     
-//    fun registerCommand(builder: LiteralArgumentBuilder<Any>) {
-//        COMMAND_DISPATCHER.register(builder)
-//    }
+    fun registerCommand(builder: LiteralArgumentBuilder<Any>) {
+        COMMAND_DISPATCHER.register(builder)
+    }
     
-//    fun syncCommands() {
-//        CB_CRAFT_SERVER_SYNC_COMMANDS_METHOD.invoke(Bukkit.getServer())
-//    }
+    fun syncCommands() {
+        CB_CRAFT_SERVER_SYNC_COMMANDS_METHOD.invoke(Bukkit.getServer())
+    }
     
-//    fun unregisterCommand(name: String) {
-//        val children = COMMAND_NODE_CHILDREN_FIELD.get(COMMAND_DISPATCHER_ROOT_NODE) as MutableMap<String, *>
-//        val literals = COMMAND_NODE_LITERALS_FIELD.get(COMMAND_DISPATCHER_ROOT_NODE) as MutableMap<String, *>
-//        val arguments = COMMAND_NODE_ARGUMENTS_FIELD.get(COMMAND_DISPATCHER_ROOT_NODE) as MutableMap<String, *>
-//        
-//        children.remove(name)
-//        literals.remove(name)
-//        arguments.remove(name)
-//    }
+    fun unregisterCommand(name: String) {
+        val children = COMMAND_NODE_CHILDREN_FIELD.get(COMMAND_DISPATCHER_ROOT_NODE) as MutableMap<String, *>
+        val literals = COMMAND_NODE_LITERALS_FIELD.get(COMMAND_DISPATCHER_ROOT_NODE) as MutableMap<String, *>
+        val arguments = COMMAND_NODE_ARGUMENTS_FIELD.get(COMMAND_DISPATCHER_ROOT_NODE) as MutableMap<String, *>
+        
+        children.remove(name)
+        literals.remove(name)
+        arguments.remove(name)
+    }
     
     fun getNMSEntity(entity: Entity): Any {
         return CB_CRAFT_ENTITY_GET_HANDLE_METHOD.invoke(entity)
@@ -97,18 +105,18 @@ object ReflectionUtils {
         return createBukkitEntityFromNMSEntity(entityPlayer) as Player
     }
     
-//    fun getEntityFromCommandListenerWrapper(commandListenerWrapper: Any): Any? =
-//        NMS_COMMAND_LISTENER_WRAPPER_GET_ENTITY_METHOD.invoke(commandListenerWrapper)
+    fun getEntityFromCommandListenerWrapper(commandListenerWrapper: Any): Any? =
+        NMS_COMMAND_LISTENER_WRAPPER_GET_ENTITY_METHOD.invoke(commandListenerWrapper)
     
-//    fun createPlayerFromCommandListenerWrapper(commandListenerWrapper: Any): Player? {
-//        val entity = getEntityFromCommandListenerWrapper(commandListenerWrapper)
-//        return if (entity != null) createPlayerFromEntityPlayer(entity) else null
-//    }
+    fun createPlayerFromCommandListenerWrapper(commandListenerWrapper: Any): Player? {
+        val entity = getEntityFromCommandListenerWrapper(commandListenerWrapper)
+        return if (entity != null) createPlayerFromEntityPlayer(entity) else null
+    }
     
-//    fun getPlayerFromCommandListenerWrapper(commandListenerWrapper: Any): Player? {
-//        val entity = getEntityFromCommandListenerWrapper(commandListenerWrapper)
-//        return if (entity != null) getPlayerFromEntityPlayer(entity) else null
-//    }
+    fun getPlayerFromCommandListenerWrapper(commandListenerWrapper: Any): Player? {
+        val entity = getEntityFromCommandListenerWrapper(commandListenerWrapper)
+        return if (entity != null) getPlayerFromEntityPlayer(entity) else null
+    }
     
     fun createNMSEntity(world: World, location: Location, entityType: EntityType): Any {
         return CB_CRAFT_WORLD_CREATE_ENTITY_METHOD.invoke(world, location, entityType.entityClass)

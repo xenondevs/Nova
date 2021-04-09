@@ -83,7 +83,7 @@ private object FuelUtils {
         addToList(Tag.SAPLINGS, 100)
         addToList(Tag.CARPETS, 67)
         
-        FUELS = fuels.map { it.material to it }.toMap()
+        FUELS = fuels.associateBy { it.material }
     }
     
     fun getBurnTime(material: Material) = FUELS[material]?.burnTime ?: 0

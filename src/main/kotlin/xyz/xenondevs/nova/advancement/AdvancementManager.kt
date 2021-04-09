@@ -11,7 +11,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.awardAdvancement
-import java.util.*
 import net.roxeez.advancement.AdvancementManager as RoxeezAdvancementManager
 
 fun NovaMaterial.toIcon(): Icon {
@@ -21,7 +20,7 @@ fun NovaMaterial.toIcon(): Icon {
     return Icon(material, "{CustomModelData:$customModelData}")
 }
 
-fun Advancement.addObtainCriteria(novaMaterial: NovaMaterial) : Criteria {
+fun Advancement.addObtainCriteria(novaMaterial: NovaMaterial): Criteria {
     val itemStack = novaMaterial.createBasicItemBuilder().build()
     val material = itemStack.type
     val customModelData = itemStack.itemMeta?.customModelData ?: 0
