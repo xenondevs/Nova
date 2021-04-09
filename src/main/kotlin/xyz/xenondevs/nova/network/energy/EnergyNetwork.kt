@@ -24,17 +24,17 @@ class EnergyNetwork : Network {
         get() = _nodes
     
     private val _nodes = HashSet<NetworkNode>()
+    private val bridges = HashSet<EnergyBridge>()
     private val providers = HashSet<EnergyStorage>()
     private val consumers = HashSet<EnergyStorage>()
     private val buffers = HashSet<EnergyStorage>()
-    private val bridges = HashSet<EnergyBridge>()
     
     private val availableProviderEnergy: Int
-        get() = providers.map { it.providedEnergy }.sum()
+        get() = providers.sumOf { it.providedEnergy }
     private val availableBufferEnergy: Int
-        get() = buffers.map { it.providedEnergy }.sum()
+        get() = buffers.sumOf { it.providedEnergy }
     private val requestedConsumerEnergy: Int
-        get() = consumers.map { it.requestedEnergy }.sum()
+        get() = consumers.sumOf { it.requestedEnergy }
     private val transferRate: Int
         get() = bridges.map { it.transferRate }.minOrNull() ?: 0
     
@@ -79,6 +79,8 @@ class EnergyNetwork : Network {
             providers -= node
             consumers -= node
             buffers -= node
+        } else if (node is EnergyBridge) {
+            bridges -= node
         }
     }
     

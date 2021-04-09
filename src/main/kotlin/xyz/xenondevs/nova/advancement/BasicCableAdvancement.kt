@@ -9,11 +9,11 @@ class BasicCableAdvancement : Advancement(KEY) {
     
     init {
         setParent(RootAdvancement.KEY)
-        addObtainCriteria(NovaMaterial.CABLE)
+        addObtainCriteria(NovaMaterial.BASIC_CABLE)
         setDisplay {
             it.setTitle("Transferring Energy")
             it.setDescription("Craft a Basic Cable")
-            it.setIcon(NovaMaterial.CABLE.toIcon())
+            it.setIcon(NovaMaterial.BASIC_CABLE.toIcon())
         }
     }
     

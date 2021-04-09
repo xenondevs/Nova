@@ -26,7 +26,8 @@ private const val HORIZONTAL = 2
 private const val DOWN = 3
 private const val UP = 4
 
-class Cable(
+open class Cable(
+    override val transferRate: Int,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : MultiModelTileEntity(
@@ -34,7 +35,6 @@ class Cable(
     armorStand,
 ), EnergyBridge {
     
-    override val transferRate = 100
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = CUBE_FACES.toSet() // TODO: allow players to enable / disable cable faces
     
@@ -132,3 +132,13 @@ class Cable(
     override fun handleRightClick(event: PlayerInteractEvent) = Unit // TODO: Configuration Menu
     
 }
+
+class BasicCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(100, material, armorStand)
+
+class AdvancedCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(1000, material, armorStand)
+
+class EliteCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(5000, material, armorStand)
+
+class UltimateCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(20000, material, armorStand)
+
+class CreativeCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(Int.MAX_VALUE, material, armorStand)

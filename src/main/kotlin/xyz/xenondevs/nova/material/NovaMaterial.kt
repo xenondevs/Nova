@@ -6,10 +6,7 @@ import org.bukkit.Material.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.impl.Cable
-import xyz.xenondevs.nova.tileentity.impl.FurnaceGenerator
-import xyz.xenondevs.nova.tileentity.impl.MechanicalPress
-import xyz.xenondevs.nova.tileentity.impl.PowerCell
+import xyz.xenondevs.nova.tileentity.impl.*
 import xyz.xenondevs.nova.util.toIntArray
 
 private fun blockOf(data: IntArray) = ModelData(STRUCTURE_VOID, data)
@@ -52,7 +49,11 @@ enum class NovaMaterial(
     // 2000 - 3000: Upgrades and similar
     
     // 5000 - 10.000 MultiModel Blocks
-    CABLE("Cable", blockOf(5000), null, blockOf(intArrayOf(-1) + (5000..5003).toIntArray()), null, ::Cable),
+    BASIC_CABLE("Basic Cable", blockOf(5004), null, blockOf(intArrayOf(-1) + (5000..5003).toIntArray()), null, ::BasicCable),
+    ADVANCED_CABLE("Advanced Cable", blockOf(5009), null, blockOf(intArrayOf(-1) + (5005..5008).toIntArray()), null, ::AdvancedCable),
+    ELITE_CABLE("Elite Cable", blockOf(5014), null, blockOf(intArrayOf(-1) + (5010..5013).toIntArray()), null, ::EliteCable),
+    ULTIMATE_CABLE("Ultimate Cable", blockOf(5019), null, blockOf(intArrayOf(-1) + (5015..5018).toIntArray()), null, ::UltimateCable),
+    CREATIVE_CABLE("Creative Cable", blockOf(5024), null, blockOf(intArrayOf(-1) + (5020..5023).toIntArray()), null, ::CreativeCable),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),
@@ -84,7 +85,7 @@ enum class NovaMaterial(
     /**
      * Creates a basic [ItemBuilder] without any additional information
      * like an energy bar added to the [ItemStack].
-     * 
+     *
      * Can be used for just previewing the item type or as a base in
      * a `createItemBuilder` function for a [TileEntity].
      */
@@ -95,7 +96,7 @@ enum class NovaMaterial(
      *
      * The [TileEntity] provided must be of the same type as the [TileEntity]
      * returned in the [createTileEntity] function.
-     * 
+     *
      * If there is no custom [createItemBuilderFunction] for this [NovaMaterial],
      * it will return the result of [createBasicItemBuilder].
      */

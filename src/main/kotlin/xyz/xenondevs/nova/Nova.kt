@@ -68,7 +68,7 @@ class Nova : JavaPlugin() {
                     for (y in 0..7) {
                         for (z in 0..7) {
                             val location = sender.location.clone().add(x.toDouble(), y.toDouble(), z.toDouble()).blockLocation
-                            TileEntityManager.placeTileEntity(location, 0f, NovaMaterial.CABLE, JsonObject())
+                            TileEntityManager.placeTileEntity(location, 0f, NovaMaterial.BASIC_CABLE, JsonObject())
                         }
                     }
                 }

@@ -18,7 +18,7 @@ private object FuelUtils {
     init {
         
         val fuels = mutableListOf(
-            Fuel(Material.LAVA_BUCKET, 20000),
+            Fuel(Material.LAVA_BUCKET, 20000, Material.BUCKET),
             Fuel(Material.COAL_BLOCK, 16000),
             Fuel(Material.BLAZE_ROD, 2400),
             Fuel(Material.COAL, 1600),
