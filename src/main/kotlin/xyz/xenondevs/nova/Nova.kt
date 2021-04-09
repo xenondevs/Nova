@@ -6,11 +6,14 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import xyz.xenondevs.nova.advancement.AdvancementManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.recipe.NovaRecipes
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.getTileEntityData
 import xyz.xenondevs.nova.ui.setGlobalIngredients
+import xyz.xenondevs.nova.util.GSON
 import xyz.xenondevs.nova.util.blockLocation
 
 lateinit var NOVA: Nova
@@ -26,6 +29,7 @@ class Nova : JavaPlugin() {
         TileEntityManager.init()
         NetworkManager.init()
         NovaRecipes.loadRecipes()
+        AdvancementManager.loadAdvancements()
         
         getCommand("test")!!.setExecutor(this)
         getCommand("getNovaMaterial")!!.setExecutor(this)
@@ -39,10 +43,18 @@ class Nova : JavaPlugin() {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         sender as Player
         when {
-            
             label.equals("test", true) -> {
-                val count = sender.location.chunk.entities.filterIsInstance<ArmorStand>().count()
-                sender.sendMessage("Amount of ArmorStands in Chunk: $count")
+                val armorStands = sender
+                    .location
+                    .chunk
+                    .entities
+                    .filterIsInstance<ArmorStand>()
+                
+                sender.sendMessage("Amount of ArmorStands in Chunk: ${armorStands.count()}")
+                
+                val nearest = armorStands.minByOrNull { it.location.distance(sender.location) }!!
+                
+                println(GSON.toJson(nearest.getTileEntityData()))
             }
             
             label.equals("getnovamaterial", true) -> {

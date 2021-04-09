@@ -1,9 +1,18 @@
 package xyz.xenondevs.nova.util
 
+import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+
+fun Player.awardAdvancement(key: NamespacedKey) {
+    val advancement = Bukkit.getAdvancement(key)!!
+    val progress = getAdvancementProgress(advancement)
+    advancement.criteria.forEach { progress.awardCriteria(it) }
+}
 
 object EntityUtils {
     
