@@ -9,6 +9,15 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.advancement.cable.AdvancedCableAdvancement
+import xyz.xenondevs.nova.advancement.cable.BasicCableAdvancement
+import xyz.xenondevs.nova.advancement.cable.EliteCableAdvancement
+import xyz.xenondevs.nova.advancement.cable.UltimateCableAdvancement
+import xyz.xenondevs.nova.advancement.powercell.AdvancedPowerCellAdvancement
+import xyz.xenondevs.nova.advancement.powercell.BasicPowerCellAdvancement
+import xyz.xenondevs.nova.advancement.powercell.ElitePowerCellAdvancement
+import xyz.xenondevs.nova.advancement.powercell.UltimatePowerCellAdvancement
+import xyz.xenondevs.nova.advancement.press.*
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.awardAdvancement
 import net.roxeez.advancement.AdvancementManager as RoxeezAdvancementManager
@@ -44,7 +53,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             RootAdvancement(),
             BasicCableAdvancement(), AdvancedCableAdvancement(), EliteCableAdvancement(), UltimateCableAdvancement(),
             FurnaceGeneratorAdvancement(),
-            BasicPowerCellAdvancement(),
+            BasicPowerCellAdvancement(), AdvancedPowerCellAdvancement(), ElitePowerCellAdvancement(), UltimatePowerCellAdvancement(),
             MechanicalPressAdvancement(), GearsAdvancement(), PlatesAdvancement(), AllPlatesAdvancement(), AllGearsAdvancement()
         )
         

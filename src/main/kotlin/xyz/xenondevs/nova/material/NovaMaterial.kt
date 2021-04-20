@@ -27,8 +27,12 @@ enum class NovaMaterial(
     
     // 1 - 1000: Blocks
     FURNACE_GENERATOR("Furnace Generator", blockOf(1), FurnaceGenerator::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
-    POWER_CELL("Power Cell", blockOf(2), PowerCell::createItemBuilder, blockOf(2), IRON_BLOCK, ::PowerCell),
-    MECHANICAL_PRESS("Mechanical Press", blockOf(3), null, blockOf(3), IRON_BLOCK, ::MechanicalPress),
+    MECHANICAL_PRESS("Mechanical Press", blockOf(2), null, blockOf(3), IRON_BLOCK, ::MechanicalPress),
+    BASIC_POWER_CELL("Basic Power Cell", blockOf(3), PowerCell::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
+    ADVANCED_POWER_CELL("Advanced Power Cell", blockOf(4), PowerCell::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
+    ELITE_POWER_CELL("Elite Power Cell", blockOf(5), PowerCell::createItemBuilder, blockOf(5), IRON_BLOCK, ::ElitePowerCell),
+    ULTIMATE_POWER_CELL("Ultimate Power Cell", blockOf(6), PowerCell::createItemBuilder, blockOf(6), IRON_BLOCK, ::UltimatePowerCell),
+    CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), PowerCell::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),

@@ -26,9 +26,8 @@ import xyz.xenondevs.particle.data.color.RegularColor
 import java.awt.Color
 import java.util.*
 
-private const val MAX_ENERGY = 100_000
-
-class PowerCell(
+open class PowerCell(
+    val maxEnergy: Int,
     material: NovaMaterial,
     armorStand: ArmorStand,
 ) : TileEntity(material, armorStand), EnergyStorage {
@@ -44,7 +43,7 @@ class PowerCell(
     override val providedEnergy: Int
         get() = storedEnergy
     override val requestedEnergy
-        get() = MAX_ENERGY - storedEnergy
+        get() = maxEnergy - storedEnergy
     
     override fun addEnergy(energy: Int) {
         storedEnergy += energy
@@ -74,7 +73,7 @@ class PowerCell(
         gui.openWindow(event.player)
     }
     
-    private fun getEnergyValues() = storedEnergy to MAX_ENERGY
+    private fun getEnergyValues() = storedEnergy to maxEnergy
     
     override fun handleTick() {
         if (updateEnergyBar) {
@@ -118,10 +117,21 @@ class PowerCell(
         fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
             val builder = material.createBasicItemBuilder()
             val energy = tileEntity?.let { (tileEntity as PowerCell).storedEnergy } ?: 0
-            builder.addLoreLines(EnergyUtils.getEnergyString(energy, MAX_ENERGY))
+            val maxEnergy = tileEntity?.let { (tileEntity as PowerCell).maxEnergy } ?: 0
+            builder.addLoreLines(EnergyUtils.getEnergyString(energy, maxEnergy))
             return builder
         }
         
     }
     
 }
+
+class BasicPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(100_000, material, armorStand)
+
+class AdvancedPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(1_000_000, material, armorStand)
+
+class ElitePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(5_000_000, material, armorStand)
+
+class UltimatePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(20_000_000, material, armorStand)
+
+class CreativePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(Int.MAX_VALUE, material, armorStand)

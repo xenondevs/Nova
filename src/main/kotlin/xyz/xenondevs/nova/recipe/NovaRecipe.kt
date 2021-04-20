@@ -43,7 +43,7 @@ object NovaRecipes : Listener {
                 .setIngredient('f', Material.FURNACE)
                 .setIngredient('r', Material.REDSTONE),
             
-            NovaMaterial.POWER_CELL.makeRecipe()
+            NovaMaterial.BASIC_POWER_CELL.makeRecipe()
                 .shape("ici", "crc", "ici")
                 .setIngredient('i', Material.IRON_INGOT)
                 .setIngredient('c', NovaMaterial.BASIC_CABLE)
