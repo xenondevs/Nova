@@ -8,6 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.util.EnergyUtils
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
@@ -51,7 +52,7 @@ class EnergyBar(
             val displayPercentage = max(min((percentage - displayPercentageStart) * totalSections, 1.0), 0.0)
             val state = round(displayPercentage * 16).toInt()
             
-            return NovaMaterial.RED_BAR.item.getItemBuilder("§c$energy§8/§7$maxEnergy Energy", state)
+            return NovaMaterial.RED_BAR.item.getItemBuilder(EnergyUtils.getEnergyString(energy, maxEnergy), state)
         }
         
         override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit

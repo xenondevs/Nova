@@ -199,7 +199,7 @@ class FurnaceGenerator(
         fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
             val builder = material.createBasicItemBuilder()
             val energy = tileEntity?.let { (tileEntity as FurnaceGenerator).energy } ?: 0
-            builder.addLoreLines("§7Energy: $energy/$MAX_ENERGY")
+            builder.addLoreLines(EnergyUtils.getEnergyString(energy, MAX_ENERGY))
             return builder
         }
         

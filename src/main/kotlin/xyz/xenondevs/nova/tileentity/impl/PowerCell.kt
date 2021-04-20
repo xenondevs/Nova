@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.SideConfigGUI
+import xyz.xenondevs.nova.util.EnergyUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
@@ -117,7 +118,7 @@ class PowerCell(
         fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
             val builder = material.createBasicItemBuilder()
             val energy = tileEntity?.let { (tileEntity as PowerCell).storedEnergy } ?: 0
-            builder.addLoreLines("§7Energy: $energy/$MAX_ENERGY")
+            builder.addLoreLines(EnergyUtils.getEnergyString(energy, MAX_ENERGY))
             return builder
         }
         
