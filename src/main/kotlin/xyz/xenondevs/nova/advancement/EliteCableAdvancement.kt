@@ -11,7 +11,7 @@ class EliteCableAdvancement : Advancement(KEY) {
         setParent(AdvancedCableAdvancement.KEY)
         addObtainCriteria(NovaMaterial.ELITE_CABLE)
         setDisplay {
-            it.setTitle("Even More Energy")
+            it.setTitle("Even More Cable")
             it.setDescription("Craft an Elite Cable")
             it.setIcon(NovaMaterial.ELITE_CABLE.toIcon())
         }

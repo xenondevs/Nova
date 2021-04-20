@@ -9,6 +9,6 @@ interface EnergyBridge : NetworkBridge {
      * types of [NetworkBridge]s inside an [EnergyNetwork], the transfer of the
      * whole network is equal to the smallest one.
      */
-    val transferRate: Int
+    val energyTransferRate: Int
     
 }

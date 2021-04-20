@@ -1,13 +1,11 @@
 package xyz.xenondevs.nova.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.network.energy.EnergyNetwork
+import xyz.xenondevs.nova.network.item.ItemNetwork
+import java.lang.RuntimeException
 
 interface Network {
-    
-    /**
-     * What [NetworkType] this [Network] is.
-     */
-    val type: NetworkType
     
     /**
      * A set of [NetworkNode]s that are connected to this [Network].
@@ -51,3 +49,18 @@ interface Network {
     
 }
 
+enum class NetworkType(val networkConstructor: () -> Network) {
+    
+    /**
+     * Transfers Energy
+     */
+    ENERGY(::EnergyNetwork),
+    
+    /**
+     * Transfers Items
+     */
+    ITEMS(::ItemNetwork)
+    
+}
+
+class NetworkException(message: String) : RuntimeException(message)

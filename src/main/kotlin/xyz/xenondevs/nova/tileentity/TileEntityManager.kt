@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import org.bukkit.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
 import org.bukkit.event.player.PlayerInteractEvent
@@ -16,7 +17,7 @@ import xyz.xenondevs.nova.tileentity.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
 import kotlin.math.roundToInt
 
-private val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
+val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
 
 fun ItemStack.setTileEntityData(data: JsonObject) {
     if (hasItemMeta()) {
@@ -159,7 +160,7 @@ object TileEntityManager : Listener {
         handleChunkUnload(event.chunk)
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePlace(event: BlockPlaceEvent) {
         val player = event.player
         val placedItem = event.itemInHand
@@ -178,7 +179,7 @@ object TileEntityManager : Listener {
         }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
         val tileEntity = getTileEntityAt(event.block.location)
         if (tileEntity != null) {
@@ -187,7 +188,7 @@ object TileEntityManager : Listener {
         }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleInteract(event: PlayerInteractEvent) {
         val action = event.action
         if (action == Action.RIGHT_CLICK_BLOCK && !event.player.isSneaking) {

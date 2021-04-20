@@ -9,17 +9,28 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.hitbox.Hitbox
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.*
+import xyz.xenondevs.nova.network.Network
+import xyz.xenondevs.nova.network.NetworkManager
+import xyz.xenondevs.nova.network.NetworkNode
+import xyz.xenondevs.nova.network.NetworkType
+import xyz.xenondevs.nova.network.NetworkType.ENERGY
+import xyz.xenondevs.nova.network.NetworkType.ITEMS
 import xyz.xenondevs.nova.network.energy.EnergyBridge
 import xyz.xenondevs.nova.network.energy.EnergyNetwork
+import xyz.xenondevs.nova.network.item.ItemBridge
+import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.tileentity.MultiModelTileEntity
+import xyz.xenondevs.nova.ui.CableItemConfigGUI
 import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.axis
+import xyz.xenondevs.nova.util.point.Point3D
+import xyz.xenondevs.nova.util.rotationValues
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
-import kotlin.collections.ArrayList
 
 private const val CONNECTOR = 1
 private const val HORIZONTAL = 2
@@ -27,13 +38,14 @@ private const val DOWN = 3
 private const val UP = 4
 
 open class Cable(
-    override val transferRate: Int,
+    override val energyTransferRate: Int,
+    override val itemTransferRate: Int,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : MultiModelTileEntity(
     material,
     armorStand,
-), EnergyBridge {
+), EnergyBridge, ItemBridge {
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = CUBE_FACES.toSet() // TODO: allow players to enable / disable cable faces
@@ -45,8 +57,10 @@ open class Cable(
             return _connectedNodes!!
         }
     
+    private val hitboxes = ArrayList<Hitbox>()
+    
     override fun handleTick() {
-        val network = networks[NetworkType.ENERGY]
+        val network = networks[ENERGY]
         if (network != null) {
             ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location)
                 .setParticleData((network as EnergyNetwork).color)
@@ -63,13 +77,14 @@ open class Cable(
     }
     
     override fun handleInitialized() {
-        NetworkManager.handleBridgeAdd(this, NetworkType.ENERGY)
+        NetworkManager.handleBridgeAdd(this, ENERGY, ITEMS)
         replaceModels(getModelsNeeded())
         updateHitbox()
     }
     
     override fun handleRemoved(unload: Boolean) {
         NetworkManager.handleBridgeRemove(this, unload)
+        hitboxes.forEach { it.remove() }
     }
     
     private fun getModelsNeeded(): List<Pair<ItemStack, Float>> {
@@ -77,10 +92,10 @@ open class Cable(
         
         val items = ArrayList<Pair<ItemStack, Float>>()
         
-        val connectedFaces = connectedNodes.values.flatMap { it.keys }
+        val connectedFaces = connectedNodes.values.flatMapTo(HashSet()) { it.keys }
         
         // only show connector if connections aren't on two opposite sides
-        if (connectedFaces.size != 2 || connectedFaces[0] != connectedFaces[1].oppositeFace) {
+        if (connectedFaces.size != 2 || connectedFaces.first() != connectedFaces.last().oppositeFace) {
             items += material.block!!.getItem(CONNECTOR) to 0f
         }
         
@@ -108,18 +123,60 @@ open class Cable(
     }
     
     private fun updateHitbox() {
-        val block = armorStand.location.block
+        updateVirtualHitbox()
+        updateBlockHitbox()
+    }
+    
+    private fun updateVirtualHitbox() {
+        hitboxes.forEach { it.remove() }
+        hitboxes.clear()
         
-        val neighborFaces = block.location.getNearbyNodes()
-            .map { (blockFace, _) -> blockFace }
+        val neighborEndPoints = connectedNodes
+            .values
+            .flatMap { it.entries }
+            .filter { (_, node) -> node is ItemStorage }
+            .associate { it.key to it.value as ItemStorage }
+        
+        neighborEndPoints
+            .map { it.key }
+            .forEach { blockFace ->
+                val pointA = Point3D(0.3, 0.3, 0.0)
+                val pointB = Point3D(0.7, 0.7, 0.2)
+                
+                val origin = Point3D(0.5, 0.5, 0.5)
+                
+                val rotationValues = blockFace.rotationValues
+                pointA.rotateAroundXAxis(rotationValues.first, origin)
+                pointA.rotateAroundYAxis(rotationValues.second, origin)
+                pointB.rotateAroundXAxis(rotationValues.first, origin)
+                pointB.rotateAroundYAxis(rotationValues.second, origin)
+                
+                val sortedPoints = Point3D.sort(pointA, pointB)
+                val from = location.clone().add(sortedPoints.first.x, sortedPoints.first.y, sortedPoints.first.z)
+                val to = location.clone().add(sortedPoints.second.x, sortedPoints.second.y, sortedPoints.second.z)
+                
+                hitboxes += Hitbox(from, to) { handleHitboxHit(it, blockFace, neighborEndPoints[blockFace]!!) }
+            }
+    }
+    
+    private fun updateBlockHitbox() {
+        val neighborFaces = connectedNodes.flatMapTo(HashSet()) { it.value.keys }
         val axis = when {
+            neighborFaces.contains(BlockFace.EAST) && neighborFaces.contains(BlockFace.WEST) -> Axis.X
             neighborFaces.contains(BlockFace.NORTH) && neighborFaces.contains(BlockFace.SOUTH) -> Axis.Z
             neighborFaces.contains(BlockFace.UP) && neighborFaces.contains(BlockFace.DOWN) -> Axis.Y
-            else -> Axis.X
+            else -> {
+                connectedNodes.values
+                    .mapNotNull { faceMap -> faceMap.keys.firstOrNull() }
+                    .firstOrNull()
+                    ?.axis
+                    ?: Axis.X
+            }
         }
         
         // run later because this might be called during an event
         runTaskLater(1) {
+            val block = armorStand.location.block
             block.type = Material.CHAIN
             val blockData = block.blockData as Orientable
             blockData.axis = axis
@@ -127,18 +184,23 @@ open class Cable(
         }
     }
     
+    private fun handleHitboxHit(event: PlayerInteractEvent, face: BlockFace, itemStorage: ItemStorage) {
+        event.isCancelled = true
+        CableItemConfigGUI(itemStorage, face.oppositeFace).openWindow(event.player)
+    }
+    
     override fun saveData() = Unit
     
-    override fun handleRightClick(event: PlayerInteractEvent) = Unit // TODO: Configuration Menu
+    override fun handleRightClick(event: PlayerInteractEvent) = Unit
     
 }
 
-class BasicCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(100, material, armorStand)
+class BasicCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(100, 1, material, armorStand)
 
-class AdvancedCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(1000, material, armorStand)
+class AdvancedCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(1000, 2, material, armorStand)
 
-class EliteCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(5000, material, armorStand)
+class EliteCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(5000, 4, material, armorStand)
 
-class UltimateCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(20000, material, armorStand)
+class UltimateCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(20000, 8, material, armorStand)
 
-class CreativeCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(Int.MAX_VALUE, material, armorStand)
+class CreativeCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(Int.MAX_VALUE, Int.MAX_VALUE, material, armorStand)

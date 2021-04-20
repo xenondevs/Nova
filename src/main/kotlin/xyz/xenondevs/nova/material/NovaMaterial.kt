@@ -65,6 +65,10 @@ enum class NovaMaterial(
     PLATE_OFF_BUTTON("", itemOf(9006)),
     GEAR_ON_BUTTON("", itemOf(9007)),
     GEAR_OFF_BUTTON("", itemOf(9008)),
+    ENERGY_ON_BUTTON("", itemOf(9009)),
+    ENERGY_OFF_BUTTON("", itemOf(9010)),
+    ITEM_ON_BUTTON("", itemOf(9011)),
+    ITEM_OFF_BUTTON("", itemOf(9012)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),

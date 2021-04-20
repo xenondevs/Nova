@@ -15,6 +15,7 @@ object NetworkManager {
     }
     
     fun handleEndPointAdd(endPoint: NetworkEndPoint) {
+        val bridgesToUpdate = HashSet<NetworkBridge>()
         NetworkType.values().forEach { networkType ->
             val allowedFaces = endPoint.allowedFaces[networkType]
             if (allowedFaces != null) {
@@ -24,10 +25,11 @@ object NetworkManager {
                         val network = bridge.networks[networkType]!!
                         endPoint.setNetwork(networkType, face, network)
                         network.addEndPoint(endPoint, face)
-                        bridge.handleNetworkUpdate()
+                        bridgesToUpdate += bridge
                     }
             }
         }
+        bridgesToUpdate.forEach(NetworkBridge::handleNetworkUpdate)
     }
     
     fun handleBridgeAdd(bridge: NetworkBridge, vararg supportedNetworkTypes: NetworkType) {

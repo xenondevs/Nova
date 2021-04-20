@@ -5,8 +5,6 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.util.getNeighboringTileEntitiesOfType
 import java.util.*
 
-fun Location.getNearbyNodes() = getNeighboringTileEntitiesOfType<NetworkNode>()
-
 interface NetworkNode {
     
     val location: Location
@@ -35,7 +33,7 @@ interface NetworkNode {
         }
     }
     
-    fun getNearbyNodes() = location.getNearbyNodes()
+    fun getNearbyNodes() = location.getNeighboringTileEntitiesOfType<NetworkNode>()
     
     fun getNearbyEndPoints() = location.getNeighboringTileEntitiesOfType<NetworkEndPoint>()
     

@@ -18,8 +18,6 @@ class EnergyNetwork : Network {
     
     val color: RegularColor = RegularColor.random() // TODO: remove
     
-    override val type = NetworkType.ENERGY
-    
     override val nodes: Set<NetworkNode>
         get() = _nodes
     
@@ -36,7 +34,7 @@ class EnergyNetwork : Network {
     private val requestedConsumerEnergy: Int
         get() = consumers.sumOf { it.requestedEnergy }
     private val transferRate: Int
-        get() = bridges.map { it.transferRate }.minOrNull() ?: 0
+        get() = bridges.map { it.energyTransferRate }.minOrNull() ?: 0
     
     override fun addAll(network: Network) {
         Preconditions.checkArgument(network is EnergyNetwork, "Illegal Network Type")
@@ -60,12 +58,33 @@ class EnergyNetwork : Network {
         
         when (val connectionType = (endPoint as EnergyStorage).energyConfig[face]!!) {
             
-            PROVIDE -> if (!buffers.contains(endPoint)) providers += endPoint
-            CONSUME -> if (!buffers.contains(endPoint)) consumers += endPoint
+            PROVIDE -> {
+                if (!buffers.contains(endPoint)) {
+                    if (consumers.contains(endPoint)) {
+                        consumers -= endPoint
+                        buffers += endPoint
+                    } else {
+                        providers += endPoint
+                    }
+                }
+            }
+            
+            CONSUME -> {
+                if (!buffers.contains(endPoint)) {
+                    if (providers.contains(endPoint)) {
+                        providers -= endPoint
+                        buffers += endPoint
+                    } else {
+                        consumers += endPoint
+                    }
+                }
+            }
+            
             BUFFER -> {
                 removeNode(endPoint) // remove from provider / consumer set
                 buffers += endPoint
             }
+            
             else -> throw IllegalArgumentException("Illegal ConnectionType: $connectionType")
             
         }
@@ -106,7 +125,7 @@ class EnergyNetwork : Network {
         energyDeficit = takeEqually(energyDeficit, providers)
         if (energyDeficit != 0 && useBuffers) energyDeficit = takeEqually(energyDeficit, buffers)
         
-        if (energyDeficit != 0) throw ArithmeticException("Not enough energy: $energyDeficit") // should never happen
+        if (energyDeficit != 0) throw NetworkException("Not enough energy: $energyDeficit") // should never happen
     }
     
     private fun distributeEqually(energy: Int, consumers: Iterable<EnergyStorage>): Int {

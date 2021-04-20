@@ -23,6 +23,10 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>minecraft-repo</id>
+            <url>https://libraries.minecraft.net/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -39,14 +43,14 @@
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
+            <artifactId>spigot-api</artifactId>
             <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.NichtStudioCode</groupId>
             <artifactId>InvUI</artifactId>
-            <version>ce147a38b8</version>
+            <version>ff56f8e017</version>
         </dependency>
         <dependency>
             <groupId>xyz.xenondevs</groupId>
@@ -57,6 +61,12 @@
             <groupId>com.github.NichtStudioCode</groupId>
             <artifactId>AdvancementAPI</artifactId>
             <version>485a8e37cc</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>brigadier</artifactId>
+            <version>1.0.17</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
