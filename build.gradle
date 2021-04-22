@@ -1,0 +1,72 @@
+plugins {
+    id "java"
+    id "maven-publish"
+    id "org.jetbrains.kotlin.jvm" version "1.4.32"
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    }
+
+    maven {
+        url = uri("https://jitpack.io")
+    }
+
+    maven {
+        url = uri("https://libraries.minecraft.net/")
+    }
+
+    maven {
+        url = uri("https://repo.maven.apache.org/maven2/")
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32"
+    implementation "com.github.NichtStudioCode:InvUI:cab14d0047"
+    implementation "xyz.xenondevs:particle:1.5.1"
+    implementation "com.github.NichtStudioCode:AdvancementAPI:485a8e37cc"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.4.31"
+    compileOnly "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"
+    compileOnly "com.mojang:brigadier:1.0.17"
+    shadow "junit:junit:3.8.2"
+}
+
+sourceSets {
+    main.kotlin.srcDirs += "src/main/kotlin"
+    main.java.srcDirs += "src/main/kotlin"
+}
+
+group = "xyz.xenondevs"
+version = "0.1-SNAPSHOT"
+description = "Nova"
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+shadowJar {
+    if (System.getProperty("dir") != null)
+        destinationDirectory.set(new File(System.getProperty("dir")))
+
+    archiveBaseName.set(project.name)
+    archiveVersion.set(project.version.toString())
+
+    relocate("kotlin", "xyz.xenondevs.nova.lib.kotlin")
+    relocate("net.roxeez", "xyz.xenondevs.nova.lib.net.roxeez")
+    relocate("org.intellij.lang.annotations", "xyz.xenondevs.nova.lib.org.intellij.lang.annotations")
+    relocate("org.jetbrains.annotations", "xyz.xenondevs.nova.lib.org.jetbrains.annotations")
+    relocate("de.studiocode.invui", "xyz.xenondevs.nova.lib.de.studiocode.invui")
+    relocate("de.studiocode.inventoryaccess", "xyz.xenondevs.nova.lib.de.studiocode.inventoryaccess")
+}
+
+
+tasks {
+    "build" {
+        dependsOn(shadowJar)
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
