@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.block.BlockState
+import org.bukkit.block.Chest
 import org.bukkit.block.Container
 import org.bukkit.block.Furnace
 import org.bukkit.event.EventHandler
@@ -82,6 +83,7 @@ object VanillaTileEntityManager : Listener {
     
     private fun getVanillaTileEntity(state: BlockState) =
         when (state) {
+            is Chest -> VanillaChestTileEntity(state)
             is Furnace -> VanillaFurnaceTileEntity(state)
             is Container -> VanillaContainerTileEntity(state)
             else -> null

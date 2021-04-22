@@ -1,10 +1,7 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
 import com.google.gson.JsonObject
-import org.bukkit.block.BlockFace
-import org.bukkit.block.Container
-import org.bukkit.block.Furnace
-import org.bukkit.block.TileState
+import org.bukkit.block.*
 import xyz.xenondevs.nova.network.Network
 import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.NetworkType
@@ -20,7 +17,6 @@ import xyz.xenondevs.nova.util.GSON
 import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.fromJson
 import java.util.*
-
 
 private fun TileState.hasTileEntityData() =
     persistentDataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
@@ -76,7 +72,6 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     
     override fun handleInitialized() {
         NetworkManager.handleEndPointAdd(this)
-    
     }
     
     override fun handleRemoved(unload: Boolean) {
@@ -94,6 +89,17 @@ class VanillaContainerTileEntity(container: Container) : ItemStorageVanillaTileE
         val inventory = NetworkedBukkitInventory(container.inventory)
         inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
     }
+    
+}
+
+class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest) {
+    
+    override val inventories: MutableMap<BlockFace, NetworkedInventory>
+        get() {
+            val chest = location.block.state as Chest
+            val inventory = NetworkedBukkitInventory(chest.inventory)
+            return CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+        }
     
 }
 
