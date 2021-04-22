@@ -18,12 +18,12 @@ class Nova : JavaPlugin() {
     override fun onEnable() {
         NOVA = this
         setGlobalIngredients()
-        
+    
+        AdvancementManager.loadAdvancements()
+        NovaRecipes.registerRecipes()
         VanillaTileEntityManager.init()
         TileEntityManager.init()
         NetworkManager.init()
-        NovaRecipes.loadRecipes()
-        AdvancementManager.loadAdvancements()
         CommandManager.init()
     }
     

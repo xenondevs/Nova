@@ -9,7 +9,7 @@ object PressRecipe {
     
     private val recipes = HashMap<Pair<Material, PressType>, NovaMaterial>()
     
-    init {
+    fun registerRecipes() {
         recipes[Material.IRON_INGOT to PLATE] = NovaMaterial.IRON_PLATE
         recipes[Material.GOLD_INGOT to PLATE] = NovaMaterial.GOLD_PLATE
         recipes[Material.NETHERITE_INGOT to PLATE] = NovaMaterial.NETHERITE_PLATE

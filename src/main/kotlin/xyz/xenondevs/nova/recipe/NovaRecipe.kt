@@ -33,7 +33,7 @@ object NovaRecipes : Listener {
     
     private val recipes = ArrayList<NamespacedKey>()
     
-    fun loadRecipes() {
+    fun registerRecipes() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         
         addRecipes(
@@ -54,6 +54,8 @@ object NovaRecipes : Listener {
                 .setIngredient('i', Material.IRON_INGOT)
                 .setIngredient('r', Material.REDSTONE)
         )
+    
+        FurnaceRecipes.registerRecipes()
     }
     
     private fun addRecipes(vararg recipes: Recipe) {
