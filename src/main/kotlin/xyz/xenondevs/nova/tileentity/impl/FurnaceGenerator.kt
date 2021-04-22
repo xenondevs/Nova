@@ -22,6 +22,10 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
 import xyz.xenondevs.nova.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.network.energy.EnergyStorage
+import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.network.item.ItemStorage
+import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenSideConfigItem
@@ -44,7 +48,7 @@ private const val BURN_TIME_MULTIPLIER = 0.1
 class FurnaceGenerator(
     material: NovaMaterial,
     armorStand: ArmorStand
-) : TileEntity(material, armorStand), EnergyStorage {
+) : TileEntity(material, armorStand), EnergyStorage, ItemStorage {
     
     private var energy: Int = retrieveData(0, "energy")
     private var burnTime: Int = retrieveData(0, "burnTime")
@@ -56,13 +60,20 @@ class FurnaceGenerator(
     private var updateEnergyBar = true
     
     override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
-    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createSideConfig(PROVIDE, FRONT), "sideConfig")
-    override val allowedFaces: Map<NetworkType, List<BlockFace>>
-        get() = mapOf(NetworkType.ENERGY to energyConfig.filterNot { it.value == NONE }.map { it.key })
+    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> =
+        retrieveData(createEnergySideConfig(PROVIDE, FRONT), "energyConfig")
     override val requestedEnergy = 0
-    
     override val providedEnergy: Int
         get() = energy
+    
+    override val inventories: MutableMap<BlockFace, NetworkedInventory>
+    override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
+        retrieveData(createItemSideConfig(ItemConnectionType.INSERT, FRONT), "itemConfig")
+    
+    init {
+        val networkedInventory = NetworkedVirtualInventory(inventory)
+        inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { networkedInventory }
+    }
     
     override fun addEnergy(energy: Int) {
         throw UnsupportedOperationException()
@@ -124,7 +135,7 @@ class FurnaceGenerator(
     }
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
-        if (event.player != null) { // done by a player
+        if (event.updateReason != null) { // not done by the tileEntity itself
             if (event.newItemStack != null && event.newItemStack.type.fuel == null) {
                 // illegal item
                 event.isCancelled = true
@@ -164,7 +175,8 @@ class FurnaceGenerator(
         storeData("energy", energy, true)
         storeData("burnTime", burnTime)
         storeData("totalBurnTime", totalBurnTime)
-        storeData("sideConfig", energyConfig)
+        storeData("energyConfig", energyConfig)
+        storeData("itemConfig", itemConfig)
     }
     
     private fun getEnergyValues() = energy to MAX_ENERGY

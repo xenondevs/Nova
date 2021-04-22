@@ -28,8 +28,9 @@ private fun TileState.hasTileEntityData() =
 private fun TileState.getTileEntityData() =
     persistentDataContainer.get(TILE_ENTITY_KEY, JsonElementDataType) as JsonObject
 
-abstract class VanillaTileEntity(private val tileState: TileState) {
+abstract class VanillaTileEntity(tileState: TileState) {
     
+    protected val block = tileState.block
     protected val dataObject: JsonObject = if (tileState.hasTileEntityData()) tileState.getTileEntityData() else JsonObject()
     
     abstract fun handleRemoved(unload: Boolean)
@@ -46,6 +47,7 @@ abstract class VanillaTileEntity(private val tileState: TileState) {
     
     fun storeData(key: String, value: Any) {
         dataObject.add(key, GSON.toJsonTree(value))
+        val tileState = block.state as TileState
         tileState.persistentDataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, dataObject)
         tileState.update()
     }

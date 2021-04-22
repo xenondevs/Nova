@@ -58,7 +58,7 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     private var currentItem: ItemStack? = null
     
     override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
-    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createSideConfig(CONSUME, FRONT), "sideConfig")
+    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createEnergySideConfig(CONSUME, FRONT), "sideConfig")
     override val allowedFaces: Map<NetworkType, List<BlockFace>>
         get() = mapOf(NetworkType.ENERGY to energyConfig.filterNot { it.value == NONE }.map { it.key })
     override val providedEnergy = 0
@@ -115,7 +115,7 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     }
     
     private fun handleInputUpdate(event: ItemUpdateEvent) {
-        if (event.player != null && event.newItemStack != null) {
+        if (event.updateReason != null && event.newItemStack != null) {
             val material = event.newItemStack.type
             if (!PressRecipe.isPressable(material, type)) {
                 event.isCancelled = true
@@ -124,7 +124,7 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     }
     
     private fun handleOutputUpdate(event: ItemUpdateEvent) {
-        if (event.player != null && event.newItemStack != null) event.isCancelled = true
+        if (event.updateReason != null && event.newItemStack != null) event.isCancelled = true
     }
     
     override fun addEnergy(energy: Int) {

@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.github.NichtStudioCode</groupId>
             <artifactId>InvUI</artifactId>
-            <version>ff56f8e017</version>
+            <version>cab14d0047</version>
         </dependency>
         <dependency>
             <groupId>xyz.xenondevs</groupId>

@@ -37,7 +37,7 @@ open class PowerCell(
     private var updateEnergyBar = true
     
     override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
-    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createSideConfig(BUFFER), "sideConfig")
+    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createEnergySideConfig(BUFFER), "sideConfig")
     override val allowedFaces: Map<NetworkType, List<BlockFace>>
         get() = mapOf(NetworkType.ENERGY to energyConfig.filterNot { it.value == NONE }.map { it.key })
     override val providedEnergy: Int

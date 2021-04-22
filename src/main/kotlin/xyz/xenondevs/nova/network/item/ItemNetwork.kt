@@ -81,10 +81,8 @@ class ItemNetwork : Network {
         var availableTransfers = transferRate
         
         for (providerInventory in providerInventories) {
-            
-            @Suppress("UselessCallOnCollection") // filterNotNull is not useless
-            for (itemStack in providerInventory.items.filterNotNull()) {
-                if (availableTransfers == 0) break
+            for ((index, itemStack) in providerInventory.items.withIndex()) {
+                if (itemStack == null || availableTransfers == 0) continue
                 
                 val transferAmount = min(itemStack.amount, availableTransfers)
                 var amountLeft = transferAmount
@@ -110,7 +108,9 @@ class ItemNetwork : Network {
                 
                 val transferredAmount = transferAmount - amountLeft
                 itemStack.amount -= transferredAmount
-                availableTransfers -= transferAmount
+                availableTransfers -= transferredAmount
+                
+                providerInventory.setItem(index, if (itemStack.amount == 0) null else itemStack)
             }
         }
     }

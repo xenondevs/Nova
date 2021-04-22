@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.util.*
 import java.util.*
 
@@ -96,14 +97,32 @@ abstract class TileEntity(
     fun getFace(blockSide: BlockSide) = blockSide.getBlockFace(armorStand.location.yaw)
     
     /**
-     * Creates a side config
+     * Creates an energy side config
      */
-    fun createSideConfig(default: EnergyConnectionType, vararg blocked: BlockSide): EnumMap<BlockFace, EnergyConnectionType> {
+    fun createEnergySideConfig(
+        default: EnergyConnectionType,
+        vararg blocked: BlockSide
+    ): EnumMap<BlockFace, EnergyConnectionType> {
+        
         val sideConfig = EnumMap<BlockFace, EnergyConnectionType>(BlockFace::class.java)
         val blockedFaces = blocked.map { getFace(it) }
-        CUBE_FACES.forEach {
-            sideConfig[it] = if (blockedFaces.contains(it)) EnergyConnectionType.NONE else default
-        }
+        CUBE_FACES.forEach { sideConfig[it] = if (blockedFaces.contains(it)) EnergyConnectionType.NONE else default }
+        
+        return sideConfig
+    }
+    
+    /**
+     * Creates an item side config
+     */
+    fun createItemSideConfig(
+        default: ItemConnectionType,
+        vararg blocked: BlockSide
+    ): EnumMap<BlockFace, ItemConnectionType> {
+        
+        val sideConfig = EnumMap<BlockFace, ItemConnectionType>(BlockFace::class.java)
+        val blockedFaces = blocked.map { getFace(it) }
+        CUBE_FACES.forEach { sideConfig[it] = if (blockedFaces.contains(it)) ItemConnectionType.NONE else default }
+        
         return sideConfig
     }
     

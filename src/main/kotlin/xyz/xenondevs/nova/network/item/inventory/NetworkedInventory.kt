@@ -15,7 +15,7 @@ interface NetworkedInventory {
     /**
      * An array of all the [ItemStack]s in this inventory.
      */
-    val items: Array<ItemStack>
+    val items: Array<ItemStack?>
     
     /**
      * Adds an [ItemStack] to the inventory and returns the
@@ -27,7 +27,7 @@ interface NetworkedInventory {
      * Changes the [ItemStack] on a specific slot to the
      * specified [ItemStack].
      */
-    fun setItem(slot: Int, item: ItemStack)
+    fun setItem(slot: Int, item: ItemStack?)
     
     /**
      * Gets the [ItemStack] on a specific slot.
@@ -44,15 +44,18 @@ class NetworkedVirtualInventory(private val virtualInventory: VirtualInventory) 
     override val size: Int
         get() = virtualInventory.size
     
-    override val items: Array<ItemStack>
+    override val items: Array<ItemStack?>
         get() = virtualInventory.items
     
-    override fun setItem(slot: Int, item: ItemStack) {
-        if (virtualInventory.setItemStack(null, slot, item)) throw NetworkException("The ItemUpdateEvent was cancelled")
+    override fun setItem(slot: Int, item: ItemStack?) {
+        if (
+            if (item == null) virtualInventory.removeItem(null, slot)
+            else virtualInventory.setItemStack(null, slot, item)
+        ) throw NetworkException("The ItemUpdateEvent was cancelled")
     }
     
     override fun addItem(item: ItemStack): ItemStack? {
-        val amount = virtualInventory.addItem(null, item)
+        val amount = virtualInventory.addItem(CustomUpdateReason("NetworkedVirtualInventory"), item)
         return if (amount != 0) item.clone().also { it.amount = amount } else null
     }
     
@@ -64,10 +67,10 @@ class NetworkedVirtualInventory(private val virtualInventory: VirtualInventory) 
 class NetworkedBukkitInventory(private val inventory: Inventory) : NetworkedInventory {
     
     override val size = inventory.size
-    override val items: Array<ItemStack>
+    override val items: Array<ItemStack?>
         get() = inventory.contents
     
-    override fun setItem(slot: Int, item: ItemStack) {
+    override fun setItem(slot: Int, item: ItemStack?) {
         inventory.setItem(slot, item)
     }
     
@@ -90,15 +93,16 @@ class NetworkedRangedBukkitInventory(
     
     override val size = slots.size
     
-    override val items: Array<ItemStack>
+    override val items: Array<ItemStack?>
         get() = inventory.contents.takeIndices(slots)
     
-    override fun setItem(slot: Int, item: ItemStack) {
+    override fun setItem(slot: Int, item: ItemStack?) {
         inventory.setItem(slots[slot], item)
     }
     
     override fun addItem(item: ItemStack): ItemStack? {
-        val tempInventory = VirtualInventory(null, size, items) // create a temp virtual inventory
+        @Suppress("UNCHECKED_CAST")
+        val tempInventory = VirtualInventory(null, size, items as Array<ItemStack>) // create a temp virtual inventory
         val amount = tempInventory.addItem(null, item) // add item to the temp inventory
         
         // copy items from temp inv to real inv
