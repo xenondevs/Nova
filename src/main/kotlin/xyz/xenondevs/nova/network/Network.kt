@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.network
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.network.item.ItemNetwork
-import java.lang.RuntimeException
 
 interface Network {
     

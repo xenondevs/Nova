@@ -9,7 +9,9 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.*
+import xyz.xenondevs.nova.network.Network
+import xyz.xenondevs.nova.network.NetworkManager
+import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.network.energy.EnergyNetwork

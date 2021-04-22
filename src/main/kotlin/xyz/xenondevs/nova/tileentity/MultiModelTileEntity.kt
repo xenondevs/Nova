@@ -7,7 +7,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.serialization.UUIDDataType
 import xyz.xenondevs.nova.util.EntityUtils
-import java.util.*
 
 private val MULTI_MODEL_KEY = NamespacedKey(NOVA, "multiModel")
 

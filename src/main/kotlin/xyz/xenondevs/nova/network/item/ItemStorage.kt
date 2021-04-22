@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.network.item
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.network.NetworkEndPoint
-import xyz.xenondevs.nova.network.item.ItemConnectionType.*
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 
 interface ItemStorage : NetworkEndPoint {
