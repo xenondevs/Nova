@@ -64,3 +64,7 @@ logs/
 
 # output folder if not defined in command line
 ${dir}/
+
+# gradle directories
+build/
+gradle/
