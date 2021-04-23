@@ -9,9 +9,13 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.*
 import xyz.xenondevs.nova.util.toIntArray
 
-private fun blockOf(data: IntArray) = ModelData(STRUCTURE_VOID, data)
+private fun blockOf(data: IntArray) = ModelData(BARRIER, data)
 
-private fun blockOf(data: Int) = ModelData(STRUCTURE_VOID, intArrayOf(data))
+private fun blockOf(data: Int) = ModelData(BARRIER, intArrayOf(data))
+
+private fun structureBlockOf(data: IntArray) = ModelData(STRUCTURE_VOID, data)
+
+private fun structureBlockOf(data: Int) = ModelData(STRUCTURE_VOID, intArrayOf(data))
 
 private fun itemOf(data: IntArray) = ModelData(SHULKER_SHELL, data)
 
@@ -60,11 +64,11 @@ enum class NovaMaterial(
     // 2000 - 3000: Upgrades and similar
     
     // 5000 - 10.000 MultiModel Blocks
-    BASIC_CABLE("Basic Cable", blockOf(5004), null, blockOf(intArrayOf(-1) + (5000..5003).toIntArray()), null, ::BasicCable),
-    ADVANCED_CABLE("Advanced Cable", blockOf(5009), null, blockOf(intArrayOf(-1) + (5005..5008).toIntArray()), null, ::AdvancedCable),
-    ELITE_CABLE("Elite Cable", blockOf(5014), null, blockOf(intArrayOf(-1) + (5010..5013).toIntArray()), null, ::EliteCable),
-    ULTIMATE_CABLE("Ultimate Cable", blockOf(5019), null, blockOf(intArrayOf(-1) + (5015..5018).toIntArray()), null, ::UltimateCable),
-    CREATIVE_CABLE("Creative Cable", blockOf(5024), null, blockOf(intArrayOf(-1) + (5020..5023).toIntArray()), null, ::CreativeCable),
+    BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray()), null, ::BasicCable),
+    ADVANCED_CABLE("Advanced Cable", structureBlockOf(5009), null, structureBlockOf(intArrayOf(-1) + (5005..5008).toIntArray()), null, ::AdvancedCable),
+    ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray()), null, ::EliteCable),
+    ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray()), null, ::UltimateCable),
+    CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray()), null, ::CreativeCable),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),
