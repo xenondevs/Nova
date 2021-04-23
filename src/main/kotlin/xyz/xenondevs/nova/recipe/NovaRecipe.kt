@@ -56,6 +56,7 @@ object NovaRecipes : Listener {
         )
     
         FurnaceRecipes.registerRecipes()
+        PressRecipe.registerRecipes()
     }
     
     private fun addRecipes(vararg recipes: Recipe) {
