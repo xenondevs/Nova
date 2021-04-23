@@ -50,12 +50,12 @@ enum class NovaMaterial(
     EMERALD_GEAR("Emerald Gear", itemOf(1014)),
     REDSTONE_GEAR("Redstone Gear", itemOf(1015)),
     LAPIS_GEAR("Lapis Gear", itemOf(1016)),
-    IRON_DUST("Iron Dust", itemOf(1017)),
-    GOLD_DUST("Gold Dust", itemOf(1018)),
-    DIAMOND_DUST("Diamond Dust", itemOf(1019)),
-    NETHERITE_DUST("Netherite Dust", itemOf(1020)),
-    EMERALD_DUST("Emerald Dust", itemOf(1021)),
-    LAPIS_DUST("Lapis Dust", itemOf(1022)),
+    IRON_DUST("Iron Dust", itemOf(1020)),
+    GOLD_DUST("Gold Dust", itemOf(1021)),
+    DIAMOND_DUST("Diamond Dust", itemOf(1022)),
+    NETHERITE_DUST("Netherite Dust", itemOf(1023)),
+    EMERALD_DUST("Emerald Dust", itemOf(1024)),
+    LAPIS_DUST("Lapis Dust", itemOf(1025)),
     
     // 2000 - 3000: Upgrades and similar
     
