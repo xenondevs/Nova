@@ -14,18 +14,12 @@ import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
-import xyz.xenondevs.nova.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.SideConfigGUI
 import xyz.xenondevs.nova.util.EnergyUtils
-import xyz.xenondevs.nova.util.advance
-import xyz.xenondevs.particle.ParticleBuilder
-import xyz.xenondevs.particle.ParticleEffect
-import xyz.xenondevs.particle.data.color.RegularColor
-import java.awt.Color
 import java.util.*
 
 open class PowerCell(
@@ -82,15 +76,6 @@ open class PowerCell(
             gui.energyBar.update()
             updateEnergyBar = false
         }
-        
-        energyConfig.forEach { (face, _) ->
-            val color = networks[NetworkType.ENERGY]?.get(face)
-                .let { if (it == null) RegularColor(Color(0, 0, 0)) else (it as EnergyNetwork).color }
-            
-            ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
-                .setParticleData(color)
-                .display()
-        }
     }
     
     private inner class PowerCellUI {
@@ -115,7 +100,7 @@ open class PowerCell(
     }
     
     companion object {
-    
+        
         fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
             val builder = material.createBasicItemBuilder()
             val energy = tileEntity?.let { (tileEntity as PowerCell).storedEnergy } ?: 0

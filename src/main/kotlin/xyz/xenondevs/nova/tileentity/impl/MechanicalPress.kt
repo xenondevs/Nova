@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
-import xyz.xenondevs.nova.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.recipe.PressRecipe
 import xyz.xenondevs.nova.recipe.PressType
@@ -34,13 +33,8 @@ import xyz.xenondevs.nova.ui.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.PressProgressItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
-import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.seed
-import xyz.xenondevs.particle.ParticleBuilder
-import xyz.xenondevs.particle.ParticleEffect
-import xyz.xenondevs.particle.data.color.RegularColor
-import java.awt.Color
 import java.util.*
 
 private const val MAX_ENERGY = 5_000
@@ -86,15 +80,6 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
         if (updateEnergyBar) {
             gui.energyBar.update()
             updateEnergyBar = false
-        }
-        
-        energyConfig.forEach { (face, _) ->
-            val color = networks[NetworkType.ENERGY]?.get(face)
-                .let { if (it == null) RegularColor(Color(0, 0, 0)) else (it as EnergyNetwork).color }
-            
-            ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
-                .setParticleData(color)
-                .display()
         }
     }
     

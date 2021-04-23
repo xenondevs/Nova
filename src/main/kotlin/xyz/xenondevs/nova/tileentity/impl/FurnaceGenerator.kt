@@ -20,7 +20,6 @@ import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
-import xyz.xenondevs.nova.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
@@ -33,10 +32,6 @@ import xyz.xenondevs.nova.ui.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.BlockSide.FRONT
-import xyz.xenondevs.particle.ParticleBuilder
-import xyz.xenondevs.particle.ParticleEffect
-import xyz.xenondevs.particle.data.color.RegularColor
-import java.awt.Color
 import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -98,15 +93,6 @@ class FurnaceGenerator(
         if (updateEnergyBar) {
             gui.energyBar.update()
             updateEnergyBar = false
-        }
-        
-        energyConfig.forEach { (face, _) ->
-            val color = networks[NetworkType.ENERGY]?.get(face)
-                .let { if (it == null) RegularColor(Color(0, 0, 0)) else (it as EnergyNetwork).color }
-            
-            ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location.clone().add(0.0, 0.5, 0.0).advance(face, 0.5))
-                .setParticleData(color)
-                .display()
         }
     }
     

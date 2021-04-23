@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.NetworkType.ENERGY
 import xyz.xenondevs.nova.network.NetworkType.ITEMS
 import xyz.xenondevs.nova.network.energy.EnergyBridge
-import xyz.xenondevs.nova.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.network.item.ItemBridge
 import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.tileentity.MultiModelTileEntity
@@ -28,8 +27,6 @@ import xyz.xenondevs.nova.util.axis
 import xyz.xenondevs.nova.util.point.Point3D
 import xyz.xenondevs.nova.util.rotationValues
 import xyz.xenondevs.nova.util.runTaskLater
-import xyz.xenondevs.particle.ParticleBuilder
-import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 
 private const val CONNECTOR = 1
@@ -58,15 +55,6 @@ open class Cable(
         }
     
     private val hitboxes = ArrayList<Hitbox>()
-    
-    override fun handleTick() {
-        val network = networks[ENERGY]
-        if (network != null) {
-            ParticleBuilder(ParticleEffect.REDSTONE, armorStand.location)
-                .setParticleData((network as EnergyNetwork).color)
-                .display()
-        }
-    }
     
     override fun handleNetworkUpdate() {
         _connectedNodes = findConnectedNodes()
@@ -190,6 +178,8 @@ open class Cable(
     }
     
     override fun saveData() = Unit
+    
+    override fun handleTick() = Unit
     
     override fun handleRightClick(event: PlayerInteractEvent) = Unit
     

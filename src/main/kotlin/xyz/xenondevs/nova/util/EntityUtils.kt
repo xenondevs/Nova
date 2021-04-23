@@ -4,14 +4,29 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataContainer
+import xyz.xenondevs.nova.NOVA
+import java.util.*
 
 fun Player.awardAdvancement(key: NamespacedKey) {
     val advancement = Bukkit.getAdvancement(key)!!
     val progress = getAdvancementProgress(advancement)
     advancement.criteria.forEach { progress.awardCriteria(it) }
+}
+
+fun Entity.teleport(modifyLocation: Location.() -> Unit) {
+    val location = location
+    location.modifyLocation()
+    teleport(location)
+}
+
+fun PersistentDataContainer.hasNovaData(): Boolean {
+    val novaNameSpace = NOVA.name.toLowerCase(Locale.ROOT)
+    return keys.any { it.namespace == novaNameSpace }
 }
 
 object EntityUtils {

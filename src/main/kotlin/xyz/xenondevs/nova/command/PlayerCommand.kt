@@ -5,13 +5,14 @@ import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import org.bukkit.entity.Player
 import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.ReflectionUtils.createPlayerFromCommandListenerWrapper
 
-fun CommandContext<*>.getPlayer() =
-    ReflectionUtils.getPlayerFromCommandListenerWrapper(source)!!
+val CommandContext<*>.player: Player
+    get() = ReflectionUtils.getPlayerFromCommandListenerWrapper(source)!!
 
-inline fun <reified V> CommandContext<*>.getArgument(name: String): V =
+inline operator fun <reified V> CommandContext<*>.get(name: String): V =
     getArgument(name, V::class.java)
 
 fun <S, T : ArgumentBuilder<S, T>> ArgumentBuilder<S, T>.executesCatching(run: (CommandContext<S>) -> Unit): T {

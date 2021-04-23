@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.util.runTaskTimer
 
 object NetworkManager {
     
-    private val networks = ArrayList<Network>()
+    val networks = ArrayList<Network>()
     
     fun init() {
         runTaskTimer(0, 1) {

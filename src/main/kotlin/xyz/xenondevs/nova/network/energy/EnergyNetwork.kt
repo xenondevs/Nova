@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.network.*
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
-import xyz.xenondevs.particle.data.color.RegularColor
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
@@ -15,8 +14,6 @@ import kotlin.math.min
  * Cables connect EnergyProviders to EnergyConsumers.
  */
 class EnergyNetwork : Network {
-    
-    val color: RegularColor = RegularColor.random() // TODO: remove
     
     override val nodes: Set<NetworkNode>
         get() = _nodes
