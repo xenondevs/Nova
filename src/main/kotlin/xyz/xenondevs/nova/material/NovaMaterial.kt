@@ -13,9 +13,10 @@ private fun blockOf(data: IntArray) = ModelData(STRUCTURE_VOID, data)
 
 private fun blockOf(data: Int) = ModelData(STRUCTURE_VOID, intArrayOf(data))
 
-private fun itemOf(data: IntArray) = ModelData(BOWL, data)
+private fun itemOf(data: IntArray) = ModelData(SHULKER_SHELL, data)
 
-private fun itemOf(data: Int) = ModelData(BOWL, intArrayOf(data))
+private fun itemOf(data: Int) = ModelData(SHULKER_SHELL, intArrayOf(data))
+
 enum class NovaMaterial(
     val itemName: String,
     val item: ModelData,
