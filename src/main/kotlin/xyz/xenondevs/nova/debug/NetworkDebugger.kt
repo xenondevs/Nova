@@ -44,8 +44,7 @@ object NetworkDebugger {
         NetworkManager.networks
             .forEach { network ->
                 val players = if (network is EnergyNetwork) energyDebuggers else itemDebuggers
-                val colorHex = Integer.toHexString(network.hashCode() % Integer.parseInt("ffffff", 16))
-                val color = Color.decode("#$colorHex")
+                val color = Color(network.hashCode())
                 
                 network.nodes.forEach { node ->
                     if (node is NetworkBridge) {
