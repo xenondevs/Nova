@@ -59,7 +59,7 @@ class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(ma
                 energy -= ENERGY_PER_TICK
                 
                 if (pulverizeTime == 0) {
-                    outputInv.place(null, 0, currentItem)
+                    outputInv.addItem(null, currentItem)
                 }
                 
                 gui.updateProgress()
@@ -76,9 +76,8 @@ class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(ma
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val outputItem = outputInv.getItemStack(0)
             val recipeOutput = PulverizerRecipe.getOutputFor(inputItem.type)
-            if (outputItem == null || outputItem.type == recipeOutput.type) {
+            if (outputInv.simulateAdd(recipeOutput) == 0) {
                 inputInv.removeOne(null, 0)
                 currentItem = recipeOutput
                 pulverizeTime = PULVERIZE_TIME

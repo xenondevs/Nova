@@ -86,11 +86,11 @@ class MechanicalPress(material: NovaMaterial, armorStand: ArmorStand) : TileEnti
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val outputItem = outputInv.getItemStack(0)
             val recipeOutput = PressRecipe.getOutputFor(inputItem.type, type)
-            if (outputItem == null || outputItem.novaMaterial == recipeOutput) {
+            val outputStack = recipeOutput.createItemStack()
+            if (outputInv.simulateAdd(outputStack) == 0) {
                 inputInv.removeOne(null, 0)
-                currentItem = recipeOutput.createItemStack()
+                currentItem = outputStack
                 pressTime = PRESS_TIME
             }
         }
