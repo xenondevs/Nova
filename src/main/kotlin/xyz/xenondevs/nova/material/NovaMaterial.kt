@@ -38,6 +38,7 @@ enum class NovaMaterial(
     ELITE_POWER_CELL("Elite Power Cell", blockOf(5), PowerCell::createItemBuilder, blockOf(5), IRON_BLOCK, ::ElitePowerCell),
     ULTIMATE_POWER_CELL("Ultimate Power Cell", blockOf(6), PowerCell::createItemBuilder, blockOf(6), IRON_BLOCK, ::UltimatePowerCell),
     CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), PowerCell::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
+    PULVERIZER("Pulverizer", blockOf(8), null, blockOf(8), IRON_BLOCK, ::Pulverizer),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
@@ -91,8 +92,8 @@ enum class NovaMaterial(
     RED_BAR("", itemOf((10_200..10_216).toIntArray())),
     GREEN_BAR("", itemOf((10_300..10_316).toIntArray())),
     BLUE_BAR("", itemOf((10_400..10_416).toIntArray())),
-    PRESS_PROGRESS("", itemOf((10_500..10_508).toIntArray()));
-    
+    PRESS_PROGRESS("", itemOf((10_500..10_508).toIntArray())),
+    PULVERIZER_PROGRESS("", itemOf((10_600..10_614).toIntArray()));
     
     val isBlock = block != null && createTileEntity != null
     private val createItemBuilderFunction: ((TileEntity?) -> ItemBuilder)? = if (createItemBuilderFunction != null) {
@@ -131,6 +132,13 @@ enum class NovaMaterial(
      * This is the same as calling `createItemBuilder.build()`
      */
     fun createItemStack(): ItemStack = createItemBuilder().build()
+    
+    /**
+     * Creates an [ItemStack] with the specified amount for this [NovaMaterial].
+     *
+     * This is the same as calling `createItemBuilder.build()`
+     */
+    fun createItemStack(amount: Int): ItemStack = createItemBuilder().setAmount(amount).build()
     
     companion object {
         

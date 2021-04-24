@@ -28,3 +28,5 @@ class ProgressArrowItem : ProgressItem(NovaMaterial.PROGRESS_ARROW, 16)
 class EnergyProgressItem : ProgressItem(NovaMaterial.ENERGY_PROGRESS, 16)
 
 class PressProgressItem : ProgressItem(NovaMaterial.PRESS_PROGRESS, 8)
+
+class PulverizerProgress : ProgressItem(NovaMaterial.PULVERIZER_PROGRESS, 14)
