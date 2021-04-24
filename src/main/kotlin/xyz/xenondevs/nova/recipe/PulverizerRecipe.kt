@@ -22,8 +22,8 @@ object PulverizerRecipe {
         recipes[Material.REDSTONE_ORE] = ItemStack(Material.REDSTONE, 10)
         recipes[Material.LAPIS_ORE] = NovaMaterial.LAPIS_DUST.createItemStack(2)
         recipes[Material.LAPIS_LAZULI] = NovaMaterial.LAPIS_DUST.createItemStack()
-        // recipes[Material.COAL_ORE] = NovaMaterial.COAL_DUST.createItemStack(2)
-        // recipes[Material.COAL] = NovaMaterial.COAL_DUST.createItemStack()
+        recipes[Material.COAL_ORE] = NovaMaterial.COAL_DUST.createItemStack(2)
+        recipes[Material.COAL] = NovaMaterial.COAL_DUST.createItemStack()
     }
     
     fun isPulverizable(material: Material) = recipes.containsKey(material)

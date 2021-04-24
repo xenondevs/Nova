@@ -61,6 +61,7 @@ enum class NovaMaterial(
     NETHERITE_DUST("Netherite Dust", itemOf(1023)),
     EMERALD_DUST("Emerald Dust", itemOf(1024)),
     LAPIS_DUST("Lapis Dust", itemOf(1025)),
+    COAL_DUST("Coal Dust", itemOf(1026)),
     
     // 2000 - 3000: Upgrades and similar
     

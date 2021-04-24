@@ -19,6 +19,7 @@ object FurnaceRecipes {
         addOreRecipe("nova.smeltNetheriteDust", NovaMaterial.NETHERITE_DUST, ItemStack(Material.NETHERITE_INGOT, 1))
         addOreRecipe("nova.smeltEmeraldDust", NovaMaterial.EMERALD_DUST, ItemStack(Material.EMERALD, 1))
         addOreRecipe("nova.smeltLapisDust", NovaMaterial.LAPIS_DUST, ItemStack(Material.LAPIS_LAZULI, 1))
+        addOreRecipe("nova.smeltCoalDust", NovaMaterial.COAL_DUST, ItemStack(Material.COAL, 1))
     }
     
     fun addFurnaceRecipe(name: String, input: NovaMaterial, result: ItemStack, xp: Float, burnTicks: Int) {
