@@ -32,6 +32,7 @@ private const val MAX_ENERGY = 10_000
 private const val ENERGY_PER_TICK = 50
 private const val PULVERIZE_TIME = 200
 
+// TODO: Make PULVERIZE_TIME recipe dependent
 class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(material, armorStand), EnergyStorage {
     
     private var energy = retrieveData(0, "energy")
