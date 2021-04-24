@@ -39,7 +39,7 @@ interface NetworkedInventory {
 /**
  * A [NetworkedInventory] wrapper for [VirtualInventory]
  */
-class NetworkedVirtualInventory(private val virtualInventory: VirtualInventory) : NetworkedInventory {
+class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : NetworkedInventory {
     
     override val size: Int
         get() = virtualInventory.size

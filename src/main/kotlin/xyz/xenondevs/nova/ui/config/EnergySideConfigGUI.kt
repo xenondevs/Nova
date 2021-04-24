@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui
+package xyz.xenondevs.nova.ui.config
 
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.structure.Structure
@@ -19,23 +19,21 @@ import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.BlockSide
 
-class SideConfigGUI(
+class EnergySideConfigGUI(
     val energyStorage: EnergyStorage,
-    private vararg val allowedTypes: EnergyConnectionType,
-    private val openPrevious: (Player) -> Unit,
-) : SimpleGUI(9, 3) {
+    private val allowedTypes: List<EnergyConnectionType>,
+) : SimpleGUI(8, 3) {
     
     private val structure = Structure("" +
-        "~ # # # u # # # #" +
-        "# # # l f r # # #" +
-        "# # # # d b # # #")
+        "# # # u # # # #" +
+        "# # l f r # # #" +
+        "# # # d b # # #")
         .addIngredient('u', SideConfigItem(BlockSide.TOP))
         .addIngredient('l', SideConfigItem(BlockSide.LEFT))
         .addIngredient('f', SideConfigItem(BlockSide.FRONT))
         .addIngredient('r', SideConfigItem(BlockSide.RIGHT))
         .addIngredient('d', SideConfigItem(BlockSide.BOTTOM))
         .addIngredient('b', SideConfigItem(BlockSide.BACK))
-        .addIngredient('~', BackItem())
     
     init {
         applyStructure(structure)
@@ -78,23 +76,6 @@ class SideConfigGUI(
             notifyWindows()
         }
         
-    }
-    
-    private inner class BackItem : SimpleItem(Icon.ARROW_1_LEFT.itemBuilder) {
-        
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            openPrevious(player)
-        }
-        
-    }
-    
-}
-
-class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterial.SIDE_CONFIG_BUTTON.item.getItemBuilder("Side Config")) {
-    
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-        SimpleWindow(player, "Side Config", sideConfigGUI).show()
     }
     
 }

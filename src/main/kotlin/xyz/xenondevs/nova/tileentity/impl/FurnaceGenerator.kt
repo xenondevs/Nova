@@ -27,8 +27,9 @@ import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.findNetworkedInventory
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.BlockSide.FRONT
@@ -171,7 +172,12 @@ class FurnaceGenerator(
         
         val progressItem = EnergyProgressItem()
         
-        private val sideConfigGUI = SideConfigGUI(this@FurnaceGenerator, NONE, PROVIDE) { openWindow(it) }
+        private val sideConfigGUI = SideConfigGUI(
+            this@FurnaceGenerator,
+            listOf(NONE, PROVIDE),
+            listOf(inventory.findNetworkedInventory(this@FurnaceGenerator) to "Fuel Inventory")
+        ) { openWindow(it) }
+        
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +

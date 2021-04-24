@@ -17,8 +17,8 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.EnergyUtils
 import java.util.*
 
@@ -80,7 +80,12 @@ open class PowerCell(
     
     private inner class PowerCellUI {
         
-        private val sideConfigGUI = SideConfigGUI(this@PowerCell, NONE, CONSUME, PROVIDE, BUFFER) { openWindow(it) }
+        private val sideConfigGUI = SideConfigGUI(
+            this@PowerCell,
+            listOf(NONE, PROVIDE, CONSUME, BUFFER),
+            null
+        ) { openWindow(it) }
+        
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +

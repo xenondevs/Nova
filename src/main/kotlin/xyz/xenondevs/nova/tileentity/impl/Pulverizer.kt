@@ -20,8 +20,8 @@ import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.recipe.PulverizerRecipe
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.util.BlockSide
@@ -131,7 +131,13 @@ class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(ma
         
         private val mainProgress = ProgressArrowItem()
         private val pulverizerProgress = PulverizerProgress()
-        private val sideConfigGUI = SideConfigGUI(this@Pulverizer, EnergyConnectionType.NONE, EnergyConnectionType.CONSUME) { openWindow(it) }
+        
+        private val sideConfigGUI = SideConfigGUI(
+            this@Pulverizer,
+            listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
+            null
+        ) { openWindow(it) }
+        
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
