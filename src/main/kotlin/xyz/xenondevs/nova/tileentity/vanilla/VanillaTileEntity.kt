@@ -10,8 +10,8 @@ import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedBukkitInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedRangedBukkitInventory
-import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.serialization.JsonElementDataType
+import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.GSON
 import xyz.xenondevs.nova.util.enumMapOf

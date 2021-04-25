@@ -104,9 +104,8 @@ abstract class TileEntity(
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
-     * When this method is used an [dropItems] is true, the [VirtualInventory]
-     * will be automatically deleted and its contents dropped when the [TileEntity]
-     * is destroyed.
+     * When [dropItems] is true, the [VirtualInventory] will automatically be
+     * deleted and its contents dropped when the [TileEntity] is destroyed.
      */
     fun getInventory(seed: String, size: Int, dropItems: Boolean, itemHandler: (ItemUpdateEvent) -> Unit): VirtualInventory {
         val inventory = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed(seed), size)
