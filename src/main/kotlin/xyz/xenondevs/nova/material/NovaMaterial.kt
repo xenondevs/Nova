@@ -66,11 +66,11 @@ enum class NovaMaterial(
     // 2000 - 3000: Upgrades and similar
     
     // 5000 - 10.000 MultiModel Blocks
-    BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray()), null, ::BasicCable),
-    ADVANCED_CABLE("Advanced Cable", structureBlockOf(5009), null, structureBlockOf(intArrayOf(-1) + (5005..5008).toIntArray()), null, ::AdvancedCable),
-    ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray()), null, ::EliteCable),
-    ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray()), null, ::UltimateCable),
-    CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray()), null, ::CreativeCable),
+    BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray() + (5025..5033).toIntArray()), null, ::BasicCable),
+    ADVANCED_CABLE("Advanced Cable", structureBlockOf(5009), null, structureBlockOf(intArrayOf(-1) + (5005..5008).toIntArray() + (5025..5033).toIntArray()), null, ::AdvancedCable),
+    ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray() + (5025..5033).toIntArray()), null, ::EliteCable),
+    ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), null, ::UltimateCable),
+    CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), null, ::CreativeCable),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),

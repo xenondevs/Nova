@@ -15,17 +15,23 @@ abstract class MultiModelTileEntity(
     armorStand: ArmorStand,
 ) : TileEntity(material, armorStand) {
     
+    private var currentModels: HashSet<Pair<ItemStack, Float>>? = null
+    
     override fun handleDisabled() {
         super.handleDisabled()
-        removeModels()
+        removeModels(null)
     }
     
     fun replaceModels(models: List<Pair<ItemStack, Float>>) {
-        removeModels()
-        setModels(models)
+        val modelsToRemove = if (currentModels != null) currentModels!!.filterNot { models.contains(it) } else models
+        
+        removeModels(modelsToRemove)
+        spawnModels(models.filterNot { currentModels?.contains(it) ?: false })
+        
+        currentModels = HashSet(models)
     }
     
-    open fun setModels(models: List<Pair<ItemStack, Float>>) {
+    private fun spawnModels(models: List<Pair<ItemStack, Float>>) {
         models.forEach { (itemStack, yaw) ->
             val location = armorStand.location.clone()
             location.yaw = yaw
@@ -36,19 +42,24 @@ abstract class MultiModelTileEntity(
         }
     }
     
-    fun removeModels() {
+    private fun removeModels(models: List<Pair<ItemStack, Float>>?) {
+        if (models != null && models.isEmpty()) return
         armorStand.location.chunk.entities
             .filterIsInstance<ArmorStand>()
-            .filter {
-                val dataContainer = it.persistentDataContainer
+            .filter { armorStand ->
+                val dataContainer = armorStand.persistentDataContainer
                 dataContainer.has(MULTI_MODEL_KEY, UUIDDataType)
                     && dataContainer.get(MULTI_MODEL_KEY, UUIDDataType) == uuid
+                    && models?.any { armorStand.hasModel(it) } ?: true
             }
             .forEach(ArmorStand::remove)
     }
     
+    private fun ArmorStand.hasModel(model: Pair<ItemStack, Float>) =
+        equipment!!.helmet == model.first && location.yaw == model.second
+    
     override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
-        removeModels()
+        removeModels(null)
         return super.destroy(dropItems)
     }
     

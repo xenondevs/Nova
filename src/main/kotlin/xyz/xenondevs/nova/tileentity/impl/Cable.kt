@@ -19,20 +19,19 @@ import xyz.xenondevs.nova.network.NetworkType.ENERGY
 import xyz.xenondevs.nova.network.NetworkType.ITEMS
 import xyz.xenondevs.nova.network.energy.EnergyBridge
 import xyz.xenondevs.nova.network.item.ItemBridge
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.tileentity.MultiModelTileEntity
 import xyz.xenondevs.nova.ui.CableItemConfigGUI
-import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.axis
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.point.Point3D
-import xyz.xenondevs.nova.util.rotationValues
-import xyz.xenondevs.nova.util.runTaskLater
 import java.util.*
 
 private const val CONNECTOR = 1
 private const val HORIZONTAL = 2
 private const val DOWN = 3
 private const val UP = 4
+private val ATTACHMENTS: IntArray = (5..13).toIntArray()
 
 open class Cable(
     override val energyTransferRate: Int,
@@ -87,7 +86,7 @@ open class Cable(
             items += material.block!!.getItem(CONNECTOR) to 0f
         }
         
-        // add all connections
+        // add all cable connections
         connectedFaces.forEach { blockFace ->
             val dataIndex = when (blockFace) {
                 BlockFace.DOWN -> DOWN
@@ -95,20 +94,42 @@ open class Cable(
                 else -> HORIZONTAL
             }
             
-            val rotation = when (blockFace) {
-                BlockFace.NORTH -> 0f
-                BlockFace.EAST -> 90f
-                BlockFace.SOUTH -> 180f
-                BlockFace.WEST -> 270f
-                else -> 0f
-            }
-            
             val itemStack = material.block!!.getItem(dataIndex)
-            items += itemStack to rotation
+            items += itemStack to getRotation(blockFace)
         }
+        
+        // add all item network attachments
+        connectedNodes[ITEMS]!!
+            .filter { it.value is ItemStorage }
+            .forEach { (blockFace, itemStorage) ->
+                itemStorage as ItemStorage
+                
+                val attachmentIndex = when (itemStorage.itemConfig[blockFace.oppositeFace] ?: ItemConnectionType.NONE) {
+                    ItemConnectionType.INSERT -> 0
+                    ItemConnectionType.EXTRACT -> 1
+                    ItemConnectionType.BUFFER -> 2
+                    else -> throw UnsupportedOperationException()
+                } * 3 + when (blockFace) {
+                    BlockFace.DOWN -> 1
+                    BlockFace.UP -> 2
+                    else -> 0
+                }
+                
+                val itemStack = material.block!!.getItem(ATTACHMENTS[attachmentIndex])
+                items += itemStack to getRotation(blockFace)
+            }
         
         return items
     }
+    
+    private fun getRotation(blockFace: BlockFace) =
+        when (blockFace) {
+            BlockFace.NORTH -> 0f
+            BlockFace.EAST -> 90f
+            BlockFace.SOUTH -> 180f
+            BlockFace.WEST -> 270f
+            else -> 0f
+        }
     
     private fun updateHitbox() {
         updateVirtualHitbox()
@@ -128,8 +149,8 @@ open class Cable(
         neighborEndPoints
             .map { it.key }
             .forEach { blockFace ->
-                val pointA = Point3D(0.3, 0.3, 0.0)
-                val pointB = Point3D(0.7, 0.7, 0.2)
+                val pointA = Point3D(0.125, 0.125, 0.0)
+                val pointB = Point3D(0.875, 0.875, 0.2)
                 
                 val origin = Point3D(0.5, 0.5, 0.5)
                 
