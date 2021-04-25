@@ -57,7 +57,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             MechanicalPressAdvancement(), GearsAdvancement(), PlatesAdvancement(), AllPlatesAdvancement(), AllGearsAdvancement()
         )
         
-        createAll(true)
+        createAll(false)
     }
     
     private fun registerAll(vararg advancements: Advancement) {

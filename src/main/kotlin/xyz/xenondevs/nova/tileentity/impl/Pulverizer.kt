@@ -6,19 +6,14 @@ import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.window.impl.single.SimpleWindow
-import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.Network
-import xyz.xenondevs.nova.network.NetworkManager
-import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.recipe.PulverizerRecipe
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -26,31 +21,31 @@ import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.seed
-import java.util.*
 
 private const val MAX_ENERGY = 10_000
 private const val ENERGY_PER_TICK = 50
 private const val PULVERIZE_TIME = 200
 
 // TODO: Make PULVERIZE_TIME recipe dependent
-class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(material, armorStand), EnergyStorage {
+class Pulverizer(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : EnergyItemTileEntity(material, armorStand) {
     
-    private var energy = retrieveData(0, "energy")
     private val inputInv = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("input"), 1).apply { setItemUpdateHandler(::handleInputUpdate) }
     private val outputInv = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("output"), 2).apply { setItemUpdateHandler(::handleOutputUpdate) }
     private val gui = PulverizerGUI()
-    private var updateEnergyBar = true
     
     private var pulverizeTime: Int = 0
     private var currentItem: ItemStack? = null
     
-    override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
-    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT), "sideConfig")
-    override val allowedFaces: Map<NetworkType, List<BlockFace>>
-        get() = mapOf(NetworkType.ENERGY to energyConfig.filterNot { it.value == EnergyConnectionType.NONE }.map { it.key })
-    override val providedEnergy = 0
+    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int
         get() = MAX_ENERGY - energy
+    
+    init {
+        setDefaultInventory(inputInv)
+    }
     
     override fun handleTick() {
         if (energy >= ENERGY_PER_TICK) {
@@ -64,13 +59,12 @@ class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(ma
                 }
                 
                 gui.updateProgress()
-                updateEnergyBar = true
             }
         }
         
-        if (updateEnergyBar) {
+        if (hasEnergyChanged) {
             gui.energyBar.update()
-            updateEnergyBar = false
+            hasEnergyChanged = false
         }
     }
     
@@ -104,30 +98,6 @@ class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(ma
         if (event.updateReason != null && event.newItemStack != null) event.isCancelled = true
     }
     
-    override fun addEnergy(energy: Int) {
-        this.energy += energy
-        updateEnergyBar = true
-    }
-    
-    override fun removeEnergy(energy: Int) {
-        throw UnsupportedOperationException()
-    }
-    
-    override fun saveData() {
-        storeData("energy", energy, true)
-        storeData("sideConfig", energyConfig)
-    }
-    
-    override fun handleInitialized() {
-        NetworkManager.handleEndPointAdd(this)
-    }
-    
-    override fun handleRemoved(unload: Boolean) {
-        NetworkManager.handleEndPointRemove(this, unload)
-    }
-    
-    private fun getEnergyValues() = energy to MAX_ENERGY
-    
     inner class PulverizerGUI {
         
         private val mainProgress = ProgressArrowItem()
@@ -136,7 +106,7 @@ class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(ma
         private val sideConfigGUI = SideConfigGUI(
             this@Pulverizer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            null
+            listOf(inputInv to "Input Inventory", outputInv to "Output Inventory"),
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
@@ -154,7 +124,7 @@ class Pulverizer(material: NovaMaterial, armorStand: ArmorStand) : TileEntity(ma
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, ::getEnergyValues)
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { energy to MAX_ENERGY }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Pulverizer", gui).show()

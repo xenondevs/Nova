@@ -4,77 +4,39 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.window.impl.single.SimpleWindow
-import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.Network
-import xyz.xenondevs.nova.network.NetworkManager
-import xyz.xenondevs.nova.network.NetworkType
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
-import xyz.xenondevs.nova.network.energy.EnergyStorage
+import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.EnergyUtils
-import java.util.*
 
 open class PowerCell(
     val maxEnergy: Int,
     material: NovaMaterial,
     armorStand: ArmorStand,
-) : TileEntity(material, armorStand), EnergyStorage {
+) : EnergyTileEntity(material, armorStand) {
     
-    private var storedEnergy = retrieveData(0, "storedEnergy")
+    override val defaultEnergyConfig by lazy { createEnergySideConfig(BUFFER) }
+    override val requestedEnergy: Int
+        get() = maxEnergy - energy
+    
     private val gui = PowerCellUI()
-    private var updateEnergyBar = true
-    
-    override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
-    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> = retrieveData(createEnergySideConfig(BUFFER), "sideConfig")
-    override val allowedFaces: Map<NetworkType, List<BlockFace>>
-        get() = mapOf(NetworkType.ENERGY to energyConfig.filterNot { it.value == NONE }.map { it.key })
-    override val providedEnergy: Int
-        get() = storedEnergy
-    override val requestedEnergy
-        get() = maxEnergy - storedEnergy
-    
-    override fun addEnergy(energy: Int) {
-        storedEnergy += energy
-        updateEnergyBar = true
-    }
-    
-    override fun removeEnergy(energy: Int) {
-        storedEnergy -= energy
-        updateEnergyBar = true
-    }
-    
-    override fun handleInitialized() {
-        NetworkManager.handleEndPointAdd(this)
-    }
-    
-    override fun handleRemoved(unload: Boolean) {
-        NetworkManager.handleEndPointRemove(this, unload)
-    }
-    
-    override fun saveData() {
-        storeData("storedEnergy", storedEnergy, true)
-        storeData("sideConfig", energyConfig)
-    }
     
     override fun handleRightClick(event: PlayerInteractEvent) {
         event.isCancelled = true
         gui.openWindow(event.player)
     }
     
-    private fun getEnergyValues() = storedEnergy to maxEnergy
-    
     override fun handleTick() {
-        if (updateEnergyBar) {
+        if (hasEnergyChanged) {
             gui.energyBar.update()
-            updateEnergyBar = false
+            hasEnergyChanged = false
         }
     }
     
@@ -96,7 +58,7 @@ open class PowerCell(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, ::getEnergyValues)
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { energy to maxEnergy }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Power Cell", gui).show()
@@ -108,7 +70,7 @@ open class PowerCell(
         
         fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
             val builder = material.createBasicItemBuilder()
-            val energy = tileEntity?.let { (tileEntity as PowerCell).storedEnergy } ?: 0
+            val energy = tileEntity?.let { (tileEntity as PowerCell).energy } ?: 0
             val maxEnergy = tileEntity?.let { (tileEntity as PowerCell).maxEnergy } ?: 0
             builder.addLoreLines(EnergyUtils.getEnergyString(energy, maxEnergy))
             return builder

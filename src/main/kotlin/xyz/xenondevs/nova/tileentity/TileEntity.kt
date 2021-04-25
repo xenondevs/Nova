@@ -17,8 +17,8 @@ abstract class TileEntity(
     val armorStand: ArmorStand,
 ) {
     
-    protected val mainDataObject: JsonObject = if (armorStand.hasTileEntityData()) armorStand.getTileEntityData() else JsonObject()
-    protected val globalDataObject: JsonObject = mainDataObject.get("global")?.let { it as JsonObject }
+    val mainDataObject: JsonObject = if (armorStand.hasTileEntityData()) armorStand.getTileEntityData() else JsonObject()
+    val globalDataObject: JsonObject = mainDataObject.get("global")?.let { it as JsonObject }
         ?: JsonObject().also { mainDataObject.add("global", it) }
     
     val uuid: UUID = armorStand.uniqueId
@@ -129,18 +129,18 @@ abstract class TileEntity(
     /**
      * Retrieves data using GSON deserialization from the
      * ArmorStand of this TileEntity.
-     * If it can't find anything under the given key, the parameter
-     * [alternative] is returned.
+     * If it can't find anything under the given key, the
+     * result of the [getAlternative] lambda is returned.
      */
-    protected inline fun <reified T> retrieveData(alternative: T, key: String): T {
-        return retrieveOrNull(key) ?: alternative
+    inline fun <reified T> retrieveData(key: String, getAlternative: () -> T): T {
+        return retrieveOrNull(key) ?: getAlternative()
     }
     
     /**
      * Retrieves data using GSON deserialization from the
      * ArmorStand of this TileEntity.
      */
-    protected inline fun <reified T> retrieveOrNull(key: String): T? {
+    inline fun <reified T> retrieveOrNull(key: String): T? {
         return GSON.fromJson<T>(mainDataObject.get(key) ?: globalDataObject.get(key))
     }
     

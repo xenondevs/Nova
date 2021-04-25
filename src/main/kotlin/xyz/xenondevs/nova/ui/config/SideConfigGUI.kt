@@ -19,19 +19,14 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
-import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
 
 private val ALLOWED_ITEM_TYPES = listOf(ItemConnectionType.NONE, ItemConnectionType.INSERT, ItemConnectionType.EXTRACT, ItemConnectionType.BUFFER)
 
-fun VirtualInventory.findNetworkedInventory(itemStorage: ItemStorage) =
-    itemStorage.inventories.values.first { it is NetworkedVirtualInventory && it.virtualInventory == this }
-
 class SideConfigGUI(
     endPoint: NetworkEndPoint,
     allowedEnergyTypes: List<EnergyConnectionType>?,
-    inventoryNames: List<Pair<NetworkedInventory, String>>?,
+    inventoryNames: List<Pair<VirtualInventory, String>>?,
     openPrevious: (Player) -> Unit
 ) {
     

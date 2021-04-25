@@ -59,6 +59,12 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
         return if (amount != 0) item.clone().also { it.amount = amount } else null
     }
     
+    override fun equals(other: Any?) =
+        if (other is NetworkedVirtualInventory) other.virtualInventory.uuid == virtualInventory.uuid else false
+    
+    
+    override fun hashCode() = virtualInventory.uuid.hashCode()
+    
 }
 
 /**
@@ -77,6 +83,11 @@ class NetworkedBukkitInventory(private val inventory: Inventory) : NetworkedInve
     override fun addItem(item: ItemStack): ItemStack? {
         return inventory.addItem(item)[0]
     }
+    
+    override fun equals(other: Any?) =
+        if (other is NetworkedBukkitInventory) other.inventory == inventory else false
+    
+    override fun hashCode() = inventory.hashCode()
     
 }
 
@@ -111,6 +122,15 @@ class NetworkedRangedBukkitInventory(
         }
         
         return if (amount != 0) item.clone().also { it.amount = amount } else null
+    }
+    
+    override fun equals(other: Any?) =
+        if (other is NetworkedRangedBukkitInventory) other.inventory == inventory && other.slots.contentEquals(slots) else false
+    
+    override fun hashCode(): Int {
+        var result = inventory.hashCode()
+        result = 31 * result + slots.contentHashCode()
+        return result
     }
     
 }

@@ -7,33 +7,22 @@ import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.window.impl.single.SimpleWindow
-import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.Network
-import xyz.xenondevs.nova.network.NetworkManager
-import xyz.xenondevs.nova.network.NetworkType
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
-import xyz.xenondevs.nova.network.energy.EnergyStorage
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.network.item.ItemStorage
-import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
+import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.ui.config.findNetworkedInventory
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.BlockSide.FRONT
-import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -44,40 +33,20 @@ private const val BURN_TIME_MULTIPLIER = 0.1
 class FurnaceGenerator(
     material: NovaMaterial,
     armorStand: ArmorStand
-) : TileEntity(material, armorStand), EnergyStorage, ItemStorage {
+) : EnergyItemTileEntity(material, armorStand) {
     
-    private var energy: Int = retrieveData(0, "energy")
-    private var burnTime: Int = retrieveData(0, "burnTime")
-    private var totalBurnTime: Int = retrieveData(0, "totalBurnTime")
+    override val defaultEnergyConfig by lazy { createEnergySideConfig(PROVIDE, FRONT) }
+    
+    private var burnTime: Int = retrieveData("burnTime") { 0 }
+    private var totalBurnTime: Int = retrieveData("totalBurnTime") { 0 }
     
     private val inventory = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("inventory"), 1)
         .also { it.setItemUpdateHandler(this::handleInventoryUpdate) }
+    
     private val gui by lazy { CoalGeneratorGUI() }
-    private var updateEnergyBar = true
-    
-    override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
-    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> =
-        retrieveData(createEnergySideConfig(PROVIDE, FRONT), "energyConfig")
-    override val requestedEnergy = 0
-    override val providedEnergy: Int
-        get() = energy
-    
-    override val inventories: MutableMap<BlockFace, NetworkedInventory>
-    override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
-        retrieveData(createItemSideConfig(ItemConnectionType.INSERT, FRONT), "itemConfig")
     
     init {
-        val networkedInventory = NetworkedVirtualInventory(inventory)
-        inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { networkedInventory }
-    }
-    
-    override fun addEnergy(energy: Int) {
-        throw UnsupportedOperationException()
-    }
-    
-    override fun removeEnergy(energy: Int) {
-        this.energy -= energy
-        updateEnergyBar = true
+        setDefaultInventory(inventory)
     }
     
     override fun handleTick() {
@@ -88,21 +57,13 @@ class FurnaceGenerator(
             energy = min(MAX_ENERGY, energy + ENERGY_PER_TICK)
             
             gui.progressItem.percentage = burnTime.toDouble() / totalBurnTime.toDouble()
-            updateEnergyBar = true
+            hasEnergyChanged = true
         }
         
-        if (updateEnergyBar) {
+        if (hasEnergyChanged) {
             gui.energyBar.update()
-            updateEnergyBar = false
+            hasEnergyChanged = false
         }
-    }
-    
-    override fun handleInitialized() {
-        NetworkManager.handleEndPointAdd(this)
-    }
-    
-    override fun handleRemoved(unload: Boolean) {
-        NetworkManager.handleEndPointRemove(this, unload)
     }
     
     private fun burnItem() {
@@ -159,14 +120,10 @@ class FurnaceGenerator(
     }
     
     override fun saveData() {
-        storeData("energy", energy, true)
+        super.saveData()
         storeData("burnTime", burnTime)
         storeData("totalBurnTime", totalBurnTime)
-        storeData("energyConfig", energyConfig)
-        storeData("itemConfig", itemConfig)
     }
-    
-    private fun getEnergyValues() = energy to MAX_ENERGY
     
     inner class CoalGeneratorGUI {
         
@@ -175,7 +132,7 @@ class FurnaceGenerator(
         private val sideConfigGUI = SideConfigGUI(
             this@FurnaceGenerator,
             listOf(NONE, PROVIDE),
-            listOf(inventory.findNetworkedInventory(this@FurnaceGenerator) to "Fuel Inventory")
+            listOf(inventory to "Fuel Inventory")
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)
@@ -191,7 +148,7 @@ class FurnaceGenerator(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, ::getEnergyValues)
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { energy to MAX_ENERGY }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Furnace Generator", gui).show()
