@@ -13,7 +13,7 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.serialization.JsonElementDataType
+import xyz.xenondevs.nova.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
 import kotlin.math.roundToInt
 

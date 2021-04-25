@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.tileentity.serialization
+package xyz.xenondevs.nova.serialization
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser

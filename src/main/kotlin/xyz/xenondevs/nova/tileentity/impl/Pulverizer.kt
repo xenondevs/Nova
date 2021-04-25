@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.tileentity.impl
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.entity.ArmorStand
@@ -20,7 +19,6 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.seed
 
 private const val MAX_ENERGY = 10_000
 private const val ENERGY_PER_TICK = 50
@@ -32,12 +30,12 @@ class Pulverizer(
     armorStand: ArmorStand
 ) : EnergyItemTileEntity(material, armorStand) {
     
-    private val inputInv = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("input"), 1).apply { setItemUpdateHandler(::handleInputUpdate) }
-    private val outputInv = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("output"), 2).apply { setItemUpdateHandler(::handleOutputUpdate) }
+    private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
+    private val outputInv = getInventory("output", 2, true, ::handleOutputUpdate)
     private val gui = PulverizerGUI()
     
-    private var pulverizeTime: Int = 0
-    private var currentItem: ItemStack? = null
+    private var pulverizeTime = retrieveData("pulverizerTime") { 0 }
+    private var currentItem: ItemStack? = retrieveOrNull("currentItem")
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int
@@ -56,6 +54,7 @@ class Pulverizer(
                 
                 if (pulverizeTime == 0) {
                     outputInv.addItem(null, currentItem)
+                    currentItem = null
                 }
                 
                 gui.updateProgress()
@@ -98,6 +97,12 @@ class Pulverizer(
         if (event.updateReason != null && event.newItemStack != null) event.isCancelled = true
     }
     
+    override fun saveData() {
+        super.saveData()
+        storeData("pulverizerTime", pulverizeTime)
+        storeData("currentItem", currentItem)
+    }
+    
     inner class PulverizerGUI {
         
         private val mainProgress = ProgressArrowItem()
@@ -125,6 +130,10 @@ class Pulverizer(
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { energy to MAX_ENERGY }
+        
+        init {
+            updateProgress()
+        }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Pulverizer", gui).show()

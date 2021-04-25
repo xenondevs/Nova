@@ -40,8 +40,7 @@ class FurnaceGenerator(
     private var burnTime: Int = retrieveData("burnTime") { 0 }
     private var totalBurnTime: Int = retrieveData("totalBurnTime") { 0 }
     
-    private val inventory = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("inventory"), 1)
-        .also { it.setItemUpdateHandler(this::handleInventoryUpdate) }
+    private val inventory = getInventory("fuel", 1, true, ::handleInventoryUpdate)
     
     private val gui by lazy { CoalGeneratorGUI() }
     
@@ -103,20 +102,6 @@ class FurnaceGenerator(
         }
         
         gui.openWindow(event.player)
-    }
-    
-    override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
-        val drops = super.destroy(dropItems)
-        
-        // add items from inventory if there are any
-        if (inventory.hasItemStack(0)) {
-            drops += inventory.getItemStack(0)
-        }
-        
-        // delete the inventory since the items will be dropped
-        VirtualInventoryManager.getInstance().remove(inventory)
-        
-        return drops
     }
     
     override fun saveData() {

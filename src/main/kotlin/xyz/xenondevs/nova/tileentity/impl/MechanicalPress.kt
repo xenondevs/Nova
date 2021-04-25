@@ -43,11 +43,11 @@ class MechanicalPress(
         get() = MAX_ENERGY - energy
     
     private var type: PressType = retrieveData("pressType") { PressType.PLATE }
-    private var pressTime: Int = 0
-    private var currentItem: ItemStack? = null
+    private var pressTime: Int = retrieveData("pressTime") { 0 }
+    private var currentItem: ItemStack? = retrieveOrNull("currentItem")
     
-    private val inputInv = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("input"), 1).apply { setItemUpdateHandler(::handleInputUpdate) }
-    private val outputInv = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed("output"), 1).apply { setItemUpdateHandler(::handleOutputUpdate) }
+    private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
+    private val outputInv = getInventory("output", 1, true, ::handleOutputUpdate)
     
     private val gui by lazy { MechanicalPressUI() }
     
@@ -64,6 +64,7 @@ class MechanicalPress(
                 
                 if (pressTime == 0) {
                     outputInv.placeOne(null, 0, currentItem)
+                    currentItem = null
                 }
                 
                 gui.updateProgress()
@@ -110,7 +111,9 @@ class MechanicalPress(
     
     override fun saveData() {
         super.saveData()
-        storeData("pressType", pressTime)
+        storeData("pressType", type)
+        storeData("pressTime", pressTime)
+        storeData("currentItem", currentItem)
     }
     
     inner class MechanicalPressUI {
@@ -140,6 +143,10 @@ class MechanicalPress(
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { energy to MAX_ENERGY }
+        
+        init {
+            updateProgress()
+        }
         
         fun updateProgress() {
             pressProgress.percentage = if (pressTime == 0) 0.0 else (PRESS_TIME - pressTime).toDouble() / PRESS_TIME.toDouble()

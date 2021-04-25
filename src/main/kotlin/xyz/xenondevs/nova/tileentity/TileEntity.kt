@@ -2,6 +2,9 @@ package xyz.xenondevs.nova.tileentity
 
 import com.google.common.base.Preconditions
 import com.google.gson.JsonObject
+import de.studiocode.invui.virtualinventory.VirtualInventory
+import de.studiocode.invui.virtualinventory.VirtualInventoryManager
+import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.player.PlayerInteractEvent
@@ -25,6 +28,8 @@ abstract class TileEntity(
     val location = armorStand.location.blockLocation
     val chunk = location.chunk
     
+    private val inventories = ArrayList<VirtualInventory>()
+    
     init {
         if (mainDataObject.size() <= 1) {
             storeData("material", material)
@@ -46,6 +51,12 @@ abstract class TileEntity(
             val item = material.createItemBuilder(this).build()
             item.setTileEntityData(globalDataObject)
             drops += item
+        }
+        
+        // inventory drops ignore the dropItems parameter
+        inventories.forEach {
+            drops += it.items.filterNotNull()
+            VirtualInventoryManager.getInstance().remove(it)
         }
         
         return drops
@@ -90,6 +101,19 @@ abstract class TileEntity(
      * is performed in that method.
      */
     abstract fun handleRightClick(event: PlayerInteractEvent)
+    
+    /**
+     * Gets a [VirtualInventory] for this [TileEntity].
+     * When this method is used an [dropItems] is true, the [VirtualInventory]
+     * will be automatically deleted and its contents dropped when the [TileEntity]
+     * is destroyed.
+     */
+    fun getInventory(seed: String, size: Int, dropItems: Boolean, itemHandler: (ItemUpdateEvent) -> Unit): VirtualInventory {
+        val inventory = VirtualInventoryManager.getInstance().getOrCreate(uuid.seed(seed), size)
+        inventory.setItemUpdateHandler(itemHandler)
+        if (dropItems) inventories += inventory
+        return inventory
+    }
     
     /**
      * Gets the correct direction a block side.
@@ -151,13 +175,15 @@ abstract class TileEntity(
      * @param global If the data should also be stored in the [ItemStack]
      * of this [TileEntity].
      */
-    fun storeData(key: String, value: Any, global: Boolean = false) {
+    fun storeData(key: String, value: Any?, global: Boolean = false) {
         if (global) {
             Preconditions.checkArgument(!mainDataObject.has(key), "$key is already a non-global value")
-            globalDataObject.add(key, GSON.toJsonTree(value))
+            if (value != null) globalDataObject.add(key, GSON.toJsonTree(value))
+            else globalDataObject.remove(key)
         } else {
             Preconditions.checkArgument(!globalDataObject.has(key), "$key is already a global value")
-            mainDataObject.add(key, GSON.toJsonTree(value))
+            if (value != null) mainDataObject.add(key, GSON.toJsonTree(value))
+            else mainDataObject.remove(key)
         }
         armorStand.setTileEntityData(mainDataObject)
     }

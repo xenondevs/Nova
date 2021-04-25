@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.tileentity.serialization
+package xyz.xenondevs.nova.serialization
 
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataType

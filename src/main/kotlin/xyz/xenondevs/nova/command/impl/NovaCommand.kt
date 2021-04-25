@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.command.player
 import xyz.xenondevs.nova.debug.NetworkDebugger
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkType
+import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.hasNovaData
 
 class NovaCommand(name: String, permission: String) : PlayerCommand(name, permission) {
@@ -25,6 +26,8 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
             .then(literal("debug")
                 .then(literal("listNearby")
                     .executesCatching { listNearby(it) })
+                .then(literal("getNearestData")
+                    .executesCatching { getNearestData(it) })
                 .then(literal("energyNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
                 .then(literal("itemNet")
@@ -46,6 +49,18 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
         val tileEntityArmorStands = armorStands.filter { it.persistentDataContainer.hasNovaData() }
         
         player.sendMessage("§7Out of the §b${armorStands.count()}§7 ArmorStands in your chunk, §b${tileEntityArmorStands.count()}§7 are part of a TileEntity.")
+    }
+    
+    private fun getNearestData(context: CommandContext<Any>) {
+        val player = context.player
+        val chunks = player.location.chunk.getSurroundingChunks(1, true)
+        val armorStands = chunks
+            .flatMap { it.entities.toList() }
+            .filterIsInstance<ArmorStand>()
+            .filter { it.persistentDataContainer.hasNovaData() }
+        val armorStand = armorStands.minByOrNull { it.location.distance(player.location) }
+        if (armorStand != null) player.chat("/data get entity ${armorStand.uniqueId}")
+        else player.sendMessage("§cCould not find a TileEntity nearby.")
     }
     
     private fun toggleNetworkDebugging(type: NetworkType, context: CommandContext<Any>) {

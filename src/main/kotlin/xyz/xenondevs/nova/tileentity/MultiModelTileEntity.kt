@@ -5,7 +5,7 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.serialization.UUIDDataType
+import xyz.xenondevs.nova.serialization.UUIDDataType
 import xyz.xenondevs.nova.util.EntityUtils
 
 private val MULTI_MODEL_KEY = NamespacedKey(NOVA, "multiModel")
