@@ -6,6 +6,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 class Hitbox(
     private val from: Location,
     private val to: Location,
+    val checkQualify: (PlayerInteractEvent) -> Boolean = { true },
     val handleHit: (PlayerInteractEvent) -> Unit
 ) {
     

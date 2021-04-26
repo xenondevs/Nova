@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.network
 
+import com.google.common.base.Preconditions
 import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.runTaskTimer
 
@@ -33,11 +34,14 @@ object NetworkManager {
     }
     
     fun handleBridgeAdd(bridge: NetworkBridge, vararg supportedNetworkTypes: NetworkType) {
+        Preconditions.checkArgument(supportedNetworkTypes.isNotEmpty(), "Bridge needs to support at least one network type")
+        
         supportedNetworkTypes.forEach { networkType ->
             
             val previousNetworks = HashSet<Network>()
             bridge.getNearbyBridges(networkType).forEach { (face, otherBridge) ->
-                if (otherBridge.bridgeFaces.contains(face.oppositeFace)) { // if bridge connects to this bridge
+                if (bridge.bridgeFaces.contains(face)
+                    && otherBridge.bridgeFaces.contains(face.oppositeFace)) { // if bridge connects to this bridge
                     previousNetworks += otherBridge.networks[networkType]!!
                 }
             }
@@ -77,17 +81,22 @@ object NetworkManager {
             
             // Connect Storages
             bridge.getNearbyEndPoints().forEach { (face, endPoint) ->
-                val allowedFaces = endPoint.allowedFaces[networkType]
-                val oppositeFace = face.oppositeFace
-                if (allowedFaces != null && allowedFaces.contains(oppositeFace)) {
-                    endPoint.setNetwork(networkType, oppositeFace, network)
-                    network.addEndPoint(endPoint, oppositeFace)
+                if (bridge.bridgeFaces.contains(face)) {
+                    val allowedFaces = endPoint.allowedFaces[networkType]
+                    val oppositeFace = face.oppositeFace
+                    if (allowedFaces != null && allowedFaces.contains(oppositeFace)) {
+                        endPoint.setNetwork(networkType, oppositeFace, network)
+                        network.addEndPoint(endPoint, oppositeFace)
+                    }
                 }
             }
         }
         
         // update nearby bridges
         bridge.updateNearbyBridges()
+        
+        // update itself
+        bridge.handleNetworkUpdate()
     }
     
     

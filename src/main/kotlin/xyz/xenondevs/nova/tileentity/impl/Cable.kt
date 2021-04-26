@@ -2,14 +2,17 @@ package xyz.xenondevs.nova.tileentity.impl
 
 import com.google.common.base.Preconditions
 import org.bukkit.Axis
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Orientable
 import org.bukkit.entity.ArmorStand
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.hitbox.Hitbox
+import xyz.xenondevs.nova.hitbox.isRightClick
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.Network
 import xyz.xenondevs.nova.network.NetworkManager
@@ -33,6 +36,8 @@ private const val DOWN = 3
 private const val UP = 4
 private val ATTACHMENTS: IntArray = (5..13).toIntArray()
 
+private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
+
 open class Cable(
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
@@ -44,7 +49,7 @@ open class Cable(
 ), EnergyBridge, ItemBridge {
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
-    override val bridgeFaces = CUBE_FACES.toSet() // TODO: allow players to enable / disable cable faces
+    override val bridgeFaces = CUBE_FACES.toMutableSet()
     
     private var _connectedNodes: Map<NetworkType, Map<BlockFace, NetworkNode>>? = null
     override val connectedNodes: Map<NetworkType, Map<BlockFace, NetworkNode>>
@@ -56,6 +61,7 @@ open class Cable(
     private val hitboxes = ArrayList<Hitbox>()
     
     override fun handleNetworkUpdate() {
+        println("handlentworkupdate")
         _connectedNodes = findConnectedNodes()
         if (NOVA.isEnabled) {
             replaceModels(getModelsNeeded())
@@ -64,9 +70,7 @@ open class Cable(
     }
     
     override fun handleInitialized() {
-        NetworkManager.handleBridgeAdd(this, ENERGY, ITEMS)
-        replaceModels(getModelsNeeded())
-        updateHitbox()
+        NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
     }
     
     override fun handleRemoved(unload: Boolean) {
@@ -132,18 +136,55 @@ open class Cable(
         }
     
     private fun updateHitbox() {
-        updateVirtualHitbox()
+        updateVirtualHitboxes()
         updateBlockHitbox()
     }
     
-    private fun updateVirtualHitbox() {
+    private fun updateVirtualHitboxes() {
         hitboxes.forEach { it.remove() }
         hitboxes.clear()
         
+        createCableHitboxes()
+        createAttachmentHitboxes()
+    }
+    
+    private fun createCableHitboxes() {
+        CUBE_FACES.forEach { blockFace ->
+            val pointA: Point3D
+            val pointB: Point3D
+            if (connectedNodes.values.any { it.containsKey(blockFace) }) {
+                pointA = Point3D(0.35, 0.35, 0.0)
+                pointB = Point3D(0.65, 0.65, 0.5)
+            } else {
+                pointA = Point3D(0.35, 0.35, 0.3)
+                pointB = Point3D(0.65, 0.65, 0.5)
+            }
+            
+            val origin = Point3D(0.5, 0.5, 0.5)
+            
+            val rotationValues = blockFace.rotationValues
+            pointA.rotateAroundXAxis(rotationValues.first, origin)
+            pointA.rotateAroundYAxis(rotationValues.second, origin)
+            pointB.rotateAroundXAxis(rotationValues.first, origin)
+            pointB.rotateAroundYAxis(rotationValues.second, origin)
+            
+            val sortedPoints = Point3D.sort(pointA, pointB)
+            val from = location.clone().add(sortedPoints.first.x, sortedPoints.first.y, sortedPoints.first.z)
+            val to = location.clone().add(sortedPoints.second.x, sortedPoints.second.y, sortedPoints.second.z)
+            
+            hitboxes += Hitbox(
+                from, to,
+                { it.action.isRightClick() && it.hasItem() && it.item!!.novaMaterial == NovaMaterial.WRENCH },
+                { handleCableWrenchHit(it, blockFace) }
+            )
+        }
+    }
+    
+    private fun createAttachmentHitboxes() {
         val neighborEndPoints = connectedNodes
             .values
             .flatMap { it.entries }
-            .filter { (_, node) -> node is ItemStorage }
+            .filter { (blockFace, node) -> node is ItemStorage && node.itemConfig[blockFace.oppositeFace] != ItemConnectionType.NONE }
             .associate { it.key to it.value as ItemStorage }
         
         neighborEndPoints
@@ -164,7 +205,7 @@ open class Cable(
                 val from = location.clone().add(sortedPoints.first.x, sortedPoints.first.y, sortedPoints.first.z)
                 val to = location.clone().add(sortedPoints.second.x, sortedPoints.second.y, sortedPoints.second.z)
                 
-                hitboxes += Hitbox(from, to) { handleHitboxHit(it, blockFace, neighborEndPoints[blockFace]!!) }
+                hitboxes += Hitbox(from, to) { handleAttachmentHit(it, blockFace, neighborEndPoints[blockFace]!!) }
             }
     }
     
@@ -193,9 +234,28 @@ open class Cable(
         }
     }
     
-    private fun handleHitboxHit(event: PlayerInteractEvent, face: BlockFace, itemStorage: ItemStorage) {
+    private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemStorage: ItemStorage) {
         event.isCancelled = true
         CableItemConfigGUI(itemStorage, face.oppositeFace).openWindow(event.player)
+    }
+    
+    private fun handleCableWrenchHit(event: PlayerInteractEvent, face: BlockFace) {
+        event.isCancelled = true
+        
+        val player = event.player
+        if (player.isSneaking) {
+            Bukkit.getPluginManager().callEvent(BlockBreakEvent(location.block, player))
+        } else {
+            if (connectedNodes.values.any { it.containsKey(face) }) {
+                NetworkManager.handleBridgeRemove(this, false)
+                bridgeFaces.remove(face)
+                NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+            } else if (!bridgeFaces.contains(face)) {
+                NetworkManager.handleBridgeRemove(this, false)
+                bridgeFaces.add(face)
+                NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+            }
+        }
     }
     
     override fun saveData() = Unit

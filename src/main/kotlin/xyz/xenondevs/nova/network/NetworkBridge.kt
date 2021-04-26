@@ -47,8 +47,11 @@ interface NetworkBridge : NetworkNode {
         val connectedNodes = EnumMap<NetworkType, EnumMap<BlockFace, NetworkNode>>(NetworkType::class.java)
         NetworkType.values().forEach { connectedNodes[it] = EnumMap(BlockFace::class.java) }
         
-        getNearbyNodes().forEach { (face, node) ->
-            node.getNetworks(face.oppositeFace).forEach { (networkType, network) ->
+        for ((face, node) in getNearbyNodes()) {
+            if (!bridgeFaces.contains(face)) continue
+            val oppositeFace = face.oppositeFace
+            if (node is NetworkBridge && !node.bridgeFaces.contains(oppositeFace)) continue
+            for ((networkType, network) in node.getNetworks(oppositeFace)) {
                 if (network == networks[networkType]) {
                     connectedNodes[networkType]!![face] = node
                 }

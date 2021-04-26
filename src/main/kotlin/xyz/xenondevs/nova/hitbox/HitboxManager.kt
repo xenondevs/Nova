@@ -4,12 +4,17 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.castRay
 import xyz.xenondevs.nova.util.getSurroundingChunks
+
+fun Action.isRightClick() = this == Action.RIGHT_CLICK_BLOCK || this == Action.RIGHT_CLICK_AIR
+
+fun Action.isLeftClick() = this == Action.LEFT_CLICK_BLOCK || this == Action.LEFT_CLICK_AIR
 
 object HitboxManager : Listener {
     
@@ -32,7 +37,7 @@ object HitboxManager : Listener {
         }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleInteract(event: PlayerInteractEvent) {
         val action = event.action
         if (action != Action.PHYSICAL) {
@@ -48,7 +53,9 @@ object HitboxManager : Listener {
                         // if the ray has moved out of the chunk it was previously in, the surrounding hitboxes need to be recalculated
                         lastChunk = chunk
                         val chunks = chunk.getSurroundingChunks(range = 1, includeCurrent = true)
-                        surroundingHitboxes = chunks.flatMap { hitboxes[it] ?: emptyList() }
+                        surroundingHitboxes = chunks.flatMap {
+                            hitboxes[it] ?: emptyList()
+                        }.filter { it.checkQualify(event) }
                     }
                     
                     val hitHitboxes = surroundingHitboxes!!.filter { it.isInHitbox(location) }

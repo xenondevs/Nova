@@ -64,6 +64,7 @@ enum class NovaMaterial(
     COAL_DUST("Coal Dust", itemOf(1026)),
     
     // 2000 - 3000: Upgrades and similar
+    WRENCH("Wrench", itemOf(2000)),
     
     // 5000 - 10.000 MultiModel Blocks
     BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray() + (5025..5033).toIntArray()), null, ::BasicCable),
