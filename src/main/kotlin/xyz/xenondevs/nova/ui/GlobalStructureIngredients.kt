@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.ui
 import de.studiocode.invui.gui.structure.Marker
 import de.studiocode.invui.gui.structure.Structure
 import de.studiocode.invui.resourcepack.Icon
+import xyz.xenondevs.nova.ui.item.ScrollUpItem
+import xyz.xenondevs.nova.ui.item.ScrollDownItem
 
 fun setGlobalIngredients() {
     Structure.addGlobalIngredient('x', Marker.ITEM_LIST_SLOT)
@@ -17,4 +19,6 @@ fun setGlobalIngredients() {
     Structure.addGlobalIngredient('6', Icon.LIGHT_VERTICAL_LEFT.item)
     Structure.addGlobalIngredient('7', Icon.LIGHT_HORIZONTAL_UP.item)
     Structure.addGlobalIngredient('8', Icon.LIGHT_HORIZONTAL_DOWN.item)
+    Structure.addGlobalIngredient('u', ::ScrollUpItem)
+    Structure.addGlobalIngredient('d', ::ScrollDownItem)
 }

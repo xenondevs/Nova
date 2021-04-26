@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.command.player
 import xyz.xenondevs.nova.debug.NetworkDebugger
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkType
+import xyz.xenondevs.nova.ui.gui.CreativeGUI
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.hasNovaData
 
@@ -31,8 +32,9 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
                 .then(literal("energyNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
                 .then(literal("itemNet")
-                    .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) })
-            )
+                    .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) }))
+            .then(literal("inventory")
+                .executesCatching { openCreativeInventory(it) })
     }
     
     private fun handleGive(material: NovaMaterial, context: CommandContext<Any>) {
@@ -67,6 +69,10 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
         val player = context.player
         NetworkDebugger.toggleDebugger(type, player)
         player.sendMessage("§7Toggled debug-view for §b${type.name.toLowerCase().capitalize()}-Networks")
+    }
+    
+    private fun openCreativeInventory(context: CommandContext<Any>) {
+        CreativeGUI.getWindow(context.player).show()
     }
     
 }
