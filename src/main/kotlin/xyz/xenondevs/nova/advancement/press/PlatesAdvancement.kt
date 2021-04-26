@@ -7,10 +7,10 @@ import xyz.xenondevs.nova.advancement.addObtainCriteria
 import xyz.xenondevs.nova.advancement.toIcon
 import xyz.xenondevs.nova.material.NovaMaterial
 
-class PlatesAdvancement : Advancement(KEY) {
+object PlatesAdvancement : Advancement(NamespacedKey(NOVA, "plates")) {
     
     init {
-        setParent(MechanicalPressAdvancement.KEY)
+        setParent(MechanicalPressAdvancement.key)
         
         val criteria = NovaMaterial.values()
             .filter { it.name.endsWith("PLATE") }
@@ -23,10 +23,6 @@ class PlatesAdvancement : Advancement(KEY) {
             it.setDescription("Make a plate using a Mechanical Press")
             it.setIcon(NovaMaterial.IRON_PLATE.toIcon())
         }
-    }
-    
-    companion object {
-        val KEY = NamespacedKey(NOVA, "plates")
     }
     
 }

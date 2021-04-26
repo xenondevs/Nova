@@ -7,20 +7,16 @@ import xyz.xenondevs.nova.advancement.addObtainCriteria
 import xyz.xenondevs.nova.advancement.toIcon
 import xyz.xenondevs.nova.material.NovaMaterial
 
-class EliteCableAdvancement : Advancement(KEY) {
+object EliteCableAdvancement : Advancement(NamespacedKey(NOVA, "elite_cable")) {
     
     init {
-        setParent(AdvancedCableAdvancement.KEY)
+        setParent(AdvancedCableAdvancement.key)
         addObtainCriteria(NovaMaterial.ELITE_CABLE)
         setDisplay {
             it.setTitle("Even More Cable")
             it.setDescription("Craft an Elite Cable")
             it.setIcon(NovaMaterial.ELITE_CABLE.toIcon())
         }
-    }
-    
-    companion object {
-        val KEY = NamespacedKey(NOVA, "elite_cable")
     }
     
 }

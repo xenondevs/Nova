@@ -6,7 +6,7 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 
-class RootAdvancement : Advancement(KEY) {
+object RootAdvancement : Advancement(NamespacedKey(NOVA, "root")) {
     
     init {
         addCriteria("none", TriggerType.IMPOSSIBLE) {}
@@ -18,10 +18,6 @@ class RootAdvancement : Advancement(KEY) {
             it.setToast(false)
             it.setBackground(NamespacedKey.minecraft("textures/block/tube_coral_block.png"))
         }
-    }
-    
-    companion object {
-        val KEY = NamespacedKey(NOVA, "root")
     }
     
 }

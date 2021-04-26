@@ -7,24 +7,20 @@ import xyz.xenondevs.nova.advancement.addObtainCriteria
 import xyz.xenondevs.nova.advancement.toIcon
 import xyz.xenondevs.nova.material.NovaMaterial
 
-class AllGearsAdvancement : Advancement(KEY) {
+object AllGearsAdvancement : Advancement(NamespacedKey(NOVA, "all_gears")) {
     
     init {
-        setParent(GearsAdvancement.KEY)
-    
+        setParent(GearsAdvancement.key)
+        
         NovaMaterial.values()
             .filter { it.name.endsWith("GEAR") }
             .forEach { addObtainCriteria(it) }
-    
+        
         setDisplay {
             it.setTitle("All the Gears")
             it.setDescription("Get one of every gear")
             it.setIcon(NovaMaterial.DIAMOND_GEAR.toIcon())
         }
-    }
-    
-    companion object {
-        val KEY = NamespacedKey(NOVA, "all_gears")
     }
     
 }

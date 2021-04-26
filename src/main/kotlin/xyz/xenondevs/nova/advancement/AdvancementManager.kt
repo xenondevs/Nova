@@ -50,12 +50,12 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
     
     fun loadAdvancements() {
         registerAll(
-            RootAdvancement(),
-            BasicCableAdvancement(), AdvancedCableAdvancement(), EliteCableAdvancement(), UltimateCableAdvancement(),
-            FurnaceGeneratorAdvancement(),
-            BasicPowerCellAdvancement(), AdvancedPowerCellAdvancement(), ElitePowerCellAdvancement(), UltimatePowerCellAdvancement(),
-            MechanicalPressAdvancement(), GearsAdvancement(), PlatesAdvancement(), AllPlatesAdvancement(), AllGearsAdvancement(),
-            PulverizerAdvancement()
+            RootAdvancement,
+            BasicCableAdvancement, AdvancedCableAdvancement, EliteCableAdvancement, UltimateCableAdvancement,
+            FurnaceGeneratorAdvancement,
+            BasicPowerCellAdvancement, AdvancedPowerCellAdvancement, ElitePowerCellAdvancement, UltimatePowerCellAdvancement,
+            MechanicalPressAdvancement, GearsAdvancement, PlatesAdvancement, AllPlatesAdvancement, AllGearsAdvancement,
+            PulverizerAdvancement
         )
         
         createAll(false)
@@ -67,7 +67,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
     
     @EventHandler
     fun handlePlayerJoin(event: PlayerJoinEvent) {
-        event.player.awardAdvancement(RootAdvancement.KEY)
+        event.player.awardAdvancement(RootAdvancement.key)
     }
     
 }

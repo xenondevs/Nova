@@ -7,15 +7,15 @@ import xyz.xenondevs.nova.advancement.addObtainCriteria
 import xyz.xenondevs.nova.advancement.toIcon
 import xyz.xenondevs.nova.material.NovaMaterial
 
-class GearsAdvancement : Advancement(KEY) {
+object GearsAdvancement : Advancement(NamespacedKey(NOVA, "gears")) {
     
     init {
-        setParent(MechanicalPressAdvancement.KEY)
-    
+        setParent(MechanicalPressAdvancement.key)
+        
         val criteria = NovaMaterial.values()
             .filter { it.name.endsWith("GEAR") }
             .map { addObtainCriteria(it) }
-    
+        
         addRequirements(*criteria.toTypedArray())
         
         setDisplay {
@@ -23,10 +23,6 @@ class GearsAdvancement : Advancement(KEY) {
             it.setDescription("Make a gear using a Mechanical Press")
             it.setIcon(NovaMaterial.IRON_GEAR.toIcon())
         }
-    }
-    
-    companion object {
-        val KEY = NamespacedKey(NOVA, "gears")
     }
     
 }

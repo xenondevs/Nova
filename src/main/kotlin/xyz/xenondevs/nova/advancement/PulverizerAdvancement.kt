@@ -5,20 +5,16 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 
-class PulverizerAdvancement : Advancement(KEY) {
+object PulverizerAdvancement : Advancement(NamespacedKey(NOVA, "pulverizer")) {
     
     init {
-        setParent(RootAdvancement.KEY)
+        setParent(RootAdvancement.key)
         addObtainCriteria(NovaMaterial.PULVERIZER)
         setDisplay {
             it.setTitle("Basic Ore Duplication")
             it.setDescription("Craft a Pulverizer")
             it.setIcon(NovaMaterial.PULVERIZER.toIcon())
         }
-    }
-    
-    companion object {
-        val KEY = NamespacedKey(NOVA, "pulverizer")
     }
     
 }

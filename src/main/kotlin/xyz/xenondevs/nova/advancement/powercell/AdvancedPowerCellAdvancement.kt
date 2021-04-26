@@ -7,20 +7,16 @@ import xyz.xenondevs.nova.advancement.addObtainCriteria
 import xyz.xenondevs.nova.advancement.toIcon
 import xyz.xenondevs.nova.material.NovaMaterial
 
-class AdvancedPowerCellAdvancement : Advancement(KEY) {
+object AdvancedPowerCellAdvancement : Advancement(NamespacedKey(NOVA, "advanced_power_cell")) {
     
     init {
-        setParent(BasicPowerCellAdvancement.KEY)
+        setParent(BasicPowerCellAdvancement.key)
         addObtainCriteria(NovaMaterial.ADVANCED_POWER_CELL)
         setDisplay {
             it.setTitle("Even More Energy")
             it.setDescription("Craft an Advanced Power Cell")
             it.setIcon(NovaMaterial.ADVANCED_POWER_CELL.toIcon())
         }
-    }
-    
-    companion object {
-        val KEY = NamespacedKey(NOVA, "advanced_power_cell")
     }
     
 }
