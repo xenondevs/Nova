@@ -61,7 +61,6 @@ open class Cable(
     private val hitboxes = ArrayList<Hitbox>()
     
     override fun handleNetworkUpdate() {
-        println("handlentworkupdate")
         _connectedNodes = findConnectedNodes()
         if (NOVA.isEnabled) {
             replaceModels(getModelsNeeded())

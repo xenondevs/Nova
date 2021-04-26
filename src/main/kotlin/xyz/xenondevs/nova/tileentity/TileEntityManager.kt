@@ -3,10 +3,12 @@ package xyz.xenondevs.nova.tileentity
 import com.google.gson.JsonObject
 import org.bukkit.*
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
+import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
@@ -195,6 +197,19 @@ object TileEntityManager : Listener {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
             tileEntity?.handleRightClick(event)
+        }
+    }
+    
+    @EventHandler
+    fun handleInventoryCreative(event: InventoryCreativeEvent) {
+        val player = event.whoClicked as Player
+        val targetBlock = player.getTargetBlockExact(8)
+        if (targetBlock != null && targetBlock.type == event.cursor.type) {
+            val tileEntity = getTileEntityAt(targetBlock.location)
+            if (tileEntity != null) {
+                val novaMaterial = tileEntity.material
+                event.cursor = novaMaterial.createItemStack()
+            }
         }
     }
     
