@@ -20,7 +20,7 @@ import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.util.BlockSide
 
-private const val MAX_ENERGY = 10_000
+private const val MAX_ENERGY = 100_000
 private const val ENERGY_PER_TICK = 50
 private const val PULVERIZE_TIME = 200
 

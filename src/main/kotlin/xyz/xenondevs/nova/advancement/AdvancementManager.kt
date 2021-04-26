@@ -54,7 +54,8 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             BasicCableAdvancement(), AdvancedCableAdvancement(), EliteCableAdvancement(), UltimateCableAdvancement(),
             FurnaceGeneratorAdvancement(),
             BasicPowerCellAdvancement(), AdvancedPowerCellAdvancement(), ElitePowerCellAdvancement(), UltimatePowerCellAdvancement(),
-            MechanicalPressAdvancement(), GearsAdvancement(), PlatesAdvancement(), AllPlatesAdvancement(), AllGearsAdvancement()
+            MechanicalPressAdvancement(), GearsAdvancement(), PlatesAdvancement(), AllPlatesAdvancement(), AllGearsAdvancement(),
+            PulverizerAdvancement()
         )
         
         createAll(false)

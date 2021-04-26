@@ -1,0 +1,24 @@
+package xyz.xenondevs.nova.advancement
+
+import net.roxeez.advancement.Advancement
+import org.bukkit.NamespacedKey
+import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.material.NovaMaterial
+
+class PulverizerAdvancement : Advancement(KEY) {
+    
+    init {
+        setParent(RootAdvancement.KEY)
+        addObtainCriteria(NovaMaterial.PULVERIZER)
+        setDisplay {
+            it.setTitle("Basic Ore Duplication")
+            it.setDescription("Craft a Pulverizer")
+            it.setIcon(NovaMaterial.PULVERIZER.toIcon())
+        }
+    }
+    
+    companion object {
+        val KEY = NamespacedKey(NOVA, "pulverizer")
+    }
+    
+}

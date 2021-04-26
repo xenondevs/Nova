@@ -49,12 +49,18 @@ object NovaRecipes : Listener {
                 .setIngredient('c', NovaMaterial.BASIC_CABLE)
                 .setIngredient('r', Material.REDSTONE_BLOCK),
             
+            NovaMaterial.PULVERIZER.makeRecipe()
+                .shape("iii", "igi", "ipi")
+                .setIngredient('i', Material.IRON_INGOT)
+                .setIngredient('g', NovaMaterial.IRON_GEAR)
+                .setIngredient('p', NovaMaterial.BASIC_POWER_CELL),
+            
             NovaMaterial.BASIC_CABLE.makeRecipe(8)
                 .shape("iii", "rrr", "iii")
                 .setIngredient('i', Material.IRON_INGOT)
                 .setIngredient('r', Material.REDSTONE)
         )
-    
+        
         FurnaceRecipes.registerRecipes()
         PressRecipe.registerRecipes()
         PulverizerRecipe.registerRecipes()
