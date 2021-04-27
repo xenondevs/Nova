@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.debug.NetworkDebugger
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.ui.gui.CreativeGUI
+import xyz.xenondevs.nova.util.capitalize
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.hasNovaData
 
@@ -68,7 +69,7 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
     private fun toggleNetworkDebugging(type: NetworkType, context: CommandContext<Any>) {
         val player = context.player
         NetworkDebugger.toggleDebugger(type, player)
-        player.sendMessage("§7Toggled debug-view for §b${type.name.toLowerCase().capitalize()}-Networks")
+        player.sendMessage("§7Toggled debug-view for §b${type.name.lowercase().capitalize()}-Networks")
     }
     
     private fun openCreativeInventory(context: CommandContext<Any>) {

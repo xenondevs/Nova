@@ -25,7 +25,7 @@ fun Entity.teleport(modifyLocation: Location.() -> Unit) {
 }
 
 fun PersistentDataContainer.hasNovaData(): Boolean {
-    val novaNameSpace = NOVA.name.toLowerCase(Locale.ROOT)
+    val novaNameSpace = NOVA.name.lowercase()
     return keys.any { it.namespace == novaNameSpace }
 }
 

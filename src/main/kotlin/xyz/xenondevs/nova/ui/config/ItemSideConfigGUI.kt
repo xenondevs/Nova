@@ -84,7 +84,7 @@ class ItemSideConfigGUI(
         private val blockFace = (itemStorage as TileEntity).getFace(blockSide)
         
         override fun getItemBuilder(): ItemBuilder {
-            val blockSide = blockSide.name[0] + blockSide.name.substring(1).toLowerCase()
+            val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (itemStorage.itemConfig[blockFace]!!) {
                 ItemConnectionType.NONE ->
                     NovaMaterial.GRAY_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§7None")
@@ -110,7 +110,7 @@ class ItemSideConfigGUI(
         private val blockFace = (itemStorage as TileEntity).getFace(blockSide)
         
         override fun getItemBuilder(): ItemBuilder {
-            val blockSide = blockSide.name[0] + blockSide.name.substring(1).toLowerCase()
+            val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             val inventory = itemStorage.inventories[blockFace]!! as NetworkedVirtualInventory
             return buttonBuilders[inventory.virtualInventory]!!.clone().setDisplayName("§7$blockSide")
         }

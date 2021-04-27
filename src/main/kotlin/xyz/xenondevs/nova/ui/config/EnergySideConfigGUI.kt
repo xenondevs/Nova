@@ -54,7 +54,7 @@ class EnergySideConfigGUI(
         private val blockFace = (energyStorage as TileEntity).getFace(blockSide)
         
         override fun getItemBuilder(): ItemBuilder {
-            val blockSide = blockSide.name[0] + blockSide.name.substring(1).toLowerCase()
+            val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (energyStorage.energyConfig[blockFace]!!) {
                 EnergyConnectionType.NONE ->
                     NovaMaterial.GRAY_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§7None")
