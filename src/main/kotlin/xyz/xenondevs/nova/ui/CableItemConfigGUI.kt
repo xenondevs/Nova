@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.gui.GUI
+import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.item.impl.controlitem.TabItem
+import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
@@ -16,31 +16,27 @@ import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
 
-class CableItemConfigGUI(private val itemStorage: ItemStorage, private val face: BlockFace) {
+class CableItemConfigGUI(
+    private val itemStorage: ItemStorage,
+    private val face: BlockFace,
+    insertFilterInventory: VirtualInventory,
+    extractFilterInventory: VirtualInventory
+) {
     
-    private val itemsGUI: GUI = GUIBuilder(GUIType.NORMAL, 8, 3)
+    private val gui = GUIBuilder(GUIType.NORMAL, 9, 4)
         .setStructure("" +
-            "# # # # # # # #" +
-            "# i # # # e # #" +
-            "# # # # # # # #")
+            "# # # # # # # # #" +
+            "# # i # # # e # #" +
+            "# # 1 # # # 2 # #" +
+            "# # # # # # # # #")
         .addIngredient('i', InsertItem())
         .addIngredient('e', ExtractItem())
-        .build()
-    
-    private val mainGUI = GUIBuilder(GUIType.TAB, 9, 3)
-        .setStructure("" +
-            "i x x x x x x x x" +
-            "# x x x x x x x x" +
-            "# x x x x x x x x")
-        .addGUI(itemsGUI)
-        .addIngredient('i', TabItem(0) {
-            if (it.currentTab == 0) NovaMaterial.ITEM_OFF_BUTTON.createBasicItemBuilder()
-            else NovaMaterial.ITEM_ON_BUTTON.createBasicItemBuilder().setDisplayName("§rItems")
-        })
+        .addIngredient('1', VISlotElement(insertFilterInventory, 0))
+        .addIngredient('2', VISlotElement(extractFilterInventory, 0))
         .build()
     
     fun openWindow(player: Player) {
-        SimpleWindow(player, "Config", mainGUI).show()
+        SimpleWindow(player, "Config", gui).show()
     }
     
     private fun updateState(run: () -> Unit) {

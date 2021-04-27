@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity.impl
 
 import com.google.common.base.Preconditions
+import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Axis
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -13,6 +14,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.hitbox.Hitbox
 import xyz.xenondevs.nova.hitbox.isRightClick
+import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.Network
 import xyz.xenondevs.nova.network.NetworkManager
@@ -58,6 +60,13 @@ open class Cable(
             return _connectedNodes!!
         }
     
+    private val filterInventories = mapOf(
+        ItemConnectionType.INSERT to
+            CUBE_FACES.associateWith { getInventory("filter_insert_$it", 1, true, ::handleFilterInventoryUpdate) },
+        ItemConnectionType.EXTRACT to
+            CUBE_FACES.associateWith { getInventory("filter_extract_$it", 1, true, ::handleFilterInventoryUpdate) }
+    )
+    
     private val hitboxes = ArrayList<Hitbox>()
     
     override fun handleNetworkUpdate() {
@@ -75,6 +84,14 @@ open class Cable(
     override fun handleRemoved(unload: Boolean) {
         NetworkManager.handleBridgeRemove(this, unload)
         hitboxes.forEach { it.remove() }
+    }
+    
+    override fun getFilter(type: ItemConnectionType, blockFace: BlockFace) =
+        filterInventories[type]?.get(blockFace)?.getItemStack(0)?.getFilterConfig()
+    
+    private fun handleFilterInventoryUpdate(event: ItemUpdateEvent) {
+        if (event.newItemStack != null && event.newItemStack?.novaMaterial != NovaMaterial.ITEM_FILTER)
+            event.isCancelled = true
     }
     
     private fun getModelsNeeded(): List<Pair<ItemStack, Float>> {
@@ -235,7 +252,12 @@ open class Cable(
     
     private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemStorage: ItemStorage) {
         event.isCancelled = true
-        CableItemConfigGUI(itemStorage, face.oppositeFace).openWindow(event.player)
+        CableItemConfigGUI(
+            itemStorage,
+            face.oppositeFace,
+            filterInventories[ItemConnectionType.INSERT]!![face]!!,
+            filterInventories[ItemConnectionType.EXTRACT]!![face]!!
+        ).openWindow(event.player)
     }
     
     private fun handleCableWrenchHit(event: PlayerInteractEvent, face: BlockFace) {

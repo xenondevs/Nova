@@ -65,6 +65,7 @@ enum class NovaMaterial(
     
     // 2000 - 3000: Upgrades and similar
     WRENCH("Wrench", itemOf(2000)),
+    ITEM_FILTER("Item Filter", itemOf(2001)),
     
     // 5000 - 10.000 MultiModel Blocks
     BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray() + (5025..5033).toIntArray()), null, ::BasicCable),
@@ -87,6 +88,8 @@ enum class NovaMaterial(
     ENERGY_OFF_BUTTON("", itemOf(9010)),
     ITEM_ON_BUTTON("", itemOf(9011)),
     ITEM_OFF_BUTTON("", itemOf(9012)),
+    WHITELIST_BUTTON("", itemOf(9013)),
+    BLACKLIST_BUTTON("", itemOf(9014)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),

@@ -2,22 +2,23 @@ package xyz.xenondevs.nova.util
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import xyz.xenondevs.nova.serialization.EnumMapInstanceCreator
-import xyz.xenondevs.nova.serialization.ItemStackDeserializer
-import xyz.xenondevs.nova.serialization.ItemStackSerializer
-import xyz.xenondevs.nova.serialization.UUIDTypeAdapter
+import xyz.xenondevs.nova.serialization.*
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.reflect.KProperty
 
-val GSON: Gson = GsonBuilder()
-    .setPrettyPrinting()
-    .registerTypeAdapter(UUIDTypeAdapter)
-    .registerTypeAdapter(ItemStackDeserializer)
-    .registerTypeAdapter(ItemStackSerializer)
-    .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
-    .create()
+inline val GSON: Gson
+    get() =
+        GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeHierarchyAdapter(UUIDTypeAdapter)
+            .registerTypeHierarchyAdapter(ItemStackSerializer)
+            .registerTypeHierarchyAdapter(ItemStackDeserializer)
+            .registerTypeHierarchyAdapter(ItemFilterSerializer)
+            .registerTypeHierarchyAdapter(ItemFilterDeserializer)
+            .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
+            .create()
 
 fun JsonElement.writeToFile(file: File) =
     file.writeText(toString())
@@ -68,6 +69,15 @@ inline fun <reified T> GsonBuilder.registerTypeAdapter(typeAdapter: JsonSerializ
 
 inline fun <reified T> GsonBuilder.registerTypeAdapter(typeAdapter: JsonDeserializer<T>): GsonBuilder =
     registerTypeAdapter(type<T>(), typeAdapter)
+
+inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: TypeAdapter<T>): GsonBuilder =
+    registerTypeHierarchyAdapter(T::class.java, typeAdapter)
+
+inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: JsonSerializer<T>): GsonBuilder =
+    registerTypeHierarchyAdapter(T::class.java, typeAdapter)
+
+inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: JsonDeserializer<T>): GsonBuilder =
+    registerTypeHierarchyAdapter(T::class.java, typeAdapter)
 
 inline fun <reified T> type(): Type = object : TypeToken<T>() {}.type
 

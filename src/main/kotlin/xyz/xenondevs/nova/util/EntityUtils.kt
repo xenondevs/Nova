@@ -10,7 +10,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import xyz.xenondevs.nova.NOVA
-import java.util.*
 
 fun Player.awardAdvancement(key: NamespacedKey) {
     val advancement = Bukkit.getAdvancement(key)!!

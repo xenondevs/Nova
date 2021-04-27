@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.network.item
 
 import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.network.Network
 import xyz.xenondevs.nova.network.NetworkBridge
 import xyz.xenondevs.nova.network.NetworkEndPoint
@@ -10,6 +11,10 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType.*
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
+
+private typealias ItemFilterList = List<ItemFilter>
+
+private fun ItemFilterList.allowsItem(itemStack: ItemStack) = isEmpty() || any { it.allowsItem(itemStack) }
 
 class ItemNetwork : Network {
     
@@ -75,34 +80,44 @@ class ItemNetwork : Network {
     
     override fun handleTick() {
         val transferRate = transferRate
+        
         val providerInventories = providers.mapNotNullTo(HashSet()) { it.first.inventories[it.second] }
         val consumerInventories = consumers.mapNotNullTo(HashSet()) { it.first.inventories[it.second] }
+        
+        val providerFilter = getFilterMap(EXTRACT)
+        val consumerFilter = getFilterMap(INSERT)
         
         var availableTransfers = transferRate
         
         for (providerInventory in providerInventories) {
             for ((index, itemStack) in providerInventory.items.withIndex()) {
-                if (itemStack == null || availableTransfers == 0) continue
+                if (
+                    itemStack == null
+                    || availableTransfers == 0
+                    || !providerFilter[providerInventory]!!.allowsItem(itemStack)
+                ) continue
                 
                 val transferAmount = min(itemStack.amount, availableTransfers)
                 var amountLeft = transferAmount
                 
-                val emptyInventories = ConcurrentHashMap.newKeySet<NetworkedInventory>()
+                val availableInventories = ConcurrentHashMap.newKeySet<NetworkedInventory>()
                     .also {
                         it += consumerInventories
                         it -= providerInventory
                     }
                 
-                while (emptyInventories.isNotEmpty() && amountLeft != 0) {
-                    for (consumerInventory in emptyInventories) {
-                        val leftover = consumerInventory.addItem(itemStack.clone().also { it.amount = amountLeft })
-                        if (leftover == null) {
-                            amountLeft = 0
-                            break
-                        } else {
-                            emptyInventories -= consumerInventory
-                            amountLeft = leftover.amount
-                        }
+                while (availableInventories.isNotEmpty() && amountLeft != 0) {
+                    for (consumerInventory in availableInventories) {
+                        if (consumerFilter[consumerInventory]!!.allowsItem(itemStack)) {
+                            val leftover = consumerInventory.addItem(itemStack.clone().also { it.amount = amountLeft })
+                            if (leftover == null) {
+                                amountLeft = 0
+                                break
+                            } else {
+                                availableInventories -= consumerInventory
+                                amountLeft = leftover.amount
+                            }
+                        } else availableInventories -= consumerInventory
                     }
                 }
                 
@@ -113,6 +128,29 @@ class ItemNetwork : Network {
                 providerInventory.setItem(index, if (itemStack.amount == 0) null else itemStack)
             }
         }
+    }
+    
+    // TODO: optimize
+    private fun getFilterMap(type: ItemConnectionType): Map<NetworkedInventory, ItemFilterList> {
+        val itemStorages = when (type) {
+            INSERT -> consumers
+            EXTRACT -> providers
+            else -> throw UnsupportedOperationException()
+        }
+        
+        val filterMap = HashMap<NetworkedInventory, MutableList<ItemFilter>>()
+        itemStorages.forEach { (itemStorage, face) ->
+            val inventory = itemStorage.inventories[face]!!
+            val filterList = filterMap[inventory] ?: ArrayList()
+            val node = itemStorage.getNearbyNodes()[face]
+            if (node is ItemBridge) {
+                val filter = node.getFilter(type, face.oppositeFace) ?: ItemFilter(false, emptyArray())
+                filterList.add(filter)
+            }
+            filterMap[inventory] = filterList
+        }
+        
+        return filterMap
     }
     
 }
