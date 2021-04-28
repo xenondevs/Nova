@@ -29,6 +29,7 @@ dependencies {
     implementation "com.github.NichtStudioCode:InvUI:3b9e5f5db0"
     implementation "xyz.xenondevs:particle:1.5.1"
     implementation "com.github.NichtStudioCode:AdvancementAPI:485a8e37cc"
+    implementation "com.google.code.gson:gson:2.8.6"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.5.0"
     compileOnly "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"
     compileOnly "com.mojang:brigadier:1.0.17"
@@ -58,6 +59,7 @@ shadowJar {
     relocate("org.jetbrains.annotations", "xyz.xenondevs.nova.lib.org.jetbrains.annotations")
     relocate("de.studiocode.invui", "xyz.xenondevs.nova.lib.de.studiocode.invui")
     relocate("de.studiocode.inventoryaccess", "xyz.xenondevs.nova.lib.de.studiocode.inventoryaccess")
+    relocate("com.google.gson", "xyz.xenondevs.nova.lib.com.google.gson")
 }
 
 
