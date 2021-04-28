@@ -11,10 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.castRay
 import xyz.xenondevs.nova.util.getSurroundingChunks
-
-fun Action.isRightClick() = this == Action.RIGHT_CLICK_BLOCK || this == Action.RIGHT_CLICK_AIR
-
-fun Action.isLeftClick() = this == Action.LEFT_CLICK_BLOCK || this == Action.LEFT_CLICK_AIR
+import xyz.xenondevs.nova.util.isCompletelyDenied
 
 object HitboxManager : Listener {
     
@@ -37,8 +34,10 @@ object HitboxManager : Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun handleInteract(event: PlayerInteractEvent) {
+        if (event.isCompletelyDenied()) return
+        
         val action = event.action
         if (action != Action.PHYSICAL) {
             val player = event.player

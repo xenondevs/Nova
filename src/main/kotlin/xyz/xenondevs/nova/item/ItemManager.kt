@@ -7,6 +7,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.item.impl.FilterItem
+import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.novaMaterial
 
 object ItemManager : Listener {
@@ -21,6 +22,8 @@ object ItemManager : Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     fun handleInteract(event: PlayerInteractEvent) {
+        if (event.isCompletelyDenied()) return
+        
         val material = event.item?.novaMaterial
         if (material != null) {
             items

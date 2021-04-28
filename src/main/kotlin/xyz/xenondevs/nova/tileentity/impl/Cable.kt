@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.hitbox.Hitbox
-import xyz.xenondevs.nova.hitbox.isRightClick
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.Network
