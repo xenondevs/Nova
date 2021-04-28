@@ -71,3 +71,13 @@ fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean): List<Chunk>
     
     return chunks
 }
+
+fun Location.untilHeightLimit(includeThis: Boolean, run: (Location) -> Boolean) {
+    val heightLimit = world!!.maxHeight
+    val location = clone().apply { if (!includeThis) add(0.0, 1.0, 0.0) }
+    while (location.y < heightLimit) {
+        if (!run(location)) break
+        
+        location.add(0.0, 1.0, 0.0)
+    }
+}

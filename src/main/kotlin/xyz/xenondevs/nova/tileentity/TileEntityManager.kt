@@ -197,6 +197,14 @@ object TileEntityManager : Listener {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
             tileEntity?.handleRightClick(event)
+        } else if (action == Action.LEFT_CLICK_BLOCK) {
+            val block = event.clickedBlock!!
+            if (block.type == Material.BARRIER && getTileEntityAt(block.location) != null) {
+                event.isCancelled = true
+                val player = event.player
+                Bukkit.getPluginManager().callEvent(BlockBreakEvent(block, player))
+                player.playSound(block.location, Sound.BLOCK_STONE_BREAK, 1f, 1f)
+            }
         }
     }
     

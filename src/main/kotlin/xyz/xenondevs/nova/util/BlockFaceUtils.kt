@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util
 
 import org.bukkit.Axis
+import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
 import kotlin.math.roundToInt
@@ -44,4 +45,16 @@ val BlockFace.rotationValues: Pair<Int, Int>
         DOWN -> 3 to 0
         
         else -> throw IllegalArgumentException("Illegal facing")
+    }
+
+val Location.facing: BlockFace
+    get() {
+        val yawMod = yaw.mod(360f)
+        return when {
+            yawMod >= 315 -> SOUTH
+            yawMod >= 225 -> EAST
+            yawMod >= 135 -> NORTH
+            yawMod >= 45 -> WEST
+            else -> SOUTH
+        }
     }

@@ -39,6 +39,7 @@ enum class NovaMaterial(
     ULTIMATE_POWER_CELL("Ultimate Power Cell", blockOf(6), PowerCell::createItemBuilder, blockOf(6), IRON_BLOCK, ::UltimatePowerCell),
     CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), PowerCell::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
     PULVERIZER("Pulverizer", blockOf(8), null, blockOf(8), IRON_BLOCK, ::Pulverizer),
+    SOLAR_PANEL("Solar Panel", blockOf(9), null, blockOf(9), BARRIER, ::SolarPanel),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
