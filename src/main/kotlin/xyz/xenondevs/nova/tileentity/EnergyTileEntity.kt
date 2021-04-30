@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import java.util.*
+import kotlin.math.min
 
 abstract class EnergyTileEntity(material: NovaMaterial, armorStand: ArmorStand)
     : TileEntity(material, armorStand), EnergyStorage {
@@ -40,7 +41,7 @@ abstract class EnergyTileEntity(material: NovaMaterial, armorStand: ArmorStand)
         storeData("energyConfig", energyConfig)
     }
     
-    override fun handleInitialized() {
+    override fun handleInitialized(first: Boolean) {
         NetworkManager.handleEndPointAdd(this)
     }
     

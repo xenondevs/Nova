@@ -72,7 +72,7 @@ object TileEntityManager : Listener {
         runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
     }
     
-    fun placeTileEntity(location: Location, rotation: Float, material: NovaMaterial, data: JsonObject = JsonObject()) {
+    private fun placeTileEntity(location: Location, yaw: Float, material: NovaMaterial, data: JsonObject = JsonObject()) {
         val block = location.block
         
         // spawn ArmorStand there
@@ -80,13 +80,7 @@ object TileEntityManager : Listener {
         val spawnLocation = location
             .clone()
             .add(0.5, 0.0, 0.5)
-            .also {
-                var yaw = rotation % 360
-                if (yaw < 0) yaw += 360
-                yaw = (yaw / 90).roundToInt() * 90f
-                yaw += 180
-                it.yaw = yaw
-            }
+            .also { it.yaw = ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f }
         val armorStand = EntityUtils.spawnArmorStandSilently(
             spawnLocation,
             headItem
@@ -106,11 +100,11 @@ object TileEntityManager : Listener {
         // 1 tick later or it collides with the cancelled event which removes the block
         runTaskLater(1) {
             if (material.hitbox != null) block.type = material.hitbox
-            tileEntity.handleInitialized()
+            tileEntity.handleInitialized(true)
         }
     }
     
-    fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean) {
+    fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
         val location = tileEntity.armorStand.location.blockLocation
         val chunk = location.chunk
         
@@ -124,8 +118,7 @@ object TileEntityManager : Listener {
         
         tileEntity.handleRemoved(unload = false)
         
-        // drop items a tick later to prevent interference with the cancellation of the break event
-        runTaskLater(1) { location.clone().dropItems(drops) }
+        return drops
     }
     
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)
@@ -143,7 +136,7 @@ object TileEntityManager : Listener {
             }
         
         tileEntityMap[chunk] = chunkMap
-        chunkMap.values.forEach(TileEntity::handleInitialized)
+        chunkMap.values.forEach { it.handleInitialized(false) }
     }
     
     private fun handleChunkUnload(chunk: Chunk) {
@@ -166,7 +159,7 @@ object TileEntityManager : Listener {
     fun handlePlace(event: BlockPlaceEvent) {
         val player = event.player
         val placedItem = event.itemInHand
-        val material = NovaMaterial.toNovaMaterial(placedItem)
+        val material = placedItem.novaMaterial
         if (material != null) {
             event.isCancelled = true
             if (material.isBlock) {
@@ -183,10 +176,14 @@ object TileEntityManager : Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
-        val tileEntity = getTileEntityAt(event.block.location)
+        val location = event.block.location
+        val tileEntity = getTileEntityAt(location)
         if (tileEntity != null) {
             event.isCancelled = true
-            destroyTileEntity(tileEntity, event.player.gameMode == GameMode.SURVIVAL)
+            val drops = destroyTileEntity(tileEntity, event.player.gameMode == GameMode.SURVIVAL)
+            
+            // drop items a tick later to prevent interference with the cancellation of the break event
+            runTaskLater(1) { location.dropItems(drops) }
         }
     }
     
@@ -199,7 +196,10 @@ object TileEntityManager : Listener {
             tileEntity?.handleRightClick(event)
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
-            if (block.type == Material.BARRIER && getTileEntityAt(block.location) != null) {
+            if (block.type == Material.BARRIER
+                && event.player.gameMode == GameMode.SURVIVAL
+                && getTileEntityAt(block.location) != null) {
+                
                 event.isCancelled = true
                 val player = event.player
                 Bukkit.getPluginManager().callEvent(BlockBreakEvent(block, player))

@@ -26,9 +26,12 @@ abstract class TileEntity(
     
     val uuid: UUID = armorStand.uniqueId
     val location = armorStand.location.blockLocation
+    val world = location.world!!
     val chunk = location.chunk
+    val facing = armorStand.facing
     
     private val inventories = ArrayList<VirtualInventory>()
+    private val multiModels = HashMap<String, MultiModel>()
     
     init {
         if (mainDataObject.size() <= 1) {
@@ -59,6 +62,8 @@ abstract class TileEntity(
             VirtualInventoryManager.getInstance().remove(it)
         }
         
+        multiModels.values.forEach { it.removeAllModels() }
+        
         return drops
     }
     
@@ -73,7 +78,11 @@ abstract class TileEntity(
     /**
      * Called to save all data using the [storeData] method.
      */
-    abstract fun saveData()
+    open fun saveData() {
+        multiModels.forEach { (name, multiModel) -> 
+            storeData("multiMode_$name", multiModel.chunks)
+        }
+    }
     
     /**
      * Called every tick for every TileEntity that is in a loaded chunk.
@@ -83,8 +92,11 @@ abstract class TileEntity(
     /**
      * Called after the TileEntity has been initialized and added to the
      * TileEntity map in the TileEntityManager.
+     *
+     * The [first] parameter specifies if it is the first time this
+     * [TileEntity] got initialized, meaning it has just been placed.
      */
-    abstract fun handleInitialized()
+    abstract fun handleInitialized(first: Boolean)
     
     /**
      * Called after the TileEntity has been removed from the
@@ -112,6 +124,20 @@ abstract class TileEntity(
         inventory.setItemUpdateHandler(itemHandler)
         if (dropItems) inventories += inventory
         return inventory
+    }
+    
+    /**
+     * Gets a [MultiModel] for this [TileEntity].
+     * The [MultiModel] will use the storage of this [TileEntity]
+     * to store data regarding the location of [Model]s.
+     * When the [TileEntity] is destroyed, all [Model]s belonging
+     * to this [MultiModel] will be removed.
+     */
+    fun getMultiModel(name: String): MultiModel {
+        val uuid = this.uuid.seed(name)
+        val multiModel = MultiModel(uuid, retrieveData("multiModel_$name") { mutableSetOf(chunk) })
+        multiModels[name] = multiModel
+        return multiModel
     }
     
     /**

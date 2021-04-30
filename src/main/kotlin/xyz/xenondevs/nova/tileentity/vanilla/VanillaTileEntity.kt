@@ -94,10 +94,13 @@ class VanillaContainerTileEntity(container: Container) : ItemStorageVanillaTileE
 
 class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest) {
     
+    private var inventory = chest.inventory
+    
     override val inventories: MutableMap<BlockFace, NetworkedInventory>
         get() {
             val chest = location.block.state as Chest
-            val inventory = NetworkedBukkitInventory(chest.inventory)
+            if (chest.inventory.size != inventory.size) inventory = chest.inventory
+            val inventory = NetworkedBukkitInventory(inventory)
             return CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
         }
     

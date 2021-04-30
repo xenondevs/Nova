@@ -39,6 +39,7 @@ private val ATTACHMENTS: IntArray = (5..13).toIntArray()
 
 private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
 
+// TODO: Use MultiModel instead of MultiModelTileEntity
 open class Cable(
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
@@ -76,7 +77,7 @@ open class Cable(
         }
     }
     
-    override fun handleInitialized() {
+    override fun handleInitialized(first: Boolean) {
         NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
     }
     

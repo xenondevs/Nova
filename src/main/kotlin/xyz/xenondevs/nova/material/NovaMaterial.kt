@@ -40,6 +40,7 @@ enum class NovaMaterial(
     CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), PowerCell::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
     PULVERIZER("Pulverizer", blockOf(8), null, blockOf(8), IRON_BLOCK, ::Pulverizer),
     SOLAR_PANEL("Solar Panel", blockOf(9), null, blockOf(9), BARRIER, ::SolarPanel),
+    QUARRY("Quarry", blockOf(10), null, blockOf(10), BARRIER, ::Quarry),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
@@ -74,6 +75,7 @@ enum class NovaMaterial(
     ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray() + (5025..5033).toIntArray()), null, ::EliteCable),
     ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), null, ::UltimateCable),
     CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), null, ::CreativeCable),
+    SCAFFOLDING("", structureBlockOf(5035), null, structureBlockOf((5034..5040).toIntArray()), null, null),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),
@@ -145,15 +147,5 @@ enum class NovaMaterial(
      * This is the same as calling `createItemBuilder.build()`
      */
     fun createItemStack(amount: Int): ItemStack = createItemBuilder().setAmount(amount).build()
-    
-    companion object {
-        
-        fun toNovaMaterial(itemStack: ItemStack): NovaMaterial? =
-            values().find {
-                it.item.material == itemStack.type
-                    && it.item.dataArray.contains(itemStack.itemMeta?.customModelData ?: -1)
-            }
-        
-    }
     
 }

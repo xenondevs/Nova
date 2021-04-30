@@ -7,10 +7,21 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.RecipeChoice.MaterialChoice
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.recipe.NovaRecipeChoice
+import kotlin.math.absoluteValue
 
 fun Material.isGlass() = name.endsWith("GLASS") || name.endsWith("GLASS_PANE")
 
 fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmount(amount).build()
+
+fun Material.isTraversable() = isAir || name == "WATER" || name == "LAVA"
+
+fun Material.isBreakable() = blastResistance < 3600000.0f
+
+/**
+ * The break speed for a specific material, always positive.
+ */
+val Material.breakSpeed: Double
+    get() = 1.0 / hardness.absoluteValue
 
 val ItemStack.novaMaterial: NovaMaterial?
     get() = NovaMaterial.values().find {
@@ -34,4 +45,5 @@ object MaterialUtils {
             return MaterialChoice(material)
         } else throw IllegalArgumentException("Invalid item name: $name")
     }
+    
 }

@@ -4,11 +4,13 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_BLOCK_GET_NMS_BLOCK_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_ENTITY_GET_HANDLE_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_ITEM_STACK_AS_NMS_COPY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_SERVER_SYNC_COMMANDS_METHOD
@@ -20,10 +22,14 @@ import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_DISPATCHER_ROOT_NODE
 import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_ARGUMENTS_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_CHILDREN_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_LITERALS_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_BLOCK_POSITION_CONSTRUCTOR
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_COMMAND_LISTENER_WRAPPER_GET_ENTITY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_ARMOR_STAND_ARMOR_ITEMS_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_GET_BUKKIT_ENTITY_METHOD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_PLAYER_PLAYER_CONNECTION_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKAGE_PATH
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_BLOCK_BREAK_ANIMATION_CONSTRUCTOR
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PLAYER_CONNECTION_SEND_PACKET_METHOD
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -71,6 +77,13 @@ object ReflectionUtils {
     
     fun getField(clazz: Class<*>, declared: Boolean, name: String): Field {
         val field = if (declared) clazz.getDeclaredField(name) else clazz.getField(name)
+        if (declared) field.isAccessible = true
+        return field
+    }
+    
+    fun getFieldOf(clazz: Class<*>, type: Class<*>, declared: Boolean, vararg names: String): Field {
+        val field = if (declared) clazz.declaredFields.first { it.type == type && names.contains(it.name) }
+        else clazz.fields.first { it.type == type && names.contains(it.name) }
         if (declared) field.isAccessible = true
         return field
     }
@@ -136,6 +149,31 @@ object ReflectionUtils {
     
     fun setArmorStandArmorItems(entityArmorStand: Any, index: Int, nmsItemStack: Any) {
         (NMS_ENTITY_ARMOR_STAND_ARMOR_ITEMS_FIELD.get(entityArmorStand) as MutableList<Any>)[index] = nmsItemStack
+    }
+    
+    fun getEntityPlayer(player: Player): Any {
+        return CB_CRAFT_ENTITY_GET_HANDLE_METHOD.invoke(player)
+    }
+    
+    fun getPlayerConnection(entityPlayer: Any): Any {
+        return NMS_ENTITY_PLAYER_PLAYER_CONNECTION_FIELD.get(entityPlayer)
+    }
+    
+    fun sendPacket(player: Player, packet: Any) {
+        val playerConnection = getPlayerConnection(getEntityPlayer(player))
+        NMS_PLAYER_CONNECTION_SEND_PACKET_METHOD.invoke(playerConnection, packet)
+    }
+    
+    fun createBlockPosition(location: Location): Any {
+        return NMS_BLOCK_POSITION_CONSTRUCTOR.newInstance(location.x, location.y, location.z)
+    }
+    
+    fun createBlockBreakAnimationPacket(entityId: Int, blockPosition: Any, breakStage: Int): Any {
+        return NMS_PACKET_PLAY_OUT_BLOCK_BREAK_ANIMATION_CONSTRUCTOR.newInstance(entityId, blockPosition, breakStage)
+    }
+    
+    fun getNMSBlock(block: Block): Any {
+        return CB_CRAFT_BLOCK_GET_NMS_BLOCK_METHOD.invoke(block)
     }
     
 }
