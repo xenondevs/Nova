@@ -15,6 +15,8 @@ lateinit var NOVA: Nova
 class Nova : JavaPlugin() {
     
     val disableHandlers = ArrayList<() -> Unit>()
+    val pluginFile
+        get() = file
     
     override fun onEnable() {
         NOVA = this
