@@ -8,17 +8,44 @@ import java.lang.reflect.Type
 import java.util.*
 import kotlin.reflect.KProperty
 
-inline val GSON: Gson
-    get() =
-        GsonBuilder()
-            .setPrettyPrinting()
-            .registerTypeHierarchyAdapter(UUIDTypeAdapter)
-            .registerTypeHierarchyAdapter(ItemStackSerializer)
-            .registerTypeHierarchyAdapter(ItemStackDeserializer)
-            .registerTypeHierarchyAdapter(ItemFilterSerializer)
-            .registerTypeHierarchyAdapter(ItemFilterDeserializer)
-            .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
-            .create()
+val GSON: Gson =
+    GsonBuilder()
+        .setPrettyPrinting()
+        .registerTypeHierarchyAdapter(UUIDTypeAdapter)
+        .registerTypeHierarchyAdapter(ItemStackSerializer)
+        .registerTypeHierarchyAdapter(ItemStackDeserializer)
+        .registerTypeHierarchyAdapter(ItemFilterSerializer)
+        .registerTypeHierarchyAdapter(ItemFilterDeserializer)
+        .registerTypeHierarchyAdapter(NovaRecipeDeserializer)
+        .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
+        .create()
+
+fun JsonObject.hasString(property: String) =
+    has(property) && this[property].isString()
+
+fun JsonObject.hasNumber(property: String) =
+    has(property) && this[property].isNumber()
+
+fun JsonObject.hasBoolean(property: String) =
+    has(property) && this[property].isBoolean()
+
+fun JsonObject.hasObject(property: String) =
+    has(property) && this[property] is JsonObject
+
+fun JsonObject.hasArray(property: String) =
+    has(property) && this[property] is JsonArray
+
+fun JsonObject.getString(property: String, default: String? = null) = if (hasString(property)) get(property).asString else default
+
+fun JsonObject.getNumber(property: String, default: Number? = null) = if (hasNumber(property)) get(property).asNumber else default
+
+fun JsonObject.getInt(property: String, default: Int? = null) = if (hasNumber(property)) get(property).asInt else default
+
+fun JsonObject.getDouble(property: String, default: Double? = null) = if (hasNumber(property)) get(property).asDouble else default
+
+fun JsonObject.getBoolean(property: String, default: Boolean = false) = if (hasBoolean(property)) get(property).asBoolean else default
+
+operator fun JsonObject.set(property: String, value: JsonElement) = add(property, value)
 
 fun JsonElement.writeToFile(file: File) =
     file.writeText(toString())
@@ -55,6 +82,9 @@ fun JsonArray.getAllStrings() =
 
 fun JsonArray.getAllDoubles() =
     filter(JsonElement::isNumber).map { it.asDouble }
+
+fun <T> JsonArray.toStringList(consumer: (List<String>) -> T) =
+    consumer(this.filter(JsonElement::isString).map(JsonElement::getAsString))
 
 inline fun <reified T> Gson.fromJson(jsonElement: JsonElement?): T? {
     if (jsonElement == null) return null

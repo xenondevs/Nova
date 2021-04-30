@@ -3,9 +3,10 @@ package xyz.xenondevs.nova
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.advancement.AdvancementManager
 import xyz.xenondevs.nova.command.CommandManager
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.NetworkManager
-import xyz.xenondevs.nova.recipe.NovaRecipes
+import xyz.xenondevs.nova.recipe.RecipeManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
@@ -21,9 +22,10 @@ class Nova : JavaPlugin() {
     override fun onEnable() {
         NOVA = this
         setGlobalIngredients()
-    
+        
+        NovaConfig.init()
         AdvancementManager.loadAdvancements()
-        NovaRecipes.registerRecipes()
+        RecipeManager.registerRecipes()
         VanillaTileEntityManager.init()
         TileEntityManager.init()
         NetworkManager.init()
