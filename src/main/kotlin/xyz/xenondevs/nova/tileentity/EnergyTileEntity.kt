@@ -37,6 +37,7 @@ abstract class EnergyTileEntity(material: NovaMaterial, armorStand: ArmorStand)
     }
     
     override fun saveData() {
+        super.saveData()
         storeData("energy", energy)
         storeData("energyConfig", energyConfig)
     }

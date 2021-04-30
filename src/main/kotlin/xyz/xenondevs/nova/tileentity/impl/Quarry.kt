@@ -75,11 +75,11 @@ class Quarry(
     
     private var lastPointerLocation: Location
     private var pointerLocation: Location
-    private var pointerDestination: Location? = null
+    private var pointerDestination: Location? = retrieveOrNull("pointerDestination")
     
-    private var drillProgress = 0.0
-    private var drilling = false
-    private var done = false
+    private var drillProgress = retrieveData("drillProgress") { 0.0 }
+    private var drilling = retrieveData("drilling") { false }
+    private var done = retrieveData("done") { false }
     
     init {
         setDefaultInventory(inventory)
@@ -98,8 +98,8 @@ class Quarry(
         maxX = max(location.blockX, location.blockX + sizeX)
         maxZ = max(location.blockZ, location.blockZ + sizeZ)
         
-        pointerLocation = Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
-        lastPointerLocation = Location(world, 0.0, 0.0, 0.0)
+        pointerLocation = retrieveOrNull("pointerLocation") ?: Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
+        lastPointerLocation = retrieveOrNull("lastPointerLocation") ?: Location(world, 0.0, 0.0, 0.0)
     }
     
     override fun handleInitialized(first: Boolean) {
@@ -109,6 +109,16 @@ class Quarry(
             drill.addModels(Model(DRILL, pointerLocation))
             runTaskLater(1) { updatePointer() }
         }
+    }
+    
+    override fun saveData() {
+        super.saveData()
+        storeData("pointerLocation", pointerLocation)
+        storeData("lastPointerLocation", lastPointerLocation)
+        storeData("pointerDestination", pointerDestination)
+        storeData("drillProgress", drillProgress)
+        storeData("drilling", drilling)
+        storeData("done", done)
     }
     
     override fun handleTick() {

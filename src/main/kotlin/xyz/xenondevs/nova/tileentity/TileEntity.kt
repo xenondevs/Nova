@@ -80,7 +80,7 @@ abstract class TileEntity(
      */
     open fun saveData() {
         multiModels.forEach { (name, multiModel) -> 
-            storeData("multiMode_$name", multiModel.chunks)
+            storeData("multiModel_$name", multiModel.chunks)
         }
     }
     

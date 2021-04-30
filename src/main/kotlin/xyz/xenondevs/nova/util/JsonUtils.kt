@@ -19,6 +19,8 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter(NovaRecipeDeserializer)
         .registerTypeHierarchyAdapter(ChunkSerializer)
         .registerTypeHierarchyAdapter(ChunkDeserializer)
+        .registerTypeHierarchyAdapter(LocationSerializer)
+        .registerTypeHierarchyAdapter(LocationDeserializer)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
         .create()
 
