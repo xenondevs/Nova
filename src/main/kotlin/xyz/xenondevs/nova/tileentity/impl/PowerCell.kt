@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.EnergyUtils
 
 open class PowerCell(
+    private val creative: Boolean,
     val maxEnergy: Int,
     material: NovaMaterial,
     armorStand: ArmorStand,
@@ -24,9 +25,13 @@ open class PowerCell(
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(BUFFER) }
     override val requestedEnergy: Int
-        get() = maxEnergy - energy
+        get() = if (creative) Int.MAX_VALUE else maxEnergy - energy
     
     private val gui = PowerCellUI()
+    
+    init {
+        if (creative) energy = Int.MAX_VALUE
+    }
     
     override fun handleRightClick(event: PlayerInteractEvent) {
         event.isCancelled = true
@@ -37,6 +42,18 @@ open class PowerCell(
         if (hasEnergyChanged) {
             gui.energyBar.update()
             hasEnergyChanged = false
+        }
+    }
+    
+    override fun addEnergy(energy: Int) {
+        if (!creative) {
+            super.addEnergy(energy)
+        }
+    }
+    
+    override fun removeEnergy(energy: Int) {
+        if (!creative) {
+            super.removeEnergy(energy)
         }
     }
     
@@ -80,12 +97,12 @@ open class PowerCell(
     
 }
 
-class BasicPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(100_000, material, armorStand)
+class BasicPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 100_000, material, armorStand)
 
-class AdvancedPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(1_000_000, material, armorStand)
+class AdvancedPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 1_000_000, material, armorStand)
 
-class ElitePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(5_000_000, material, armorStand)
+class ElitePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 5_000_000, material, armorStand)
 
-class UltimatePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(20_000_000, material, armorStand)
+class UltimatePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 20_000_000, material, armorStand)
 
-class CreativePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(Int.MAX_VALUE, material, armorStand)
+class CreativePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(true, Int.MAX_VALUE, material, armorStand)
