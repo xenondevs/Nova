@@ -1,0 +1,19 @@
+{
+  "result": "nova:basic_cable",
+  "amount": 8,
+  "shape": [
+    "iii",
+    "rrr",
+    "iii"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "r",
+      "item": "minecraft:redstone"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "result": "nova:furnace_generator",
+  "shape": [
+    "iii",
+    "ifi",
+    "iri"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "f",
+      "item": "minecraft:furnace"
+    },
+    {
+      "char": "r",
+      "item": "minecraft:redstone"
+    }
+  ]
+}

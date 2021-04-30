@@ -1,0 +1,22 @@
+{
+  "result": "nova:pulverizer",
+  "shape": [
+    "iii",
+    "igi",
+    "ipi"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "g",
+      "item": "nova:iron_gear"
+    },
+    {
+      "char": "p",
+      "item": "nova:basic_power_cell"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "result": "nova:basic_power_cell",
+  "shape": [
+    "ici",
+    "crc",
+    "ici"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "c",
+      "item": "nova:basic_cable"
+    },
+    {
+      "char": "r",
+      "item": "minecraft:redstone_block"
+    }
+  ]
+}
