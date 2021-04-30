@@ -25,7 +25,8 @@ import xyz.xenondevs.nova.network.energy.EnergyBridge
 import xyz.xenondevs.nova.network.item.ItemBridge
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
-import xyz.xenondevs.nova.tileentity.MultiModelTileEntity
+import xyz.xenondevs.nova.tileentity.Model
+import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.CableItemConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.point.Point3D
@@ -39,13 +40,12 @@ private val ATTACHMENTS: IntArray = (5..13).toIntArray()
 
 private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
 
-// TODO: Use MultiModel instead of MultiModelTileEntity
 open class Cable(
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : MultiModelTileEntity(
+) : TileEntity(
     material,
     armorStand,
 ), EnergyBridge, ItemBridge {
@@ -67,12 +67,13 @@ open class Cable(
             CUBE_FACES.associateWith { getInventory("filter_extract_$it", 1, true, ::handleFilterInventoryUpdate) }
     )
     
+    private val multiModel = getMultiModel("cableModels")
     private val hitboxes = ArrayList<Hitbox>()
     
     override fun handleNetworkUpdate() {
         _connectedNodes = findConnectedNodes()
         if (NOVA.isEnabled) {
-            replaceModels(getModelsNeeded())
+            multiModel.replaceModels(getModelsNeeded())
             updateHitbox()
         }
     }
@@ -94,7 +95,7 @@ open class Cable(
             event.isCancelled = true
     }
     
-    private fun getModelsNeeded(): List<Pair<ItemStack, Float>> {
+    private fun getModelsNeeded(): List<Model> {
         Preconditions.checkState(networks.isNotEmpty(), "No network is initialized")
         
         val items = ArrayList<Pair<ItemStack, Float>>()
@@ -139,7 +140,7 @@ open class Cable(
                 items += itemStack to getRotation(blockFace)
             }
         
-        return items
+        return items.map { Model(it.first, location.clone().center().apply { yaw = it.second }) }
     }
     
     private fun getRotation(blockFace: BlockFace) =
