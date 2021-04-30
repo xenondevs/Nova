@@ -19,7 +19,6 @@ object NovaRecipeDeserializer : JsonDeserializer<NovaRecipe> {
         json as JsonObject
         
         val resultName = json.getString("result")!!.substringAfter(':').uppercase()
-        println(resultName)
         val result = NovaMaterial.valueOf(resultName)
         val amount = json.getInt("amount", default = 1)!!
         val shape = json.getAsJsonArray("shape").toStringList(::ArrayList)
