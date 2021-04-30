@@ -38,9 +38,10 @@ enum class NovaMaterial(
     ELITE_POWER_CELL("Elite Power Cell", blockOf(5), PowerCell::createItemBuilder, blockOf(5), IRON_BLOCK, ::ElitePowerCell),
     ULTIMATE_POWER_CELL("Ultimate Power Cell", blockOf(6), PowerCell::createItemBuilder, blockOf(6), IRON_BLOCK, ::UltimatePowerCell),
     CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), PowerCell::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
-    PULVERIZER("Pulverizer", blockOf(8), null, blockOf(8), IRON_BLOCK, ::Pulverizer),
+    PULVERIZER("Pulverizer", blockOf(8), null, blockOf(8), COBBLESTONE, ::Pulverizer),
     SOLAR_PANEL("Solar Panel", blockOf(9), null, blockOf(9), BARRIER, ::SolarPanel),
-    QUARRY("Quarry", blockOf(10), null, blockOf(10), BARRIER, ::Quarry),
+    QUARRY("Quarry", blockOf(10), null, blockOf(10), COBBLESTONE, ::Quarry),
+    ELECTRICAL_FURNACE("Electrical Furnace", blockOf(11), null, blockOf(11), COBBLESTONE, ::ElectricalFurnace),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),

@@ -34,7 +34,7 @@ object HitboxManager : Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     fun handleInteract(event: PlayerInteractEvent) {
         if (event.isCompletelyDenied()) return
         

@@ -43,13 +43,13 @@ object FurnaceRecipes {
     }
     
     fun addOreRecipe(name: String, input: NovaMaterial, result: ItemStack) {
-        addFurnaceRecipe(name, input, result, 0.7f, 200)
-        addBlastingRecipe("$name.blasting", input, result, 0.7f, 100)
+        addFurnaceRecipe(name, input, result, 1f, 200)
+        addBlastingRecipe("$name.blasting", input, result, 1f, 100)
     }
     
     fun addOreRecipe(name: String, input: Material, result: ItemStack) {
-        addFurnaceRecipe(name, input, result, 0.7f, 200)
-        addBlastingRecipe("$name.blasting", input, result, 0.7f, 100)
+        addFurnaceRecipe(name, input, result, 1f, 200)
+        addBlastingRecipe("$name.blasting", input, result, 1f, 100)
     }
     
 }

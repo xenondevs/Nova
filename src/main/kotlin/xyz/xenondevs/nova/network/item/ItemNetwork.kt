@@ -125,7 +125,7 @@ class ItemNetwork : Network {
                 itemStack.amount -= transferredAmount
                 availableTransfers -= transferredAmount
                 
-                providerInventory.setItem(index, if (itemStack.amount == 0) null else itemStack)
+                if (itemStack != providerInventory.getItem(index)) providerInventory.setItem(index, if (itemStack.amount == 0) null else itemStack)
             }
         }
     }
