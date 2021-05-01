@@ -12,8 +12,19 @@ import java.util.*
 
 private val MULTI_MODEL_KEY = NamespacedKey(NOVA, "multiModel")
 
+fun ArmorStand.isMultiModel() = persistentDataContainer.has(MULTI_MODEL_KEY, UUIDDataType)
+
+fun ArmorStand.getMultiModelParent(): TileEntity? {
+    val uuid = persistentDataContainer.get(MULTI_MODEL_KEY, UUIDDataType)
+    return if (uuid != null) TileEntityManager.tileEntities.firstOrNull { tileEntity ->
+        tileEntity.multiModels.values.any { multiModel ->
+            multiModel.uuid == uuid
+        }
+    } else null
+}
+
 class MultiModel(
-    private val uuid: UUID,
+    val uuid: UUID,
     chunks: MutableSet<Chunk> = mutableSetOf()
 ) {
     
@@ -46,7 +57,7 @@ class MultiModel(
         chunksInvalid = true
         models.forEach {
             val location = it.location
-            val armorStand = EntityUtils.spawnArmorStandSilently(location, it.itemStack) {
+            val armorStand = EntityUtils.spawnArmorStandSilently(location, it.itemStack, false) {
                 val dataContainer = persistentDataContainer
                 dataContainer.set(MULTI_MODEL_KEY, UUIDDataType, uuid)
             }

@@ -1,13 +1,18 @@
 package xyz.xenondevs.nova.command.impl
 
+import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.command.PlayerCommand
 import xyz.xenondevs.nova.command.executesCatching
+import xyz.xenondevs.nova.command.get
 import xyz.xenondevs.nova.command.player
 import xyz.xenondevs.nova.debug.NetworkDebugger
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkType
+import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.getMultiModelParent
+import xyz.xenondevs.nova.tileentity.isMultiModel
 import xyz.xenondevs.nova.ui.gui.CreativeGUI
 import xyz.xenondevs.nova.util.capitalize
 import xyz.xenondevs.nova.util.getSurroundingChunks
@@ -30,6 +35,12 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
                     .executesCatching { listNearby(it) })
                 .then(literal("getNearestData")
                     .executesCatching { getNearestData(it) })
+                .then(literal("removeObsoleteModels")
+                    .then(argument("range", IntegerArgumentType.integer(0))
+                        .executesCatching { removeObsoleteModels(it) }))
+                .then(literal("removeTileEntities")
+                    .then(argument("range", IntegerArgumentType.integer(0))
+                        .executesCatching { removeTileEntities(it) }))
                 .then(literal("energyNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
                 .then(literal("itemNet")
@@ -64,6 +75,25 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
         val armorStand = armorStands.minByOrNull { it.location.distance(player.location) }
         if (armorStand != null) player.chat("/data get entity ${armorStand.uniqueId}")
         else player.sendMessage("§cCould not find a TileEntity nearby.")
+    }
+    
+    private fun removeObsoleteModels(context: CommandContext<Any>) {
+        val player = context.player
+        val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
+        val obsoleteModels = chunks
+            .flatMap { it.entities.toList() }
+            .filterIsInstance<ArmorStand>()
+            .filter { it.isMultiModel() && it.getMultiModelParent() == null }
+        obsoleteModels.forEach(ArmorStand::remove)
+        player.sendMessage("§7Removed §b${obsoleteModels.count()} §7Armor Stands.")
+    }
+    
+    private fun removeTileEntities(context: CommandContext<Any>) {
+        val player = context.player
+        val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
+        val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it) }
+        tileEntities.forEach { TileEntityManager.destroyTileEntity(it, false) }
+        player.sendMessage("§7Removed §b${tileEntities.count()} §7Tile Entities.")
     }
     
     private fun toggleNetworkDebugging(type: NetworkType, context: CommandContext<Any>) {

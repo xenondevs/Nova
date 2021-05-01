@@ -33,6 +33,7 @@ object EntityUtils {
     fun spawnArmorStandSilently(
         location: Location,
         headStack: ItemStack,
+        light: Boolean = true,
         modify: (ArmorStand.() -> Unit)? = null
     ): ArmorStand {
         val world = location.world!!
@@ -49,7 +50,7 @@ object EntityUtils {
         // set other properties
         armorStand.isMarker = true
         armorStand.isVisible = false
-        armorStand.fireTicks = Int.MAX_VALUE
+        if (light) armorStand.fireTicks = Int.MAX_VALUE
         
         // set data
         if (modify != null) armorStand.modify()
