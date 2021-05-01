@@ -7,6 +7,19 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
+private fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Int): Int {
+    return try {
+        var sum = 0
+        for (element in this) {
+            sum = Math.addExact(sum, selector(element))
+        }
+        
+        sum
+    } catch (e: ArithmeticException) {
+        Int.MAX_VALUE
+    }
+}
+
 /**
  * An EnergyNetwork consists of EnergyProviders, which provide
  * energy to the it and EnergyConsumers, which consume energy from it.
@@ -25,11 +38,11 @@ class EnergyNetwork : Network {
     private val buffers = HashSet<EnergyStorage>()
     
     private val availableProviderEnergy: Int
-        get() = providers.sumOf { it.providedEnergy }
+        get() = providers.sumOfNoOverflow { it.providedEnergy }
     private val availableBufferEnergy: Int
-        get() = buffers.sumOf { it.providedEnergy }
+        get() = buffers.sumOfNoOverflow { it.providedEnergy }
     private val requestedConsumerEnergy: Int
-        get() = consumers.sumOf { it.requestedEnergy }
+        get() = consumers.sumOfNoOverflow { it.requestedEnergy }
     private val transferRate: Int
         get() = bridges.map { it.energyTransferRate }.minOrNull() ?: 0
     
