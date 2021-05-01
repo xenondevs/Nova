@@ -85,7 +85,7 @@ class SolarPanel(
                 "3 - - - - - - - 4")
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { energy to MAX_ENERGY }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Solar Panel", gui).show()

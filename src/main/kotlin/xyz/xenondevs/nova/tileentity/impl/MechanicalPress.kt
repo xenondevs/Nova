@@ -140,7 +140,7 @@ class MechanicalPress(
             .addIngredient('g', PressTypeItem(PressType.GEAR).apply(pressTypeItems::add))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { energy to MAX_ENERGY }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, ENERGY_PER_TICK) }
         
         init {
             updateProgress()

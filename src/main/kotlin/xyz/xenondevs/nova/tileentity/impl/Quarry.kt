@@ -2,13 +2,19 @@ package xyz.xenondevs.nova.tileentity.impl
 
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.item.Item
+import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -25,7 +31,9 @@ import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.texture.BlockTexture
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
 import kotlin.math.roundToInt
+import kotlin.properties.Delegates
 import kotlin.random.Random
 
 private val SCAFFOLDING_STACKS = NovaMaterial.SCAFFOLDING.block!!.let { modelData -> modelData.dataArray.indices.map { modelData.getItem(it) } }
@@ -37,15 +45,18 @@ private val FULL_SLIM_VERTICAL = SCAFFOLDING_STACKS[4]
 private val SLIM_VERTICAL_DOWN = SCAFFOLDING_STACKS[5]
 private val DRILL = SCAFFOLDING_STACKS[6]
 
-private const val SIZE_X = 10
-private const val SIZE_Z = 10
+private const val MAX_SIZE = 30
+private const val MIN_SIZE = 1
+private const val DEFAULT_SIZE_X = 10
+private const val DEFAULT_SIZE_Z = 10
 
 private const val MOVE_SPEED = 0.15
 private const val DRILL_SPEED_MULTIPLIER = 0.25
 private const val DRILL_SPEED_CLAMP = 0.5
 
 private const val MAX_ENERGY = 100_000
-private const val ENERGY_PER_TICK = 1000
+private const val ENERGY_CONSUMPTION_BASE = 100
+private const val ENERGY_INEFFICIENCY_EXPONENT = 1.5
 
 class Quarry(
     material: NovaMaterial,
@@ -57,9 +68,14 @@ class Quarry(
         get() = MAX_ENERGY - energy
     
     private val gui by lazy { QuarryGUI() }
-    private val inventory = getInventory("quarryInventory", 18, true) {}
+    private val inventory = getInventory("quarryInventory", 9, true) {}
     
     private val entityId = uuid.hashCode()
+    
+    private var sizeX = retrieveData("sizeX") { DEFAULT_SIZE_X }
+    private var sizeZ = retrieveData("sizeZ") { DEFAULT_SIZE_Z }
+    
+    private var energyPerTick by Delegates.notNull<Int>()
     
     private val solidScaffolding = getMultiModel("solidScaffolding")
     private val armX = getMultiModel("armX")
@@ -68,10 +84,10 @@ class Quarry(
     private val drill = getMultiModel("drill")
     
     private val y: Int
-    private val minX: Int
-    private val minZ: Int
-    private val maxX: Int
-    private val maxZ: Int
+    private var minX = 0
+    private var minZ = 0
+    private var maxX = 0
+    private var maxZ = 0
     
     private var lastPointerLocation: Location
     private var pointerLocation: Location
@@ -83,36 +99,64 @@ class Quarry(
     
     init {
         setDefaultInventory(inventory)
-        
-        val back = getFace(BlockSide.BACK)
-        val right = getFace(BlockSide.RIGHT)
-        val modX = back.modX.takeUnless { it == 0 } ?: right.modX
-        val modZ = back.modZ.takeUnless { it == 0 } ?: right.modZ
-        
-        val sizeX = modX * SIZE_X
-        val sizeZ = modZ * SIZE_Z
-        
         y = location.blockY
-        minX = min(location.blockX, location.blockX + sizeX)
-        minZ = min(location.blockZ, location.blockZ + sizeZ)
-        maxX = max(location.blockX, location.blockX + sizeX)
-        maxZ = max(location.blockZ, location.blockZ + sizeZ)
+        updateBounds()
         
         pointerLocation = retrieveOrNull("pointerLocation") ?: Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
         lastPointerLocation = retrieveOrNull("lastPointerLocation") ?: Location(world, 0.0, 0.0, 0.0)
     }
     
+    private fun updateBounds() {
+        val back = getFace(BlockSide.BACK)
+        val right = getFace(BlockSide.RIGHT)
+        val modX = back.modX.takeUnless { it == 0 } ?: right.modX
+        val modZ = back.modZ.takeUnless { it == 0 } ?: right.modZ
+        
+        val distanceX = modX * (sizeX + 1)
+        val distanceZ = modZ * (sizeZ + 1)
+        
+        minX = min(location.blockX, location.blockX + distanceX)
+        minZ = min(location.blockZ, location.blockZ + distanceZ)
+        maxX = max(location.blockX, location.blockX + distanceX)
+        maxZ = max(location.blockZ, location.blockZ + distanceZ)
+        
+        updateEnergyPerTick()
+    }
+    
+    private fun resize(sizeX: Int, sizeZ: Int) {
+        this.sizeX = sizeX
+        this.sizeZ = sizeZ
+        
+        updateBounds()
+        
+        drilling = false
+        drillProgress = 0.0
+        done = false
+        pointerDestination = null
+        pointerLocation = Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
+        
+        solidScaffolding.removeAllModels()
+        armX.removeAllModels()
+        armY.removeAllModels()
+        armZ.removeAllModels()
+        drill.removeAllModels()
+        
+        createScaffolding()
+    }
+    
+    private fun updateEnergyPerTick() {
+        energyPerTick = (ENERGY_CONSUMPTION_BASE + (sizeX * sizeZ).toDouble().pow(ENERGY_INEFFICIENCY_EXPONENT)).toInt()
+    }
+    
     override fun handleInitialized(first: Boolean) {
         super.handleInitialized(first)
-        if (first) {
-            createScaffolding()
-            drill.addModels(Model(DRILL, pointerLocation))
-            runTaskLater(1) { updatePointer() }
-        }
+        if (first) createScaffolding()
     }
     
     override fun saveData() {
         super.saveData()
+        storeData("sizeX", sizeX)
+        storeData("sizeZ", sizeZ)
         storeData("pointerLocation", pointerLocation)
         storeData("lastPointerLocation", lastPointerLocation)
         storeData("pointerDestination", pointerDestination)
@@ -122,9 +166,8 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (hasEnergyChanged) gui.energyBar.update()
-        if (energy >= ENERGY_PER_TICK) {
-            energy -= ENERGY_PER_TICK
+        if (energy >= energyPerTick) {
+            energy -= energyPerTick
         } else return
         
         if (!done && !drilling) {
@@ -139,6 +182,8 @@ class Quarry(
                 }
             } else done = true
         } else if (drilling) drill()
+        
+        if (hasEnergyChanged) gui.energyBar.update()
     }
     
     private fun moveToPointer(pointerDestination: Location) {
@@ -201,14 +246,14 @@ class Quarry(
         updatePointer()
     }
     
-    private fun updatePointer() {
-        if (lastPointerLocation.z != pointerLocation.z)
+    private fun updatePointer(force: Boolean = false) {
+        if (force || lastPointerLocation.z != pointerLocation.z)
             armX.useArmorStands { it.teleport { z = pointerLocation.z } }
-        if (lastPointerLocation.x != pointerLocation.x)
+        if (force || lastPointerLocation.x != pointerLocation.x)
             armZ.useArmorStands { it.teleport { x = pointerLocation.x } }
-        if (lastPointerLocation.x != pointerLocation.x || lastPointerLocation.z != pointerLocation.z)
+        if (force || lastPointerLocation.x != pointerLocation.x || lastPointerLocation.z != pointerLocation.z)
             armY.useArmorStands { it.teleport { x = pointerLocation.x; z = pointerLocation.z } }
-        if (lastPointerLocation.y != pointerLocation.y) updateVerticalArmModels()
+        if (force || lastPointerLocation.y != pointerLocation.y) updateVerticalArmModels()
         
         drill.useArmorStands {
             val location = pointerLocation.clone()
@@ -227,7 +272,7 @@ class Quarry(
             location.y = y.toDouble()
             if (!armY.hasModelLocation(location)) armY.addModels(Model(FULL_SLIM_VERTICAL, location))
         }
-        armY.removeIf { armorStand, _ -> armorStand.location.y - 1 < pointerLocation.y }
+        armY.removeIf { armorStand, _ -> armorStand.location.blockY - 1 < pointerLocation.blockY }
     }
     
     private fun selectNextDestination(): Location? {
@@ -290,38 +335,57 @@ class Quarry(
     }
     
     private fun createScaffolding() {
-        createScaffoldingLines()
+        createScaffoldingOutlines()
         createScaffoldingCorners()
         createScaffoldingPillars()
+        createScaffoldingArms()
+        
+        drill.addModels(Model(DRILL, pointerLocation))
+        runTaskLater(1) { updatePointer(true) }
     }
     
-    private fun createScaffoldingLines() {
+    private fun createScaffoldingOutlines() {
         val min = Location(location.world, minX.toDouble(), location.y, minZ.toDouble())
         val max = Location(location.world, maxX.toDouble(), location.y, maxZ.toDouble())
         
         min.getRectangle(max, true).forEach { (axis, locations) ->
             locations.forEach { createHorizontalScaffolding(solidScaffolding, it, axis) }
         }
+    }
+    
+    private fun createScaffoldingArms() {
+        val baseLocation = pointerLocation.clone().also { it.y = y.toDouble() }
         
-        val armXLocations = min.getStraightLine(Axis.X, max.blockX)
+        val armXLocations = LocationUtils.getStraightLine(baseLocation, Axis.X, minX..maxX)
         armXLocations.withIndex().forEach { (index, location) ->
+            location.x += 0.5
             if (index == 0 || index == armXLocations.size - 1) {
-                createSmallHorizontalScaffolding(armX, location.apply { yaw = if (index == 0) 180f else 0f }, Axis.X)
+                createSmallHorizontalScaffolding(
+                    armX,
+                    location.apply { yaw = if (index == 0) 180f else 0f },
+                    Axis.X,
+                    center = false
+                )
             } else {
-                createHorizontalScaffolding(armX, location, Axis.X)
+                createHorizontalScaffolding(armX, location, Axis.X, false)
             }
         }
         
-        val armZLocations = min.getStraightLine(Axis.Z, max.blockZ)
+        val armZLocations = LocationUtils.getStraightLine(baseLocation, Axis.Z, minZ..maxZ)
         armZLocations.withIndex().forEach { (index, location) ->
+            location.z += 0.5
             if (index == 0 || index == armZLocations.size - 1) {
-                createSmallHorizontalScaffolding(armZ, location.apply { yaw = if (index == 0) 0f else 180f }, Axis.Z)
+                createSmallHorizontalScaffolding(armZ,
+                    location.apply { yaw = if (index == 0) 0f else 180f },
+                    Axis.Z,
+                    center = false
+                )
             } else {
-                createHorizontalScaffolding(armZ, location, Axis.Z)
+                createHorizontalScaffolding(armZ, location, Axis.Z, false)
             }
         }
         
-        armY.addModels(Model(SLIM_VERTICAL_DOWN, location))
+        armY.addModels(Model(SLIM_VERTICAL_DOWN, baseLocation.clone()))
     }
     
     private fun createScaffoldingPillars() {
@@ -352,14 +416,14 @@ class Quarry(
             Location(world, minX.toDouble(), y, maxZ.toDouble(), 270f, 0f)
         )
     
-    private fun createSmallHorizontalScaffolding(model: MultiModel, location: Location, axis: Axis) {
+    private fun createSmallHorizontalScaffolding(model: MultiModel, location: Location, axis: Axis, center: Boolean = true) {
         location.yaw += if (axis == Axis.Z) 0f else 90f
-        model.addModels(Model(SMALL_HORIZONTAL, location.center()))
+        model.addModels(Model(SMALL_HORIZONTAL, if (center) location.center() else location))
     }
     
-    private fun createHorizontalScaffolding(model: MultiModel, location: Location, axis: Axis) {
+    private fun createHorizontalScaffolding(model: MultiModel, location: Location, axis: Axis, center: Boolean = true) {
         location.yaw = if (axis == Axis.Z) 0f else 90f
-        model.addModels(Model(FULL_HORIZONTAL, location.center()))
+        model.addModels(Model(FULL_HORIZONTAL, if (center) location.center() else location))
     }
     
     private fun createVerticalScaffolding(model: MultiModel, location: Location) {
@@ -379,22 +443,69 @@ class Quarry(
             listOf(inventory to "Quarry Inventory")
         ) { openWindow(it) }
         
+        private val sizeItems = ArrayList<Item>()
+        
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # # # # # . |" +
-                "| . . . . . . . |" +
-                "| . . . . . . . |" +
-                "| . . . . . . . |" +
+                "| # # # . . . . |" +
+                "| m n p . . . . |" +
+                "| # # # . . . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
+            .addIngredient('m', ChangeSizeItem(
+                -1,
+                NovaMaterial.MINUS_ON_BUTTON.createBasicItemBuilder(),
+                NovaMaterial.MINUS_OFF_BUTTON.createBasicItemBuilder()
+            ).also(sizeItems::add))
+            .addIngredient('p', ChangeSizeItem(1,
+                NovaMaterial.PLUS_ON_BUTTON.createBasicItemBuilder(),
+                NovaMaterial.PLUS_OFF_BUTTON.createBasicItemBuilder()
+            ).also(sizeItems::add))
             .build()
-            .also { it.fillRectangle(1, 2, 6, inventory, true) }
+            .also { it.fillRectangle(4, 2, 3, inventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { energy to MAX_ENERGY }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, energyPerTick) }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Quarry", gui).show()
+        }
+        
+        private inner class ChangeSizeItem(
+            private val sizeModifier: Int,
+            private val onBuilder: ItemBuilder,
+            private val offBuilder: ItemBuilder
+        ) : BaseItem() {
+            
+            override fun getItemBuilder() = if (canModify()) onBuilder else offBuilder
+            
+            override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+                if (canModify()) {
+                    player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                    val size = sizeX + sizeModifier
+                    resize(size, size)
+                    
+                    sizeItems.forEach(Item::notifyWindows)
+                }
+            }
+            
+            private fun canModify() = sizeX + sizeModifier in MIN_SIZE..MAX_SIZE
+            
+        }
+        
+        private inner class NumberDisplayItem(private val getNumber: () -> Int) : BaseItem() {
+            
+            override fun getItemBuilder(): ItemBuilder {
+                val number = getNumber()
+                return NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
+                    .setDisplayName("§rQuarry Size: $number x $number Blocks")
+                    .addLoreLines("§7A bigger size makes the Quarry less efficient")
+            }
+            
+            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+            
         }
         
     }

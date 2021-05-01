@@ -75,7 +75,7 @@ open class PowerCell(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { energy to maxEnergy }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, maxEnergy, -1) }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Power Cell", gui).show()
@@ -101,8 +101,8 @@ class BasicPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell
 
 class AdvancedPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 1_000_000, material, armorStand)
 
-class ElitePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 5_000_000, material, armorStand)
+class ElitePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 10_000_000, material, armorStand)
 
-class UltimatePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 20_000_000, material, armorStand)
+class UltimatePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 100_000_000, material, armorStand)
 
 class CreativePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(true, Int.MAX_VALUE, material, armorStand)

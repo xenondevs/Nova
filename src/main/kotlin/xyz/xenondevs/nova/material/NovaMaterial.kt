@@ -94,6 +94,10 @@ enum class NovaMaterial(
     ITEM_OFF_BUTTON("", itemOf(9012)),
     WHITELIST_BUTTON("", itemOf(9013)),
     BLACKLIST_BUTTON("", itemOf(9014)),
+    PLUS_ON_BUTTON("", itemOf(9015)),
+    PLUS_OFF_BUTTON("", itemOf(9016)),
+    MINUS_ON_BUTTON("", itemOf(9017)),
+    MINUS_OFF_BUTTON("", itemOf(9018)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),
@@ -102,7 +106,10 @@ enum class NovaMaterial(
     GREEN_BAR("", itemOf((10_300..10_316).toIntArray())),
     BLUE_BAR("", itemOf((10_400..10_416).toIntArray())),
     PRESS_PROGRESS("", itemOf((10_500..10_508).toIntArray())),
-    PULVERIZER_PROGRESS("", itemOf((10_600..10_614).toIntArray()));
+    PULVERIZER_PROGRESS("", itemOf((10_600..10_614).toIntArray())),
+    
+    // 100.000 - ? Numbers
+    NUMBER("", itemOf((100_000..100_999).toIntArray()));
     
     val isBlock = block != null && createTileEntity != null
     private val createItemBuilderFunction: ((TileEntity?) -> ItemBuilder)? = if (createItemBuilderFunction != null) {

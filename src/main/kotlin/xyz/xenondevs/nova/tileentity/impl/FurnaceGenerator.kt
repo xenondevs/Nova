@@ -134,7 +134,7 @@ class FurnaceGenerator(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { energy to MAX_ENERGY }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, -1) }
         
         fun openWindow(player: Player) {
             SimpleWindow(player, "Furnace Generator", gui).show()

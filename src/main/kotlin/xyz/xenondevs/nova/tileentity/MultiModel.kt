@@ -14,21 +14,14 @@ private val MULTI_MODEL_KEY = NamespacedKey(NOVA, "multiModel")
 
 class MultiModel(
     private val uuid: UUID,
-    private var _chunks: MutableSet<Chunk> = mutableSetOf()
+    chunks: MutableSet<Chunk> = mutableSetOf()
 ) {
     
     private val currentModels = HashMap<ArmorStand, Model>()
     private var chunksInvalid = false
     
     val chunks: Set<Chunk>
-        get() {
-            if (chunksInvalid) {
-                _chunks = currentModels.keys.mapTo(HashSet()) { it.location.chunk }
-                chunksInvalid = false
-            }
-            
-            return _chunks
-        }
+        get() = currentModels.keys.mapTo(HashSet()) { it.location.chunk }
     
     val armorStands: Set<ArmorStand>
         get() = currentModels.keys.toSet()

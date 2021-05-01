@@ -292,8 +292,8 @@ class BasicCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(100, 1,
 
 class AdvancedCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(1000, 2, material, armorStand)
 
-class EliteCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(5000, 4, material, armorStand)
+class EliteCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(10_000, 4, material, armorStand)
 
-class UltimateCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(20000, 8, material, armorStand)
+class UltimateCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(100_000, 8, material, armorStand)
 
 class CreativeCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(Int.MAX_VALUE, Int.MAX_VALUE, material, armorStand)

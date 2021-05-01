@@ -92,6 +92,9 @@ fun Location.positionEquals(other: Location) =
         && y == other.y
         && z == other.z
 
+fun Location.isBlockLocation() =
+    x.toInt() - x == 0.0 && y.toInt() - y == 0.0 && z.toInt() - z == 0.0
+
 fun Location.center() = add(0.5, 0.0, 0.5)
 
 fun Location.setCoordinate(axis: Axis, coordinate: Double) =
@@ -172,5 +175,8 @@ object LocationUtils {
         
         return locations
     }
+    
+    fun getStraightLine(base: Location, axis: Axis, range: IntRange) =
+        range.map { base.clone().apply { setCoordinate(axis, it.toDouble()) } }
     
 }
