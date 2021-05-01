@@ -9,6 +9,7 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.recipe.PulverizerRecipe
@@ -20,9 +21,9 @@ import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.util.BlockSide
 
-private const val MAX_ENERGY = 100_000
-private const val ENERGY_PER_TICK = 50
-private const val PULVERIZE_TIME = 200
+private val MAX_ENERGY = NovaConfig.getInt("pulverizer.capacity")!!
+private val ENERGY_PER_TICK = NovaConfig.getInt("pulverizer.energy_per_tick")!!
+private val PULVERIZE_TIME = NovaConfig.getInt("pulverizer.pulverizer_time")!!
 
 // TODO: Make PULVERIZE_TIME recipe dependent
 class Pulverizer(

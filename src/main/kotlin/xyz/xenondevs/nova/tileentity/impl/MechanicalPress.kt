@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
@@ -27,9 +28,9 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.PressProgressItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
 
-private const val MAX_ENERGY = 5_000
-private const val ENERGY_PER_TICK = 100
-private const val PRESS_TIME = 200
+private val MAX_ENERGY = NovaConfig.getInt("mechanical_press.capacity")!!
+private val ENERGY_PER_TICK = NovaConfig.getInt("mechanical_press.energy_per_tick")!!
+private val PRESS_TIME = NovaConfig.getInt("mechanical_press.press_time")!!
 
 class MechanicalPress(
     material: NovaMaterial,

@@ -1,1 +1,70 @@
-{}
+{
+  "cable": {
+    "basic": {
+      "energy_transfer_rate": 100,
+      "item_transfer_rate": 1
+    },
+    "advanced": {
+      "energy_transfer_rate": 1000,
+      "item_transfer_rate": 2
+    },
+    "elite": {
+      "energy_transfer_rate": 10000,
+      "item_transfer_rate": 4
+    },
+    "ultimate": {
+      "energy_transfer_rate": 100000,
+      "item_transfer_rate": 8
+    }
+  },
+  "power_cell": {
+    "basic": {
+      "capacity": 100000
+    },
+    "advanced": {
+      "capacity": 1000000
+    },
+    "elite": {
+      "capacity": 10000000
+    },
+    "ultimate": {
+      "capacity": 100000000
+    }
+  },
+  "furnace_generator": {
+    "capacity": 10000,
+    "energy_per_tick": 20,
+    "burn_time_multiplier": 0.1
+  },
+  "solar_panel": {
+    "capacity": 10000,
+    "energy_per_tick": 10
+  },
+  "pulverizer": {
+    "capacity": 10000,
+    "energy_per_tick": 50,
+    "pulverizer_time": 200
+  },
+  "electrical_furnace": {
+    "capacity": 10000,
+    "energy_per_tick": 100,
+    "cook_speed": 2
+  },
+  "mechanical_press": {
+    "capacity": 10000,
+    "energy_per_tick": 100,
+    "press_time": 200
+  },
+  "quarry": {
+    "capacity": 100000,
+    "energy_consumption_base": 100,
+    "energy_inefficiency_exponent": 1.5,
+    "max_size": 30,
+    "min_size": 1,
+    "default_size_x": 10,
+    "default_size_z": 10,
+    "move_speed": 0.15,
+    "drill_speed_multiplier": 0.25,
+    "drill_speed_clamp": 0.5
+  }
+}

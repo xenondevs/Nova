@@ -7,30 +7,41 @@ import xyz.xenondevs.nova.util.isString
 import xyz.xenondevs.nova.util.set
 import java.io.File
 
-open class JsonConfig(val file: File, autoInit: Boolean = true) {
+private fun File.readConfig(): JsonObject {
+    check()
+    val text = readText(Charsets.UTF_8)
+    return if (text.isBlank()) JsonObject() else JsonParser.parseString(text).asJsonObject
+}
+
+private fun File.check() {
+    if (exists()) return
+    val parent = parentFile
+    if (parent != null && !parent.exists()) parent.mkdirs()
+    createNewFile()
+}
+
+open class JsonConfig {
     
+    private val file: File?
     private lateinit var config: JsonObject
     
-    init {
-        if (autoInit) {
-            checkFile()
-            reload()
-        }
+    constructor(file: File, autoInit: Boolean) {
+        this.file = file
+        if (autoInit) config = file.readConfig()
     }
     
-    private fun checkFile() {
-        if (file.exists()) return
-        val parent = file.parentFile
-        if (parent != null && !parent.exists()) parent.mkdirs()
-        file.createNewFile()
+    constructor(config: JsonObject) {
+        this.file = null
+        this.config = config
     }
     
     fun reload() {
-        val text = file.readText(Charsets.UTF_8)
-        this.config = if (text.isBlank()) JsonObject() else JsonParser.parseString(text).asJsonObject
+        if (file == null) throw IllegalStateException("This config has no file")
+        config = file.readConfig()
     }
     
     fun save(formatted: Boolean = true) {
+        if (file == null) throw IllegalStateException("This config has no file")
         val text = (if (formatted) PRETTY_PRINTING_GSON else GSON).toJson(config)
         file.writeText(text, Charsets.UTF_8)
     }
@@ -120,7 +131,7 @@ open class JsonConfig(val file: File, autoInit: Boolean = true) {
         element.isNumber() && values.any { it.toString() == element.asNumber.toString() }
     }
     
-    fun get(path: List<String>): JsonElement? {
+    open fun get(path: List<String>): JsonElement? {
         var current = this.config
         path.dropLast(1).forEach { pathPart ->
             val property = pathPart.replace("\\.", ".")
@@ -149,6 +160,10 @@ open class JsonConfig(val file: File, autoInit: Boolean = true) {
     fun getString(path: String) = getPrimitive(path)?.asString
     
     fun getNumber(path: String) = getPrimitive(path)?.asNumber
+    
+    fun getInt(path: String) = getNumber(path)?.toInt()
+    
+    fun getDouble(path: String) = getNumber(path)?.toDouble()
     
     fun getBoolean(path: String) = getPrimitive(path)?.asBoolean ?: false
     

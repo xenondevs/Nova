@@ -10,6 +10,7 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
@@ -27,9 +28,9 @@ import xyz.xenondevs.nova.util.toItemStack
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private const val MAX_ENERGY = 10_000
-private const val ENERGY_PER_TICK = 20
-private const val BURN_TIME_MULTIPLIER = 0.1
+private val MAX_ENERGY = NovaConfig.getInt("furnace_generator.capacity")!!
+private val ENERGY_PER_TICK = NovaConfig.getInt("furnace_generator.energy_per_tick")!!
+private val BURN_TIME_MULTIPLIER = NovaConfig.getDouble("furnace_generator.burn_time_multiplier")!!
 
 class FurnaceGenerator(
     material: NovaMaterial,

@@ -8,6 +8,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
@@ -21,8 +22,8 @@ import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private const val ENERGY_PER_TICK = 10
-private const val MAX_ENERGY = 10_000
+private val MAX_ENERGY = NovaConfig.getInt("solar_panel.capacity")!!
+private val ENERGY_PER_TICK = NovaConfig.getInt("solar_panel.energy_per_tick")!!
 
 class SolarPanel(
     material: NovaMaterial,

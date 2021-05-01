@@ -3,11 +3,16 @@ package xyz.xenondevs.nova.config
 import com.google.gson.JsonParser
 import xyz.xenondevs.nova.recipe.NovaRecipe
 import xyz.xenondevs.nova.serialization.NovaRecipeDeserializer
+import xyz.xenondevs.nova.util.getResourceAsStream
 import xyz.xenondevs.nova.util.getResourceData
 import xyz.xenondevs.nova.util.getResources
 import java.io.File
 
 object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
+    
+    private val fallbackConfig = JsonConfig(
+        JsonParser.parseReader(getResourceAsStream("config/config.json")!!.reader()).asJsonObject
+    )
     
     fun init() {
         extractNeededFiles()
@@ -39,5 +44,8 @@ object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
         }
         return recipes
     }
+    
+    override fun get(path: List<String>) =
+        super.get(path) ?: fallbackConfig.get(path)
     
 }

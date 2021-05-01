@@ -15,7 +15,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
@@ -45,18 +45,18 @@ private val FULL_SLIM_VERTICAL = SCAFFOLDING_STACKS[4]
 private val SLIM_VERTICAL_DOWN = SCAFFOLDING_STACKS[5]
 private val DRILL = SCAFFOLDING_STACKS[6]
 
-private const val MAX_SIZE = 30
-private const val MIN_SIZE = 1
-private const val DEFAULT_SIZE_X = 10
-private const val DEFAULT_SIZE_Z = 10
+private val MIN_SIZE = NovaConfig.getInt("quarry.min_size")!!
+private val MAX_SIZE = NovaConfig.getInt("quarry.max_size")!!
+private val DEFAULT_SIZE_X = NovaConfig.getInt("quarry.default_size_x")!!
+private val DEFAULT_SIZE_Z = NovaConfig.getInt("quarry.default_size_z")!!
 
-private const val MOVE_SPEED = 0.15
-private const val DRILL_SPEED_MULTIPLIER = 0.25
-private const val DRILL_SPEED_CLAMP = 0.5
+private val MOVE_SPEED = NovaConfig.getDouble("quarry.move_speed")!!
+private val DRILL_SPEED_MULTIPLIER = NovaConfig.getDouble("quarry.drill_speed_multiplier")!!
+private val DRILL_SPEED_CLAMP = NovaConfig.getDouble("quarry.drill_speed_clamp")!!
 
-private const val MAX_ENERGY = 100_000
-private const val ENERGY_CONSUMPTION_BASE = 100
-private const val ENERGY_INEFFICIENCY_EXPONENT = 1.5
+private val MAX_ENERGY = NovaConfig.getInt("quarry.capacity")!!
+private val ENERGY_CONSUMPTION_BASE = NovaConfig.getInt("quarry.energy_consumption_base")!!
+private val ENERGY_INEFFICIENCY_EXPONENT = NovaConfig.getDouble("quarry.energy_inefficiency_exponent")!!
 
 class Quarry(
     material: NovaMaterial,
@@ -215,7 +215,7 @@ class Quarry(
         val block = pointerDestination!!.block
         spawnDrillParticles(block)
         
-        val drillSpeed = min(min(DRILL_SPEED_CLAMP, 1.0), block.type.breakSpeed * DRILL_SPEED_MULTIPLIER)
+        val drillSpeed = min(DRILL_SPEED_CLAMP, block.type.breakSpeed * DRILL_SPEED_MULTIPLIER)
         drillProgress += drillSpeed
         pointerLocation.y -= drillSpeed - max(0.0, drillProgress - 1)
         

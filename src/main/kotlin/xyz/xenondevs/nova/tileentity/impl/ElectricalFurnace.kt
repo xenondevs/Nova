@@ -16,6 +16,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.inventory.CustomUpdateReason
@@ -35,9 +36,9 @@ private val RECIPES: List<FurnaceRecipe> by lazy {
 private fun getRecipe(input: ItemStack) =
     RECIPES.firstOrNull { it.input.isSimilar(input) }
 
-private const val ENERGY_PER_TICK = 100
-private const val MAX_ENERGY = 10_000
-private const val COOK_SPEED = 2
+private val MAX_ENERGY = NovaConfig.getInt("electrical_furnace.capacity")!!
+private val ENERGY_PER_TICK = NovaConfig.getInt("electrical_furnace.energy_per_tick")!!
+private val COOK_SPEED = NovaConfig.getInt("electrical_furnace.")!!
 
 class ElectricalFurnace(
     material: NovaMaterial,

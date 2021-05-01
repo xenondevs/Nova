@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.hitbox.Hitbox
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -288,12 +289,52 @@ open class Cable(
     
 }
 
-class BasicCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(100, 1, material, armorStand)
+class BasicCable(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : Cable(
+    NovaConfig.getInt("cable.basic.energy_transfer_rate")!!,
+    NovaConfig.getInt("cable.basic.item_transfer_rate")!!,
+    material,
+    armorStand
+)
 
-class AdvancedCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(1000, 2, material, armorStand)
+class AdvancedCable(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : Cable(
+    NovaConfig.getInt("cable.advanced.energy_transfer_rate")!!,
+    NovaConfig.getInt("cable.advanced.item_transfer_rate")!!,
+    material,
+    armorStand
+)
 
-class EliteCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(10_000, 4, material, armorStand)
+class EliteCable(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : Cable(
+    NovaConfig.getInt("cable.elite.energy_transfer_rate")!!,
+    NovaConfig.getInt("cable.elite.item_transfer_rate")!!,
+    material,
+    armorStand
+)
 
-class UltimateCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(100_000, 8, material, armorStand)
+class UltimateCable(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : Cable(
+    NovaConfig.getInt("cable.ultimate.energy_transfer_rate")!!,
+    NovaConfig.getInt("cable.ultimate.item_transfer_rate")!!,
+    material,
+    armorStand
+)
 
-class CreativeCable(material: NovaMaterial, armorStand: ArmorStand) : Cable(Int.MAX_VALUE, Int.MAX_VALUE, material, armorStand)
+class CreativeCable(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : Cable(
+    Int.MAX_VALUE,
+    Int.MAX_VALUE,
+    material,
+    armorStand
+)

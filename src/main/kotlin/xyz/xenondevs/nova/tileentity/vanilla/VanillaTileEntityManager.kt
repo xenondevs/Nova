@@ -60,6 +60,8 @@ object VanillaTileEntityManager : Listener {
         }
     }
     
+    // TODO: handle block remove by non-players
+    
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
         val location = event.block.location

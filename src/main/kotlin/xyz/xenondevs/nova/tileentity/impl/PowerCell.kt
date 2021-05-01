@@ -7,6 +7,7 @@ import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
@@ -97,12 +98,52 @@ open class PowerCell(
     
 }
 
-class BasicPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 100_000, material, armorStand)
+class BasicPowerCell(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : PowerCell(
+    false,
+    NovaConfig.getInt("power_cell.basic.capacity")!!,
+    material,
+    armorStand
+)
 
-class AdvancedPowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 1_000_000, material, armorStand)
+class AdvancedPowerCell(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : PowerCell(
+    false,
+    NovaConfig.getInt("power_cell.advanced.capacity")!!,
+    material,
+    armorStand
+)
 
-class ElitePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 10_000_000, material, armorStand)
+class ElitePowerCell(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : PowerCell(
+    false,
+    NovaConfig.getInt("power_cell.elite.capacity")!!,
+    material,
+    armorStand
+)
 
-class UltimatePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(false, 100_000_000, material, armorStand)
+class UltimatePowerCell(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : PowerCell(
+    false,
+    NovaConfig.getInt("power_cell.ultimate.capacity")!!,
+    material,
+    armorStand
+)
 
-class CreativePowerCell(material: NovaMaterial, armorStand: ArmorStand) : PowerCell(true, Int.MAX_VALUE, material, armorStand)
+class CreativePowerCell(
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : PowerCell(
+    true,
+    Int.MAX_VALUE,
+    material,
+    armorStand
+)
