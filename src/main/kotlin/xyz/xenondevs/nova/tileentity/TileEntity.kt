@@ -31,7 +31,7 @@ abstract class TileEntity(
     val facing = armorStand.facing
     
     private val inventories = ArrayList<VirtualInventory>()
-    private val multiModels = HashMap<String, MultiModel>()
+    val multiModels = HashMap<String, MultiModel>()
     
     init {
         if (mainDataObject.size() <= 1) {
@@ -79,7 +79,7 @@ abstract class TileEntity(
      * Called to save all data using the [storeData] method.
      */
     open fun saveData() {
-        multiModels.forEach { (name, multiModel) -> 
+        multiModels.forEach { (name, multiModel) ->
             storeData("multiModel_$name", multiModel.chunks)
         }
     }

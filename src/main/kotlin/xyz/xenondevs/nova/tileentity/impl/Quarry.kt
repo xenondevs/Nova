@@ -8,7 +8,6 @@ import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Axis
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.ArmorStand
@@ -16,6 +15,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
@@ -226,16 +226,16 @@ class Quarry(
             playBreakSound(block)
             
             val tileEntity = TileEntityManager.getTileEntityAt(block.location)
-            if (tileEntity != null) {
-                val drops = TileEntityManager.destroyTileEntity(tileEntity, true)
-                if (inventory.canFit(drops)) inventory.addAll(null, drops)
-                else block.world.dropItemsNaturally(block.location, drops)
-            } else {
-                val drops = block.drops.toList()
-                if (inventory.canFit(drops)) {
-                    inventory.addAll(null, drops)
-                    block.type = Material.AIR
-                } else block.breakNaturally()
+            
+            val drops = if (tileEntity != null) TileEntityManager.destroyTileEntity(tileEntity, true)
+            else block.breakAndTakeDrops()
+            
+            drops.forEach { drop ->
+                val leftover = inventory.addItem(null, drop)
+                if (leftover != 0) {
+                    drop.amount = leftover
+                    world.dropItemNaturally(block.location, drop)
+                }
             }
             
             pointerDestination = null

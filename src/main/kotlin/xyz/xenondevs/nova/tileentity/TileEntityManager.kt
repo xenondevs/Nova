@@ -62,7 +62,7 @@ fun ArmorStand.hasTileEntityData(): Boolean =
 object TileEntityManager : Listener {
     
     private val tileEntityMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
-    private val tileEntities: List<TileEntity>
+    val tileEntities: List<TileEntity>
         get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
     
     fun init() {
@@ -122,6 +122,8 @@ object TileEntityManager : Listener {
     }
     
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)
+    
+    fun getTileEntitiesInChunk(chunk: Chunk) = tileEntityMap[chunk]?.values?.toList() ?: emptyList()
     
     private fun handleChunkLoad(chunk: Chunk) {
         val chunkMap = HashMap<Location, TileEntity>()
