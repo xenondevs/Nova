@@ -44,9 +44,11 @@ private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
 open class Cable(
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : TileEntity(
+    ownerUUID,
     material,
     armorStand,
 ), EnergyBridge, ItemBridge {
@@ -72,10 +74,12 @@ open class Cable(
     private val hitboxes = ArrayList<Hitbox>()
     
     override fun handleNetworkUpdate() {
-        _connectedNodes = findConnectedNodes()
-        if (NOVA.isEnabled) {
-            multiModel.replaceModels(getModelsNeeded())
-            updateHitbox()
+        if (isValid) {
+            _connectedNodes = findConnectedNodes()
+            if (NOVA.isEnabled) {
+                multiModel.replaceModels(getModelsNeeded())
+                updateHitbox()
+            }
         }
     }
     
@@ -84,6 +88,7 @@ open class Cable(
     }
     
     override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
         NetworkManager.handleBridgeRemove(this, unload)
         hitboxes.forEach { it.remove() }
     }
@@ -244,11 +249,13 @@ open class Cable(
         
         // run later because this might be called during an event
         runTaskLater(1) {
-            val block = armorStand.location.block
-            block.type = Material.CHAIN
-            val blockData = block.blockData as Orientable
-            blockData.axis = axis
-            block.setBlockData(blockData, false)
+            if (isValid) {
+                val block = armorStand.location.block
+                block.type = Material.CHAIN
+                val blockData = block.blockData as Orientable
+                blockData.axis = axis
+                block.setBlockData(blockData, false)
+            }
         }
     }
     
@@ -290,51 +297,61 @@ open class Cable(
 }
 
 class BasicCable(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : Cable(
     NovaConfig.getInt("cable.basic.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.basic.item_transfer_rate")!!,
+    ownerUUID,
     material,
     armorStand
 )
 
 class AdvancedCable(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : Cable(
     NovaConfig.getInt("cable.advanced.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.advanced.item_transfer_rate")!!,
+    ownerUUID,
     material,
     armorStand
 )
 
 class EliteCable(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : Cable(
     NovaConfig.getInt("cable.elite.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.elite.item_transfer_rate")!!,
+    ownerUUID,
     material,
     armorStand
 )
 
 class UltimateCable(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : Cable(
     NovaConfig.getInt("cable.ultimate.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.ultimate.item_transfer_rate")!!,
+    ownerUUID,
     material,
     armorStand
 )
 
 class CreativeCable(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : Cable(
     Int.MAX_VALUE,
     Int.MAX_VALUE,
+    ownerUUID,
     material,
     armorStand
 )

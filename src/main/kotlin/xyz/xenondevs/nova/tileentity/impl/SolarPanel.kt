@@ -26,9 +26,10 @@ private val MAX_ENERGY = NovaConfig.getInt("solar_panel.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("solar_panel.energy_per_tick")!!
 
 class SolarPanel(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : EnergyTileEntity(material, armorStand) {
+) : EnergyTileEntity(ownerUUID, material, armorStand) {
     
     override val defaultEnergyConfig by lazy {
         CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))

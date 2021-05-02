@@ -25,6 +25,7 @@ import xyz.xenondevs.nova.util.EnergyUtils
 import xyz.xenondevs.nova.util.fuel
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.util.toItemStack
+import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -33,9 +34,10 @@ private val ENERGY_PER_TICK = NovaConfig.getInt("furnace_generator.energy_per_ti
 private val BURN_TIME_MULTIPLIER = NovaConfig.getDouble("furnace_generator.burn_time_multiplier")!!
 
 class FurnaceGenerator(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(PROVIDE, FRONT) }
     

@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.util.*
 import java.util.*
 
 abstract class TileEntity(
+    ownerUUID: UUID?,
     val material: NovaMaterial,
     val armorStand: ArmorStand,
 ) {
@@ -24,19 +25,26 @@ abstract class TileEntity(
     val globalDataObject: JsonObject = mainDataObject.get("global")?.let { it as JsonObject }
         ?: JsonObject().also { mainDataObject.add("global", it) }
     
+    var isValid: Boolean = true
+        private set
+    
     val uuid: UUID = armorStand.uniqueId
     val location = armorStand.location.blockLocation
     val world = location.world!!
     val chunk = location.chunk
     val facing = armorStand.facing
     
+    val ownerUUID: UUID
+    
     private val inventories = ArrayList<VirtualInventory>()
     val multiModels = HashMap<String, MultiModel>()
     
     init {
-        if (mainDataObject.size() <= 1) {
+        if (!mainDataObject.has("material"))
             storeData("material", material)
-        }
+        if (!mainDataObject.has("owner"))
+            storeData("owner", ownerUUID)
+        this.ownerUUID = ownerUUID ?: retrieveOrNull("owner")!!
     }
     
     /**
@@ -105,7 +113,9 @@ abstract class TileEntity(
      *
      * @param unload If the [TileEntity] was removed because the chunk got unloaded.
      */
-    abstract fun handleRemoved(unload: Boolean)
+    open fun handleRemoved(unload: Boolean) {
+        isValid = false
+    }
     
     /**
      * Called when a player right-clicks the TileEntity.
@@ -231,7 +241,7 @@ abstract class TileEntity(
             val data = armorStand.getTileEntityData()
             val material: NovaMaterial = GSON.fromJson(data.get("material"))!!
             
-            return material.createTileEntity!!(material, armorStand)
+            return material.createTileEntity!!(null, material, armorStand)
         }
         
     }

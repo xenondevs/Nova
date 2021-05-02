@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.*
 import xyz.xenondevs.nova.util.toIntArray
+import java.util.*
 
 private fun blockOf(data: IntArray) = ModelData(BARRIER, data)
 
@@ -27,7 +28,7 @@ enum class NovaMaterial(
     createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> ItemBuilder)?,
     val block: ModelData?,
     val hitbox: Material?,
-    val createTileEntity: ((NovaMaterial, ArmorStand) -> TileEntity)?
+    val createTileEntity: ((UUID?, NovaMaterial, ArmorStand) -> TileEntity)?
 ) {
     
     // 1 - 1000: Blocks

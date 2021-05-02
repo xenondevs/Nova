@@ -26,6 +26,8 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
+import java.util.*
+import kotlin.collections.ArrayList
 
 private val RECIPES: List<FurnaceRecipe> by lazy {
     val recipes = ArrayList<FurnaceRecipe>()
@@ -41,9 +43,10 @@ private val ENERGY_PER_TICK = NovaConfig.getInt("electrical_furnace.energy_per_t
 private val COOK_SPEED = NovaConfig.getInt("electrical_furnace.")!!
 
 class ElectricalFurnace(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int

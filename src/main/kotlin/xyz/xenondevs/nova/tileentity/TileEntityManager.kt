@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
+import java.util.*
 import kotlin.math.roundToInt
 
 val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
@@ -72,7 +73,14 @@ object TileEntityManager : Listener {
         runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
     }
     
-    private fun placeTileEntity(location: Location, yaw: Float, material: NovaMaterial, data: JsonObject = JsonObject()) {
+    private fun placeTileEntity(
+        ownerUUID: UUID,
+        location: Location,
+        yaw: Float,
+        material: NovaMaterial,
+        data: JsonObject = JsonObject()
+    ) {
+        
         val block = location.block
         
         // spawn ArmorStand there
@@ -90,7 +98,7 @@ object TileEntityManager : Listener {
         armorStand.setTileEntityData(data.let { JsonObject().apply { add("global", it) } })
         
         // create TileEntity instance
-        val tileEntity = material.createTileEntity!!(material, armorStand)
+        val tileEntity = material.createTileEntity!!(ownerUUID, material, armorStand)
         
         // add to tileEntities map
         val chunk = block.chunk
@@ -119,6 +127,13 @@ object TileEntityManager : Listener {
         tileEntity.handleRemoved(unload = false)
         
         return drops
+    }
+    
+    fun destroyAndDropTileEntity(tileEntity: TileEntity, dropItems: Boolean) {
+        val drops = destroyTileEntity(tileEntity, dropItems)
+        
+        // drop items a tick later to prevent interference with the cancellation of the break event
+        runTaskLater(1) { tileEntity.location.dropItems(drops) }
     }
     
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)
@@ -168,7 +183,7 @@ object TileEntityManager : Listener {
                 val location = event.block.location
                 if (getTileEntityAt(location) == null) {
                     val data = if (placedItem.hasTileEntityData()) placedItem.getTileEntityData()!! else JsonObject()
-                    placeTileEntity(event.block.location, player.location.yaw, material, data)
+                    placeTileEntity(player.uniqueId, event.block.location, player.location.yaw, material, data)
                     
                     if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
                 }
@@ -182,10 +197,7 @@ object TileEntityManager : Listener {
         val tileEntity = getTileEntityAt(location)
         if (tileEntity != null) {
             event.isCancelled = true
-            val drops = destroyTileEntity(tileEntity, event.player.gameMode == GameMode.SURVIVAL)
-            
-            // drop items a tick later to prevent interference with the cancellation of the break event
-            runTaskLater(1) { location.dropItems(drops) }
+            destroyAndDropTileEntity(tileEntity, event.player.gameMode == GameMode.SURVIVAL)
         }
     }
     

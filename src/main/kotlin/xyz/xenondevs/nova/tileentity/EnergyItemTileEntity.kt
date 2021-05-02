@@ -13,9 +13,10 @@ import xyz.xenondevs.nova.util.CUBE_FACES
 import java.util.*
 
 abstract class EnergyItemTileEntity(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : EnergyTileEntity(material, armorStand), ItemStorage {
+) : EnergyTileEntity(ownerUUID, material, armorStand), ItemStorage {
     
     final override lateinit var inventories: MutableMap<BlockFace, NetworkedInventory>
     

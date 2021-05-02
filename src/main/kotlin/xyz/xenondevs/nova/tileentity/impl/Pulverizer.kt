@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.util.BlockSide
+import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("pulverizer.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("pulverizer.energy_per_tick")!!
@@ -27,9 +28,10 @@ private val PULVERIZE_TIME = NovaConfig.getInt("pulverizer.pulverizer_time")!!
 
 // TODO: Make PULVERIZE_TIME recipe dependent
 class Pulverizer(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
     
     private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
     private val outputInv = getInventory("output", 2, true, ::handleOutputUpdate)

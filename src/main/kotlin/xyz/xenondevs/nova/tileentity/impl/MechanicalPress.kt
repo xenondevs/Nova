@@ -27,15 +27,18 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.PressProgressItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
+import java.util.*
+import kotlin.collections.ArrayList
 
 private val MAX_ENERGY = NovaConfig.getInt("mechanical_press.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("mechanical_press.energy_per_tick")!!
 private val PRESS_TIME = NovaConfig.getInt("mechanical_press.press_time")!!
 
 class MechanicalPress(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(CONSUME, FRONT) }
     override val requestedEnergy: Int

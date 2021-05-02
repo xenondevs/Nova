@@ -16,13 +16,15 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.EnergyUtils
+import java.util.*
 
 open class PowerCell(
     private val creative: Boolean,
     val maxEnergy: Int,
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand,
-) : EnergyTileEntity(material, armorStand) {
+) : EnergyTileEntity(ownerUUID, material, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(BUFFER) }
     override val requestedEnergy: Int
@@ -99,51 +101,61 @@ open class PowerCell(
 }
 
 class BasicPowerCell(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : PowerCell(
     false,
     NovaConfig.getInt("power_cell.basic.capacity")!!,
+    ownerUUID,
     material,
     armorStand
 )
 
 class AdvancedPowerCell(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : PowerCell(
     false,
     NovaConfig.getInt("power_cell.advanced.capacity")!!,
+    ownerUUID,
     material,
     armorStand
 )
 
 class ElitePowerCell(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : PowerCell(
     false,
     NovaConfig.getInt("power_cell.elite.capacity")!!,
+    ownerUUID,
     material,
     armorStand
 )
 
 class UltimatePowerCell(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : PowerCell(
     false,
     NovaConfig.getInt("power_cell.ultimate.capacity")!!,
+    ownerUUID,
     material,
     armorStand
 )
 
 class CreativePowerCell(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
 ) : PowerCell(
     true,
     Int.MAX_VALUE,
+    ownerUUID,
     material,
     armorStand
 )

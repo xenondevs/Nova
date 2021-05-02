@@ -8,11 +8,15 @@ import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
+import java.security.acl.Owner
 import java.util.*
 import kotlin.math.min
 
-abstract class EnergyTileEntity(material: NovaMaterial, armorStand: ArmorStand)
-    : TileEntity(material, armorStand), EnergyStorage {
+abstract class EnergyTileEntity(
+    ownerUUID: UUID?,
+    material: NovaMaterial,
+    armorStand: ArmorStand
+) : TileEntity(ownerUUID, material, armorStand), EnergyStorage {
     
     protected abstract val defaultEnergyConfig: MutableMap<BlockFace, EnergyConnectionType>
     
@@ -47,6 +51,7 @@ abstract class EnergyTileEntity(material: NovaMaterial, armorStand: ArmorStand)
     }
     
     override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
         NetworkManager.handleEndPointRemove(this, unload)
     }
     

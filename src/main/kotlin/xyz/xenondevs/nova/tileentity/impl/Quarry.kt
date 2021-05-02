@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.sk89q.worldguard.protection.flags.Flags
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
@@ -29,6 +30,8 @@ import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.texture.BlockTexture
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -59,9 +62,10 @@ private val ENERGY_CONSUMPTION_BASE = NovaConfig.getInt("quarry.energy_consumpti
 private val ENERGY_INEFFICIENCY_EXPONENT = NovaConfig.getDouble("quarry.energy_inefficiency_exponent")!!
 
 class Quarry(
+    ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int
@@ -213,6 +217,13 @@ class Quarry(
     
     private fun drill() {
         val block = pointerDestination!!.block
+        
+        if (!WorldGuardUtils.runQuery(ownerUUID, block.location, Flags.BLOCK_BREAK)) {
+            // trying to mine a protected area
+            TileEntityManager.destroyAndDropTileEntity(this, true)
+            return
+        }
+        
         spawnDrillParticles(block)
         
         val drillSpeed = min(DRILL_SPEED_CLAMP, block.type.breakSpeed * DRILL_SPEED_MULTIPLIER)
