@@ -27,7 +27,6 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
 import java.util.*
-import kotlin.collections.ArrayList
 
 private val RECIPES: List<FurnaceRecipe> by lazy {
     val recipes = ArrayList<FurnaceRecipe>()

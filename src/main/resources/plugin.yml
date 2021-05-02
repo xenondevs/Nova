@@ -4,3 +4,5 @@ main: xyz.xenondevs.nova.Nova
 api-version: 1.16
 softdepend:
   - WorldGuard
+  - GriefPrevention
+  - Vault

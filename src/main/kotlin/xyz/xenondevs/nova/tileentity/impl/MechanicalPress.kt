@@ -28,7 +28,6 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.PressProgressItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
 import java.util.*
-import kotlin.collections.ArrayList
 
 private val MAX_ENERGY = NovaConfig.getInt("mechanical_press.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("mechanical_press.energy_per_tick")!!

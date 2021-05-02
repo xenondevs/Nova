@@ -10,10 +10,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.WorldGuardUtils
+import xyz.xenondevs.nova.util.protection.WorldGuardUtils
 import xyz.xenondevs.nova.util.castRay
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.isCompletelyDenied
+import xyz.xenondevs.nova.util.protection.ProtectionUtils
 
 object HitboxManager : Listener {
     
@@ -61,7 +62,7 @@ object HitboxManager : Listener {
                     
                     val hitHitboxes = surroundingHitboxes!!.filter { it.isInHitbox(location) }
                     if (hitHitboxes.isNotEmpty()) {
-                        if (WorldGuardUtils.runQuery(player, location, Flags.USE))
+                        if (ProtectionUtils.canUse(player, location))
                             hitHitboxes.forEach { it.handleHit(event) }
                         return@castRay false // don't continue ray
                     }

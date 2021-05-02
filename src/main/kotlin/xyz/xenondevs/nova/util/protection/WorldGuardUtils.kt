@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.util
+package xyz.xenondevs.nova.util.protection
 
 import com.sk89q.wepif.PermissionsResolverManager
 import com.sk89q.worldedit.blocks.BaseItemStack
@@ -16,6 +16,7 @@ import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.bukkit.BukkitPlayer
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform
+import com.sk89q.worldguard.protection.flags.Flags
 import com.sk89q.worldguard.protection.flags.StateFlag
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -37,16 +38,26 @@ object WorldGuardUtils {
         }
     }
     
-    fun isWorldGuardEnabled() = PLUGIN != null
+    fun canBreak(offlinePlayer: OfflinePlayer, location: Location): Boolean {
+        if (PLATFORM == null || PLUGIN == null) return true
+        return runQuery(offlinePlayer, location, Flags.BLOCK_BREAK)
+    }
     
-    fun runQuery(playerUUID: UUID, location: Location, vararg flags: StateFlag): Boolean =
-        runQuery(Bukkit.getOfflinePlayer(playerUUID), location, *flags)
+    fun canPlace(offlinePlayer: OfflinePlayer, location: Location): Boolean {
+        if (PLATFORM == null || PLUGIN == null) return true
+        return runQuery(offlinePlayer, location, Flags.BLOCK_PLACE)
+    }
     
-    fun runQuery(player: OfflinePlayer, location: Location, vararg flags: StateFlag): Boolean {
+    fun canUse(offlinePlayer: OfflinePlayer, location: Location): Boolean {
+        if (PLATFORM == null || PLUGIN == null) return true
+        return runQuery(offlinePlayer, location, Flags.USE)
+    }
+    
+    fun runQuery(offlinePlayer: OfflinePlayer, location: Location, vararg flags: StateFlag): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true
         
         val world = BukkitAdapter.adapt(location.world)
-        val localPlayer = BetterBukkitOfflinePlayer(world, PLUGIN, player)
+        val localPlayer = BetterBukkitOfflinePlayer(world, PLUGIN, offlinePlayer)
         
         return if (!hasBypass(world, localPlayer)) {
             val vector = BukkitAdapter.asBlockVector(location)
@@ -64,13 +75,10 @@ object WorldGuardUtils {
         return regionManager.getApplicableRegions(vector).size() > 0
     }
     
-    fun hasPermission(world: World, player: OfflinePlayer, perm: String): Boolean {
+    fun hasPermission(world: World, offlinePlayer: OfflinePlayer, perm: String): Boolean {
         if (PLATFORM == null || PLUGIN == null) return false
-        
-        if (player.isOp)
-            return PLATFORM.globalStateManager[world].opPermissions
-        
-        return PermissionsResolverManager.getInstance().hasPermission(world.name, player, perm)
+        if (offlinePlayer.isOp) return PLATFORM.globalStateManager[world].opPermissions
+        return PermissionsResolverManager.getInstance().hasPermission(world.name, offlinePlayer, perm)
     }
     
     fun hasBypass(world: World, player: LocalPlayer): Boolean {

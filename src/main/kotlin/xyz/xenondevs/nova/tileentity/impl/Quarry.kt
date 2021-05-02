@@ -27,11 +27,12 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.protection.WorldGuardUtils
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.texture.BlockTexture
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -218,7 +219,7 @@ class Quarry(
     private fun drill() {
         val block = pointerDestination!!.block
         
-        if (WorldGuardUtils.isWorldGuardEnabled() && !WorldGuardUtils.runQuery(ownerUUID, block.location, Flags.BLOCK_BREAK)) {
+        if (!ProtectionUtils.canBreak(ownerUUID, block.location)) {
             // trying to mine a protected area
             TileEntityManager.destroyAndDropTileEntity(this, true)
             return

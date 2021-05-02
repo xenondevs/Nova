@@ -8,9 +8,7 @@ import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
-import java.security.acl.Owner
 import java.util.*
-import kotlin.math.min
 
 abstract class EnergyTileEntity(
     ownerUUID: UUID?,
