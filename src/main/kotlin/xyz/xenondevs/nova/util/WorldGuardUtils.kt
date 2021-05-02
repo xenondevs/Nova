@@ -37,6 +37,8 @@ object WorldGuardUtils {
         }
     }
     
+    fun isWorldGuardEnabled() = PLUGIN != null
+    
     fun runQuery(playerUUID: UUID, location: Location, vararg flags: StateFlag): Boolean =
         runQuery(Bukkit.getOfflinePlayer(playerUUID), location, *flags)
     

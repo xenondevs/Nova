@@ -218,7 +218,7 @@ class Quarry(
     private fun drill() {
         val block = pointerDestination!!.block
         
-        if (!WorldGuardUtils.runQuery(ownerUUID, block.location, Flags.BLOCK_BREAK)) {
+        if (WorldGuardUtils.isWorldGuardEnabled() && !WorldGuardUtils.runQuery(ownerUUID, block.location, Flags.BLOCK_BREAK)) {
             // trying to mine a protected area
             TileEntityManager.destroyAndDropTileEntity(this, true)
             return
