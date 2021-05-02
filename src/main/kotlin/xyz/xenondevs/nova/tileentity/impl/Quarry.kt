@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl
 
-import com.sk89q.worldguard.protection.flags.Flags
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
@@ -28,7 +27,6 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
-import xyz.xenondevs.nova.util.protection.WorldGuardUtils
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.texture.BlockTexture
@@ -218,13 +216,6 @@ class Quarry(
     
     private fun drill() {
         val block = pointerDestination!!.block
-        
-        if (!ProtectionUtils.canBreak(ownerUUID, block.location)) {
-            // trying to mine a protected area
-            TileEntityManager.destroyAndDropTileEntity(this, true)
-            return
-        }
-        
         spawnDrillParticles(block)
         
         val drillSpeed = min(DRILL_SPEED_CLAMP, block.type.breakSpeed * DRILL_SPEED_MULTIPLIER)
@@ -293,7 +284,7 @@ class Quarry(
             minX + 1, 0, minZ + 1,
             maxX - 1, y - 2, maxZ - 1
         )
-            .filter { it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null }
+            .filter { ProtectionUtils.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
             .sortedBy { it.distance(pointerLocation) }
             .maxByOrNull { it.y }
             ?.center()
