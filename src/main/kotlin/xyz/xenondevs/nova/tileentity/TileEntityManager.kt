@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.serialization.JsonElementDataType
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -204,18 +205,19 @@ object TileEntityManager : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleInteract(event: PlayerInteractEvent) {
         val action = event.action
+        val player = event.player
         if (action == Action.RIGHT_CLICK_BLOCK && !event.player.isSneaking) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
-            tileEntity?.handleRightClick(event)
+            if (tileEntity != null && ProtectionUtils.canUse(player, block.location)) tileEntity.handleRightClick(event)
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             if (block.type == Material.BARRIER
                 && event.player.gameMode == GameMode.SURVIVAL
-                && getTileEntityAt(block.location) != null) {
+                && getTileEntityAt(block.location) != null
+                && ProtectionUtils.canBreak(player, block.location)) {
                 
                 event.isCancelled = true
-                val player = event.player
                 Bukkit.getPluginManager().callEvent(BlockBreakEvent(block, player))
                 player.playSound(block.location, Sound.BLOCK_STONE_BREAK, 1f, 1f)
             }

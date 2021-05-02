@@ -12,6 +12,7 @@ repositories {
     maven { url = uri("https://libraries.minecraft.net/") }
     maven { url = uri("https://repo.maven.apache.org/maven2/") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
+    maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
 }
 
 dependencies {
@@ -26,6 +27,8 @@ dependencies {
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.4"
     compileOnly "com.github.TechFortress:GriefPrevention:16.17.1"
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+    compileOnly "com.plotsquared:PlotSquared-Core:5.13.11"
+    compileOnly "com.plotsquared:PlotSquared-Bukkit:5.13.11"
     shadow "junit:junit:3.8.2"
 }
 

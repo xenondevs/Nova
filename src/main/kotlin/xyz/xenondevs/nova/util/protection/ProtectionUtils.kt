@@ -19,13 +19,16 @@ object ProtectionUtils {
     fun canPlace(offlinePlayer: OfflinePlayer, location: Location) =
         WorldGuardUtils.canPlace(offlinePlayer, location)
             && GriefPreventionUtils.canPlace(offlinePlayer, location)
+            && PlotSquaredUtils.isAllowed(offlinePlayer, location)
     
     fun canBreak(offlinePlayer: OfflinePlayer, location: Location) =
         WorldGuardUtils.canBreak(offlinePlayer, location)
             && GriefPreventionUtils.canBreak(offlinePlayer, location)
+            && PlotSquaredUtils.isAllowed(offlinePlayer, location)
     
     fun canUse(offlinePlayer: OfflinePlayer, location: Location) =
         WorldGuardUtils.canUse(offlinePlayer, location)
             && GriefPreventionUtils.canBreak(offlinePlayer, location)
+            && PlotSquaredUtils.isAllowed(offlinePlayer, location)
     
 }
