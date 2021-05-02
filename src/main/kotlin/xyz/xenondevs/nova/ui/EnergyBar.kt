@@ -28,7 +28,7 @@ class EnergyBar(
     
     init {
         updateEnergyValues()
-        (height downTo y).withIndex().forEach { (index, y) -> gui.setItem(x, y, energyItems[index]) }
+        ((y + height - 1) downTo y).withIndex().forEach { (index, y) -> gui.setItem(x, y, energyItems[index]) }
     }
     
     fun update() {

@@ -8,7 +8,6 @@ import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Axis
 import org.bukkit.Location
-import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
@@ -25,6 +24,8 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.AddNumberItem
+import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import xyz.xenondevs.particle.ParticleBuilder
@@ -441,44 +442,20 @@ class Quarry(
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
-            .addIngredient('m', ChangeSizeItem(
-                -1,
-                NovaMaterial.MINUS_ON_BUTTON.createBasicItemBuilder(),
-                NovaMaterial.MINUS_OFF_BUTTON.createBasicItemBuilder()
-            ).also(sizeItems::add))
-            .addIngredient('p', ChangeSizeItem(1,
-                NovaMaterial.PLUS_ON_BUTTON.createBasicItemBuilder(),
-                NovaMaterial.PLUS_OFF_BUTTON.createBasicItemBuilder()
-            ).also(sizeItems::add))
+            .addIngredient('m', AddNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('p', RemoveNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
             .build()
             .also { it.fillRectangle(4, 2, 3, inventory, true) }
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, energyPerTick) }
         
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Quarry", gui).show()
+        private fun setSize(size: Int) {
+            resize(size, size)
+            sizeItems.forEach(Item::notifyWindows)
         }
         
-        private inner class ChangeSizeItem(
-            private val sizeModifier: Int,
-            private val onBuilder: ItemBuilder,
-            private val offBuilder: ItemBuilder
-        ) : BaseItem() {
-            
-            override fun getItemBuilder() = if (canModify()) onBuilder else offBuilder
-            
-            override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-                if (canModify()) {
-                    player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-                    val size = sizeX + sizeModifier
-                    resize(size, size)
-                    
-                    sizeItems.forEach(Item::notifyWindows)
-                }
-            }
-            
-            private fun canModify() = sizeX + sizeModifier in MIN_SIZE..MAX_SIZE
-            
+        fun openWindow(player: Player) {
+            SimpleWindow(player, "Quarry", gui).show()
         }
         
         private inner class NumberDisplayItem(private val getNumber: () -> Int) : BaseItem() {

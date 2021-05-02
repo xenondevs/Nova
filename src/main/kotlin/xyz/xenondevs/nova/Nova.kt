@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.recipe.RecipeManager
+import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
@@ -26,6 +27,7 @@ class Nova : JavaPlugin() {
         NovaConfig.init()
         AdvancementManager.loadAdvancements()
         RecipeManager.registerRecipes()
+        ChunkLoadManager.init()
         VanillaTileEntityManager.init()
         TileEntityManager.init()
         NetworkManager.init()

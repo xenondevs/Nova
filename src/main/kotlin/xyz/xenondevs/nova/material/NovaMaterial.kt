@@ -43,6 +43,7 @@ enum class NovaMaterial(
     SOLAR_PANEL("Solar Panel", blockOf(9), null, blockOf(9), BARRIER, ::SolarPanel),
     QUARRY("Quarry", blockOf(10), null, blockOf(10), COBBLESTONE, ::Quarry),
     ELECTRICAL_FURNACE("Electrical Furnace", blockOf(11), null, blockOf(11), COBBLESTONE, ::ElectricalFurnace),
+    CHUNK_LOADER("Chunk Loader", blockOf(12), null, blockOf(12), COBBLESTONE, ::ChunkLoader),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),

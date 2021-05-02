@@ -66,5 +66,10 @@
     "move_speed": 0.15,
     "drill_speed_multiplier": 0.25,
     "drill_speed_clamp": 0.5
+  },
+  "chunk_loader": {
+    "capacity": 100000,
+    "energy_per_chunk": 250,
+    "max_range": 3
   }
 }

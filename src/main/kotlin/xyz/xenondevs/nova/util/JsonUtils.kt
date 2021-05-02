@@ -22,6 +22,7 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter(LocationSerializer)
         .registerTypeHierarchyAdapter(LocationDeserializer)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
+        .enableComplexMapKeySerialization()
         .create()
 
 fun JsonObject.hasString(property: String) =

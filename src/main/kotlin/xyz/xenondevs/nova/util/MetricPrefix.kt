@@ -42,7 +42,7 @@ enum class MetricPrefix(exponent: Int, val prefixName: String, val prefixSymbol:
         
         fun getMetricString(number: BigDecimal, unit: String, short: Boolean, vararg ignoredPrefixes: MetricPrefix): String {
             val closest = findBestPrefix(number, *ignoredPrefixes)
-            val resultNumber = closest.first
+            val resultNumber = closest.first.toPlainString()
             val prefix = closest.second
             val prefixString = if (short) prefix.prefixSymbol else prefix.prefixName
             return "$resultNumber $prefixString$unit"

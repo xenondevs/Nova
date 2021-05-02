@@ -13,6 +13,6 @@ object JsonElementDataType : PersistentDataType<String, JsonElement> {
     
     override fun toPrimitive(complex: JsonElement, context: PersistentDataAdapterContext) = complex.toString()
     
-    override fun fromPrimitive(primitive: String, context: PersistentDataAdapterContext): JsonElement = JsonParser().parse(primitive)
+    override fun fromPrimitive(primitive: String, context: PersistentDataAdapterContext): JsonElement = JsonParser.parseString(primitive)
     
 }
