@@ -86,18 +86,6 @@ open class PowerCell(
         
     }
     
-    companion object {
-        
-        fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
-            val builder = material.createBasicItemBuilder()
-            val energy = tileEntity?.let { (tileEntity as PowerCell).energy } ?: 0
-            val maxEnergy = tileEntity?.let { (tileEntity as PowerCell).maxEnergy } ?: 0
-            builder.addLoreLines(EnergyUtils.getEnergyString(energy, maxEnergy))
-            return builder
-        }
-        
-    }
-    
 }
 
 class BasicPowerCell(

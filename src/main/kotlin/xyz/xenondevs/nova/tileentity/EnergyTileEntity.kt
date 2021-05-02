@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
+import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -8,6 +9,8 @@ import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
+import xyz.xenondevs.nova.tileentity.impl.FurnaceGenerator
+import xyz.xenondevs.nova.util.EnergyUtils
 import java.util.*
 
 abstract class EnergyTileEntity(
@@ -51,6 +54,17 @@ abstract class EnergyTileEntity(
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
         NetworkManager.handleEndPointRemove(this, unload)
+    }
+    
+    companion object {
+        
+        fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
+            val builder = material.createBasicItemBuilder()
+            val energy = tileEntity?.let { (tileEntity as EnergyTileEntity).energy } ?: 0
+            builder.addLoreLines("§7" + EnergyUtils.getEnergyString(energy))
+            return builder
+        }
+        
     }
     
 }

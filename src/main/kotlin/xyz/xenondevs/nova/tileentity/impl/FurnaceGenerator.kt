@@ -144,15 +144,4 @@ class FurnaceGenerator(
         }
     }
     
-    companion object {
-        
-        fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
-            val builder = material.createBasicItemBuilder()
-            val energy = tileEntity?.let { (tileEntity as FurnaceGenerator).energy } ?: 0
-            builder.addLoreLines(EnergyUtils.getEnergyString(energy, MAX_ENERGY))
-            return builder
-        }
-        
-    }
-    
 }

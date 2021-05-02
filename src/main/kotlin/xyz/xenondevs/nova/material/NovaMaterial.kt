@@ -5,6 +5,7 @@ import org.bukkit.Material
 import org.bukkit.Material.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.*
 import xyz.xenondevs.nova.util.toIntArray
@@ -32,18 +33,18 @@ enum class NovaMaterial(
 ) {
     
     // 1 - 1000: Blocks
-    FURNACE_GENERATOR("Furnace Generator", blockOf(1), FurnaceGenerator::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
-    MECHANICAL_PRESS("Mechanical Press", blockOf(2), null, blockOf(2), IRON_BLOCK, ::MechanicalPress),
-    BASIC_POWER_CELL("Basic Power Cell", blockOf(3), PowerCell::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
-    ADVANCED_POWER_CELL("Advanced Power Cell", blockOf(4), PowerCell::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
-    ELITE_POWER_CELL("Elite Power Cell", blockOf(5), PowerCell::createItemBuilder, blockOf(5), IRON_BLOCK, ::ElitePowerCell),
-    ULTIMATE_POWER_CELL("Ultimate Power Cell", blockOf(6), PowerCell::createItemBuilder, blockOf(6), IRON_BLOCK, ::UltimatePowerCell),
-    CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), PowerCell::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
-    PULVERIZER("Pulverizer", blockOf(8), null, blockOf(8), COBBLESTONE, ::Pulverizer),
-    SOLAR_PANEL("Solar Panel", blockOf(9), null, blockOf(9), BARRIER, ::SolarPanel),
-    QUARRY("Quarry", blockOf(10), null, blockOf(10), COBBLESTONE, ::Quarry),
-    ELECTRICAL_FURNACE("Electrical Furnace", blockOf(11), null, blockOf(11), COBBLESTONE, ::ElectricalFurnace),
-    CHUNK_LOADER("Chunk Loader", blockOf(12), null, blockOf(12), COBBLESTONE, ::ChunkLoader),
+    FURNACE_GENERATOR("Furnace Generator", blockOf(1), EnergyTileEntity::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
+    MECHANICAL_PRESS("Mechanical Press", blockOf(2), EnergyTileEntity::createItemBuilder, blockOf(2), IRON_BLOCK, ::MechanicalPress),
+    BASIC_POWER_CELL("Basic Power Cell", blockOf(3), EnergyTileEntity::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
+    ADVANCED_POWER_CELL("Advanced Power Cell", blockOf(4), EnergyTileEntity::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
+    ELITE_POWER_CELL("Elite Power Cell", blockOf(5), EnergyTileEntity::createItemBuilder, blockOf(5), IRON_BLOCK, ::ElitePowerCell),
+    ULTIMATE_POWER_CELL("Ultimate Power Cell", blockOf(6), EnergyTileEntity::createItemBuilder, blockOf(6), IRON_BLOCK, ::UltimatePowerCell),
+    CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), EnergyTileEntity::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
+    PULVERIZER("Pulverizer", blockOf(8), EnergyTileEntity::createItemBuilder, blockOf(8), COBBLESTONE, ::Pulverizer),
+    SOLAR_PANEL("Solar Panel", blockOf(9), EnergyTileEntity::createItemBuilder, blockOf(9), BARRIER, ::SolarPanel),
+    QUARRY("Quarry", blockOf(10), EnergyTileEntity::createItemBuilder, blockOf(10), COBBLESTONE, ::Quarry),
+    ELECTRICAL_FURNACE("Electrical Furnace", blockOf(11), EnergyTileEntity::createItemBuilder, blockOf(11), COBBLESTONE, ::ElectricalFurnace),
+    CHUNK_LOADER("Chunk Loader", blockOf(12), EnergyTileEntity::createItemBuilder, blockOf(12), COBBLESTONE, ::ChunkLoader),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
