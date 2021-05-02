@@ -36,7 +36,6 @@ import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
-import kotlin.random.Random
 
 private val SCAFFOLDING_STACKS = NovaMaterial.SCAFFOLDING.block!!.let { modelData -> modelData.dataArray.indices.map { modelData.getItem(it) } }
 private val FULL_HORIZONTAL = SCAFFOLDING_STACKS[0]
@@ -225,8 +224,7 @@ class Quarry(
         updateBreakState(block)
         
         if (drillProgress >= 1f) { // is done drilling
-            spawnBreakParticles(block)
-            playBreakSound(block)
+            block.playBreakEffects()
             
             val tileEntity = TileEntityManager.getTileEntityAt(block.location)
             
@@ -305,21 +303,6 @@ class Quarry(
             .flatMap { it.entities.toList() }
             .filterIsInstance<Player>()
             .forEach { ReflectionUtils.sendPacket(it, breakPacket) }
-    }
-    
-    private fun spawnBreakParticles(block: Block) {
-        ParticleBuilder(ParticleEffect.BLOCK_CRACK, block.location.add(0.5, 0.5, 0.5))
-            .setParticleData(BlockTexture(block.type))
-            .setOffsetX(0.2f)
-            .setOffsetY(0.2f)
-            .setOffsetZ(0.2f)
-            .setAmount(50)
-            .display()
-    }
-    
-    private fun playBreakSound(block: Block) {
-        val breakSound = SoundUtils.getSoundEffects(block)[0]
-        world.playSound(block.location, breakSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
     }
     
     private fun spawnDrillParticles(block: Block) {
