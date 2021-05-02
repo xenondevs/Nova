@@ -45,7 +45,7 @@ private val CORNER_DOWN = SCAFFOLDING_STACKS[2]
 private val SMALL_HORIZONTAL = SCAFFOLDING_STACKS[3]
 private val FULL_SLIM_VERTICAL = SCAFFOLDING_STACKS[4]
 private val SLIM_VERTICAL_DOWN = SCAFFOLDING_STACKS[5]
-private val DRILL = SCAFFOLDING_STACKS[6]
+private val DRILL = NovaMaterial.NETHERITE_DRILL.createItemStack()
 
 private val MIN_SIZE = NovaConfig.getInt("quarry.min_size")!!
 private val MAX_SIZE = NovaConfig.getInt("quarry.max_size")!!

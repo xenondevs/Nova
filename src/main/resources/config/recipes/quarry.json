@@ -1,0 +1,26 @@
+{
+  "result": "nova:quarry",
+  "shape": [
+    "ppp",
+    "sgs",
+    "pdp"
+  ],
+  "ingredients": [
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "s",
+      "item": "nova:scaffolding"
+    },
+    {
+      "char": "g",
+      "item": "nova:diamond_gear"
+    },
+    {
+      "char": "d",
+      "item": "nova:netherite_drill"
+    }
+  ]
+}

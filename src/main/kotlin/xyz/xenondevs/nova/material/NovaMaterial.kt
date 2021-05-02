@@ -68,6 +68,7 @@ enum class NovaMaterial(
     EMERALD_DUST("Emerald Dust", itemOf(1024)),
     LAPIS_DUST("Lapis Dust", itemOf(1025)),
     COAL_DUST("Coal Dust", itemOf(1026)),
+    NETHERITE_DRILL("Netherite Drill", itemOf(1030)),
     
     // 2000 - 3000: Upgrades and similar
     WRENCH("Wrench", itemOf(2000)),
@@ -79,7 +80,7 @@ enum class NovaMaterial(
     ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray() + (5025..5033).toIntArray()), null, ::EliteCable),
     ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), null, ::UltimateCable),
     CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), null, ::CreativeCable),
-    SCAFFOLDING("", structureBlockOf(5035), null, structureBlockOf((5034..5040).toIntArray()), null, null),
+    SCAFFOLDING("Quarry Scaffolding", itemOf(5040), null, itemOf((5041..5046).toIntArray()), null, null),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),

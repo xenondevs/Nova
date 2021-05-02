@@ -1,0 +1,22 @@
+{
+  "result": "nova:scaffolding",
+  "shape": [
+    "bbb",
+    "iyi",
+    "bbb"
+  ],
+  "ingredients": [
+    {
+      "char": "b",
+      "item": "minecraft:iron_block"
+    },
+    {
+      "char": "i",
+      "item": "minecraft:iron_bars"
+    },
+    {
+      "char": "y",
+      "item": "minecraft:yellow_dye"
+    }
+  ]
+}

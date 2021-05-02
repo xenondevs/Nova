@@ -1,0 +1,22 @@
+{
+  "result": "nova:netherite_drill",
+  "shape": [
+    "ppp",
+    " g ",
+    " b "
+  ],
+  "ingredients": [
+    {
+      "char": "g",
+      "item": "nova:netherite_gear"
+    },
+    {
+      "char": "p",
+      "item": "nova:netherite_plate"
+    },
+    {
+      "char": "b",
+      "item": "minecraft:netherite_block"
+    }
+  ]
+}
