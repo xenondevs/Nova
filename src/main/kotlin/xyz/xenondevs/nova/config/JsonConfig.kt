@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.config
 
 import com.google.gson.*
 import org.intellij.lang.annotations.RegExp
+import xyz.xenondevs.nova.util.GSON
 import xyz.xenondevs.nova.util.isNumber
 import xyz.xenondevs.nova.util.isString
 import xyz.xenondevs.nova.util.set
@@ -42,7 +43,7 @@ open class JsonConfig {
     
     fun save(formatted: Boolean = true) {
         if (file == null) throw IllegalStateException("This config has no file")
-        val text = (if (formatted) PRETTY_PRINTING_GSON else GSON).toJson(config)
+        val text = (if (formatted) GSON else MINIFIED_GSON).toJson(config)
         file.writeText(text, Charsets.UTF_8)
     }
     
@@ -196,8 +197,7 @@ open class JsonConfig {
     operator fun minusAssign(path: String) = remove(path)
     
     companion object {
-        val GSON = Gson()
-        val PRETTY_PRINTING_GSON = GsonBuilder().setPrettyPrinting().create()!!
+        private val MINIFIED_GSON = Gson()
         
         @RegExp
         val PATH_SPLIT_REGEX = Regex("""(?<!\\)\Q.\E""")
