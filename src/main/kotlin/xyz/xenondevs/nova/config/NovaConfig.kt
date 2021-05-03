@@ -2,10 +2,7 @@ package xyz.xenondevs.nova.config
 
 import com.google.gson.JsonParser
 import xyz.xenondevs.nova.recipe.NovaRecipe
-import xyz.xenondevs.nova.serialization.NovaRecipeDeserializer
-import xyz.xenondevs.nova.util.getResourceAsStream
-import xyz.xenondevs.nova.util.getResourceData
-import xyz.xenondevs.nova.util.getResources
+import xyz.xenondevs.nova.util.*
 import java.io.File
 
 object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
@@ -36,7 +33,7 @@ object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
         recipesDirectory.walkTopDown().filter(File::isFile).forEach { file ->
             try {
                 val element = file.reader().use(JsonParser::parseReader)
-                val recipe = NovaRecipeDeserializer.deserialize(element, null, null) // FIXME When deserializing with GSON: NovaRecipeDeserializer is never called
+                val recipe = GSON.fromJson<NovaRecipe>(element)!!
                 recipes += recipe
             } catch (ex: IllegalArgumentException) {
                 throw IllegalStateException("Invalid recipe in file ${file.name}.", ex)
