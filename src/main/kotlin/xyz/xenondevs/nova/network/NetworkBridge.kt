@@ -20,12 +20,6 @@ interface NetworkBridge : NetworkNode {
     val bridgeFaces: Set<BlockFace>
     
     /**
-     * Caches the directly connected nodes.
-     * Should be updated when handleNetworkUpdate is called.
-     */
-    val connectedNodes: Map<NetworkType, Map<BlockFace, NetworkNode>>
-    
-    /**
      * Called when another [NetworkNode] has ben placed
      * or broken right next to this node.
      *
@@ -35,31 +29,6 @@ interface NetworkBridge : NetworkNode {
      * to additional sides.
      */
     fun handleNetworkUpdate()
-    
-    /**
-     * Finds the nodes directly connected to this [NetworkBridge] on each side
-     * of the block.
-     *
-     * Will always contain the [NetworkType] keys, but only contain the [BlockFace]s that
-     * actually have a [NetworkNode] connected to them.
-     */
-    fun findConnectedNodes(): Map<NetworkType, Map<BlockFace, NetworkNode>> {
-        val connectedNodes = EnumMap<NetworkType, EnumMap<BlockFace, NetworkNode>>(NetworkType::class.java)
-        NetworkType.values().forEach { connectedNodes[it] = EnumMap(BlockFace::class.java) }
-        
-        for ((face, node) in getNearbyNodes()) {
-            if (!bridgeFaces.contains(face)) continue
-            val oppositeFace = face.oppositeFace
-            if (node is NetworkBridge && !node.bridgeFaces.contains(oppositeFace)) continue
-            for ((networkType, network) in node.getNetworks(oppositeFace)) {
-                if (network == networks[networkType]) {
-                    connectedNodes[networkType]!![face] = node
-                }
-            }
-        }
-        
-        return connectedNodes
-    }
     
     /**
      * Gets a map of attached [NetworkNode]s for each side of this [NetworkBridge].

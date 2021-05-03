@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.network
 
 import com.google.common.base.Preconditions
+import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.util.contentEquals
+import xyz.xenondevs.nova.util.filterIsInstanceValues
 import xyz.xenondevs.nova.util.runTaskTimer
 
 object NetworkManager {
@@ -19,33 +21,59 @@ object NetworkManager {
         val bridgesToUpdate = HashSet<NetworkBridge>()
         NetworkType.values().forEach { networkType ->
             val allowedFaces = endPoint.allowedFaces[networkType]
-            if (allowedFaces != null) {
+            if (allowedFaces != null) { // does the endpoint want to have any connections?
+                // loop over all bridges nearby to possibly connect to
                 endPoint.getNearbyBridges(networkType)
-                    .filter { (face, _) -> allowedFaces.contains(face) }
-                    .forEach { (face, bridge) ->
+                    .filter { (face, bridge) ->
+                        allowedFaces.contains(face) // does the endpoint want a connection at that face
+                            && bridge.bridgeFaces.contains(face.oppositeFace) // does the bridge want a connection at that face
+                    }.forEach { (face, bridge) ->
+                        // add to network
                         val network = bridge.networks[networkType]!!
                         endPoint.setNetwork(networkType, face, network)
                         network.addEndPoint(endPoint, face)
                         bridgesToUpdate += bridge
+                        
+                        // tell the bridge that we connected to it
+                        bridge.connectedNodes[networkType]!![face.oppositeFace] = endPoint
+                        
+                        // remember that we connected to it
+                        endPoint.connectedNodes[networkType]!![face] = bridge
                     }
             }
         }
+        
         bridgesToUpdate.forEach(NetworkBridge::handleNetworkUpdate)
     }
     
     fun handleBridgeAdd(bridge: NetworkBridge, vararg supportedNetworkTypes: NetworkType) {
         Preconditions.checkArgument(supportedNetworkTypes.isNotEmpty(), "Bridge needs to support at least one network type")
         
+        val nearbyNodes: Map<BlockFace, NetworkNode> = bridge.getNearbyNodes()
+        val nearbyBridges: Map<BlockFace, NetworkBridge> = nearbyNodes.filterIsInstanceValues()
+        val nearbyEndPoints: Map<BlockFace, NetworkEndPoint> = nearbyNodes.filterIsInstanceValues()
+        
         supportedNetworkTypes.forEach { networkType ->
-            
             val previousNetworks = HashSet<Network>()
-            bridge.getNearbyBridges(networkType).forEach { (face, otherBridge) ->
+            nearbyBridges.forEach { (face, otherBridge) ->
                 if (bridge.bridgeFaces.contains(face)
                     && otherBridge.bridgeFaces.contains(face.oppositeFace)) { // if bridge connects to this bridge
-                    previousNetworks += otherBridge.networks[networkType]!!
+                    
+                    // bridges won't have a network if they haven't been fully initialized yet
+                    if (otherBridge.networks.containsKey(networkType)) {
+                        // a possible network to connect to
+                        previousNetworks += otherBridge.networks[networkType]!!
+                    }
+                    
+                    // tell that bridge we connected to it
+                    otherBridge.connectedNodes[networkType]!![face.oppositeFace] = bridge
+                    
+                    // remember that we connected to it
+                    bridge.connectedNodes[networkType]!![face] = otherBridge
                 }
             }
             
+            // depending on how many possible networks there are, perform the required action
             val network = when {
                 previousNetworks.size > 1 -> {
                     // MERGE NETWORKS
@@ -79,14 +107,22 @@ object NetworkManager {
             bridge.networks[networkType] = network
             network.addBridge(bridge)
             
-            // Connect Storages
-            bridge.getNearbyEndPoints().forEach { (face, endPoint) ->
+            // Connect EndPoints
+            nearbyEndPoints.forEach { (face, endPoint) ->
                 if (bridge.bridgeFaces.contains(face)) {
                     val allowedFaces = endPoint.allowedFaces[networkType]
                     val oppositeFace = face.oppositeFace
                     if (allowedFaces != null && allowedFaces.contains(oppositeFace)) {
+                        
+                        // add to network
                         endPoint.setNetwork(networkType, oppositeFace, network)
                         network.addEndPoint(endPoint, oppositeFace)
+                        
+                        // tell the endpoint that we connected to it
+                        endPoint.connectedNodes[networkType]!![oppositeFace] = bridge
+                        
+                        // remember that we connected to that endpoint
+                        bridge.connectedNodes[networkType]!![face] = endPoint
                     }
                 }
             }
@@ -104,13 +140,20 @@ object NetworkManager {
         endPoint.networks.forEach { (_, networkMap) -> networkMap.forEach { (_, network) -> network.removeNode(endPoint) } }
         endPoint.networks.clear()
         
-        if (!unload) endPoint.updateNearbyBridges()
+        // tell all the connected nodes that we no longer exist
+        endPoint.connectedNodes.forEach { (networkType, faceMap) ->
+            faceMap.forEach { (face, node) ->
+                node.connectedNodes[networkType]!!.remove(face.oppositeFace)
+            }
+        }
+        
+        if(!unload) endPoint.updateNearbyBridges()
     }
     
     fun handleBridgeRemove(bridge: NetworkBridge, unload: Boolean) {
         bridge.networks.forEach { (networkType, currentNetwork) ->
             // get nodes that are directly connected to this bridge
-            val directlyConnected = bridge.connectedNodes[networkType] ?: emptyMap()
+            val directlyConnected = bridge.connectedNodes[networkType]!!
             
             // disconnect nearby EndPoints
             directlyConnected
@@ -118,8 +161,11 @@ object NetworkManager {
                 .forEach { (face, endPoint) ->
                     endPoint as NetworkEndPoint
                     
+                    val oppositeFace = face.oppositeFace
+                    
                     // there is no longer a network connection at this block face
-                    endPoint.removeNetwork(networkType, face.oppositeFace)
+                    endPoint.removeNetwork(networkType, oppositeFace)
+                    endPoint.connectedNodes[networkType]!!.remove(oppositeFace)
                     
                     // remove from network in it's current ConnectionType
                     currentNetwork.removeNode(endPoint)
@@ -131,8 +177,15 @@ object NetworkManager {
                     }
                 }
             
+            val connectedBridges: Map<BlockFace, NetworkBridge> = directlyConnected.filterIsInstanceValues()
+            
+            // remove this bridge from the connectedNodes map of the connected bridges
+            connectedBridges.forEach { (face, bridge) ->
+                bridge.connectedNodes[networkType]!!.remove(face.oppositeFace)
+            }
+            
             // if the bridge was connected to multiple other bridges, split networks
-            if (directlyConnected.filter { (_, node) -> node is NetworkBridge }.count() > 1) {
+            if (connectedBridges.size > 1) {
                 // remove previous network from networks
                 networks -= currentNetwork
                 

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import org.bukkit.block.*
 import xyz.xenondevs.nova.network.Network
 import xyz.xenondevs.nova.network.NetworkManager
+import xyz.xenondevs.nova.network.NetworkNode
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
@@ -12,10 +13,7 @@ import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedRangedBukkitInventory
 import xyz.xenondevs.nova.serialization.JsonElementDataType
 import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
-import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.GSON
-import xyz.xenondevs.nova.util.enumMapOf
-import xyz.xenondevs.nova.util.fromJson
+import xyz.xenondevs.nova.util.*
 import java.util.*
 
 private fun TileState.hasTileEntityData() =
@@ -54,8 +52,9 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     
     override val location = tileState.location
     
-    override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> =
-        EnumMap(NetworkType::class.java)
+    final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = emptyEnumMap()
+    final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
+        NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     
     final override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
         retrieveData(

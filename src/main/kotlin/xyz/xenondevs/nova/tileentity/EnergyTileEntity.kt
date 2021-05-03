@@ -6,11 +6,13 @@ import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.Network
 import xyz.xenondevs.nova.network.NetworkManager
+import xyz.xenondevs.nova.network.NetworkNode
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
-import xyz.xenondevs.nova.tileentity.impl.FurnaceGenerator
 import xyz.xenondevs.nova.util.EnergyUtils
+import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.enumMapOf
 import java.util.*
 
 abstract class EnergyTileEntity(
@@ -19,7 +21,12 @@ abstract class EnergyTileEntity(
     armorStand: ArmorStand
 ) : TileEntity(ownerUUID, material, armorStand), EnergyStorage {
     
+    final override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
+    final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
+        NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
+    
     protected abstract val defaultEnergyConfig: MutableMap<BlockFace, EnergyConnectionType>
+    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> by lazy { retrieveData("energyConfig") { defaultEnergyConfig } }
     
     protected var energy: Int = retrieveData("energy") { 0 }
         set(value) {
@@ -27,8 +34,6 @@ abstract class EnergyTileEntity(
             hasEnergyChanged = true
         }
     protected var hasEnergyChanged = true
-    override val networks = EnumMap<NetworkType, MutableMap<BlockFace, Network>>(NetworkType::class.java)
-    override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> by lazy { retrieveData("energyConfig") { defaultEnergyConfig } }
     override val providedEnergy: Int
         get() = energy
     override val requestedEnergy = 0

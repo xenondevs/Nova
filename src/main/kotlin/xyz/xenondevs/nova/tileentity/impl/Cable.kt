@@ -56,12 +56,8 @@ open class Cable(
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = CUBE_FACES.toMutableSet()
     
-    private var _connectedNodes: Map<NetworkType, Map<BlockFace, NetworkNode>>? = null
-    override val connectedNodes: Map<NetworkType, Map<BlockFace, NetworkNode>>
-        get() {
-            if (_connectedNodes == null) _connectedNodes = findConnectedNodes()
-            return _connectedNodes!!
-        }
+    override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
+        NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     
     private val filterInventories = mapOf(
         ItemConnectionType.INSERT to
@@ -75,7 +71,6 @@ open class Cable(
     
     override fun handleNetworkUpdate() {
         if (isValid) {
-            _connectedNodes = findConnectedNodes()
             if (NOVA.isEnabled) {
                 multiModel.replaceModels(getModelsNeeded())
                 updateHitbox()

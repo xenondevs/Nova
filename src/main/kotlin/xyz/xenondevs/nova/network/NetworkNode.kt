@@ -7,7 +7,21 @@ import java.util.*
 
 interface NetworkNode {
     
+    /**
+     * The location of this [NetworkNode]
+     */
     val location: Location
+    
+    /**
+     * Stores the [NetworkNode]s that are connected to this [NetworkNode].
+     *
+     * For [NetworkBridge]s, connected nodes can be [NetworkBridge]s as well as
+     * [NetworkEndPoint]s. For [NetworkEndPoint]s, only [NetworkBridge]s.
+     * 
+     * Should always contain the [NetworkType] keys, but only contain the
+     * [BlockFace]s that actually have a [NetworkNode] connected to them.
+     */
+    val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>>
     
     fun getNetworks(face: BlockFace): Map<NetworkType, Network> {
         return if (this is NetworkBridge) networks
