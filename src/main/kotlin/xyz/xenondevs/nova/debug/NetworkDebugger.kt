@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.debug
 
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
@@ -14,11 +15,13 @@ import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.color.RegularColor
 import java.awt.Color
+import java.util.*
+import kotlin.collections.ArrayList
 
 object NetworkDebugger {
     
-    private val energyDebuggers = ArrayList<Player>()
-    private val itemDebuggers = ArrayList<Player>()
+    private val energyDebuggers = ArrayList<UUID>()
+    private val itemDebuggers = ArrayList<UUID>()
     
     init {
         runTaskTimer(0, 1, ::handleTick)
@@ -27,13 +30,13 @@ object NetworkDebugger {
     fun toggleDebugger(type: NetworkType, player: Player) {
         when (type) {
             NetworkType.ENERGY -> {
-                if (energyDebuggers.contains(player)) energyDebuggers -= player
-                else energyDebuggers += player
+                if (energyDebuggers.contains(player.uniqueId)) energyDebuggers -= player.uniqueId
+                else energyDebuggers += player.uniqueId
             }
             
             NetworkType.ITEMS -> {
-                if (itemDebuggers.contains(player)) itemDebuggers -= player
-                else itemDebuggers += player
+                if (itemDebuggers.contains(player.uniqueId)) itemDebuggers -= player.uniqueId
+                else itemDebuggers += player.uniqueId
             }
         }
     }
@@ -43,7 +46,7 @@ object NetworkDebugger {
         
         NetworkManager.networks
             .forEach { network ->
-                val players = if (network is EnergyNetwork) energyDebuggers else itemDebuggers
+                val players = if (network is EnergyNetwork) energyDebuggers.mapNotNull(Bukkit::getPlayer) else itemDebuggers.mapNotNull(Bukkit::getPlayer)
                 val color = Color(network.hashCode())
                 
                 network.nodes.forEach { node ->
