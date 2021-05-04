@@ -150,7 +150,10 @@ class ElectricalFurnace(
         private val sideConfigGUI = SideConfigGUI(
             this@ElectricalFurnace,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(inputInventory to "Input Inventory", outputInventory to "Output Inventory"),
+            listOf(
+                getNetworkedInventory(inputInventory) to "Input Inventory",
+                getNetworkedInventory(outputInventory) to "Output Inventory"
+            ),
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)

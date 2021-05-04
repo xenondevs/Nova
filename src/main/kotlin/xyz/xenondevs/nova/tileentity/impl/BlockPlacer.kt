@@ -94,7 +94,7 @@ class BlockPlacer(
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(inventory to "BlockPlacer Inventory")
+            listOf(getNetworkedInventory(inventory) to "BlockPlacer Inventory")
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)

@@ -121,7 +121,7 @@ class FurnaceGenerator(
         private val sideConfigGUI = SideConfigGUI(
             this@FurnaceGenerator,
             listOf(NONE, PROVIDE),
-            listOf(inventory to "Fuel Inventory")
+            listOf(getNetworkedInventory(inventory) to "Fuel Inventory")
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)

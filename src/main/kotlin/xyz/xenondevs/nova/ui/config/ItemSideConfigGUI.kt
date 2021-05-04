@@ -4,7 +4,6 @@ import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.structure.Structure
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
@@ -14,6 +13,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
+import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.BlockSide
@@ -23,11 +23,11 @@ private val BUTTON_COLORS = listOf(NovaMaterial.ORANGE_BUTTON, NovaMaterial.BLUE
 class ItemSideConfigGUI(
     val itemStorage: ItemStorage,
     private val allowedTypes: List<ItemConnectionType>,
-    inventoryNames: List<Pair<VirtualInventory, String>>
+    inventoryNames: List<Pair<NetworkedInventory, String>>
 ) : SimpleGUI(8, 3) {
     
     private val inventories = inventoryNames.map { it.first }
-    private val buttonBuilders: Map<VirtualInventory, ItemBuilder> =
+    private val buttonBuilders: Map<NetworkedInventory, ItemBuilder> =
         inventoryNames.toList().withIndex().associate { (index, pair) ->
             pair.first to BUTTON_COLORS[index].createBasicItemBuilder().addLoreLines("§b${pair.second}")
         }
@@ -69,12 +69,12 @@ class ItemSideConfigGUI(
     private fun changeInventory(blockFace: BlockFace, forward: Boolean) {
         NetworkManager.handleEndPointRemove(itemStorage, false)
         
-        val currentInventory = (itemStorage.inventories[blockFace]!! as NetworkedVirtualInventory).virtualInventory
+        val currentInventory = itemStorage.inventories[blockFace]!! as NetworkedVirtualInventory
         var index = inventories.indexOf(currentInventory)
         if (forward) index++ else index--
         if (index < 0) index = inventories.lastIndex
         else if (index == inventories.size) index = 0
-        itemStorage.inventories[blockFace] = NetworkedVirtualInventory(inventories[index])
+        itemStorage.inventories[blockFace] = inventories[index]
         
         NetworkManager.handleEndPointAdd(itemStorage)
     }
@@ -112,7 +112,7 @@ class ItemSideConfigGUI(
         override fun getItemBuilder(): ItemBuilder {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             val inventory = itemStorage.inventories[blockFace]!! as NetworkedVirtualInventory
-            return buttonBuilders[inventory.virtualInventory]!!.clone().setDisplayName("§7$blockSide")
+            return buttonBuilders[inventory]!!.clone().setDisplayName("§7$blockSide")
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

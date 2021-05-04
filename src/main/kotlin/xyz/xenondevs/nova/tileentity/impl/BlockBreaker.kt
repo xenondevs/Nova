@@ -110,7 +110,7 @@ class BlockBreaker(
         private val sideConfigGUI = SideConfigGUI(
             this@BlockBreaker,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(inventory to "BlockBreaker Inventory")
+            listOf(getNetworkedInventory(inventory) to "BlockBreaker Inventory")
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)

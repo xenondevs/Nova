@@ -408,7 +408,7 @@ class Quarry(
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(inventory to "Quarry Inventory")
+            listOf(getNetworkedInventory(inventory) to "Quarry Inventory")
         ) { openWindow(it) }
         
         private val sizeItems = ArrayList<Item>()

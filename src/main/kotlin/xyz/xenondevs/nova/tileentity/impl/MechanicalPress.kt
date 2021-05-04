@@ -125,7 +125,10 @@ class MechanicalPress(
         private val sideConfigGUI = SideConfigGUI(
             this@MechanicalPress,
             listOf(NONE, CONSUME),
-            listOf(inputInv to "Input Inventory", outputInv to "Output Inventory")
+            listOf(
+                getNetworkedInventory(inputInv) to "Input Inventory",
+                getNetworkedInventory(outputInv) to "Output Inventory"
+            )
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)

@@ -7,7 +7,6 @@ import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.resourcepack.Icon
-import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -19,6 +18,7 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
+import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
 
 private val ALLOWED_ITEM_TYPES = listOf(ItemConnectionType.NONE, ItemConnectionType.INSERT, ItemConnectionType.EXTRACT, ItemConnectionType.BUFFER)
@@ -26,7 +26,7 @@ private val ALLOWED_ITEM_TYPES = listOf(ItemConnectionType.NONE, ItemConnectionT
 class SideConfigGUI(
     endPoint: NetworkEndPoint,
     allowedEnergyTypes: List<EnergyConnectionType>?,
-    inventoryNames: List<Pair<VirtualInventory, String>>?,
+    inventoryNames: List<Pair<NetworkedInventory, String>>?,
     openPrevious: (Player) -> Unit
 ) {
     

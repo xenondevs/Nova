@@ -42,6 +42,13 @@ abstract class EnergyItemTileEntity(
         setDefaultInventoryConfig(CUBE_FACES.associateWith { inventory })
     }
     
+    fun getNetworkedInventory(inventory: VirtualInventory): NetworkedInventory {
+        return inventories.values
+            .filterIsInstance<NetworkedVirtualInventory>()
+            .firstOrNull { it.virtualInventory == inventory } 
+            ?: NetworkedVirtualInventory(inventory)
+    }
+    
     override fun saveData() {
         super.saveData()
         storeData("itemConfig", itemConfig)
