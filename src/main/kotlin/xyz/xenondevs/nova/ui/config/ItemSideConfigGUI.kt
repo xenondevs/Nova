@@ -111,7 +111,7 @@ class ItemSideConfigGUI(
         
         override fun getItemBuilder(): ItemBuilder {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
-            val inventory = itemStorage.inventories[blockFace]!! as NetworkedVirtualInventory
+            val inventory = itemStorage.inventories[blockFace]!!
             return buttonBuilders[inventory]!!.clone().setDisplayName("§7$blockSide")
         }
         

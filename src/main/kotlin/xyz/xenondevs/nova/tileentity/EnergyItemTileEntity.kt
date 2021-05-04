@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
 import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.filterIsInstanceValues
 import java.util.*
 
 abstract class EnergyItemTileEntity(
@@ -34,7 +35,17 @@ abstract class EnergyItemTileEntity(
         inventories = inventoryConfig.mapValuesTo(EnumMap(BlockFace::class.java)) { NetworkedVirtualInventory(it.value) }
     }
     
+    @JvmName("initInventories1")
+    private fun initInventories(inventoryConfig: Map<BlockFace, NetworkedInventory>) {
+        inventories = inventoryConfig.mapValuesTo(EnumMap(BlockFace::class.java)) { it.value }
+    }
+    
     fun setDefaultInventoryConfig(inventoryConfig: Map<BlockFace, VirtualInventory>) {
+        if (!::inventories.isInitialized) initInventories(inventoryConfig)
+    }
+    
+    @JvmName("setDefaultInventoryConfig1")
+    fun setDefaultNetworkedInventoryConfig(inventoryConfig: Map<BlockFace, NetworkedInventory>) {
         if (!::inventories.isInitialized) initInventories(inventoryConfig)
     }
     
@@ -42,18 +53,22 @@ abstract class EnergyItemTileEntity(
         setDefaultInventoryConfig(CUBE_FACES.associateWith { inventory })
     }
     
+    fun setDefaultInventory(inventory: NetworkedInventory) {
+        setDefaultNetworkedInventoryConfig(CUBE_FACES.associateWith { inventory })
+    }
+    
     fun getNetworkedInventory(inventory: VirtualInventory): NetworkedInventory {
         return inventories.values
             .filterIsInstance<NetworkedVirtualInventory>()
-            .firstOrNull { it.virtualInventory == inventory } 
+            .firstOrNull { it.virtualInventory == inventory }
             ?: NetworkedVirtualInventory(inventory)
     }
     
     override fun saveData() {
         super.saveData()
         storeData("itemConfig", itemConfig)
-        storeData("inventoryConfig", inventories.mapValuesTo(EnumMap(BlockFace::class.java))
-        { (it.value as NetworkedVirtualInventory).virtualInventory.uuid })
+        storeData("inventoryConfig", inventories.filterIsInstanceValues<NetworkedVirtualInventory, BlockFace, NetworkedInventory>()
+            .mapValuesTo(EnumMap(BlockFace::class.java)) { it.value.virtualInventory.uuid })
     }
     
 }

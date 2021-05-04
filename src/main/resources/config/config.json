@@ -81,5 +81,8 @@
   "block_placer": {
     "capacity": 10000,
     "energy_per_place": 500
+  },
+  "item_storage_unit": {
+    "max_items": 2147483647
   }
 }
