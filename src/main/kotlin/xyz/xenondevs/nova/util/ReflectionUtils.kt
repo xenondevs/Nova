@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
@@ -27,9 +28,12 @@ import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_COMMAND_LISTENER_WRAPPER_G
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_ARMOR_STAND_ARMOR_ITEMS_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_GET_BUKKIT_ENTITY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_PLAYER_PLAYER_CONNECTION_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_MINECRAFT_KEY_CONSTRUCTOR
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKAGE_PATH
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_BLOCK_BREAK_ANIMATION_CONSTRUCTOR
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PLAYER_CONNECTION_SEND_PACKET_METHOD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_REGISTRY_BLOCKS
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_REGISTRY_BLOCKS_GET_METHOD
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -174,6 +178,11 @@ object ReflectionUtils {
     
     fun getNMSBlock(block: Block): Any {
         return CB_CRAFT_BLOCK_GET_NMS_BLOCK_METHOD.invoke(block)
+    }
+    
+    fun getNMSBlock(material: Material): Any {
+        val minecraftKey = NMS_MINECRAFT_KEY_CONSTRUCTOR.newInstance(material.key.toString())
+        return NMS_REGISTRY_BLOCKS_GET_METHOD.invoke(NMS_REGISTRY_BLOCKS, minecraftKey)
     }
     
 }

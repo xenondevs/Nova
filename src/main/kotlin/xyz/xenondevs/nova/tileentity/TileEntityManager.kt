@@ -74,7 +74,7 @@ object TileEntityManager : Listener {
         runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
     }
     
-    private fun placeTileEntity(
+    fun placeTileEntity(
         ownerUUID: UUID,
         location: Location,
         yaw: Float,

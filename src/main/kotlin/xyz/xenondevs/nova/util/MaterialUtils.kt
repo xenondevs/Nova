@@ -1,13 +1,16 @@
 package xyz.xenondevs.nova.util
 
 import de.studiocode.invui.item.ItemBuilder
+import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.RecipeChoice.MaterialChoice
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.recipe.NovaRecipeChoice
 import kotlin.math.absoluteValue
+import kotlin.random.Random
 
 fun Material.isGlass() = name.endsWith("GLASS") || name.endsWith("GLASS_PANE")
 
@@ -32,6 +35,11 @@ val ItemStack.novaMaterial: NovaMaterial?
             && itemMeta!!.hasCustomModelData()
             && itemMeta!!.customModelData == itemStack.itemMeta!!.customModelData
     }
+
+fun Material.playPlaceSoundEffect(location: Location) {
+    val placeSound = SoundUtils.getSoundEffects(this)[2]
+    location.world!!.playSound(location, placeSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
+}
 
 @Suppress("LiftReturnOrAssignment", "CascadeIf")
 object MaterialUtils {

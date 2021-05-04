@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.util
 
 import org.bukkit.Material
 import org.bukkit.Sound
-import org.bukkit.block.Block
 import java.util.*
 
 object SoundUtils {
@@ -18,10 +17,10 @@ object SoundUtils {
      * 4. hit sound
      * 5. fall sound
      */
-    fun getSoundEffects(block: Block): List<Sound> {
-        if (soundCache.containsKey(block.type)) return soundCache[block.type]!!
+    fun getSoundEffects(material: Material): List<Sound> {
+        if (soundCache.containsKey(material)) return soundCache[material]!!
         
-        val nmsBlock = ReflectionUtils.getNMSBlock(block)
+        val nmsBlock = ReflectionUtils.getNMSBlock(material)
         val soundEffectType = ReflectionRegistry.NMS_BLOCK_GET_SOUND_EFFECT_TYPE_METHOD.invoke(nmsBlock, null)
         val breakSound = ReflectionRegistry.NMS_SOUND_EFFECT_TYPE_BREAK_SOUND_FIELD.get(soundEffectType)
         val stepSound = ReflectionRegistry.NMS_SOUND_EFFECT_TYPE_STEP_SOUND_FIELD.get(soundEffectType)
@@ -36,7 +35,7 @@ object SoundUtils {
             toBukkitSound(hitSound),
             toBukkitSound(fallSound)
         )
-        soundCache[block.type] = sounds
+        soundCache[material] = sounds
         
         return sounds
     }

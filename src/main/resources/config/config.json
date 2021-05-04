@@ -71,5 +71,15 @@
     "capacity": 100000,
     "energy_per_chunk": 250,
     "max_range": 3
+  },
+  "block_breaker": {
+    "capacity": 10000,
+    "energy_per_tick": 20,
+    "break_speed_multiplier": 0.1,
+    "break_speed_clamp": 0.5
+  },
+  "block_placer": {
+    "capacity": 10000,
+    "energy_per_place": 500
   }
 }

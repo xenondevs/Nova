@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
+import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.event.player.PlayerInteractEvent
@@ -14,6 +15,8 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.util.*
 import java.util.*
+
+internal val SELF_UPDATE_REASON = object : UpdateReason {}
 
 abstract class TileEntity(
     ownerUUID: UUID?,

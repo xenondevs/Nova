@@ -222,16 +222,10 @@ class Quarry(
         drillProgress += drillSpeed
         pointerLocation.y -= drillSpeed - max(0.0, drillProgress - 1)
         
-        updateBreakState(block)
+        block.setBreakState(entityId, (drillProgress * 9).roundToInt())
         
         if (drillProgress >= 1f) { // is done drilling
-            block.playBreakEffects()
-            
-            val tileEntity = TileEntityManager.getTileEntityAt(block.location)
-            
-            val drops = if (tileEntity != null) TileEntityManager.destroyTileEntity(tileEntity, true)
-            else block.breakAndTakeDrops()
-            
+            val drops = block.breakAndTakeDrops()
             drops.forEach { drop ->
                 val leftover = inventory.addItem(null, drop)
                 if (leftover != 0) {
@@ -291,19 +285,6 @@ class Quarry(
         
         pointerDestination = destination
         return destination
-    }
-    
-    private fun updateBreakState(block: Block) {
-        val breakPacket = ReflectionUtils.createBlockBreakAnimationPacket(
-            entityId,
-            ReflectionUtils.createBlockPosition(block.location),
-            (drillProgress * 9).roundToInt()
-        )
-        
-        block.chunk.getSurroundingChunks(1, true)
-            .flatMap { it.entities.toList() }
-            .filterIsInstance<Player>()
-            .forEach { ReflectionUtils.sendPacket(it, breakPacket) }
     }
     
     private fun spawnDrillParticles(block: Block) {
