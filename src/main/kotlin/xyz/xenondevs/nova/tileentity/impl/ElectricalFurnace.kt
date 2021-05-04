@@ -39,7 +39,7 @@ private fun getRecipe(input: ItemStack) =
 
 private val MAX_ENERGY = NovaConfig.getInt("electrical_furnace.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("electrical_furnace.energy_per_tick")!!
-private val COOK_SPEED = NovaConfig.getInt("electrical_furnace.")!!
+private val COOK_SPEED = NovaConfig.getInt("electrical_furnace.cook_speed")!!
 
 class ElectricalFurnace(
     ownerUUID: UUID?,
