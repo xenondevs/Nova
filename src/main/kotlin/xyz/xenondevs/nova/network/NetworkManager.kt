@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.network
 import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.util.contentEquals
+import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.filterIsInstanceValues
 import xyz.xenondevs.nova.util.runTaskTimer
 
@@ -139,6 +140,7 @@ object NetworkManager {
     fun handleEndPointRemove(endPoint: NetworkEndPoint, unload: Boolean) {
         endPoint.networks.forEach { (_, networkMap) -> networkMap.forEach { (_, network) -> network.removeNode(endPoint) } }
         endPoint.networks.clear()
+        NetworkType.values().forEach { endPoint.connectedNodes[it] = enumMapOf() }
         
         // tell all the connected nodes that we no longer exist
         endPoint.connectedNodes.forEach { (networkType, faceMap) ->
@@ -224,7 +226,9 @@ object NetworkManager {
                 bridge.networks.remove(networkType)
             }
         }
-        
+    
+        NetworkType.values().forEach { bridge.connectedNodes[it] = enumMapOf() }
+    
         // update nearby bridges
         if (!unload) bridge.updateNearbyBridges()
     }

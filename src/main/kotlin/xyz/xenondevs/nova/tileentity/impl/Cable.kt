@@ -54,7 +54,7 @@ open class Cable(
 ), EnergyBridge, ItemBridge {
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
-    override val bridgeFaces = CUBE_FACES.toMutableSet()
+    override val bridgeFaces = retrieveData("bridgeFaces") { CUBE_FACES.toMutableSet() }
     
     override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
@@ -68,6 +68,11 @@ open class Cable(
     
     private val multiModel = getMultiModel("cableModels")
     private val hitboxes = ArrayList<Hitbox>()
+    
+    override fun saveData() {
+        super.saveData()
+        storeData("bridgeFaces", bridgeFaces)
+    }
     
     override fun handleNetworkUpdate() {
         if (isValid) {
@@ -171,11 +176,11 @@ open class Cable(
             val pointA: Point3D
             val pointB: Point3D
             if (connectedNodes.values.any { it.containsKey(blockFace) }) {
-                pointA = Point3D(0.35, 0.35, 0.0)
-                pointB = Point3D(0.65, 0.65, 0.5)
+                pointA = Point3D(0.3, 0.3, 0.0)
+                pointB = Point3D(0.7, 0.7, 0.5)
             } else {
-                pointA = Point3D(0.35, 0.35, 0.3)
-                pointB = Point3D(0.65, 0.65, 0.5)
+                pointA = Point3D(0.3, 0.3, 0.3)
+                pointB = Point3D(0.7, 0.7, 0.5)
             }
             
             val origin = Point3D(0.5, 0.5, 0.5)
@@ -283,7 +288,6 @@ open class Cable(
         }
     }
     
-    override fun saveData() = Unit
     
     override fun handleTick() = Unit
     
