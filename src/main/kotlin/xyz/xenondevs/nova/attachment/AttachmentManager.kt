@@ -17,8 +17,7 @@ object AttachmentManager : Listener {
     
     fun init() {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
-        println(PermanentStorage.retrieveOrNull<ArrayList<Attachment>>("attachments")?.count())
-        println(attachments.size)
+        PermanentStorage.retrieveOrNull<ArrayList<Attachment>>("attachments")
         NOVA.disableHandlers.add {
             PermanentStorage.store("attachments", attachments)
             attachments.forEach(Attachment::despawn)
