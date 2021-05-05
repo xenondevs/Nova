@@ -24,6 +24,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.5.0"
     compileOnly "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"
     compileOnly "com.mojang:brigadier:1.0.17"
+    compileOnly 'com.mojang:datafixerupper:1.0.20'
     compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.4"
     compileOnly "com.github.TechFortress:GriefPrevention:16.17.1"
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
