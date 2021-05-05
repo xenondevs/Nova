@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.inventory.CustomUpdateReason
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -61,6 +62,7 @@ class ElectricalFurnace(
     private val gui by lazy { ElectricalFurnaceGUI() }
     
     init {
+        addAvailableInventories(inputInventory, outputInventory)
         setDefaultInventory(inputInventory)
     }
     
@@ -151,9 +153,9 @@ class ElectricalFurnace(
             this@ElectricalFurnace,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                getNetworkedInventory(inputInventory) to "Input Inventory",
-                getNetworkedInventory(outputInventory) to "Output Inventory"
-            ),
+                Triple(getNetworkedInventory(inputInventory), "Input Inventory", ItemConnectionType.ALL_TYPES),
+                Triple(getNetworkedInventory(outputInventory), "Output Inventory", ItemConnectionType.EXTRACT_TYPES)
+            )
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)

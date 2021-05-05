@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -121,7 +122,7 @@ class FurnaceGenerator(
         private val sideConfigGUI = SideConfigGUI(
             this@FurnaceGenerator,
             listOf(NONE, PROVIDE),
-            listOf(getNetworkedInventory(inventory) to "Fuel Inventory")
+            listOf(Triple(getNetworkedInventory(inventory), "Fuel Inventory", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)

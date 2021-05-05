@@ -21,20 +21,18 @@ import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
 
-private val ALLOWED_ITEM_TYPES = listOf(ItemConnectionType.NONE, ItemConnectionType.INSERT, ItemConnectionType.EXTRACT, ItemConnectionType.BUFFER)
-
 class SideConfigGUI(
     endPoint: NetworkEndPoint,
     allowedEnergyTypes: List<EnergyConnectionType>?,
-    inventoryNames: List<Pair<NetworkedInventory, String>>?,
+    inventories: List<Triple<NetworkedInventory, String, List<ItemConnectionType>>>?,
     openPrevious: (Player) -> Unit
 ) {
     
     private val energyConfigGUI = if (allowedEnergyTypes != null)
         EnergySideConfigGUI(endPoint as EnergyStorage, allowedEnergyTypes) else null
     
-    private val itemConfigGUI = if (inventoryNames != null)
-        ItemSideConfigGUI(endPoint as ItemStorage, ALLOWED_ITEM_TYPES, inventoryNames) else null
+    private val itemConfigGUI = if (inventories != null)
+        ItemSideConfigGUI(endPoint as ItemStorage, inventories) else null
     
     private val mainGUI: GUI
     

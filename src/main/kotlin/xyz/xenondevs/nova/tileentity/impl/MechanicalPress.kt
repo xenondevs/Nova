@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.recipe.PressRecipe
 import xyz.xenondevs.nova.recipe.PressType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
@@ -53,6 +54,7 @@ class MechanicalPress(
     private val gui by lazy { MechanicalPressUI() }
     
     init {
+        addAvailableInventories(inputInv, outputInv)
         setDefaultInventory(inputInv)
     }
     
@@ -126,8 +128,8 @@ class MechanicalPress(
             this@MechanicalPress,
             listOf(NONE, CONSUME),
             listOf(
-                getNetworkedInventory(inputInv) to "Input Inventory",
-                getNetworkedInventory(outputInv) to "Output Inventory"
+                Triple(getNetworkedInventory(inputInv), "Input Inventory", ItemConnectionType.ALL_TYPES),
+                Triple(getNetworkedInventory(outputInv), "Output Inventory", ItemConnectionType.EXTRACT_TYPES),
             )
         ) { openWindow(it) }
         

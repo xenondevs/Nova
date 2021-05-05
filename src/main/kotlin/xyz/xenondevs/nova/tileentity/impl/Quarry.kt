@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.MultiModel
@@ -408,7 +409,7 @@ class Quarry(
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(getNetworkedInventory(inventory) to "Quarry Inventory")
+            listOf(Triple(getNetworkedInventory(inventory), "Quarry Inventory", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         private val sizeItems = ArrayList<Item>()

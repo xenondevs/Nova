@@ -138,16 +138,16 @@ object NetworkManager {
     
     
     fun handleEndPointRemove(endPoint: NetworkEndPoint, unload: Boolean) {
-        endPoint.networks.forEach { (_, networkMap) -> networkMap.forEach { (_, network) -> network.removeNode(endPoint) } }
-        endPoint.networks.clear()
-        NetworkType.values().forEach { endPoint.connectedNodes[it] = enumMapOf() }
-        
         // tell all the connected nodes that we no longer exist
         endPoint.connectedNodes.forEach { (networkType, faceMap) ->
             faceMap.forEach { (face, node) ->
                 node.connectedNodes[networkType]!!.remove(face.oppositeFace)
             }
         }
+        
+        endPoint.networks.forEach { (_, networkMap) -> networkMap.forEach { (_, network) -> network.removeNode(endPoint) } }
+        endPoint.networks.clear()
+        NetworkType.values().forEach { endPoint.connectedNodes[it] = enumMapOf() }
         
         if(!unload) endPoint.updateNearbyBridges()
     }

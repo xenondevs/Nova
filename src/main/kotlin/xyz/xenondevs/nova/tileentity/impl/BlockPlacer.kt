@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -94,7 +95,7 @@ class BlockPlacer(
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(getNetworkedInventory(inventory) to "BlockPlacer Inventory")
+            listOf(Triple(getNetworkedInventory(inventory), "BlockBreaker Inventory", ItemConnectionType.EXTRACT_TYPES))
         ) { openWindow(it) }
         
         private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)

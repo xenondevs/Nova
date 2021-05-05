@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.ui.config
 
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.structure.Structure
+import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.Sound
@@ -14,23 +15,24 @@ import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.enumMapOf
 
 private val BUTTON_COLORS = listOf(NovaMaterial.ORANGE_BUTTON, NovaMaterial.BLUE_BUTTON, NovaMaterial.GREEN_BUTTON)
 
 class ItemSideConfigGUI(
     val itemStorage: ItemStorage,
-    private val allowedTypes: List<ItemConnectionType>,
-    inventoryNames: List<Pair<NetworkedInventory, String>>
+    inventories: List<Triple<NetworkedInventory, String, List<ItemConnectionType>>>
 ) : SimpleGUI(8, 3) {
     
-    private val inventories = inventoryNames.map { it.first }
-    private val buttonBuilders: Map<NetworkedInventory, ItemBuilder> =
-        inventoryNames.toList().withIndex().associate { (index, pair) ->
-            pair.first to BUTTON_COLORS[index].createBasicItemBuilder().addLoreLines("§b${pair.second}")
-        }
+    private val inventories = inventories.map { it.first }
+    private val allowedTypes = inventories.associate { it.first to it.third }
+    private val buttonBuilders = inventories.withIndex().associate { (index, triple) ->
+        triple.first to BUTTON_COLORS[index].createBasicItemBuilder().addLoreLines("§b${triple.second}")
+    }
+    
+    private val configItems = enumMapOf<BlockFace, MutableList<Item>>()
     
     init {
         val structure = Structure("" +
@@ -53,7 +55,15 @@ class ItemSideConfigGUI(
         applyStructure(structure)
     }
     
-    private fun changeConnectionType(blockFace: BlockFace, forward: Boolean) {
+    private fun registerConfigItem(blockFace: BlockFace, item: Item) {
+        val configItemList = configItems[blockFace] ?: ArrayList<Item>().also { configItems[blockFace] = it }
+        configItemList.add(item)
+    }
+    
+    private fun changeConnectionType(blockFace: BlockFace, forward: Boolean): Boolean {
+        val allowedTypes = allowedTypes[itemStorage.inventories[blockFace]!!]!!
+        if (allowedTypes.size < 2) return false
+        
         NetworkManager.handleEndPointRemove(itemStorage, false)
         
         val currentType = itemStorage.itemConfig[blockFace]!!
@@ -64,24 +74,41 @@ class ItemSideConfigGUI(
         itemStorage.itemConfig[blockFace] = allowedTypes[index]
         
         NetworkManager.handleEndPointAdd(itemStorage)
+        
+        return true
     }
     
-    private fun changeInventory(blockFace: BlockFace, forward: Boolean) {
+    private fun changeInventory(blockFace: BlockFace, forward: Boolean): Boolean {
+        if (inventories.size < 2) return false
+        
         NetworkManager.handleEndPointRemove(itemStorage, false)
         
-        val currentInventory = itemStorage.inventories[blockFace]!! as NetworkedVirtualInventory
+        val currentInventory = itemStorage.inventories[blockFace]!!
         var index = inventories.indexOf(currentInventory)
         if (forward) index++ else index--
         if (index < 0) index = inventories.lastIndex
         else if (index == inventories.size) index = 0
-        itemStorage.inventories[blockFace] = inventories[index]
+        
+        val newInventory = inventories[index]
+        itemStorage.inventories[blockFace] = newInventory
+        
+        val allowedTypes = allowedTypes[newInventory]!!
+        if (!allowedTypes.contains(itemStorage.itemConfig[blockFace]!!)) {
+            itemStorage.itemConfig[blockFace] = allowedTypes[0]
+        }
         
         NetworkManager.handleEndPointAdd(itemStorage)
+        
+        return true
     }
     
     private inner class ConnectionConfigItem(val blockSide: BlockSide) : BaseItem() {
         
         private val blockFace = (itemStorage as TileEntity).getFace(blockSide)
+        
+        init {
+            registerConfigItem(blockFace, this)
+        }
         
         override fun getItemBuilder(): ItemBuilder {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
@@ -98,9 +125,10 @@ class ItemSideConfigGUI(
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-            changeConnectionType(blockFace, clickType.isLeftClick)
-            notifyWindows()
+            if (changeConnectionType(blockFace, clickType.isLeftClick)) {
+                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                configItems[blockFace]?.forEach(Item::notifyWindows)
+            }
         }
         
     }
@@ -108,6 +136,10 @@ class ItemSideConfigGUI(
     private inner class InventoryConfigItem(val blockSide: BlockSide) : BaseItem() {
         
         private val blockFace = (itemStorage as TileEntity).getFace(blockSide)
+    
+        init {
+            registerConfigItem(blockFace, this)
+        }
         
         override fun getItemBuilder(): ItemBuilder {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
@@ -116,9 +148,10 @@ class ItemSideConfigGUI(
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-            changeInventory(blockFace, clickType.isLeftClick)
-            notifyWindows()
+            if (changeInventory(blockFace, clickType.isLeftClick)) {
+                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                configItems[blockFace]?.forEach(Item::notifyWindows)
+            }
         }
         
     }

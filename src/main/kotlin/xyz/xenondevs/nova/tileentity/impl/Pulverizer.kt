@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.recipe.PulverizerRecipe
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -35,16 +36,18 @@ class Pulverizer(
     
     private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
     private val outputInv = getInventory("output", 2, true, ::handleOutputUpdate)
-    private val gui = PulverizerGUI()
-    
     private var pulverizeTime = retrieveData("pulverizerTime") { 0 }
-    private var currentItem: ItemStack? = retrieveOrNull("currentItem")
     
+    private var currentItem: ItemStack? = retrieveOrNull("currentItem")
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    
     override val requestedEnergy: Int
         get() = MAX_ENERGY - energy
     
+    private val gui by lazy { PulverizerGUI() }
+    
     init {
+        addAvailableInventories(inputInv, outputInv)
         setDefaultInventory(inputInv)
     }
     
@@ -115,8 +118,8 @@ class Pulverizer(
             this@Pulverizer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                getNetworkedInventory(inputInv) to "Input Inventory",
-                getNetworkedInventory(outputInv) to "Output Inventory"
+                Triple(getNetworkedInventory(inputInv), "Input Inventory", ItemConnectionType.ALL_TYPES),
+                Triple(getNetworkedInventory(outputInv), "Output Inventory", ItemConnectionType.EXTRACT_TYPES)
             ),
         ) { openWindow(it) }
         

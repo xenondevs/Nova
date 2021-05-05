@@ -30,7 +30,7 @@ open class PowerCell(
     override val requestedEnergy: Int
         get() = if (creative) Int.MAX_VALUE else maxEnergy - energy
     
-    private val gui = PowerCellUI()
+    private val gui by lazy { PowerCellUI() }
     
     init {
         if (creative) energy = Int.MAX_VALUE

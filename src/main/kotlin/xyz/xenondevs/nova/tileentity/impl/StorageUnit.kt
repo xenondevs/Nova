@@ -13,9 +13,9 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.ItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -30,9 +30,7 @@ class StorageUnit(
     ownerUUID: UUID?,
     material: NovaMaterial,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
-    
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.NONE) }
+) : ItemTileEntity(ownerUUID, material, armorStand) {
     
     private val inventory = StorageUnitInventory(retrieveOrNull("type"), retrieveOrNull("amount") ?: 0)
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
@@ -40,15 +38,16 @@ class StorageUnit(
     private val gui by lazy { ItemStorageGUI() }
     
     init {
+        addAvailableInventories(uuid to inventory)
         setDefaultInventory(inventory)
     }
     
-    fun handleInputInventoryUpdate(event: ItemUpdateEvent) {
+    private fun handleInputInventoryUpdate(event: ItemUpdateEvent) {
         if (event.isAdd && inventory.type != null && !inventory.type!!.isSimilar(event.newItemStack))
             event.isCancelled = true
     }
     
-    fun handleOutputInventoryUpdate(event: ItemUpdateEvent) {
+    private fun handleOutputInventoryUpdate(event: ItemUpdateEvent) {
         if (event.updateReason == SELF_UPDATE_REASON)
             return
         
@@ -62,7 +61,7 @@ class StorageUnit(
         }
     }
     
-    fun updateOutputSlot() {
+    private fun updateOutputSlot() {
         if (inventory.type == null)
             outputInventory.removeItem(SELF_UPDATE_REASON, 0)
         else
@@ -100,12 +99,12 @@ class StorageUnit(
         
         private val sideConfigGUI = SideConfigGUI(
             this@StorageUnit,
-            listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(inventory to "Inventory"),
+            null,
+            listOf(Triple(inventory, "Inventory", ItemConnectionType.ALL_TYPES)),
             ::openWindow
         )
         
-        val storageUnitDisplay = StorageUnitDisplay(inventory)
+        private val storageUnitDisplay = StorageUnitDisplay(inventory)
         
         private val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 3)
             .setStructure("" +
