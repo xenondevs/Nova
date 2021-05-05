@@ -36,7 +36,7 @@ abstract class EnergyItemTileEntity(
     
     override fun saveData() {
         super.saveData()
-        storeData("energy", energy)
+        storeData("energy", energy, true)
         storeData("energyConfig", energyConfig)
     }
     

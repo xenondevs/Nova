@@ -39,7 +39,7 @@ abstract class EnergyTileEntity(
     
     override fun saveData() {
         super.saveData()
-        storeData("energy", energy)
+        storeData("energy", energy, true)
         storeData("energyConfig", energyConfig)
     }
     
@@ -47,7 +47,7 @@ abstract class EnergyTileEntity(
         
         fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
             val builder = material.createBasicItemBuilder()
-            val energy = tileEntity?.let { (tileEntity as EnergyTileEntity).energy } ?: 0
+            val energy = tileEntity?.let { (tileEntity as EnergyStorage).providedEnergy } ?: 0
             builder.addLoreLines("§7" + EnergyUtils.getEnergyString(energy))
             return builder
         }
