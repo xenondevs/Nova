@@ -40,8 +40,12 @@ object ReflectionRegistry {
     val NMS_SOUND_EFFECT_TYPE_CLASS = getNMSClass("SoundEffectType")
     val NMS_SOUND_EFFECT_CLASS = getNMSClass("SoundEffect")
     val NMS_MINECRAFT_KEY_CLASS = getNMSClass("MinecraftKey")
-    val I_REGISTRY_CLASS = getNMSClass("IRegistry")
-    val REGISTRY_BLOCKS_CLASS = getNMSClass("RegistryBlocks")
+    val NMS_I_REGISTRY_CLASS = getNMSClass("IRegistry")
+    val NMS_REGISTRY_BLOCKS_CLASS = getNMSClass("RegistryBlocks")
+    val NMS_PACKET_PLAY_OUT_ENTITY_HEAD_ROTATION_CLASS = getNMSClass("PacketPlayOutEntityHeadRotation")
+    val NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CLASS = getNMSClass("PacketPlayOutEntityEquipment")
+    val NMS_ENUM_ITEM_SLOT_CLASS = getNMSClass("EnumItemSlot")
+    val NMS_ITEM_STACK_CLASS = getNMSClass("ItemStack")
     
     // CB classes
     val CB_CRAFT_SERVER_CLASS = getCBClass("CraftServer")
@@ -55,6 +59,8 @@ object ReflectionRegistry {
     val NMS_BLOCK_POSITION_CONSTRUCTOR = getConstructor(NMS_BLOCK_POSITION_CLASS, false, Double::class.java, Double::class.java, Double::class.java)
     val NMS_PACKET_PLAY_OUT_BLOCK_BREAK_ANIMATION_CONSTRUCTOR = getConstructor(NMS_PACKET_PLAY_OUT_BLOCK_BREAK_ANIMATION_CLASS, false, Int::class.java, NMS_BLOCK_POSITION_CLASS, Int::class.java)
     val NMS_MINECRAFT_KEY_CONSTRUCTOR = getConstructor(NMS_MINECRAFT_KEY_CLASS, false, String::class.java)
+    val NMS_PACKET_PLAY_OUT_ENTITY_HEAD_ROTATION_CONSTRUCTOR = getConstructor(NMS_PACKET_PLAY_OUT_ENTITY_HEAD_ROTATION_CLASS, false, NMS_ENTITY_CLASS, Byte::class.java)
+    val NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CONSTRUCTOR = getConstructor(NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CLASS, false, Int::class.java, java.util.List::class.java)
     
     // NMS methods
     val NMS_COMMAND_DISPATCHER_GET_BRIGADIER_COMMAND_DISPATCHER_METHOD = getMethod(NMS_COMMAND_DISPATCHER_CLASS, false, "a")
@@ -62,7 +68,9 @@ object ReflectionRegistry {
     val NMS_ENTITY_GET_BUKKIT_ENTITY_METHOD = getMethod(NMS_ENTITY_CLASS, false, "getBukkitEntity")
     val NMS_PLAYER_CONNECTION_SEND_PACKET_METHOD = getMethod(NMS_PLAYER_CONNECTION_CLASS, false, "sendPacket", NMS_PACKET_CLASS)
     val NMS_BLOCK_GET_SOUND_EFFECT_TYPE_METHOD = getMethod(NMS_BLOCK_CLASS, false, "getStepSound", NMS_I_BLOCK_DATA_ClASS)
-    val NMS_REGISTRY_BLOCKS_GET_METHOD = getMethod(REGISTRY_BLOCKS_CLASS, false, "get", NMS_MINECRAFT_KEY_CLASS)
+    val NMS_REGISTRY_BLOCKS_GET_METHOD = getMethod(NMS_REGISTRY_BLOCKS_CLASS, false, "get", NMS_MINECRAFT_KEY_CLASS)
+    val NMS_ENTITY_GET_ID_METHOD = getMethod(NMS_ENTITY_CLASS, false, "getId")
+    val NMS_ENUM_ITEM_SLOT_FROM_NAME_METHOD = getMethod(NMS_ENUM_ITEM_SLOT_CLASS, false, "fromName", String::class.java)
     
     // CB methods
     val CB_CRAFT_SERVER_GET_SERVER_METHOD = getMethod(CB_CRAFT_SERVER_CLASS, false, "getServer")
@@ -83,7 +91,8 @@ object ReflectionRegistry {
     val NMS_SOUND_EFFECT_TYPE_PLACE_SOUND_FIELD = getFieldOf(NMS_SOUND_EFFECT_TYPE_CLASS, NMS_SOUND_EFFECT_CLASS, true, "placeSound", "Z")
     val NMS_SOUND_EFFECT_TYPE_HIT_SOUND_FIELD = getFieldOf(NMS_SOUND_EFFECT_TYPE_CLASS, NMS_SOUND_EFFECT_CLASS, true, "hitSound", "aa")
     val NMS_SOUND_EFFECT_TYPE_FALL_SOUND_FIELD = getFieldOf(NMS_SOUND_EFFECT_TYPE_CLASS, NMS_SOUND_EFFECT_CLASS, true, "fallSound", "bb")
-    val NMS_I_REGISTRY_BLOCK_FIELD = getField(I_REGISTRY_CLASS, false, "BLOCK")
+    val NMS_I_REGISTRY_BLOCK_FIELD = getField(NMS_I_REGISTRY_CLASS, false, "BLOCK")
+    val NMS_EMPTY_STACK_FIELD = getField(NMS_ITEM_STACK_CLASS, false, "b")
     
     // other fields
     val COMMAND_DISPATCHER_ROOT_FIELD = getField(CommandDispatcher::class.java, true, "root")
@@ -97,5 +106,6 @@ object ReflectionRegistry {
     val COMMAND_DISPATCHER = NMS_COMMAND_DISPATCHER_GET_BRIGADIER_COMMAND_DISPATCHER_METHOD.invoke(NMS_COMMAND_DISPATCHER)!! as CommandDispatcher<Any>
     val COMMAND_DISPATCHER_ROOT_NODE = COMMAND_DISPATCHER_ROOT_FIELD.get(COMMAND_DISPATCHER)!! as RootCommandNode<Any>
     val NMS_REGISTRY_BLOCKS = NMS_I_REGISTRY_BLOCK_FIELD.get(null)
-        
+    val NMS_EMPTY_ITEM_STACK = NMS_EMPTY_STACK_FIELD.get(null)
+    
 }

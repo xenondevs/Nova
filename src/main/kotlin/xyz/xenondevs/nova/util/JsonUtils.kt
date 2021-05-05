@@ -21,6 +21,8 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter(ChunkDeserializer)
         .registerTypeHierarchyAdapter(LocationSerializer)
         .registerTypeHierarchyAdapter(LocationDeserializer)
+        .registerTypeHierarchyAdapter(AttachmentSerializer)
+        .registerTypeHierarchyAdapter(AttachmentDeserializer)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
         .enableComplexMapKeySerialization()
         .create()

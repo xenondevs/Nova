@@ -62,11 +62,13 @@ fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> B
     }
 }
 
-fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean): List<Chunk> {
+fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean, ignoreUnloaded: Boolean = false): List<Chunk> {
     val chunks = ArrayList<Chunk>()
     val world = world
     for (chunkX in (x - range)..(x + range)) {
         for (chunkZ in (z - range)..(z + range)) {
+            if (ignoreUnloaded && !world.isChunkLoaded(chunkX, chunkZ)) continue
+            
             val chunk = world.getChunkAt(chunkX, chunkZ)
             if (chunk != this || includeCurrent)
                 chunks += world.getChunkAt(chunkX, chunkZ)

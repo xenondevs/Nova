@@ -25,12 +25,16 @@ import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_CHILDREN_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_LITERALS_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_BLOCK_POSITION_CONSTRUCTOR
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_COMMAND_LISTENER_WRAPPER_GET_ENTITY_METHOD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_EMPTY_ITEM_STACK
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_ARMOR_STAND_ARMOR_ITEMS_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_GET_BUKKIT_ENTITY_METHOD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_GET_ID_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENTITY_PLAYER_PLAYER_CONNECTION_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_ENUM_ITEM_SLOT_FROM_NAME_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_MINECRAFT_KEY_CONSTRUCTOR
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKAGE_PATH
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_BLOCK_BREAK_ANIMATION_CONSTRUCTOR
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CONSTRUCTOR
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PLAYER_CONNECTION_SEND_PACKET_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_REGISTRY_BLOCKS
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_REGISTRY_BLOCKS_GET_METHOD
@@ -114,6 +118,10 @@ object ReflectionUtils {
         return CB_CRAFT_ENTITY_GET_HANDLE_METHOD.invoke(entity)
     }
     
+    fun getEntityId(entity: Entity): Int {
+        return NMS_ENTITY_GET_ID_METHOD.invoke(getNMSEntity(entity)) as Int
+    }
+    
     fun getPlayerFromEntityPlayer(entityPlayer: Any): Player? {
         return Bukkit.getOnlinePlayers().find { getNMSEntity(it) == entityPlayer }
     }
@@ -168,6 +176,10 @@ object ReflectionUtils {
         NMS_PLAYER_CONNECTION_SEND_PACKET_METHOD.invoke(playerConnection, packet)
     }
     
+    fun sendPacketToEveryone(packet: Any) {
+        Bukkit.getOnlinePlayers().forEach { sendPacket(it, packet) }
+    }
+    
     fun createBlockPosition(location: Location): Any {
         return NMS_BLOCK_POSITION_CONSTRUCTOR.newInstance(location.x, location.y, location.z)
     }
@@ -183,6 +195,17 @@ object ReflectionUtils {
     fun getNMSBlock(material: Material): Any {
         val minecraftKey = NMS_MINECRAFT_KEY_CONSTRUCTOR.newInstance(material.key.toString())
         return NMS_REGISTRY_BLOCKS_GET_METHOD.invoke(NMS_REGISTRY_BLOCKS, minecraftKey)
+    }
+    
+    fun createPacketPlayOutEntityEquipment(entityId: Int, items: List<Pair<String, ItemStack?>>): Any {
+        val nmsItems: List<*> = items.map { pair ->
+            com.mojang.datafixers.util.Pair(
+                NMS_ENUM_ITEM_SLOT_FROM_NAME_METHOD.invoke(null, pair.first),
+                pair.second?.let { createNMSItemStackCopy(it) } ?: NMS_EMPTY_ITEM_STACK
+            )
+        }
+    
+        return NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CONSTRUCTOR.newInstance(entityId, nmsItems)
     }
     
 }
