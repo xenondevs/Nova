@@ -141,25 +141,22 @@ class StorageUnit(
             }
         
         override fun addItem(item: ItemStack): ItemStack? {
-            if (type == null) {
+            val remaining: ItemStack?
+            
+            if (type == null) { // Storage unit is empty
                 type = item
-                amount += item.amount
-                gui.updateWindows()
-                return null
-            } else if (type!!.isSimilar(item)) {
+                amount = item.amount
+                remaining = null
+            } else if (type!!.isSimilar(item)) { // The item is the same as the one stored in the unit
                 val leeway = MAX_ITEMS - amount
-                if (leeway >= item.amount) {
+                if (leeway >= item.amount) { // The whole stack fits into the storage unit
                     amount += item.amount
-                    gui.updateWindows()
-                    return null
-                } else {
-                    gui.updateWindows()
-                    return item.clone().also { amount -= leeway }
-                }
-            } else {
-                gui.updateWindows()
-                return item
-            }
+                    remaining = null
+                } else remaining = item.clone().also { amount -= leeway }  // Not all items fit so a few will remain
+            } else remaining = item // The item isn't the same as the one stored in the unit
+            
+            gui.updateWindows()
+            return remaining
         }
         
         override fun setItem(slot: Int, item: ItemStack?) {
