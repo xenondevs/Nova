@@ -15,6 +15,8 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.util.removeIf
+import xyz.xenondevs.nova.util.runTaskTimer
 
 /**
  * Manages wrappers for vanilla TileEntities
@@ -27,6 +29,13 @@ object VanillaTileEntityManager : Listener {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::handleChunkLoad)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::handleChunkUnload) }
+        
+        runTaskTimer(0, 1) {
+            tileEntityMap.forEach { (chunk, tileEntities) ->
+                val chunkTileEntities = chunk.tileEntities.mapTo(HashSet()) { it.location }
+                tileEntities.removeIf { !chunkTileEntities.contains(it.key) }
+            }
+        }
     }
     
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)
