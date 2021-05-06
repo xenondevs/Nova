@@ -35,6 +35,9 @@ import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_MINECRAFT_KEY_CONSTRUCTOR
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKAGE_PATH
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_BLOCK_BREAK_ANIMATION_CONSTRUCTOR
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CONSTRUCTOR
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_MOUNT_CARRIER_ID_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_MOUNT_CONSTRUCTOR
+import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PACKET_PLAY_OUT_MOUNT_PASSENGER_IDS_FIELD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_PLAYER_CONNECTION_SEND_PACKET_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_REGISTRY_BLOCKS
 import xyz.xenondevs.nova.util.ReflectionRegistry.NMS_REGISTRY_BLOCKS_GET_METHOD
@@ -206,6 +209,13 @@ object ReflectionUtils {
         }
     
         return NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CONSTRUCTOR.newInstance(entityId, nmsItems)
+    }
+    
+    fun createPacketPlayOutMount(entityId: Int, passengerIds: IntArray): Any {
+        val packet = NMS_PACKET_PLAY_OUT_MOUNT_CONSTRUCTOR.newInstance()
+        NMS_PACKET_PLAY_OUT_MOUNT_CARRIER_ID_FIELD.set(packet, entityId)
+        NMS_PACKET_PLAY_OUT_MOUNT_PASSENGER_IDS_FIELD.set(packet, passengerIds)
+        return packet
     }
     
 }

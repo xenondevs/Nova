@@ -46,6 +46,7 @@ object ReflectionRegistry {
     val NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CLASS = getNMSClass("PacketPlayOutEntityEquipment")
     val NMS_ENUM_ITEM_SLOT_CLASS = getNMSClass("EnumItemSlot")
     val NMS_ITEM_STACK_CLASS = getNMSClass("ItemStack")
+    val NMS_PACKET_PLAY_OUT_MOUNT_CLASS = getNMSClass("PacketPlayOutMount")
     
     // CB classes
     val CB_CRAFT_SERVER_CLASS = getCBClass("CraftServer")
@@ -61,6 +62,7 @@ object ReflectionRegistry {
     val NMS_MINECRAFT_KEY_CONSTRUCTOR = getConstructor(NMS_MINECRAFT_KEY_CLASS, false, String::class.java)
     val NMS_PACKET_PLAY_OUT_ENTITY_HEAD_ROTATION_CONSTRUCTOR = getConstructor(NMS_PACKET_PLAY_OUT_ENTITY_HEAD_ROTATION_CLASS, false, NMS_ENTITY_CLASS, Byte::class.java)
     val NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CONSTRUCTOR = getConstructor(NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CLASS, false, Int::class.java, java.util.List::class.java)
+    val NMS_PACKET_PLAY_OUT_MOUNT_CONSTRUCTOR = getConstructor(NMS_PACKET_PLAY_OUT_MOUNT_CLASS, false)
     
     // NMS methods
     val NMS_COMMAND_DISPATCHER_GET_BRIGADIER_COMMAND_DISPATCHER_METHOD = getMethod(NMS_COMMAND_DISPATCHER_CLASS, false, "a")
@@ -93,6 +95,8 @@ object ReflectionRegistry {
     val NMS_SOUND_EFFECT_TYPE_FALL_SOUND_FIELD = getFieldOf(NMS_SOUND_EFFECT_TYPE_CLASS, NMS_SOUND_EFFECT_CLASS, true, "fallSound", "bb")
     val NMS_I_REGISTRY_BLOCK_FIELD = getField(NMS_I_REGISTRY_CLASS, false, "BLOCK")
     val NMS_EMPTY_STACK_FIELD = getField(NMS_ITEM_STACK_CLASS, false, "b")
+    val NMS_PACKET_PLAY_OUT_MOUNT_CARRIER_ID_FIELD = getField(NMS_PACKET_PLAY_OUT_MOUNT_CLASS, true, "a")
+    val NMS_PACKET_PLAY_OUT_MOUNT_PASSENGER_IDS_FIELD = getField(NMS_PACKET_PLAY_OUT_MOUNT_CLASS, true, "b")
     
     // other fields
     val COMMAND_DISPATCHER_ROOT_FIELD = getField(CommandDispatcher::class.java, true, "root")

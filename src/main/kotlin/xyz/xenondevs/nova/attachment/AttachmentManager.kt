@@ -4,7 +4,6 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.NOVA
@@ -14,6 +13,7 @@ import xyz.xenondevs.nova.util.runTaskTimer
 object AttachmentManager : Listener {
     
     private val attachments = ArrayList<Attachment>()
+    private var tick = 0
     
     fun init() {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
@@ -23,7 +23,7 @@ object AttachmentManager : Listener {
             attachments.forEach(Attachment::despawn)
         }
         
-        runTaskTimer(0, 1) { attachments.forEach(Attachment::handleTick) }
+        runTaskTimer(0, 1) { attachments.forEach { it.handleTick(tick++) } }
     }
     
     fun registerAttachment(attachment: Attachment) {
@@ -34,29 +34,19 @@ object AttachmentManager : Listener {
         attachments.remove(attachment)
     }
     
-    fun findAttachment(player: Player): Attachment? {
-        return attachments.firstOrNull { it.uuid == player.uniqueId }
+    fun getAttachments(player: Player): List<Attachment> {
+        val uuid = player.uniqueId
+        return attachments.filter { it.uuid == uuid }
     }
     
     @EventHandler
     fun handlePlayerJoin(event: PlayerJoinEvent) {
-        val player = event.player
-        val uuid = player.uniqueId
-        attachments.filter { it.uuid == uuid }.forEach { it.spawn() }
+        getAttachments(event.player).forEach(Attachment::spawn)
     }
     
     @EventHandler
     fun handlePlayerQuit(event: PlayerQuitEvent) {
-        val player = event.player
-        val uuid = player.uniqueId
-        attachments.filter { it.uuid == uuid }.forEach { it.despawn() }
+        getAttachments(event.player).forEach(Attachment::despawn)
     }
-    
-    @EventHandler
-    fun handleWorldChange(event: PlayerChangedWorldEvent) {
-        println(event)
-    }
-    
-    //TODO: world change?
     
 }
