@@ -47,7 +47,7 @@ enum class NovaMaterial(
     CHUNK_LOADER("Chunk Loader", blockOf(12), EnergyTileEntity::createItemBuilder, blockOf(12), COBBLESTONE, ::ChunkLoader),
     BLOCK_BREAKER("Block Breaker", blockOf(13), EnergyTileEntity::createItemBuilder, blockOf(13), COBBLESTONE, ::BlockBreaker),
     BLOCK_PLACER("Block Placer", blockOf(14), EnergyTileEntity::createItemBuilder, blockOf(14), COBBLESTONE, ::BlockPlacer),
-    STORAGE_UNIT("Storage Unit", blockOf(15), null, blockOf(15), COBBLESTONE, ::StorageUnit),
+    STORAGE_UNIT("Storage Unit", blockOf(15), null, blockOf(15), BARRIER, ::StorageUnit),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),

@@ -91,8 +91,8 @@ class StorageUnit(
     
     override fun saveData() {
         super.saveData()
-        storeData("type", inventory.type)
-        storeData("amount", inventory.amount)
+        storeData("type", inventory.type, true)
+        storeData("amount", inventory.amount, true)
     }
     
     private inner class ItemStorageGUI {
