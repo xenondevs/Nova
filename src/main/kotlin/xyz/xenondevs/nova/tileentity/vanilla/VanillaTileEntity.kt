@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.vanilla
 
 import com.google.gson.JsonObject
 import org.bukkit.block.*
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.network.Network
 import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.NetworkNode
@@ -21,6 +22,15 @@ private fun TileState.hasTileEntityData() =
 
 private fun TileState.getTileEntityData() =
     persistentDataContainer.get(TILE_ENTITY_KEY, JsonElementDataType) as JsonObject
+
+private val EMPTY_INVENTORY: NetworkedInventory = object : NetworkedInventory {
+    override val size = 0
+    override val items = emptyArray<ItemStack?>()
+    override fun addItem(item: ItemStack) = item
+    override fun setItem(slot: Int, item: ItemStack?) = Unit
+}
+
+private val EMPTY_INVENTORIES_MAP = CUBE_FACES.associateWithTo(emptyEnumMap()) { EMPTY_INVENTORY }
 
 abstract class VanillaTileEntity(tileState: TileState) {
     
@@ -52,7 +62,8 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     
     override val location = tileState.location
     
-    final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = emptyEnumMap()
+    final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> =
+        NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     
@@ -74,7 +85,7 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     }
     
     override fun handleRemoved(unload: Boolean) {
-        storeData("itemConfig", itemConfig)
+        if (unload) storeData("itemConfig", itemConfig)
         NetworkManager.handleEndPointRemove(this, unload)
     }
     
@@ -95,12 +106,14 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     
     private var inventory = chest.inventory
     
-    override val inventories: MutableMap<BlockFace, NetworkedInventory>
+    override val inventories: EnumMap<BlockFace, NetworkedInventory>
         get() {
-            val chest = location.block.state as Chest
-            if (chest.inventory.size != inventory.size) inventory = chest.inventory
-            val inventory = NetworkedBukkitInventory(inventory)
-            return CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+            val state = location.block.state
+            return if (state is Chest) {
+                if (state.inventory.size != inventory.size) inventory = state.inventory
+                val inventory = NetworkedBukkitInventory(inventory)
+                CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+            } else EMPTY_INVENTORIES_MAP
         }
     
 }

@@ -15,7 +15,6 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTaskTimer
 
 /**
@@ -33,7 +32,16 @@ object VanillaTileEntityManager : Listener {
         runTaskTimer(0, 1) {
             tileEntityMap.forEach { (chunk, tileEntities) ->
                 val chunkTileEntities = chunk.tileEntities.mapTo(HashSet()) { it.location }
-                tileEntities.removeIf { !chunkTileEntities.contains(it.key) }
+                
+                val iterator = tileEntities.iterator()
+                while (iterator.hasNext()) {
+                    val entry = iterator.next()
+                    if (!chunkTileEntities.contains(entry.key)) {
+                        entry.value.handleRemoved(false)
+                        iterator.remove()
+                    }
+                }
+                
             }
         }
     }
@@ -68,8 +76,6 @@ object VanillaTileEntityManager : Listener {
             tileEntity.handleInitialized()
         }
     }
-    
-    // TODO: handle block remove by non-players
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
