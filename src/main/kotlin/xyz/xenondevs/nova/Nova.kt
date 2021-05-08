@@ -5,6 +5,7 @@ import xyz.xenondevs.nova.advancement.AdvancementManager
 import xyz.xenondevs.nova.attachment.AttachmentManager
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.equipment.event.ArmorEquipListener
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.recipe.RecipeManager
@@ -35,6 +36,7 @@ class Nova : JavaPlugin() {
         ItemManager.init()
         AttachmentManager.init()
         CommandManager.init()
+        ArmorEquipListener.init()
     }
     
     override fun onDisable() {
