@@ -84,5 +84,12 @@
   },
   "item_storage_unit": {
     "max_items": 2147483647
+  },
+  "jetpack": {
+    "capacity": 100000
+  },
+  "charger": {
+    "capacity": 1000000,
+    "charge_speed": 100
   }
 }

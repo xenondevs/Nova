@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.item.ItemFilter
-import xyz.xenondevs.nova.serialization.JsonElementDataType
+import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.GSON
 import xyz.xenondevs.nova.util.fromJson
 
@@ -33,7 +33,7 @@ fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     setItemMeta(itemMeta)
 }
 
-object FilterItem : NovaItem(NovaMaterial.ITEM_FILTER) {
+object FilterItem : NovaItem() {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_AIR) {

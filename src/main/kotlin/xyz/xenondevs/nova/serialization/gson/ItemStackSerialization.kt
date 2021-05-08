@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.serialization
+package xyz.xenondevs.nova.serialization.gson
 
 import com.google.gson.*
 import org.bukkit.configuration.file.YamlConfiguration

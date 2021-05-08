@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.util
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import xyz.xenondevs.nova.serialization.*
+import xyz.xenondevs.nova.serialization.gson.*
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*

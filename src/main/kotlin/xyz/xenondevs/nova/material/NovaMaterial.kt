@@ -5,6 +5,9 @@ import org.bukkit.Material
 import org.bukkit.Material.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.impl.FilterItem
+import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.*
@@ -26,28 +29,30 @@ private fun itemOf(data: Int) = ModelData(SHULKER_SHELL, intArrayOf(data))
 enum class NovaMaterial(
     val itemName: String,
     val item: ModelData,
-    createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> ItemBuilder)?,
-    val block: ModelData?,
-    val hitbox: Material?,
-    val createTileEntity: ((UUID?, NovaMaterial, ArmorStand) -> TileEntity)?
+    val novaItem: NovaItem? = null,
+    createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> ItemBuilder)? = null,
+    val block: ModelData? = null,
+    val hitbox: Material? = null,
+    val createTileEntity: ((UUID?, NovaMaterial, ArmorStand) -> TileEntity)? = null
 ) {
     
     // 1 - 1000: Blocks
-    FURNACE_GENERATOR("Furnace Generator", blockOf(1), EnergyTileEntity::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
-    MECHANICAL_PRESS("Mechanical Press", blockOf(2), EnergyTileEntity::createItemBuilder, blockOf(2), IRON_BLOCK, ::MechanicalPress),
-    BASIC_POWER_CELL("Basic Power Cell", blockOf(3), EnergyTileEntity::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
-    ADVANCED_POWER_CELL("Advanced Power Cell", blockOf(4), EnergyTileEntity::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
-    ELITE_POWER_CELL("Elite Power Cell", blockOf(5), EnergyTileEntity::createItemBuilder, blockOf(5), IRON_BLOCK, ::ElitePowerCell),
-    ULTIMATE_POWER_CELL("Ultimate Power Cell", blockOf(6), EnergyTileEntity::createItemBuilder, blockOf(6), IRON_BLOCK, ::UltimatePowerCell),
-    CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), EnergyTileEntity::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
-    PULVERIZER("Pulverizer", blockOf(8), EnergyTileEntity::createItemBuilder, blockOf(8), COBBLESTONE, ::Pulverizer),
-    SOLAR_PANEL("Solar Panel", blockOf(9), EnergyTileEntity::createItemBuilder, blockOf(9), BARRIER, ::SolarPanel),
-    QUARRY("Quarry", blockOf(10), EnergyTileEntity::createItemBuilder, blockOf(10), COBBLESTONE, ::Quarry),
-    ELECTRICAL_FURNACE("Electrical Furnace", blockOf(11), EnergyTileEntity::createItemBuilder, blockOf(11), COBBLESTONE, ::ElectricalFurnace),
-    CHUNK_LOADER("Chunk Loader", blockOf(12), EnergyTileEntity::createItemBuilder, blockOf(12), COBBLESTONE, ::ChunkLoader),
-    BLOCK_BREAKER("Block Breaker", blockOf(13), EnergyTileEntity::createItemBuilder, blockOf(13), COBBLESTONE, ::BlockBreaker),
-    BLOCK_PLACER("Block Placer", blockOf(14), EnergyTileEntity::createItemBuilder, blockOf(14), COBBLESTONE, ::BlockPlacer),
-    STORAGE_UNIT("Storage Unit", blockOf(15), null, blockOf(15), BARRIER, ::StorageUnit),
+    FURNACE_GENERATOR("Furnace Generator", blockOf(1), null, EnergyTileEntity::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
+    MECHANICAL_PRESS("Mechanical Press", blockOf(2), null, EnergyTileEntity::createItemBuilder, blockOf(2), IRON_BLOCK, ::MechanicalPress),
+    BASIC_POWER_CELL("Basic Power Cell", blockOf(3), null, EnergyTileEntity::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
+    ADVANCED_POWER_CELL("Advanced Power Cell", blockOf(4), null, EnergyTileEntity::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
+    ELITE_POWER_CELL("Elite Power Cell", blockOf(5), null, EnergyTileEntity::createItemBuilder, blockOf(5), IRON_BLOCK, ::ElitePowerCell),
+    ULTIMATE_POWER_CELL("Ultimate Power Cell", blockOf(6), null, EnergyTileEntity::createItemBuilder, blockOf(6), IRON_BLOCK, ::UltimatePowerCell),
+    CREATIVE_POWER_CELL("Creative Power Cell", blockOf(7), null, EnergyTileEntity::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
+    PULVERIZER("Pulverizer", blockOf(8), null, EnergyTileEntity::createItemBuilder, blockOf(8), COBBLESTONE, ::Pulverizer),
+    SOLAR_PANEL("Solar Panel", blockOf(9), null, EnergyTileEntity::createItemBuilder, blockOf(9), BARRIER, ::SolarPanel),
+    QUARRY("Quarry", blockOf(10), null, EnergyTileEntity::createItemBuilder, blockOf(10), COBBLESTONE, ::Quarry),
+    ELECTRICAL_FURNACE("Electrical Furnace", blockOf(11), null, EnergyTileEntity::createItemBuilder, blockOf(11), COBBLESTONE, ::ElectricalFurnace),
+    CHUNK_LOADER("Chunk Loader", blockOf(12), null, EnergyTileEntity::createItemBuilder, blockOf(12), COBBLESTONE, ::ChunkLoader),
+    BLOCK_BREAKER("Block Breaker", blockOf(13), null, EnergyTileEntity::createItemBuilder, blockOf(13), COBBLESTONE, ::BlockBreaker),
+    BLOCK_PLACER("Block Placer", blockOf(14), null, EnergyTileEntity::createItemBuilder, blockOf(14), COBBLESTONE, ::BlockPlacer),
+    STORAGE_UNIT("Storage Unit", blockOf(15), null, null, blockOf(15), BARRIER, ::StorageUnit),
+    CHARGER("Charger", blockOf(16), null, null, blockOf(16), IRON_BLOCK, ::Charger),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
@@ -75,15 +80,18 @@ enum class NovaMaterial(
     
     // 2000 - 3000: Upgrades and similar
     WRENCH("Wrench", itemOf(2000)),
-    ITEM_FILTER("Item Filter", itemOf(2001)),
+    ITEM_FILTER("Item Filter", itemOf(2001), FilterItem),
+    
+    // 3000 - 4000: Equipment, Attachments
+    JETPACK("Jetpack", ModelData(IRON_CHESTPLATE, intArrayOf(3000)), JetpackItem),
     
     // 5000 - 10.000 MultiModel Blocks
-    BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray() + (5025..5033).toIntArray()), null, ::BasicCable),
-    ADVANCED_CABLE("Advanced Cable", structureBlockOf(5009), null, structureBlockOf(intArrayOf(-1) + (5005..5008).toIntArray() + (5025..5033).toIntArray()), null, ::AdvancedCable),
-    ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray() + (5025..5033).toIntArray()), null, ::EliteCable),
-    ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), null, ::UltimateCable),
-    CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), null, ::CreativeCable),
-    SCAFFOLDING("Quarry Scaffolding", itemOf(5040), null, itemOf((5041..5046).toIntArray()), null, null),
+    BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray() + (5025..5033).toIntArray()), null, ::BasicCable),
+    ADVANCED_CABLE("Advanced Cable", structureBlockOf(5009), null, null, structureBlockOf(intArrayOf(-1) + (5005..5008).toIntArray() + (5025..5033).toIntArray()), null, ::AdvancedCable),
+    ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray() + (5025..5033).toIntArray()), null, ::EliteCable),
+    ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), null, ::UltimateCable),
+    CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), null, ::CreativeCable),
+    SCAFFOLDING("Quarry Scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray()), null, null),
     
     // 9.000 - 10.000 UI Elements
     SIDE_CONFIG_BUTTON("", itemOf(9000)),
@@ -123,8 +131,6 @@ enum class NovaMaterial(
         { createItemBuilderFunction(this, it) }
     } else null
     
-    constructor(itemName: String, item: ModelData) : this(itemName, item, null, null, null, null)
-    
     /**
      * Creates a basic [ItemBuilder] without any additional information
      * like an energy bar added to the [ItemStack].
@@ -143,11 +149,8 @@ enum class NovaMaterial(
      * If there is no custom [createItemBuilderFunction] for this [NovaMaterial],
      * it will return the result of [createBasicItemBuilder].
      */
-    fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder {
-        return if (createItemBuilderFunction != null) {
-            createItemBuilderFunction!!(tileEntity)
-        } else createBasicItemBuilder()
-    }
+    fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder =
+        createItemBuilderFunction?.invoke(tileEntity) ?: novaItem?.getDefaultItemBuilder(createBasicItemBuilder()) ?: createBasicItemBuilder()
     
     /**
      * Creates an [ItemStack] for this [NovaMaterial].
@@ -159,7 +162,7 @@ enum class NovaMaterial(
     /**
      * Creates an [ItemStack] with the specified amount for this [NovaMaterial].
      *
-     * This is the same as calling `createItemBuilder.build()`
+     * This is the same as calling `createItemBuilder.setAmount([amount]).build()`
      */
     fun createItemStack(amount: Int): ItemStack = createItemBuilder().setAmount(amount).build()
     

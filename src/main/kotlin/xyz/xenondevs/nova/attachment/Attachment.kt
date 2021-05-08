@@ -12,20 +12,24 @@ import java.util.*
  * A model with or without functionality that attaches to a [Player]
  * by using an [ArmorStand] as a passenger.
  *
- * @param uuid Specifies the [UUID] of the [Player] that carries
+ * @param key Specifies a key for this Attachment type. This key helps to remove
+ * the [Attachment] later without having to save to reference. If a [Player] already
+ * carries an [Attachment] of this key, an exception is thrown.
+ * @param playerUUID Specifies the [UUID] of the [Player] that carries
  * this [Attachment].
  * @param itemStack The [ItemStack] to be used for the [Attachment].
  * @param hideOnDown If the [Attachment] should be hidden clientside when
  * the [Player] is looking down.
  */
 class Attachment(
-    val uuid: UUID,
+    val key: String,
+    val playerUUID: UUID,
     val itemStack: ItemStack,
     val hideOnDown: Boolean
 ) {
     
     val player: Player?
-        get() = Bukkit.getPlayer(uuid)
+        get() = Bukkit.getPlayer(playerUUID)
     lateinit var armorStand: ArmorStand
     private lateinit var nmsEntity: Any
     private var hidden = false
@@ -78,7 +82,7 @@ class Attachment(
                 }
             }
             
-            if (tick % 10 == 0) {
+            if (tick % 3 == 0) {
                 // teleport the armor stand near the player because it's not actually a passenger
                 armorStand.teleport(player.location)
                 

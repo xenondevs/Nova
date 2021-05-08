@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedBukkitInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedRangedBukkitInventory
-import xyz.xenondevs.nova.serialization.JsonElementDataType
+import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.util.*
 import java.util.*

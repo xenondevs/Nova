@@ -5,31 +5,36 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.item.impl.FilterItem
+import xyz.xenondevs.nova.equipment.event.ArmorEquipEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.novaMaterial
 
 object ItemManager : Listener {
     
-    private val items = ArrayList<NovaItem>()
-    
     fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        
-        items.add(FilterItem)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
     fun handleInteract(event: PlayerInteractEvent) {
         if (event.isCompletelyDenied()) return
-        
-        val material = event.item?.novaMaterial
-        if (material != null) {
-            items
-                .filter { it.material == material }
-                .forEach { it.handleInteract(event.player, event.item!!, event.action, event) }
-        }
+        event.item?.novaMaterial?.novaItem?.handleInteract(event.player, event.item!!, event.action, event)
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    fun handleBreak(event: PlayerItemBreakEvent) {
+        event.brokenItem.novaMaterial?.novaItem?.handleBreak(event.player, event.brokenItem, event)
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun handleEquip(event: ArmorEquipEvent) {
+        val player = event.player
+        val unequippedItem = event.previousArmorItem
+        val equippedItem = event.newArmorItem
+        unequippedItem?.novaMaterial?.novaItem?.handleEquip(player, unequippedItem, false, event)
+        equippedItem?.novaMaterial?.novaItem?.handleEquip(player, equippedItem, true, event)
     }
     
 }

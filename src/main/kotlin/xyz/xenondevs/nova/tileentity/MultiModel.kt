@@ -6,7 +6,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.serialization.UUIDDataType
+import xyz.xenondevs.nova.serialization.persistentdata.UUIDDataType
 import xyz.xenondevs.nova.util.EntityUtils
 import java.util.*
 
