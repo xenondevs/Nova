@@ -7,8 +7,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.attachment.Attachment
 import xyz.xenondevs.nova.attachment.AttachmentManager
 import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.equipment.event.ArmorEquipEvent
-import xyz.xenondevs.nova.equipment.event.EquipMethod
+import xyz.xenondevs.nova.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.equipment.EquipMethod
 import xyz.xenondevs.nova.material.NovaMaterial
 
 private val MAX_ENERGY = NovaConfig.getInt("jetpack.capacity")!!

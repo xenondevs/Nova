@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.equipment.event
+package xyz.xenondevs.nova.equipment
 
 import org.bukkit.Material
 import org.bukkit.inventory.EquipmentSlot
