@@ -4,15 +4,13 @@ import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.equipment.event.ArmorEquipEvent
-import xyz.xenondevs.nova.equipment.event.EquipMethod
+import xyz.xenondevs.nova.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.equipment.EquipMethod
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.EnergyUtils
-import xyz.xenondevs.nova.util.runTask
 import kotlin.math.roundToInt
 
 private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy")
