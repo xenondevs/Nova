@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova
 
 import org.bukkit.plugin.java.JavaPlugin
+import xyz.xenondevs.nova.ability.AbilityManager
 import xyz.xenondevs.nova.advancement.AdvancementManager
 import xyz.xenondevs.nova.attachment.AttachmentManager
 import xyz.xenondevs.nova.command.CommandManager
@@ -37,6 +38,7 @@ class Nova : JavaPlugin() {
         AttachmentManager.init()
         CommandManager.init()
         ArmorEquipListener.init()
+        AbilityManager.init()
     }
     
     override fun onDisable() {

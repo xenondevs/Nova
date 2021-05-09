@@ -4,6 +4,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.ability.AbilityManager
+import xyz.xenondevs.nova.ability.AbilityManager.AbilityType
 import xyz.xenondevs.nova.attachment.Attachment
 import xyz.xenondevs.nova.attachment.AttachmentManager
 import xyz.xenondevs.nova.config.NovaConfig
@@ -23,8 +25,13 @@ object JetpackItem : ChargeableItem(MAX_ENERGY) {
         if (event.equipMethod == EquipMethod.BREAK) {
             event.isCancelled = true
         } else {
-            if (equipped) Attachment("Jetpack", player.uniqueId, NovaMaterial.JETPACK.createItemStack(), true)
-            else AttachmentManager.getAttachment(player.uniqueId, "Jetpack")?.remove()
+            if (equipped) {
+                Attachment("Jetpack", player.uniqueId, NovaMaterial.JETPACK.createItemStack(), true)
+                AbilityManager.giveAbility(player, AbilityType.JETPACK)
+            } else {
+                AttachmentManager.getAttachment(player.uniqueId, "Jetpack")?.remove()
+                AbilityManager.takeAbility(player, AbilityType.JETPACK)
+            }
         }
     }
     
