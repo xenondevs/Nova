@@ -4,6 +4,7 @@ import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.network.NetworkException
+import xyz.xenondevs.nova.util.addItemCorrectly
 
 interface NetworkedInventory {
     
@@ -81,7 +82,8 @@ class NetworkedBukkitInventory(private val inventory: Inventory) : NetworkedInve
     }
     
     override fun addItem(item: ItemStack): ItemStack? {
-        return inventory.addItem(item)[0]
+        val amount = inventory.addItemCorrectly(item)
+        return if (amount != 0) item.clone().also { it.amount = amount } else null
     }
     
     override fun equals(other: Any?) =
