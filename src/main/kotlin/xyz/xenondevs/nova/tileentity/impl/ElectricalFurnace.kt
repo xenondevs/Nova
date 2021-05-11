@@ -1,19 +1,17 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.PlayerUpdateReason
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ExperienceOrb
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
@@ -22,6 +20,7 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.inventory.CustomUpdateReason
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -59,7 +58,7 @@ class ElectricalFurnace(
     private var timeCooked = retrieveData("timeCooked") { 0 }
     private var experience = retrieveData("experience") { 0f }
     
-    private val gui by lazy { ElectricalFurnaceGUI() }
+    override val gui by lazy { ElectricalFurnaceGUI() }
     
     init {
         addAvailableInventories(inputInventory, outputInventory)
@@ -140,12 +139,7 @@ class ElectricalFurnace(
         }
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
-    inner class ElectricalFurnaceGUI {
+    inner class ElectricalFurnaceGUI : TileEntityGUI("Electrical Furnace") {
         
         private val progressItem = ProgressArrowItem()
         
@@ -158,7 +152,7 @@ class ElectricalFurnace(
             )
         ) { openWindow(it) }
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # # # # # . |" +
@@ -175,10 +169,6 @@ class ElectricalFurnace(
         
         init {
             updateProgress()
-        }
-        
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Electrical Furnace", gui).show()
         }
         
         fun updateProgress() {

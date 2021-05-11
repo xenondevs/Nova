@@ -2,12 +2,15 @@ package xyz.xenondevs.nova.tileentity
 
 import com.google.common.base.Preconditions
 import com.google.gson.JsonObject
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
+import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -23,6 +26,8 @@ abstract class TileEntity(
     val material: NovaMaterial,
     val armorStand: ArmorStand,
 ) {
+    
+    protected abstract val gui: TileEntityGUI?
     
     val mainDataObject: JsonObject = if (armorStand.hasTileEntityData()) armorStand.getTileEntityData() else JsonObject()
     val globalDataObject: JsonObject = mainDataObject.get("global")?.let { it as JsonObject }
@@ -118,6 +123,7 @@ abstract class TileEntity(
      */
     open fun handleRemoved(unload: Boolean) {
         isValid = false
+        gui?.closeWindows()
     }
     
     /**
@@ -125,7 +131,10 @@ abstract class TileEntity(
      * The event has should probably be cancelled if any action
      * is performed in that method.
      */
-    abstract fun handleRightClick(event: PlayerInteractEvent)
+    open fun handleRightClick(event: PlayerInteractEvent) {
+        event.isCancelled = true
+        gui?.openWindow(event.player)
+    }
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
@@ -248,5 +257,15 @@ abstract class TileEntity(
         }
         
     }
+    
+}
+
+abstract class TileEntityGUI(private val title: String) {
+    
+    abstract val gui: GUI
+    
+    fun openWindow(player: Player) = SimpleWindow(player, title, gui).show()
+    
+    fun closeWindows() = gui.closeForAllViewers()
     
 }

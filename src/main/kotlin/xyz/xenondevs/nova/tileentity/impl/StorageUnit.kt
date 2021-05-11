@@ -6,10 +6,7 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -17,6 +14,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.ItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.StorageUnitDisplay
@@ -35,7 +33,7 @@ class StorageUnit(
     private val inventory = StorageUnitInventory(retrieveOrNull("type"), retrieveOrNull("amount") ?: 0)
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
     private val outputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleOutputInventoryUpdate) }
-    private val gui by lazy { ItemStorageGUI() }
+    override val gui by lazy { ItemStorageGUI() }
     
     init {
         addAvailableInventories(uuid to inventory)
@@ -84,18 +82,13 @@ class StorageUnit(
         }
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
     override fun saveData() {
         super.saveData()
         storeData("type", inventory.type, true)
         storeData("amount", inventory.amount, true)
     }
     
-    private inner class ItemStorageGUI {
+    inner class ItemStorageGUI : TileEntityGUI("Storage Unit") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@StorageUnit,
@@ -106,7 +99,7 @@ class StorageUnit(
         
         private val storageUnitDisplay = StorageUnitDisplay(inventory)
         
-        private val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 3)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 3)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| # i # c # o s |" +
@@ -116,9 +109,6 @@ class StorageUnit(
             .addIngredient('o', VISlotElement(outputInventory, 0))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
-        
-        fun openWindow(player: Player) =
-            SimpleWindow(player, "Storage Unit", gui).show()
         
         fun updateWindows() {
             storageUnitDisplay.notifyWindows()

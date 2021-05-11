@@ -1,17 +1,16 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.isGlass
@@ -39,7 +38,7 @@ class SolarPanel(
     private val obstructionTask = runTaskTimer(0, 20 * 5, ::checkSkyObstruction)
     private var obstructed = true
     
-    private val gui by lazy { SolarPanelUI() }
+    override val gui by lazy { SolarPanelGUI() }
     
     private fun checkSkyObstruction() {
         obstructed = false
@@ -66,19 +65,14 @@ class SolarPanel(
         if (hasEnergyChanged) gui.energyBar.update()
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
     override fun handleDisabled() {
         super.handleDisabled()
         obstructionTask.cancel()
     }
     
-    private inner class SolarPanelUI {
+    inner class SolarPanelGUI : TileEntityGUI("Solar Panel") {
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| # # # . # # # |" +
@@ -88,10 +82,6 @@ class SolarPanel(
             .build()
         
         val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
-        
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Solar Panel", gui).show()
-        }
         
     }
     

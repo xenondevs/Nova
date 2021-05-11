@@ -1,30 +1,24 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
-import xyz.xenondevs.nova.util.EnergyUtils
 import xyz.xenondevs.nova.util.fuel
-import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.util.toItemStack
 import java.util.*
 import kotlin.math.min
@@ -47,7 +41,7 @@ class FurnaceGenerator(
     
     private val inventory = getInventory("fuel", 1, true, ::handleInventoryUpdate)
     
-    private val gui by lazy { CoalGeneratorGUI() }
+    override val gui by lazy { FurnaceGeneratorGUI() }
     
     init {
         setDefaultInventory(inventory)
@@ -95,27 +89,13 @@ class FurnaceGenerator(
         }
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        
-        runAsyncTaskLater(1) {
-            when (event.hand) {
-                EquipmentSlot.HAND -> event.player.swingMainHand()
-                EquipmentSlot.OFF_HAND -> event.player.swingOffHand()
-                else -> Unit
-            }
-        }
-        
-        gui.openWindow(event.player)
-    }
-    
     override fun saveData() {
         super.saveData()
         storeData("burnTime", burnTime)
         storeData("totalBurnTime", totalBurnTime)
     }
     
-    inner class CoalGeneratorGUI {
+    inner class FurnaceGeneratorGUI : TileEntityGUI("Furnace Generator") {
         
         val progressItem = EnergyProgressItem()
         
@@ -125,7 +105,7 @@ class FurnaceGenerator(
             listOf(Triple(getNetworkedInventory(inventory), "Fuel Inventory", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # # # # # # |" +
@@ -140,9 +120,6 @@ class FurnaceGenerator(
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, -1) }
         
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Furnace Generator", gui).show()
-        }
     }
     
 }

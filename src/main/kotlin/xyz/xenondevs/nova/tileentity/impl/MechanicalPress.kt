@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -7,13 +8,11 @@ import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Sound
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -23,6 +22,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.recipe.PressRecipe
 import xyz.xenondevs.nova.recipe.PressType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -51,7 +51,7 @@ class MechanicalPress(
     private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
     private val outputInv = getInventory("output", 1, true, ::handleOutputUpdate)
     
-    private val gui by lazy { MechanicalPressUI() }
+    override val gui by lazy { MechanicalPressGUI() }
     
     init {
         addAvailableInventories(inputInv, outputInv)
@@ -94,11 +94,6 @@ class MechanicalPress(
         }
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
     private fun handleInputUpdate(event: ItemUpdateEvent) {
         if (event.updateReason != null && event.newItemStack != null) {
             val material = event.newItemStack.type
@@ -119,7 +114,12 @@ class MechanicalPress(
         storeData("currentItem", currentItem)
     }
     
-    inner class MechanicalPressUI {
+    override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
+        if (!unload) gui.close()
+    }
+    
+    inner class MechanicalPressGUI : TileEntityGUI("Mechanical Press") {
         
         private val pressProgress = PressProgressItem()
         private val pressTypeItems = ArrayList<PressTypeItem>()
@@ -133,7 +133,7 @@ class MechanicalPress(
             )
         ) { openWindow(it) }
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| p g # i # # . |" +
@@ -158,9 +158,7 @@ class MechanicalPress(
             pressProgress.percentage = if (pressTime == 0) 0.0 else (PRESS_TIME - pressTime).toDouble() / PRESS_TIME.toDouble()
         }
         
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Mechanical Press", gui).show()
-        }
+        fun close() = gui.closeForAllViewers()
         
         private inner class PressTypeItem(private val type: PressType) : BaseItem() {
             

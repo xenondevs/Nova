@@ -8,6 +8,7 @@ import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Orientable
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
@@ -28,6 +29,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.CableItemConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.point.Point3D
@@ -55,6 +57,8 @@ open class Cable(
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = retrieveData("bridgeFaces") { CUBE_FACES.toMutableSet() }
+    
+    override val gui: TileEntityGUI? = null
     
     override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
@@ -91,6 +95,14 @@ open class Cable(
         super.handleRemoved(unload)
         NetworkManager.handleBridgeRemove(this, unload)
         hitboxes.forEach { it.remove() }
+        
+        if (!unload) {
+            filterInventories.values
+                .flatMap { it.values.toList() }
+                .flatMap { it.windows }
+                .mapNotNull { it.currentViewer }
+                .forEach(Player::closeInventory)
+        }
     }
     
     override fun getFilter(type: ItemConnectionType, blockFace: BlockFace) =
@@ -288,10 +300,7 @@ open class Cable(
         }
     }
     
-    
     override fun handleTick() = Unit
-    
-    override fun handleRightClick(event: PlayerInteractEvent) = Unit
     
 }
 

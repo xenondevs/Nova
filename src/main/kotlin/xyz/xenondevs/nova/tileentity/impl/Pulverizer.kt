@@ -1,13 +1,11 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -15,6 +13,7 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.recipe.PulverizerRecipe
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -44,7 +43,7 @@ class Pulverizer(
     override val requestedEnergy: Int
         get() = MAX_ENERGY - energy
     
-    private val gui by lazy { PulverizerGUI() }
+    override val gui by lazy { PulverizerGUI() }
     
     init {
         addAvailableInventories(inputInv, outputInv)
@@ -85,11 +84,6 @@ class Pulverizer(
         }
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
     private fun handleInputUpdate(event: ItemUpdateEvent) {
         if (event.updateReason != null && event.newItemStack != null) {
             val material = event.newItemStack.type
@@ -109,7 +103,7 @@ class Pulverizer(
         storeData("currentItem", currentItem)
     }
     
-    inner class PulverizerGUI {
+    inner class PulverizerGUI : TileEntityGUI("Pulverizer") {
         
         private val mainProgress = ProgressArrowItem()
         private val pulverizerProgress = PulverizerProgress()
@@ -123,7 +117,7 @@ class Pulverizer(
             ),
         ) { openWindow(it) }
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # # # # # . |" +
@@ -142,10 +136,6 @@ class Pulverizer(
         
         init {
             updateProgress()
-        }
-        
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Pulverizer", gui).show()
         }
         
         fun updateProgress() {

@@ -1,19 +1,18 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.ChargeableItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -35,7 +34,7 @@ class Charger(
     
     private val inventory = getInventory("inventory", 1, true, ::handleInventoryUpdate)
     
-    private val gui by lazy { ChargerGUI() }
+    override val gui by lazy { ChargerGUI() }
     
     init {
         setDefaultInventory(inventory)
@@ -65,12 +64,7 @@ class Charger(
         }
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
-    private inner class ChargerGUI {
+    inner class ChargerGUI : TileEntityGUI("Charger") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Charger,
@@ -78,7 +72,7 @@ class Charger(
             listOf(Triple(getNetworkedInventory(inventory), "Charger Inventory", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # # # # # . |" +
@@ -90,10 +84,6 @@ class Charger(
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
-        
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Charger", gui).show()
-        }
         
     }
     

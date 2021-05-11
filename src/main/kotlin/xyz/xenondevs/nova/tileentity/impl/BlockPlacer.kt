@@ -1,18 +1,17 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -40,7 +39,7 @@ class BlockPlacer(
     private val inventory = getInventory("inventory", 9, true) { }
     private val block = location.clone().advance(getFace(BlockSide.FRONT)).block
     
-    private val gui by lazy { BlockPlacerGUI() }
+    override val gui by lazy { BlockPlacerGUI() }
     
     init {
         setDefaultInventory(inventory)
@@ -84,21 +83,15 @@ class BlockPlacer(
         }
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
-    
-    private inner class BlockPlacerGUI {
+    inner class BlockPlacerGUI : TileEntityGUI("Block Placer") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "BlockBreaker Inventory", ItemConnectionType.EXTRACT_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "BlockPlacer Inventory", ItemConnectionType.EXTRACT_TYPES))
         ) { openWindow(it) }
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # . . . # . |" +
@@ -110,10 +103,6 @@ class BlockPlacer(
             .also { it.fillRectangle(3, 1, 3, inventory, true) }
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
-        
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Block Placer", gui).show()
-        }
         
     }
     

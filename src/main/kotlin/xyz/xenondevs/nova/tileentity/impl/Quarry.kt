@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.block.Block
@@ -13,15 +13,11 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
-import xyz.xenondevs.nova.tileentity.Model
-import xyz.xenondevs.nova.tileentity.MultiModel
-import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -71,7 +67,7 @@ class Quarry(
     override val requestedEnergy: Int
         get() = MAX_ENERGY - energy
     
-    private val gui by lazy { QuarryGUI() }
+    override val gui by lazy { QuarryGUI() }
     private val inventory = getInventory("quarryInventory", 9, true) {}
     
     private val entityId = uuid.hashCode()
@@ -399,12 +395,7 @@ class Quarry(
         model.addModels(Model(FULL_VERTICAL, location.center()))
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
-    private inner class QuarryGUI {
+    inner class QuarryGUI : TileEntityGUI("Quarry") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
@@ -414,7 +405,7 @@ class Quarry(
         
         private val sizeItems = ArrayList<Item>()
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 6)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # # # # # . |" +
@@ -434,10 +425,6 @@ class Quarry(
         private fun setSize(size: Int) {
             resize(size, size)
             sizeItems.forEach(Item::notifyWindows)
-        }
-        
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Quarry", gui).show()
         }
         
         private inner class NumberDisplayItem(private val getNumber: () -> Int) : BaseItem() {

@@ -4,7 +4,6 @@ import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.util.EnergyUtils

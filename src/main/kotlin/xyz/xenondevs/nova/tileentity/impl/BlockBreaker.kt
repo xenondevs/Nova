@@ -1,18 +1,17 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -43,7 +42,7 @@ class BlockBreaker(
     private var lastType: Material? = null
     private var breakProgress = retrieveData("breakProgress") { 0.0 }
     
-    private val gui by lazy { BlockBreakerGUI() }
+    override val gui by lazy { BlockBreakerGUI() }
     
     init {
         setDefaultInventory(inventory)
@@ -100,13 +99,7 @@ class BlockBreaker(
         }
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
-    
-    private inner class BlockBreakerGUI {
+    inner class BlockBreakerGUI : TileEntityGUI("Block Breaker") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@BlockBreaker,
@@ -114,7 +107,7 @@ class BlockBreaker(
             listOf(Triple(getNetworkedInventory(inventory), "BlockBreaker Inventory", ItemConnectionType.EXTRACT_TYPES))
         ) { openWindow(it) }
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 5)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # . . . # . |" +
@@ -126,10 +119,6 @@ class BlockBreaker(
             .also { it.fillRectangle(3, 1, 3, inventory, true) }
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, ENERGY_PER_TICK) }
-        
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Block Breaker", gui).show()
-        }
         
     }
     

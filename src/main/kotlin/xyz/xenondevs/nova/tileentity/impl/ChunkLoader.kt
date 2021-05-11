@@ -1,18 +1,17 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Chunk
 import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -40,7 +39,7 @@ class ChunkLoader(
     private var chunks: List<Chunk> = retrieveData("chunks") { chunk.getSurroundingChunks(range, true) }
     private var active = false
     
-    private val gui by lazy { ChunkLoaderGUI() }
+    override val gui by lazy { ChunkLoaderGUI() }
     
     override fun saveData() {
         super.saveData()
@@ -85,12 +84,7 @@ class ChunkLoader(
         if (!unload) setChunksForceLoaded(false)
     }
     
-    override fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui.openWindow(event.player)
-    }
-    
-    private inner class ChunkLoaderGUI {
+    inner class ChunkLoaderGUI : TileEntityGUI("Chunk Loader") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@ChunkLoader,
@@ -100,7 +94,7 @@ class ChunkLoader(
         
         private val rangeItems = ArrayList<Item>()
         
-        private val gui = GUIBuilder(GUIType.NORMAL, 9, 3)
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 3)
             .setStructure("" +
                 "# 1 - - - - - 2 ." +
                 "# | # m n p # | ." +
@@ -118,10 +112,6 @@ class ChunkLoader(
             this@ChunkLoader.setRange(range)
             rangeItems.forEach(Item::notifyWindows)
             energyBar.update()
-        }
-        
-        fun openWindow(player: Player) {
-            SimpleWindow(player, "Chunk Loader", gui).show()
         }
         
     }
