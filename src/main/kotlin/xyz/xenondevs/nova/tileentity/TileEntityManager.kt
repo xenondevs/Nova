@@ -2,12 +2,14 @@ package xyz.xenondevs.nova.tileentity
 
 import com.google.gson.JsonObject
 import org.bukkit.*
+import org.bukkit.block.Block
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
+import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
@@ -19,6 +21,7 @@ import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import java.util.*
+import kotlin.collections.HashSet
 import kotlin.math.roundToInt
 
 val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
@@ -64,6 +67,7 @@ fun ArmorStand.hasTileEntityData(): Boolean =
 object TileEntityManager : Listener {
     
     private val tileEntityMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
+    val locationCache = HashSet<Location>()
     val tileEntities: List<TileEntity>
         get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
     
@@ -72,6 +76,14 @@ object TileEntityManager : Listener {
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkLoad)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkUnload) }
         runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
+        
+        runTaskTimer(0, 1200) {
+            // In some special cases no event is called when replacing a block. So we check for air blocks every minute.
+            tileEntities.associateWith(TileEntity::location).forEach { (tileEntity, location) ->
+                if (Material.AIR == location.block.type)
+                    destroyTileEntity(tileEntity, false)
+            }
+        }
     }
     
     fun placeTileEntity(
@@ -90,10 +102,7 @@ object TileEntityManager : Listener {
             .clone()
             .add(0.5, 0.0, 0.5)
             .also { it.yaw = ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f }
-        val armorStand = EntityUtils.spawnArmorStandSilently(
-            spawnLocation,
-            headItem
-        )
+        val armorStand = EntityUtils.spawnArmorStandSilently(spawnLocation, headItem)
         
         // set TileEntity data
         armorStand.setTileEntityData(data.let { JsonObject().apply { add("global", it) } })
@@ -105,6 +114,8 @@ object TileEntityManager : Listener {
         val chunk = block.chunk
         val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>().also { tileEntityMap[chunk] = it }
         chunkMap[location] = tileEntity
+        // add to location cache
+        locationCache += location
         
         // 1 tick later or it collides with the cancelled event which removes the block
         runTaskLater(1) {
@@ -117,13 +128,13 @@ object TileEntityManager : Listener {
         val location = tileEntity.armorStand.location.blockLocation
         val chunk = location.chunk
         
-        location.block.type = Material.AIR
-        
-        val drops = tileEntity.destroy(dropItems) // destroy tileEntity and save drops for later
-        
         // remove TileEntity and ArmorStand
         tileEntityMap[chunk]?.remove(location)
+        locationCache -= location
         tileEntity.armorStand.remove()
+        
+        location.block.type = Material.AIR
+        val drops = tileEntity.destroy(dropItems) // destroy tileEntity and save drops for later
         
         tileEntity.handleRemoved(unload = false)
         
@@ -146,11 +157,13 @@ object TileEntityManager : Listener {
         
         chunk.entities
             .filterIsInstance<ArmorStand>()
-            .filter { it.hasTileEntityData() }
+            .filter(ArmorStand::hasTileEntityData)
             .forEach { armorStand ->
                 armorStand.fireTicks = Int.MAX_VALUE
                 val tileEntity = TileEntity.newInstance(armorStand)
-                chunkMap[armorStand.location.clone().apply { removeOrientation() }.subtract(0.5, 0.0, 0.5)] = tileEntity
+                val location = armorStand.location.clone().apply(Location::removeOrientation).subtract(0.5, 0.0, 0.5)
+                chunkMap[location] = tileEntity
+                locationCache += location
             }
         
         tileEntityMap[chunk] = chunkMap
@@ -159,7 +172,8 @@ object TileEntityManager : Listener {
     
     private fun handleChunkUnload(chunk: Chunk) {
         val tileEntities = tileEntityMap[chunk]
-        tileEntityMap.remove(chunk)
+        tileEntityMap -= chunk
+        locationCache.removeAll { it.chunk == chunk }
         tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleDisabled(); tileEntity.handleRemoved(unload = true) }
     }
     
@@ -247,4 +261,25 @@ object TileEntityManager : Listener {
         if (event.blocks.any { getTileEntityAt(it.location) != null }) event.isCancelled = true
     }
     
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun handleBlockPhysics(event: BlockPhysicsEvent) {
+        val location = event.block.location
+        if (location in locationCache && Material.AIR == event.block.type) {
+            val tileEntity = getTileEntityAt(location)
+            if (tileEntity != null)
+                destroyAndDropTileEntity(tileEntity, true)
+        }
+    }
+    
+    private fun handleExplosion(blockList: MutableList<Block>) {
+        val tiles = blockList.filter { it.location in locationCache }
+        blockList.removeAll(tiles)
+        tiles.forEach { destroyAndDropTileEntity(getTileEntityAt(it.location)!!, true) }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun handleEntityExplosion(event: EntityExplodeEvent) = handleExplosion(event.blockList())
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun handleBlockExplosion(event: BlockExplodeEvent) = handleExplosion(event.blockList())
 }
