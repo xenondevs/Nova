@@ -136,7 +136,7 @@ class StorageUnit(
         override val items: Array<ItemStack?>
             get() {
                 type ?: return emptyArray()
-                return arrayOf((type!!.clone().also { it.amount = min(type!!.maxStackSize, amount) }))
+                return arrayOf(type!!.clone().also { it.amount = amount })
             }
         
         override fun addItem(item: ItemStack): ItemStack? {
@@ -159,7 +159,7 @@ class StorageUnit(
         }
         
         override fun setItem(slot: Int, item: ItemStack?) {
-            amount -= min(type!!.maxStackSize, amount) - (item?.amount ?: 0)
+            amount = item?.amount ?: 0
             if (item != null || amount == 0)
                 type = item
             
