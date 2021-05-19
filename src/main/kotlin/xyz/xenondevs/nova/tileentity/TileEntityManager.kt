@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import java.util.*
-import kotlin.collections.HashSet
 import kotlin.math.roundToInt
 
 val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")

@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.CableItemConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.point.Point3D
@@ -263,7 +264,6 @@ open class Cable(
         runTaskLater(1) {
             if (isValid) {
                 val block = armorStand.location.block
-                block.type = Material.CHAIN
                 val blockData = block.blockData as Orientable
                 blockData.axis = axis
                 block.setBlockData(blockData, false)

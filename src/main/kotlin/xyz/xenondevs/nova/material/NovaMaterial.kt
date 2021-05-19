@@ -86,11 +86,11 @@ enum class NovaMaterial(
     JETPACK("Jetpack", ModelData(IRON_CHESTPLATE, intArrayOf(3000)), JetpackItem),
     
     // 5000 - 10.000 MultiModel Blocks
-    BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray() + (5025..5033).toIntArray()), null, ::BasicCable),
-    ADVANCED_CABLE("Advanced Cable", structureBlockOf(5009), null, null, structureBlockOf(intArrayOf(-1) + (5005..5008).toIntArray() + (5025..5033).toIntArray()), null, ::AdvancedCable),
-    ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray() + (5025..5033).toIntArray()), null, ::EliteCable),
-    ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), null, ::UltimateCable),
-    CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), null, ::CreativeCable),
+    BASIC_CABLE("Basic Cable", structureBlockOf(5004), null, null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::BasicCable),
+    ADVANCED_CABLE("Advanced Cable", structureBlockOf(5009), null, null, structureBlockOf(intArrayOf(-1) + (5005..5008).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::AdvancedCable),
+    ELITE_CABLE("Elite Cable", structureBlockOf(5014), null, null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::EliteCable),
+    ULTIMATE_CABLE("Ultimate Cable", structureBlockOf(5019), null, null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::UltimateCable),
+    CREATIVE_CABLE("Creative Cable", structureBlockOf(5024), null, null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::CreativeCable),
     SCAFFOLDING("Quarry Scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray()), null, null),
     
     // 9.000 - 10.000 UI Elements
