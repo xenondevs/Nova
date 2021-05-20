@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.item.impl
 
 import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.ability.AbilityManager
 import xyz.xenondevs.nova.ability.AbilityManager.AbilityType

@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.util
 import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.RecipeChoice.MaterialChoice

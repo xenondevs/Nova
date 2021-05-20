@@ -17,7 +17,7 @@ interface NetworkNode {
      *
      * For [NetworkBridge]s, connected nodes can be [NetworkBridge]s as well as
      * [NetworkEndPoint]s. For [NetworkEndPoint]s, only [NetworkBridge]s.
-     * 
+     *
      * Should always contain the [NetworkType] keys, but only contain the
      * [BlockFace]s that actually have a [NetworkNode] connected to them.
      */

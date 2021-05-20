@@ -262,7 +262,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun isOnGround(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -307,7 +306,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun playNote(loc: Location, instrument: Byte, note: Byte) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -348,7 +346,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun playEffect(loc: Location, effect: Effect, data: Int) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -357,7 +354,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun sendBlockChange(loc: Location, material: Material, data: Byte) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -370,7 +366,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun sendChunkChange(loc: Location, sx: Int, sy: Int, sz: Int, data: ByteArray): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -473,7 +468,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun hidePlayer(player: Player) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -482,7 +476,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun showPlayer(player: Player) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -521,7 +514,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun setTexturePack(url: String) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -568,7 +560,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun sendTitle(title: String?, subtitle: String?) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -705,12 +696,10 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun getItemInHand(): ItemStack {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun setItemInHand(item: ItemStack?) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -799,22 +788,18 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun getShoulderEntityLeft(): Entity? {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun setShoulderEntityLeft(entity: Entity?) {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun getShoulderEntityRight(): Entity? {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun setShoulderEntityRight(entity: Entity?) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -975,7 +960,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun addPotionEffect(effect: PotionEffect, force: Boolean): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1141,17 +1125,14 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun getMaxHealth(): Double {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun setMaxHealth(health: Double) {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun resetMaxHealth() {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1257,12 +1238,10 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun getPassenger(): Entity? {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Deprecated("")
     override fun setPassenger(passenger: Entity): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }

@@ -136,7 +136,7 @@ class ItemSideConfigGUI(
     private inner class InventoryConfigItem(val blockSide: BlockSide) : BaseItem() {
         
         private val blockFace = (itemStorage as TileEntity).getFace(blockSide)
-    
+        
         init {
             registerConfigItem(blockFace, this)
         }

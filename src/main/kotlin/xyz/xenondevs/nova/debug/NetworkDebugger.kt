@@ -16,7 +16,6 @@ import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.color.RegularColor
 import java.awt.Color
 import java.util.*
-import kotlin.collections.ArrayList
 
 object NetworkDebugger {
     

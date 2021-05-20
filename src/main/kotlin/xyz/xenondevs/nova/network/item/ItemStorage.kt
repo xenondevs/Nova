@@ -29,7 +29,7 @@ enum class ItemConnectionType(val insert: Boolean, val extract: Boolean) {
     BUFFER(true, true);
     
     companion object {
-    
+        
         val ALL_TYPES = listOf(NONE, INSERT, EXTRACT, BUFFER)
         val INSERT_TYPES = listOf(NONE, INSERT)
         val EXTRACT_TYPES = listOf(NONE, EXTRACT)

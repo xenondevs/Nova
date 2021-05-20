@@ -22,7 +22,7 @@ object NovaRecipeDeserializer : JsonDeserializer<NovaRecipe> {
         val result = NovaMaterial.valueOf(resultName)
         val amount = json.getInt("amount", default = 1)!!
         val shape = json.getAsJsonArray("shape").toStringList(::ArrayList)
-
+        
         val ingredients = HashMap<Char, RecipeChoice>()
         json.getAsJsonArray("ingredients").filterIsInstance<JsonObject>().forEach { ingr ->
             val char = ingr.getString("char")!!.first()

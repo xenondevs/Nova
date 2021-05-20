@@ -149,7 +149,7 @@ object NetworkManager {
         endPoint.networks.clear()
         NetworkType.values().forEach { endPoint.connectedNodes[it] = enumMapOf() }
         
-        if(!unload) endPoint.updateNearbyBridges()
+        if (!unload) endPoint.updateNearbyBridges()
     }
     
     fun handleBridgeRemove(bridge: NetworkBridge, unload: Boolean) {
@@ -226,9 +226,9 @@ object NetworkManager {
                 bridge.networks.remove(networkType)
             }
         }
-    
+        
         NetworkType.values().forEach { bridge.connectedNodes[it] = enumMapOf() }
-    
+        
         // update nearby bridges
         if (!unload) bridge.updateNearbyBridges()
     }

@@ -207,7 +207,7 @@ object ReflectionUtils {
                 pair.second?.let { createNMSItemStackCopy(it) } ?: NMS_EMPTY_ITEM_STACK
             )
         }
-    
+        
         return NMS_PACKET_PLAY_OUT_ENTITY_EQUIPMENT_CONSTRUCTOR.newInstance(entityId, nmsItems)
     }
     

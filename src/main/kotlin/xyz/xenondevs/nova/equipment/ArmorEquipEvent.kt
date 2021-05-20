@@ -5,7 +5,6 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
-import java.lang.IllegalStateException
 
 class ArmorEquipEvent(
     player: Player,

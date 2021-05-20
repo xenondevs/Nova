@@ -151,7 +151,8 @@ enum class NovaMaterial(
      * it will return the result of [createBasicItemBuilder].
      */
     fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder =
-        createItemBuilderFunction?.invoke(tileEntity) ?: novaItem?.getDefaultItemBuilder(createBasicItemBuilder()) ?: createBasicItemBuilder()
+        createItemBuilderFunction?.invoke(tileEntity) ?: novaItem?.getDefaultItemBuilder(createBasicItemBuilder())
+        ?: createBasicItemBuilder()
     
     /**
      * Creates an [ItemStack] for this [NovaMaterial].
