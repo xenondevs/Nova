@@ -59,8 +59,6 @@ class MobKiller(
             if (--idleTime == 0) {
                 idleTime = IDLE_TIME
                 
-                gui.idleBar.percentage = (IDLE_TIME - idleTime) / IDLE_TIME.toDouble()
-                
                 val killLimit = min(energy / ENERGY_PER_DAMAGE, KILL_LIMIT)
                 val chunks = location.chunk.getSurroundingChunks(1, includeCurrent = true, ignoreUnloaded = true)
                 chunks.flatMap { chunk.entities.asList() }
@@ -74,6 +72,7 @@ class MobKiller(
             }
         }
         
+        gui.idleBar.percentage = (IDLE_TIME - idleTime) / IDLE_TIME.toDouble()
         
         if (hasEnergyChanged) {
             hasEnergyChanged = false

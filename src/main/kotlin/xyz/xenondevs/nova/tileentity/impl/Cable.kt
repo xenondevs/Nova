@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Axis
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Orientable
 import org.bukkit.entity.ArmorStand
@@ -30,7 +29,6 @@ import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.CableItemConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.point.Point3D

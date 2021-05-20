@@ -132,8 +132,10 @@ abstract class TileEntity(
      * is performed in that method.
      */
     open fun handleRightClick(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        gui?.openWindow(event.player)
+        if (gui != null) {
+            event.isCancelled = true
+            gui!!.openWindow(event.player)
+        }
     }
     
     /**

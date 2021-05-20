@@ -17,10 +17,6 @@ private val MAX_ENERGY = NovaConfig.getInt("jetpack.capacity")!!
 
 object JetpackItem : ChargeableItem(MAX_ENERGY) {
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
-        addEnergy(itemStack, 1000)
-    }
-    
     override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {
         if (event.equipMethod == EquipMethod.BREAK) {
             event.isCancelled = true
