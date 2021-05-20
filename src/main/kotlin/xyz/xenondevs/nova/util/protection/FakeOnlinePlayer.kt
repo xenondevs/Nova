@@ -637,6 +637,10 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getPing(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getLocale(): String {
         throw UnsupportedOperationException("Player is not online")
     }

@@ -165,7 +165,7 @@ class ElectricalFurnace(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, ENERGY_PER_TICK) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, if (currentRecipe != null) -ENERGY_PER_TICK else 0) }
         
         init {
             updateProgress()

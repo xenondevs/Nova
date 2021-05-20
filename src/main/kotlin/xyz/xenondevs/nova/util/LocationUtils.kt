@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import com.google.common.base.Preconditions
 import org.bukkit.Axis
 import org.bukkit.Chunk
 import org.bukkit.Location
@@ -154,6 +155,12 @@ fun Location.getRectangle(to: Location, omitCorners: Boolean): Map<Axis, List<Lo
 fun World.dropItemsNaturally(location: Location, items: Iterable<ItemStack>) =
     items.forEach { dropItemNaturally(location, it) }
 
+fun Location.isBetween(min: Location, max: Location) =
+    x in min.x.rangeTo(max.x)
+        && y in min.y.rangeTo(max.y)
+        && z in min.z.rangeTo(max.z)
+
+
 object LocationUtils {
     
     fun getTopBlocksBetween(
@@ -180,5 +187,18 @@ object LocationUtils {
     
     fun getStraightLine(base: Location, axis: Axis, range: IntRange) =
         range.map { base.clone().apply { setCoordinate(axis, it.toDouble()) } }
+    
+    fun sort(first: Location, second: Location): Pair<Location, Location> {
+        Preconditions.checkArgument(first.world == second.world)
+        
+        val minX = min(first.x, second.x)
+        val minY = min(first.y, second.y)
+        val minZ = min(first.z, second.z)
+        val maxX = max(first.x, second.x)
+        val maxY = max(first.y, second.y)
+        val maxZ = max(first.z, second.z)
+        
+        return Location(first.world, minX, minY, minZ) to Location(second.world, maxX, maxY, maxZ)
+    }
     
 }

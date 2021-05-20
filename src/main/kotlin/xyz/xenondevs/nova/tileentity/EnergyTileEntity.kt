@@ -20,8 +20,8 @@ abstract class EnergyTileEntity(
     
     protected var energy: Int = retrieveData("energy") { 0 }
         set(value) {
+            if (field != value) hasEnergyChanged = true
             field = value
-            hasEnergyChanged = true
         }
     protected var hasEnergyChanged = true
     override val providedEnergy: Int

@@ -420,7 +420,7 @@ class Quarry(
             .build()
             .also { it.fillRectangle(4, 2, 3, inventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, energyPerTick) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, if (!done) -energyPerTick else 0) }
         
         private fun setSize(size: Int) {
             resize(size, size)

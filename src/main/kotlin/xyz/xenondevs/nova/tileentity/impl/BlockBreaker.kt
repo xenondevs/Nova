@@ -118,7 +118,7 @@ class BlockBreaker(
             .build()
             .also { it.fillRectangle(3, 1, 3, inventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, ENERGY_PER_TICK) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
         
     }
     

@@ -53,16 +53,18 @@ class SolarPanel(
     }
     
     override fun handleTick() {
-        if (!obstructed) {
-            val time = location.world!!.time
-            if (time < 13_000) {
-                val bestTime = 6_500
-                val multiplier = (bestTime - abs(bestTime - time)) / bestTime.toDouble()
-                val energyGenerated = (ENERGY_PER_TICK * multiplier).roundToInt()
-                energy = min(energy + energyGenerated, MAX_ENERGY)
-            }
-        }
+        energy = min(energy + calculateCurrentEnergyOutput(), MAX_ENERGY)
         if (hasEnergyChanged) gui.energyBar.update()
+    }
+    
+    private fun calculateCurrentEnergyOutput(): Int {
+        val time = location.world!!.time
+        if (!obstructed && time < 13_000) {
+            val bestTime = 6_500
+            val multiplier = (bestTime - abs(bestTime - time)) / bestTime.toDouble()
+            return (ENERGY_PER_TICK * multiplier).roundToInt()
+        }
+        return 0
     }
     
     override fun handleDisabled() {
@@ -81,7 +83,7 @@ class SolarPanel(
                 "3 - - - - - - - 4")
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, calculateCurrentEnergyOutput()) }
         
     }
     

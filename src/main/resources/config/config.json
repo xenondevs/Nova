@@ -92,5 +92,13 @@
   "charger": {
     "capacity": 1000000,
     "charge_speed": 100
+  },
+  "mob_killer": {
+    "capacity": 10000,
+    "energy_per_tick": 20,
+    "energy_per_damage": 300,
+    "idle_time": 20,
+    "kill_limit": 3,
+    "damage": 10
   }
 }

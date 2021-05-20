@@ -29,7 +29,7 @@ object EnergyUtils {
         val prefixedMaxEnergy = bestMaxEnergy.first.stripTrailingZeros().toPlainString()
         
         val unit = "${prefix.prefixSymbol}J"
-        return "§r$prefixedEnergy$unit / $prefixedMaxEnergy$unit"
+        return "§r$prefixedEnergy $unit / $prefixedMaxEnergy $unit"
     }
     
 }

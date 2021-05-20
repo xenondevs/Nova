@@ -106,7 +106,7 @@ class ChunkLoader(
             .addIngredient('n', DisplayNumberItem { range + 1 }.also(rangeItems::add))
             .build()
         
-        val energyBar = EnergyBar(gui, 8, 0, 3) { Triple(energy, MAX_ENERGY, ENERGY_PER_CHUNK * chunks.size) }
+        val energyBar = EnergyBar(gui, 8, 0, 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_CHUNK * chunks.size) }
         
         private fun setRange(range: Int) {
             this@ChunkLoader.setRange(range)

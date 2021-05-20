@@ -118,7 +118,7 @@ class FurnaceGenerator(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, -1) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, if (burnTime > 0) ENERGY_PER_TICK else 0) }
         
     }
     
