@@ -7,6 +7,7 @@ import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Item
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.item.ItemConnectionType
@@ -16,18 +17,21 @@ import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
+import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.isBetween
 import xyz.xenondevs.nova.util.novaMaterial
 import java.util.*
+
+private val RANGE = NovaConfig.getDouble("vacuum_chest.range")!!
 
 class VacuumChest(ownerUUID: UUID?, material: NovaMaterial, armorStand: ArmorStand) : ItemTileEntity(ownerUUID, material, armorStand) {
     
     private val inventory = getInventory("inventory", 12, true) {}
     private val filterInventory = getInventory("itemFilter", 1, true, ::handleFilterInventoryUpdate)
     
-    private val pos1 = location.clone().subtract(5.0, 5.0, 5.0)
-    private val pos2 = location.clone().add(5.0, 5.0, 5.0)
+    private val pos1 = location.clone().center().subtract(RANGE, RANGE, RANGE)
+    private val pos2 = location.clone().center().add(RANGE, RANGE, RANGE)
     
     private var items: List<Item>? = null
     

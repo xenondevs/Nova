@@ -100,5 +100,8 @@
     "idle_time": 20,
     "kill_limit": 3,
     "damage": 10
+  },
+  "vacuum_chest": {
+    "range": 5
   }
 }
