@@ -52,11 +52,12 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
         registerAll(
             RootAdvancement,
             BasicCableAdvancement, AdvancedCableAdvancement, EliteCableAdvancement, UltimateCableAdvancement,
-            ItemFilterAdvancement,
-            FurnaceGeneratorAdvancement,
+            ItemFilterAdvancement, StorageUnitAdvancement, ChargerAdvancement,
+            FurnaceGeneratorAdvancement, SolarPanelAdvancement,
             BasicPowerCellAdvancement, AdvancedPowerCellAdvancement, ElitePowerCellAdvancement, UltimatePowerCellAdvancement,
             MechanicalPressAdvancement, GearsAdvancement, PlatesAdvancement, AllPlatesAdvancement, AllGearsAdvancement,
-            PulverizerAdvancement
+            PulverizerAdvancement,
+            BlockPlacerAdvancement, BlockBreakerAdvancement, QuarryAdvancement
         )
         
         createAll(false)
