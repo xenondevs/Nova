@@ -1,7 +1,7 @@
 {
-  "result": "nova:pulverizer",
+  "result": "nova:block_placer",
   "shape": [
-    "gig",
+    "iii",
     "igi",
     "iii"
   ],
@@ -12,7 +12,7 @@
     },
     {
       "char": "g",
-      "item": "nova:iron_gear"
+      "item": "nova:redstone_gear"
     }
   ]
 }

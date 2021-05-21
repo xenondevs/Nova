@@ -1,0 +1,22 @@
+{
+  "result": "nova:charger",
+  "shape": [
+    "iri",
+    "rgr",
+    "iri"
+  ],
+  "ingredients": [
+    {
+      "char": "g",
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "r",
+      "item": "nova:redstone_plate"
+    }
+  ]
+}

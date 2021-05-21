@@ -1,0 +1,22 @@
+{
+  "result": "nova:chunk_loader",
+  "shape": [
+    "idi",
+    "dgd",
+    "idi"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "d",
+      "item": "nova:diamond_plate"
+    },
+    {
+      "char": "g",
+      "item": "nova:emerald_gear"
+    }
+  ]
+}

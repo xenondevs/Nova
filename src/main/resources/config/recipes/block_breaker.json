@@ -1,18 +1,22 @@
 {
-  "result": "nova:pulverizer",
+  "result": "nova:block_breaker",
   "shape": [
-    "gig",
+    "ipi",
     "igi",
     "iii"
   ],
   "ingredients": [
+    {
+      "char": "p",
+      "item": "minecraft:diamond_pickaxe"
+    },
     {
       "char": "i",
       "item": "nova:iron_plate"
     },
     {
       "char": "g",
-      "item": "nova:iron_gear"
+      "item": "nova:redstone_gear"
     }
   ]
 }

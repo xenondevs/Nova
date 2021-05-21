@@ -1,0 +1,18 @@
+{
+  "result": "nova:item_filter",
+  "shape": [
+    " h ",
+    " p ",
+    "   "
+  ],
+  "ingredients": [
+    {
+      "char": "h",
+      "item": "minecraft:hopper"
+    },
+    {
+      "char": "p",
+      "item": "minecraft:paper"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "result": "nova:vacuum_chest",
+  "shape": [
+    " p ",
+    "pcp",
+    " p "
+  ],
+  "ingredients": [
+    {
+      "char": "c",
+      "item": "minecraft:chest"
+    },
+    {
+      "char": "p",
+      "item": "minecraft:ender_pearl"
+    }
+  ]
+}

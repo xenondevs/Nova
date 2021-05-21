@@ -1,0 +1,19 @@
+{
+  "result": "nova:advanced_cable",
+  "amount": 3,
+  "shape": [
+    "ggg",
+    "ccc",
+    "ggg"
+  ],
+  "ingredients": [
+    {
+      "char": "g",
+      "item": "minecraft:glowstone_dust"
+    },
+    {
+      "char": "c",
+      "item": "nova:basic_cable"
+    }
+  ]
+}

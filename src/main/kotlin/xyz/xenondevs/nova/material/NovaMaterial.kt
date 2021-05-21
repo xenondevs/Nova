@@ -79,6 +79,7 @@ enum class NovaMaterial(
     LAPIS_DUST("Lapis Dust", itemOf(1025)),
     COAL_DUST("Coal Dust", itemOf(1026)),
     NETHERITE_DRILL("Netherite Drill", itemOf(1030)),
+    SOLAR_CELL("Solar Cell", itemOf(1031)),
     
     // 2000 - 3000: Upgrades and similar
     WRENCH("Wrench", itemOf(2000)),

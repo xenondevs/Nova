@@ -1,0 +1,22 @@
+{
+  "result": "nova:solar_panel",
+  "shape": [
+    "ccc",
+    " i ",
+    "ppp"
+  ],
+  "ingredients": [
+    {
+      "char": "c",
+      "item": "nova:solar_cell"
+    },
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    }
+  ]
+}

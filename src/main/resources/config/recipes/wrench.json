@@ -1,0 +1,14 @@
+{
+  "result": "nova:wrench",
+  "shape": [
+    " i ",
+    " ii",
+    "i  "
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "result": "nova:storage_unit",
+  "shape": [
+    "pcp",
+    "cec",
+    "pcp"
+  ],
+  "ingredients": [
+    {
+      "char": "e",
+      "item": "minecraft:end_crystal"
+    },
+    {
+      "char": "c",
+      "item": "minecraft:chest"
+    },
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    }
+  ]
+}

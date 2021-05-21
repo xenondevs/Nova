@@ -1,0 +1,19 @@
+{
+  "result": "nova:elite_cable",
+  "amount": 3,
+  "shape": [
+    "ggg",
+    "ccc",
+    "ggg"
+  ],
+  "ingredients": [
+    {
+      "char": "g",
+      "item": "minecraft:gold_nugget"
+    },
+    {
+      "char": "c",
+      "item": "nova:advanced_cable"
+    }
+  ]
+}

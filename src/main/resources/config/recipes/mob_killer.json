@@ -1,11 +1,15 @@
 {
-  "result": "nova:pulverizer",
+  "result": "nova:mob_killer",
   "shape": [
-    "gig",
-    "igi",
+    "isi",
+    "sgs",
     "iii"
   ],
   "ingredients": [
+    {
+      "char": "s",
+      "item": "minecraft:diamond_sword"
+    },
     {
       "char": "i",
       "item": "nova:iron_plate"

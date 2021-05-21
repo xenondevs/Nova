@@ -1,0 +1,22 @@
+{
+  "result": "nova:elite_power_cell",
+  "shape": [
+    "pcp",
+    "cbc",
+    "pcp"
+  ],
+  "ingredients": [
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "c",
+      "item": "nova:elite_cable"
+    },
+    {
+      "char": "b",
+      "item": "nova:advanced_power_cell"
+    }
+  ]
+}
