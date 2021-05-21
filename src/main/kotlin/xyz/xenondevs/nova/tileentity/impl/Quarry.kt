@@ -415,8 +415,8 @@ class Quarry(
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
-            .addIngredient('m', AddNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
-            .addIngredient('p', RemoveNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('p', AddNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('m', RemoveNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
             .build()
             .also { it.fillRectangle(4, 2, 3, inventory, true) }
         
