@@ -179,6 +179,10 @@ object ReflectionUtils {
         NMS_PLAYER_CONNECTION_SEND_PACKET_METHOD.invoke(playerConnection, packet)
     }
     
+    fun sendPacket(playerIterable: Iterable<Player>, packet: Any) {
+        playerIterable.forEach { sendPacket(it, packet) }
+    }
+    
     fun sendPacketToEveryone(packet: Any) {
         Bukkit.getOnlinePlayers().forEach { sendPacket(it, packet) }
     }

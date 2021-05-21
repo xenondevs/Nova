@@ -54,6 +54,7 @@ enum class NovaMaterial(
     STORAGE_UNIT("Storage Unit", blockOf(15), null, null, blockOf(15), BARRIER, ::StorageUnit),
     CHARGER("Charger", blockOf(16), null, EnergyTileEntity::createItemBuilder, blockOf(16), IRON_BLOCK, ::Charger),
     MOB_KILLER("Mob Killer", blockOf(17), null, EnergyTileEntity::createItemBuilder, blockOf(17), IRON_BLOCK, ::MobKiller),
+    VACUUM_CHEST("Vacuum Chest", blockOf(18), null, null, blockOf(18), BARRIER, ::VacuumChest),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
@@ -114,6 +115,8 @@ enum class NovaMaterial(
     PLUS_OFF_BUTTON("", itemOf(9016)),
     MINUS_ON_BUTTON("", itemOf(9017)),
     MINUS_OFF_BUTTON("", itemOf(9018)),
+    AREA_ON_BUTTON("", itemOf(9019)),
+    AREA_OFF_BUTTON("", itemOf(9020)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),

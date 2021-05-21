@@ -10,12 +10,14 @@ import org.bukkit.entity.Mob
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.region.VisualRegion
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.*
 import java.util.*
 import kotlin.math.min
@@ -80,6 +82,11 @@ class MobKiller(
         }
     }
     
+    override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
+        VisualRegion.removeRegion(uuid)
+    }
+    
     inner class MobCrusherGUI : TileEntityGUI("Mob Killer") {
         
         private val sideConfigGUI = SideConfigGUI(
@@ -92,10 +99,11 @@ class MobKiller(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # . # . # # |" +
-                "| # # . # . # # |" +
+                "| r # . # . # # |" +
                 "| # # . # . # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('r', VisualizeRegionItem(uuid, min, max))
             .build()
         
         val energyBar = EnergyBar(gui, x = 3, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
