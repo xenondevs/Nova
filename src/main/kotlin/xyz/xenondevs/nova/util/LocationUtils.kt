@@ -1,10 +1,7 @@
 package xyz.xenondevs.nova.util
 
 import com.google.common.base.Preconditions
-import org.bukkit.Axis
-import org.bukkit.Chunk
-import org.bukkit.Location
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
 import org.bukkit.inventory.ItemStack
@@ -207,6 +204,17 @@ fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double =
 }
 
 fun Location.createColoredParticle(color: Color): Any = ParticleBuilder(ParticleEffect.REDSTONE, this).setColor(color).toPacket()
+
+fun Location.getNextBlockBelow(countSelf: Boolean): Location? {
+    val location = clone()
+    if (!countSelf) location.y -= 1
+    while (location.y >= 0) {
+        if (location.block.type != Material.AIR) return location
+        location.y -= 1
+    }
+    
+    return null
+}
 
 object LocationUtils {
     

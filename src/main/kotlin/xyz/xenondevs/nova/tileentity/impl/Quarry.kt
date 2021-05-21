@@ -354,10 +354,14 @@ class Quarry(
     }
     
     private fun createScaffoldingPillars() {
-        getCornerLocations(location.y).forEach { corner ->
+        for (corner in getCornerLocations(location.y)) {
+            corner.y -= 1
+            
+            val blockBelow = corner.getNextBlockBelow(true)
+            if (blockBelow != null && blockBelow.positionEquals(corner)) continue
+            
             corner
-                .subtract(0.0, 1.0, 0.0)
-                .getStraightLine(Axis.Y, 0)
+                .getStraightLine(Axis.Y, blockBelow?.blockY?.plus(1) ?: 0)
                 .forEach { createVerticalScaffolding(solidScaffolding, it) }
         }
     }
