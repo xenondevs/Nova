@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -30,8 +31,9 @@ private val PULVERIZE_TIME = NovaConfig.getInt("pulverizer.pulverizer_time")!!
 class Pulverizer(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
     
     private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
     private val outputInv = getInventory("output", 2, true, ::handleOutputUpdate)

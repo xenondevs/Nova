@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -27,8 +28,9 @@ private val ENERGY_PER_TICK = NovaConfig.getInt("solar_panel.energy_per_tick")!!
 class SolarPanel(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
-) : EnergyTileEntity(ownerUUID, material, armorStand) {
+) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
     
     override val defaultEnergyConfig by lazy {
         CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))
@@ -67,8 +69,8 @@ class SolarPanel(
         return 0
     }
     
-    override fun handleDisabled() {
-        super.handleDisabled()
+    override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
         obstructionTask.cancel()
     }
     

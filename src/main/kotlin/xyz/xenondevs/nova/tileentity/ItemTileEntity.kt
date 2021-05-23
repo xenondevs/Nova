@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
@@ -15,8 +16,9 @@ import java.util.*
 abstract class ItemTileEntity(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
-) : NetworkedTileEntity(ownerUUID, material, armorStand), ItemStorage {
+) : NetworkedTileEntity(ownerUUID, material, data, armorStand), ItemStorage {
     
     final override val inventories: MutableMap<BlockFace, NetworkedInventory> by lazy {
         (retrieveOrNull<Map<BlockFace, UUID>>("inventories") ?: defaultInventoryConfig)

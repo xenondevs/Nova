@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -44,8 +45,9 @@ private val COOK_SPEED = NovaConfig.getInt("electrical_furnace.cook_speed")!!
 class ElectricalFurnace(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int

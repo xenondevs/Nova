@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -37,8 +38,9 @@ private val PRESS_TIME = NovaConfig.getInt("mechanical_press.press_time")!!
 class MechanicalPress(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(CONSUME, FRONT) }
     override val requestedEnergy: Int

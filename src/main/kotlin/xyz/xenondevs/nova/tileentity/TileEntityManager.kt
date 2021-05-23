@@ -58,7 +58,7 @@ fun ArmorStand.setTileEntityData(data: JsonObject) =
     persistentDataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, data)
 
 fun ArmorStand.getTileEntityData() =
-    persistentDataContainer.get(TILE_ENTITY_KEY, JsonElementDataType) as JsonObject
+    persistentDataContainer.get(TILE_ENTITY_KEY, JsonElementDataType)?.let { it as JsonObject }
 
 fun ArmorStand.hasTileEntityData(): Boolean =
     persistentDataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
@@ -66,7 +66,7 @@ fun ArmorStand.hasTileEntityData(): Boolean =
 object TileEntityManager : Listener {
     
     private val tileEntityMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
-    val locationCache = HashSet<Location>()
+    private val locationCache = HashSet<Location>()
     val tileEntities: List<TileEntity>
         get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
     
@@ -90,7 +90,7 @@ object TileEntityManager : Listener {
         location: Location,
         yaw: Float,
         material: NovaMaterial,
-        data: JsonObject = JsonObject()
+        data: JsonObject?
     ) {
         
         val block = location.block
@@ -103,20 +103,23 @@ object TileEntityManager : Listener {
             .also { it.yaw = ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f }
         val armorStand = EntityUtils.spawnArmorStandSilently(spawnLocation, headItem)
         
-        // set TileEntity data
-        armorStand.setTileEntityData(data.let { JsonObject().apply { add("global", it) } })
-        
         // create TileEntity instance
-        val tileEntity = material.createTileEntity!!(ownerUUID, material, armorStand)
+        val tileEntity = material.createTileEntity!!(
+            ownerUUID,
+            material,
+            data ?: JsonObject().apply { add("global", JsonObject()) },
+            armorStand
+        )
         
         // add to tileEntities map
         val chunk = block.chunk
         val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>().also { tileEntityMap[chunk] = it }
         chunkMap[location] = tileEntity
+        
         // add to location cache
         locationCache += location
         
-        // 1 tick later or it collides with the cancelled event which removes the block
+        // set hitbox block a tick later to prevent interference with the cancellation of the BlockPlaceEvent
         runTaskLater(1) {
             if (material.hitbox != null) block.type = material.hitbox
             tileEntity.handleInitialized(true)
@@ -160,7 +163,10 @@ object TileEntityManager : Listener {
             .forEach { armorStand ->
                 armorStand.fireTicks = Int.MAX_VALUE
                 val tileEntity = TileEntity.newInstance(armorStand)
-                val location = armorStand.location.clone().apply(Location::removeOrientation).subtract(0.5, 0.0, 0.5)
+                val location = armorStand.location
+                    .clone()
+                    .apply(Location::removeOrientation)
+                    .subtract(0.5, 0.0, 0.5)
                 chunkMap[location] = tileEntity
                 locationCache += location
             }
@@ -173,15 +179,13 @@ object TileEntityManager : Listener {
         val tileEntities = tileEntityMap[chunk]
         tileEntityMap -= chunk
         locationCache.removeAll { it.chunk == chunk }
-        tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleDisabled(); tileEntity.handleRemoved(unload = true) }
+        tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
     }
     
-    @EventHandler
     fun handleChunkLoad(event: ChunkLoadEvent) {
         handleChunkLoad(event.chunk)
     }
     
-    @EventHandler
     fun handleChunkUnload(event: ChunkUnloadEvent) {
         handleChunkUnload(event.chunk)
     }
@@ -196,8 +200,14 @@ object TileEntityManager : Listener {
             if (material.isBlock) {
                 val location = event.block.location
                 if (getTileEntityAt(location) == null) {
-                    val data = if (placedItem.hasTileEntityData()) placedItem.getTileEntityData()!! else JsonObject()
-                    placeTileEntity(player.uniqueId, event.block.location, player.location.yaw, material, data)
+                    
+                    placeTileEntity(
+                        player.uniqueId,
+                        event.block.location,
+                        player.location.yaw,
+                        material,
+                        placedItem.getTileEntityData()
+                    )
                     
                     if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
                 }
@@ -237,7 +247,7 @@ object TileEntityManager : Listener {
         }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleInventoryCreative(event: InventoryCreativeEvent) {
         val player = event.whoClicked as Player
         val targetBlock = player.getTargetBlockExact(8)
@@ -250,17 +260,17 @@ object TileEntityManager : Listener {
         }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePistonExtend(event: BlockPistonExtendEvent) {
-        if (event.blocks.any { getTileEntityAt(it.location) != null }) event.isCancelled = true
+        if (event.blocks.any { it.location in locationCache }) event.isCancelled = true
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePistonRetract(event: BlockPistonRetractEvent) {
-        if (event.blocks.any { getTileEntityAt(it.location) != null }) event.isCancelled = true
+        if (event.blocks.any { it.location in locationCache }) event.isCancelled = true
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleBlockPhysics(event: BlockPhysicsEvent) {
         val location = event.block.location
         if (location in locationCache && Material.AIR == event.block.type) {
@@ -276,9 +286,10 @@ object TileEntityManager : Listener {
         tiles.forEach { destroyAndDropTileEntity(getTileEntityAt(it.location)!!, true) }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleEntityExplosion(event: EntityExplodeEvent) = handleExplosion(event.blockList())
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleBlockExplosion(event: BlockExplodeEvent) = handleExplosion(event.blockList())
+    
 }

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -25,8 +26,9 @@ private val ENERGY_PER_TICK = NovaConfig.getInt("charger.charge_speed")!!
 class Charger(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     override val requestedEnergy: Int

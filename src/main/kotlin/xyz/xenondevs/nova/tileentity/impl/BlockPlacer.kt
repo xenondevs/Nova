@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -29,8 +30,9 @@ private val ENERGY_PER_PLACE = NovaConfig.getInt("block_placer.energy_per_place"
 class BlockPlacer(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int
@@ -53,7 +55,7 @@ class BlockPlacer(
             if (material.isBlock) {
                 val novaMaterial = item.novaMaterial
                 if (novaMaterial != null && novaMaterial.isBlock) {
-                    TileEntityManager.placeTileEntity(ownerUUID, block.location, armorStand.location.yaw, novaMaterial)
+                    TileEntityManager.placeTileEntity(ownerUUID, block.location, armorStand.location.yaw, novaMaterial, null)
                     novaMaterial.hitbox?.playPlaceSoundEffect(block.location)
                 } else {
                     block.type = material

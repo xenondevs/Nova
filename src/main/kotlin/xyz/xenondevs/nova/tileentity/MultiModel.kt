@@ -25,7 +25,7 @@ fun ArmorStand.getMultiModelParent(): TileEntity? {
 
 class MultiModel(
     val uuid: UUID,
-    chunks: MutableSet<Chunk> = mutableSetOf()
+    chunks: Set<Chunk> = emptySet()
 ) {
     
     private val currentModels = HashMap<ArmorStand, Model>()

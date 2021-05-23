@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.equipment.ArmorEquipListener
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.recipe.RecipeManager
+import xyz.xenondevs.nova.region.VisualRegion
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
@@ -39,6 +40,7 @@ class Nova : JavaPlugin() {
         CommandManager.init()
         ArmorEquipListener.init()
         AbilityManager.init()
+        VisualRegion.init()
     }
     
     override fun onDisable() {

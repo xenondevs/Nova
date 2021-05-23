@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -25,7 +26,12 @@ import java.util.*
 
 private val RANGE = NovaConfig.getDouble("vacuum_chest.range")!!
 
-class VacuumChest(ownerUUID: UUID?, material: NovaMaterial, armorStand: ArmorStand) : ItemTileEntity(ownerUUID, material, armorStand) {
+class VacuumChest(
+    ownerUUID: UUID?,
+    material: NovaMaterial,
+    data: JsonObject,
+    armorStand: ArmorStand
+) : ItemTileEntity(ownerUUID, material, data, armorStand) {
     
     private val inventory = getInventory("inventory", 12, true) {}
     private val filterInventory = getInventory("itemFilter", 1, true, ::handleFilterInventoryUpdate)

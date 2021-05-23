@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity.impl
 
 import com.google.common.base.Preconditions
+import com.google.gson.JsonObject
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Axis
 import org.bukkit.Bukkit
@@ -47,10 +48,12 @@ open class Cable(
     override val itemTransferRate: Int,
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : TileEntity(
     ownerUUID,
     material,
+    data,
     armorStand,
 ), EnergyBridge, ItemBridge {
     
@@ -305,59 +308,69 @@ open class Cable(
 class BasicCable(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : Cable(
     NovaConfig.getInt("cable.basic.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.basic.item_transfer_rate")!!,
     ownerUUID,
     material,
+    data,
     armorStand
 )
 
 class AdvancedCable(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : Cable(
     NovaConfig.getInt("cable.advanced.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.advanced.item_transfer_rate")!!,
     ownerUUID,
     material,
+    data,
     armorStand
 )
 
 class EliteCable(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : Cable(
     NovaConfig.getInt("cable.elite.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.elite.item_transfer_rate")!!,
     ownerUUID,
     material,
+    data,
     armorStand
 )
 
 class UltimateCable(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : Cable(
     NovaConfig.getInt("cable.ultimate.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.ultimate.item_transfer_rate")!!,
     ownerUUID,
     material,
+    data,
     armorStand
 )
 
 class CreativeCable(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : Cable(
     Int.MAX_VALUE,
     Int.MAX_VALUE,
     ownerUUID,
     material,
+    data,
     armorStand
 )

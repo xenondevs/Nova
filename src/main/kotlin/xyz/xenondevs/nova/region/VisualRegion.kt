@@ -14,7 +14,7 @@ object VisualRegion {
     
     private val regions = HashMap<UUID, Pair<MutableList<UUID>, List<Any>>>()
     
-    init {
+    fun init() {
         runTaskTimer(0, 3, ::handleTick)
     }
     

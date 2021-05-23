@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.material
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.Material.*
@@ -33,7 +34,7 @@ enum class NovaMaterial(
     createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> ItemBuilder)? = null,
     val block: ModelData? = null,
     val hitbox: Material? = null,
-    val createTileEntity: ((UUID?, NovaMaterial, ArmorStand) -> TileEntity)? = null
+    val createTileEntity: ((UUID?, NovaMaterial, JsonObject, ArmorStand) -> TileEntity)? = null
 ) {
     
     // 1 - 1000: Blocks

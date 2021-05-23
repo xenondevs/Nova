@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
+import com.google.gson.JsonObject
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -10,8 +11,9 @@ import java.util.*
 abstract class EnergyItemTileEntity(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
-) : ItemTileEntity(ownerUUID, material, armorStand), EnergyStorage {
+) : ItemTileEntity(ownerUUID, material, data, armorStand), EnergyStorage {
     
     protected abstract val defaultEnergyConfig: MutableMap<BlockFace, EnergyConnectionType>
     override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> by lazy { retrieveData("energyConfig") { defaultEnergyConfig } }

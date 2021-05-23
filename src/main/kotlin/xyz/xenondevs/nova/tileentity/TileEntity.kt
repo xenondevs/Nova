@@ -24,14 +24,13 @@ internal val SELF_UPDATE_REASON = object : UpdateReason {}
 abstract class TileEntity(
     ownerUUID: UUID?,
     val material: NovaMaterial,
+    val data: JsonObject,
     val armorStand: ArmorStand,
 ) {
     
     protected abstract val gui: TileEntityGUI?
     
-    val mainDataObject: JsonObject = if (armorStand.hasTileEntityData()) armorStand.getTileEntityData() else JsonObject()
-    val globalDataObject: JsonObject = mainDataObject.get("global")?.let { it as JsonObject }
-        ?: JsonObject().also { mainDataObject.add("global", it) }
+    val globalData: JsonObject = data.get("global") as JsonObject
     
     var isValid: Boolean = true
         private set
@@ -48,9 +47,9 @@ abstract class TileEntity(
     val multiModels = HashMap<String, MultiModel>()
     
     init {
-        if (!mainDataObject.has("material"))
+        if (!data.has("material"))
             storeData("material", material)
-        if (!mainDataObject.has("owner"))
+        if (!data.has("owner"))
             storeData("owner", ownerUUID)
         this.ownerUUID = ownerUUID ?: retrieveOrNull("owner")!!
     }
@@ -68,7 +67,7 @@ abstract class TileEntity(
         if (dropItems) {
             saveData()
             val item = material.createItemBuilder(this).build()
-            item.setTileEntityData(globalDataObject)
+            item.setTileEntityData(globalData)
             drops += item
         }
         
@@ -81,14 +80,6 @@ abstract class TileEntity(
         multiModels.values.forEach { it.removeAllModels() }
         
         return drops
-    }
-    
-    /**
-     * Called after the TileEntity has been removed from the TileEntityManager's
-     * TileEntity map because it got unloaded.
-     */
-    open fun handleDisabled() {
-        saveData()
     }
     
     /**
@@ -124,6 +115,11 @@ abstract class TileEntity(
     open fun handleRemoved(unload: Boolean) {
         isValid = false
         gui?.closeWindows()
+        
+        if (unload) {
+            saveData()
+            armorStand.setTileEntityData(data)
+        }
     }
     
     /**
@@ -159,7 +155,7 @@ abstract class TileEntity(
      */
     fun getMultiModel(name: String): MultiModel {
         val uuid = this.uuid.salt(name)
-        val multiModel = MultiModel(uuid, retrieveData("multiModel_$name") { mutableSetOf(chunk) })
+        val multiModel = MultiModel(uuid, retrieveData("multiModel_$name") { setOf(chunk) })
         multiModels[name] = multiModel
         return multiModel
     }
@@ -177,11 +173,10 @@ abstract class TileEntity(
         vararg blocked: BlockSide
     ): EnumMap<BlockFace, EnergyConnectionType> {
         
-        val sideConfig = EnumMap<BlockFace, EnergyConnectionType>(BlockFace::class.java)
         val blockedFaces = blocked.map { getFace(it) }
-        CUBE_FACES.forEach { sideConfig[it] = if (blockedFaces.contains(it)) EnergyConnectionType.NONE else default }
-        
-        return sideConfig
+        return CUBE_FACES.associateWithTo(enumMapOf()) {
+            if (blockedFaces.contains(it)) EnergyConnectionType.NONE else default
+        }
     }
     
     /**
@@ -214,27 +209,26 @@ abstract class TileEntity(
      * ArmorStand of this TileEntity.
      */
     inline fun <reified T> retrieveOrNull(key: String): T? {
-        return GSON.fromJson<T>(mainDataObject.get(key) ?: globalDataObject.get(key))
+        return GSON.fromJson<T>(data.get(key) ?: globalData.get(key))
     }
     
     /**
      * Serializes objects using GSON and stores them under the given key in
-     * the ArmorStand of this TileEntity.
+     * the data object. This method does not store any data in the armor stand yet.
      *
      * @param global If the data should also be stored in the [ItemStack]
      * of this [TileEntity].
      */
     fun storeData(key: String, value: Any?, global: Boolean = false) {
         if (global) {
-            Preconditions.checkArgument(!mainDataObject.has(key), "$key is already a non-global value")
-            if (value != null) globalDataObject.add(key, GSON.toJsonTree(value))
-            else globalDataObject.remove(key)
+            Preconditions.checkArgument(!data.has(key), "$key is already a non-global value")
+            if (value != null) globalData.add(key, GSON.toJsonTree(value))
+            else globalData.remove(key)
         } else {
-            Preconditions.checkArgument(!globalDataObject.has(key), "$key is already a global value")
-            if (value != null) mainDataObject.add(key, GSON.toJsonTree(value))
-            else mainDataObject.remove(key)
+            Preconditions.checkArgument(!globalData.has(key), "$key is already a global value")
+            if (value != null) data.add(key, GSON.toJsonTree(value))
+            else data.remove(key)
         }
-        armorStand.setTileEntityData(mainDataObject)
     }
     
     override fun equals(other: Any?): Boolean {
@@ -252,10 +246,10 @@ abstract class TileEntity(
     companion object {
         
         fun newInstance(armorStand: ArmorStand): TileEntity {
-            val data = armorStand.getTileEntityData()
+            val data = armorStand.getTileEntityData()!!
             val material: NovaMaterial = GSON.fromJson(data.get("material"))!!
             
-            return material.createTileEntity!!(null, material, armorStand)
+            return material.createTileEntity!!(null, material, data, armorStand)
         }
         
     }

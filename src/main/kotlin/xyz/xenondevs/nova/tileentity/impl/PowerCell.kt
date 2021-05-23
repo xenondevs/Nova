@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl
 
+import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -19,8 +20,9 @@ open class PowerCell(
     val maxEnergy: Int,
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand,
-) : EnergyTileEntity(ownerUUID, material, armorStand) {
+) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(BUFFER) }
     override val requestedEnergy: Int
@@ -78,59 +80,69 @@ open class PowerCell(
 class BasicPowerCell(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : PowerCell(
     false,
     NovaConfig.getInt("power_cell.basic.capacity")!!,
     ownerUUID,
     material,
+    data,
     armorStand
 )
 
 class AdvancedPowerCell(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : PowerCell(
     false,
     NovaConfig.getInt("power_cell.advanced.capacity")!!,
     ownerUUID,
     material,
+    data,
     armorStand
 )
 
 class ElitePowerCell(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : PowerCell(
     false,
     NovaConfig.getInt("power_cell.elite.capacity")!!,
     ownerUUID,
     material,
+    data,
     armorStand
 )
 
 class UltimatePowerCell(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : PowerCell(
     false,
     NovaConfig.getInt("power_cell.ultimate.capacity")!!,
     ownerUUID,
     material,
+    data,
     armorStand
 )
 
 class CreativePowerCell(
     ownerUUID: UUID?,
     material: NovaMaterial,
+    data: JsonObject,
     armorStand: ArmorStand
 ) : PowerCell(
     true,
     Int.MAX_VALUE,
     ownerUUID,
     material,
+    data,
     armorStand
 )
