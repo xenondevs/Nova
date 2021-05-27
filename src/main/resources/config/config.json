@@ -103,5 +103,12 @@
   },
   "vacuum_chest": {
     "range": 5
+  },
+  "breeder": {
+    "capacity": 10000,
+    "energy_per_tick": 10,
+    "energy_per_breed": 100,
+    "idle_time": 200,
+    "breed_limit": 5
   }
 }

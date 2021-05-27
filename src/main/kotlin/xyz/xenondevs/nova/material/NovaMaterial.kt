@@ -56,6 +56,7 @@ enum class NovaMaterial(
     CHARGER("Charger", blockOf(16), null, EnergyTileEntity::createItemBuilder, blockOf(16), IRON_BLOCK, ::Charger),
     MOB_KILLER("Mob Killer", blockOf(17), null, EnergyTileEntity::createItemBuilder, blockOf(17), IRON_BLOCK, ::MobKiller),
     VACUUM_CHEST("Vacuum Chest", blockOf(18), null, null, blockOf(18), BARRIER, ::VacuumChest),
+    BREEDER("Breeder", blockOf(19), null, null, blockOf(19), IRON_BLOCK, ::Breeder),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),

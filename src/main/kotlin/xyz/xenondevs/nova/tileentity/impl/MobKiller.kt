@@ -64,8 +64,11 @@ class MobKiller(
                 idleTime = IDLE_TIME
                 
                 val killLimit = min(energy / ENERGY_PER_DAMAGE, KILL_LIMIT)
-                val chunks = location.chunk.getSurroundingChunks(1, includeCurrent = true, ignoreUnloaded = true)
-                chunks.flatMap { chunk.entities.asList() }
+                
+                location
+                    .chunk
+                    .getSurroundingChunks(1, includeCurrent = true, ignoreUnloaded = true)
+                    .flatMap { it.entities.asList() }
                     .filterIsInstance<Mob>()
                     .filter { it.location.isBetween(min, max) }
                     .take(killLimit)

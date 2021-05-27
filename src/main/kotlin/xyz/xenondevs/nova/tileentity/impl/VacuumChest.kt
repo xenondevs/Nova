@@ -63,7 +63,7 @@ class VacuumChest(
             }
         
         val filter = getFilter()
-        items = chunk.getSurroundingChunks(1, true, ignoreUnloaded = true)
+        items = chunk.getSurroundingChunks(1, includeCurrent = true, ignoreUnloaded = true)
             .flatMap { it.entities.asList() }
             .filterIsInstance<Item>()
             .filter { it.location.isBetween(pos1, pos2) }
