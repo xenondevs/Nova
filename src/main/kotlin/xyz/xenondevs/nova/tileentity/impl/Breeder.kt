@@ -12,10 +12,10 @@ import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -36,7 +36,7 @@ class Breeder(
     material: NovaMaterial,
     data: JsonObject,
     armorStand: ArmorStand
-) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
+) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     override val gui by lazy { MobCrusherGUI() }
@@ -50,6 +50,8 @@ class Breeder(
     private val inventory = getInventory("inventory", 9, true, ::handleInventoryUpdate)
     
     init {
+        setDefaultInventory(inventory)
+        
         val frontFace = getFace(BlockSide.FRONT)
         val startLocation = location.clone().advance(frontFace)
         val pos1 = startLocation.clone().advance(getFace(BlockSide.LEFT), 3.0).apply { y -= 1 }
@@ -139,7 +141,7 @@ class Breeder(
         private val sideConfigGUI = SideConfigGUI(
             this@Breeder,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            null
+            listOf(Triple(getNetworkedInventory(inventory), "Inventory", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
