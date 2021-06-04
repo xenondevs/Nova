@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.recipe.PressRecipe
 import xyz.xenondevs.nova.recipe.PressType
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -68,7 +69,7 @@ class MechanicalPress(
                 energy -= ENERGY_PER_TICK
                 
                 if (pressTime == 0) {
-                    outputInv.placeOne(null, 0, currentItem)
+                    outputInv.putItemStack(null, 0, currentItem!!)
                     currentItem = null
                 }
                 
@@ -88,8 +89,8 @@ class MechanicalPress(
         if (inputItem != null) {
             val recipeOutput = PressRecipe.getOutputFor(inputItem.type, type)
             val outputStack = recipeOutput.createItemStack()
-            if (outputInv.simulateAdd(outputStack) == 0) {
-                inputInv.removeOne(null, 0)
+            if (outputInv.simulateAdd(outputStack)[0] == 0) {
+                inputInv.addItemAmount(null, 0, -1)
                 currentItem = outputStack
                 pressTime = PRESS_TIME
             }

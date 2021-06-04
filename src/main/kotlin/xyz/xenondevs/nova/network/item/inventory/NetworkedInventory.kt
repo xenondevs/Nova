@@ -49,10 +49,8 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
         get() = virtualInventory.items
     
     override fun setItem(slot: Int, item: ItemStack?) {
-        if (
-            if (item == null) virtualInventory.removeItem(null, slot)
-            else virtualInventory.setItemStack(null, slot, item)
-        ) throw NetworkException("The ItemUpdateEvent was cancelled")
+        if (!virtualInventory.setItemStack(null, slot, item))
+            throw NetworkException("The ItemUpdateEvent was cancelled")
     }
     
     override fun addItem(item: ItemStack): ItemStack? {
@@ -115,7 +113,7 @@ class NetworkedRangedBukkitInventory(
     
     override fun addItem(item: ItemStack): ItemStack? {
         @Suppress("UNCHECKED_CAST")
-        val tempInventory = VirtualInventory(null, size, items as Array<ItemStack>) // create a temp virtual inventory
+        val tempInventory = VirtualInventory(null, size, items as Array<ItemStack>, null) // create a temp virtual inventory
         val amount = tempInventory.addItem(null, item) // add item to the temp inventory
         
         // copy items from temp inv to real inv

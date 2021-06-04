@@ -112,9 +112,9 @@ class ElectricalFurnace(
                 val item = inputInventory.getItemStack(0)
                 if (item != null) {
                     val recipe = getRecipe(item)
-                    if (recipe != null && outputInventory.canHold(listOf(recipe.result))) {
+                    if (recipe != null && outputInventory.canHold(recipe.result)) {
                         currentRecipe = recipe
-                        inputInventory.removeOne(null, 0)
+                        inputInventory.addItemAmount(null, 0, -1)
                     }
                 }
             }

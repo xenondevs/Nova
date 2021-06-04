@@ -74,7 +74,7 @@ class FurnaceGenerator(
                 burnTime += (fuel.burnTime * BURN_TIME_MULTIPLIER).roundToInt()
                 totalBurnTime = burnTime
                 if (fuel.remains == null) {
-                    inventory.removeOne(null, 0)
+                    inventory.addItemAmount(null, 0, -1)
                 } else {
                     inventory.setItemStack(null, 0, fuel.remains.toItemStack())
                 }

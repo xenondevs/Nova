@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.10"
-    implementation "com.github.NichtStudioCode:InvUI:048568cfac"
+    implementation "com.github.NichtStudioCode:InvUI:793a8c28da"
     implementation "xyz.xenondevs:particle:1.5.1"
     implementation "com.github.NichtStudioCode:AdvancementAPI:485a8e37cc"
     implementation "com.google.code.gson:gson:2.8.6"

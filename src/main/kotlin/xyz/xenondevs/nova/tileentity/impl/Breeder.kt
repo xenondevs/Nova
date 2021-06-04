@@ -105,7 +105,7 @@ class Breeder(
             val healAmount = FoodUtils.getHealAmount(animal, item.type)
             if (healAmount > 0) {
                 animal.health = min(animal.health + healAmount, animal.genericMaxHealth)
-                inventory.removeOne(SELF_UPDATE_REASON, index)
+                inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
                 return true
             }
         }
@@ -119,7 +119,7 @@ class Breeder(
             
             if (FoodUtils.canUseBreedFood(animal, item.type)) {
                 animal.loveModeTicks = 600
-                inventory.removeOne(SELF_UPDATE_REASON, index)
+                inventory.setItemAmount(SELF_UPDATE_REASON, index, -1)
                 return true
             }
         }

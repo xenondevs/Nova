@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.recipe.PulverizerRecipe
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -78,8 +79,8 @@ class Pulverizer(
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
             val recipeOutput = PulverizerRecipe.getOutputFor(inputItem.type)
-            if (outputInv.simulateAdd(recipeOutput) == 0) {
-                inputInv.removeOne(null, 0)
+            if (outputInv.simulateAdd(recipeOutput)[0] == 0) {
+                inputInv.addItemAmount(null, 0, -1)
                 currentItem = recipeOutput
                 pulverizeTime = PULVERIZE_TIME
             }

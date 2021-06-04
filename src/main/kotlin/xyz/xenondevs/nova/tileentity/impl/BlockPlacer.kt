@@ -62,7 +62,7 @@ class BlockPlacer(
                     material.playPlaceSoundEffect(block.location)
                 }
                 
-                inventory.removeOne(SELF_UPDATE_REASON, index)
+                inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
                 return true
             }
         }

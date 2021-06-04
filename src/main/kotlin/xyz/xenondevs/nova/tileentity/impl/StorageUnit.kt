@@ -63,7 +63,7 @@ class StorageUnit(
     
     private fun updateOutputSlot() {
         if (inventory.type == null)
-            outputInventory.removeItem(SELF_UPDATE_REASON, 0)
+            outputInventory.setItemStack(SELF_UPDATE_REASON, 0, null)
         else
             outputInventory.setItemStack(SELF_UPDATE_REASON, 0, inventory.type!!.apply { amount = min(type.maxStackSize, inventory.amount) })
     }
@@ -77,10 +77,7 @@ class StorageUnit(
         val item = inputInventory.getItemStack(0)
         if (item != null) {
             val remaining = inventory.addItem(item)
-            if (remaining == null)
-                inputInventory.removeItem(null, 0)
-            else
-                inputInventory.setItemStack(null, 0, remaining)
+            inputInventory.setItemStack(null, 0, remaining)
         }
     }
     
