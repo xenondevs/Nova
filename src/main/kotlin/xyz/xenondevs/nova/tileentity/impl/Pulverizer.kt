@@ -12,9 +12,8 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.recipe.PulverizerRecipe
+import xyz.xenondevs.nova.recipe.RecipeManager
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
-import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -78,7 +77,7 @@ class Pulverizer(
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val recipeOutput = PulverizerRecipe.getOutputFor(inputItem.type)
+            val recipeOutput = RecipeManager.getPulverizerOutputFor(inputItem)!!
             if (outputInv.simulateAdd(recipeOutput)[0] == 0) {
                 inputInv.addItemAmount(null, 0, -1)
                 currentItem = recipeOutput
@@ -88,11 +87,11 @@ class Pulverizer(
     }
     
     private fun handleInputUpdate(event: ItemUpdateEvent) {
-        if (event.updateReason != null && event.newItemStack != null) {
-            val material = event.newItemStack.type
-            if (!PulverizerRecipe.isPulverizable(material)) {
-                event.isCancelled = true
-            }
+        if (event.updateReason != null
+            && event.newItemStack != null
+            && RecipeManager.getPulverizerOutputFor(event.newItemStack) == null) {
+            
+            event.isCancelled = true
         }
     }
     

@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package xyz.xenondevs.nova.recipe
 
 import org.bukkit.Bukkit
@@ -9,18 +7,16 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.inventory.*
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.RecipeChoice.ExactChoice
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.inventory.ShapelessRecipe
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.tileentity.impl.PressType
 import xyz.xenondevs.nova.util.novaMaterial
-
-private fun NovaMaterial.makeRecipe(amount: Int = 1): ShapedRecipe {
-    val key = NamespacedKey(NOVA, name)
-    RecipeManager.recipes += key
-    return ShapedRecipe(NamespacedKey(NOVA, name), createItemBuilder().setAmount(amount).build())
-}
 
 private val Recipe.key: NamespacedKey
     get() = when (this) {
@@ -29,36 +25,26 @@ private val Recipe.key: NamespacedKey
         else -> throw UnsupportedOperationException("Unsupported Recipe Type")
     }
 
-class NovaRecipe(val result: NovaMaterial, val shape: List<String>, val ingredientMap: Map<Char, RecipeChoice>, val amount: Int) {
-    fun toShapedRecipe(): ShapedRecipe {
-        val recipe = result.makeRecipe(amount)
-        recipe.shape(*shape.toTypedArray())
-        ingredientMap.forEach { (key, material) -> recipe.setIngredient(key, material) }
-        
-        return recipe
-    }
-}
-
 class NovaRecipeChoice(material: NovaMaterial) : ExactChoice(material.createItemStack())
 
 object RecipeManager : Listener {
     
     internal val recipes = ArrayList<NamespacedKey>()
+    internal val pulverizerRecipes = ArrayList<PulverizerNovaRecipe>()
+    internal val platePressRecipes = ArrayList<PlatePressNovaRecipe>()
+    internal val gearPressRecipes = ArrayList<GearPressNovaRecipe>()
     
     fun registerRecipes() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        
-        val server = Bukkit.getServer()
-        NovaConfig.loadRecipes().map(NovaRecipe::toShapedRecipe).forEach(server::addRecipe)
-        
-        FurnaceRecipes.registerRecipes()
-        PressRecipe.registerRecipes()
-        PulverizerRecipe.registerRecipes()
+        NovaConfig.loadRecipes().forEach(NovaRecipe::register)
     }
     
-    private fun addRecipes(recipes: List<Recipe>) {
-        val server = Bukkit.getServer()
-        recipes.forEach(server::addRecipe)
+    fun getPulverizerOutputFor(itemStack: ItemStack): ItemStack? =
+        pulverizerRecipes.firstOrNull { it.inputStack.isSimilar(itemStack) }?.resultStack
+    
+    fun getPressOutputFor(itemStack: ItemStack, type: PressType): ItemStack? {
+        return if (type == PressType.PLATE) platePressRecipes.firstOrNull { it.inputStack.isSimilar(itemStack) }?.resultStack
+        else gearPressRecipes.firstOrNull { it.inputStack.isSimilar(itemStack) }?.resultStack
     }
     
     @EventHandler
@@ -75,4 +61,5 @@ object RecipeManager : Listener {
             event.inventory.result = ItemStack(Material.AIR)
         }
     }
+    
 }

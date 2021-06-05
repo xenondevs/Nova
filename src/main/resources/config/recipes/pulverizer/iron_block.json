@@ -1,0 +1,5 @@
+{
+  "input": "minecraft:iron_block",
+  "result": "nova:iron_dust",
+  "amount": 9
+}

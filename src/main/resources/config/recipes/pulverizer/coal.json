@@ -1,0 +1,5 @@
+{
+  "input": "minecraft:coal",
+  "result": "nova:coal_dust",
+  "amount": 1
+}

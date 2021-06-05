@@ -1,0 +1,5 @@
+{
+  "input": "minecraft:lapis_lazuli",
+  "result": "nova:lapis_dust",
+  "amount": 1
+}

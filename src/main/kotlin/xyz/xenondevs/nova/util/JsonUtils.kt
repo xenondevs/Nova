@@ -16,7 +16,12 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter(ItemStackDeserializer)
         .registerTypeHierarchyAdapter(ItemFilterSerializer)
         .registerTypeHierarchyAdapter(ItemFilterDeserializer)
-        .registerTypeHierarchyAdapter(NovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter(ShapedNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter(ShapelessNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter(FurnaceNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter(PulverizerNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter(PlatePressNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter(GearPressNovaRecipeDeserializer)
         .registerTypeHierarchyAdapter(ChunkSerializer)
         .registerTypeHierarchyAdapter(ChunkDeserializer)
         .registerTypeHierarchyAdapter(LocationSerializer)
@@ -42,13 +47,25 @@ fun JsonObject.hasObject(property: String) =
 fun JsonObject.hasArray(property: String) =
     has(property) && this[property] is JsonArray
 
-fun JsonObject.getString(property: String, default: String? = null) = if (hasString(property)) get(property).asString else default
+fun JsonObject.getString(property: String) = if (hasString(property)) get(property).asString else null
 
-fun JsonObject.getNumber(property: String, default: Number? = null) = if (hasNumber(property)) get(property).asNumber else default
+fun JsonObject.getNumber(property: String) = if (hasNumber(property)) get(property).asNumber else null
 
-fun JsonObject.getInt(property: String, default: Int? = null) = if (hasNumber(property)) get(property).asInt else default
+fun JsonObject.getInt(property: String) = if (hasNumber(property)) get(property).asInt else null
 
-fun JsonObject.getDouble(property: String, default: Double? = null) = if (hasNumber(property)) get(property).asDouble else default
+fun JsonObject.getDouble(property: String) = if (hasNumber(property)) get(property).asDouble else null
+
+fun JsonObject.getFloat(property: String) = if (hasNumber(property)) get(property).asFloat else null
+
+fun JsonObject.getString(property: String, default: String) = if (hasString(property)) get(property).asString else default
+
+fun JsonObject.getNumber(property: String, default: Number) = if (hasNumber(property)) get(property).asNumber else default
+
+fun JsonObject.getInt(property: String, default: Int) = if (hasNumber(property)) get(property).asInt else default
+
+fun JsonObject.getDouble(property: String, default: Double) = if (hasNumber(property)) get(property).asDouble else default
+
+fun JsonObject.getFloat(property: String, default: Float) = if (hasNumber(property)) get(property).asFloat else default
 
 fun JsonObject.getBoolean(property: String, default: Boolean = false) = if (hasBoolean(property)) get(property).asBoolean else default
 
