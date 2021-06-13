@@ -1,0 +1,5 @@
+{
+  "input": "minecraft:emerald_block",
+  "result": "nova:emerald_dust",
+  "amount": 9
+}

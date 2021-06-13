@@ -1,0 +1,6 @@
+{
+  "result": "minecraft:gold_ingot",
+  "input": "nova:gold_dust",
+  "experience": 1.0,
+  "cookingTime": 100
+}

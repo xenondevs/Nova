@@ -1,0 +1,5 @@
+{
+  "input": "minecraft:emerald_ore",
+  "result": "nova:emerald_dust",
+  "amount": 2
+}

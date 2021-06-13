@@ -1,0 +1,5 @@
+{
+  "input": "minecraft:netherite_block",
+  "result": "nova:netherite_dust",
+  "amount": 9
+}

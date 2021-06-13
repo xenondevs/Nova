@@ -20,10 +20,8 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.recipe.PressRecipe
-import xyz.xenondevs.nova.recipe.PressType
+import xyz.xenondevs.nova.recipe.RecipeManager
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
-import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -35,6 +33,13 @@ import java.util.*
 private val MAX_ENERGY = NovaConfig.getInt("mechanical_press.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("mechanical_press.energy_per_tick")!!
 private val PRESS_TIME = NovaConfig.getInt("mechanical_press.press_time")!!
+
+enum class PressType {
+    
+    PLATE,
+    GEAR
+    
+}
 
 class MechanicalPress(
     ownerUUID: UUID?,
@@ -87,9 +92,8 @@ class MechanicalPress(
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val recipeOutput = PressRecipe.getOutputFor(inputItem.type, type)
-            val outputStack = recipeOutput.createItemStack()
-            if (outputInv.simulateAdd(outputStack)[0] == 0) {
+            val outputStack = RecipeManager.getPressOutputFor(inputItem, type)
+            if (outputStack != null && outputInv.simulateAdd(outputStack)[0] == 0) {
                 inputInv.addItemAmount(null, 0, -1)
                 currentItem = outputStack
                 pressTime = PRESS_TIME
@@ -98,11 +102,11 @@ class MechanicalPress(
     }
     
     private fun handleInputUpdate(event: ItemUpdateEvent) {
-        if (event.updateReason != null && event.newItemStack != null) {
-            val material = event.newItemStack.type
-            if (!PressRecipe.isPressable(material, type)) {
-                event.isCancelled = true
-            }
+        if (event.updateReason != null
+            && event.newItemStack != null
+            && RecipeManager.getPressOutputFor(event.newItemStack, type) == null) {
+            
+            event.isCancelled = true
         }
     }
     

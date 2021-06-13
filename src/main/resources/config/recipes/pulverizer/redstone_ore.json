@@ -1,0 +1,5 @@
+{
+  "input": "minecraft:redstone_ore",
+  "result": "minecraft:redstone",
+  "amount": 10
+}
