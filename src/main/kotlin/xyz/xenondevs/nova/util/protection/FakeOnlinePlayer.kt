@@ -346,6 +346,10 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun breakBlock(p0: Block): Boolean {
+        TODO("Not yet implemented")
+    }
+    
     override fun playEffect(loc: Location, effect: Effect, data: Int) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -756,6 +760,10 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getItemInUse(): ItemStack? {
+        TODO("Not yet implemented")
+    }
+    
     override fun getExpToLevel(): Int {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1045,6 +1053,10 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun isClimbing(): Boolean {
+        TODO("Not yet implemented")
+    }
+    
     override fun setAI(ai: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1211,6 +1223,30 @@ internal class FakeOnlinePlayer(
     }
     
     override fun setFireTicks(ticks: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setVisualFire(p0: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isVisualFire(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getFreezeTicks(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getMaxFreezeTicks(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setFreezeTicks(p0: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isFrozen(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
     

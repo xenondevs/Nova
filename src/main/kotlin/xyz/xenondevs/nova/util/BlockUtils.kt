@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util
 
+import net.minecraft.core.BlockPos
+import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.Chest
@@ -7,6 +9,7 @@ import org.bukkit.block.Container
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.ReflectionUtils.send
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.texture.BlockTexture
@@ -48,19 +51,19 @@ fun Block.playBreakEffects() {
         .display()
     
     // break sound
-    val breakSound = SoundUtils.getSoundEffects(this.type)[0]
+    val breakSound = blockData.soundGroup.breakSound
     world.playSound(location, breakSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
 }
 
 fun Block.setBreakState(entityId: Int, state: Int) {
-    val breakPacket = ReflectionUtils.createBlockBreakAnimationPacket(
+    val packet = ClientboundBlockDestructionPacket(
         entityId,
-        ReflectionUtils.createBlockPosition(location),
+        BlockPos(location.blockX, location.blockY, location.blockZ),
         state
     )
     
     chunk.getSurroundingChunks(1, true)
         .flatMap { it.entities.toList() }
         .filterIsInstance<Player>()
-        .forEach { ReflectionUtils.sendPacket(it, breakPacket) }
+        .forEach { it.send(packet) }
 }

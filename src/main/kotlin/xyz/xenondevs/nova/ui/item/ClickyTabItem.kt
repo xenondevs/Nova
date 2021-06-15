@@ -7,9 +7,12 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import java.util.function.Function
 
-class ClickyTabItem(private val tab: Int, builderFunction: Function<TabGUI, ItemBuilder>?) : TabItem(tab, builderFunction) {
+class ClickyTabItem(private val tab: Int, private val itemProvider: (TabGUI) -> ItemBuilder) : TabItem(tab) {
+    
+    override fun getItemBuilder(gui: TabGUI): ItemBuilder {
+        return itemProvider(gui)
+    }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         if (clickType == ClickType.LEFT) {

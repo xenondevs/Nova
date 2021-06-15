@@ -1,12 +1,22 @@
 package xyz.xenondevs.nova.attachment
 
+import com.mojang.datafixers.util.Pair
+import io.netty.buffer.Unpooled
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
+import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Bukkit
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.ReflectionUtils
+import xyz.xenondevs.nova.util.ReflectionUtils.nmsEntity
+import xyz.xenondevs.nova.util.ReflectionUtils.nmsStack
+import xyz.xenondevs.nova.util.ReflectionUtils.send
 import java.util.*
+import net.minecraft.world.item.ItemStack as NMSItemStack
 
 /**
  * A model with or without functionality that attaches to a [Player]
@@ -63,20 +73,20 @@ class Attachment(
     fun handleTick(tick: Int) {
         val player = player
         if (player != null) {
-            val armorStandId = ReflectionUtils.getEntityId(armorStand)
+            val armorStandId = armorStand.entityId
             
             if (hideOnDown) {
                 val pitch = player.location.pitch
                 if (pitch >= 40 && !hidden) {
                     // hide armor stand for attachment carrier
-                    val packet = ReflectionUtils.createPacketPlayOutEntityEquipment(armorStandId, listOf("head" to null))
-                    ReflectionUtils.sendPacket(player, packet)
+                    val packet = ClientboundSetEquipmentPacket(armorStandId, listOf(Pair(EquipmentSlot.HEAD, NMSItemStack.EMPTY)))
+                    player.send(packet)
                     
                     hidden = true
                 } else if (hidden && pitch < 40) {
                     // show armor stand again
-                    val packet = ReflectionUtils.createPacketPlayOutEntityEquipment(armorStandId, listOf("head" to itemStack))
-                    ReflectionUtils.sendPacket(player, packet)
+                    val packet = ClientboundSetEquipmentPacket(armorStandId, listOf(Pair(EquipmentSlot.HEAD, itemStack.nmsStack)))
+                    player.send(packet)
                     
                     hidden = false
                 }
@@ -89,15 +99,17 @@ class Attachment(
                 // send the mount packet to everyone because we don't know who knows that the armor stand is a passenger of the player
                 // (this could theoretically be optimized by listening to outgoing packets and checking for a spawn packet of the
                 // armor stand and then send a mount packet immediately afterwards)
-                val packet = ReflectionUtils.createPacketPlayOutMount(
-                    ReflectionUtils.getEntityId(player),
-                    player.passengers
-                        .toMutableList()
-                        .mapTo(ArrayList(), ReflectionUtils::getEntityId)
-                        .also { it.add(armorStandId) }
-                        .toIntArray()
-                )
-                ReflectionUtils.sendPacketToEveryone(packet)
+                val passengers = armorStand.nmsEntity.passengers
+                    .mapTo(ArrayList()) { it.id }
+                    .apply { add(armorStandId) }
+                    .toIntArray()
+                
+                val buffer = FriendlyByteBuf(Unpooled.buffer())
+                buffer.writeVarInt(player.entityId)
+                buffer.writeVarIntArray(passengers)
+                
+                val packet = ClientboundSetPassengersPacket(buffer)
+                player.send(packet)
             }
         }
     }

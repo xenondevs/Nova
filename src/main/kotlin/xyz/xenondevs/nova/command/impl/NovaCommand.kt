@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.command.impl
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
+import net.minecraft.commands.CommandSourceStack
 import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.command.PlayerCommand
 import xyz.xenondevs.nova.command.executesCatching
@@ -49,14 +50,14 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
                 .executesCatching { openCreativeInventory(it) })
     }
     
-    private fun handleGive(material: NovaMaterial, context: CommandContext<Any>) {
+    private fun handleGive(material: NovaMaterial, context: CommandContext<CommandSourceStack>) {
         val player = context.player
         player.inventory.addItem(material.createItemStack())
         val itemName = material.itemName.ifBlank { material.name }
         player.sendMessage("§7The item §b$itemName§7 has been added to your inventory.")
     }
     
-    private fun listNearby(context: CommandContext<Any>) {
+    private fun listNearby(context: CommandContext<CommandSourceStack>) {
         val player = context.player
         val chunk = player.location.chunk
         val armorStands = chunk.entities.filterIsInstance<ArmorStand>()
@@ -65,7 +66,7 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
         player.sendMessage("§7Out of the §b${armorStands.count()}§7 ArmorStands in your chunk, §b${tileEntityArmorStands.count()}§7 are part of a TileEntity.")
     }
     
-    private fun getNearestData(context: CommandContext<Any>) {
+    private fun getNearestData(context: CommandContext<CommandSourceStack>) {
         val player = context.player
         val chunks = player.location.chunk.getSurroundingChunks(1, true)
         val armorStands = chunks
@@ -77,7 +78,7 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
         else player.sendMessage("§cCould not find a TileEntity nearby.")
     }
     
-    private fun removeObsoleteModels(context: CommandContext<Any>) {
+    private fun removeObsoleteModels(context: CommandContext<CommandSourceStack>) {
         val player = context.player
         val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
         val obsoleteModels = chunks
@@ -88,7 +89,7 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
         player.sendMessage("§7Removed §b${obsoleteModels.count()} §7Armor Stands.")
     }
     
-    private fun removeTileEntities(context: CommandContext<Any>) {
+    private fun removeTileEntities(context: CommandContext<CommandSourceStack>) {
         val player = context.player
         val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
         val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it) }
@@ -96,13 +97,13 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
         player.sendMessage("§7Removed §b${tileEntities.count()} §7Tile Entities.")
     }
     
-    private fun toggleNetworkDebugging(type: NetworkType, context: CommandContext<Any>) {
+    private fun toggleNetworkDebugging(type: NetworkType, context: CommandContext<CommandSourceStack>) {
         val player = context.player
         NetworkDebugger.toggleDebugger(type, player)
         player.sendMessage("§7Toggled debug-view for §b${type.name.lowercase().capitalize()}-Networks")
     }
     
-    private fun openCreativeInventory(context: CommandContext<Any>) {
+    private fun openCreativeInventory(context: CommandContext<CommandSourceStack>) {
         CreativeGUI.getWindow(context.player).show()
     }
     

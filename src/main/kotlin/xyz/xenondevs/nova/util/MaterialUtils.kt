@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.util
 
 import de.studiocode.invui.item.ItemBuilder
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.SoundGroup
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.RecipeChoice.MaterialChoice
@@ -35,9 +37,11 @@ val ItemStack.novaMaterial: NovaMaterial?
             && itemMeta!!.customModelData == itemStack.itemMeta!!.customModelData
     }
 
+val Material.soundGroup: SoundGroup
+    get() = createBlockData().soundGroup
+
 fun Material.playPlaceSoundEffect(location: Location) {
-    val placeSound = SoundUtils.getSoundEffects(this)[2]
-    location.world!!.playSound(location, placeSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
+    location.world!!.playSound(location, soundGroup.placeSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
 }
 
 @Suppress("LiftReturnOrAssignment", "CascadeIf")

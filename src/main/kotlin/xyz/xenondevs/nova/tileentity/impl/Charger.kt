@@ -47,7 +47,7 @@ class Charger(
     }
     
     override fun handleTick() {
-        val currentItem = inventory.getItemStack(0)
+        val currentItem = inventory.getUnsafeItemStack(0)
         val novaItem = currentItem?.novaMaterial?.novaItem
         if (novaItem is ChargeableItem) {
             val itemCharge = novaItem.getEnergy(currentItem)

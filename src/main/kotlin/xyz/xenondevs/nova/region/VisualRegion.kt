@@ -3,10 +3,10 @@ package xyz.xenondevs.nova.region
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.createColoredParticle
 import xyz.xenondevs.nova.util.getBoxOutline
 import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.particle.utils.ParticleUtils
 import java.awt.Color
 import java.util.*
 
@@ -62,7 +62,7 @@ object VisualRegion {
     private fun handleTick() {
         regions.forEach { _, (viewerList, particlePackets) ->
             val playerList = viewerList.mapNotNull(Bukkit::getPlayer)
-            particlePackets.forEach { ReflectionUtils.sendPacket(playerList, it) }
+            ParticleUtils.sendBulk(particlePackets, playerList)
         }
     }
 }
