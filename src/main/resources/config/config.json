@@ -87,7 +87,8 @@
   },
   "jetpack": {
     "capacity": 100000,
-    "energy_per_tick": 100
+    "energy_per_tick": 100,
+    "fly_speed": 0.035
   },
   "charger": {
     "capacity": 1000000,

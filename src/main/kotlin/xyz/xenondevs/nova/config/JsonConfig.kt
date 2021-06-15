@@ -166,6 +166,8 @@ open class JsonConfig {
     
     fun getDouble(path: String) = getNumber(path)?.toDouble()
     
+    fun getFloat(path: String) = getNumber(path)?.toFloat()
+    
     fun getBoolean(path: String) = getPrimitive(path)?.asBoolean ?: false
     
     fun getChar(path: String) = getPrimitive(path)?.asCharacter

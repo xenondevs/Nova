@@ -10,21 +10,25 @@ import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 
 private val ENERGY_PER_TICK = NovaConfig.getInt("jetpack.energy_per_tick")!!
+private val FLY_SPEED = NovaConfig.getFloat("jetpack.fly_speed")!!
 
 internal class JetpackFlyAbility(player: Player) : Ability(player) {
     
     private val wasFlying = player.isFlying
     private val wasAllowFlight = player.allowFlight
+    private val previousFlySpeed = player.flySpeed
     
     private lateinit var jetpackItem: ItemStack
     
     init {
         player.isFlying = false
+        player.flySpeed = FLY_SPEED
     }
     
     override fun handleRemove() {
         player.allowFlight = wasAllowFlight
         player.isFlying = wasFlying
+        player.flySpeed = previousFlySpeed
     }
     
     override fun handleTick(tick: Int) {
