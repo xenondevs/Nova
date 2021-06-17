@@ -10,7 +10,6 @@ import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.recipe.*
 import xyz.xenondevs.nova.util.*
-import java.lang.IllegalArgumentException
 import java.lang.reflect.Type
 
 @Suppress("LiftReturnOrAssignment", "CascadeIf")
@@ -78,13 +77,20 @@ object FurnaceNovaRecipeDeserializer : JsonDeserializer<FurnaceNovaRecipe> {
 }
 
 abstract class ConversionNovaRecipeDeserializer<T : ConversionNovaRecipe>(
-    private val constructor: (ItemBuilder, ItemBuilder) -> T
+    private val constructor: (List<ItemBuilder>, ItemBuilder) -> T
 ) : JsonDeserializer<T> {
     
     override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): T {
         json as JsonObject
-    
-        val input = getItemBuilder(json.getString("input")!!)
+        
+        val input = if (json.hasString("input")) {
+            listOf(getItemBuilder(json.getString("input")!!))
+        } else {
+            json.getAsJsonArray("input")
+                .getAllStrings()
+                .map(::getItemBuilder)
+        }
+        
         val result = getItemBuilder(json.getString("result")!!)
         result.amount = json.getInt("amount", default = 1)
         

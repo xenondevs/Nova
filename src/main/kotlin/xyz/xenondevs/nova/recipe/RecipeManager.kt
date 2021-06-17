@@ -40,11 +40,11 @@ object RecipeManager : Listener {
     }
     
     fun getPulverizerOutputFor(itemStack: ItemStack): ItemStack? =
-        pulverizerRecipes.firstOrNull { it.inputStack.isSimilar(itemStack) }?.resultStack
+        pulverizerRecipes.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }?.resultStack
     
     fun getPressOutputFor(itemStack: ItemStack, type: PressType): ItemStack? {
-        return if (type == PressType.PLATE) platePressRecipes.firstOrNull { it.inputStack.isSimilar(itemStack) }?.resultStack
-        else gearPressRecipes.firstOrNull { it.inputStack.isSimilar(itemStack) }?.resultStack
+        return if (type == PressType.PLATE) platePressRecipes.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }?.resultStack
+        else gearPressRecipes.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }?.resultStack
     }
     
     @EventHandler

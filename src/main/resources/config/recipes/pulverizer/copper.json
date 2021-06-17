@@ -1,0 +1,9 @@
+{
+  "input": [
+    "minecraft:copper_ingot",
+    "nova:copper_plate",
+    "nova:copper_gear"
+  ],
+  "result": "nova:copper_dust",
+  "amount": 1
+}

@@ -1,5 +1,9 @@
 {
-  "input": "minecraft:emerald",
+  "input": [
+    "minecraft:emerald",
+    "nova:emerald_plate",
+    "nova:emerald_gear"
+  ],
   "result": "nova:emerald_dust",
   "amount": 1
 }

@@ -1,0 +1,30 @@
+{
+  "result": "nova:breeder",
+  "shape": [
+    "ipi",
+    "cgs",
+    "iii"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "p",
+      "item": "minecraft:potato"
+    },
+    {
+      "char": "c",
+      "item": "minecraft:carrot"
+    },
+    {
+      "char": "s",
+      "item": "minecraft:wheat_seeds"
+    },
+    {
+      "char": "g",
+      "item": "nova:copper_gear"
+    }
+  ]
+}

@@ -79,14 +79,14 @@ class FurnaceNovaRecipe(
     
 }
 
-abstract class ConversionNovaRecipe(input: ItemBuilder, result: ItemBuilder) : NovaRecipe {
+abstract class ConversionNovaRecipe(input: List<ItemBuilder>, result: ItemBuilder) : NovaRecipe {
     
-    val inputStack: ItemStack = input.build()
+    val inputStacks: List<ItemStack> = input.map(ItemBuilder::build)
     val resultStack: ItemStack = result.build()
     
 }
 
-class PulverizerNovaRecipe(input: ItemBuilder, result: ItemBuilder) : ConversionNovaRecipe(input, result) {
+class PulverizerNovaRecipe(input: List<ItemBuilder>, result: ItemBuilder) : ConversionNovaRecipe(input, result) {
     
     override fun register() {
         RecipeManager.pulverizerRecipes += this
@@ -94,7 +94,7 @@ class PulverizerNovaRecipe(input: ItemBuilder, result: ItemBuilder) : Conversion
     
 }
 
-class PlatePressNovaRecipe(input: ItemBuilder, result: ItemBuilder) : ConversionNovaRecipe(input, result) {
+class PlatePressNovaRecipe(input: List<ItemBuilder>, result: ItemBuilder) : ConversionNovaRecipe(input, result) {
     
     override fun register() {
         RecipeManager.platePressRecipes += this
@@ -102,7 +102,7 @@ class PlatePressNovaRecipe(input: ItemBuilder, result: ItemBuilder) : Conversion
     
 }
 
-class GearPressNovaRecipe(input: ItemBuilder, result: ItemBuilder) : ConversionNovaRecipe(input, result) {
+class GearPressNovaRecipe(input: List<ItemBuilder>, result: ItemBuilder) : ConversionNovaRecipe(input, result) {
     
     override fun register() {
         RecipeManager.gearPressRecipes += this

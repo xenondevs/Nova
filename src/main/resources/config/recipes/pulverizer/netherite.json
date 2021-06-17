@@ -1,0 +1,9 @@
+{
+  "input": [
+    "minecraft:netherite_ingot",
+    "nova:netherite_plate",
+    "nova:netherite_gear"
+  ],
+  "result": "nova:netherite_dust",
+  "amount": 1
+}

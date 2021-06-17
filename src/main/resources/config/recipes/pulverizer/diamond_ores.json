@@ -1,0 +1,8 @@
+{
+  "input": [
+    "minecraft:diamond_ore",
+    "minecraft:deepslate_diamond_ore"
+  ],
+  "result": "nova:diamond_dust",
+  "amount": 2
+}

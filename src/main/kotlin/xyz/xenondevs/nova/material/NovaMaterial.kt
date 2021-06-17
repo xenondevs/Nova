@@ -66,6 +66,7 @@ enum class NovaMaterial(
     EMERALD_PLATE("Emerald Plate", itemOf(1004)),
     REDSTONE_PLATE("Redstone Plate", itemOf(1005)),
     LAPIS_PLATE("Lapis Plate", itemOf(1006)),
+    COPPER_PLATE("Copper Plate", itemOf(1007)),
     IRON_GEAR("Iron Gear", itemOf(1010)),
     GOLD_GEAR("Gold Gear", itemOf(1011)),
     DIAMOND_GEAR("Diamond Gear", itemOf(1012)),
@@ -73,6 +74,7 @@ enum class NovaMaterial(
     EMERALD_GEAR("Emerald Gear", itemOf(1014)),
     REDSTONE_GEAR("Redstone Gear", itemOf(1015)),
     LAPIS_GEAR("Lapis Gear", itemOf(1016)),
+    COPPER_GEAR("Copper Gear", itemOf(1017)),
     IRON_DUST("Iron Dust", itemOf(1020)),
     GOLD_DUST("Gold Dust", itemOf(1021)),
     DIAMOND_DUST("Diamond Dust", itemOf(1022)),
@@ -80,6 +82,8 @@ enum class NovaMaterial(
     EMERALD_DUST("Emerald Dust", itemOf(1024)),
     LAPIS_DUST("Lapis Dust", itemOf(1025)),
     COAL_DUST("Coal Dust", itemOf(1026)),
+    COPPER_DUST("Copper Dust", itemOf(1027)),
+    
     NETHERITE_DRILL("Netherite Drill", itemOf(1030)),
     SOLAR_CELL("Solar Cell", itemOf(1031)),
     

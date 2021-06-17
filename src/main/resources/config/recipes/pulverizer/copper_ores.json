@@ -1,0 +1,8 @@
+{
+  "input": [
+    "minecraft:copper_ore",
+    "minecraft:deepslate_copper_ore"
+  ],
+  "result": "nova:copper_dust",
+  "amount": 6
+}

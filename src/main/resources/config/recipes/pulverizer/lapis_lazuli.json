@@ -1,5 +1,9 @@
 {
-  "input": "minecraft:lapis_lazuli",
+  "input": [
+    "minecraft:lapis_lazuli",
+    "nova:lapis_plate",
+    "nova:lapis_gear"
+  ],
   "result": "nova:lapis_dust",
   "amount": 1
 }
