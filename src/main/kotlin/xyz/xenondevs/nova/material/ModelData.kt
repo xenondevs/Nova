@@ -17,7 +17,7 @@ class ModelData(val material: Material, val dataArray: IntArray) {
     
     fun getItemBuilder(name: String, dataIndex: Int = 0): ItemBuilder =
         ItemBuilder(material)
-            .setDisplayName("§r$name")
+            .setDisplayName("§r§f$name")
             .setCustomModelData(dataArray[dataIndex])
     
     fun getItemBuilder(dataIndex: Int = 0): ItemBuilder =
