@@ -30,9 +30,9 @@ class NovaRecipeChoice(material: NovaMaterial) : ExactChoice(material.createItem
 object RecipeManager : Listener {
     
     internal val recipes = ArrayList<NamespacedKey>()
-    internal val pulverizerRecipes = ArrayList<PulverizerNovaRecipe>()
-    internal val platePressRecipes = ArrayList<PlatePressNovaRecipe>()
-    internal val gearPressRecipes = ArrayList<GearPressNovaRecipe>()
+    val pulverizerRecipes = ArrayList<PulverizerNovaRecipe>()
+    val platePressRecipes = ArrayList<PlatePressNovaRecipe>()
+    val gearPressRecipes = ArrayList<GearPressNovaRecipe>()
     
     fun registerRecipes() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)

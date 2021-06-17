@@ -14,7 +14,8 @@ import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.getMultiModelParent
 import xyz.xenondevs.nova.tileentity.isMultiModel
-import xyz.xenondevs.nova.ui.gui.CreativeGUI
+import xyz.xenondevs.nova.ui.menu.CreativeMenu
+import xyz.xenondevs.nova.ui.menu.RecipesMenu
 import xyz.xenondevs.nova.util.capitalize
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.hasNovaData
@@ -48,6 +49,8 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
                     .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) }))
             .then(literal("inventory")
                 .executesCatching { openCreativeInventory(it) })
+            .then(literal("recipes")
+                .executesCatching { openRecipesMenu(it) })
     }
     
     private fun handleGive(material: NovaMaterial, context: CommandContext<CommandSourceStack>) {
@@ -104,7 +107,11 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
     }
     
     private fun openCreativeInventory(context: CommandContext<CommandSourceStack>) {
-        CreativeGUI.getWindow(context.player).show()
+        CreativeMenu.getWindow(context.player).show()
+    }
+    
+    private fun openRecipesMenu(context: CommandContext<CommandSourceStack>) {
+        RecipesMenu.open(context.player)
     }
     
 }

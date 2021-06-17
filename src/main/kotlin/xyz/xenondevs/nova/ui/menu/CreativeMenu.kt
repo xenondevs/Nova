@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui.gui
+package xyz.xenondevs.nova.ui.menu
 
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
 
-object CreativeGUI {
+object CreativeMenu {
     
     fun getWindow(player: Player): SimpleWindow {
         val items = NovaMaterial.values().filter { it.item.data < 9000 }.map(::ObtainItem)
