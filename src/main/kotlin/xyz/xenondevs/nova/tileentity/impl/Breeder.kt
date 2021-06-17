@@ -136,7 +136,7 @@ class Breeder(
     }
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
-        if (event.updateReason != SELF_UPDATE_REASON && event.isAdd && !FoodUtils.isFood(event.newItemStack.type))
+        if (event.updateReason != SELF_UPDATE_REASON && !event.isRemove && !FoodUtils.isFood(event.newItemStack.type))
             event.isCancelled = true
     }
     
