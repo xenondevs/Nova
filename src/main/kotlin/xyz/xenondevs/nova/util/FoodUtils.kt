@@ -15,11 +15,11 @@ val LivingEntity.genericMaxHealth: Double
 val Animals.canBredNow: Boolean
     get() = !isLoveMode && canBreed() && if (this is Tameable) this.isTamed else true
 
-// TODO: 1.17: Goat, Axolotl
 object FoodUtils {
     
     private val HEALING_TYPES: Map<EntityType, Map<Material, Double>>
     private val BREEDING_TYPES: Map<EntityType, List<Material>>
+    private val ITEM_REMAINS: Map<Material, Material>
     private val FOOD_TYPES: Set<Material>
     
     init {
@@ -91,6 +91,7 @@ object FoodUtils {
             EntityType.COW to wheat,
             EntityType.MUSHROOM_COW to wheat,
             EntityType.SHEEP to wheat,
+            EntityType.GOAT to wheat,
             EntityType.PIG to listOf(
                 Material.CARROT,
                 Material.POTATO,
@@ -107,12 +108,18 @@ object FoodUtils {
                 Material.CARROT,
                 Material.GOLDEN_CARROT
             ),
+            EntityType.AXOLOTL to listOf(
+                Material.TROPICAL_FISH,
+                Material.TROPICAL_FISH_BUCKET
+            )
         )
         
         val foodTypes = HashSet<Material>()
         foodTypes += HEALING_TYPES.flatMap { it.value.toList() }.map { it.first }
         foodTypes += BREEDING_TYPES.flatMap { it.value }
         FOOD_TYPES = foodTypes
+        
+        ITEM_REMAINS = mapOf(Material.TROPICAL_FISH_BUCKET to Material.BUCKET)
     }
     
     fun requiresHealing(entity: LivingEntity): Boolean =
@@ -126,5 +133,8 @@ object FoodUtils {
     
     fun isFood(material: Material): Boolean =
         FOOD_TYPES.contains(material)
+    
+    fun getItemRemains(material: Material) =
+        ITEM_REMAINS[material]
     
 }

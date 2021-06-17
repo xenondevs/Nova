@@ -9,6 +9,7 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Location
 import org.bukkit.entity.Animals
 import org.bukkit.entity.ArmorStand
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -103,6 +104,11 @@ class Breeder(
             if (healAmount > 0) {
                 animal.health = min(animal.health + healAmount, animal.genericMaxHealth)
                 inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
+                
+                val remains = FoodUtils.getItemRemains(item.type)
+                if (remains != null)
+                    inventory.setItemStack(SELF_UPDATE_REASON, index, ItemStack(remains))
+                
                 return true
             }
         }
@@ -116,7 +122,12 @@ class Breeder(
             
             if (FoodUtils.canUseBreedFood(animal, item.type)) {
                 animal.loveModeTicks = 600
-                inventory.setItemAmount(SELF_UPDATE_REASON, index, -1)
+                inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
+                
+                val remains = FoodUtils.getItemRemains(item.type)
+                if (remains != null)
+                    inventory.setItemStack(SELF_UPDATE_REASON, index, ItemStack(remains))
+                
                 return true
             }
         }
@@ -125,7 +136,8 @@ class Breeder(
     }
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
-        if (event.isAdd && !FoodUtils.isFood(event.newItemStack.type)) event.isCancelled = true
+        if (event.updateReason != SELF_UPDATE_REASON && event.isAdd && !FoodUtils.isFood(event.newItemStack.type))
+            event.isCancelled = true
     }
     
     override fun handleRemoved(unload: Boolean) {
