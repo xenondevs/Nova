@@ -8,6 +8,7 @@ import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
@@ -192,6 +193,29 @@ abstract class TileEntity(
         CUBE_FACES.forEach { sideConfig[it] = if (blockedFaces.contains(it)) ItemConnectionType.NONE else default }
         
         return sideConfig
+    }
+    
+    /**
+     * Creates a [Pair] of [Locations][Location] which mark the edge points of an area with the
+     * given [length], [width], [height] and [vertical translation][translateVertical] in front
+     * of this [TileEntity].
+     */
+    fun getFrontArea(length: Double, width: Double, height: Double, translateVertical: Double): Pair<Location, Location> {
+        val frontFace = getFace(BlockSide.FRONT)
+        val startLocation = location.clone().center().advance(frontFace, 0.5)
+        
+        val pos1 = startLocation.clone().apply {
+            advance(getFace(BlockSide.LEFT), width / 2.0)
+            y += translateVertical
+        }
+        
+        val pos2 = startLocation.clone().apply {
+            advance(getFace(BlockSide.RIGHT), width / 2.0)
+            advance(frontFace, length)
+            y += height + translateVertical
+        }
+        
+        return LocationUtils.sort(pos1, pos2)
     }
     
     /**

@@ -14,8 +14,9 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.tileentity.*
+import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
+import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -52,11 +53,7 @@ class Breeder(
     init {
         setDefaultInventory(inventory)
         
-        val frontFace = getFace(BlockSide.FRONT)
-        val startLocation = location.clone().advance(frontFace)
-        val pos1 = startLocation.clone().advance(getFace(BlockSide.LEFT), 3.0).apply { y -= 1 }
-        val pos2 = startLocation.clone().advance(getFace(BlockSide.RIGHT), 3.0).advance(frontFace, 6.0).apply { y += 3 }
-        val sorted = LocationUtils.sort(pos1, pos2)
+        val sorted = getFrontArea(7.0, 7.0, 4.0, -1.0)
         min = sorted.first
         max = sorted.second
     }

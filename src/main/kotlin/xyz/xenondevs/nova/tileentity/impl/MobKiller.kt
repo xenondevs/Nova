@@ -19,7 +19,8 @@ import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.util.isBetween
 import java.util.*
 import kotlin.math.min
 
@@ -47,11 +48,7 @@ class MobKiller(
     private var max: Location
     
     init {
-        val frontFace = getFace(BlockSide.FRONT)
-        val startLocation = location.clone().advance(frontFace)
-        val pos1 = startLocation.clone().advance(getFace(BlockSide.LEFT), 5.0).apply { y -= 1 }
-        val pos2 = startLocation.clone().advance(getFace(BlockSide.RIGHT), 5.0).advance(frontFace, 10.0).apply { y += 3 }
-        val sorted = LocationUtils.sort(pos1, pos2)
+        val sorted = getFrontArea(10.0, 10.0, 4.0, -1.0)
         min = sorted.first
         max = sorted.second
     }
