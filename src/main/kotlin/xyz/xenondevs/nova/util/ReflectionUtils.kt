@@ -5,13 +5,16 @@ import net.minecraft.server.level.ServerPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.command.Command
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_COMMAND_MAP_GET_COMMAND_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_ENTITY_GET_HANDLE_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_ITEM_STACK_AS_NMS_COPY_METHOD
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_SERVER_GET_COMMAND_MAP_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_SERVER_SYNC_COMMANDS_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_WORLD_ADD_ENTITY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_WORLD_CREATE_ENTITY_METHOD
@@ -66,6 +69,11 @@ object ReflectionUtils {
     
     fun syncCommands() {
         CB_CRAFT_SERVER_SYNC_COMMANDS_METHOD.invoke(Bukkit.getServer())
+    }
+    
+    fun getCommand(name: String): Command {
+        val commandMap = CB_CRAFT_SERVER_GET_COMMAND_MAP_METHOD.invoke(Bukkit.getServer())
+        return CB_CRAFT_COMMAND_MAP_GET_COMMAND_METHOD.invoke(commandMap, name) as Command
     }
     
     fun unregisterCommand(name: String) {

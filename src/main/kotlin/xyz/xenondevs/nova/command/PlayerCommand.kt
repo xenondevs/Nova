@@ -30,11 +30,12 @@ fun <CommandSourceStack, T : ArgumentBuilder<CommandSourceStack, T>> ArgumentBui
     }
 }
 
-abstract class PlayerCommand(val name: String, private val permission: String) {
+fun LiteralArgumentBuilder<CommandSourceStack>.requiresPermission(permission: String): LiteralArgumentBuilder<CommandSourceStack> =
+    this.requires { it.player.hasPermission(permission) }
+
+abstract class PlayerCommand(val name: String) {
     
-    var builder: LiteralArgumentBuilder<CommandSourceStack> = literal(name).requires {
-        it.player.hasPermission(permission)
-    }
+    var builder: LiteralArgumentBuilder<CommandSourceStack> = literal(name)
     
     fun literal(name: String): LiteralArgumentBuilder<CommandSourceStack> {
         return LiteralArgumentBuilder.literal(name)

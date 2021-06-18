@@ -4,10 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.commands.CommandSourceStack
 import org.bukkit.entity.ArmorStand
-import xyz.xenondevs.nova.command.PlayerCommand
-import xyz.xenondevs.nova.command.executesCatching
-import xyz.xenondevs.nova.command.get
-import xyz.xenondevs.nova.command.player
+import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.debug.NetworkDebugger
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkType
@@ -20,11 +17,12 @@ import xyz.xenondevs.nova.util.capitalize
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.hasNovaData
 
-class NovaCommand(name: String, permission: String) : PlayerCommand(name, permission) {
+object NovaCommand : PlayerCommand("nova") {
     
     init {
         builder = builder
             .then(literal("give")
+                .requiresPermission("nova.creative")
                 .apply {
                     NovaMaterial.values().forEach { material ->
                         then(literal(material.name)
@@ -33,6 +31,7 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
                     }
                 })
             .then(literal("debug")
+                .requiresPermission("nova.debug")
                 .then(literal("listNearby")
                     .executesCatching { listNearby(it) })
                 .then(literal("getNearestData")
@@ -48,6 +47,7 @@ class NovaCommand(name: String, permission: String) : PlayerCommand(name, permis
                 .then(literal("itemNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) }))
             .then(literal("inventory")
+                .requiresPermission("nova.creative")
                 .executesCatching { openCreativeInventory(it) })
             .then(literal("recipes")
                 .executesCatching { openRecipesMenu(it) })
