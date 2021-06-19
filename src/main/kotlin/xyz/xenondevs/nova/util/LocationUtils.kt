@@ -160,6 +160,10 @@ fun Location.isBetween(min: Location, max: Location) =
         && y in min.y.rangeTo(max.y)
         && z in min.z.rangeTo(max.z)
 
+fun Location.isBetweenXZ(min: Location, max: Location) =
+    x in min.x.rangeTo(max.x)
+        && z in min.z.rangeTo(max.z)
+
 fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double = 0.5): List<Location> {
     val locations = ArrayList<Location>()
     

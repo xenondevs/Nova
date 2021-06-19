@@ -111,5 +111,12 @@
     "energy_per_breed": 100,
     "idle_time": 200,
     "breed_limit": 5
+  },
+  "mob_duplicator": {
+    "capacity": 10000,
+    "energy_per_tick": 500,
+    "energy_per_tick_nbt": 2000,
+    "idle_time": 400,
+    "idle_time_nbt": 1000
   }
 }

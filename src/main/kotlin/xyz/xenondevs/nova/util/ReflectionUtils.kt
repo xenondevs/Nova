@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.util
 
 import net.minecraft.network.protocol.Packet
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.level.Level
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
@@ -18,6 +20,7 @@ import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_SERVER_GET_COMMAND_MA
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_SERVER_SYNC_COMMANDS_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_WORLD_ADD_ENTITY_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_WORLD_CREATE_ENTITY_METHOD
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_WORLD_GET_HANDLE_METHOD
 import xyz.xenondevs.nova.util.ReflectionRegistry.CB_PACKAGE_PATH
 import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_DISPATCHER_ROOT_NODE
 import xyz.xenondevs.nova.util.ReflectionRegistry.COMMAND_NODE_ARGUMENTS_FIELD
@@ -94,6 +97,9 @@ object ReflectionUtils {
     
     val ItemStack.nmsStack: net.minecraft.world.item.ItemStack
         get() = CB_CRAFT_ITEM_STACK_AS_NMS_COPY_METHOD.invoke(null, this) as NMSItemStack
+    
+    val World.nmsWorld: ServerLevel
+        get() = CB_CRAFT_WORLD_GET_HANDLE_METHOD.invoke(this) as ServerLevel
     
     fun Player.send(packet: Packet<*>) = nmsEntity.connection.send(packet)
     

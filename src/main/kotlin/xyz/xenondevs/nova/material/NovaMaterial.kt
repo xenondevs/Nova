@@ -7,6 +7,7 @@ import org.bukkit.Material.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
@@ -57,6 +58,7 @@ enum class NovaMaterial(
     MOB_KILLER("Mob Killer", blockOf(17), null, EnergyTileEntity::createItemBuilder, blockOf(17), IRON_BLOCK, ::MobKiller),
     VACUUM_CHEST("Vacuum Chest", blockOf(18), null, null, blockOf(18), BARRIER, ::VacuumChest),
     BREEDER("Breeder", blockOf(19), null, null, blockOf(19), IRON_BLOCK, ::Breeder),
+    MOB_DUPLICATOR("Mob Duplicator", blockOf(20), null, null, blockOf(20), IRON_BLOCK, ::MobDuplicator),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),
@@ -86,6 +88,7 @@ enum class NovaMaterial(
     
     NETHERITE_DRILL("Netherite Drill", itemOf(1030)),
     SOLAR_CELL("Solar Cell", itemOf(1031)),
+    BOTTLED_MOB("Bottled Mob", itemOf(1032), BottledMobItem),
     
     // 2000 - 3000: Upgrades and similar
     WRENCH("Wrench", itemOf(2000)),
@@ -124,6 +127,8 @@ enum class NovaMaterial(
     MINUS_OFF_BUTTON("", itemOf(9018)),
     AREA_ON_BUTTON("", itemOf(9019)),
     AREA_OFF_BUTTON("", itemOf(9020)),
+    NBT_ON_BUTTON("", itemOf(9021)),
+    NBT_OFF_BUTTON("", itemOf(9022)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),
