@@ -14,6 +14,7 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -42,7 +43,7 @@ class MobDuplicator(
 ) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
     
     private val inventory = getInventory("inventory", 1, true, ::handleInventoryUpdate)
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.TOP) }
     override val requestedEnergy: Int
         get() = MAX_ENERGY - energy
     private val energyPerTick: Int
@@ -60,6 +61,8 @@ class MobDuplicator(
     
     init {
         setDefaultInventory(inventory)
+        
+        updateEntityData(inventory.getItemStack(0))
     }
     
     override fun handleTick() {
@@ -83,12 +86,17 @@ class MobDuplicator(
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
         if (event.newItemStack != null) {
-            val itemStack = event.newItemStack
-            val novaItem = event.newItemStack.novaMaterial?.novaItem
-            if (novaItem is BottledMobItem) {
-                setEntityData(novaItem.getEntityType(itemStack), novaItem.getEntityData(itemStack))
-            } else event.isCancelled = true
+            event.isCancelled = !updateEntityData(event.newItemStack)
         } else setEntityData(null, null)
+    }
+    
+    private fun updateEntityData(itemStack: ItemStack?): Boolean {
+        val novaItem = itemStack?.novaMaterial?.novaItem
+        if (novaItem is BottledMobItem) {
+            setEntityData(novaItem.getEntityType(itemStack), novaItem.getEntityData(itemStack))
+            return true
+        }
+        return false
     }
     
     private fun setEntityData(type: EntityType?, data: ByteArray?) {
@@ -139,8 +147,8 @@ class MobDuplicator(
         private inner class ToggleNBTModeItem : BaseItem() {
             
             override fun getItemBuilder(): ItemBuilder {
-                return if (keepNbt) NovaMaterial.NBT_OFF_BUTTON.createBasicItemBuilder().setDisplayName("§rTurn NBT-Mode off")
-                else NovaMaterial.NBT_ON_BUTTON.createBasicItemBuilder().setDisplayName("§rTurn NBT-Mode on")
+                return (if (keepNbt) NovaMaterial.NBT_ON_BUTTON else NovaMaterial.NBT_OFF_BUTTON)
+                    .createBasicItemBuilder().setDisplayName("§rUse NBT")
             }
             
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
