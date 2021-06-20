@@ -118,5 +118,10 @@
     "energy_per_tick_nbt": 2000,
     "idle_time": 400,
     "idle_time_nbt": 1000
-  }
+  },
+  "bottled_mob_blacklist": [
+    "WITHER",
+    "ENDER_DRAGON",
+    "ELDER_GUARDIAN"
+  ]
 }

@@ -1,23 +1,73 @@
 package xyz.xenondevs.nova.item.impl
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.protection.ProtectionUtils
 
 private val DATA_KEY = NamespacedKey(NOVA, "entityData")
 private val TYPE_KEY = NamespacedKey(NOVA, "entityType")
 private val TIME_KEY = NamespacedKey(NOVA, "fillTime")
 
-object BottledMobItem : NovaItem() {
+private val BLACKLISTED_ENTITY_TYPES = NovaConfig
+    .getArray("bottled_mob_blacklist")!!
+    .getAllStrings()
+    .mapTo(HashSet(), EntityType::valueOf)
+
+object BottledMobItem : NovaItem(), Listener {
+    
+    init {
+        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
+    }
+    
+    @EventHandler
+    fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
+        val clicked = event.rightClicked
+        if (clicked is Mob) {
+            val player = event.player
+            val item = player.inventory.getItem(event.hand)
+            
+            if (item.type == Material.GLASS_BOTTLE
+                && !BLACKLISTED_ENTITY_TYPES.contains(clicked.type)
+                && ProtectionUtils.canUse(player, clicked.location)) {
+                
+                    EntityType.CHICKEN
+                    
+                val fakeDamageEvent = EntityDamageByEntityEvent(player, clicked, DamageCause.ENTITY_ATTACK, Double.MAX_VALUE)
+                Bukkit.getPluginManager().callEvent(fakeDamageEvent)
+                
+                if (!fakeDamageEvent.isCancelled && fakeDamageEvent.damage != 0.0) {
+                    val itemStack = NovaMaterial.BOTTLED_MOB.createItemStack()
+                    absorbEntity(itemStack, clicked)
+                    
+                    player.inventory.getItem(event.hand).amount -= 1
+                    player.inventory.addPrioritized(event.hand, itemStack)
+                    
+                    if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
+                    
+                    event.isCancelled = true
+                }
+            }
+        }
+    }
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
