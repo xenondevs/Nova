@@ -206,7 +206,7 @@ object TileEntityManager : Listener {
                         event.block.location,
                         player.location.yaw,
                         material,
-                        placedItem.getTileEntityData()
+                        placedItem.getTileEntityData()?.let { JsonObject().apply { add("global", it) } }
                     )
                     
                     if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
@@ -235,7 +235,7 @@ object TileEntityManager : Listener {
             if (tileEntity != null && ProtectionUtils.canUse(player, block.location)) tileEntity.handleRightClick(event)
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
-            if (block.type == Material.BARRIER
+            if ((block.type == Material.BARRIER || block.type == Material.CHAIN)
                 && event.player.gameMode == GameMode.SURVIVAL
                 && getTileEntityAt(block.location) != null
                 && ProtectionUtils.canBreak(player, block.location)) {

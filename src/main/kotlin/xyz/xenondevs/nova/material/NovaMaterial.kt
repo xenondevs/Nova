@@ -40,7 +40,7 @@ enum class NovaMaterial(
     
     // 1 - 1000: Blocks
     FURNACE_GENERATOR("Furnace Generator", blockOf(1), null, EnergyTileEntity::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
-    MECHANICAL_PRESS("Mechanical Press", blockOf(2), null, EnergyTileEntity::createItemBuilder, blockOf(2), IRON_BLOCK, ::MechanicalPress),
+    MECHANICAL_PRESS("Mechanical Press", blockOf(2), null, EnergyTileEntity::createItemBuilder, blockOf(2), COBBLESTONE, ::MechanicalPress),
     BASIC_POWER_CELL("Basic Power Cell", blockOf(3), null, EnergyTileEntity::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
     ADVANCED_POWER_CELL("Advanced Power Cell", blockOf(4), null, EnergyTileEntity::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
     ELITE_POWER_CELL("Elite Power Cell", blockOf(5), null, EnergyTileEntity::createItemBuilder, blockOf(5), IRON_BLOCK, ::ElitePowerCell),
@@ -54,11 +54,11 @@ enum class NovaMaterial(
     BLOCK_BREAKER("Block Breaker", blockOf(13), null, EnergyTileEntity::createItemBuilder, blockOf(13), COBBLESTONE, ::BlockBreaker),
     BLOCK_PLACER("Block Placer", blockOf(14), null, EnergyTileEntity::createItemBuilder, blockOf(14), COBBLESTONE, ::BlockPlacer),
     STORAGE_UNIT("Storage Unit", blockOf(15), null, null, blockOf(15), BARRIER, ::StorageUnit),
-    CHARGER("Charger", blockOf(16), null, EnergyTileEntity::createItemBuilder, blockOf(16), IRON_BLOCK, ::Charger),
-    MOB_KILLER("Mob Killer", blockOf(17), null, EnergyTileEntity::createItemBuilder, blockOf(17), IRON_BLOCK, ::MobKiller),
+    CHARGER("Charger", blockOf(16), null, EnergyTileEntity::createItemBuilder, blockOf(16), COBBLESTONE, ::Charger),
+    MOB_KILLER("Mob Killer", blockOf(17), null, EnergyTileEntity::createItemBuilder, blockOf(17), COBBLESTONE, ::MobKiller),
     VACUUM_CHEST("Vacuum Chest", blockOf(18), null, null, blockOf(18), BARRIER, ::VacuumChest),
-    BREEDER("Breeder", blockOf(19), null, null, blockOf(19), IRON_BLOCK, ::Breeder),
-    MOB_DUPLICATOR("Mob Duplicator", blockOf(20), null, null, blockOf(20), IRON_BLOCK, ::MobDuplicator),
+    BREEDER("Breeder", blockOf(19), null, EnergyTileEntity::createItemBuilder, blockOf(19), COBBLESTONE, ::Breeder),
+    MOB_DUPLICATOR("Mob Duplicator", blockOf(20), null, EnergyTileEntity::createItemBuilder, blockOf(20), COBBLESTONE, ::MobDuplicator),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("Iron Plate", itemOf(1000)),

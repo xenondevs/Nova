@@ -41,7 +41,11 @@ fun Block.breakAndTakeDrops(playEffects: Boolean = true): Collection<ItemStack> 
 }
 
 fun Block.playBreakEffects() {
-    // break particles
+    showBreakParticles()
+    playBreakSound()
+}
+
+fun Block.showBreakParticles() {
     ParticleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5))
         .setParticleData(BlockTexture(type))
         .setOffsetX(0.2f)
@@ -49,8 +53,9 @@ fun Block.playBreakEffects() {
         .setOffsetZ(0.2f)
         .setAmount(50)
         .display()
-    
-    // break sound
+}
+
+fun Block.playBreakSound() {
     val breakSound = blockData.soundGroup.breakSound
     world.playSound(location, breakSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
 }
