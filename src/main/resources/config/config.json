@@ -1,4 +1,8 @@
 {
+  "resource_pack": {
+    "enabled": true,
+    "url": "https://github.com/xenondevs/NovaRP/releases/download/v0.1/NovaRP.zip"
+  },
   "cable": {
     "basic": {
       "energy_transfer_rate": 100,

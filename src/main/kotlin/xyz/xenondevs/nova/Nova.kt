@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova
 
+import de.studiocode.invui.resourcepack.ForceResourcePack
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.ability.AbilityManager
 import xyz.xenondevs.nova.advancement.AdvancementManager
@@ -41,10 +42,17 @@ class Nova : JavaPlugin() {
         ArmorEquipListener.init()
         AbilityManager.init()
         VisualRegion.init()
+        
+        forceResourcePack()
     }
     
     override fun onDisable() {
         disableHandlers.forEach { it() }
+    }
+    
+    private fun forceResourcePack() {
+        if (NovaConfig.getBoolean("resource_pack.enabled")) 
+            ForceResourcePack.getInstance().resourcePackUrl = NovaConfig.getString("resource_pack.url")
     }
     
 }
