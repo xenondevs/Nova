@@ -13,11 +13,18 @@ import xyz.xenondevs.nova.advancement.cable.AdvancedCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.BasicCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.EliteCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.UltimateCableAdvancement
+import xyz.xenondevs.nova.advancement.mob.BottledMobAdvancement
+import xyz.xenondevs.nova.advancement.mob.BreederAdvancement
+import xyz.xenondevs.nova.advancement.mob.MobDuplicatorAdvancement
+import xyz.xenondevs.nova.advancement.mob.MobKillerAdvancement
 import xyz.xenondevs.nova.advancement.powercell.AdvancedPowerCellAdvancement
 import xyz.xenondevs.nova.advancement.powercell.BasicPowerCellAdvancement
 import xyz.xenondevs.nova.advancement.powercell.ElitePowerCellAdvancement
 import xyz.xenondevs.nova.advancement.powercell.UltimatePowerCellAdvancement
 import xyz.xenondevs.nova.advancement.press.*
+import xyz.xenondevs.nova.advancement.pulverizer.AllDustsAdvancement
+import xyz.xenondevs.nova.advancement.pulverizer.DustAdvancement
+import xyz.xenondevs.nova.advancement.pulverizer.PulverizerAdvancement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.awardAdvancement
 import net.roxeez.advancement.AdvancementManager as RoxeezAdvancementManager
@@ -52,12 +59,13 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
         registerAll(
             RootAdvancement,
             BasicCableAdvancement, AdvancedCableAdvancement, EliteCableAdvancement, UltimateCableAdvancement,
-            ItemFilterAdvancement, StorageUnitAdvancement, ChargerAdvancement,
+            ItemFilterAdvancement, VacuumChestAdvancement, StorageUnitAdvancement, ChargerAdvancement, JetpackAdvancement,
             FurnaceGeneratorAdvancement, SolarPanelAdvancement,
             BasicPowerCellAdvancement, AdvancedPowerCellAdvancement, ElitePowerCellAdvancement, UltimatePowerCellAdvancement,
             MechanicalPressAdvancement, GearsAdvancement, PlatesAdvancement, AllPlatesAdvancement, AllGearsAdvancement,
-            PulverizerAdvancement,
-            BlockPlacerAdvancement, BlockBreakerAdvancement, QuarryAdvancement
+            PulverizerAdvancement, DustAdvancement, AllDustsAdvancement,
+            BlockPlacerAdvancement, BlockBreakerAdvancement, QuarryAdvancement,
+            BottledMobAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement
         )
         
         createAll(false)

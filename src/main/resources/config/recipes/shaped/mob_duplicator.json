@@ -1,0 +1,34 @@
+{
+  "result": "nova:mob_duplicator",
+  "shape": [
+    "nEn",
+    "esg",
+    "ndn"
+  ],
+  "ingredients": [
+    {
+      "char": "n",
+      "item": "nova:netherite_plate"
+    },
+    {
+      "char": "E",
+      "item": "minecraft:dragon_egg"
+    },
+    {
+      "char": "d",
+      "item": "nova:diamond_gear"
+    },
+    {
+      "char": "e",
+      "item": "nova:emerald_gear"
+    },
+    {
+      "char": "s",
+      "item": "minecraft:nether_star"
+    },
+    {
+      "char": "g",
+      "item": "nova:gold_gear"
+    }
+  ]
+}

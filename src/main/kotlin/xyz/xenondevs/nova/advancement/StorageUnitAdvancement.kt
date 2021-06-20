@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 object StorageUnitAdvancement : Advancement(NamespacedKey(NOVA, "storage_unit")) {
     
     init {
-        setParent(BasicCableAdvancement.key)
+        setParent(VacuumChestAdvancement.key)
         addObtainCriteria(NovaMaterial.STORAGE_UNIT)
         setDisplay {
             it.setTitle("Infinite Items")

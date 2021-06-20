@@ -21,7 +21,7 @@ object GearsAdvancement : Advancement(NamespacedKey(NOVA, "gears")) {
         setDisplay {
             it.setTitle("Gears")
             it.setDescription("Make a gear using a Mechanical Press")
-            it.setIcon(NovaMaterial.IRON_GEAR.toIcon())
+            it.setIcon(NovaMaterial.COPPER_GEAR.toIcon())
         }
     }
     

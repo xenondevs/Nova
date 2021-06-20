@@ -13,7 +13,7 @@ object RootAdvancement : Advancement(NamespacedKey(NOVA, "root")) {
         setDisplay {
             it.setTitle("Nova")
             it.setDescription("")
-            it.setIcon(NovaMaterial.IRON_GEAR.toIcon())
+            it.setIcon(NovaMaterial.COPPER_GEAR.toIcon())
             it.setAnnounce(false)
             it.setToast(false)
             it.setBackground(NamespacedKey.minecraft("textures/block/tube_coral_block.png"))
