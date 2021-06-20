@@ -2,8 +2,11 @@ package xyz.xenondevs.nova.util
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.UpdateReason
+import org.bukkit.Material
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.PlayerInventory
 
 /**
  * Adds a [List] of [ItemStack]s to a [VirtualInventory].
@@ -72,4 +75,22 @@ fun Inventory.getFirstEmptySlot(): Int? {
     }
     
     return null
+}
+
+/**
+ * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory][PlayerInventory]
+ * if the given slot is occupied.
+ */
+fun PlayerInventory.addPrioritized(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
+    if (getItem(prioritizedSlot).type == Material.AIR) setItem(prioritizedSlot, itemStack)
+    else addItem(itemStack)
+}
+
+/**
+ * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory]
+ * if the given slot is occupied.
+ */
+fun Inventory.addPrioritized(prioritizedSlot: Int, itemStack: ItemStack) {
+    if (getItem(prioritizedSlot) == null) setItem(prioritizedSlot, itemStack)
+    else addItem(itemStack)
 }

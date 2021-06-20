@@ -63,6 +63,22 @@ fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> B
     }
 }
 
+fun Location.getTargetLocation(stepSize: Double, maxDistance: Double): Location {
+    var location = this
+    
+    castRay(stepSize, maxDistance) { rayLocation ->
+        val block = rayLocation.block
+        if (block.type.isTraversable() && !block.boundingBox.contains(rayLocation.x, rayLocation.y, rayLocation.z)) {
+            location = rayLocation.clone()
+            return@castRay true
+        } else {
+            return@castRay false
+        }
+    }
+    
+    return location
+}
+
 fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean, ignoreUnloaded: Boolean = false): List<Chunk> {
     val chunks = ArrayList<Chunk>()
     val world = world

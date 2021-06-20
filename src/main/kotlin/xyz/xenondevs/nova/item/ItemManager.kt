@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.util.addPrioritized
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
@@ -53,15 +54,21 @@ object ItemManager : Listener {
         if (clicked is Mob) {
             val player = event.player
             val item = player.inventory.getItem(event.hand)
+            
             if (item.type == Material.GLASS_BOTTLE && ProtectionUtils.canUse(player, clicked.location)) {
                 val fakeDamageEvent = EntityDamageByEntityEvent(player, clicked, DamageCause.ENTITY_ATTACK, Double.MAX_VALUE)
                 Bukkit.getPluginManager().callEvent(fakeDamageEvent)
+                
                 if (!fakeDamageEvent.isCancelled && fakeDamageEvent.damage != 0.0) {
                     val itemStack = NovaMaterial.BOTTLED_MOB.createItemStack()
                     BottledMobItem.absorbEntity(itemStack, clicked)
+                    
                     player.inventory.getItem(event.hand).amount -= 1
-                    player.inventory.addItem(itemStack)
+                    player.inventory.addPrioritized(event.hand, itemStack)
+                    
                     if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
+                    
+                    event.isCancelled = true
                 }
             }
         }

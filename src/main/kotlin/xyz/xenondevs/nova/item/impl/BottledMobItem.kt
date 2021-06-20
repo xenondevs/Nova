@@ -11,9 +11,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.capitalizeAll
-import xyz.xenondevs.nova.util.center
+import xyz.xenondevs.nova.util.*
 
 private val DATA_KEY = NamespacedKey(NOVA, "entityData")
 private val TYPE_KEY = NamespacedKey(NOVA, "entityType")
@@ -29,15 +27,14 @@ object BottledMobItem : NovaItem() {
             val data = getEntityData(itemStack)
             if (data != null) {
                 player.inventory.getItem(event.hand!!).amount -= 1
-                player.inventory.addItem(ItemStack(Material.GLASS_BOTTLE))
+                player.inventory.addPrioritized(event.hand!!, ItemStack(Material.GLASS_BOTTLE))
                 
-                val location = event.clickedBlock!!.location.apply {
-                    val blockFace = event.blockFace
-                    add(blockFace.modX.toDouble(), blockFace.modY.toDouble(), blockFace.modZ.toDouble())
-                }.center()
+                val location = player.eyeLocation.getTargetLocation(0.25, 8.0)
                 
                 EntityUtils.deserializeAndSpawn(data, location)
                 if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
+                
+                event.isCancelled = true
             }
         }
     }
