@@ -67,7 +67,7 @@
         <dependency>
             <groupId>xyz.xenondevs</groupId>
             <artifactId>particle</artifactId>
-            <version>1.6.1</version>
+            <version>1.6.3</version>
         </dependency>
         <dependency>
             <groupId>com.github.NichtStudioCode</groupId>
