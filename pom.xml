@@ -6,7 +6,7 @@
 
     <groupId>xyz.xenondevs</groupId>
     <artifactId>Nova</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
 
     <properties>
         <kotlin.version>1.5.20-RC</kotlin.version>
@@ -267,6 +267,10 @@
                                 <relocation>
                                     <pattern>net.roxeez</pattern>
                                     <shadedPattern>${shadePath}.net.roxeez</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>xyz.xenondevs.particle</pattern>
+                                    <shadedPattern>${shadePath}.xyz.xenondevs.particle</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
