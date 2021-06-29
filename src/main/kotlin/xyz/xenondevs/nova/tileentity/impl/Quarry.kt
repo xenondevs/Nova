@@ -99,6 +99,15 @@ class Quarry(
     private var drilling = retrieveData("drilling") { false }
     private var done = retrieveData("done") { false }
     
+    private val energySufficiency: Double
+        get() = min(1.0, energy.toDouble() / energyPerTick.toDouble())
+    
+    private val currentMoveSpeed: Double
+        get() = MOVE_SPEED * energySufficiency
+    
+    private val currentDrillSpeedMultiplier: Double
+        get() = DRILL_SPEED_MULTIPLIER * energySufficiency
+    
     init {
         setDefaultInventory(inventory)
         y = location.blockY
@@ -168,22 +177,24 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (energy >= energyPerTick) {
-            energy -= energyPerTick
-        } else return
+        if (energy == 0) return
         
-        if (!done && !drilling) {
-            val pointerDestination = pointerDestination ?: selectNextDestination()
-            if (pointerDestination != null) {
-                if (pointerLocation.distance(pointerDestination) > 0.2) {
-                    moveToPointer(pointerDestination)
-                } else {
-                    pointerLocation = pointerDestination.clone()
-                    pointerDestination.y -= 1
-                    drilling = true
-                }
-            } else done = true
-        } else if (drilling) drill()
+        if (!done) {
+            if (!drilling) {
+                val pointerDestination = pointerDestination ?: selectNextDestination()
+                if (pointerDestination != null) {
+                    if (pointerLocation.distance(pointerDestination) > 0.2) {
+                        moveToPointer(pointerDestination)
+                    } else {
+                        pointerLocation = pointerDestination.clone()
+                        pointerDestination.y -= 1
+                        drilling = true
+                    }
+                } else done = true
+            } else drill()
+    
+            energy = max(0, energy - energyPerTick)
+        }
         
         if (hasEnergyChanged) gui.energyBar.update()
     }
@@ -197,15 +208,17 @@ class Quarry(
         var moveY = 0.0
         var moveZ = 0.0
         
+        val moveSpeed = currentMoveSpeed
+        
         if (deltaY > 0) {
-            moveY = deltaY.coerceIn(-MOVE_SPEED, MOVE_SPEED)
+            moveY = deltaY.coerceIn(-moveSpeed, moveSpeed)
         } else {
             var distance = 0.0
-            moveX = deltaX.coerceIn(-MOVE_SPEED, MOVE_SPEED)
+            moveX = deltaX.coerceIn(-moveSpeed, moveSpeed)
             distance += moveX
-            moveZ = deltaZ.coerceIn(-(MOVE_SPEED - distance), MOVE_SPEED - distance)
+            moveZ = deltaZ.coerceIn(-(moveSpeed - distance), moveSpeed - distance)
             distance += moveZ
-            if (distance == 0.0) moveY = deltaY.coerceIn(-MOVE_SPEED, MOVE_SPEED)
+            if (distance == 0.0) moveY = deltaY.coerceIn(-moveSpeed, moveSpeed)
         }
         
         pointerLocation.add(moveX, moveY, moveZ)
@@ -217,7 +230,7 @@ class Quarry(
         val block = pointerDestination!!.block
         spawnDrillParticles(block)
         
-        val drillSpeed = min(DRILL_SPEED_CLAMP, block.type.breakSpeed * DRILL_SPEED_MULTIPLIER)
+        val drillSpeed = min(DRILL_SPEED_CLAMP, block.type.breakSpeed * currentDrillSpeedMultiplier)
         drillProgress += drillSpeed
         pointerLocation.y -= drillSpeed - max(0.0, drillProgress - 1)
         
