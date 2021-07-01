@@ -123,6 +123,7 @@ object TileEntityManager : Listener {
         runTaskLater(1) {
             if (material.hitbox != null) block.type = material.hitbox
             tileEntity.handleInitialized(true)
+            tileEntity.saveData()
         }
     }
     

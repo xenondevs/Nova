@@ -13,9 +13,7 @@ import xyz.xenondevs.nova.tileentity.getMultiModelParent
 import xyz.xenondevs.nova.tileentity.isMultiModel
 import xyz.xenondevs.nova.ui.menu.CreativeMenu
 import xyz.xenondevs.nova.ui.menu.RecipesMenu
-import xyz.xenondevs.nova.util.capitalize
-import xyz.xenondevs.nova.util.getSurroundingChunks
-import xyz.xenondevs.nova.util.hasNovaData
+import xyz.xenondevs.nova.util.*
 
 object NovaCommand : PlayerCommand("nova") {
     
@@ -87,7 +85,11 @@ object NovaCommand : PlayerCommand("nova") {
         val obsoleteModels = chunks
             .flatMap { it.entities.toList() }
             .filterIsInstance<ArmorStand>()
-            .filter { it.isMultiModel() && it.getMultiModelParent() == null }
+            .filter {
+                (it.isMultiModel() && it.getMultiModelParent() == null) ||
+                    (TileEntityManager.getTileEntityAt(it.location.blockLocation) == null 
+                        && it.equipment?.helmet?.novaMaterial != null)
+            }
         obsoleteModels.forEach(ArmorStand::remove)
         player.sendMessage("§7Removed §b${obsoleteModels.count()} §7Armor Stands.")
     }
