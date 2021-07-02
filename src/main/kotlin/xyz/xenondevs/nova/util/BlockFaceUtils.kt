@@ -17,8 +17,9 @@ enum class BlockSide(private val rotation: Int, private val blockFace: BlockFace
     
     fun getBlockFace(yaw: Float): BlockFace {
         if (rotation == -1) return blockFace
-        val rot = ((yaw / 90.0).roundToInt() + rotation) % 4
-        return values().find { it.rotation == rot }!!.blockFace
+        
+        val rot = ((yaw / 90.0).roundToInt() + rotation).mod(4)
+        return values()[rot].blockFace
     }
     
 }
