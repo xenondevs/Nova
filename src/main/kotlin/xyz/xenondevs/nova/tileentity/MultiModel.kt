@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.serialization.persistentdata.UUIDDataType
 import xyz.xenondevs.nova.util.EntityUtils
+import xyz.xenondevs.nova.util.runTaskLater
 import java.util.*
 
 private val MULTI_MODEL_KEY = NamespacedKey(NOVA, "multiModel")
@@ -38,7 +39,12 @@ class MultiModel(
         get() = currentModels.keys.toSet()
     
     init {
-        currentModels += findModelArmorStands(chunks)
+        // https://hub.spigotmc.org/jira/browse/SPIGOT-6547
+        // workaround because of async entity loading:
+        // check for entities every 10 ticks for the next 15 seconds (300 ticks)
+        for (delay in 0..300 step 10) {
+            runTaskLater(delay.toLong()) { currentModels += findModelArmorStands(chunks) }
+        }
     }
     
     fun useArmorStands(run: (ArmorStand) -> Unit) {
