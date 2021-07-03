@@ -1,3 +1,17 @@
-# Nova
+[![Banner](https://i.imgur.com/wTwCmYT.png)](https://www.spigotmc.org/resources/81295/)
 
-![image](https://i.imgur.com/31OUr58.png)
+<p align="center">
+  <a href="https://www.spigotmc.org/resources/93648/reviews">
+    <img src="https://img.shields.io/spiget/rating/93648"> 
+  </a>
+  <a href="https://www.spigotmc.org/resources/93648/">
+    <img src="https://img.shields.io/spiget/downloads/93648"> 
+  </a>
+  <a href="https://www.spigotmc.org/resources/93648/">
+    <img src="https://img.shields.io/spiget/tested-versions/93648"> 
+  </a>
+</p>
+
+# Nova
+Nova is a spigot plugin aimed to provide the experience of a modpack.<br>
+Visit our [spigot page](https://www.spigotmc.org/resources/93648/) for a more detailed explanation.
