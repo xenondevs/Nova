@@ -98,7 +98,8 @@ object NovaCommand : PlayerCommand("nova") {
             .filterIsInstance<ArmorStand>()
             .filter {
                 (it.isMultiModel() && it.getMultiModelParent() == null) ||
-                    (TileEntityManager.getTileEntityAt(it.location.blockLocation) == null
+                    (!it.isMultiModel()
+                        && TileEntityManager.getTileEntityAt(it.location.blockLocation) == null
                         && it.equipment?.helmet?.novaMaterial != null)
             }
         obsoleteModels.forEach(ArmorStand::remove)
