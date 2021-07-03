@@ -7,6 +7,8 @@ import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.block.Block
@@ -192,7 +194,7 @@ class Quarry(
                     }
                 } else done = true
             } else drill()
-    
+            
             energy = max(0, energy - energyPerTick)
         }
         
@@ -451,8 +453,8 @@ class Quarry(
             override fun getItemBuilder(): ItemBuilder {
                 val number = getNumber()
                 return NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
-                    .setDisplayName("§rQuarry Size: $number x $number Blocks")
-                    .addLoreLines("§7A bigger size makes the Quarry less efficient")
+                    .setLocalizedName(TranslatableComponent("menu.nova.quarry.size", number, number))
+                    .addLocalizedLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
             }
             
             override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit

@@ -150,7 +150,7 @@ class MobDuplicator(
             
             override fun getItemBuilder(): ItemBuilder {
                 return (if (keepNbt) NovaMaterial.NBT_ON_BUTTON else NovaMaterial.NBT_OFF_BUTTON)
-                    .createBasicItemBuilder().setDisplayName("§rUse NBT")
+                    .createBasicItemBuilder().setLocalizedName("menu.nova.mob_duplicator.nbt")
             }
             
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

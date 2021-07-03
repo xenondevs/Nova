@@ -6,6 +6,7 @@ import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.util.SlotUtils
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -62,7 +63,7 @@ private class ItemFilterGUI(private val player: Player, private val itemStack: I
         }
     
     fun openWindow() {
-        SimpleWindow(player, "Item Filter", gui).show()
+        SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.item_filter")), gui).show()
     }
     
     private fun saveFilterConfig() = itemStack.saveFilterConfig(itemFilter)
@@ -95,8 +96,8 @@ private class ItemFilterGUI(private val player: Player, private val itemStack: I
     private inner class SwitchModeItem : BaseItem() {
         
         override fun getItemBuilder(): ItemBuilder =
-            if (itemFilter.whitelist) NovaMaterial.WHITELIST_BUTTON.createBasicItemBuilder().setDisplayName("§rCurrently: Whitelist")
-            else NovaMaterial.BLACKLIST_BUTTON.createBasicItemBuilder().setDisplayName("§rCurrently: Blacklist")
+            if (itemFilter.whitelist) NovaMaterial.WHITELIST_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.whitelist")
+            else NovaMaterial.BLACKLIST_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.blacklist")
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             itemFilter.whitelist = !itemFilter.whitelist

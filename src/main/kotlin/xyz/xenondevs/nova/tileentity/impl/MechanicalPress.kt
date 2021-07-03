@@ -172,10 +172,10 @@ class MechanicalPress(
             override fun getItemBuilder(): ItemBuilder {
                 return if (type == PressType.PLATE) {
                     if (this@MechanicalPress.type == PressType.PLATE) NovaMaterial.PLATE_OFF_BUTTON.createItemBuilder()
-                    else NovaMaterial.PLATE_ON_BUTTON.item.getItemBuilder("Press Plates")
+                    else NovaMaterial.PLATE_ON_BUTTON.item.getItemBuilder("menu.nova.mechanical_press.press_plates")
                 } else {
                     if (this@MechanicalPress.type == PressType.GEAR) NovaMaterial.GEAR_OFF_BUTTON.createItemBuilder()
-                    else NovaMaterial.GEAR_ON_BUTTON.item.getItemBuilder("Press Gears")
+                    else NovaMaterial.GEAR_ON_BUTTON.item.getItemBuilder("menu.nova.mechanical_press.press_gears")
                 }
             }
             
