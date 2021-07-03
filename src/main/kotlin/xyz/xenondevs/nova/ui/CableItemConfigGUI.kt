@@ -7,6 +7,7 @@ import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -36,7 +37,7 @@ class CableItemConfigGUI(
         .build()
     
     fun openWindow(player: Player) {
-        SimpleWindow(player, "Config", gui).show()
+        SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.cable_config")), gui).show()
     }
     
     private fun updateState(run: () -> Unit) {
@@ -55,7 +56,7 @@ class CableItemConfigGUI(
         
         override fun getItemBuilder(): ItemBuilder =
             (if (state) NovaMaterial.GREEN_BUTTON else NovaMaterial.GRAY_BUTTON)
-                .createBasicItemBuilder().setDisplayName("§rInsert")
+                .createBasicItemBuilder().setLocalizedName("menu.nova.cable_config.insert")
         
         override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) {
             updateState { state = !state }
@@ -72,7 +73,7 @@ class CableItemConfigGUI(
         
         override fun getItemBuilder(): ItemBuilder =
             (if (state) NovaMaterial.GREEN_BUTTON else NovaMaterial.GRAY_BUTTON)
-                .createBasicItemBuilder().setDisplayName("§rExtract")
+                .createBasicItemBuilder().setLocalizedName("menu.nova.cable_config.extract")
         
         override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) {
             updateState { state = !state }

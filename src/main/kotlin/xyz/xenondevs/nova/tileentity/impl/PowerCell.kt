@@ -53,7 +53,7 @@ open class PowerCell(
         }
     }
     
-    inner class PowerCellGUI : TileEntityGUI("Power Cell") {
+    inner class PowerCellGUI : TileEntityGUI("menu.nova.power_cell") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@PowerCell,

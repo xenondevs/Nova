@@ -4,6 +4,7 @@ import net.roxeez.advancement.Advancement
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.advancement.addObtainCriteria
+import xyz.xenondevs.nova.advancement.setDisplayLocalized
 import xyz.xenondevs.nova.advancement.toIcon
 import xyz.xenondevs.nova.material.NovaMaterial
 
@@ -12,9 +13,7 @@ object AdvancedCableAdvancement : Advancement(NamespacedKey(NOVA, "advanced_cabl
     init {
         setParent(BasicCableAdvancement.key)
         addObtainCriteria(NovaMaterial.ADVANCED_CABLE)
-        setDisplay {
-            it.setTitle("Advanced Cable Technology")
-            it.setDescription("Craft an Advanced Cable")
+        setDisplayLocalized {
             it.setIcon(NovaMaterial.ADVANCED_CABLE.toIcon())
         }
     }

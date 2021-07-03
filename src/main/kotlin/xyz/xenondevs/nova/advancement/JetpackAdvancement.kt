@@ -10,9 +10,7 @@ object JetpackAdvancement : Advancement(NamespacedKey(NOVA, "jetpack")) {
     init {
         setParent(ChargerAdvancement.key)
         addObtainCriteria(NovaMaterial.JETPACK)
-        setDisplay {
-            it.setTitle("Jetpack")
-            it.setDescription("Craft a Jetpack")
+        setDisplayLocalized {
             it.setIcon(NovaMaterial.JETPACK.toIcon())
         }
     }

@@ -74,7 +74,7 @@ class SolarPanel(
         obstructionTask.cancel()
     }
     
-    inner class SolarPanelGUI : TileEntityGUI("Solar Panel") {
+    inner class SolarPanelGUI : TileEntityGUI("menu.nova.solar_panel") {
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +

@@ -8,6 +8,8 @@ import java.lang.reflect.Type
 import java.util.*
 import kotlin.reflect.KProperty
 
+val JSON_PARSER = JsonParser()
+
 val GSON: Gson =
     GsonBuilder()
         .setPrettyPrinting()

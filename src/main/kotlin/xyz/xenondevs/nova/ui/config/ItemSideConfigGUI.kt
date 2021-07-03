@@ -5,6 +5,8 @@ import de.studiocode.invui.gui.structure.Structure
 import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
@@ -29,7 +31,9 @@ class ItemSideConfigGUI(
     private val inventories = inventories.map { it.first }
     private val allowedTypes = inventories.associate { it.first to it.third }
     private val buttonBuilders = inventories.withIndex().associate { (index, triple) ->
-        triple.first to BUTTON_COLORS[index].createBasicItemBuilder().addLoreLines("§b${triple.second}")
+        triple.first to BUTTON_COLORS[index]
+            .createBasicItemBuilder()
+            .addLocalizedLoreLines(TranslatableComponent(triple.second).apply { color = ChatColor.AQUA })
     }
     
     private val configItems = enumMapOf<BlockFace, MutableList<Item>>()
@@ -114,14 +118,14 @@ class ItemSideConfigGUI(
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (itemStorage.itemConfig[blockFace]!!) {
                 ItemConnectionType.NONE ->
-                    NovaMaterial.GRAY_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§7None")
+                    NovaMaterial.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
                 ItemConnectionType.EXTRACT ->
-                    NovaMaterial.ORANGE_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§6Output")
+                    NovaMaterial.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
                 ItemConnectionType.INSERT ->
-                    NovaMaterial.BLUE_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§bInput")
+                    NovaMaterial.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
                 ItemConnectionType.BUFFER ->
-                    NovaMaterial.GREEN_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§aInput & Output")
-            }
+                    NovaMaterial.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
+            }.setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -144,7 +148,7 @@ class ItemSideConfigGUI(
         override fun getItemBuilder(): ItemBuilder {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             val inventory = itemStorage.inventories[blockFace]!!
-            return buttonBuilders[inventory]!!.clone().setDisplayName("§7$blockSide")
+            return buttonBuilders[inventory]!!.clone().setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

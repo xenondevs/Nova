@@ -11,13 +11,17 @@ import de.studiocode.invui.item.impl.AutoCycleItem
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.item.novaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.recipe.RecipeManager
+import xyz.xenondevs.nova.util.localized
 
 internal enum class CraftingType(
     val typeName: String,
@@ -26,20 +30,20 @@ internal enum class CraftingType(
 ) {
     
     PULVERIZING(
-        "Pulverizing",
-        NovaMaterial.PULVERIZER.createBasicItemBuilder().setDisplayName("§fPulverizing"),
+        "menu.nova.recipe.pulverize",
+        NovaMaterial.PULVERIZER.createBasicItemBuilder().setLocalizedName("menu.nova.recipe.pulverize"),
         RecipeManager.pulverizerRecipes
     ),
     
     PLATE_PRESSING(
-        "Plate Pressing",
-        NovaMaterial.IRON_PLATE.createBasicItemBuilder().setDisplayName("§fPlate Pressing"),
+        "menu.nova.recipe.plate",
+        NovaMaterial.IRON_PLATE.createBasicItemBuilder().setLocalizedName("menu.nova.recipe.plate"),
         RecipeManager.platePressRecipes
     ),
     
     GEAR_PRESSING(
-        "Gear Pressing",
-        NovaMaterial.IRON_GEAR.createBasicItemBuilder().setDisplayName("§fGear Pressing"),
+        "menu.nova.recipe.gear",
+        NovaMaterial.IRON_GEAR.createBasicItemBuilder().setLocalizedName("menu.nova.recipe.gear"),
         RecipeManager.gearPressRecipes
     )
     
@@ -77,7 +81,7 @@ object RecipesMenu {
         .build()
     
     fun open(player: Player) {
-        SimpleWindow(player, "Crafting Guide", GUI).show()
+        SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.recipe")), GUI).show()
     }
     
 }
@@ -108,7 +112,7 @@ internal class OpenCraftResultsMenuItem(private val type: CraftingType) : Simple
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         val gui = CRAFTING_RESULTS_GUIS[type]
-        SimpleWindow(player, type.typeName, gui).show()
+        SimpleWindow(player, arrayOf(TranslatableComponent(type.typeName)), gui).show()
     }
     
 }
@@ -121,17 +125,17 @@ internal class OpenCraftTypeMenuItem(private val type: CraftingType, private val
                 "b - - - - - - - 2" +
                 "| x x x x x x x |" +
                 "3 - - < - > - - 4")
-            .addIngredient('b', BackItem { SimpleWindow(it, type.typeName, CRAFTING_RESULTS_GUIS[type]).show() })
+            .addIngredient('b', BackItem { SimpleWindow(it, arrayOf(TranslatableComponent(type.typeName)), CRAFTING_RESULTS_GUIS[type]).show() })
             .setGUIs(RECIPE_GUIS[type]!![result]!!)
             .build()
         
-        SimpleWindow(player, type.typeName, gui).show()
+        SimpleWindow(player, arrayOf(TranslatableComponent(type.typeName)), gui).show()
     }
     
 }
 
 internal class BackItem(openWindow: (Player) -> Unit) : SimpleItem(
-    Icon.ARROW_1_LEFT.itemBuilder.setDisplayName("§7Back"),
+    Icon.ARROW_1_LEFT.novaItemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.recipe.back")),
     { openWindow(it.player) }
 )
 

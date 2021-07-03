@@ -6,11 +6,13 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.Location
 import org.bukkit.entity.Animals
 import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
@@ -145,12 +147,12 @@ class Breeder(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class MobCrusherGUI : TileEntityGUI("Breeder") {
+    inner class MobCrusherGUI : TileEntityGUI("menu.nova.breeder") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Breeder,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "Inventory", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
@@ -169,8 +171,8 @@ class Breeder(
         
         val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
             
-            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
-                itemBuilder.setDisplayName("§7Next try in $idleTime ticks")
+            override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
+                itemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.breeder.idle", idleTime))
             
         }
         

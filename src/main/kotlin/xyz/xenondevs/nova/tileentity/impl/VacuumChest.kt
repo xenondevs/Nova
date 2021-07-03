@@ -79,13 +79,13 @@ class VacuumChest(
     private fun getFilter() =
         filterInventory.getItemStack(0)?.getFilterConfig()
     
-    inner class VacuumChestGUI : TileEntityGUI("Vacuum Chest") {
+    inner class VacuumChestGUI : TileEntityGUI("menu.nova.vacuum_chest") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@VacuumChest,
             null,
             listOf(
-                Triple(getNetworkedInventory(inventory), "Inventory", ItemConnectionType.ALL_TYPES)
+                Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES)
             ),
         ) { openWindow(it) }
         

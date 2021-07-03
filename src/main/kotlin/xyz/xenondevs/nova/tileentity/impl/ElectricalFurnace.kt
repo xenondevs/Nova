@@ -141,7 +141,7 @@ class ElectricalFurnace(
         }
     }
     
-    inner class ElectricalFurnaceGUI : TileEntityGUI("Electrical Furnace") {
+    inner class ElectricalFurnaceGUI : TileEntityGUI("menu.nova.electrical_furnace") {
         
         private val progressItem = ProgressArrowItem()
         
@@ -149,8 +149,8 @@ class ElectricalFurnace(
             this@ElectricalFurnace,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inputInventory), "Input Inventory", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(outputInventory), "Output Inventory", ItemConnectionType.EXTRACT_TYPES)
+                Triple(getNetworkedInventory(inputInventory), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
+                Triple(getNetworkedInventory(outputInventory), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES)
             )
         ) { openWindow(it) }
         

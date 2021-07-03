@@ -87,12 +87,12 @@ class StorageUnit(
         storeData("amount", inventory.amount, true)
     }
     
-    inner class ItemStorageGUI : TileEntityGUI("Storage Unit") {
+    inner class ItemStorageGUI : TileEntityGUI("menu.nova.storage_unit") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@StorageUnit,
             null,
-            listOf(Triple(inventory, "Inventory", ItemConnectionType.ALL_TYPES)),
+            listOf(Triple(inventory, "inventory.nova.default", ItemConnectionType.ALL_TYPES)),
             ::openWindow
         )
         

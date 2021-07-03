@@ -66,12 +66,12 @@ class Charger(
         }
     }
     
-    inner class ChargerGUI : TileEntityGUI("Charger") {
+    inner class ChargerGUI : TileEntityGUI("menu.nova.charger") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Charger,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "Charger Inventory", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)

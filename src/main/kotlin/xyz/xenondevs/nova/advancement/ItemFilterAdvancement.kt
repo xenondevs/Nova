@@ -11,9 +11,7 @@ object ItemFilterAdvancement : Advancement(NamespacedKey(NOVA, "item_filter")) {
     init {
         setParent(BasicCableAdvancement.key)
         addObtainCriteria(NovaMaterial.ITEM_FILTER)
-        setDisplay {
-            it.setTitle("Filtering")
-            it.setDescription("Craft an Item Filter")
+        setDisplayLocalized {
             it.setIcon(NovaMaterial.ITEM_FILTER.toIcon())
         }
     }

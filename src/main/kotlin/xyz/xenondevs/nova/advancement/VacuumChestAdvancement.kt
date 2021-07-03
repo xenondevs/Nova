@@ -10,9 +10,7 @@ object VacuumChestAdvancement : Advancement(NamespacedKey(NOVA, "vacuum_chest"))
     init {
         setParent(ItemFilterAdvancement.key)
         addObtainCriteria(NovaMaterial.VACUUM_CHEST)
-        setDisplay {
-            it.setTitle("This seems safe")
-            it.setDescription("Craft a Vacuum Chest")
+        setDisplayLocalized {
             it.setIcon(NovaMaterial.VACUUM_CHEST.toIcon())
         }
     }

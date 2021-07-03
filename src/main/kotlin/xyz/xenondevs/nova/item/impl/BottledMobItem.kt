@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item.impl
 
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -19,6 +20,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
@@ -49,8 +51,6 @@ object BottledMobItem : NovaItem(), Listener {
                 && !BLACKLISTED_ENTITY_TYPES.contains(clicked.type)
                 && ProtectionUtils.canUse(player, clicked.location)) {
                 
-                    EntityType.CHICKEN
-                    
                 val fakeDamageEvent = EntityDamageByEntityEvent(player, clicked, DamageCause.ENTITY_ATTACK, Double.MAX_VALUE)
                 Bukkit.getPluginManager().callEvent(fakeDamageEvent)
                 
@@ -103,10 +103,11 @@ object BottledMobItem : NovaItem(), Listener {
         val data = EntityUtils.serialize(entity, true)
         setEntityData(itemStack, entity.type, data)
         
-        val itemMeta = itemStack.itemMeta!!
-        itemMeta.lore = listOf("§8Type: §e${entity.type.name.lowercase().replace('_', ' ').capitalizeAll()}")
-        
-        itemStack.itemMeta = itemMeta
+        itemStack.itemMeta = NovaItemBuilder(itemStack).addLocalizedLoreLines(localized(
+            ChatColor.DARK_GRAY,
+            "item.nova.bottled_mob.type",
+            coloredText(ChatColor.YELLOW, entity.type.name.lowercase().replace('_', ' ').capitalizeAll())
+        )).build().itemMeta
     }
     
 }

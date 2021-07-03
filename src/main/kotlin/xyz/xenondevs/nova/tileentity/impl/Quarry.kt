@@ -414,12 +414,12 @@ class Quarry(
         model.addModels(Model(FULL_VERTICAL, location.center()))
     }
     
-    inner class QuarryGUI : TileEntityGUI("Quarry") {
+    inner class QuarryGUI : TileEntityGUI("menu.nova.quarry") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "Quarry Inventory", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         private val sizeItems = ArrayList<Item>()

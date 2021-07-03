@@ -8,6 +8,7 @@ import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -48,11 +49,11 @@ class SideConfigGUI(
                 .addIngredient('b', BackItem(openPrevious))
                 .addIngredient('e', ClickyTabItem(0) {
                     if (it.currentTab == 0) NovaMaterial.ENERGY_OFF_BUTTON.createBasicItemBuilder()
-                    else NovaMaterial.ENERGY_ON_BUTTON.createBasicItemBuilder().setDisplayName("§rEnergy Side Config")
+                    else NovaMaterial.ENERGY_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.energy")
                 })
                 .addIngredient('i', ClickyTabItem(1) {
                     if (it.currentTab == 1) NovaMaterial.ITEM_OFF_BUTTON.createBasicItemBuilder()
-                    else NovaMaterial.ITEM_ON_BUTTON.createBasicItemBuilder().setDisplayName("§rItem Side Config")
+                    else NovaMaterial.ITEM_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.item")
                 })
                 .addGUI(energyConfigGUI)
                 .addGUI(itemConfigGUI)
@@ -67,12 +68,12 @@ class SideConfigGUI(
     }
     
     fun openWindow(player: Player) {
-        SimpleWindow(player, "Side Config", mainGUI).show()
+        SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.side_config")), mainGUI).show()
     }
     
 }
 
-class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterial.SIDE_CONFIG_BUTTON.item.getItemBuilder("Side Config")) {
+class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterial.SIDE_CONFIG_BUTTON.item.getItemBuilder("menu.nova.side_config")) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

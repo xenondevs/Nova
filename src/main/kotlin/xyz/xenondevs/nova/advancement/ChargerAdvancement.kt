@@ -11,9 +11,7 @@ object ChargerAdvancement : Advancement(NamespacedKey(NOVA, "charger")) {
     init { 
         setParent(BasicCableAdvancement.key)
         addObtainCriteria(NovaMaterial.CHARGER)
-        setDisplay {
-            it.setTitle("Charging up")
-            it.setDescription("Craft a Charger")
+        setDisplayLocalized {
             it.setIcon(NovaMaterial.CHARGER.toIcon())
         }
     }

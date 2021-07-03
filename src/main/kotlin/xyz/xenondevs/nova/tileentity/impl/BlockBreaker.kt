@@ -101,12 +101,12 @@ class BlockBreaker(
         }
     }
     
-    inner class BlockBreakerGUI : TileEntityGUI("Block Breaker") {
+    inner class BlockBreakerGUI : TileEntityGUI("menu.nova.block_breaker") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@BlockBreaker,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "BlockBreaker Inventory", ItemConnectionType.EXTRACT_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)

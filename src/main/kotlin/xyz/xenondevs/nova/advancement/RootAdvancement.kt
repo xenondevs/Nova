@@ -10,9 +10,7 @@ object RootAdvancement : Advancement(NamespacedKey(NOVA, "root")) {
     
     init {
         addCriteria("none", TriggerType.IMPOSSIBLE) {}
-        setDisplay {
-            it.setTitle("Nova")
-            it.setDescription("")
+        setDisplayLocalized {
             it.setIcon(NovaMaterial.COPPER_GEAR.toIcon())
             it.setAnnounce(false)
             it.setToast(false)

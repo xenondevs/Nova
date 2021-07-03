@@ -4,6 +4,7 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -23,7 +24,7 @@ object CreativeMenu {
             .setItems(items)
             .build()
         
-        return SimpleWindow(player, "Items", gui)
+        return SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.creative")), gui)
     }
 }
 

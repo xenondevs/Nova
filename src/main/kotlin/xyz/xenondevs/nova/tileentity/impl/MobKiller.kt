@@ -5,10 +5,12 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Mob
 import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.region.VisualRegion
@@ -21,6 +23,7 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.isBetween
+import xyz.xenondevs.nova.util.localized
 import java.util.*
 import kotlin.math.min
 
@@ -89,7 +92,7 @@ class MobKiller(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class MobCrusherGUI : TileEntityGUI("Mob Killer") {
+    inner class MobCrusherGUI : TileEntityGUI("menu.nova.mob_killer") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@MobKiller,
@@ -112,8 +115,8 @@ class MobKiller(
         
         val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
             
-            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
-                itemBuilder.setDisplayName("§7Next attack in $idleTime ticks")
+            override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
+                itemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.mob_killer.idle", idleTime))
             
         }
         

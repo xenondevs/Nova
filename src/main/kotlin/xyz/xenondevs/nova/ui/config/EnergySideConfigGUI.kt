@@ -57,14 +57,14 @@ class EnergySideConfigGUI(
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (energyStorage.energyConfig[blockFace]!!) {
                 EnergyConnectionType.NONE ->
-                    NovaMaterial.GRAY_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§7None")
+                    NovaMaterial.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
                 EnergyConnectionType.PROVIDE ->
-                    NovaMaterial.ORANGE_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§6Output")
+                    NovaMaterial.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
                 EnergyConnectionType.CONSUME ->
-                    NovaMaterial.BLUE_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§bInput")
+                    NovaMaterial.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
                 EnergyConnectionType.BUFFER ->
-                    NovaMaterial.GREEN_BUTTON.createItemBuilder().setDisplayName("§7$blockSide").addLoreLines("§aInput & Output")
-            }
+                    NovaMaterial.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
+            }.setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

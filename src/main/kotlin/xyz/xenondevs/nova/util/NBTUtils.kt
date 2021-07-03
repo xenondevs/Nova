@@ -1,9 +1,6 @@
 package xyz.xenondevs.nova.util
 
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.DoubleTag
-import net.minecraft.nbt.FloatTag
-import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.*
 
 object NBTUtils {
     
@@ -16,6 +13,12 @@ object NBTUtils {
     fun createFloatList(vararg floats: Float): ListTag {
         val listTag = ListTag()
         floats.forEach { listTag.add(FloatTag.valueOf(it)) }
+        return listTag
+    }
+    
+    fun createStringList(strings: Iterable<String>): ListTag {
+        val listTag = ListTag()
+        strings.forEach { listTag.add(StringTag.valueOf(it)) }
         return listTag
     }
     

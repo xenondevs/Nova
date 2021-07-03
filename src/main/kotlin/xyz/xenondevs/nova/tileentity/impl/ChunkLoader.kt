@@ -86,7 +86,7 @@ class ChunkLoader(
         if (!unload) setChunksForceLoaded(false)
     }
     
-    inner class ChunkLoaderGUI : TileEntityGUI("Chunk Loader") {
+    inner class ChunkLoaderGUI : TileEntityGUI("menu.nova.chunk_loader") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@ChunkLoader,

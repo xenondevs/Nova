@@ -2,16 +2,13 @@ package xyz.xenondevs.nova.config
 
 import com.google.gson.*
 import org.intellij.lang.annotations.RegExp
-import xyz.xenondevs.nova.util.GSON
-import xyz.xenondevs.nova.util.isNumber
-import xyz.xenondevs.nova.util.isString
-import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.util.*
 import java.io.File
 
 private fun File.readConfig(): JsonObject {
     check()
     val text = readText(Charsets.UTF_8)
-    return if (text.isBlank()) JsonObject() else JsonParser.parseString(text).asJsonObject
+    return if (text.isBlank()) JsonObject() else JSON_PARSER.parse(text).asJsonObject
 }
 
 private fun File.check() {

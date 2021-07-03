@@ -105,7 +105,7 @@ class Pulverizer(
         storeData("currentItem", currentItem)
     }
     
-    inner class PulverizerGUI : TileEntityGUI("Pulverizer") {
+    inner class PulverizerGUI : TileEntityGUI("menu.nova.pulverizer") {
         
         private val mainProgress = ProgressArrowItem()
         private val pulverizerProgress = PulverizerProgress()
@@ -114,8 +114,8 @@ class Pulverizer(
             this@Pulverizer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inputInv), "Input Inventory", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(outputInv), "Output Inventory", ItemConnectionType.EXTRACT_TYPES)
+                Triple(getNetworkedInventory(inputInv), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
+                Triple(getNetworkedInventory(outputInv), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES)
             ),
         ) { openWindow(it) }
         

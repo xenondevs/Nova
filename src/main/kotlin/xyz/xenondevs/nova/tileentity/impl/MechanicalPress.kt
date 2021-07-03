@@ -126,7 +126,7 @@ class MechanicalPress(
         if (!unload) gui.close()
     }
     
-    inner class MechanicalPressGUI : TileEntityGUI("Mechanical Press") {
+    inner class MechanicalPressGUI : TileEntityGUI("menu.nova.mechanical_press") {
         
         private val pressProgress = PressProgressItem()
         private val pressTypeItems = ArrayList<PressTypeItem>()
@@ -135,8 +135,8 @@ class MechanicalPress(
             this@MechanicalPress,
             listOf(NONE, CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inputInv), "Input Inventory", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(outputInv), "Output Inventory", ItemConnectionType.EXTRACT_TYPES),
+                Triple(getNetworkedInventory(inputInv), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
+                Triple(getNetworkedInventory(outputInv), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES),
             )
         ) { openWindow(it) }
         

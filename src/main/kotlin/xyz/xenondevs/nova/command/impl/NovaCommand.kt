@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.command.impl
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
+import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.command.*
@@ -55,7 +56,12 @@ object NovaCommand : PlayerCommand("nova") {
         val player = context.player
         player.inventory.addItem(material.createItemStack())
         val itemName = material.itemName.ifBlank { material.name }
-        player.sendMessage("§7The item §b$itemName§7 has been added to your inventory.")
+        
+        player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.give.success",
+            localized(ChatColor.AQUA, itemName)
+        ))
     }
     
     private fun listNearby(context: CommandContext<CommandSourceStack>) {
@@ -64,7 +70,12 @@ object NovaCommand : PlayerCommand("nova") {
         val armorStands = chunk.entities.filterIsInstance<ArmorStand>()
         val tileEntityArmorStands = armorStands.filter { it.persistentDataContainer.hasNovaData() }
         
-        player.sendMessage("§7Out of the §b${armorStands.count()}§7 ArmorStands in your chunk, §b${tileEntityArmorStands.count()}§7 are part of a TileEntity.")
+        player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.list_nearby.success",
+            coloredText(ChatColor.AQUA, armorStands.count()),
+            coloredText(ChatColor.AQUA, tileEntityArmorStands.count())
+        ))
     }
     
     private fun getNearestData(context: CommandContext<CommandSourceStack>) {
@@ -76,7 +87,7 @@ object NovaCommand : PlayerCommand("nova") {
             .filter { it.persistentDataContainer.hasNovaData() }
         val armorStand = armorStands.minByOrNull { it.location.distance(player.location) }
         if (armorStand != null) player.chat("/data get entity ${armorStand.uniqueId}")
-        else player.sendMessage("§cCould not find a TileEntity nearby.")
+        else player.spigot().sendMessage(localized(ChatColor.GRAY, "command.nova.get_nearest_data.failed"))
     }
     
     private fun removeObsoleteModels(context: CommandContext<CommandSourceStack>) {
@@ -87,11 +98,16 @@ object NovaCommand : PlayerCommand("nova") {
             .filterIsInstance<ArmorStand>()
             .filter {
                 (it.isMultiModel() && it.getMultiModelParent() == null) ||
-                    (TileEntityManager.getTileEntityAt(it.location.blockLocation) == null 
+                    (TileEntityManager.getTileEntityAt(it.location.blockLocation) == null
                         && it.equipment?.helmet?.novaMaterial != null)
             }
         obsoleteModels.forEach(ArmorStand::remove)
-        player.sendMessage("§7Removed §b${obsoleteModels.count()} §7Armor Stands.")
+        
+        player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.remove_obsolete_models.success",
+            coloredText(ChatColor.AQUA, obsoleteModels.count())
+        ))
     }
     
     private fun removeTileEntities(context: CommandContext<CommandSourceStack>) {
@@ -99,13 +115,22 @@ object NovaCommand : PlayerCommand("nova") {
         val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
         val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it) }
         tileEntities.forEach { TileEntityManager.destroyTileEntity(it, false) }
-        player.sendMessage("§7Removed §b${tileEntities.count()} §7Tile Entities.")
+        
+        player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.remove_tile_entities.success",
+            coloredText(ChatColor.AQUA, tileEntities.count())
+        ))
     }
     
     private fun toggleNetworkDebugging(type: NetworkType, context: CommandContext<CommandSourceStack>) {
         val player = context.player
         NetworkDebugger.toggleDebugger(type, player)
-        player.sendMessage("§7Toggled debug-view for §b${type.name.lowercase().capitalize()}-Networks")
+        
+        player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.network_debug." + type.name.lowercase()
+        ))
     }
     
     private fun openCreativeInventory(context: CommandContext<CommandSourceStack>) {

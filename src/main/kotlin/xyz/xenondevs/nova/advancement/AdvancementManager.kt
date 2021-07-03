@@ -1,13 +1,16 @@
 package xyz.xenondevs.nova.advancement
 
+import net.md_5.bungee.api.chat.TranslatableComponent
 import net.roxeez.advancement.Advancement
 import net.roxeez.advancement.Criteria
+import net.roxeez.advancement.display.Display
 import net.roxeez.advancement.display.Icon
 import net.roxeez.advancement.trigger.TriggerType
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.advancement.cable.AdvancedCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.BasicCableAdvancement
@@ -25,6 +28,7 @@ import xyz.xenondevs.nova.advancement.press.*
 import xyz.xenondevs.nova.advancement.pulverizer.AllDustsAdvancement
 import xyz.xenondevs.nova.advancement.pulverizer.DustAdvancement
 import xyz.xenondevs.nova.advancement.pulverizer.PulverizerAdvancement
+import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.awardAdvancement
 import net.roxeez.advancement.AdvancementManager as RoxeezAdvancementManager
@@ -49,6 +53,22 @@ fun Advancement.addObtainCriteria(novaMaterial: NovaMaterial): Criteria {
     }
 }
 
+fun Display.setTitleLocalized(translate: String, vararg with: Any) {
+    setTitle(TranslatableComponent(translate, *with))
+}
+
+fun Display.setDescriptionLocalized(translate: String, vararg with: Any) {
+    setDescription(TranslatableComponent(translate, *with))
+}
+
+fun Advancement.setDisplayLocalized(run: (Display) -> Unit) {
+    setDisplay { 
+        it.setTitleLocalized("advancement.nova.${key.key}.title")
+        it.setDescriptionLocalized("advancement.nova.${key.key}.description")
+        run(it)
+    }
+}
+
 object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
     
     init {
@@ -68,7 +88,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             BottledMobAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement
         )
         
-        createAll(false)
+        createAll(IS_VERSION_CHANGE)
     }
     
     private fun registerAll(vararg advancements: Advancement) {

@@ -10,9 +10,7 @@ object FurnaceGeneratorAdvancement : Advancement(NamespacedKey(NOVA, "furnace_ge
     init {
         setParent(RootAdvancement.key)
         addObtainCriteria(NovaMaterial.FURNACE_GENERATOR)
-        setDisplay {
-            it.setTitle("Generating Energy")
-            it.setDescription("Craft a Furnace Generator")
+        setDisplayLocalized {
             it.setIcon(NovaMaterial.FURNACE_GENERATOR.toIcon())
         }
     }

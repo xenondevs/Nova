@@ -1,15 +1,15 @@
 package xyz.xenondevs.nova.config
 
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import xyz.xenondevs.nova.util.GSON
+import xyz.xenondevs.nova.util.JSON_PARSER
 import xyz.xenondevs.nova.util.fromJson
 import java.io.File
 
 object PermanentStorage {
     
     private val file = File("plugins/Nova/storage.json").apply { parentFile.mkdirs() }
-    val mainObj: JsonObject = if (file.exists()) JsonParser.parseReader(file.reader()).asJsonObject else JsonObject()
+    val mainObj: JsonObject = if (file.exists()) JSON_PARSER.parse(file.reader()).asJsonObject else JsonObject()
     
     fun store(key: String, data: Any) {
         mainObj.add(key, GSON.toJsonTree(data))

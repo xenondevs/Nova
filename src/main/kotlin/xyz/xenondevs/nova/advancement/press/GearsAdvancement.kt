@@ -4,6 +4,7 @@ import net.roxeez.advancement.Advancement
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.advancement.addObtainCriteria
+import xyz.xenondevs.nova.advancement.setDisplayLocalized
 import xyz.xenondevs.nova.advancement.toIcon
 import xyz.xenondevs.nova.material.NovaMaterial
 
@@ -17,10 +18,8 @@ object GearsAdvancement : Advancement(NamespacedKey(NOVA, "gears")) {
             .map { addObtainCriteria(it) }
         
         addRequirements(*criteria.toTypedArray())
-        
-        setDisplay {
-            it.setTitle("Gears")
-            it.setDescription("Make a gear using a Mechanical Press")
+    
+        setDisplayLocalized {
             it.setIcon(NovaMaterial.COPPER_GEAR.toIcon())
         }
     }

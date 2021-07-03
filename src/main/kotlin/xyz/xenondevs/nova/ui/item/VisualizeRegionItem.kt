@@ -24,8 +24,8 @@ class VisualizeRegionItem(
             
             override fun buildFor(playerUUID: UUID): ItemStack {
                 val visible = VisualRegion.isVisible(playerUUID, regionUUID)
-                return (if (visible) NovaMaterial.AREA_ON_BUTTON.createBasicItemBuilder().setDisplayName("§7Hide area")
-                else NovaMaterial.AREA_OFF_BUTTON.createBasicItemBuilder().setDisplayName("§7Show area")).buildFor(playerUUID)
+                return (if (visible) NovaMaterial.AREA_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.visual_region.hide")
+                else NovaMaterial.AREA_OFF_BUTTON.createBasicItemBuilder().setDisplayName("menu.nova.visual_region.show")).buildFor(playerUUID)
             }
             
         }

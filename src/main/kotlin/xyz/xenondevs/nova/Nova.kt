@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.advancement.AdvancementManager
 import xyz.xenondevs.nova.attachment.AttachmentManager
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.equipment.ArmorEquipListener
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.NetworkManager
@@ -18,6 +19,7 @@ import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 
 lateinit var NOVA: Nova
+var IS_VERSION_CHANGE: Boolean = false
 
 class Nova : JavaPlugin() {
     
@@ -27,8 +29,11 @@ class Nova : JavaPlugin() {
     
     override fun onEnable() {
         NOVA = this
-        setGlobalIngredients()
         
+        IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
+        PermanentStorage.store("last_version", description.version)
+        
+        setGlobalIngredients()
         NovaConfig.init()
         AdvancementManager.loadAdvancements()
         RecipeManager.registerRecipes()
@@ -51,7 +56,7 @@ class Nova : JavaPlugin() {
     }
     
     private fun forceResourcePack() {
-        if (NovaConfig.getBoolean("resource_pack.enabled")) 
+        if (NovaConfig.getBoolean("resource_pack.enabled"))
             ForceResourcePack.getInstance().resourcePackUrl = NovaConfig.getString("resource_pack.url")
     }
     

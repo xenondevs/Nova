@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.config
 
-import com.google.gson.JsonParser
 import xyz.xenondevs.nova.recipe.*
 import xyz.xenondevs.nova.util.*
 import java.io.File
@@ -8,7 +7,7 @@ import java.io.File
 object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
     
     private val fallbackConfig = JsonConfig(
-        JsonParser.parseReader(getResourceAsStream("config/config.json")!!.reader()).asJsonObject
+        JSON_PARSER.parse(getResourceAsStream("config/config.json")!!.reader()).asJsonObject
     )
     
     fun init() {
@@ -44,7 +43,7 @@ object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
         val recipesDirectory = File("plugins/Nova/recipes/$folder")
         recipesDirectory.walkTopDown().filter(File::isFile).forEach { file ->
             try {
-                val element = file.reader().use(JsonParser::parseReader)
+                val element = file.reader().use { JSON_PARSER.parse(it) }
                 val recipe = GSON.fromJson<T>(element)!!
                 recipes += recipe
             } catch (ex: IllegalArgumentException) {

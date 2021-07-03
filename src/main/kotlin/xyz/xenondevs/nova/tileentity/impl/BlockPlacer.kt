@@ -85,12 +85,12 @@ class BlockPlacer(
         }
     }
     
-    inner class BlockPlacerGUI : TileEntityGUI("Block Placer") {
+    inner class BlockPlacerGUI : TileEntityGUI("menu.nova.block_placer") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "BlockPlacer Inventory", ItemConnectionType.EXTRACT_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)

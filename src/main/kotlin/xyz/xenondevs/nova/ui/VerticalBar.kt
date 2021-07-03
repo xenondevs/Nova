@@ -7,6 +7,7 @@ import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import kotlin.math.max
 import kotlin.math.min
@@ -30,14 +31,14 @@ open class VerticalBar(
         ((y + height - 1) downTo y).withIndex().forEach { (index, y) -> gui.setItem(x, y, barItems[index]) }
     }
     
-    protected open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
+    protected open fun modifyItemBuilder(itemBuilder: NovaItemBuilder): NovaItemBuilder = itemBuilder
     
     private inner class VerticalBarItem(
         private val section: Int,
         private val totalSections: Int,
     ) : BaseItem() {
         
-        override fun getItemBuilder(): ItemBuilder {
+        override fun getItemBuilder(): NovaItemBuilder {
             val displayPercentageStart = (1.0 / totalSections) * section
             val displayPercentage = max(min((percentage - displayPercentageStart) * totalSections, 1.0), 0.0)
             val state = round(displayPercentage * 16).toInt()

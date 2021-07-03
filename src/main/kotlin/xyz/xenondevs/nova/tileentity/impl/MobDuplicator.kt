@@ -8,6 +8,7 @@ import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.Sound
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
@@ -16,6 +17,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -111,12 +113,12 @@ class MobDuplicator(
         else spawnLocation.world!!.spawnEntity(spawnLocation, entityType!!)
     }
     
-    inner class MobDuplicatorGUI : TileEntityGUI("Mob Duplicator") {
+    inner class MobDuplicatorGUI : TileEntityGUI("menu.nova.mob_duplicator") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@MobDuplicator,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "Inventory", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
@@ -135,8 +137,8 @@ class MobDuplicator(
         
         private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
             
-            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
-                itemBuilder.setDisplayName("§7Next spawn in ${totalIdleTime - idleTime} ticks")
+            override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
+                itemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.mob_killer", totalIdleTime - idleTime))
             
         }
         

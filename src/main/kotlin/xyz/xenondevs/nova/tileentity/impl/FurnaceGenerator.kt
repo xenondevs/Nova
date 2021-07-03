@@ -97,14 +97,14 @@ class FurnaceGenerator(
         storeData("totalBurnTime", totalBurnTime)
     }
     
-    inner class FurnaceGeneratorGUI : TileEntityGUI("Furnace Generator") {
+    inner class FurnaceGeneratorGUI : TileEntityGUI("menu.nova.furnace_generator") {
         
         val progressItem = EnergyProgressItem()
         
         private val sideConfigGUI = SideConfigGUI(
             this@FurnaceGenerator,
             listOf(NONE, PROVIDE),
-            listOf(Triple(getNetworkedInventory(inventory), "Fuel Inventory", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.fuel", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)

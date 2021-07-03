@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.item.impl
 
-import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -10,6 +9,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.equipment.EquipMethod
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.util.EnergyUtils
 import kotlin.math.roundToInt
 
@@ -49,7 +49,7 @@ abstract class ChargeableItem(
         }
     }
     
-    override fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+    override fun getDefaultItemBuilder(itemBuilder: NovaItemBuilder): NovaItemBuilder {
         itemBuilder.damage = calculateDamage(itemBuilder.material, 0)
         itemBuilder.addLoreLines(EnergyUtils.getEnergyString(0, maxEnergy))
         return itemBuilder

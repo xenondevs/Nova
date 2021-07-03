@@ -8,6 +8,7 @@ import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.ArmorStand
@@ -284,7 +285,7 @@ abstract class TileEntityGUI(private val title: String) {
     
     abstract val gui: GUI
     
-    fun openWindow(player: Player) = SimpleWindow(player, title, gui).show()
+    fun openWindow(player: Player) = SimpleWindow(player, arrayOf(TranslatableComponent(title)), gui).show()
     
     fun closeWindows() = gui.closeForAllViewers()
     
