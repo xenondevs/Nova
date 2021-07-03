@@ -183,10 +183,12 @@ object TileEntityManager : Listener {
         tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
     }
     
+    @EventHandler
     fun handleChunkLoad(event: ChunkLoadEvent) {
         handleChunkLoad(event.chunk)
     }
     
+    @EventHandler
     fun handleChunkUnload(event: ChunkUnloadEvent) {
         handleChunkUnload(event.chunk)
     }
