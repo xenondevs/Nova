@@ -6,7 +6,7 @@ import java.io.File
 
 object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
     
-    private val fallbackConfig = JsonConfig(
+    val fallbackConfig = JsonConfig(
         JSON_PARSER.parse(getResourceAsStream("config/config.json")!!.reader()).asJsonObject
     )
     

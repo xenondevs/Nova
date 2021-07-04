@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova
 
 import de.studiocode.invui.resourcepack.ForceResourcePack
+import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.ability.AbilityManager
 import xyz.xenondevs.nova.advancement.AdvancementManager
@@ -47,6 +48,13 @@ class Nova : JavaPlugin() {
         ArmorEquipListener.init()
         AbilityManager.init()
         VisualRegion.init()
+        
+        if (IS_VERSION_CHANGE) {
+            NovaConfig["resource_pack.url"] = NovaConfig.fallbackConfig.getString("resource_pack.url")!!
+            NovaConfig.save(true)
+        }
+        
+        Metrics(this, 11927)
         
         forceResourcePack()
     }
