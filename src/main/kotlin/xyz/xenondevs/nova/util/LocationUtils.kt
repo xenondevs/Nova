@@ -168,6 +168,20 @@ fun Location.getRectangle(to: Location, omitCorners: Boolean): Map<Axis, List<Lo
     return rectangle
 }
 
+fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
+    Preconditions.checkArgument(world != null && to.world == world)
+    
+    val (min, max) = LocationUtils.sort(this, to)
+    for (x in min.blockX..max.blockX) {
+        for (y in min.blockY..max.blockY) {
+            for (z in min.blockZ..max.blockZ) {
+                val location = Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+                if (!run(location)) return
+            }
+        }
+    }
+}
+
 fun World.dropItemsNaturally(location: Location, items: Iterable<ItemStack>) =
     items.forEach { dropItemNaturally(location, it) }
 

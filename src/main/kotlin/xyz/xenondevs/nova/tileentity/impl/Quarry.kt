@@ -119,7 +119,7 @@ class Quarry(
         lastPointerLocation = retrieveOrNull("lastPointerLocation") ?: Location(world, 0.0, 0.0, 0.0)
     }
     
-    private fun updateBounds() {
+    private fun updateBounds(): Boolean {
         val back = getFace(BlockSide.BACK)
         val right = getFace(BlockSide.RIGHT)
         val modX = back.modX.takeUnless { it == 0 } ?: right.modX
@@ -134,27 +134,51 @@ class Quarry(
         maxZ = max(location.blockZ, location.blockZ + distanceZ)
         
         updateEnergyPerTick()
+        
+        if (isRegionProtected()) {
+            if (sizeX == MIN_SIZE && sizeZ == MIN_SIZE) {
+                runTaskLater(3) { TileEntityManager.destroyAndDropTileEntity(this, true) }
+                return false
+            } else resize(MIN_SIZE, MIN_SIZE)
+        }
+        
+        return true
     }
     
     private fun resize(sizeX: Int, sizeZ: Int) {
         this.sizeX = sizeX
         this.sizeZ = sizeZ
         
-        updateBounds()
+        if (updateBounds()) {
+            drilling = false
+            drillProgress = 0.0
+            done = false
+            pointerDestination = null
+            pointerLocation = Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
+            
+            solidScaffolding.removeAllModels()
+            armX.removeAllModels()
+            armY.removeAllModels()
+            armZ.removeAllModels()
+            drill.removeAllModels()
+            
+            createScaffolding()
+        }
+    }
+    
+    private fun isRegionProtected(): Boolean {
+        val minLoc = Location(world, minX.toDouble(), y.toDouble(), minZ.toDouble())
+        val maxLoc = Location(world, maxX.toDouble(), y.toDouble(), maxZ.toDouble())
+        var protected = false
         
-        drilling = false
-        drillProgress = 0.0
-        done = false
-        pointerDestination = null
-        pointerLocation = Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
+        minLoc.fullCuboidTo(maxLoc) {
+            protected = !ProtectionUtils.canBreak(ownerUUID, it)
+            println(protected)
+            ParticleBuilder(ParticleEffect.FLAME, it.clone().apply { y += 1 }).display()
+            return@fullCuboidTo !protected
+        }
         
-        solidScaffolding.removeAllModels()
-        armX.removeAllModels()
-        armY.removeAllModels()
-        armZ.removeAllModels()
-        drill.removeAllModels()
-        
-        createScaffolding()
+        return protected
     }
     
     private fun updateEnergyPerTick() {
