@@ -10,10 +10,8 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -55,8 +53,10 @@ class BlockPlacer(
             if (material.isBlock) {
                 val novaMaterial = item.novaMaterial
                 if (novaMaterial != null && novaMaterial.isBlock) {
-                    TileEntityManager.placeTileEntity(ownerUUID, block.location, armorStand.location.yaw, novaMaterial, null)
-                    novaMaterial.hitbox?.playPlaceSoundEffect(block.location)
+                    if (TileEntityLimits.canPlaceTileEntity(ownerUUID, world, novaMaterial) == PlaceResult.ALLOW) {
+                        TileEntityManager.placeTileEntity(ownerUUID, block.location, armorStand.location.yaw, novaMaterial, null)
+                        novaMaterial.hitbox?.playPlaceSoundEffect(block.location)
+                    } else continue
                 } else {
                     block.type = material
                     material.playPlaceSoundEffect(block.location)

@@ -127,5 +127,11 @@
     "WITHER",
     "ENDER_DRAGON",
     "ELDER_GUARDIAN"
-  ]
+  ],
+  "tile_entity_world_blacklist": [
+  ],
+  "tile_entity_type_world_blacklist": {
+  },
+  "tile_entity_limit": {
+  }
 }

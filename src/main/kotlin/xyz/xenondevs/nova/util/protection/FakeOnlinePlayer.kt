@@ -30,6 +30,7 @@ import org.bukkit.util.BoundingBox
 import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
 import org.jetbrains.annotations.Contract
+import xyz.xenondevs.nova.util.PermissionUtils
 import xyz.xenondevs.nova.util.VaultUtils
 import java.net.InetSocketAddress
 import java.util.*
@@ -47,11 +48,11 @@ internal class FakeOnlinePlayer(
 ) : Player {
     
     override fun hasPermission(name: String): Boolean {
-        return VaultUtils.hasPermission(world, offlinePlayer, name)
+        return PermissionUtils.hasPermission(world, uniqueId, name)
     }
     
     override fun hasPermission(perm: Permission): Boolean {
-        return VaultUtils.hasPermission(world, offlinePlayer, perm.name)
+        return PermissionUtils.hasPermission(world, uniqueId, perm.name)
     }
     
     override fun isOnline(): Boolean {

@@ -30,6 +30,7 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter(LocationDeserializer)
         .registerTypeHierarchyAdapter(AttachmentSerializer)
         .registerTypeHierarchyAdapter(AttachmentDeserializer)
+        .registerTypeHierarchyAdapter(WorldTypeAdapter)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
         .enableComplexMapKeySerialization()
         .create()

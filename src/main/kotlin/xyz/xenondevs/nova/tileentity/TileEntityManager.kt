@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity
 
 import com.google.gson.JsonObject
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.ArmorStand
@@ -119,6 +120,9 @@ object TileEntityManager : Listener {
         // add to location cache
         locationCache += location
         
+        // count for TileEntity limits
+        TileEntityLimits.handleTileEntityCreate(ownerUUID, material)
+        
         // set hitbox block a tick later to prevent interference with the cancellation of the BlockPlaceEvent
         runTaskLater(1) {
             if (material.hitbox != null) block.type = material.hitbox
@@ -140,6 +144,9 @@ object TileEntityManager : Listener {
         val drops = tileEntity.destroy(dropItems) // destroy tileEntity and save drops for later
         
         tileEntity.handleRemoved(unload = false)
+        
+        // count for TileEntity limits
+        TileEntityLimits.handleTileEntityRemove(tileEntity.ownerUUID, tileEntity.material)
         
         return drops
     }
@@ -205,21 +212,30 @@ object TileEntityManager : Listener {
         val player = event.player
         val placedItem = event.itemInHand
         val material = placedItem.novaMaterial
+        
         if (material != null) {
             event.isCancelled = true
+            
             if (material.isBlock) {
                 val location = event.block.location
                 if (getTileEntityAt(location) == null) {
-                    
-                    placeTileEntity(
-                        player.uniqueId,
-                        event.block.location,
-                        player.location.yaw,
-                        material,
-                        placedItem.getTileEntityData()?.let { JsonObject().apply { add("global", it) } }
-                    )
-                    
-                    if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
+                    val uuid = player.uniqueId
+                    val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
+                    if (result == PlaceResult.ALLOW) {
+                        placeTileEntity(
+                            uuid,
+                            event.block.location,
+                            player.location.yaw,
+                            material,
+                            placedItem.getTileEntityData()?.let { JsonObject().apply { add("global", it) } }
+                        )
+                        
+                        if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
+                    } else {
+                        player.spigot().sendMessage(
+                            localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
+                        )
+                    }
                 }
             }
         }
