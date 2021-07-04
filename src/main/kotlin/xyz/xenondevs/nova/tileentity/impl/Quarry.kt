@@ -173,8 +173,6 @@ class Quarry(
         
         minLoc.fullCuboidTo(maxLoc) {
             protected = !ProtectionUtils.canBreak(ownerUUID, it)
-            println(protected)
-            ParticleBuilder(ParticleEffect.FLAME, it.clone().apply { y += 1 }).display()
             return@fullCuboidTo !protected
         }
         
