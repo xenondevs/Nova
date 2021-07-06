@@ -1,14 +1,21 @@
 package xyz.xenondevs.nova.attachment
 
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
+import xyz.xenondevs.nova.util.GSON
+import xyz.xenondevs.nova.util.fromJson
 import xyz.xenondevs.nova.util.runTaskTimer
 import java.util.*
+import kotlin.collections.set
+
+private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments")
 
 object AttachmentManager : Listener {
     
@@ -17,12 +24,8 @@ object AttachmentManager : Listener {
     
     fun init() {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
-        PermanentStorage.retrieveOrNull<Map<UUID, List<Attachment>>>("attachments")
-        NOVA.disableHandlers.add {
-            PermanentStorage.store("attachments", attachments)
-            attachments.values.flatten().forEach(Attachment::despawn)
-        }
-        
+        Bukkit.getOnlinePlayers().forEach { loadAttachments(it) }
+        NOVA.disableHandlers.add { Bukkit.getOnlinePlayers().forEach { saveAndRemoveAttachments(it) } }
         runTaskTimer(0, 1) { attachments.values.flatten().forEach { it.handleTick(tick++) } }
     }
     
@@ -53,12 +56,32 @@ object AttachmentManager : Listener {
     
     @EventHandler
     fun handlePlayerJoin(event: PlayerJoinEvent) {
-        getAttachments(event.player.uniqueId).forEach(Attachment::spawn)
+        loadAttachments(event.player)
     }
     
     @EventHandler
     fun handlePlayerQuit(event: PlayerQuitEvent) {
-        getAttachments(event.player.uniqueId).forEach(Attachment::despawn)
+        saveAndRemoveAttachments(event.player)
+    }
+    
+    private fun loadAttachments(player: Player) {
+        val dataContainer = player.persistentDataContainer
+        val jsonElement = dataContainer.get(ATTACHMENTS_KEY, JsonElementDataType)
+        if (jsonElement != null)
+            GSON.fromJson<List<Attachment>>(jsonElement)
+    }
+    
+    private fun saveAndRemoveAttachments(player: Player) {
+        val uuid = player.uniqueId
+        
+        saveAttachments(player)
+        getAttachments(uuid).forEach(Attachment::despawn)
+        attachments.remove(uuid)
+    }
+    
+    private fun saveAttachments(player: Player) {
+        val dataContainer = player.persistentDataContainer
+        dataContainer.set(ATTACHMENTS_KEY, JsonElementDataType, GSON.toJsonTree(attachments[player.uniqueId]))
     }
     
 }
