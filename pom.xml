@@ -72,7 +72,7 @@
         <dependency>
             <groupId>com.github.NichtStudioCode</groupId>
             <artifactId>AdvancementAPI</artifactId>
-            <version>8ea69fcadf</version>
+            <version>4a8d5e64ad</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
