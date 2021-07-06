@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **Potential name of the block**
-What should be the name of this block?
+What should this block be named?
 
 **Describe the block.**
 Describe what the block is and what it should be able to do.
