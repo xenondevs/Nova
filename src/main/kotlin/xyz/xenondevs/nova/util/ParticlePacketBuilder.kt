@@ -16,9 +16,9 @@ import xyz.xenondevs.particle.data.texture.BlockTexture
 import xyz.xenondevs.particle.data.texture.ItemTexture
 import java.awt.Color
 
-class ParticlePacketBuilder(val effect: ParticleEffect) {
+class ParticlePacketBuilder(val effect: ParticleEffect, location: Location? = null) {
     
-    val builder = ParticleBuilder(effect)
+    val builder = ParticleBuilder(effect, location)
     val packet: Any
         get() = builder.toPacket()
     
@@ -86,7 +86,7 @@ class ParticlePacketBuilder(val effect: ParticleEffect) {
         return this
     }
     
-    fun texture(item: ItemStack) : ParticlePacketBuilder {
+    fun texture(item: ItemStack): ParticlePacketBuilder {
         builder.setParticleData(ItemTexture(item))
         return this
     }
@@ -121,4 +121,4 @@ fun particle(effect: ParticleEffect, builder: ParticlePacketBuilder.() -> Unit):
     ParticlePacketBuilder(effect).apply(builder).packet
 
 fun particleBuilder(effect: ParticleEffect, location: Location? = null, builder: ParticlePacketBuilder.() -> Unit) =
-    ParticlePacketBuilder(effect).apply(builder)
+    ParticlePacketBuilder(effect, location).apply(builder)
