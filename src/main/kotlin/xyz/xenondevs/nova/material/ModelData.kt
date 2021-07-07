@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.NovaItemBuilder

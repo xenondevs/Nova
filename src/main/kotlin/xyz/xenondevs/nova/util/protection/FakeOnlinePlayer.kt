@@ -31,7 +31,6 @@ import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
 import org.jetbrains.annotations.Contract
 import xyz.xenondevs.nova.util.PermissionUtils
-import xyz.xenondevs.nova.util.VaultUtils
 import java.net.InetSocketAddress
 import java.util.*
 

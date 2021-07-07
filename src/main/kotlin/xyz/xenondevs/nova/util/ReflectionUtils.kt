@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.util
 import net.minecraft.network.protocol.Packet
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.level.Level
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
