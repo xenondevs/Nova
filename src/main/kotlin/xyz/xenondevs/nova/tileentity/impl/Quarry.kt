@@ -28,9 +28,7 @@ import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
-import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
-import xyz.xenondevs.particle.data.texture.BlockTexture
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -325,17 +323,18 @@ class Quarry(
     
     private fun spawnDrillParticles(block: Block) {
         // block cracks
-        ParticleBuilder(ParticleEffect.BLOCK_CRACK, block.location.center().apply { y += 1 })
-            .setParticleData(BlockTexture(block.type))
-            .setOffsetX(0.2f)
-            .setOffsetZ(0.2f)
-            .setSpeed(0.5f)
-            .display()
+        particleBuilder(ParticleEffect.BLOCK_CRACK, block.location.center().apply { y += 1 }) {
+            texture(block.type)
+            offsetX(0.2f)
+            offsetZ(0.2f)
+            speed(0.5f)
+        }.display()
         
         // smoke
-        ParticleBuilder(ParticleEffect.SMOKE_NORMAL,
-            pointerLocation.clone().apply { y -= 0.1 }
-        ).setAmount(10).setSpeed(0.02f).display()
+        particleBuilder(ParticleEffect.SMOKE_NORMAL, pointerLocation.clone().apply { y -= 0.1 }) {
+            amount(10)
+            speed(0.2f)
+        }.display()
     }
     
     private fun createScaffolding() {

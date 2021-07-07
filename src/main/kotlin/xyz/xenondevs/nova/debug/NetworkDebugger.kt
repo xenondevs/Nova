@@ -10,10 +10,9 @@ import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
-import xyz.xenondevs.particle.data.color.RegularColor
 import java.awt.Color
 import java.util.*
 
@@ -65,9 +64,9 @@ object NetworkDebugger {
         if (blockFace != null)
             particleLocation.add(0.0, 0.5, 0.0).advance(blockFace, 0.5)
         
-        ParticleBuilder(ParticleEffect.REDSTONE, particleLocation)
-            .setParticleData(RegularColor(color))
-            .display(players)
+        particleBuilder(ParticleEffect.REDSTONE, particleLocation) {
+            color(color)
+        }.display()
     }
     
 }

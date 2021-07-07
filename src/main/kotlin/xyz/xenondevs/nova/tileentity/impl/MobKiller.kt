@@ -4,7 +4,6 @@ import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Location
 import org.bukkit.entity.ArmorStand

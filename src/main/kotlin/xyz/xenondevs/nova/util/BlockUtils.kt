@@ -10,9 +10,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.ReflectionUtils.send
-import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
-import xyz.xenondevs.particle.data.texture.BlockTexture
 import kotlin.random.Random
 
 fun Block.breakAndTakeDrops(playEffects: Boolean = true): Collection<ItemStack> {
@@ -46,13 +44,11 @@ fun Block.playBreakEffects() {
 }
 
 fun Block.showBreakParticles() {
-    ParticleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5))
-        .setParticleData(BlockTexture(type))
-        .setOffsetX(0.2f)
-        .setOffsetY(0.2f)
-        .setOffsetZ(0.2f)
-        .setAmount(50)
-        .display()
+    particleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5)) {
+        texture(type)
+        offset(0.2, 0.2, 0.2)
+        amount(50)
+    }.display()
 }
 
 fun Block.playBreakSound() {

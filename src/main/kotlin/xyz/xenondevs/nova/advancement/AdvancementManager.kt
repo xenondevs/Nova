@@ -28,7 +28,6 @@ import xyz.xenondevs.nova.advancement.press.*
 import xyz.xenondevs.nova.advancement.pulverizer.AllDustsAdvancement
 import xyz.xenondevs.nova.advancement.pulverizer.DustAdvancement
 import xyz.xenondevs.nova.advancement.pulverizer.PulverizerAdvancement
-import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.awardAdvancement
 import net.roxeez.advancement.AdvancementManager as RoxeezAdvancementManager

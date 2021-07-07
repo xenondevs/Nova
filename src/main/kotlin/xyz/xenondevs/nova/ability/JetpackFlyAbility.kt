@@ -6,7 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.JetpackItem
-import xyz.xenondevs.particle.ParticleBuilder
+import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 
 private val ENERGY_PER_TICK = NovaConfig.getInt("jetpack.energy_per_tick")!!
@@ -68,9 +68,9 @@ internal class JetpackFlyAbility(player: Player) : Ability(player) {
     }
     
     private fun spawnParticle(location: Location) {
-        ParticleBuilder(ParticleEffect.FLAME, location)
-            .setOffsetY(-0.5f)
-            .display()
+        particleBuilder(ParticleEffect.FLAME, location) {
+            offsetY(-0.5f)
+        }.display()
     }
     
 }

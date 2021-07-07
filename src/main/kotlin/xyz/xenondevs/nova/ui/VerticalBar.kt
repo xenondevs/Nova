@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
