@@ -5,12 +5,14 @@ import de.studiocode.invui.resourcepack.Icon
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.Tag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.NBTUtils
-import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_META_ITEM_APPLY_TO_ITEM_METHOD
-import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_META_ITEM_CLASS
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_META_ITEM_DISPLAY_NAME_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_META_ITEM_INTERNAL_TAG_FIELD
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_META_ITEM_LORE_FIELD
+import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.clean
 
 private val ICON_BUILDERS = Icon.values().associateWith {
@@ -36,21 +38,31 @@ class NovaItemBuilder : ItemBuilder {
     @Suppress("UNCHECKED_CAST")
     override fun build(): ItemStack {
         val itemStack = super.build()
+        
         if (localizedName != null || localizedLore.isNotEmpty()) {
             val itemMeta = itemStack.itemMeta!!
             
-            val mainTag = CompoundTag()
-            CB_CRAFT_META_ITEM_APPLY_TO_ITEM_METHOD.invoke(itemMeta, mainTag)
-            val displayTag = mainTag.getCompound("display")
+            val internalTag = ReflectionUtils.getField(CB_CRAFT_META_ITEM_CLASS, true, "internalTag")
+                .get(itemMeta) as CompoundTag? ?: CompoundTag()
             
-            if (localizedName != null) displayTag.putString("Name", ComponentSerializer.toString(localizedName))
+            val displayTag = internalTag.getCompound("display")
+            
+            if (localizedName != null) {
+                val nameJSON = ComponentSerializer.toString(localizedName)
+                displayTag.putString("Name", nameJSON)
+                
+                // required for isSimilar and equals
+                CB_CRAFT_META_ITEM_DISPLAY_NAME_FIELD.set(itemMeta, nameJSON)
+            }
             if (localizedLore.isNotEmpty()) {
-                val serializedLore = localizedLore.map { ComponentSerializer.toString(it) }
-                displayTag.put("Lore", NBTUtils.createStringList(serializedLore))
+                val loreJSON = localizedLore.map { ComponentSerializer.toString(it) }
+                displayTag.put("Lore", NBTUtils.createStringList(loreJSON))
+                
+                // required for isSimilar and equals
+                CB_CRAFT_META_ITEM_LORE_FIELD.set(itemMeta, loreJSON)
             }
             
-            val unhandledTags = CB_CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(itemMeta) as MutableMap<String, Tag>
-            unhandledTags["display"] = displayTag
+            CB_CRAFT_META_ITEM_INTERNAL_TAG_FIELD.set(itemMeta, internalTag)
             
             itemStack.itemMeta = itemMeta
         }
