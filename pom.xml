@@ -12,9 +12,10 @@
         <kotlin.version>1.5.20</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <shadePath>xyz.xenondevs.nova.lib</shadePath>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
+        <shadePath>xyz.xenondevs.nova.lib</shadePath>
+        <spigotVersion>1.17.1-R0.1-SNAPSHOT</spigotVersion>
     </properties>
 
     <repositories>
@@ -83,7 +84,7 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <classifier>remapped-mojang</classifier>
-            <version>1.17-R0.1-SNAPSHOT</version>
+            <version>${spigotVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -193,10 +194,10 @@
                         </goals>
                         <id>remap-obf</id>
                         <configuration>
-                            <srgIn>org.spigotmc:minecraft-server:1.17-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
+                            <srgIn>org.spigotmc:minecraft-server:${spigotVersion}:txt:maps-mojang</srgIn>
                             <reverse>true</reverse>
                             <remappedDependencies>
-                                org.spigotmc:spigot:1.17-R0.1-SNAPSHOT:jar:remapped-mojang
+                                org.spigotmc:spigot:${spigotVersion}:jar:remapped-mojang
                             </remappedDependencies>
                             <remappedArtifactAttached>true</remappedArtifactAttached>
                             <remappedClassifierName>remapped-obf</remappedClassifierName>
@@ -212,9 +213,9 @@
                             <inputFile>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar
                             </inputFile>
-                            <srgIn>org.spigotmc:minecraft-server:1.17-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
+                            <srgIn>org.spigotmc:minecraft-server:${spigotVersion}:csrg:maps-spigot</srgIn>
                             <remappedDependencies>
-                                org.spigotmc:spigot:1.17-R0.1-SNAPSHOT:jar:remapped-obf
+                                org.spigotmc:spigot:${spigotVersion}:jar:remapped-obf
                             </remappedDependencies>
                         </configuration>
                     </execution>
