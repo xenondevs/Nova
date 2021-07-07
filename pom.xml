@@ -6,7 +6,7 @@
 
     <groupId>xyz.xenondevs</groupId>
     <artifactId>Nova</artifactId>
-    <version>0.2.1</version>
+    <version>0.3-SNAPSHOT</version>
 
     <properties>
         <kotlin.version>1.5.20</kotlin.version>
