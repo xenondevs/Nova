@@ -36,7 +36,8 @@ class BlockPlacer(
         get() = MAX_ENERGY - energy
     
     private val inventory = getInventory("inventory", 9, true) { }
-    private val block = location.clone().advance(getFace(BlockSide.FRONT)).block
+    private val placeLocation = location.clone().advance(getFace(BlockSide.FRONT))
+    private val placeBlock = location.clone().advance(getFace(BlockSide.FRONT)).block
     
     override val gui by lazy { BlockPlacerGUI() }
     
@@ -53,12 +54,12 @@ class BlockPlacer(
                 val novaMaterial = item.novaMaterial
                 if (novaMaterial != null && novaMaterial.isBlock) {
                     if (TileEntityLimits.canPlaceTileEntity(ownerUUID, world, novaMaterial) == PlaceResult.ALLOW) {
-                        TileEntityManager.placeTileEntity(ownerUUID, block.location, armorStand.location.yaw, novaMaterial, null)
-                        novaMaterial.hitbox?.playPlaceSoundEffect(block.location)
+                        TileEntityManager.placeTileEntity(ownerUUID, placeBlock.location, armorStand.location.yaw, novaMaterial, null)
+                        novaMaterial.hitbox?.playPlaceSoundEffect(placeBlock.location)
                     } else continue
                 } else {
-                    block.type = material
-                    material.playPlaceSoundEffect(block.location)
+                    placeBlock.type = material
+                    material.playPlaceSoundEffect(placeBlock.location)
                 }
                 
                 inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
@@ -70,10 +71,11 @@ class BlockPlacer(
     }
     
     override fun handleTick() {
-        val type = block.type
+        val type = placeBlock.type
         if (energy >= ENERGY_PER_PLACE
             && type == Material.AIR
-            && ProtectionUtils.canPlace(ownerUUID, block.location)
+            && TileEntityManager.getTileEntityAt(placeLocation) == null
+            && ProtectionUtils.canPlace(ownerUUID, placeBlock.location)
         ) {
             if (placeBlock()) energy -= ENERGY_PER_PLACE
         }
