@@ -138,7 +138,7 @@ class MobDuplicator(
         private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
             
             override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
-                itemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.mob_killer", totalIdleTime - idleTime))
+                itemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - idleTime))
             
         }
         
