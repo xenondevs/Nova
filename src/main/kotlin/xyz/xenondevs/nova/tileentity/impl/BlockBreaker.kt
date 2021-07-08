@@ -75,9 +75,6 @@ class BlockBreaker(
             val additionalProgress = min(BREAK_SPEED_CLAMP, block.type.breakSpeed * BREAK_SPEED_MULTIPLIER)
             breakProgress += additionalProgress
             
-            // send break state
-            block.setBreakState(entityId, (breakProgress * 9).roundToInt())
-            
             if (breakProgress >= 1.0) {
                 // break block, add items to inventory / drop them if full
                 val drops = block.breakAndTakeDrops()
@@ -91,6 +88,11 @@ class BlockBreaker(
                 
                 // reset break progress
                 breakProgress = 0.0
+    
+                block.setBreakState(entityId, -1)
+            } else {
+                // send break state
+                block.setBreakState(entityId, (breakProgress * 9).roundToInt())
             }
             
         }

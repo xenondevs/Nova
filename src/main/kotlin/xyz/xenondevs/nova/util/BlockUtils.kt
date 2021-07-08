@@ -6,6 +6,7 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.Chest
 import org.bukkit.block.Container
+import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -27,7 +28,7 @@ fun Block.breakAndTakeDrops(playEffects: Boolean = true): Collection<ItemStack> 
         if (state is Chest) {
             drops += state.blockInventory.contents.filterNotNull()
             state.blockInventory.clear()
-        } else if (state is Container) {
+        } else if (state is Container && state !is ShulkerBox) {
             drops += state.inventory.contents.filterNotNull()
             state.inventory.clear()
         }
