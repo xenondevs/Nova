@@ -1,15 +1,14 @@
 package xyz.xenondevs.nova.util
 
 import net.minecraft.core.BlockPos
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import org.bukkit.Material
-import org.bukkit.block.Block
-import org.bukkit.block.Chest
-import org.bukkit.block.Container
-import org.bukkit.block.ShulkerBox
+import org.bukkit.block.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
 import xyz.xenondevs.nova.util.ReflectionUtils.send
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
@@ -68,4 +67,22 @@ fun Block.setBreakState(entityId: Int, state: Int) {
         .flatMap { it.entities.toList() }
         .filterIsInstance<Player>()
         .forEach { it.send(packet) }
+}
+
+fun Block.place(itemStack: ItemStack) {
+    type = itemStack.type
+    
+    if (state is TileState || type == Material.PLAYER_HEAD || type == Material.PLAYER_WALL_HEAD)
+        setBlockEntityDataFromItemStack(itemStack)
+}
+
+fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
+    val itemTag = CompoundTag()
+    ReflectionRegistry.CB_CRAFT_META_APPLY_TO_METHOD.invoke(itemStack.itemMeta, itemTag)
+    
+    val tileEntityTag = itemTag.getCompound("BlockEntityTag")?.let { if (it.isEmpty) itemTag else it }
+    if (tileEntityTag != null) {
+        val world = this.world.nmsWorld
+        world.getTileEntity(BlockPos(x, y, z), true)?.load(tileEntityTag)
+    }
 }

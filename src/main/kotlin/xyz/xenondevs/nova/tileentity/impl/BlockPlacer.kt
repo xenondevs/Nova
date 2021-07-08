@@ -14,10 +14,7 @@ import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.advance
-import xyz.xenondevs.nova.util.novaMaterial
-import xyz.xenondevs.nova.util.playPlaceSoundEffect
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import java.util.*
 
@@ -58,7 +55,7 @@ class BlockPlacer(
                         novaMaterial.hitbox?.playPlaceSoundEffect(placeBlock.location)
                     } else continue
                 } else {
-                    placeBlock.type = material
+                    placeBlock.place(item)
                     material.playPlaceSoundEffect(placeBlock.location)
                 }
                 
@@ -91,7 +88,7 @@ class BlockPlacer(
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES))
+            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
