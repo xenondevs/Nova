@@ -163,26 +163,35 @@ object TileEntityManager : Listener {
     fun getTileEntitiesInChunk(chunk: Chunk) = tileEntityMap[chunk]?.values?.toList() ?: emptyList()
     
     private fun handleChunkLoad(chunk: Chunk) {
-        if (!chunk.isLoaded) return
-        
-        val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>()
-        
-        chunk.entities
-            .filterIsInstance<ArmorStand>()
-            .filter(ArmorStand::hasTileEntityData)
-            .forEach { armorStand ->
-                val location = armorStand.location.blockLocation
+        // https://hub.spigotmc.org/jira/browse/SPIGOT-6547
+        // workaround because of async entity loading:
+        // check for entities every 10 ticks for the next 15 seconds (300 ticks)
+        for (delay in 0..300 step 10) {
+            runTaskLater(delay.toLong()) {
                 
-                if (!locationCache.contains(location)) {
-                    armorStand.fireTicks = Int.MAX_VALUE
-                    val tileEntity = TileEntity.newInstance(armorStand)
-                    chunkMap[location] = tileEntity
-                    locationCache += location
+                if (chunk.isLoaded) {
+                    val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>()
+                    
+                    chunk.entities
+                        .filterIsInstance<ArmorStand>()
+                        .filter(ArmorStand::hasTileEntityData)
+                        .forEach { armorStand ->
+                            val location = armorStand.location.blockLocation
+                            
+                            if (!locationCache.contains(location)) {
+                                armorStand.fireTicks = Int.MAX_VALUE
+                                val tileEntity = TileEntity.newInstance(armorStand)
+                                chunkMap[location] = tileEntity
+                                locationCache += location
+                            }
+                        }
+                    
+                    tileEntityMap[chunk] = chunkMap
+                    chunkMap.values.forEach { it.handleInitialized(false) }
                 }
+                
             }
-        
-        tileEntityMap[chunk] = chunkMap
-        chunkMap.values.forEach { it.handleInitialized(false) }
+        }
     }
     
     private fun handleChunkUnload(chunk: Chunk) {
@@ -194,12 +203,7 @@ object TileEntityManager : Listener {
     
     @EventHandler
     fun handleChunkLoad(event: ChunkLoadEvent) {
-        // https://hub.spigotmc.org/jira/browse/SPIGOT-6547
-        // workaround because of async entity loading:
-        // check for entities every 10 ticks for the next 15 seconds (300 ticks)
-        for (delay in 0..300 step 10) {
-            runTaskLater(delay.toLong()) { handleChunkLoad(event.chunk) }
-        }
+        handleChunkLoad(event.chunk)
     }
     
     @EventHandler
