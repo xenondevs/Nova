@@ -59,15 +59,18 @@ class MultiModel(
     
     fun addModels(vararg models: Model) = addModels(models.toList())
     
-    fun addModels(models: List<Model>) {
+    fun addModels(models: List<Model>): List<ArmorStand> {
         chunksInvalid = true
-        models.forEach {
+        
+        return models.map {
             val location = it.location
-            val armorStand = EntityUtils.spawnArmorStandSilently(location, it.itemStack, false) {
+            val armorStand = EntityUtils.spawnArmorStandSilently(location, it.itemStack, true) {
                 val dataContainer = persistentDataContainer
                 dataContainer.set(MULTI_MODEL_KEY, UUIDDataType, uuid)
             }
             currentModels[armorStand] = it
+            
+            return@map armorStand
         }
     }
     
