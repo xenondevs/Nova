@@ -87,6 +87,12 @@ object TileEntityManager : Listener {
                 if (Material.AIR == location.block.type)
                     destroyTileEntity(tileEntity, false)
             }
+            
+            // Async entity loading causes MultiModels to not replace models correctly as the armor stands
+            // haven't been loaded at that time.
+            // This is a temporary workaround until spigot fixes this issue.
+            // https://hub.spigotmc.org/jira/browse/SPIGOT-6547
+            tileEntities.flatMap { it.multiModels.values }.forEach(MultiModel::removeDuplicates)
         }
     }
     

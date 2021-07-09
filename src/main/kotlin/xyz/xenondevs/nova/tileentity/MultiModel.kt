@@ -47,6 +47,15 @@ class MultiModel(
         }
     }
     
+    fun removeDuplicates() {
+        val models = HashSet<Model>()
+        currentModels.forEach { (armorStand, model) ->
+            if (models.contains(model)) {
+                armorStand.remove()
+            } else models += model
+        }
+    }
+    
     fun useArmorStands(run: (ArmorStand) -> Unit) {
         chunksInvalid = true
         currentModels.keys.forEach(run::invoke)
