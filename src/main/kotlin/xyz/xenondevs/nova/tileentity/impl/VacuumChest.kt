@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.region.Region
 import xyz.xenondevs.nova.region.VisualRegion
 import xyz.xenondevs.nova.tileentity.ItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -20,7 +21,6 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.getSurroundingChunks
-import xyz.xenondevs.nova.util.isBetween
 import xyz.xenondevs.nova.util.novaMaterial
 import java.util.*
 
@@ -36,8 +36,10 @@ class VacuumChest(
     private val inventory = getInventory("inventory", 12, true) {}
     private val filterInventory = getInventory("itemFilter", 1, true, ::handleFilterInventoryUpdate)
     
-    private val pos1 = location.clone().center().subtract(RANGE, RANGE, RANGE)
-    private val pos2 = location.clone().center().add(RANGE, RANGE, RANGE)
+    private val region = Region(
+        location.clone().center().subtract(RANGE, RANGE, RANGE),
+        location.clone().center().add(RANGE, RANGE, RANGE)
+    )
     
     private var items: List<Item>? = null
     
@@ -66,7 +68,7 @@ class VacuumChest(
         items = chunk.getSurroundingChunks(1, includeCurrent = true, ignoreUnloaded = true)
             .flatMap { it.entities.asList() }
             .filterIsInstance<Item>()
-            .filter { it.location.isBetween(pos1, pos2) }
+            .filter { it.location in region }
             .filter { filter?.allowsItem(it.itemStack) ?: true }
             .onEach { it.velocity = location.clone().subtract(it.location).toVector() }
     }
@@ -97,7 +99,7 @@ class VacuumChest(
                 "| f # . . . . # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('r', VisualizeRegionItem(uuid, pos1, pos2))
+            .addIngredient('r', VisualizeRegionItem(uuid, region))
             .addIngredient('f', VISlotElement(filterInventory, 0))
             .build()
             .also { it.fillRectangle(3, 1, 4, inventory, true) }

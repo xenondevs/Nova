@@ -59,6 +59,7 @@ enum class NovaMaterial(
     VACUUM_CHEST("block.nova.vacuum_chest", blockOf(18), null, null, blockOf(18), BARRIER, ::VacuumChest),
     BREEDER("block.nova.breeder", blockOf(19), null, EnergyTileEntity::createItemBuilder, blockOf(19), COBBLESTONE, ::Breeder),
     MOB_DUPLICATOR("block.nova.mob_duplicator", blockOf(20), null, EnergyTileEntity::createItemBuilder, blockOf(20), COBBLESTONE, ::MobDuplicator),
+    PLANTER("block.nova.planter", blockOf(21), null, EnergyTileEntity::createItemBuilder, blockOf(21), COBBLESTONE, ::Planter),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("item.nova.iron_plate", itemOf(1000)),
@@ -130,6 +131,8 @@ enum class NovaMaterial(
     AREA_OFF_BUTTON("", itemOf(9020)),
     NBT_ON_BUTTON("", itemOf(9021)),
     NBT_OFF_BUTTON("", itemOf(9022)),
+    HOE_ON_BUTTON("", itemOf(9023)),
+    HOE_OFF_BUTTON("", itemOf(9024)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),

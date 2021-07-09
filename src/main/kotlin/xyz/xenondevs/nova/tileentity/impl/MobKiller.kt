@@ -5,7 +5,6 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import net.md_5.bungee.api.ChatColor
-import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Mob
 import xyz.xenondevs.nova.config.NovaConfig
@@ -21,7 +20,6 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.getSurroundingChunks
-import xyz.xenondevs.nova.util.isBetween
 import xyz.xenondevs.nova.util.localized
 import java.util.*
 import kotlin.math.min
@@ -46,14 +44,7 @@ class MobKiller(
         get() = MAX_ENERGY - energy
     
     private var idleTime = IDLE_TIME
-    private var min: Location
-    private var max: Location
-    
-    init {
-        val sorted = getFrontArea(10.0, 10.0, 4.0, -1.0)
-        min = sorted.first
-        max = sorted.second
-    }
+    private val region = getFrontArea(10.0, 10.0, 4.0, -1.0)
     
     override fun handleTick() {
         if (energy >= ENERGY_PER_TICK) {
@@ -69,7 +60,7 @@ class MobKiller(
                     .getSurroundingChunks(1, includeCurrent = true, ignoreUnloaded = true)
                     .flatMap { it.entities.asList() }
                     .filterIsInstance<Mob>()
-                    .filter { it.location.isBetween(min, max) }
+                    .filter { it.location in region }
                     .take(killLimit)
                     .forEach { entity ->
                         energy -= ENERGY_PER_DAMAGE
@@ -107,7 +98,7 @@ class MobKiller(
                 "| # # . # . # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('r', VisualizeRegionItem(uuid, min, max))
+            .addIngredient('r', VisualizeRegionItem(uuid, region))
             .build()
         
         val energyBar = EnergyBar(gui, x = 3, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }

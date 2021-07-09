@@ -123,6 +123,11 @@
     "idle_time": 400,
     "idle_time_nbt": 1000
   },
+  "planter": {
+    "capacity": 10000,
+    "energy_per_tick": 20,
+    "wait_time": 40
+  },
   "wind_turbine": {
     "capacity": 10000,
     "energy_per_tick": 80

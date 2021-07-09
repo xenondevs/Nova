@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
-import xyz.xenondevs.nova.util.fuel
+import xyz.xenondevs.nova.util.item.fuel
 import xyz.xenondevs.nova.util.toItemStack
 import java.util.*
 import kotlin.math.min

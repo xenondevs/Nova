@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.region.Region
 import xyz.xenondevs.nova.util.*
 import java.util.*
 
@@ -201,7 +202,7 @@ abstract class TileEntity(
      * given [length], [width], [height] and [vertical translation][translateVertical] in front
      * of this [TileEntity].
      */
-    fun getFrontArea(length: Double, width: Double, height: Double, translateVertical: Double): Pair<Location, Location> {
+    fun getFrontArea(length: Double, width: Double, height: Double, translateVertical: Double): Region {
         val frontFace = getFace(BlockSide.FRONT)
         val startLocation = location.clone().center().advance(frontFace, 0.5)
         
@@ -216,7 +217,7 @@ abstract class TileEntity(
             y += height + translateVertical
         }
         
-        return LocationUtils.sort(pos1, pos2)
+        return Region(LocationUtils.sort(pos1, pos2))
     }
     
     /**
@@ -257,7 +258,7 @@ abstract class TileEntity(
     }
     
     override fun equals(other: Any?): Boolean {
-        return if (other is TileEntity) other.uuid == uuid else other === this
+        return other is TileEntity && other === this
     }
     
     override fun hashCode(): Int {

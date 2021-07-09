@@ -6,7 +6,6 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.ChatColor
-import org.bukkit.Location
 import org.bukkit.entity.Animals
 import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
@@ -24,7 +23,11 @@ import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.util.item.FoodUtils
+import xyz.xenondevs.nova.util.item.canBredNow
+import xyz.xenondevs.nova.util.item.genericMaxHealth
+import xyz.xenondevs.nova.util.localized
 import java.util.*
 import kotlin.math.min
 
@@ -47,17 +50,12 @@ class Breeder(
         get() = MAX_ENERGY - energy
     
     private var idleTime = IDLE_TIME
-    private var min: Location
-    private var max: Location
+    private val region = getFrontArea(7.0, 7.0, 4.0, -1.0)
     
     private val inventory = getInventory("inventory", 9, true, ::handleInventoryUpdate)
     
     init {
         setDefaultInventory(inventory)
-        
-        val sorted = getFrontArea(7.0, 7.0, 4.0, -1.0)
-        min = sorted.first
-        max = sorted.second
     }
     
     override fun handleTick() {
@@ -73,7 +71,7 @@ class Breeder(
                         .getSurroundingChunks(1, includeCurrent = true, ignoreUnloaded = true)
                         .flatMap { it.entities.asList() }
                         .filterIsInstance<Animals>()
-                        .filter { it.canBredNow && it.location.isBetween(min, max) }
+                        .filter { it.canBredNow && it.location in region }
                 
                 var breedsLeft = min(energy / ENERGY_PER_BREED, BREED_LIMIT)
                 for (animal in breedableEntities) {
@@ -162,7 +160,7 @@ class Breeder(
                 "| # # . . . . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('r', VisualizeRegionItem(uuid, min, max))
+            .addIngredient('r', VisualizeRegionItem(uuid, region))
             .build()
             .also { it.fillRectangle(3, 1, 3, inventory, true) }
         

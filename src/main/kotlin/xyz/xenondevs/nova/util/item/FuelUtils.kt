@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.util
+package xyz.xenondevs.nova.util.item
 
 import org.bukkit.Material
 import org.bukkit.Tag
