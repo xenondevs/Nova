@@ -64,6 +64,10 @@ fun ArmorStand.getTileEntityData() =
 fun ArmorStand.hasTileEntityData(): Boolean =
     persistentDataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
 
+@Suppress("DEPRECATION")
+val Material?.requiresLight: Boolean
+    get() = this != null && !isTransparent
+
 object TileEntityManager : Listener {
     
     private val tileEntityMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
@@ -96,13 +100,16 @@ object TileEntityManager : Listener {
         
         val block = location.block
         
+        // the block type to be used as a hitbox for the tile entity
+        val hitboxType = material.hitbox
+        
         // spawn ArmorStand there
         val headItem = material.block!!.getItem("")
         val spawnLocation = location
             .clone()
             .add(0.5, 0.0, 0.5)
             .also { it.yaw = ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f }
-        val armorStand = EntityUtils.spawnArmorStandSilently(spawnLocation, headItem)
+        val armorStand = EntityUtils.spawnArmorStandSilently(spawnLocation, headItem, hitboxType.requiresLight)
         
         // create TileEntity instance
         val tileEntity = material.createTileEntity!!(
@@ -125,7 +132,7 @@ object TileEntityManager : Listener {
         
         // set hitbox block a tick later to prevent interference with the cancellation of the BlockPlaceEvent
         runTaskLater(1) {
-            if (material.hitbox != null) block.type = material.hitbox
+            if (hitboxType != null) block.type = hitboxType
             tileEntity.handleInitialized(true)
             tileEntity.saveData()
         }
@@ -179,7 +186,8 @@ object TileEntityManager : Listener {
                             val location = armorStand.location.blockLocation
                             
                             if (!locationCache.contains(location)) {
-                                armorStand.fireTicks = Int.MAX_VALUE
+                                if (location.block.type.requiresLight) armorStand.fireTicks = Int.MAX_VALUE
+                                
                                 val tileEntity = TileEntity.newInstance(armorStand)
                                 chunkMap[location] = tileEntity
                                 locationCache += location

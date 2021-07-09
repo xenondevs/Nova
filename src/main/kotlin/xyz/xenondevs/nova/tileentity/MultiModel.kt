@@ -64,7 +64,7 @@ class MultiModel(
         
         return models.map {
             val location = it.location
-            val armorStand = EntityUtils.spawnArmorStandSilently(location, it.itemStack, true) {
+            val armorStand = EntityUtils.spawnArmorStandSilently(location, it.itemStack, false) {
                 val dataContainer = persistentDataContainer
                 dataContainer.set(MULTI_MODEL_KEY, UUIDDataType, uuid)
             }
