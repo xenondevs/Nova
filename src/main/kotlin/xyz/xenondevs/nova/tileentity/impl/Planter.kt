@@ -34,6 +34,7 @@ import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.isEmpty
 import xyz.xenondevs.nova.util.item.PlantUtils
+import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.isHoe
 import xyz.xenondevs.nova.util.item.isTillable
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
@@ -76,15 +77,21 @@ class Planter(
             if (nextSeed > 0) nextSeed--
             else {
                 nextSeed = WAIT_TIME
-                val (plant, soil) = getNextBlock() ?: return
-                energy -= ENERGY_PER_TICK
-                // TODO Saplings, Sweet berries, melons/pumpkins
-                if (autoHoe && soil.type != Material.FARMLAND) tillDirt(soil)
-                val item = takeSeed() ?: return
-                plant.type = PlantUtils.SEED_BLOCKS[item.type]!!
-                plant.world.playSound(plant.location, plant.type.soundGroup.placeSound, 1f, Random.nextDouble(0.6, 1.0).toFloat())
+                placeNextSeed()
             }
         }
+    }
+    
+    private fun placeNextSeed() {
+        if(hoesInventory.items[0] == null)
+            return
+        val (plant, soil) = getNextBlock() ?: return
+        energy -= ENERGY_PER_TICK
+        if (autoHoe && soil.type != Material.FARMLAND) tillDirt(soil)
+        val item = takeSeed() ?: return
+        plant.type = PlantUtils.SEED_BLOCKS[item.type] ?: item.type
+        plant.world.playSound(plant.location, plant.type.soundGroup.placeSound, 1f, Random.nextDouble(0.6, 1.0).toFloat())
+        useHoe()
     }
     
     private fun takeSeed(): ItemStack? {
@@ -116,11 +123,11 @@ class Planter(
     }
     
     private fun tillDirt(block: Block) {
-        // TODO damage hoe
         block.type = Material.FARMLAND
         val farmland = block.blockData as Farmland
         farmland.moisture = 7
         world.playSound(block.location, Sound.ITEM_HOE_TILL, 1f, 1f)
+        useHoe()
     }
     
     private fun handleHoeUpdate(event: ItemUpdateEvent) {
@@ -129,8 +136,12 @@ class Planter(
     }
     
     private fun handleSeedUpdate(event: ItemUpdateEvent) {
-        if ((event.isAdd || event.isSwap) && event.newItemStack.type !in PlantUtils.SEED_BLOCKS)
+        if ((event.isAdd || event.isSwap) && event.newItemStack.type !in PlantUtils.PLANTS)
             event.isCancelled = true
+    }
+    
+    private fun useHoe() {
+        hoesInventory.setItemStack(null, 0, ToolUtils.damageTool(hoesInventory.items[0]))
     }
     
     override fun handleRemoved(unload: Boolean) {

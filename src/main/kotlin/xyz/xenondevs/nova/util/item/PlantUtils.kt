@@ -12,6 +12,21 @@ fun Material.isTillable(): Boolean {
 
 object PlantUtils {
     
+    val PLANTS = setOf(
+        Material.WHEAT_SEEDS,
+        Material.BEETROOT_SEEDS,
+        Material.POTATO,
+        Material.CARROT,
+        Material.PUMPKIN_SEEDS,
+        Material.MELON_SEEDS,
+        Material.OAK_SAPLING,
+        Material.SPRUCE_SAPLING,
+        Material.BIRCH_SAPLING,
+        Material.JUNGLE_SAPLING,
+        Material.ACACIA_SAPLING,
+        Material.DARK_OAK_SAPLING
+    )
+    
     val SEED_BLOCKS = enumMapOf(
         Material.WHEAT_SEEDS to Material.WHEAT,
         Material.BEETROOT_SEEDS to Material.BEETROOTS,
