@@ -37,7 +37,9 @@ class WindTurbine(
     private val columnModel = getMultiModel("column")
     private val turbineModel = getMultiModel("turbine")
     
-    private val energyPerTick = (location.y / (world.maxHeight - 1) * ENERGY_PER_TICK).toInt()
+    private val altitude = location.y / (world.maxHeight - 1)
+    private val energyPerTick = (altitude * ENERGY_PER_TICK).toInt()
+    private val rotationPerTick = altitude * 0.2
     
     override fun handleInitialized(first: Boolean) {
         super.handleInitialized(first)
@@ -64,7 +66,7 @@ class WindTurbine(
     
     override fun handleTick() {
         turbineModel.useArmorStands {
-            it.headPose = it.headPose.add(0.0, 0.0, 0.05)
+            it.headPose = it.headPose.add(0.0, 0.0, rotationPerTick)
         }
         
         energy = min(MAX_ENERGY, energy + energyPerTick)
