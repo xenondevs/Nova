@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.advancement.cable.AdvancedCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.BasicCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.EliteCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.UltimateCableAdvancement
+import xyz.xenondevs.nova.advancement.farn.PlanterAdvancement
 import xyz.xenondevs.nova.advancement.mob.BottledMobAdvancement
 import xyz.xenondevs.nova.advancement.mob.BreederAdvancement
 import xyz.xenondevs.nova.advancement.mob.MobDuplicatorAdvancement
@@ -84,7 +85,8 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             MechanicalPressAdvancement, GearsAdvancement, PlatesAdvancement, AllPlatesAdvancement, AllGearsAdvancement,
             PulverizerAdvancement, DustAdvancement, AllDustsAdvancement,
             BlockPlacerAdvancement, BlockBreakerAdvancement, QuarryAdvancement,
-            BottledMobAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement
+            BottledMobAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement,
+            PlanterAdvancement
         )
         
         createAll(IS_VERSION_CHANGE)
