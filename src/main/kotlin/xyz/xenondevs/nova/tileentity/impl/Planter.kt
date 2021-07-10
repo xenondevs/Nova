@@ -64,7 +64,7 @@ class Planter(
     private val plantRegion = getFrontArea(7.0, 7.0, 1.0, 0.0)
     private val soilRegion = Region(plantRegion.min.clone().advance(BlockFace.DOWN), plantRegion.max.clone().advance(BlockFace.DOWN))
     
-    private var autoHoe = retrieveData("autoHoe") { true }
+    private var autoTill = retrieveData("autoTill") { true }
     private var nextSeed = WAIT_TIME
     
     init {
@@ -87,7 +87,7 @@ class Planter(
             return
         val (plant, soil) = getNextBlock() ?: return
         energy -= ENERGY_PER_TICK
-        if (autoHoe && soil.type != Material.FARMLAND) tillDirt(soil)
+        if (autoTill && soil.type != Material.FARMLAND) tillDirt(soil)
         val item = takeSeed() ?: return
         plant.type = PlantUtils.SEED_BLOCKS[item.type] ?: item.type
         plant.world.playSound(plant.location, plant.type.soundGroup.placeSound, 1f, Random.nextDouble(0.6, 1.0).toFloat())
@@ -113,9 +113,9 @@ class Planter(
                 return@indexOfFirst false
             
             if (emptyInput)
-                return@indexOfFirst block.type == Material.AIR && soilBlock.type != Material.FARMLAND && autoHoe && soilBlock.type.isTillable()
+                return@indexOfFirst block.type == Material.AIR && soilBlock.type != Material.FARMLAND && autoTill && soilBlock.type.isTillable()
             else
-                return@indexOfFirst block.type == Material.AIR && (soilBlock.type == Material.FARMLAND || autoHoe && soilBlock.type.isTillable())
+                return@indexOfFirst block.type == Material.AIR && (soilBlock.type == Material.FARMLAND || autoTill && soilBlock.type.isTillable())
         }
         if (index == -1)
             return null
@@ -151,7 +151,7 @@ class Planter(
     
     override fun saveData() {
         super.saveData()
-        storeData("autoHoe", autoHoe)
+        storeData("autoTill", autoTill)
     }
     
     inner class PlanterGUI : TileEntityGUI("menu.nova.planter") {
@@ -175,22 +175,22 @@ class Planter(
             .addIngredient('h', SlotElement.VISlotElement(hoesInventory, 0))
             .addIngredient('a', VisualizeRegionItem(uuid, plantRegion))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('f', AutoHoeingItem())
+            .addIngredient('f', AutoTillingItem())
             .build()
             .also { it.fillRectangle(1, 2, 3, inputInventory, true) }
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
         
-        private inner class AutoHoeingItem : BaseItem() {
+        private inner class AutoTillingItem : BaseItem() {
             
             override fun getItemBuilder(): ItemBuilder {
-                return if (autoHoe)
-                    NovaMaterial.HOE_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.planter.autohoe.on")
-                else NovaMaterial.HOE_OFF_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.planter.autohoe.off")
+                return if (autoTill)
+                    NovaMaterial.HOE_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.planter.autotill.on")
+                else NovaMaterial.HOE_OFF_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.planter.autotill.off")
             }
             
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-                autoHoe = !autoHoe
+                autoTill = !autoTill
                 notifyWindows()
                 
                 player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
