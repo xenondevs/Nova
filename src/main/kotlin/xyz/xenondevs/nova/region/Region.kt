@@ -17,10 +17,12 @@ class Region(val min: Location, val max: Location) : Iterable<Block> {
         return@lazy Collections.unmodifiableList(blockList)
     }
     
+    val world by lazy { min.world }
+    
     constructor(locations: Pair<Location, Location>) : this(locations.first, locations.second)
     
     init {
-        require(min.world == max.world) { "Points must be in the same world." }
+        require(min.world != null && min.world == max.world) { "Points must be in the same world." }
     }
     
     operator fun contains(loc: Location): Boolean {

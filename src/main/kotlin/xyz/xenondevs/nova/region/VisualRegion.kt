@@ -40,7 +40,7 @@ object VisualRegion {
     }
     
     fun removeRegion(regionUUID: UUID) {
-        if(regionUUID !in taskId)
+        if (regionUUID !in taskId)
             return
         TaskManager.getTaskManager().stopTask(taskId[regionUUID]!!)
         taskId.remove(regionUUID)
@@ -58,7 +58,9 @@ object VisualRegion {
         val packets = getParticlePackets(regionUUID, region)
         viewers[regionUUID] = ArrayList()
         val id = TaskManager.startSuppliedTask(packets, 3) {
-            viewers[regionUUID]!!.map(Bukkit::getPlayer)
+            viewers[regionUUID]!!
+                .mapNotNull(Bukkit::getPlayer)
+                .filter { it.location.world == region.world }
         }
         taskId[regionUUID] = id
     }
