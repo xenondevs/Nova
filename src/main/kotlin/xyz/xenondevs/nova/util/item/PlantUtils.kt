@@ -4,8 +4,7 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.util.enumMapOf
 
 fun Material.isTillable(): Boolean {
-    return this == Material.FARMLAND
-        || this == Material.GRASS_BLOCK
+    return this == Material.GRASS_BLOCK
         || this == Material.DIRT
         || this == Material.DIRT_PATH
 }

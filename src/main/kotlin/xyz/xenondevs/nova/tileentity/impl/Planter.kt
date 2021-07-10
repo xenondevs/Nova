@@ -12,7 +12,6 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.block.data.type.Farmland
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -83,15 +82,12 @@ class Planter(
     }
     
     private fun placeNextSeed() {
-        if(hoesInventory.items[0] == null)
-            return
         val (plant, soil) = getNextBlock() ?: return
         energy -= ENERGY_PER_TICK
         if (autoTill && soil.type != Material.FARMLAND) tillDirt(soil)
         val item = takeSeed() ?: return
         plant.type = PlantUtils.SEED_BLOCKS[item.type] ?: item.type
         plant.world.playSound(plant.location, plant.type.soundGroup.placeSound, 1f, Random.nextDouble(0.6, 1.0).toFloat())
-        useHoe()
     }
     
     private fun takeSeed(): ItemStack? {
@@ -105,17 +101,21 @@ class Planter(
     
     private fun getNextBlock(): Pair<Block, Block>? {
         val emptyInput = inputInventory.isEmpty()
+        val emptyHoes = hoesInventory.isEmpty()
         val index = plantRegion.withIndex().indexOfFirst { (index, block) ->
-            // Search for a block that has no block on top of it and is dirt/farmland
             val soilBlock = soilRegion[index]
-            
+            // Search for a block that has no block on top of it and is dirt/farmland
+            // If the soil or plant block is protected, skip this block
             if (!ProtectionUtils.canPlace(ownerUUID, block.location) || !ProtectionUtils.canBreak(ownerUUID, soilBlock.location))
                 return@indexOfFirst false
-            
-            if (emptyInput)
-                return@indexOfFirst block.type == Material.AIR && soilBlock.type != Material.FARMLAND && autoTill && soilBlock.type.isTillable()
-            else
-                return@indexOfFirst block.type == Material.AIR && (soilBlock.type == Material.FARMLAND || autoTill && soilBlock.type.isTillable())
+            // If the plant block is already occupied return false
+            if (!block.type.isAir)
+                return@indexOfFirst false
+            // If auto tilling is disabled or there are no hoes available, only use this block if it's already farmland
+            if (!autoTill || emptyHoes)
+                return@indexOfFirst soilBlock.type == Material.FARMLAND
+            // If there are no seeds search for dirt that still needs to be tilled
+            return@indexOfFirst (!emptyInput && soilBlock.type == Material.FARMLAND) || soilBlock.type.isTillable()
         }
         if (index == -1)
             return null
@@ -124,8 +124,6 @@ class Planter(
     
     private fun tillDirt(block: Block) {
         block.type = Material.FARMLAND
-        val farmland = block.blockData as Farmland
-        farmland.moisture = 7
         world.playSound(block.location, Sound.ITEM_HOE_TILL, 1f, 1f)
         useHoe()
     }
@@ -168,9 +166,9 @@ class Planter(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s a f # # # . |" +
+                "| s # a # # # . |" +
                 "| . . . # h # . |" +
-                "| . . . # # # . |" +
+                "| . . . # f # . |" +
                 "3 - - - - - - - 4")
             .addIngredient('h', SlotElement.VISlotElement(hoesInventory, 0))
             .addIngredient('a', VisualizeRegionItem(uuid, plantRegion))
@@ -184,9 +182,8 @@ class Planter(
         private inner class AutoTillingItem : BaseItem() {
             
             override fun getItemBuilder(): ItemBuilder {
-                return if (autoTill)
-                    NovaMaterial.HOE_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.planter.autotill.on")
-                else NovaMaterial.HOE_OFF_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.planter.autotill.off")
+                return (if (autoTill) NovaMaterial.HOE_ON_BUTTON else NovaMaterial.HOE_OFF_BUTTON)
+                    .createBasicItemBuilder().setLocalizedName("menu.nova.planter.autotill")
             }
             
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
