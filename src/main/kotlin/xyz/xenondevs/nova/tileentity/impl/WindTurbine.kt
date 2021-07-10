@@ -5,6 +5,7 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import org.bukkit.entity.ArmorStand
+import org.bukkit.util.EulerAngle
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -55,8 +56,11 @@ class WindTurbine(
         turbineModel.addModels(Model(NovaMaterial.WIND_TURBINE.block.getItem(2), location))
         
         for (blade in 0..2) {
-            turbineModel.addModels(Model(NovaMaterial.WIND_TURBINE.block.getItem(3), location))
-                .forEach { it.headPose = it.headPose.setZ(Math.toRadians(blade * 120.0)) }
+            turbineModel.addModels(Model(
+                NovaMaterial.WIND_TURBINE.block.getItem(3),
+                location,
+                EulerAngle(0.0, 0.0, Math.toRadians(blade * 120.0))
+            ))
         }
         
         turbineModel.useArmorStands {

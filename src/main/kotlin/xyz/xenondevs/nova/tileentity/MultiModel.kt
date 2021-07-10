@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
+import org.bukkit.util.EulerAngle
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.serialization.persistentdata.UUIDDataType
 import xyz.xenondevs.nova.util.EntityUtils
@@ -76,6 +77,7 @@ class MultiModel(
             val armorStand = EntityUtils.spawnArmorStandSilently(location, it.itemStack, false) {
                 val dataContainer = persistentDataContainer
                 dataContainer.set(MULTI_MODEL_KEY, UUIDDataType, uuid)
+                headPose = it.headPose
             }
             currentModels[armorStand] = it
             
@@ -114,10 +116,10 @@ class MultiModel(
     private val ArmorStand.model: Model?
         get() {
             return if (persistentDataContainer.get(MULTI_MODEL_KEY, UUIDDataType) == uuid)
-                Model(equipment!!.helmet!!, location)
+                Model(equipment!!.helmet!!, location, headPose)
             else null
         }
     
 }
 
-data class Model(val itemStack: ItemStack, val location: Location)
+data class Model(val itemStack: ItemStack, val location: Location, val headPose: EulerAngle = EulerAngle(0.0, 0.0, 0.0))
