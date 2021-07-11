@@ -21,7 +21,15 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.enumMapOf
 
-private val BUTTON_COLORS = listOf(NovaMaterial.ORANGE_BUTTON, NovaMaterial.BLUE_BUTTON, NovaMaterial.GREEN_BUTTON)
+private val BUTTON_COLORS = listOf(
+    NovaMaterial.RED_BUTTON,
+    NovaMaterial.ORANGE_BUTTON,
+    NovaMaterial.YELLOW_BUTTON,
+    NovaMaterial.GREEN_BUTTON,
+    NovaMaterial.BLUE_BUTTON,
+    NovaMaterial.PINK_BUTTON,
+    NovaMaterial.WHITE_BUTTON
+)
 
 class ItemSideConfigGUI(
     val itemStorage: ItemStorage,
