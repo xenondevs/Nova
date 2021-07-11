@@ -333,7 +333,7 @@ class Quarry(
         // smoke
         particleBuilder(ParticleEffect.SMOKE_NORMAL, pointerLocation.clone().apply { y -= 0.1 }) {
             amount(10)
-            speed(0.2f)
+            speed(0.02f)
         }.display()
     }
     
