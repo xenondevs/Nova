@@ -184,6 +184,7 @@ object TileEntityManager : Listener {
                 
                 if (chunk.isLoaded) {
                     val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>()
+                    val newChunkMap = HashMap<Location, TileEntity>()
                     
                     chunk.entities
                         .filterIsInstance<ArmorStand>()
@@ -195,13 +196,14 @@ object TileEntityManager : Listener {
                                 if (location.block.type.requiresLight) armorStand.fireTicks = Int.MAX_VALUE
                                 
                                 val tileEntity = TileEntity.newInstance(armorStand)
-                                chunkMap[location] = tileEntity
+                                newChunkMap[location] = tileEntity
                                 locationCache += location
                             }
                         }
                     
+                    chunkMap.putAll(newChunkMap)
                     tileEntityMap[chunk] = chunkMap
-                    chunkMap.values.forEach { it.handleInitialized(false) }
+                    newChunkMap.values.forEach { it.handleInitialized(false) }
                 }
                 
             }
