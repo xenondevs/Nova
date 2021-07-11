@@ -13,16 +13,21 @@ import xyz.xenondevs.nova.util.ReflectionUtils.send
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
 
-fun Block.breakAndTakeDrops(playEffects: Boolean = true): Collection<ItemStack> {
-    val drops: Collection<ItemStack>
-    
+val Block.below: Block
+    get() = location.subtract(0.0, 1.0, 0.0).block
+
+fun Block.hasSameTypeBelow(): Boolean {
+    return type == below.type
+}
+
+fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true): List<ItemStack> {
     if (playEffects) playBreakEffects()
     
     val tileEntity = TileEntityManager.getTileEntityAt(location)
     if (tileEntity != null) {
-        drops = TileEntityManager.destroyTileEntity(tileEntity, true)
+        return TileEntityManager.destroyTileEntity(tileEntity, true)
     } else {
-        drops = this.drops
+        val drops = this.getDrops(tool).toMutableList()
         val state = state
         if (state is Chest) {
             drops += state.blockInventory.contents.filterNotNull()
@@ -33,9 +38,9 @@ fun Block.breakAndTakeDrops(playEffects: Boolean = true): Collection<ItemStack> 
         }
         
         type = Material.AIR
+        
+        return drops
     }
-    
-    return drops
 }
 
 fun Block.playBreakEffects() {

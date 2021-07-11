@@ -132,6 +132,11 @@
     "capacity": 10000,
     "energy_per_tick": 80
   },
+  "harvester": {
+    "capacity": 10000,
+    "energy_per_break": 40,
+    "wait_time": 3
+  },
   "bottled_mob_blacklist": [
     "WITHER",
     "ENDER_DRAGON",

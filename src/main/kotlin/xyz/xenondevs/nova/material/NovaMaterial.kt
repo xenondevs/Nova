@@ -60,6 +60,7 @@ enum class NovaMaterial(
     BREEDER("block.nova.breeder", blockOf(19), null, EnergyTileEntity::createItemBuilder, blockOf(19), COBBLESTONE, ::Breeder),
     MOB_DUPLICATOR("block.nova.mob_duplicator", blockOf(20), null, EnergyTileEntity::createItemBuilder, blockOf(20), COBBLESTONE, ::MobDuplicator),
     PLANTER("block.nova.planter", blockOf(21), null, EnergyTileEntity::createItemBuilder, blockOf(21), COBBLESTONE, ::Planter),
+    HARVESTER("block.nova.harvester", blockOf(22), null, EnergyTileEntity::createItemBuilder, blockOf(22), COBBLESTONE, ::Harvester),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("item.nova.iron_plate", itemOf(1000)),
