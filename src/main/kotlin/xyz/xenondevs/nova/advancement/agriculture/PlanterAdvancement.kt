@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.advancement.farn
+package xyz.xenondevs.nova.advancement.agriculture
 
 import net.roxeez.advancement.Advancement
 import org.bukkit.NamespacedKey

@@ -12,11 +12,12 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.advancement.agriculture.HarvesterAdvancement
 import xyz.xenondevs.nova.advancement.cable.AdvancedCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.BasicCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.EliteCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.UltimateCableAdvancement
-import xyz.xenondevs.nova.advancement.farn.PlanterAdvancement
+import xyz.xenondevs.nova.advancement.agriculture.PlanterAdvancement
 import xyz.xenondevs.nova.advancement.mob.BottledMobAdvancement
 import xyz.xenondevs.nova.advancement.mob.BreederAdvancement
 import xyz.xenondevs.nova.advancement.mob.MobDuplicatorAdvancement
@@ -86,7 +87,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             PulverizerAdvancement, DustAdvancement, AllDustsAdvancement,
             BlockPlacerAdvancement, BlockBreakerAdvancement, QuarryAdvancement,
             BottledMobAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement,
-            PlanterAdvancement
+            PlanterAdvancement, HarvesterAdvancement
         )
         
         createAll(IS_VERSION_CHANGE)
