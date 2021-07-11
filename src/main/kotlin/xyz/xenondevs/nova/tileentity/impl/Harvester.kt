@@ -188,7 +188,7 @@ class Harvester(
             this@Harvester,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inventory), "inventory.nova.harvester", ItemConnectionType.EXTRACT_TYPES),
+                Triple(getNetworkedInventory(inventory), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES),
                 Triple(getNetworkedInventory(shearInventory), "inventory.nova.shears", ItemConnectionType.ALL_TYPES),
                 Triple(getNetworkedInventory(axeInventory), "inventory.nova.axes", ItemConnectionType.ALL_TYPES),
                 Triple(getNetworkedInventory(hoeInventory), "inventory.nova.hoes", ItemConnectionType.ALL_TYPES)
