@@ -58,7 +58,7 @@ class Planter(
     
     private val inputInventory = getInventory("input", 6, true, ::handleSeedUpdate)
     private val hoesInventory = getInventory("hoes", 1, true, ::handleHoeUpdate)
-    override val gui: TileEntityGUI by lazy(::PlanterGUI)
+    override val gui by lazy(::PlanterGUI)
     
     private val plantRegion = getFrontArea(7.0, 7.0, 1.0, 0.0)
     private val soilRegion = Region(plantRegion.min.clone().advance(BlockFace.DOWN), plantRegion.max.clone().advance(BlockFace.DOWN))
@@ -78,6 +78,11 @@ class Planter(
                 nextSeed = WAIT_TIME
                 placeNextSeed()
             }
+        }
+        
+        if (hasEnergyChanged) {
+            hasEnergyChanged = false
+            gui.energyBar.update()
         }
     }
     
