@@ -21,7 +21,7 @@ private fun File.check() {
 open class JsonConfig {
     
     private val file: File?
-    private lateinit var config: JsonObject
+    lateinit var config: JsonObject
     
     constructor(file: File, autoInit: Boolean) {
         this.file = file

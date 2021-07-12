@@ -46,15 +46,9 @@ class Nova : JavaPlugin() {
         CommandManager.init()
         ArmorEquipListener.init()
         AbilityManager.init()
-        
-        if (IS_VERSION_CHANGE) {
-            NovaConfig["resource_pack.url"] = NovaConfig.fallbackConfig.getString("resource_pack.url")!!
-            NovaConfig.save(true)
-        }
+        forceResourcePack()
         
         Metrics(this, 11927)
-        
-        forceResourcePack()
     }
     
     override fun onDisable() {
