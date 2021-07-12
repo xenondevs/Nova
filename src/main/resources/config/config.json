@@ -125,7 +125,7 @@
   },
   "planter": {
     "capacity": 10000,
-    "energy_per_tick": 20,
+    "energy_per_plant": 20,
     "wait_time": 40
   },
   "wind_turbine": {

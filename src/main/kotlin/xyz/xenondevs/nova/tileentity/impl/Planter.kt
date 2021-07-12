@@ -38,7 +38,7 @@ import java.util.*
 import kotlin.random.Random
 
 private val MAX_ENERGY = NovaConfig.getInt("planter.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("planter.energy_per_tick")!!
+private val ENERGY_PER_PLANT = NovaConfig.getInt("planter.energy_per_plant")!!
 private val WAIT_TIME = NovaConfig.getInt("planter.wait_time")!!
 
 class Planter(
@@ -68,7 +68,7 @@ class Planter(
     }
     
     override fun handleTick() {
-        if (energy >= ENERGY_PER_TICK) {
+        if (energy >= ENERGY_PER_PLANT) {
             if (nextSeed > 0) nextSeed--
             else {
                 nextSeed = WAIT_TIME
@@ -90,7 +90,7 @@ class Planter(
                 
                 // find a location to place this seed or skip to the next one if there isn't one
                 val (plant, soil) = getNextBlock(item.type) ?: continue
-                energy -= ENERGY_PER_TICK
+                energy -= ENERGY_PER_PLANT
                 
                 // till dirt if possible
                 if (soil.type.isTillable() && autoTill && !hoesInventory.isEmpty) tillDirt(soil)
@@ -108,7 +108,7 @@ class Planter(
         } else if (autoTill && !hoesInventory.isEmpty) {
             val block = getNextBlock(null)?.second
             if (block != null) {
-                energy -= ENERGY_PER_TICK
+                energy -= ENERGY_PER_PLANT
                 tillDirt(block)
             }
         }
