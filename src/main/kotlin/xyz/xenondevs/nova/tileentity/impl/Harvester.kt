@@ -109,17 +109,11 @@ class Harvester(
                 // check that the type hasn't changed
                 if (block.type == expectedType) {
                     var tool: ItemStack? = null
-                    if (Tag.LOGS.isTagged(expectedType)) {
+                    if (Tag.MINEABLE_AXE.isTagged(expectedType)) {
                         // set tool to axe
                         tool = axeInventory.getItemStack(0)
                         
-                        if (useTool(axeInventory)) {
-                            // if the block below is dirt and a hoe is provided, set farmland
-                            val below = block.below
-                            val belowType = below.type
-                            if ((belowType == Material.GRASS_BLOCK || belowType == Material.DIRT) && useTool(hoeInventory))
-                                below.type = Material.FARMLAND
-                        } else {
+                        if (!useTool(axeInventory)) {
                             // skip block if axe is not available
                             tryAgain = true
                             continue
@@ -128,6 +122,15 @@ class Harvester(
                         // set tool to shears
                         tool = shearInventory.getItemStack(0)
                         useTool(shearInventory)
+                    } else if (Tag.MINEABLE_HOE.isTagged(expectedType)) {
+                        // set tool to hoe
+                        tool = hoeInventory.getItemStack(0)
+                        
+                        if (!useTool(hoeInventory)) {
+                            // skip block if hoe is not available
+                            tryAgain = true
+                            continue
+                        }
                     }
                     
                     val drops = if (PlantUtils.COMPLEX_HARVESTABLE_BLOCKS.contains(expectedType)) {
@@ -224,21 +227,33 @@ private object HarvestPriorityComparator : Comparator<Block> {
         val type1 = o1.type
         val type2 = o2.type
         
-        if (type1 == type2) return o2.location.y.compareTo(o1.location.y)
+        fun compareLocation() = o2.location.y.compareTo(o1.location.y)
         
-        if (Tag.LEAVES.isTagged(type1)) {
-            if (Tag.LEAVES.isTagged(type2)) {
-                return 0
+        if (type1 == type2) compareLocation()
+        
+        if (type1.isTreeAttachment()) {
+            if (type2.isTreeAttachment()) {
+                return compareLocation()
             } else {
                 return -1
             }
-        } else if (Tag.LEAVES.isTagged(type2)) {
+        } else if (type2.isTreeAttachment()) {
+            return 1
+        }
+        
+        if (type1.isLeaveLike()) {
+            if (type2.isLeaveLike()) {
+                return compareLocation()
+            } else {
+                return -1
+            }
+        } else if (type2.isLeaveLike()) {
             return 1
         }
         
         if (Tag.LOGS.isTagged(type1)) {
             if (Tag.LOGS.isTagged(type2)) {
-                return 0
+                return compareLocation()
             } else {
                 return -1
             }
@@ -246,7 +261,7 @@ private object HarvestPriorityComparator : Comparator<Block> {
             return 1
         }
         
-        return type1.name.compareTo(type2.name)
+        return compareLocation()
     }
     
 }

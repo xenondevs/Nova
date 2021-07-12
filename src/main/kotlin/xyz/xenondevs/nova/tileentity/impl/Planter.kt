@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.impl
 
 import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.SlotElement
+import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
@@ -16,7 +16,6 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -24,6 +23,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.region.Region
 import xyz.xenondevs.nova.region.VisualRegion
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -31,11 +31,7 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
-import xyz.xenondevs.nova.util.isEmpty
-import xyz.xenondevs.nova.util.item.PlantUtils
-import xyz.xenondevs.nova.util.item.ToolUtils
-import xyz.xenondevs.nova.util.item.isHoe
-import xyz.xenondevs.nova.util.item.isTillable
+import xyz.xenondevs.nova.util.item.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import xyz.xenondevs.nova.util.soundGroup
 import java.util.*
@@ -87,41 +83,64 @@ class Planter(
     }
     
     private fun placeNextSeed() {
-        val (plant, soil) = getNextBlock() ?: return
-        energy -= ENERGY_PER_TICK
-        if (autoTill && soil.type != Material.FARMLAND) tillDirt(soil)
-        val item = takeSeed() ?: return
-        plant.type = PlantUtils.SEED_BLOCKS[item.type] ?: item.type
-        plant.world.playSound(plant.location, plant.type.soundGroup.placeSound, 1f, Random.nextDouble(0.6, 1.0).toFloat())
+        if (!inputInventory.isEmpty) {
+            // loop over items until a placeable seed has been found
+            for ((index, item) in inputInventory.items.withIndex()) {
+                if (item == null) continue
+                
+                // find a location to place this seed or skip to the next one if there isn't one
+                val (plant, soil) = getNextBlock(item.type) ?: continue
+                energy -= ENERGY_PER_TICK
+                
+                // till dirt if possible
+                if (soil.type.isTillable() && autoTill && !hoesInventory.isEmpty) tillDirt(soil)
+                
+                // plant the seed
+                plant.type = PlantUtils.SEED_BLOCKS[item.type] ?: item.type
+                plant.world.playSound(plant.location, plant.type.soundGroup.placeSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
+                
+                // remove one from the seed stack
+                inputInventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
+                
+                // break the loop as a seed has been placed
+                break
+            }
+        } else if (autoTill && !hoesInventory.isEmpty) {
+            val block = getNextBlock(null)?.second
+            if (block != null) {
+                energy -= ENERGY_PER_TICK
+                tillDirt(block)
+            }
+        }
     }
     
-    private fun takeSeed(): ItemStack? {
-        val index = inputInventory.items.indexOfFirst { it != null }
-        if (index == -1)
-            return null
-        val item = inputInventory.getItemStack(index)
-        inputInventory.addItemAmount(null, index, -1)
-        return item
-    }
-    
-    private fun getNextBlock(): Pair<Block, Block>? {
-        val emptyInput = inputInventory.isEmpty()
-        val emptyHoes = hoesInventory.isEmpty()
+    private fun getNextBlock(seedMaterial: Material?): Pair<Block, Block>? {
+        val emptyHoes = hoesInventory.isEmpty
         val index = plantRegion.withIndex().indexOfFirst { (index, block) ->
             val soilBlock = soilRegion[index]
+            val soilType = soilBlock.type
+            
+            // If there are no seeds search for dirt that can be tilled
+            if (seedMaterial == null) return@indexOfFirst autoTill && !emptyHoes && soilType.isTillable()
+            
             // Search for a block that has no block on top of it and is dirt/farmland
             // If the soil or plant block is protected, skip this block
             if (!ProtectionUtils.canPlace(ownerUUID, block.location) || !ProtectionUtils.canBreak(ownerUUID, soilBlock.location))
                 return@indexOfFirst false
+            
             // If the plant block is already occupied return false
             if (!block.type.isAir)
                 return@indexOfFirst false
-            // If auto tilling is disabled or there are no hoes available, only use this block if it's already farmland
-            if (!autoTill || emptyHoes)
-                return@indexOfFirst soilBlock.type == Material.FARMLAND
-            // If there are no seeds search for dirt that still needs to be tilled
-            return@indexOfFirst (!emptyInput && soilBlock.type == Material.FARMLAND) || soilBlock.type.isTillable()
+            
+            // If farmland is required and auto tilling is disabled or there are no hoes available,
+            // only use this block if it's already farmland
+            if (seedMaterial.requiresFarmland() && (!autoTill || emptyHoes))
+                return@indexOfFirst soilType == Material.FARMLAND
+            
+            // if soil type is applicable for the seed or can be made applicable
+            return@indexOfFirst seedMaterial.canBePlacedOn(soilType) || (seedMaterial.canBePlacedOn(Material.FARMLAND) && autoTill && !emptyHoes && soilType.isTillable())
         }
+        
         if (index == -1)
             return null
         return plantRegion[index] to soilRegion[index]
@@ -175,14 +194,14 @@ class Planter(
                 "| . . . # h # . |" +
                 "| . . . # f # . |" +
                 "3 - - - - - - - 4")
-            .addIngredient('h', SlotElement.VISlotElement(hoesInventory, 0))
+            .addIngredient('h', VISlotElement(hoesInventory, 0))
             .addIngredient('a', VisualizeRegionItem(uuid, plantRegion))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('f', AutoTillingItem())
             .build()
             .also { it.fillRectangle(1, 2, 3, inputInventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
         
         private inner class AutoTillingItem : BaseItem() {
             
