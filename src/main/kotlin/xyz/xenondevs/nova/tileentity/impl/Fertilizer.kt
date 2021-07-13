@@ -14,7 +14,6 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
-import org.bukkit.block.data.type.Sapling
 import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -32,7 +31,9 @@ import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.ReflectionUtils.blockPos
 import xyz.xenondevs.nova.util.ReflectionUtils.nmsStack
 import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
+import xyz.xenondevs.nova.util.item.PlantUtils
 import xyz.xenondevs.nova.util.item.isFullyAged
+import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("fertilizer.capacity")!!
@@ -97,7 +98,10 @@ class Fertilizer(
     
     private fun getRandomPlant(): Block? =
         fertilizeRegion.blocks
-            .filter { it.blockData is Sapling || (it.blockData is Ageable && !it.isFullyAged()) }
+            .filter {
+                ProtectionUtils.canUse(ownerUUID, it.location)
+                    && ((it.blockData is Ageable && !it.isFullyAged()) || (it.blockData !is Ageable && it.type in PlantUtils.PLANTS))
+            }
             .randomOrNull()
     
     private fun handleFertilizerUpdate(event: ItemUpdateEvent) {
