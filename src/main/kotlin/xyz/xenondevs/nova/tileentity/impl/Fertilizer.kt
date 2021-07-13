@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.region.VisualRegion
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -102,6 +103,11 @@ class Fertilizer(
     private fun handleFertilizerUpdate(event: ItemUpdateEvent) {
         if ((event.isAdd || event.isSwap) && event.newItemStack.type != Material.BONE_MEAL)
             event.isCancelled = true
+    }
+    
+    override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
+        VisualRegion.removeRegion(uuid)
     }
     
     inner class FertilizerGUI : TileEntityGUI("menu.nova.fertilizer") {
