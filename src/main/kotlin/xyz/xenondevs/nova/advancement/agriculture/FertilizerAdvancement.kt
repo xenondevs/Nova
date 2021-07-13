@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 object FertilizerAdvancement : Advancement(NamespacedKey(NOVA, "fertilizer")) {
     
     init {
-        setParent(HarvesterAdvancement.key)
+        setParent(PlanterAdvancement.key)
         addObtainCriteria(NovaMaterial.FERTILIZER)
         setDisplayLocalized {
             it.setIcon(NovaMaterial.FERTILIZER.toIcon())
