@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.util.protection
+package xyz.xenondevs.nova.util.protection.plugin
 
 import com.sk89q.wepif.PermissionsResolverManager
 import com.sk89q.worldedit.blocks.BaseItemStack
@@ -21,9 +21,10 @@ import com.sk89q.worldguard.protection.flags.StateFlag
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
+import xyz.xenondevs.nova.util.protection.ProtectionPlugin
 import java.util.*
 
-object WorldGuardUtils {
+object WorldGuard : ProtectionPlugin() {
     
     private val PLUGIN: WorldGuardPlugin?
     private val PLATFORM: WorldGuardPlatform?
@@ -38,19 +39,19 @@ object WorldGuardUtils {
         }
     }
     
-    fun canBreak(offlinePlayer: OfflinePlayer, location: Location): Boolean {
+    override fun canBreak(player: OfflinePlayer, location: Location): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true
-        return runQuery(offlinePlayer, location, Flags.BLOCK_BREAK)
+        return runQuery(player, location, Flags.BLOCK_BREAK)
     }
     
-    fun canPlace(offlinePlayer: OfflinePlayer, location: Location): Boolean {
+    override fun canPlace(player: OfflinePlayer, location: Location): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true
-        return runQuery(offlinePlayer, location, Flags.BLOCK_PLACE)
+        return runQuery(player, location, Flags.BLOCK_PLACE)
     }
     
-    fun canUse(offlinePlayer: OfflinePlayer, location: Location): Boolean {
+    override fun canUse(player: OfflinePlayer, location: Location): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true
-        return runQuery(offlinePlayer, location, Flags.USE)
+        return runQuery(player, location, Flags.USE)
     }
     
     fun runQuery(offlinePlayer: OfflinePlayer, location: Location, vararg flags: StateFlag): Boolean {

@@ -4,9 +4,14 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.util.isBetweenXZ
+import xyz.xenondevs.nova.util.protection.plugin.GriefPrevention
+import xyz.xenondevs.nova.util.protection.plugin.PlotSquared
+import xyz.xenondevs.nova.util.protection.plugin.WorldGuard
 import java.util.*
 
 object ProtectionUtils {
+    
+    val PROTECTION_PLUGINS = setOf(GriefPrevention, PlotSquared, WorldGuard)
     
     fun canPlace(uuid: UUID, location: Location) =
         canPlace(Bukkit.getOfflinePlayer(uuid), location)
@@ -19,21 +24,15 @@ object ProtectionUtils {
     
     fun canPlace(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
-            && WorldGuardUtils.canPlace(offlinePlayer, location)
-            && GriefPreventionUtils.canPlace(offlinePlayer, location)
-            && PlotSquaredUtils.isAllowed(offlinePlayer, location)
+            && PROTECTION_PLUGINS.all { it.canPlace(offlinePlayer, location) }
     
     fun canBreak(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
-            && WorldGuardUtils.canBreak(offlinePlayer, location)
-            && GriefPreventionUtils.canBreak(offlinePlayer, location)
-            && PlotSquaredUtils.isAllowed(offlinePlayer, location)
+            && PROTECTION_PLUGINS.all { it.canBreak(offlinePlayer, location) }
     
     fun canUse(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
-            && WorldGuardUtils.canUse(offlinePlayer, location)
-            && GriefPreventionUtils.canBreak(offlinePlayer, location)
-            && PlotSquaredUtils.isAllowed(offlinePlayer, location)
+            && PROTECTION_PLUGINS.all { it.canUse(offlinePlayer, location) }
     
     private fun isVanillaProtected(offlinePlayer: OfflinePlayer, location: Location): Boolean {
         val spawnRadius = Bukkit.getServer().spawnRadius.toDouble()
