@@ -1,0 +1,30 @@
+{
+  "result": "nova:harvester",
+  "shape": [
+    "iai",
+    "snh",
+    "iii"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "n",
+      "item": "nova:netherite_gear"
+    },
+    {
+      "char": "a",
+      "item": "minecraft:iron_axe"
+    },
+    {
+      "char": "s",
+      "item": "minecraft:shears"
+    },
+    {
+      "char": "h",
+      "item": "minecraft:iron_hoe"
+    }
+  ]
+}

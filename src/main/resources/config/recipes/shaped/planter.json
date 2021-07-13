@@ -1,0 +1,34 @@
+{
+  "result": "nova:planter",
+  "shape": [
+    "isi",
+    "wdf",
+    "ihi"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "s",
+      "item": "minecraft:oak_sapling"
+    },
+    {
+      "char": "w",
+      "item": "minecraft:wheat_seeds"
+    },
+    {
+      "char": "d",
+      "item": "nova:diamond_gear"
+    },
+    {
+      "char": "f",
+      "item": "minecraft:crimson_fungus"
+    },
+    {
+      "char": "h",
+      "item": "minecraft:iron_hoe"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "result": "nova:fertilizer",
+  "shape": [
+    "imi",
+    "gbg",
+    "idi"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "m",
+      "item": "minecraft:bone_meal"
+    },
+    {
+      "char": "g",
+      "item": "nova:gold_plate"
+    },
+    {
+      "char": "b",
+      "item": "minecraft:bone_block"
+    },
+    {
+      "char": "d",
+      "item": "nova:diamond_gear"
+    }
+  ]
+}
