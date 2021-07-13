@@ -1,0 +1,26 @@
+{
+  "result": "nova:wind_turbine",
+  "shape": [
+    "pgp",
+    " i ",
+    "bbb"
+  ],
+  "ingredients": [
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "g",
+      "item": "nova:iron_gear"
+    },
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "b",
+      "item": "minecraft:iron_block"
+    }
+  ]
+}
