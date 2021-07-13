@@ -88,7 +88,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             PulverizerAdvancement, DustAdvancement, AllDustsAdvancement,
             BlockPlacerAdvancement, BlockBreakerAdvancement, QuarryAdvancement,
             BottledMobAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement,
-            PlanterAdvancement, HarvesterAdvancement, FertilizerAdvancement
+            PlanterAdvancement, FertilizerAdvancement, HarvesterAdvancement
         )
         
         createAll(IS_VERSION_CHANGE)
