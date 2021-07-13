@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.ability.AbilityManager.AbilityType
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.util.particleBuilder
@@ -33,6 +34,10 @@ internal class JetpackFlyAbility(player: Player) : Ability(player) {
     
     override fun handleTick(tick: Int) {
         if (!::jetpackItem.isInitialized) {
+            if(player.equipment?.chestplate == null) {
+                AbilityManager.takeAbility(player, AbilityType.JETPACK)
+                return
+            }
             jetpackItem = player.equipment!!.chestplate!!
         }
         
