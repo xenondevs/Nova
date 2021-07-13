@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.Packet
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -96,6 +97,9 @@ object ReflectionUtils {
     
     val ItemStack.nmsStack: net.minecraft.world.item.ItemStack
         get() = CB_CRAFT_ITEM_STACK_AS_NMS_COPY_METHOD.invoke(null, this) as NMSItemStack
+    
+    val Location.blockPos: BlockPos
+        get() = BlockPos(blockX, blockY, blockZ)
     
     val World.nmsWorld: ServerLevel
         get() = CB_CRAFT_WORLD_GET_HANDLE_METHOD.invoke(this) as ServerLevel

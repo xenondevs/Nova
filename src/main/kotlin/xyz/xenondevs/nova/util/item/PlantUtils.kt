@@ -47,7 +47,7 @@ fun Block.isHarvestable(): Boolean {
     return false
 }
 
-private fun Block.isFullyAged(): Boolean {
+fun Block.isFullyAged(): Boolean {
     val blockData = blockData
     return blockData is Ageable && blockData.age == blockData.maximumAge
 }

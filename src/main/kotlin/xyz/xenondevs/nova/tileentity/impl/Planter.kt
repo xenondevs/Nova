@@ -60,7 +60,7 @@ class Planter(
     private val soilRegion = Region(plantRegion.min.clone().advance(BlockFace.DOWN), plantRegion.max.clone().advance(BlockFace.DOWN))
     
     private var autoTill = retrieveData("autoTill") { true }
-    private var nextSeed = WAIT_TIME
+    private var idleTime = WAIT_TIME
     
     init {
         addAvailableInventories(inputInventory, hoesInventory)
@@ -69,9 +69,9 @@ class Planter(
     
     override fun handleTick() {
         if (energy >= ENERGY_PER_PLANT) {
-            if (nextSeed > 0) nextSeed--
+            if (idleTime > 0) idleTime--
             else {
-                nextSeed = WAIT_TIME
+                idleTime = WAIT_TIME
                 placeNextSeed()
             }
         }

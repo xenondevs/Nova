@@ -8,6 +8,7 @@ import org.bukkit.block.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.ReflectionUtils.blockPos
 import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
 import xyz.xenondevs.nova.util.ReflectionUtils.send
 import xyz.xenondevs.particle.ParticleEffect
@@ -62,11 +63,7 @@ fun Block.playBreakSound() {
 }
 
 fun Block.setBreakState(entityId: Int, state: Int) {
-    val packet = ClientboundBlockDestructionPacket(
-        entityId,
-        BlockPos(location.blockX, location.blockY, location.blockZ),
-        state
-    )
+    val packet = ClientboundBlockDestructionPacket(entityId, location.blockPos, state)
     
     chunk.getSurroundingChunks(1, true)
         .flatMap { it.entities.toList() }

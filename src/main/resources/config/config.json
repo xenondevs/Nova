@@ -137,6 +137,11 @@
     "energy_per_break": 40,
     "wait_time": 3
   },
+  "fertilizer": {
+    "capacity": 10000,
+    "energy_per_fertilize": 30,
+    "wait_time": 10
+  },
   "bottled_mob_blacklist": [
     "WITHER",
     "ENDER_DRAGON",
