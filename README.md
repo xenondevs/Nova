@@ -1,4 +1,4 @@
-[![Banner](https://i.imgur.com/wTwCmYT.png)](https://www.spigotmc.org/resources/81295/)
+[![Banner](https://i.imgur.com/wTwCmYT.png)](https://www.spigotmc.org/resources/93648/)
 
 <p align="center">
   <a href="https://www.spigotmc.org/resources/93648/reviews">
