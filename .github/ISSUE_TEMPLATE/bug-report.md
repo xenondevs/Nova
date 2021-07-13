@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+**Plugin Version and Server Software**
+The plugin version and server software that were used to cause this bug
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
