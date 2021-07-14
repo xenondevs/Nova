@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.tileentity.impl
 import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement
+import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
@@ -129,7 +130,7 @@ class MobDuplicator(
                 "| # # # # # . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('i', SlotElement.VISlotElement(inventory, 0))
+            .addIngredient('i', VISlotElement(inventory, 0, NovaMaterial.BOTTLED_MOB_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('n', ToggleNBTModeItem())
             .build()
         

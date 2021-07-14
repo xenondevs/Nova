@@ -32,8 +32,8 @@ class CableItemConfigGUI(
             "# # # # # # # # #")
         .addIngredient('i', InsertItem())
         .addIngredient('e', ExtractItem())
-        .addIngredient('1', VISlotElement(insertFilterInventory, 0))
-        .addIngredient('2', VISlotElement(extractFilterInventory, 0))
+        .addIngredient('1', VISlotElement(insertFilterInventory, 0, NovaMaterial.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
+        .addIngredient('2', VISlotElement(extractFilterInventory, 0, NovaMaterial.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
         .build()
     
     fun openWindow(player: Player) {
