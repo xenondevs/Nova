@@ -6,7 +6,7 @@ import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.util.protection.ProtectionPlugin
 import com.plotsquared.core.location.Location as PlotLocation
 
-object PlotSquared : ProtectionPlugin() {
+object PlotSquared : ProtectionPlugin {
     
     private val HAS_PLOT_SQUARED = Bukkit.getPluginManager().getPlugin("PlotSquared") != null
     

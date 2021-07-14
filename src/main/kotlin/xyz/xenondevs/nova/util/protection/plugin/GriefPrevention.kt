@@ -7,7 +7,7 @@ import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.util.protection.FakeOnlinePlayer
 import xyz.xenondevs.nova.util.protection.ProtectionPlugin
 
-object GriefPrevention : ProtectionPlugin() {
+object GriefPrevention : ProtectionPlugin {
     
     private val GRIEF_PREVENTION = if (Bukkit.getPluginManager().getPlugin("GriefPrevention") != null) GriefPrevention.instance else null
     

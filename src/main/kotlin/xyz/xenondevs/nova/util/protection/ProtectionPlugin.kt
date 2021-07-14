@@ -3,12 +3,12 @@ package xyz.xenondevs.nova.util.protection
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 
-abstract class ProtectionPlugin {
+interface ProtectionPlugin {
     
-    abstract fun canBreak(player: OfflinePlayer, location: Location): Boolean
+    fun canBreak(player: OfflinePlayer, location: Location): Boolean
     
-    abstract fun canPlace(player: OfflinePlayer, location: Location): Boolean
+    fun canPlace(player: OfflinePlayer, location: Location): Boolean
     
-    abstract fun canUse(player: OfflinePlayer, location: Location): Boolean
+    fun canUse(player: OfflinePlayer, location: Location): Boolean
     
 }

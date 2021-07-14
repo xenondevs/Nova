@@ -24,7 +24,7 @@ import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.util.protection.ProtectionPlugin
 import java.util.*
 
-object WorldGuard : ProtectionPlugin() {
+object WorldGuard : ProtectionPlugin {
     
     private val PLUGIN: WorldGuardPlugin?
     private val PLATFORM: WorldGuardPlatform?
