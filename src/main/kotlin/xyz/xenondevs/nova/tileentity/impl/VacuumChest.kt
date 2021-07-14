@@ -100,7 +100,7 @@ class VacuumChest(
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('r', VisualizeRegionItem(uuid, region))
-            .addIngredient('f', VISlotElement(filterInventory, 0, NovaMaterial.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('f', VISlotElement(filterInventory, 0))
             .build()
             .also { it.fillRectangle(3, 1, 4, inventory, true) }
         

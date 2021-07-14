@@ -208,9 +208,9 @@ class Harvester(
                 "3 - - - - - - - 4")
             .addIngredient('c', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('v', VisualizeRegionItem(uuid, harvestRegion))
-            .addIngredient('s', VISlotElement(shearInventory, 0, NovaMaterial.SHEARS_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('a', VISlotElement(axeInventory, 0, NovaMaterial.AXE_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('h', VISlotElement(hoeInventory, 0, NovaMaterial.HOE_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('s', VISlotElement(shearInventory, 0))
+            .addIngredient('a', VISlotElement(axeInventory, 0))
+            .addIngredient('h', VISlotElement(hoeInventory, 0))
             .build()
             .apply { fillRectangle(1, 3, 6, inventory, true) }
         
