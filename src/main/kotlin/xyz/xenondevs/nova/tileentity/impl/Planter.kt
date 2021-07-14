@@ -194,7 +194,7 @@ class Planter(
                 "| . . . # h # . |" +
                 "| . . . # f # . |" +
                 "3 - - - - - - - 4")
-            .addIngredient('h', VISlotElement(hoesInventory, 0))
+            .addIngredient('h', VISlotElement(hoesInventory, 0, NovaMaterial.HOE_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('a', VisualizeRegionItem(uuid, plantRegion))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('f', AutoTillingItem())

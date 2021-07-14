@@ -139,6 +139,11 @@ enum class NovaMaterial(
     NBT_OFF_BUTTON("", itemOf(9118)),
     HOE_ON_BUTTON("", itemOf(9119)),
     HOE_OFF_BUTTON("", itemOf(9120)),
+    HOE_PLACEHOLDER("", itemOf(9500)),
+    AXE_PLACEHOLDER("", itemOf(9501)),
+    SHEARS_PLACEHOLDER("", itemOf(9502)),
+    ITEM_FILTER_PLACEHOLDER("", itemOf(9503)),
+    BOTTLED_MOB_PLACEHOLDER("", itemOf(9504)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),
