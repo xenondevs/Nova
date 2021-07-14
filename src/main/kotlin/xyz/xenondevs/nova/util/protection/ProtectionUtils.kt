@@ -11,7 +11,7 @@ import java.util.*
 
 object ProtectionUtils {
     
-    val PROTECTION_PLUGINS = setOf(GriefPrevention, PlotSquared, WorldGuard)
+    val PROTECTION_PLUGINS = listOf(GriefPrevention, PlotSquared, WorldGuard)
     
     fun canPlace(uuid: UUID, location: Location) =
         canPlace(Bukkit.getOfflinePlayer(uuid), location)
