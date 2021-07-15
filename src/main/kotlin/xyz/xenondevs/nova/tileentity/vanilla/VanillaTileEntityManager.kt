@@ -34,17 +34,21 @@ object VanillaTileEntityManager : Listener {
         
         runTaskTimer(0, 1200) {
             // In some special cases no event is called when replacing a block. So we check for air blocks every minute.
-            tileEntityMap.forEach { (chunk, tileEntities) ->
-                val chunkTileEntities = chunk.tileEntities.mapTo(HashSet()) { it.location }
-                
-                val iterator = tileEntities.iterator()
-                while (iterator.hasNext()) {
-                    val entry = iterator.next()
-                    val location = entry.key
-                    if (!chunkTileEntities.contains(location)) {
-                        iterator.remove()
-                        locationCache -= location
-                        entry.value.handleRemoved(false)
+            synchronized(tileEntityMap) {
+                tileEntityMap.forEach { (chunk, tileEntities) ->
+                    val chunkTileEntities = chunk.tileEntities.mapTo(HashSet()) { it.location }
+                    
+                    synchronized(tileEntities) {
+                        val iterator = tileEntities.iterator()
+                        while (iterator.hasNext()) {
+                            val entry = iterator.next()
+                            val location = entry.key
+                            if (!chunkTileEntities.contains(location)) {
+                                iterator.remove()
+                                locationCache -= location
+                                entry.value.handleRemoved(false)
+                            }
+                        }
                     }
                 }
             }
@@ -63,27 +67,32 @@ object VanillaTileEntityManager : Listener {
                 locationCache += location
             }
         }
-        tileEntityMap[chunk] = chunkMap
+        synchronized(tileEntityMap) {
+            tileEntityMap[chunk] = chunkMap
+        }
         chunkMap.values.forEach(VanillaTileEntity::handleInitialized)
     }
     
     private fun handleChunkUnload(chunk: Chunk) {
         val tileEntities = tileEntityMap[chunk]
-        tileEntityMap.remove(chunk)
-        tileEntities?.forEach { (location, tileEntity) ->
-            locationCache -= location
-            tileEntity.handleRemoved(unload = true)
+        synchronized(tileEntityMap) {
+            tileEntityMap.remove(chunk)
+            tileEntities?.forEach { (location, tileEntity) ->
+                locationCache -= location
+                tileEntity.handleRemoved(unload = true)
+            }
         }
     }
     
     private fun handleTileEntityDestroy(location: Location) {
         val chunkMap = tileEntityMap[location.chunk]!!
         val tileEntity = chunkMap[location]!!
-        
-        chunkMap -= location
-        locationCache -= location
-        
-        tileEntity.handleRemoved(false)
+        synchronized(chunkMap) {
+            chunkMap -= location
+            locationCache -= location
+    
+            tileEntity.handleRemoved(false)
+        }
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -94,9 +103,11 @@ object VanillaTileEntityManager : Listener {
         val tileEntity = getVanillaTileEntity(state)
         if (tileEntity != null) {
             val location = block.location
-            tileEntityMap[location.chunk]!![location] = tileEntity
-            locationCache += location
-            tileEntity.handleInitialized()
+            synchronized(tileEntityMap) {
+                tileEntityMap[location.chunk]!![location] = tileEntity
+                locationCache += location
+                tileEntity.handleInitialized()
+            }
         }
     }
     
