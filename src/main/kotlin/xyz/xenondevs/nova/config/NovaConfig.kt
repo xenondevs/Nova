@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.config
 
+import com.google.gson.JsonObject
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.recipe.*
 import xyz.xenondevs.nova.util.*
@@ -81,6 +82,12 @@ object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
         recipesDirectory.walkTopDown().filter(File::isFile).forEach { file ->
             try {
                 val element = file.reader().use { JSON_PARSER.parse(it) }
+                if (element !is JsonObject)
+                    throw IllegalStateException("Invalid recipe in file ${file.name}.")
+                
+                if (!element.getBoolean("enabled", default = true))
+                    return@forEach
+                
                 val recipe = GSON.fromJson<T>(element)!!
                 recipes += recipe
             } catch (ex: IllegalArgumentException) {
