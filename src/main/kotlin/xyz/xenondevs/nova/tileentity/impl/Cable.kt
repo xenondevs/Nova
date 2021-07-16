@@ -65,12 +65,17 @@ open class Cable(
     override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     
-    private val filterInventories = mapOf(
-        ItemConnectionType.INSERT to
-            CUBE_FACES.associateWith { getInventory("filter_insert_$it", 1, true, ::handleFilterInventoryUpdate) },
-        ItemConnectionType.EXTRACT to
-            CUBE_FACES.associateWith { getInventory("filter_extract_$it", 1, true, ::handleFilterInventoryUpdate) }
-    )
+    private var filterInventoriesInitialized = false
+    private val filterInventories by lazy {
+        filterInventoriesInitialized = true
+        
+        mapOf(
+            ItemConnectionType.INSERT to
+                CUBE_FACES.associateWith { getInventory("filter_insert_$it", 1, true, ::handleFilterInventoryUpdate) },
+            ItemConnectionType.EXTRACT to
+                CUBE_FACES.associateWith { getInventory("filter_extract_$it", 1, true, ::handleFilterInventoryUpdate) }
+        )
+    }
     
     private val multiModel = getMultiModel("cableModels")
     private val hitboxes = ArrayList<Hitbox>()
@@ -98,7 +103,7 @@ open class Cable(
         NetworkManager.handleBridgeRemove(this, unload)
         hitboxes.forEach { it.remove() }
         
-        if (!unload) {
+        if (!unload && filterInventoriesInitialized) {
             filterInventories.values
                 .flatMap { it.values.toList() }
                 .flatMap { it.windows }
