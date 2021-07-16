@@ -1,9 +1,8 @@
 package xyz.xenondevs.nova.util
 
 fun IntRange.toIntArray(): IntArray {
-    val array = IntArray(count())
-    withIndex().forEach { (index, value) -> array[index] = value }
-    return array
+    var current = this.first - 1
+    return IntArray(size) { ++current }
 }
 
 val IntRange.size: Int
