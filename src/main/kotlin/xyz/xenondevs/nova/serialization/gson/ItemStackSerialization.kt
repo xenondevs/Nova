@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.serialization.gson
 
 import com.google.gson.*
-import de.studiocode.inventoryaccess.api.version.InventoryAccess
+import de.studiocode.inventoryaccess.version.InventoryAccess
 import org.bukkit.inventory.ItemStack
 import java.lang.reflect.Type
 import java.util.*
