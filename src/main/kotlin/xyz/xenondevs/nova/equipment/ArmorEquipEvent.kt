@@ -75,6 +75,11 @@ enum class EquipMethod {
     NORMAL_CLICK,
     
     /**
+     * When a player drops a piece of armor out of his armor equipment slots.
+     */
+    DROP,
+    
+    /**
      * When a player swaps the currently selected armor with a different piece.
      */
     SWAP,
