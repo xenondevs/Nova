@@ -58,6 +58,13 @@ object ArmorEquipListener : Listener {
                 }
             }
             
+            InventoryAction.DROP_ALL_SLOT,
+            InventoryAction.DROP_ONE_SLOT -> {
+                if (slotType == SlotType.ARMOR) {
+                    equipEvent = ArmorEquipEvent(player, EquipMethod.DROP, currentItem, null)
+                }
+            }
+            
             InventoryAction.SWAP_WITH_CURSOR -> {
                 if (slotType == SlotType.ARMOR) {
                     equipEvent = ArmorEquipEvent(player, EquipMethod.SWAP, currentItem, cursorItem)
