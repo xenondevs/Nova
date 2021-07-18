@@ -62,6 +62,7 @@ enum class NovaMaterial(
     PLANTER("block.nova.planter", blockOf(21), null, EnergyTileEntity::createItemBuilder, blockOf(21), COBBLESTONE, ::Planter),
     HARVESTER("block.nova.harvester", blockOf(22), null, EnergyTileEntity::createItemBuilder, blockOf(22), COBBLESTONE, ::Harvester),
     FERTILIZER("block.nova.fertilizer", blockOf(23), null, EnergyTileEntity::createItemBuilder, blockOf(23), COBBLESTONE, ::Fertilizer),
+    WIRELESS_CHARGER("block.nova.wireless_charger", blockOf(24), null, EnergyTileEntity::createItemBuilder, blockOf(24), COBBLESTONE, ::WirelessCharger),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("item.nova.iron_plate", itemOf(1000)),

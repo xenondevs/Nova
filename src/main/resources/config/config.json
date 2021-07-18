@@ -142,6 +142,11 @@
     "energy_per_fertilize": 30,
     "wait_time": 10
   },
+  "wireless_charger": {
+    "capacity": 1000000,
+    "charge_speed": 80,
+    "range": 10
+  },
   "bottled_mob_blacklist": [
     "WITHER",
     "ENDER_DRAGON",
