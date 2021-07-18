@@ -1,0 +1,22 @@
+{
+  "result": "nova:wireless_charger",
+  "shape": [
+    "geg",
+    "ece",
+    "geg"
+  ],
+  "ingredients": [
+    {
+      "char": "c",
+      "item": "nova:charger"
+    },
+    {
+      "char": "e",
+      "item": "minecraft:ender_pearl"
+    },
+    {
+      "char": "g",
+      "item": "nova:gold_plate"
+    }
+  ]
+}
