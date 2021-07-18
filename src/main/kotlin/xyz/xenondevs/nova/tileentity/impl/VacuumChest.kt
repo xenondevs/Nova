@@ -34,7 +34,7 @@ class VacuumChest(
 ) : ItemTileEntity(ownerUUID, material, data, armorStand) {
     
     private val inventory = getInventory("inventory", 12, true) {}
-    private val filterInventory = getInventory("itemFilter", 1, true, ::handleFilterInventoryUpdate)
+    private val filterInventory = getInventory("itemFilter", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate)
     private var filter: ItemFilter? = filterInventory.getItemStack(0)?.getFilterConfig()
     private var tick = 0
     

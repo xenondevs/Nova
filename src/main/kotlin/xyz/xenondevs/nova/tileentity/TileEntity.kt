@@ -142,12 +142,28 @@ abstract class TileEntity(
      * When [dropItems] is true, the [VirtualInventory] will automatically be
      * deleted and its contents dropped when the [TileEntity] is destroyed.
      */
-    fun getInventory(salt: String, size: Int, dropItems: Boolean, itemHandler: (ItemUpdateEvent) -> Unit): VirtualInventory {
-        val inventory = VirtualInventoryManager.getInstance().getOrCreate(uuid.salt(salt), size)
+    fun getInventory(
+        salt: String,
+        size: Int,
+        dropItems: Boolean,
+        stackSizes: IntArray,
+        itemHandler: (ItemUpdateEvent) -> Unit
+    ): VirtualInventory {
+        val inventory = VirtualInventoryManager
+            .getInstance()
+            .getOrCreate(uuid.salt(salt), size, arrayOfNulls(size), stackSizes)
         inventory.setItemUpdateHandler(itemHandler)
         if (dropItems) inventories += inventory
         return inventory
     }
+    
+    /**
+     * Gets a [VirtualInventory] for this [TileEntity].
+     * When [dropItems] is true, the [VirtualInventory] will automatically be
+     * deleted and its contents dropped when the [TileEntity] is destroyed.
+     */
+    fun getInventory(salt: String, size: Int, dropItems: Boolean, itemHandler: (ItemUpdateEvent) -> Unit) =
+        getInventory(salt, size, dropItems, IntArray(size) { 64 }, itemHandler)
     
     /**
      * Gets a [MultiModel] for this [TileEntity].

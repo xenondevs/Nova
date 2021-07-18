@@ -71,9 +71,9 @@ open class Cable(
         
         mapOf(
             ItemConnectionType.INSERT to
-                CUBE_FACES.associateWith { getInventory("filter_insert_$it", 1, true, ::handleFilterInventoryUpdate) },
+                CUBE_FACES.associateWith { getInventory("filter_insert_$it", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate) },
             ItemConnectionType.EXTRACT to
-                CUBE_FACES.associateWith { getInventory("filter_extract_$it", 1, true, ::handleFilterInventoryUpdate) }
+                CUBE_FACES.associateWith { getInventory("filter_extract_$it", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate) }
         )
     }
     
