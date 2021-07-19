@@ -36,6 +36,16 @@ val ItemStack.novaMaterial: NovaMaterial?
             && itemMeta!!.customModelData == itemStack.itemMeta!!.customModelData
     }
 
+val ItemStack.customModelData: Int
+    get() {
+        if (hasItemMeta()) {
+            val itemMeta = itemMeta!!
+            if (itemMeta.hasCustomModelData()) return itemMeta.customModelData
+        }
+        
+        return 0
+    }
+
 val Material.soundGroup: SoundGroup
     get() = createBlockData().soundGroup
 

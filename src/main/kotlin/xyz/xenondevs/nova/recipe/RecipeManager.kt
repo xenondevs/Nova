@@ -7,16 +7,15 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.Recipe
+import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
-import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.inventory.ShapelessRecipe
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.impl.PressType
+import xyz.xenondevs.nova.util.customModelData
 import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.util.removeFirstWhere
 
 private val Recipe.key: NamespacedKey
     get() = when (this) {
@@ -25,9 +24,20 @@ private val Recipe.key: NamespacedKey
         else -> throw UnsupportedOperationException("Unsupported Recipe Type")
     }
 
-class NovaRecipeChoice(material: NovaMaterial) : ExactChoice(material.createItemStack())
+class NovaRecipeChoice(material: NovaMaterial) : ExactChoice(material.createItemStack()) {
+    
+    override fun test(item: ItemStack): Boolean {
+        return choices.any {
+            it.type == item.type && it.customModelData == item.customModelData
+        }
+    }
+    
+}
 
 object RecipeManager : Listener {
+    
+    internal val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
+    internal val shapelessRecipes = ArrayList<ShapelessRecipe>()
     
     internal val recipes = ArrayList<NamespacedKey>()
     val pulverizerRecipes = ArrayList<PulverizerNovaRecipe>()
@@ -54,12 +64,63 @@ object RecipeManager : Listener {
     
     @EventHandler
     fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
-        if (event.recipe != null
-            && event.inventory.contents.any { it.novaMaterial != null }
-            && !recipes.contains(event.recipe!!.key)) {
+        val predictedRecipe = event.recipe
+        if (predictedRecipe != null && predictedRecipe.key.namespace != "nova") {
+            // prevent non-nova recipes from using nova items
+            if (event.inventory.contents.any { it.novaMaterial != null })
+                event.inventory.result = ItemStack(Material.AIR)
+        } else {
+            // if the recipe is null or it bukkit thinks it found a nova recipe, we do our own calculations
+            // this does two things:
+            // 1. calls the custom test method of NovaRecipeChoice (-> ignores irrelevant nbt data)
+            // 2. allows for the usage of NovaRecipeChoice / ExactChoice in shapeless crafting recipes
             
-            event.inventory.result = ItemStack(Material.AIR)
+            val matrix = event.inventory.matrix
+            val recipe = findMatchingShapedRecipe(matrix) ?: findMatchingShapelessRecipe(matrix)
+            event.inventory.result = recipe?.result ?: ItemStack(Material.AIR)
         }
+    }
+    
+    
+    private fun findMatchingShapedRecipe(matrix: Array<ItemStack?>): Recipe? {
+        // loop over all shaped recipes from nova
+        return shapedRecipes.firstOrNull { recipe ->
+            // loop over all items in the crafting grid
+            matrix.withIndex().all { (index, matrixStack) ->
+                // check if the item stack matches with the given recipe choice
+                val choice = recipe.choices[index] ?: return@all matrixStack == null
+                return@all matrixStack != null && choice.test(matrixStack)
+            }
+        }?.recipe
+    }
+    
+    private fun findMatchingShapelessRecipe(matrix: Array<ItemStack?>): Recipe? {
+        // loop over all shapeless recipes from nova
+        return shapelessRecipes.firstOrNull { recipe ->
+            val choiceList = recipe.choiceList
+            
+            // loop over all items in the inventory and remove matching choices from the choice list
+            // if there is an item stack that does not have a matching choice or the choice list is not empty
+            // at the end of the loop, the recipe doesn't match
+            return@firstOrNull matrix.filterNotNull().all { matrixStack ->
+                choiceList.removeFirstWhere { it.test(matrixStack) }
+            } && choiceList.isEmpty()
+        }
+    }
+    
+}
+
+/**
+ * Optimizes the recipe matching algorithm by already saving an array of recipe choices in the
+ * layout of a crafting inventory.
+ */
+class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
+    
+    val choices: Array<RecipeChoice?>
+    
+    init {
+        val flatShape = recipe.shape.joinToString("")
+        choices = Array(9) { recipe.choiceMap[flatShape[it]] }
     }
     
 }

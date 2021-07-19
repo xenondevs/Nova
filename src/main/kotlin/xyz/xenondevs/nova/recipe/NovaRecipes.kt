@@ -31,6 +31,7 @@ class ShapedNovaRecipe(
         ingredientMap.forEach { (key, material) -> recipe.setIngredient(key, material) }
         
         RecipeManager.recipes += key
+        RecipeManager.shapedRecipes += OptimizedShapedRecipe(recipe)
         Bukkit.getServer().addRecipe(recipe)
     }
     
@@ -55,6 +56,7 @@ class ShapelessNovaRecipe(
         }
         
         RecipeManager.recipes += key
+        RecipeManager.shapelessRecipes += recipe
         Bukkit.getServer().addRecipe(recipe)
     }
     
