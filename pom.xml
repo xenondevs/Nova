@@ -6,7 +6,7 @@
 
     <groupId>xyz.xenondevs</groupId>
     <artifactId>Nova</artifactId>
-    <version>0.3.3</version>
+    <version>0.3.4</version>
 
     <properties>
         <kotlin.version>1.5.20</kotlin.version>
@@ -242,6 +242,7 @@
                                     <include>*</include>
                                 </includes>
                             </artifactSet>
+                            <!--
                             <relocations>
                                 <relocation>
                                     <pattern>kotlin</pattern>
@@ -272,6 +273,7 @@
                                     <shadedPattern>${shadePath}.xyz.xenondevs.particle</shadedPattern>
                                 </relocation>
                             </relocations>
+                            !-->
                         </configuration>
                     </execution>
                 </executions>
