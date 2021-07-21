@@ -7,6 +7,7 @@ import de.studiocode.invui.gui.builder.GUIType
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Mob
+import org.bukkit.entity.Player
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -19,6 +20,7 @@ import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
+import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.localized
 import java.util.*
@@ -46,6 +48,14 @@ class MobKiller(
     private var idleTime = IDLE_TIME
     private val region = getFrontArea(10.0, 10.0, 4.0, -1.0)
     
+    private lateinit var fakePlayer: Player
+    
+    override fun handleInitialized(first: Boolean) {
+        super.handleInitialized(first)
+        
+        fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID, "Mob Killer").bukkitEntity
+    }
+    
     override fun handleTick() {
         if (energy >= ENERGY_PER_TICK) {
             energy -= ENERGY_PER_TICK
@@ -64,7 +74,7 @@ class MobKiller(
                     .take(killLimit)
                     .forEach { entity ->
                         energy -= ENERGY_PER_DAMAGE
-                        entity.damage(DAMAGE)
+                        entity.damage(DAMAGE, fakePlayer)
                     }
             }
         }
