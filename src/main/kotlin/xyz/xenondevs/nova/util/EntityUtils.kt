@@ -1,11 +1,14 @@
 package xyz.xenondevs.nova.util
 
+import com.mojang.authlib.GameProfile
 import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
+import net.minecraft.server.level.ServerPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -166,6 +169,13 @@ object EntityUtils {
             level.addWithUUID(entity)
             entity
         }
+    }
+    
+    fun createFakePlayer(location: Location, uuid: UUID, name: String): ServerPlayer {
+        val server = (Bukkit.getServer() as CraftServer).server
+        val world = location.world!!.nmsWorld
+        val gameProfile = GameProfile(uuid, name)
+        return ServerPlayer(server, world, gameProfile)
     }
     
 }
