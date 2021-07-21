@@ -45,6 +45,8 @@ object NetworkDebugger {
         NetworkManager.networks
             .forEach { network ->
                 val players = if (network is EnergyNetwork) energyDebuggers.mapNotNull(Bukkit::getPlayer) else itemDebuggers.mapNotNull(Bukkit::getPlayer)
+                if (players.isEmpty()) return@forEach
+                
                 val color = Color(network.hashCode())
                 
                 network.nodes.forEach { node ->
@@ -66,7 +68,7 @@ object NetworkDebugger {
         
         particleBuilder(ParticleEffect.REDSTONE, particleLocation) {
             color(color)
-        }.display()
+        }.display(players)
     }
     
 }
