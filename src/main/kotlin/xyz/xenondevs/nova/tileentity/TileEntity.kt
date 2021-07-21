@@ -70,7 +70,7 @@ abstract class TileEntity(
         if (dropItems) {
             saveData()
             val item = material.createItemBuilder(this).build()
-            item.setTileEntityData(globalData)
+            if (globalData.entrySet().isNotEmpty()) item.setTileEntityData(globalData)
             drops += item
         }
         
