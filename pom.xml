@@ -242,7 +242,6 @@
                                     <include>*</include>
                                 </includes>
                             </artifactSet>
-                            <!--
                             <relocations>
                                 <relocation>
                                     <pattern>kotlin</pattern>
@@ -273,7 +272,6 @@
                                     <shadedPattern>${shadePath}.xyz.xenondevs.particle</shadedPattern>
                                 </relocation>
                             </relocations>
-                            !-->
                         </configuration>
                     </execution>
                 </executions>
