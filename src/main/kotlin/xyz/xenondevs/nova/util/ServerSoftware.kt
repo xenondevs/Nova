@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.util.ServerSoftware.*
+import java.util.concurrent.ConcurrentHashMap
 
 val SERVER_SOFTWARE by lazy {
     when (Bukkit.getVersion().substringAfter('-').substringBefore('-')) {
@@ -22,5 +23,8 @@ enum class ServerSoftware {
     TUINITY,
     PURPUR,
     AIRPLANE,
-    UNKNOWN
+    UNKNOWN;
+    
+    fun <K, V> getCorrectMap(): MutableMap<K, V> = if (this == PURPUR) ConcurrentHashMap() else HashMap()
+    
 }
