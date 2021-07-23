@@ -27,7 +27,7 @@ class ItemNetwork : Network {
     private val consumers = HashSet<Pair<ItemStorage, BlockFace>>()
     
     private val transferRate: Int
-        get() = bridges.map { it.itemTransferRate }.minOrNull() ?: 0
+        get() = bridges.map { it.itemTransferRate }.minOrNull() ?: 1
     
     override fun addAll(network: Network) {
         Preconditions.checkArgument(network is ItemNetwork, "Illegal Network Type")
@@ -77,6 +77,8 @@ class ItemNetwork : Network {
     }
     
     override fun isEmpty() = _nodes.isEmpty()
+    
+    override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
     
     override fun handleTick() {
         val transferRate = transferRate

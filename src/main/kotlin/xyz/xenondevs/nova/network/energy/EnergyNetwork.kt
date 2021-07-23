@@ -44,7 +44,7 @@ class EnergyNetwork : Network {
     private val requestedConsumerEnergy: Int
         get() = consumers.sumOfNoOverflow { it.requestedEnergy }
     private val transferRate: Int
-        get() = bridges.map { it.energyTransferRate }.minOrNull() ?: 0
+        get() = bridges.map { it.energyTransferRate }.minOrNull() ?: Int.MAX_VALUE
     
     override fun addAll(network: Network) {
         Preconditions.checkArgument(network is EnergyNetwork, "Illegal Network Type")
@@ -114,6 +114,8 @@ class EnergyNetwork : Network {
     }
     
     override fun isEmpty() = _nodes.isEmpty()
+    
+    override fun isValid() = bridges.isNotEmpty() || ((providers.isNotEmpty() && consumers.isNotEmpty()) || (buffers.isNotEmpty() && (providers.isNotEmpty() || consumers.isNotEmpty())))
     
     /**
      * Called every tick to transfer energy.

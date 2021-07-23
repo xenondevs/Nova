@@ -18,6 +18,12 @@ interface Network {
     fun isEmpty(): Boolean
     
     /**
+     * Checks if the configuration of this network makes sense or
+     * if it would never do anything and should be removed.
+     */
+    fun isValid(): Boolean
+    
+    /**
      * Called every tick
      */
     fun handleTick()

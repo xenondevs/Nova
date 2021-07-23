@@ -69,7 +69,7 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     
     final override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
         retrieveData(
-            CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.INSERT },
+            CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.BUFFER },
             "itemConfig"
         )
     

@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.network
 
 import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.filterIsInstanceValues
@@ -13,7 +14,6 @@ object NetworkManager {
     
     fun init() {
         runTaskTimer(0, 1) {
-            networks.removeIf { it.isEmpty() }
             networks.forEach(Network::handleTick)
         }
     }
@@ -24,22 +24,57 @@ object NetworkManager {
             val allowedFaces = endPoint.allowedFaces[networkType]
             if (allowedFaces != null) { // does the endpoint want to have any connections?
                 // loop over all bridges nearby to possibly connect to
-                endPoint.getNearbyBridges(networkType)
-                    .filter { (face, bridge) ->
-                        allowedFaces.contains(face) // does the endpoint want a connection at that face
-                            && bridge.bridgeFaces.contains(face.oppositeFace) // does the bridge want a connection at that face
-                    }.forEach { (face, bridge) ->
-                        // add to network
-                        val network = bridge.networks[networkType]!!
-                        endPoint.setNetwork(networkType, face, network)
-                        network.addEndPoint(endPoint, face)
-                        bridgesToUpdate += bridge
+                endPoint.getNearbyNodes()
+                    .forEach endPoints@{ (face, neighborNode) ->
+                        val oppositeFace = face.oppositeFace
                         
-                        // tell the bridge that we connected to it
-                        bridge.connectedNodes[networkType]!![face.oppositeFace] = endPoint
+                        // does the endpoint want a connection at that face?
+                        if (!allowedFaces.contains(face)) return@endPoints
                         
-                        // remember that we connected to it
-                        endPoint.connectedNodes[networkType]!![face] = bridge
+                        if (neighborNode is NetworkBridge) {
+                            if (neighborNode.networks[networkType] != null // is the bridge in a network (should always be true)
+                                && neighborNode.bridgeFaces.contains(oppositeFace)) { // does the bridge want a connection at that face
+                                
+                                // add to network
+                                val network = neighborNode.networks[networkType]!!
+                                endPoint.setNetwork(networkType, face, network)
+                                network.addEndPoint(endPoint, face)
+                                bridgesToUpdate += neighborNode
+                                
+                                // tell the bridge that we connected to it
+                                neighborNode.connectedNodes[networkType]!![oppositeFace] = endPoint
+                                
+                                // remember that we connected to it
+                                endPoint.connectedNodes[networkType]!![face] = neighborNode
+                            }
+                        } else if (neighborNode is NetworkEndPoint) {
+                            // do not allow a network between two vanilla tile entities
+                            if (neighborNode is VanillaTileEntity && endPoint is VanillaTileEntity) return@endPoints
+                            
+                            if (neighborNode.allowedFaces[networkType]?.contains(oppositeFace) == true // does the endpoint want a connection of this type at that face
+                                && neighborNode.connectedNodes[networkType]!![oppositeFace] == null // does not already connect to something there
+                            ) {
+                                
+                                // create a new "local" network
+                                val network = networkType.networkConstructor()
+                                network.addEndPoint(endPoint, face)
+                                network.addEndPoint(neighborNode, face.oppositeFace)
+                                
+                                // would this network make sense? (i.e. no networks of only consumers or only providers)
+                                if (network.isValid()) {
+                                    // tell the neighbor that is now connected to this endPoint over the network at that face
+                                    neighborNode.connectedNodes[networkType]!![face.oppositeFace] = endPoint
+                                    neighborNode.setNetwork(networkType, oppositeFace, network)
+                                    
+                                    // remember that we're now connected to that node over the network at that face
+                                    endPoint.connectedNodes[networkType]!![face] = neighborNode
+                                    endPoint.setNetwork(networkType, face, network)
+                                    
+                                    // add the network
+                                    networks += network
+                                }
+                            }
+                        }
                     }
             }
         }
@@ -145,7 +180,14 @@ object NetworkManager {
             }
         }
         
-        endPoint.networks.forEach { (_, networkMap) -> networkMap.forEach { (_, network) -> network.removeNode(endPoint) } }
+        endPoint.networks.forEach { (_, networkMap) ->
+            networkMap.forEach { (_, network) ->
+                network.removeNode(endPoint)
+                
+                // remove the network from networks if it isn't valid
+                if (!network.isValid()) networks -= network
+            }
+        }
         endPoint.networks.clear()
         NetworkType.values().forEach { endPoint.connectedNodes[it] = enumMapOf() }
         
@@ -224,6 +266,9 @@ object NetworkManager {
                 // no need for splitting networks
                 currentNetwork.removeNode(bridge)
                 bridge.networks.remove(networkType)
+                
+                // remove the network from networks if it isn't valid
+                if (!currentNetwork.isValid()) networks -= currentNetwork
             }
         }
         
