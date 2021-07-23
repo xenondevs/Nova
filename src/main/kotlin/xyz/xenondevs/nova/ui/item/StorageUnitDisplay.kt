@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.item.NovaItemBuilder
-import xyz.xenondevs.nova.tileentity.impl.StorageUnit.StorageUnitInventory
+import xyz.xenondevs.nova.tileentity.impl.storage.StorageUnit.StorageUnitInventory
 
 class StorageUnitDisplay(private val unitInventory: StorageUnitInventory) : BaseItem() {
     

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.tileentity.impl
+package xyz.xenondevs.nova.tileentity.impl.energy
 
 import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI

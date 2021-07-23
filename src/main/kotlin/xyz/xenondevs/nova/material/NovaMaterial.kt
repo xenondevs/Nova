@@ -12,7 +12,22 @@ import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.impl.*
+import xyz.xenondevs.nova.tileentity.impl.agriculture.Fertilizer
+import xyz.xenondevs.nova.tileentity.impl.agriculture.Harvester
+import xyz.xenondevs.nova.tileentity.impl.agriculture.Planter
+import xyz.xenondevs.nova.tileentity.impl.energy.*
+import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
+import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
+import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
+import xyz.xenondevs.nova.tileentity.impl.processing.ElectricalFurnace
+import xyz.xenondevs.nova.tileentity.impl.processing.MechanicalPress
+import xyz.xenondevs.nova.tileentity.impl.processing.Pulverizer
+import xyz.xenondevs.nova.tileentity.impl.storage.StorageUnit
+import xyz.xenondevs.nova.tileentity.impl.storage.VacuumChest
+import xyz.xenondevs.nova.tileentity.impl.world.BlockBreaker
+import xyz.xenondevs.nova.tileentity.impl.world.BlockPlacer
+import xyz.xenondevs.nova.tileentity.impl.world.ChunkLoader
+import xyz.xenondevs.nova.tileentity.impl.world.Quarry
 import xyz.xenondevs.nova.util.toIntArray
 import java.util.*
 

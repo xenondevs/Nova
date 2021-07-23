@@ -7,8 +7,6 @@ import org.bukkit.World
 import kotlin.math.max
 import kotlin.math.min
 
-fun List<Double>.toPoint3D() = Point3D(this[0], this[1], this[2])
-
 fun Location.toPoint3D() = Point3D(x, y, z)
 
 data class Point3D(var x: Double, var y: Double, var z: Double) {

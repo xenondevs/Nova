@@ -12,7 +12,7 @@ import org.bukkit.inventory.RecipeChoice.ExactChoice
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.impl.PressType
+import xyz.xenondevs.nova.tileentity.impl.processing.PressType
 import xyz.xenondevs.nova.util.customModelData
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.removeFirstWhere

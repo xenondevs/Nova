@@ -60,9 +60,9 @@ fun JsonObject.getDouble(property: String) = if (hasNumber(property)) get(proper
 
 fun JsonObject.getFloat(property: String) = if (hasNumber(property)) get(property).asFloat else null
 
-fun JsonObject.getString(property: String, default: String) = if (hasString(property)) get(property).asString else default
+fun JsonObject.getString(property: String, default: String): String = if (hasString(property)) get(property).asString else default
 
-fun JsonObject.getNumber(property: String, default: Number) = if (hasNumber(property)) get(property).asNumber else default
+fun JsonObject.getNumber(property: String, default: Number): Number = if (hasNumber(property)) get(property).asNumber else default
 
 fun JsonObject.getInt(property: String, default: Int) = if (hasNumber(property)) get(property).asInt else default
 
