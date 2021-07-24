@@ -1,20 +1,23 @@
 package xyz.xenondevs.nova
 
+import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.net.URL
 
 object UpdateReminder : Listener {
     
+    @Volatile
     private var needsUpdate = false
     private var taskId: Int = -1
     
     fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        taskId = runTaskTimer(0, 200) {
+        taskId = runAsyncTaskTimer(0, 12000) {
             checkVersion()
             if (needsUpdate) {
                 val sender = Bukkit.getConsoleSender()
@@ -40,11 +43,12 @@ object UpdateReminder : Listener {
     @EventHandler
     fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
-        if (player.hasPermission("nova.updatereminder")) {
-            checkVersion()
-            if (needsUpdate)
-                player.sendMessage("§cYou're running an outdated version of §bNova§c. " +
-                    "§cPlease download the latest version at §bhttps://spigotmc.org/resources/93648")
+        if (player.hasPermission("nova.updatereminder") && needsUpdate) {
+            val message = ComponentBuilder()
+                .append(TranslatableComponent("nova.outdated_version"))
+                .appendLegacy("§bhttps://spigotmc.org/resources/93648")
+                .create()
+            player.spigot().sendMessage(*message)
         }
     }
     
