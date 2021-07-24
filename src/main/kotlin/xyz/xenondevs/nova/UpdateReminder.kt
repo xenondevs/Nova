@@ -15,7 +15,6 @@ object UpdateReminder : Listener {
     fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         taskId = runTaskTimer(0, 200) {
-            println(1)
             checkVersion()
             if (needsUpdate) {
                 val sender = Bukkit.getConsoleSender()
