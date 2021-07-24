@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.recipe
 
 import org.bukkit.Bukkit
+import org.bukkit.Keyed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
@@ -16,13 +17,6 @@ import xyz.xenondevs.nova.tileentity.impl.PressType
 import xyz.xenondevs.nova.util.customModelData
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.removeFirstWhere
-
-private val Recipe.key: NamespacedKey
-    get() = when (this) {
-        is ShapedRecipe -> key
-        is ShapelessRecipe -> key
-        else -> throw UnsupportedOperationException("Unsupported Recipe Type")
-    }
 
 class NovaRecipeChoice(material: NovaMaterial) : ExactChoice(material.createItemStack()) {
     
@@ -65,7 +59,7 @@ object RecipeManager : Listener {
     @EventHandler
     fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
         val predictedRecipe = event.recipe
-        if (predictedRecipe != null && predictedRecipe.key.namespace != "nova") {
+        if (predictedRecipe != null && (predictedRecipe as Keyed).key.namespace != "nova") {
             // prevent non-nova recipes from using nova items
             if (event.inventory.contents.any { it.novaMaterial != null })
                 event.inventory.result = ItemStack(Material.AIR)
