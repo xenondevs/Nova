@@ -32,6 +32,7 @@ class Nova : JavaPlugin() {
         
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
         PermanentStorage.store("last_version", description.version)
+        UpdateReminder.init()
         
         setGlobalIngredients()
         NovaConfig.init()
