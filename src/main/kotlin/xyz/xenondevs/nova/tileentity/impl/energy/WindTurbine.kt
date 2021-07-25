@@ -4,7 +4,10 @@ import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
+import org.bukkit.Axis
+import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Player
 import org.bukkit.util.EulerAngle
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -14,6 +17,8 @@ import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.getStraightLine
+import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import java.util.*
 import kotlin.math.min
 
@@ -45,6 +50,8 @@ class WindTurbine(
     override fun handleInitialized(first: Boolean) {
         super.handleInitialized(first)
         if (first) spawnModels()
+        
+        setAdditionalHitboxes(first, getMultiHitboxLocations(location))
     }
     
     private fun spawnModels() {
@@ -79,6 +86,16 @@ class WindTurbine(
             hasEnergyChanged = false
             gui.energyBar.update()
         }
+    }
+    
+    companion object {
+        
+        fun canPlace(player: Player, location: Location) =
+            getMultiHitboxLocations(location).all { it.block.type.isAir && ProtectionUtils.canPlace(player, it) }
+        
+        fun getMultiHitboxLocations(location: Location) =
+            location.clone().add(0.0, 1.0, 0.0).getStraightLine(Axis.Y, location.blockY + 3)
+        
     }
     
     inner class WindTurbineGUI : TileEntityGUI("menu.nova.wind_turbine") {

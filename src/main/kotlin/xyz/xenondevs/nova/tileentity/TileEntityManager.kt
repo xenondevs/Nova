@@ -46,15 +46,6 @@ fun ItemStack.getTileEntityData(): JsonObject? {
     return null
 }
 
-fun ItemStack.hasTileEntityData(): Boolean {
-    if (hasItemMeta()) {
-        val dataContainer = itemMeta!!.persistentDataContainer
-        return dataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
-    }
-    
-    return false
-}
-
 fun ArmorStand.setTileEntityData(data: JsonObject) =
     persistentDataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, data)
 
@@ -145,15 +136,20 @@ object TileEntityManager : Listener {
     }
     
     fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
-        val location = tileEntity.armorStand.location.blockLocation
+        val location = tileEntity.location
         val chunk = location.chunk
         
         // remove TileEntity and ArmorStand
         tileEntityMap[chunk]?.remove(location)
         locationCache -= location
+        tileEntity.additionalHitboxes.forEach {
+            tileEntityMap[it.chunk]?.remove(it)
+            locationCache -= it
+        }
         tileEntity.armorStand.remove()
         
         location.block.type = Material.AIR
+        tileEntity.additionalHitboxes.forEach { it.block.type = Material.AIR }
         val drops = tileEntity.destroy(dropItems) // destroy tileEntity and save drops for later
         
         tileEntity.handleRemoved(unload = false)
@@ -175,6 +171,15 @@ object TileEntityManager : Listener {
     
     fun getTileEntitiesInChunk(chunk: Chunk) = tileEntityMap[chunk]?.values?.toList() ?: emptyList()
     
+    fun addTileEntityLocations(tileEntity: TileEntity, locations: List<Location>) {
+        locations.forEach {
+            val chunkMap = tileEntityMap.getOrPut(it.chunk) { HashMap() }
+            chunkMap[it] = tileEntity
+            
+            locationCache += it
+        }
+    }
+    
     private fun handleChunkLoad(chunk: Chunk) {
         // https://hub.spigotmc.org/jira/browse/SPIGOT-6547
         // workaround because of async entity loading:
@@ -183,7 +188,7 @@ object TileEntityManager : Listener {
             runTaskLater(delay.toLong()) {
                 
                 if (chunk.isLoaded) {
-                    val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>()
+                    val chunkMap = tileEntityMap[chunk] ?: HashMap()
                     val newChunkMap = HashMap<Location, TileEntity>()
                     
                     chunk.entities
@@ -238,7 +243,7 @@ object TileEntityManager : Listener {
             
             if (material.isBlock) {
                 val location = event.block.location
-                if (getTileEntityAt(location) == null) {
+                if (getTileEntityAt(location) == null && material.canPlace?.invoke(player, location) != false) {
                     val uuid = player.uniqueId
                     val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
                     if (result == PlaceResult.ALLOW) {

@@ -49,6 +49,8 @@ abstract class TileEntity(
     private val inventories = ArrayList<VirtualInventory>()
     val multiModels = HashMap<String, MultiModel>()
     
+    val additionalHitboxes = HashSet<Location>()
+    
     init {
         if (!data.has("material"))
             storeData("material", material)
@@ -234,6 +236,17 @@ abstract class TileEntity(
         }
         
         return Region(LocationUtils.sort(pos1, pos2))
+    }
+    
+    /**
+     * Places additional hitboxes for this [TileEntity] and registers them
+     * in the [TileEntityManager].
+     */
+    fun setAdditionalHitboxes(placeBlocks: Boolean, hitboxes: List<Location>) {
+        if (placeBlocks) hitboxes.forEach { it.block.type = material.hitbox!! }
+        
+        additionalHitboxes += hitboxes
+        TileEntityManager.addTileEntityLocations(this, hitboxes)
     }
     
     /**

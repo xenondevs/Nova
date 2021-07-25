@@ -1,9 +1,11 @@
 package xyz.xenondevs.nova.material
 
 import com.google.gson.JsonObject
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Material.*
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.NovaItemBuilder
@@ -50,7 +52,8 @@ enum class NovaMaterial(
     createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> NovaItemBuilder)? = null,
     val block: ModelData? = null,
     val hitbox: Material? = null,
-    val createTileEntity: ((UUID?, NovaMaterial, JsonObject, ArmorStand) -> TileEntity)? = null
+    val createTileEntity: ((UUID?, NovaMaterial, JsonObject, ArmorStand) -> TileEntity)? = null,
+    val canPlace: ((Player, Location) -> Boolean)? = null
 ) {
     
     // 1 - 1000: Blocks
@@ -123,7 +126,7 @@ enum class NovaMaterial(
     ULTIMATE_CABLE("block.nova.ultimate_cable", structureBlockOf(5019), null, null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::UltimateCable),
     CREATIVE_CABLE("block.nova.creative_cable", structureBlockOf(5024), null, null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::CreativeCable),
     SCAFFOLDING("item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray()), null, null),
-    WIND_TURBINE("block.nova.wind_turbine", blockOf(5050), null, EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine),
+    WIND_TURBINE("block.nova.wind_turbine", blockOf(5050), null, EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace),
     
     // 9.000 - 10.000 UI Elements
     GRAY_BUTTON("", itemOf(9001)),
