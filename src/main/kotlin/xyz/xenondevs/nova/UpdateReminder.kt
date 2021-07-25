@@ -16,6 +16,7 @@ object UpdateReminder : Listener {
     private var taskId: Int = -1
     
     fun init() {
+        if (NOVA.devBuild) return
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         taskId = runAsyncTaskTimer(0, 12000) {
             checkVersion()

@@ -23,6 +23,7 @@ var IS_VERSION_CHANGE: Boolean = false
 
 class Nova : JavaPlugin() {
     
+    val devBuild = description.version.contains("SNAPSHOT")
     val disableHandlers = ArrayList<() -> Unit>()
     val pluginFile
         get() = file
