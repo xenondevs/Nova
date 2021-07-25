@@ -1,5 +1,5 @@
 name: Nova
-version: 0.3.4
+version: ${project.version}
 authors: ["StudioCode", "ByteZ1337"]
 main: xyz.xenondevs.nova.Nova
 api-version: 1.17
