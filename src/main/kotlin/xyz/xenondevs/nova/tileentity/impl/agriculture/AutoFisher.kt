@@ -105,7 +105,7 @@ class AutoFisher(
         val rodItem = fishingRodInventory.getItemStack(0)
         val luck = rodItem.enchantments[Enchantment.LUCK] ?: 0
         
-        // the fake fishing hook is required for the "in_open_water" check as minecraft as the
+        // the fake fishing hook is required for the "in_open_water" check as the
         // fishing location affects the loot table
         val fakeFishingHook = FishingHook(fakePlayer, level, luck, 0)
         
