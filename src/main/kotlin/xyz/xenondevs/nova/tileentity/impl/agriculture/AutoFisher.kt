@@ -6,7 +6,6 @@ import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.projectile.FishingHook
@@ -34,11 +33,11 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
 import xyz.xenondevs.nova.util.item.ToolUtils
-import xyz.xenondevs.nova.util.localized
 import xyz.xenondevs.nova.util.salt
 import java.util.*
 
@@ -62,6 +61,7 @@ class AutoFisher(
     private val fishingRodInventory = getInventory("fishingRod", 1, true, ::handleFishingRodInventoryUpdate)
     private var idleTime = 0
     
+    private val waterBlock = location.clone().subtract(0.0, 1.0, 0.0).block
     private val random = Random(uuid.mostSignificantBits xor System.currentTimeMillis())
     private val level = world.nmsWorld
     private val position = Vec3(location.x, location.y, location.z)
@@ -80,7 +80,7 @@ class AutoFisher(
     }
     
     override fun handleTick() {
-        if (energy >= ENERGY_PER_TICK && !fishingRodInventory.isEmpty) {
+        if (energy >= ENERGY_PER_TICK && !fishingRodInventory.isEmpty && waterBlock.type == Material.WATER) {
             energy -= ENERGY_PER_TICK
             
             idleTime++
@@ -162,12 +162,13 @@ class AutoFisher(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # # f . . |" +
+                "| s u # # f . . |" +
                 "| . . . . # . . |" +
                 "| . . . . # . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('f', VISlotElement(fishingRodInventory, 0, NovaMaterial.FISHING_ROD_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
             .apply { fillRectangle(1, 2, 6, inventory, true) }
         
