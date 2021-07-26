@@ -158,6 +158,7 @@ enum class NovaMaterial(
     NBT_OFF_BUTTON("", itemOf(9118)),
     HOE_ON_BUTTON("", itemOf(9119)),
     HOE_OFF_BUTTON("", itemOf(9120)),
+    UPGRADES_BUTTON("", itemOf(9121)),
     HOE_PLACEHOLDER("", itemOf(9500)),
     AXE_PLACEHOLDER("", itemOf(9501)),
     SHEARS_PLACEHOLDER("", itemOf(9502)),

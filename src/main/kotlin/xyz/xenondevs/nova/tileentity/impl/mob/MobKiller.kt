@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.getSurroundingChunks
@@ -105,10 +106,11 @@ class MobKiller(
                 "1 - - - - - - - 2" +
                 "| s # . # . # # |" +
                 "| r # . # . # # |" +
-                "| # # . # . # # |" +
+                "| u # . # . # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('r', VisualizeRegionItem(uuid, region))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 3, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }

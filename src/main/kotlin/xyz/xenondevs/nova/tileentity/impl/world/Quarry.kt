@@ -26,6 +26,7 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import xyz.xenondevs.particle.ParticleEffect
@@ -450,7 +451,7 @@ class Quarry(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # # # # . |" +
+                "| s u # # # # . |" +
                 "| # # # . . . . |" +
                 "| m n p . . . . |" +
                 "| # # # . . . . |" +
@@ -459,6 +460,7 @@ class Quarry(
             .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
             .addIngredient('p', AddNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
             .addIngredient('m', RemoveNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
             .also { it.fillRectangle(4, 2, 3, inventory, true) }
         

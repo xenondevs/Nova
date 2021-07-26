@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.item.*
@@ -201,7 +202,7 @@ class Harvester(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| c v # s a h . |" +
+                "| c v u s a h . |" +
                 "| # # # # # # . |" +
                 "| . . . . . . . |" +
                 "| . . . . . . . |" +
@@ -211,6 +212,7 @@ class Harvester(
             .addIngredient('s', VISlotElement(shearInventory, 0, NovaMaterial.SHEARS_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('a', VISlotElement(axeInventory, 0, NovaMaterial.AXE_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('h', VISlotElement(hoeInventory, 0, NovaMaterial.HOE_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
             .apply { fillRectangle(1, 3, 6, inventory, true) }
         

@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
 import xyz.xenondevs.nova.util.item.fuel
 import xyz.xenondevs.nova.util.toItemStack
@@ -111,13 +112,14 @@ class FurnaceGenerator(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # # # # # # |" +
-                "| # # # i # # # |" +
+                "| u # # i # # # |" +
                 "| # # # ! # # # |" +
                 "| # # # # # # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', SlotElement.VISlotElement(inventory, 0))
             .addIngredient('!', progressItem)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, if (burnTime > 0) ENERGY_PER_TICK else 0) }

@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.isGlass
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -79,10 +80,11 @@ class SolarPanel(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| # # # . # # # |" +
+                "| u # # . # # # |" +
                 "| # # # . # # # |" +
                 "| # # # . # # # |" +
                 "3 - - - - - - - 4")
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, calculateCurrentEnergyOutput()) }

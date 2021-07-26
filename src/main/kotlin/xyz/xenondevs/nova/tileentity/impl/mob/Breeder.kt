@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.FoodUtils
@@ -157,10 +158,11 @@ class Breeder(
                 "1 - - - - - - - 2" +
                 "| s # . . . . . |" +
                 "| r # . . . . . |" +
-                "| # # . . . . . |" +
+                "| u # . . . . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('r', VisualizeRegionItem(uuid, region))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
             .also { it.fillRectangle(3, 1, 3, inventory, true) }
         

@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.getStraightLine
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
@@ -103,10 +104,11 @@ class WindTurbine(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| # # # . # # # |" +
+                "| u # # . # # # |" +
                 "| # # # . # # # |" +
                 "| # # # . # # # |" +
                 "3 - - - - - - - 4")
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, energyPerTick) }

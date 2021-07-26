@@ -26,6 +26,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.ReflectionUtils.blockPos
@@ -129,10 +130,11 @@ class Fertilizer(
                 "1 - - - - - - - 2" +
                 "| s . . . . # . |" +
                 "| v . . . . # . |" +
-                "| # . . . . # . |" +
+                "| u . . . . # . |" +
                 "3 - - - - - - - 4")
             .addIngredient('v', VisualizeRegionItem(uuid, fertilizeRegion))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
             .also { it.fillRectangle(2, 1, 4, fertilizerInventory, true) }
         

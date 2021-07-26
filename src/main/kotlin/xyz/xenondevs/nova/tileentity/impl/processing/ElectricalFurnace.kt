@@ -26,6 +26,7 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import java.util.*
 
@@ -157,7 +158,7 @@ class ElectricalFurnace(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # # # # . |" +
+                "| s u # # # # . |" +
                 "| i # > # o # . |" +
                 "| # # # # # # . |" +
                 "3 - - - - - - - 4")
@@ -165,6 +166,7 @@ class ElectricalFurnace(
             .addIngredient('o', SlotElement.VISlotElement(outputInventory, 0))
             .addIngredient('>', progressItem)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, if (currentRecipe != null) -ENERGY_PER_TICK else 0) }

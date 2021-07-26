@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.tileentity.impl.mob
 
 import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -29,6 +28,7 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
 import java.util.*
 
@@ -125,13 +125,14 @@ class MobDuplicator(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s n # # # . . |" +
-                "| # # # i # . . |" +
-                "| # # # # # . . |" +
+                "| s # # # # . . |" +
+                "| n # # i # . . |" +
+                "| u # # # # . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('i', VISlotElement(inventory, 0, NovaMaterial.BOTTLED_MOB_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('n', ToggleNBTModeItem())
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -energyPerTick) }

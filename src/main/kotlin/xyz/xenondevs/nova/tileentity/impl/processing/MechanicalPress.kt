@@ -27,6 +27,7 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.PressProgressItem
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
 import java.util.*
 
@@ -144,7 +145,7 @@ class MechanicalPress(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| p g # i # # . |" +
-                "| # # # , # # . |" +
+                "| u # # , # # . |" +
                 "| s # # o # # . |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', VISlotElement(inputInv, 0))
@@ -153,6 +154,7 @@ class MechanicalPress(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('p', PressTypeItem(PressType.PLATE).apply(pressTypeItems::add))
             .addIngredient('g', PressTypeItem(PressType.GEAR).apply(pressTypeItems::add))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, if (currentItem != null) -ENERGY_PER_TICK else 0) }

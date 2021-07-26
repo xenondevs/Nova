@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
+import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import java.util.*
 
@@ -122,16 +123,17 @@ class Pulverizer(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # # # # . |" +
-                "| i # , # o u . |" +
+                "| s u # # # # . |" +
+                "| i # , # o a . |" +
                 "| c # # # # # . |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', VISlotElement(inputInv, 0))
             .addIngredient('o', VISlotElement(outputInv, 0))
-            .addIngredient('u', VISlotElement(outputInv, 1))
+            .addIngredient('a', VISlotElement(outputInv, 1))
             .addIngredient(',', mainProgress)
             .addIngredient('c', pulverizerProgress)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, if (currentItem != null) -ENERGY_PER_TICK else 0) }
