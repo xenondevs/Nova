@@ -147,6 +147,11 @@
     "charge_speed": 80,
     "range": 10
   },
+  "auto_fisher": {
+    "capacity": 10000,
+    "energy_per_tick": 20,
+    "idle_time": 600
+  },
   "bottled_mob_blacklist": [
     "WITHER",
     "ENDER_DRAGON",

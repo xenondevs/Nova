@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.tileentity.impl.agriculture.AutoFisher
 import xyz.xenondevs.nova.tileentity.impl.agriculture.Fertilizer
 import xyz.xenondevs.nova.tileentity.impl.agriculture.Harvester
 import xyz.xenondevs.nova.tileentity.impl.agriculture.Planter
@@ -81,6 +82,7 @@ enum class NovaMaterial(
     HARVESTER("block.nova.harvester", blockOf(22), null, EnergyTileEntity::createItemBuilder, blockOf(22), COBBLESTONE, ::Harvester),
     FERTILIZER("block.nova.fertilizer", blockOf(23), null, EnergyTileEntity::createItemBuilder, blockOf(23), COBBLESTONE, ::Fertilizer),
     WIRELESS_CHARGER("block.nova.wireless_charger", blockOf(24), null, EnergyTileEntity::createItemBuilder, blockOf(24), COBBLESTONE, ::WirelessCharger),
+    AUTO_FISHER("block.nova.auto_fisher", blockOf(25), null, EnergyTileEntity::createItemBuilder, blockOf(25), COBBLESTONE, ::AutoFisher),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("item.nova.iron_plate", itemOf(1000)),
@@ -164,6 +166,7 @@ enum class NovaMaterial(
     SHEARS_PLACEHOLDER("", itemOf(9502)),
     ITEM_FILTER_PLACEHOLDER("", itemOf(9503)),
     BOTTLED_MOB_PLACEHOLDER("", itemOf(9504)),
+    FISHING_ROD_PLACEHOLDER("", itemOf(9505)),
     
     // 10.000 - ? Multi-Texture UI Elements
     PROGRESS_ARROW("", itemOf((10_000..10_016).toIntArray())),

@@ -1,0 +1,34 @@
+{
+  "result": "nova:auto_fisher",
+  "shape": [
+    "igi",
+    "src",
+    "iti"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "g",
+      "item": "nova:diamond_gear"
+    },
+    {
+      "char": "s",
+      "item": "minecraft:salmon_bucket"
+    },
+    {
+      "char": "r",
+      "item": "minecraft:fishing_rod"
+    },
+    {
+      "char": "c",
+      "item": "minecraft:cod_bucket"
+    },
+    {
+      "char": "t",
+      "item": "minecraft:string"
+    }
+  ]
+}
