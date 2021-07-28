@@ -83,7 +83,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             RootAdvancement,
             BasicCableAdvancement, AdvancedCableAdvancement, EliteCableAdvancement, UltimateCableAdvancement,
             ItemFilterAdvancement, VacuumChestAdvancement, StorageUnitAdvancement, ChargerAdvancement, WirelessChargerAdvancement, JetpackAdvancement,
-            FurnaceGeneratorAdvancement, SolarPanelAdvancement,
+            FurnaceGeneratorAdvancement, SolarPanelAdvancement, LightningExchangerAdvancement,
             BasicPowerCellAdvancement, AdvancedPowerCellAdvancement, ElitePowerCellAdvancement, UltimatePowerCellAdvancement,
             MechanicalPressAdvancement, GearsAdvancement, PlatesAdvancement, AllPlatesAdvancement, AllGearsAdvancement,
             PulverizerAdvancement, DustAdvancement, AllDustsAdvancement,
