@@ -21,10 +21,8 @@ import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
-import xyz.xenondevs.nova.util.BlockSide.TOP
+import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.advance
 import java.util.*
 import kotlin.math.min
@@ -42,7 +40,10 @@ class LightningExchanger(
     armorStand: ArmorStand
 ) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(PROVIDE, TOP) }
+    override val defaultEnergyConfig by lazy {
+        CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))
+        { if (it == BlockFace.DOWN) PROVIDE else NONE }
+    }
     override val gui by lazy { LightningExchangerGUI() }
     
     private var toCharge = 0
@@ -64,21 +65,14 @@ class LightningExchanger(
     }
     
     inner class LightningExchangerGUI : TileEntityGUI("menu.nova.lightning_exchanger") {
-    
-        private val sideConfigGUI = SideConfigGUI(
-            this@LightningExchanger,
-            listOf(NONE, PROVIDE),
-            null
-        ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # . # # # |" +
                 "| u # # . # # # |" +
                 "| # # # . # # # |" +
+                "| # # # . # # # |" +
                 "3 - - - - - - - 4")
-            .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', UpgradesTeaserItem)
             .build()
         

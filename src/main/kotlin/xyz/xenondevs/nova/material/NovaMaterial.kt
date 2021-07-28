@@ -83,7 +83,7 @@ enum class NovaMaterial(
     FERTILIZER("block.nova.fertilizer", blockOf(23), null, EnergyTileEntity::createItemBuilder, blockOf(23), COBBLESTONE, ::Fertilizer),
     WIRELESS_CHARGER("block.nova.wireless_charger", blockOf(24), null, EnergyTileEntity::createItemBuilder, blockOf(24), COBBLESTONE, ::WirelessCharger),
     AUTO_FISHER("block.nova.auto_fisher", blockOf(25), null, EnergyTileEntity::createItemBuilder, blockOf(25), COBBLESTONE, ::AutoFisher),
-    LIGHTNING_EXCHANGER("block.nova.lightning_exchanger", blockOf(26), null, EnergyTileEntity::createItemBuilder, blockOf(26), COBBLESTONE, ::LightningExchanger),
+    LIGHTNING_EXCHANGER("block.nova.lightning_exchanger", blockOf(26), null, EnergyTileEntity::createItemBuilder, blockOf(26), BARRIER, ::LightningExchanger),
     
     // 1000 - 2000: Crafting Items
     IRON_PLATE("item.nova.iron_plate", itemOf(1000)),
