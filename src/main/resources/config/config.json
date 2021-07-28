@@ -152,6 +152,14 @@
     "energy_per_tick": 20,
     "idle_time": 600
   },
+  "lightning_exchanger": {
+    "capacity": 1000000,
+    "conversion_rate": 5000,
+    "burst": {
+      "min": 70000,
+      "max": 100000
+    }
+  },
   "bottled_mob_blacklist": [
     "WITHER",
     "ENDER_DRAGON",
