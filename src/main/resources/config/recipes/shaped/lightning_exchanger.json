@@ -1,0 +1,22 @@
+{
+  "result": "nova:lightning_exchanger",
+  "shape": [
+    "lgl",
+    "gpg",
+    "lgl"
+  ],
+  "ingredients": [
+    {
+      "char": "l",
+      "item": "minecraft:lightning_rod"
+    },
+    {
+      "char": "g",
+      "item": "nova:copper_gear"
+    },
+    {
+      "char": "p",
+      "item": "nova:advanced_power_cell"
+    }
+  ]
+}
