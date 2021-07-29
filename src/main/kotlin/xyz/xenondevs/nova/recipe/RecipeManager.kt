@@ -18,11 +18,12 @@ import xyz.xenondevs.nova.util.customModelData
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.removeFirstWhere
 
-class NovaRecipeChoice(material: NovaMaterial) : ExactChoice(material.createItemStack()) {
+class NovaRecipeChoice(private val material: NovaMaterial) : ExactChoice(material.createItemStack()) {
     
     override fun test(item: ItemStack): Boolean {
+        val customModelData = item.customModelData
         return choices.any {
-            it.type == item.type && it.customModelData == item.customModelData
+            it.type == item.type && (it.customModelData == customModelData || material.legacyItemIds?.contains(customModelData) == true)
         }
     }
     

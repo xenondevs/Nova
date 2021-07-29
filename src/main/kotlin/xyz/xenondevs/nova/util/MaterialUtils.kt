@@ -27,13 +27,16 @@ val Material.breakSpeed: Double
     get() = 1.0 / hardness.absoluteValue
 
 val ItemStack.novaMaterial: NovaMaterial?
-    get() = NovaMaterial.values().find {
-        val itemStack = it.createItemStack()
-        
-        this.type == itemStack.type
-            && hasItemMeta()
-            && itemMeta!!.hasCustomModelData()
-            && itemMeta!!.customModelData == itemStack.itemMeta!!.customModelData
+    get() {
+        val customModelData = customModelData
+        return NovaMaterial.values().find {
+            val itemStack = it.createItemStack()
+            val currentCustomModelData = itemStack.customModelData
+            
+            return@find this.type == itemStack.type
+                && (customModelData == currentCustomModelData
+                || it.legacyItemIds?.contains(customModelData) == true)
+        }
     }
 
 val ItemStack.customModelData: Int

@@ -97,6 +97,15 @@ abstract class TileEntity(
     }
     
     /**
+     * Calls the [saveData] function and then writes the [data] object
+     * to the [armor stand][armorStand] of this [TileEntity].
+     */
+    fun saveDataToArmorStand() {
+        saveData()
+        armorStand.setTileEntityData(data)
+    }
+    
+    /**
      * Called every tick for every TileEntity that is in a loaded chunk.
      */
     abstract fun handleTick()
@@ -121,10 +130,7 @@ abstract class TileEntity(
         isValid = false
         gui?.closeWindows()
         
-        if (unload) {
-            saveData()
-            armorStand.setTileEntityData(data)
-        }
+        if (unload) saveDataToArmorStand()
     }
     
     /**

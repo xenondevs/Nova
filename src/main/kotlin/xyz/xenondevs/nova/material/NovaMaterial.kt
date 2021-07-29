@@ -54,11 +54,13 @@ enum class NovaMaterial(
     val block: ModelData? = null,
     val hitbox: Material? = null,
     val createTileEntity: ((UUID?, NovaMaterial, JsonObject, ArmorStand) -> TileEntity)? = null,
-    val canPlace: ((Player, Location) -> Boolean)? = null
+    val canPlace: ((Player, Location) -> Boolean)? = null,
+    val isDirectional: Boolean = true,
+    val legacyItemIds: IntArray? = null,
 ) {
     
     // 1 - 1000: Blocks
-    FURNACE_GENERATOR("block.nova.furnace_generator", blockOf(1), null, EnergyTileEntity::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
+    FURNACE_GENERATOR(itemName = "block.nova.furnace_generator", item = blockOf(1), createItemBuilderFunction = EnergyTileEntity::createItemBuilder, block = blockOf(1), hitbox = COBBLESTONE, createTileEntity = ::FurnaceGenerator),
     MECHANICAL_PRESS("block.nova.mechanical_press", blockOf(2), null, EnergyTileEntity::createItemBuilder, blockOf(2), COBBLESTONE, ::MechanicalPress),
     BASIC_POWER_CELL("block.nova.basic_power_cell", blockOf(3), null, EnergyTileEntity::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
     ADVANCED_POWER_CELL("block.nova.advanced_power_cell", blockOf(4), null, EnergyTileEntity::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
@@ -123,11 +125,12 @@ enum class NovaMaterial(
     JETPACK("item.nova.jetpack", ModelData(IRON_CHESTPLATE, intArrayOf(3000)), JetpackItem),
     
     // 5000 - 10.000 MultiModel Blocks
-    BASIC_CABLE("block.nova.basic_cable", structureBlockOf(5004), null, null, structureBlockOf(intArrayOf(-1) + (5000..5003).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::BasicCable),
-    ADVANCED_CABLE("block.nova.advanced_cable", structureBlockOf(5009), null, null, structureBlockOf(intArrayOf(-1) + (5005..5008).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::AdvancedCable),
-    ELITE_CABLE("block.nova.elite_cable", structureBlockOf(5014), null, null, structureBlockOf(intArrayOf(-1) + (5010..5013).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::EliteCable),
-    ULTIMATE_CABLE("block.nova.ultimate_cable", structureBlockOf(5019), null, null, structureBlockOf(intArrayOf(-1) + (5015..5018).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::UltimateCable),
-    CREATIVE_CABLE("block.nova.creative_cable", structureBlockOf(5024), null, null, structureBlockOf(intArrayOf(-1) + (5020..5023).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::CreativeCable),
+    // !!! DO NOT USE 5000 - 5100: LEGACY CABLES !!!
+    BASIC_CABLE("block.nova.basic_cable", structureBlockOf(5100), null, null, structureBlockOf((5101..5164).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::BasicCable, isDirectional = false, legacyItemIds = intArrayOf(5004)),
+    ADVANCED_CABLE("block.nova.advanced_cable", structureBlockOf(5165), null, null, structureBlockOf((5166..5229).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::AdvancedCable, isDirectional = false, legacyItemIds = intArrayOf(5009)),
+    ELITE_CABLE("block.nova.elite_cable", structureBlockOf(5230), null, null, structureBlockOf((5231..5294).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::EliteCable, isDirectional = false, legacyItemIds = intArrayOf(5014)),
+    ULTIMATE_CABLE("block.nova.ultimate_cable", structureBlockOf(5295), null, null, structureBlockOf((5296..5359).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::UltimateCable, isDirectional = false, legacyItemIds = intArrayOf(5019)),
+    CREATIVE_CABLE("block.nova.creative_cable", structureBlockOf(5360), null, null, structureBlockOf((5361..5424).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024)),
     SCAFFOLDING("item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray()), null, null),
     WIND_TURBINE("block.nova.wind_turbine", blockOf(5050), null, EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace),
     

@@ -44,6 +44,12 @@ fun PersistentDataContainer.hasNovaData(): Boolean {
     return keys.any { it.namespace == novaNameSpace }
 }
 
+@Suppress("UNCHECKED_CAST")
+fun ArmorStand.setHeadItemSilently(headStack: ItemStack) {
+    val armorItems = ReflectionRegistry.ARMOR_STAND_ARMOR_ITEMS_FIELD.get(nmsEntity) as NonNullList<NMSItemStack>
+    armorItems[3] = headStack.nmsStack
+}
+
 object EntityUtils {
     
     @Suppress("UNCHECKED_CAST")
