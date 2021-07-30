@@ -35,11 +35,7 @@ import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.point.Point3D
 import java.util.*
 
-private const val CONNECTOR = 1
-private const val HORIZONTAL = 2
-private const val DOWN = 3
-private const val UP = 4
-private val ATTACHMENTS: IntArray = (5..13).toIntArray()
+private val ATTACHMENTS: IntArray = (64..72).toIntArray()
 
 private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
 
@@ -80,6 +76,11 @@ open class Cable(
     private val multiModel = getMultiModel("cableModels")
     private val hitboxes = ArrayList<Hitbox>()
     
+    init {
+        // cables from older version do not have the correct rotation
+        armorStand.teleport { yaw = 180f }
+    }
+    
     override fun saveData() {
         super.saveData()
         storeData("bridgeFaces", bridgeFaces)
@@ -89,6 +90,7 @@ open class Cable(
         if (isValid) {
             if (NOVA.isEnabled) {
                 multiModel.replaceModels(getModelsNeeded())
+                armorStand.setHeadItemSilently(getCorrectCableModel())
                 updateHitbox()
             }
         }
@@ -120,31 +122,19 @@ open class Cable(
             event.isCancelled = true
     }
     
+    private fun getCorrectCableModel(): ItemStack {
+        val connectedFaces = connectedNodes.values.flatMapTo(HashSet()) { it.keys }
+        
+        val booleans = CUBE_FACES.map { connectedFaces.contains(it) }.reversed().toBooleanArray()
+        val number = MathUtils.convertBooleanArrayToInt(booleans)
+        return material.block!!.getItem(number)
+    }
+    
     private fun getModelsNeeded(): List<Model> {
         Preconditions.checkState(networks.isNotEmpty(), "No network is initialized")
         
         val items = ArrayList<Pair<ItemStack, Float>>()
         
-        val connectedFaces = connectedNodes.values.flatMapTo(HashSet()) { it.keys }
-        
-        // only show connector if connections aren't on two opposite sides
-        if (connectedFaces.size != 2 || connectedFaces.first() != connectedFaces.last().oppositeFace) {
-            items += material.block!!.getItem(CONNECTOR) to 0f
-        }
-        
-        // add all cable connections
-        connectedFaces.forEach { blockFace ->
-            val dataIndex = when (blockFace) {
-                BlockFace.DOWN -> DOWN
-                BlockFace.UP -> UP
-                else -> HORIZONTAL
-            }
-            
-            val itemStack = material.block!!.getItem(dataIndex)
-            items += itemStack to getRotation(blockFace)
-        }
-        
-        // add all item network attachments
         connectedNodes[ITEMS]!!
             .filter { it.value is ItemStorage }
             .forEach { (blockFace, itemStorage) ->

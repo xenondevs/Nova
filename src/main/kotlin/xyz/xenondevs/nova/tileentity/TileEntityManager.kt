@@ -105,7 +105,7 @@ object TileEntityManager : Listener {
         val spawnLocation = location
             .clone()
             .add(0.5, 0.0, 0.5)
-            .also { it.yaw = ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f }
+            .also { it.yaw = if (material.isDirectional) ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f }
         val armorStand = EntityUtils.spawnArmorStandSilently(spawnLocation, headItem, hitboxType.requiresLight)
         
         // create TileEntity instance
@@ -131,7 +131,7 @@ object TileEntityManager : Listener {
         runTaskLater(1) {
             if (hitboxType != null) block.type = hitboxType
             tileEntity.handleInitialized(true)
-            tileEntity.saveData()
+            tileEntity.saveDataToArmorStand()
         }
     }
     
