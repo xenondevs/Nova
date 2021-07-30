@@ -3,6 +3,14 @@
     "enabled": true,
     "url": "https://github.com/xenondevs/NovaRP/releases/download/v0.4/NovaRP.zip"
   },
+  "mysql": {
+    "enabled": false,
+    "address": "localhost",
+    "port": 3306,
+    "username": "",
+    "password": "",
+    "database": ""
+  },
   "cable": {
     "basic": {
       "energy_transfer_rate": 100,
