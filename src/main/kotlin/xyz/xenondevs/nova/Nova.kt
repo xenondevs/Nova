@@ -5,6 +5,7 @@ import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.ability.AbilityManager
 import xyz.xenondevs.nova.advancement.AdvancementManager
+import xyz.xenondevs.nova.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.attachment.AttachmentManager
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.config.NovaConfig
@@ -39,6 +40,7 @@ class Nova : JavaPlugin() {
         setGlobalIngredients()
         NovaConfig.init()
         DatabaseManager.connect()
+        FakeArmorStandManager.init()
         AdvancementManager.loadAdvancements()
         RecipeManager.registerRecipes()
         ChunkLoadManager.init()

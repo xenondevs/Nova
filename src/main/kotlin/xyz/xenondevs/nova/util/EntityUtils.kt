@@ -16,9 +16,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsEntity
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsStack
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -152,7 +149,7 @@ object EntityUtils {
     ) {
         // get world
         val world = location.world!!
-        val level = world.nmsWorld
+        val level = world.serverLevel
         
         // read data to compound tag
         var compoundTag = NbtIo.readCompressed(ByteArrayInputStream(data))
@@ -179,7 +176,7 @@ object EntityUtils {
     
     fun createFakePlayer(location: Location, uuid: UUID, name: String): ServerPlayer {
         val server = (Bukkit.getServer() as CraftServer).server
-        val world = location.world!!.nmsWorld
+        val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
         return ServerPlayer(server, world, gameProfile)
     }

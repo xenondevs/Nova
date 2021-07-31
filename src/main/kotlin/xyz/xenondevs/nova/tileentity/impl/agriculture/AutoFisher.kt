@@ -36,9 +36,9 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.salt
+import xyz.xenondevs.nova.util.serverLevel
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("auto_fisher.capacity")!!
@@ -63,7 +63,7 @@ class AutoFisher(
     
     private val waterBlock = location.clone().subtract(0.0, 1.0, 0.0).block
     private val random = Random(uuid.mostSignificantBits xor System.currentTimeMillis())
-    private val level = world.nmsWorld
+    private val level = world.serverLevel
     private val position = Vec3(location.x, location.y, location.z)
     private val itemDropLocation = location.clone().add(0.0, 1.0, 0.0)
     private lateinit var fakePlayer: ServerPlayer

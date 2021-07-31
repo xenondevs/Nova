@@ -5,16 +5,16 @@ import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.database.table.ModelsTable
 import xyz.xenondevs.nova.database.table.TileEntitiesTable
 import java.io.File
-import javax.sql.DataSource
 
 object DatabaseManager {
     
     private lateinit var database: Database
-    private lateinit var dataSource: DataSource
+    private lateinit var dataSource: HikariDataSource
     
     fun connect() {
         if (NovaConfig.getBoolean("mysql.enabled")) {
@@ -54,10 +54,9 @@ object DatabaseManager {
         dataSource = HikariDataSource(config)
         database = Database.connect(dataSource)
         
-        transaction {
-            SchemaUtils.create(TileEntitiesTable)
-            SchemaUtils.create(ModelsTable)
-        }
+        NOVA.disableHandlers += { dataSource.close() }
+        
+        transaction { SchemaUtils.create(TileEntitiesTable, ModelsTable) }
     }
     
 }

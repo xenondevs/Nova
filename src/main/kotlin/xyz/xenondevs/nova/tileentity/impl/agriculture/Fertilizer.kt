@@ -29,12 +29,12 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.ReflectionUtils.blockPos
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsStack
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
+import xyz.xenondevs.nova.util.blockPos
 import xyz.xenondevs.nova.util.item.PlantUtils
 import xyz.xenondevs.nova.util.item.isFullyAged
+import xyz.xenondevs.nova.util.nmsStack
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.serverLevel
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("fertilizer.capacity")!!
@@ -83,7 +83,7 @@ class Fertilizer(
             val plant = getRandomPlant() ?: return
             
             val context = UseOnContext(
-                plant.world.nmsWorld,
+                plant.world.serverLevel,
                 null,
                 InteractionHand.MAIN_HAND,
                 item.nmsStack,
