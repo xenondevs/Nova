@@ -23,15 +23,18 @@ class FakeArmorStand(
     beforeSpawn: ((FakeArmorStand) -> Unit)? = null
 ) : ArmorStand(EntityType.ARMOR_STAND, location.world!!.serverLevel) {
     
-    private var registered = false
+    private var spawnPacket: ClientboundAddMobPacket? = null
+    private var dataPacket: ClientboundSetEntityDataPacket? = null
+    private var equipmentPacket: ClientboundSetEquipmentPacket? = null
+    private val despawnPacket = ClientboundRemoveEntitiesPacket(id)
     
+    private var registered = false
     private var _location: Location = location.clone()
     private var chunk = location.chunk.pos
     private val equipment = HashMap<EquipmentSlot, MItemStack>()
     
     private val viewers: List<Player>
         get() = FakeArmorStandManager.getChunkViewers(chunk)
-    
     val location: Location
         get() = _location.clone()
     
@@ -65,19 +68,17 @@ class FakeArmorStand(
      * Also sends entity data and equipment.
      */
     fun spawn(player: Player) {
-        val entityPacket = NMSUtils.createAddMobPacket(id, uuid, EntityType.ARMOR_STAND, _location)
-        val entityDataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
-        val entityEquipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
-        
-        player.send(entityPacket, entityDataPacket, entityEquipmentPacket)
+        if (spawnPacket == null) spawnPacket = NMSUtils.createAddMobPacket(id, uuid, EntityType.ARMOR_STAND, _location)
+        if (equipmentPacket == null) equipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
+        if (dataPacket == null) dataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
+        player.send(spawnPacket!!, dataPacket!!, equipmentPacket!!)
     }
     
     /**
      * Despawns the [FakeArmorStand] for a specific [Player].
      */
     fun despawn(player: Player) {
-        val removePacket = ClientboundRemoveEntitiesPacket(id)
-        player.send(removePacket)
+        player.send(despawnPacket)
     }
     
     /**
@@ -99,8 +100,10 @@ class FakeArmorStand(
     fun teleport(newLocation: Location) {
         if (newLocation.world != _location.world) throw UnsupportedOperationException("Teleporting to different worlds is not supported.")
         
-        val viewers = viewers
+        // invalidate the spawn packet as the location has changed
+        spawnPacket = null
         
+        val viewers = viewers
         if (viewers.isNotEmpty()) {
             var packet: Packet<ClientGamePacketListener>? = null
             
@@ -157,16 +160,16 @@ class FakeArmorStand(
      * Sends a packet updating the equipment to all viewers.
      */
     fun updateEquipment() {
-        val entityEquipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
-        viewers.forEach { it.send(entityEquipmentPacket) }
+        equipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
+        viewers.forEach { it.send(equipmentPacket!!) }
     }
     
     /**
      * Sends a packet updating the entity data to all viewers.
      */
     fun updateEntityData() {
-        val entityDataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
-        viewers.forEach { it.send(entityDataPacket) }
+        dataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
+        viewers.forEach { it.send(dataPacket!!) }
     }
     
     /**
