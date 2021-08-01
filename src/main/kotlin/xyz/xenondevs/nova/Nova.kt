@@ -59,6 +59,7 @@ class Nova : JavaPlugin() {
     
     override fun onDisable() {
         disableHandlers.forEach { it() }
+        DatabaseManager.disconnect()
     }
     
     private fun forceResourcePack() {

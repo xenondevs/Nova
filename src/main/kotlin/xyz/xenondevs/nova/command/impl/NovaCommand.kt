@@ -10,11 +10,12 @@ import xyz.xenondevs.nova.debug.NetworkDebugger
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.tileentity.getMultiModelParent
-import xyz.xenondevs.nova.tileentity.isMultiModel
 import xyz.xenondevs.nova.ui.menu.CreativeMenu
 import xyz.xenondevs.nova.ui.menu.RecipesMenu
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.coloredText
+import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.util.hasNovaData
+import xyz.xenondevs.nova.util.localized
 
 object NovaCommand : PlayerCommand("nova") {
     
@@ -35,9 +36,6 @@ object NovaCommand : PlayerCommand("nova") {
                     .executesCatching { listNearby(it) })
                 .then(literal("getNearestData")
                     .executesCatching { getNearestData(it) })
-                .then(literal("removeObsoleteModels")
-                    .then(argument("range", IntegerArgumentType.integer(0))
-                        .executesCatching { removeObsoleteModels(it) }))
                 .then(literal("removeTileEntities")
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching { removeTileEntities(it) }))
@@ -88,27 +86,6 @@ object NovaCommand : PlayerCommand("nova") {
         val armorStand = armorStands.minByOrNull { it.location.distance(player.location) }
         if (armorStand != null) player.chat("/data get entity ${armorStand.uniqueId}")
         else player.spigot().sendMessage(localized(ChatColor.GRAY, "command.nova.get_nearest_data.failed"))
-    }
-    
-    private fun removeObsoleteModels(context: CommandContext<CommandSourceStack>) {
-        val player = context.player
-        val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
-        val obsoleteModels = chunks
-            .flatMap { it.entities.toList() }
-            .filterIsInstance<ArmorStand>()
-            .filter {
-                (it.isMultiModel() && it.getMultiModelParent() == null) ||
-                    (!it.isMultiModel()
-                        && TileEntityManager.getTileEntityAt(it.location.blockLocation) == null
-                        && it.equipment?.helmet?.novaMaterial != null)
-            }
-        obsoleteModels.forEach(ArmorStand::remove)
-        
-        player.spigot().sendMessage(localized(
-            ChatColor.GRAY,
-            "command.nova.remove_obsolete_models.success",
-            coloredText(ChatColor.AQUA, obsoleteModels.count())
-        ))
     }
     
     private fun removeTileEntities(context: CommandContext<CommandSourceStack>) {

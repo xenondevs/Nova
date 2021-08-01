@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util
 import io.netty.buffer.Unpooled
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
+import net.minecraft.core.Rotations
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundAddMobPacket
@@ -47,6 +48,12 @@ fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
     packets.forEach { connection.send(it) }
 }
+
+fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
+    Rotations(x ?: this.x, y ?: this.y, z ?: this.z)
+
+fun Rotations.add(x: Float, y: Float, z: Float) =
+    Rotations(this.x + x, this.y + y, this.z + z)
 
 object NMSUtils {
     

@@ -69,7 +69,7 @@ open class Cable(
         )
     }
     
-    private val multiModel = getMultiModel("cableModels")
+    private val multiModel = createMultiModel()
     private val hitboxes = ArrayList<Hitbox>()
     
     init {

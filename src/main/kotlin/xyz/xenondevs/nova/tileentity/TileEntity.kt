@@ -48,9 +48,8 @@ abstract class TileEntity(
     val chunk = location.chunk
     val facing = armorStand.location.facing
     
-    
     private val inventories = ArrayList<VirtualInventory>()
-    val multiModels = HashMap<String, MultiModel>()
+    val multiModels = ArrayList<MultiModel>()
     
     val additionalHitboxes = HashSet<Location>()
     
@@ -84,8 +83,6 @@ abstract class TileEntity(
             VirtualInventoryManager.getInstance().remove(it)
         }
         
-        multiModels.values.forEach { it.removeAllModels() }
-        
         return drops
     }
     
@@ -93,9 +90,6 @@ abstract class TileEntity(
      * Called to save all data using the [storeData] method.
      */
     open fun saveData() {
-        multiModels.forEach { (name, multiModel) ->
-            storeData("multiModel_$name", multiModel.chunks)
-        }
     }
     
     /**
@@ -117,7 +111,7 @@ abstract class TileEntity(
      * Called to get the [ItemStack] to be placed as the head of the [FakeArmorStand].
      */
     open fun getHeadStack(): ItemStack {
-        return material.createItemStack()
+        return material.block!!.getItem()
     }
     
     /**
@@ -152,6 +146,7 @@ abstract class TileEntity(
     open fun handleRemoved(unload: Boolean) {
         isValid = false
         gui?.closeWindows()
+        multiModels.forEach { it.removeAllModels() }
         
         if (unload) saveAndWriteData()
     }
@@ -197,17 +192,12 @@ abstract class TileEntity(
         getInventory(salt, size, dropItems, IntArray(size) { 64 }, itemHandler)
     
     /**
-     * Gets a [MultiModel] for this [TileEntity].
-     * The [MultiModel] will use the storage of this [TileEntity]
-     * to store data regarding the location of [Model]s.
-     * When the [TileEntity] is destroyed, all [Model]s belonging
+     * Creates a new [MultiModel] for this [TileEntity].
+     * When the [TileEntity] is removed, all [Model]s belonging
      * to this [MultiModel] will be removed.
      */
-    fun getMultiModel(name: String): MultiModel {
-        val uuid = this.uuid.salt(name)
-        val multiModel = MultiModel(uuid, retrieveData("multiModel_$name") { setOf(chunk) })
-        multiModels[name] = multiModel
-        return multiModel
+    fun createMultiModel(): MultiModel {
+        return MultiModel().also(multiModels::add)
     }
     
     /**

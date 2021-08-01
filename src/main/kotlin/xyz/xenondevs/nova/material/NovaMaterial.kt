@@ -132,7 +132,7 @@ enum class NovaMaterial(
     ULTIMATE_CABLE("block.nova.ultimate_cable", structureBlockOf(5295), null, null, structureBlockOf((5296..5359).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::UltimateCable, isDirectional = false, legacyItemIds = intArrayOf(5019)),
     CREATIVE_CABLE("block.nova.creative_cable", structureBlockOf(5360), null, null, structureBlockOf((5361..5424).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024)),
     SCAFFOLDING("item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray()), null, null),
-    WIND_TURBINE("block.nova.wind_turbine", blockOf(5050), null, EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, null, null),
+    WIND_TURBINE("block.nova.wind_turbine", blockOf(5050), null, EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace),
     
     // 9.000 - 10.000 UI Elements
     GRAY_BUTTON("", itemOf(9001)),
