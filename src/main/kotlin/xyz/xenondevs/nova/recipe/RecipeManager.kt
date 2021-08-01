@@ -20,11 +20,18 @@ import xyz.xenondevs.nova.util.removeFirstWhere
 
 class NovaRecipeChoice(private val material: NovaMaterial) : ExactChoice(material.createItemStack()) {
     
+    private val requiredType: Material
+    private val requiredModelData: Int
+    
+    init {
+        val itemStack = material.createItemStack()
+        requiredType = itemStack.type
+        requiredModelData = itemStack.customModelData
+    }
+    
     override fun test(item: ItemStack): Boolean {
         val customModelData = item.customModelData
-        return choices.any {
-            it.type == item.type && (it.customModelData == customModelData || material.legacyItemIds?.contains(customModelData) == true)
-        }
+        return item.type == requiredType && (customModelData == requiredModelData || material.legacyItemIds?.contains(customModelData) == true)
     }
     
 }
@@ -71,7 +78,9 @@ object RecipeManager : Listener {
             // 2. allows for the usage of NovaRecipeChoice / ExactChoice in shapeless crafting recipes
             
             val matrix = event.inventory.matrix
-            val recipe = findMatchingShapedRecipe(matrix) ?: findMatchingShapelessRecipe(matrix)
+            val recipe = if (matrix.size == 9) {
+                findMatchingShapedRecipe(matrix) ?: findMatchingShapelessRecipe(matrix)
+            } else findMatchingShapelessRecipe(matrix)
             event.inventory.result = recipe?.result ?: ItemStack(Material.AIR)
         }
     }
