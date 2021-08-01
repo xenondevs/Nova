@@ -9,28 +9,14 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.util.runAsyncTask
 import java.util.*
 
 val Chunk.pos: AsyncChunkPos
     get() = AsyncChunkPos(world.uid, x, z)
 
-data class AsyncChunkPos(val world: UUID, val x: Int, val z: Int) {
-    
-    fun getInRange(range: Int): Set<AsyncChunkPos> {
-        val length = 2 * range + 1
-        val chunks = HashSet<AsyncChunkPos>(length * length)
-        
-        for (newX in (x - range)..(x + range)) {
-            for (newZ in (z - range)..(z + range)) {
-                chunks.add(AsyncChunkPos(world, newX, newZ))
-            }
-        }
-        
-        return chunks
-    }
-    
-}
+private val RENDER_DISTANCE = NovaConfig.getInt("armor_stand_render_distance")!!
 
 object FakeArmorStandManager : Listener {
     
@@ -82,7 +68,7 @@ object FakeArmorStandManager : Listener {
     @Synchronized
     private fun handleChunksChange(player: Player, newChunk: Chunk) {
         val currentChunks = visibleChunks[player] ?: emptySet()
-        val newChunks = newChunk.pos.getInRange(4)
+        val newChunks = newChunk.pos.getInRange(RENDER_DISTANCE)
         
         // look for all chunks that are no longer visible
         currentChunks.stream()
