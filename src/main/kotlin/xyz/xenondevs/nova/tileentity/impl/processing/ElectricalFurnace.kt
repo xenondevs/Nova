@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl.processing
 
+
 import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement
@@ -10,11 +11,11 @@ import de.studiocode.invui.virtualinventory.event.PlayerUpdateReason
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -44,11 +45,12 @@ private val ENERGY_PER_TICK = NovaConfig.getInt("electrical_furnace.energy_per_t
 private val COOK_SPEED = NovaConfig.getInt("electrical_furnace.cook_speed")!!
 
 class ElectricalFurnace(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int

@@ -2,18 +2,19 @@ package xyz.xenondevs.nova.tileentity
 
 import com.google.gson.JsonObject
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.ArmorStand
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import java.util.*
 
 abstract class EnergyItemTileEntity(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
-) : ItemTileEntity(ownerUUID, material, data, armorStand), EnergyStorage {
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : ItemTileEntity(uuid, data, material, ownerUUID, armorStand), EnergyStorage {
     
     protected abstract val defaultEnergyConfig: MutableMap<BlockFace, EnergyConnectionType>
     override val energyConfig: MutableMap<BlockFace, EnergyConnectionType> by lazy { retrieveData("energyConfig") { defaultEnergyConfig } }

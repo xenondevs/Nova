@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity
 
 import com.google.gson.JsonObject
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.ArmorStand
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.*
 import xyz.xenondevs.nova.util.emptyEnumMap
@@ -10,11 +10,12 @@ import xyz.xenondevs.nova.util.enumMapOf
 import java.util.*
 
 abstract class NetworkedTileEntity(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
-) : TileEntity(ownerUUID, material, data, armorStand), NetworkEndPoint {
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : TileEntity(uuid, data, material, ownerUUID, armorStand), NetworkEndPoint {
     
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }

@@ -5,9 +5,9 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import net.md_5.bungee.api.ChatColor
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -35,11 +35,12 @@ private val KILL_LIMIT = NovaConfig.getInt("mob_killer.kill_limit")!!
 private val DAMAGE = NovaConfig.getDouble("mob_killer.damage")!!
 
 class MobKiller(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     override val gui by lazy { MobCrusherGUI() }

@@ -6,9 +6,12 @@ object TileEntitiesTable : Table("tileEntities") {
     
     val uuid = uuid("uuid")
     val world = uuid("world")
+    val chunkX = integer("chunkX")
+    val chunkZ = integer("chunkZ")
     val x = integer("x")
     val y = integer("y")
     val z = integer("z")
+    val yaw = float("yaw")
     val data = text("data") // TODO: binary
     
     override val primaryKey = PrimaryKey(uuid)

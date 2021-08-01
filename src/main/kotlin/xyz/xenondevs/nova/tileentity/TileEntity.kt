@@ -9,12 +9,16 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
+import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
@@ -25,10 +29,11 @@ import java.util.*
 internal val SELF_UPDATE_REASON = object : UpdateReason {}
 
 abstract class TileEntity(
-    ownerUUID: UUID?,
-    val material: NovaMaterial,
+    val uuid: UUID,
     val data: JsonObject,
-    val armorStand: ArmorStand,
+    val material: NovaMaterial,
+    val ownerUUID: UUID,
+    val armorStand: FakeArmorStand,
 ) {
     
     protected abstract val gui: TileEntityGUI?
@@ -38,13 +43,11 @@ abstract class TileEntity(
     var isValid: Boolean = true
         private set
     
-    val uuid: UUID = armorStand.uniqueId
     val location = armorStand.location.blockLocation
     val world = location.world!!
     val chunk = location.chunk
-    val facing = armorStand.facing
+    val facing = armorStand.location.facing
     
-    val ownerUUID: UUID
     
     private val inventories = ArrayList<VirtualInventory>()
     val multiModels = HashMap<String, MultiModel>()
@@ -56,7 +59,6 @@ abstract class TileEntity(
             storeData("material", material)
         if (!data.has("owner"))
             storeData("owner", ownerUUID)
-        this.ownerUUID = ownerUUID ?: retrieveOrNull("owner")!!
     }
     
     /**
@@ -100,9 +102,30 @@ abstract class TileEntity(
      * Calls the [saveData] function and then writes the [data] object
      * to the [armor stand][armorStand] of this [TileEntity].
      */
-    fun saveDataToArmorStand() {
+    fun saveAndWriteData() {
         saveData()
-        armorStand.setTileEntityData(data)
+        
+        // TODO: async?
+        transaction {
+            TileEntitiesTable.update({ TileEntitiesTable.uuid eq uuid }) {
+                it[data] = GSON.toJson(this@TileEntity.data)
+            }
+        }
+    }
+    
+    /**
+     * Called to get the [ItemStack] to be placed as the head of the [FakeArmorStand].
+     */
+    open fun getHeadStack(): ItemStack {
+        return material.createItemStack()
+    }
+    
+    /**
+     * Calls the [getHeadStack] function and puts the result on the [FakeArmorStand].
+     */
+    fun updateHeadStack() {
+        armorStand.setEquipment(EquipmentSlot.HEAD, getHeadStack())
+        armorStand.updateEquipment()
     }
     
     /**
@@ -130,7 +153,7 @@ abstract class TileEntity(
         isValid = false
         gui?.closeWindows()
         
-        if (unload) saveDataToArmorStand()
+        if (unload) saveAndWriteData()
     }
     
     /**
@@ -306,11 +329,28 @@ abstract class TileEntity(
     
     companion object {
         
-        fun newInstance(armorStand: ArmorStand): TileEntity {
-            val data = armorStand.getTileEntityData()!!
-            val material: NovaMaterial = GSON.fromJson(data.get("material"))!!
+        fun create(
+            uuid: UUID,
+            armorStandLocation: Location,
+            data: JsonObject,
+            ownerUUID: UUID = GSON.fromJson(data.get("owner"))!!,
+            material: NovaMaterial = GSON.fromJson(data.get("material"))!!
+        ): TileEntity {
+            // create the fake armor stand
+            val armorStand = FakeArmorStand(armorStandLocation, false) {
+                it.isInvisible = true
+                it.isMarker = true
+                it.hasVisualFire = material.hitbox.requiresLight
+            }
             
-            return material.createTileEntity!!(null, material, data, armorStand)
+            // create the tile entity
+            val tileEntity = material.createTileEntity!!(uuid, data, material, ownerUUID, armorStand)
+            
+            // set the head stack and register
+            armorStand.setEquipment(EquipmentSlot.HEAD, tileEntity.getHeadStack())
+            armorStand.register()
+            
+            return tileEntity
         }
         
     }

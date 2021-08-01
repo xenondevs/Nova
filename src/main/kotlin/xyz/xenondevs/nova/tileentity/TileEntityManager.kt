@@ -16,7 +16,13 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.*
@@ -96,28 +102,40 @@ object TileEntityManager : Listener {
     ) {
         
         val block = location.block
+        val chunk = location.chunk
         
-        // the block type to be used as a hitbox for the tile entity
-        val hitboxType = material.hitbox
-        
-        // spawn ArmorStand there
-        val headItem = material.block!!.getItem("")
+        // create TileEntity with FakeArmorStand
         val spawnLocation = location
             .clone()
             .add(0.5, 0.0, 0.5)
             .also { it.yaw = if (material.isDirectional) ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f }
-        val armorStand = EntityUtils.spawnArmorStandSilently(spawnLocation, headItem, hitboxType.requiresLight)
         
-        // create TileEntity instance
-        val tileEntity = material.createTileEntity!!(
+        val uuid = UUID.randomUUID()
+        val tileEntity = TileEntity.create(
+            uuid,
+            spawnLocation,
+            data ?: JsonObject().apply { add("global", JsonObject()) },
             ownerUUID,
             material,
-            data ?: JsonObject().apply { add("global", JsonObject()) },
-            armorStand
         )
         
+        // TODO: async
+        // write to database
+        transaction {
+            TileEntitiesTable.insert {
+                it[this.uuid] = uuid
+                it[world] = location.world!!.uid
+                it[chunkX] = chunk.x
+                it[chunkZ] = chunk.z
+                it[x] = location.blockX
+                it[y] = location.blockY
+                it[z] = location.blockZ
+                it[this.yaw] = spawnLocation.yaw
+                it[this.data] = "{}"
+            }
+        }
+        
         // add to tileEntities map
-        val chunk = block.chunk
         val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>().also { tileEntityMap[chunk] = it }
         chunkMap[location] = tileEntity
         
@@ -127,11 +145,13 @@ object TileEntityManager : Listener {
         // count for TileEntity limits
         TileEntityLimits.handleTileEntityCreate(ownerUUID, material)
         
-        // set hitbox block a tick later to prevent interference with the cancellation of the BlockPlaceEvent
         runTaskLater(1) {
-            if (hitboxType != null) block.type = hitboxType
+            // set the hitbox block (1 tick later to prevent interference with the BlockBreakEvent)
+            material.hitbox?.run { block.type = this }
+            // handle finished initializing
             tileEntity.handleInitialized(true)
-            tileEntity.saveDataToArmorStand()
+            // save its data and write it to the database
+            tileEntity.saveAndWriteData()
         }
     }
     
@@ -147,6 +167,12 @@ object TileEntityManager : Listener {
             locationCache -= it
         }
         tileEntity.armorStand.remove()
+        
+        // remove it from the database
+        // TODO: async
+        transaction {
+            TileEntitiesTable.deleteWhere { TileEntitiesTable.uuid eq tileEntity.uuid }
+        }
         
         location.block.type = Material.AIR
         tileEntity.additionalHitboxes.forEach { it.block.type = Material.AIR }
@@ -181,37 +207,34 @@ object TileEntityManager : Listener {
     }
     
     private fun handleChunkLoad(chunk: Chunk) {
-        // https://hub.spigotmc.org/jira/browse/SPIGOT-6547
-        // workaround because of async entity loading:
-        // check for entities every 10 ticks for the next 15 seconds (300 ticks)
-        for (delay in 0..300 step 10) {
-            runTaskLater(delay.toLong()) {
-                
-                if (chunk.isLoaded) {
-                    val chunkMap = tileEntityMap[chunk] ?: HashMap()
-                    val newChunkMap = HashMap<Location, TileEntity>()
+        // TODO: async
+        transaction {
+            TileEntitiesTable
+                .select { (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
+                .forEach {
+                    val uuid = it[TileEntitiesTable.uuid]
+                    val data = JSON_PARSER.parse(it[TileEntitiesTable.data]) as JsonObject
                     
-                    chunk.entities
-                        .filterIsInstance<ArmorStand>()
-                        .filter(ArmorStand::hasTileEntityData)
-                        .forEach { armorStand ->
-                            val location = armorStand.location.blockLocation
-                            
-                            if (!locationCache.contains(location)) {
-                                if (location.block.type.requiresLight) armorStand.fireTicks = Int.MAX_VALUE
-                                
-                                val tileEntity = TileEntity.newInstance(armorStand)
-                                newChunkMap[location] = tileEntity
-                                locationCache += location
-                            }
-                        }
+                    val location = Location(
+                        Bukkit.getWorld(it[TileEntitiesTable.world]),
+                        it[TileEntitiesTable.x].toDouble(),
+                        it[TileEntitiesTable.y].toDouble(),
+                        it[TileEntitiesTable.z].toDouble(),
+                    )
                     
-                    chunkMap.putAll(newChunkMap)
-                    tileEntityMap[chunk] = chunkMap
-                    newChunkMap.values.forEach { it.handleInitialized(false) }
+                    val tileEntity = TileEntity.create(
+                        uuid,
+                        location.clone().apply { center(); yaw = it[TileEntitiesTable.yaw] },
+                        data
+                    )
+                    
+                    val chunkMap = tileEntityMap.getOrPut(chunk) { HashMap() }
+                    chunkMap[location] = tileEntity
+                    
+                    locationCache += location
+                    
+                    tileEntity.handleInitialized(false)
                 }
-                
-            }
         }
     }
     

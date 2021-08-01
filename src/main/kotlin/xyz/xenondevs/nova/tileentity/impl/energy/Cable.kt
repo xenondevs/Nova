@@ -7,12 +7,12 @@ import org.bukkit.Axis
 import org.bukkit.Bukkit
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Orientable
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.hitbox.Hitbox
 import xyz.xenondevs.nova.item.impl.getFilterConfig
@@ -42,16 +42,12 @@ private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
 open class Cable(
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
-) : TileEntity(
-    ownerUUID,
-    material,
-    data,
-    armorStand,
-), EnergyBridge, ItemBridge {
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : TileEntity(uuid, data, material, ownerUUID, armorStand), EnergyBridge, ItemBridge {
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = retrieveData("bridgeFaces") { CUBE_FACES.toMutableSet() }
@@ -90,7 +86,7 @@ open class Cable(
         if (isValid) {
             if (NOVA.isEnabled) {
                 multiModel.replaceModels(getModelsNeeded())
-                armorStand.setHeadItemSilently(getCorrectCableModel())
+                updateHeadStack()
                 updateHitbox()
             }
         }
@@ -122,7 +118,7 @@ open class Cable(
             event.isCancelled = true
     }
     
-    private fun getCorrectCableModel(): ItemStack {
+    override fun getHeadStack(): ItemStack {
         val connectedFaces = connectedNodes.values.flatMapTo(HashSet()) { it.keys }
         
         val booleans = CUBE_FACES.map { connectedFaces.contains(it) }.reversed().toBooleanArray()
@@ -301,71 +297,81 @@ open class Cable(
 }
 
 class BasicCable(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     NovaConfig.getInt("cable.basic.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.basic.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class AdvancedCable(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     NovaConfig.getInt("cable.advanced.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.advanced.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class EliteCable(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     NovaConfig.getInt("cable.elite.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.elite.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class UltimateCable(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     NovaConfig.getInt("cable.ultimate.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.ultimate.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class CreativeCable(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     Int.MAX_VALUE,
     Int.MAX_VALUE,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )

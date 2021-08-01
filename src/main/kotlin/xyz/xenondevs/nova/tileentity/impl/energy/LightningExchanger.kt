@@ -7,12 +7,12 @@ import de.studiocode.invui.gui.builder.GUIType
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.ArmorStand
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.weather.LightningStrikeEvent
 import org.bukkit.event.weather.LightningStrikeEvent.Cause
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
@@ -34,11 +34,12 @@ private val MIN_BURST = NovaConfig.getInt("lightning_exchanger.burst.min")!!
 private val MAX_BURST = NovaConfig.getInt("lightning_exchanger.burst.max")!!
 
 class LightningExchanger(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     override val defaultEnergyConfig by lazy {
         CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))

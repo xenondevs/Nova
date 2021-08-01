@@ -6,7 +6,7 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.ArmorStand
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -27,11 +27,12 @@ private val MAX_ENERGY = NovaConfig.getInt("solar_panel.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("solar_panel.energy_per_tick")!!
 
 class SolarPanel(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     override val defaultEnergyConfig by lazy {
         CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))

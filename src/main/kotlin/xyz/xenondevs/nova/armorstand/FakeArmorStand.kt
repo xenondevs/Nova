@@ -6,13 +6,10 @@ import net.minecraft.network.protocol.game.*
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.util.*
-import java.util.*
-import kotlin.random.Random
 import net.minecraft.world.item.ItemStack as MItemStack
 import org.bukkit.inventory.ItemStack as BItemStack
 
@@ -21,14 +18,15 @@ import org.bukkit.inventory.ItemStack as BItemStack
  * as much and can also be used asynchronously.
  */
 class FakeArmorStand(
-    val uuid: UUID,
     location: Location,
+    autoRegister: Boolean = true,
     beforeSpawn: ((FakeArmorStand) -> Unit)? = null
 ) : ArmorStand(EntityType.ARMOR_STAND, location.world!!.serverLevel) {
     
+    private var registered = false
+    
     private var _location: Location = location.clone()
     private var chunk = location.chunk.pos
-    private val entityId = Random.nextInt()
     private val equipment = HashMap<EquipmentSlot, MItemStack>()
     
     private val viewers: List<Player>
@@ -40,7 +38,17 @@ class FakeArmorStand(
     init {
         EquipmentSlot.values().forEach { equipment[it] = MItemStack.EMPTY }
         beforeSpawn?.invoke(this)
+        if (autoRegister) register()
+    }
+    
+    /**
+     * Registers this [FakeArmorStand] in the [FakeArmorStandManager].
+     * @throws IllegalStateException If this [FakeArmorStand] is already registered.
+     */
+    fun register() {
+        if (registered) throw IllegalStateException("This FakeArmorStand is already registered")
         FakeArmorStandManager.addArmorStand(chunk, this)
+        registered = true
     }
     
     /**
@@ -48,6 +56,7 @@ class FakeArmorStand(
      * for all current viewers.
      */
     fun remove() {
+        registered = false
         FakeArmorStandManager.removeArmorStand(chunk, this)
     }
     
@@ -56,18 +65,9 @@ class FakeArmorStand(
      * Also sends entity data and equipment.
      */
     fun spawn(player: Player) {
-        // this isn't the right packet, but it's easier to create and still works
-        val entityPacket = ClientboundAddEntityPacket(
-            entityId, uuid,
-            _location.x, _location.y, _location.z,
-            _location.yaw, _location.pitch,
-            EntityType.ARMOR_STAND,
-            0, // object data, doesn't make sense for living entities
-            Vec3.ZERO // velocity
-        )
-        
-        val entityDataPacket = ClientboundSetEntityDataPacket(entityId, entityData, true)
-        val entityEquipmentPacket = ClientboundSetEquipmentPacket(entityId, equipment.map { (slot, stack) -> Pair(slot, stack) })
+        val entityPacket = NMSUtils.createAddMobPacket(id, uuid, EntityType.ARMOR_STAND, _location)
+        val entityDataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
+        val entityEquipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
         
         player.send(entityPacket, entityDataPacket, entityEquipmentPacket)
     }
@@ -76,8 +76,19 @@ class FakeArmorStand(
      * Despawns the [FakeArmorStand] for a specific [Player].
      */
     fun despawn(player: Player) {
-        val removePacket = ClientboundRemoveEntitiesPacket(entityId)
+        val removePacket = ClientboundRemoveEntitiesPacket(id)
         player.send(removePacket)
+    }
+    
+    /**
+     * Teleports the [FakeArmorStand] to a different location. (Different worlds aren't supported)
+     *
+     * This function automatically chooses which packet (Teleport / Pos / PosRot / Rot) to send.
+     */
+    fun teleport(modifyLocation: Location.() -> Unit) {
+        val location = location
+        modifyLocation(location)
+        teleport(location)
     }
     
     /**
@@ -96,11 +107,11 @@ class FakeArmorStand(
             // get the correct packet for this kind of movement
             if (_location.positionEquals(newLocation)) {
                 if (newLocation.yaw != bukkitYaw || newLocation.pitch != xRot) {
-                    packet = ClientboundMoveEntityPacket.Rot(entityId, newLocation.yaw.toPackedByte(), newLocation.pitch.toPackedByte(), true)
+                    packet = ClientboundMoveEntityPacket.Rot(id, newLocation.yaw.toPackedByte(), newLocation.pitch.toPackedByte(), true)
                     _location = newLocation.clone() // position won't be changed, exact rotation is not necessary
                 }
             } else if (_location.distance(newLocation) > 8) {
-                packet = ClientboundTeleportEntityPacket(this)
+                packet = NMSUtils.createTeleportPacket(id, newLocation)
                 _location = newLocation.clone() // exact position will be displayed to user
             } else {
                 val deltaX = (newLocation.x - _location.x).toFixedPoint()
@@ -116,9 +127,9 @@ class FakeArmorStand(
                     _location.yaw = newLocation.yaw
                     _location.pitch = newLocation.pitch
                     
-                    packet = ClientboundMoveEntityPacket.PosRot(entityId, deltaX, deltaY, deltaZ, newLocation.yaw.toPackedByte(), newLocation.pitch.toPackedByte(), true)
+                    packet = ClientboundMoveEntityPacket.PosRot(id, deltaX, deltaY, deltaZ, newLocation.yaw.toPackedByte(), newLocation.pitch.toPackedByte(), true)
                 } else {
-                    packet = ClientboundMoveEntityPacket.Pos(entityId, deltaX, deltaY, deltaZ, true)
+                    packet = ClientboundMoveEntityPacket.Pos(id, deltaX, deltaY, deltaZ, true)
                 }
             }
             
@@ -138,7 +149,7 @@ class FakeArmorStand(
      * Sends a teleport packet to the current position.
      */
     fun syncPosition() {
-        val teleportPacket = ClientboundTeleportEntityPacket(this)
+        val teleportPacket = NMSUtils.createTeleportPacket(id, _location)
         viewers.forEach { it.send(teleportPacket) }
     }
     
@@ -146,7 +157,7 @@ class FakeArmorStand(
      * Sends a packet updating the equipment to all viewers.
      */
     fun updateEquipment() {
-        val entityEquipmentPacket = ClientboundSetEquipmentPacket(entityId, equipment.map { (slot, stack) -> Pair(slot, stack) })
+        val entityEquipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
         viewers.forEach { it.send(entityEquipmentPacket) }
     }
     
@@ -154,7 +165,7 @@ class FakeArmorStand(
      * Sends a packet updating the entity data to all viewers.
      */
     fun updateEntityData() {
-        val entityDataPacket = ClientboundSetEntityDataPacket(entityId, entityData, true)
+        val entityDataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
         viewers.forEach { it.send(entityDataPacket) }
     }
     

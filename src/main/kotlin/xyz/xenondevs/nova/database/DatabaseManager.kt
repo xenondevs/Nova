@@ -5,7 +5,6 @@ import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.database.table.ModelsTable
 import xyz.xenondevs.nova.database.table.TileEntitiesTable
@@ -26,6 +25,10 @@ object DatabaseManager {
             
             connectMySql(address, port, username, password, databaseName)
         } else connectSqlite()
+    }
+    
+    fun disconnect() {
+        dataSource.close()
     }
     
     private fun connectMySql(address: String, port: Int, username: String, password: String, databaseName: String) {
@@ -53,8 +56,6 @@ object DatabaseManager {
         
         dataSource = HikariDataSource(config)
         database = Database.connect(dataSource)
-        
-        NOVA.disableHandlers += { dataSource.close() }
         
         transaction { SchemaUtils.create(TileEntitiesTable, ModelsTable) }
     }

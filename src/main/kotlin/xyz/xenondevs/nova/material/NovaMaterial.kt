@@ -4,9 +4,9 @@ import com.google.gson.JsonObject
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Material.*
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.impl.BottledMobItem
@@ -53,14 +53,14 @@ enum class NovaMaterial(
     createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> NovaItemBuilder)? = null,
     val block: ModelData? = null,
     val hitbox: Material? = null,
-    val createTileEntity: ((UUID?, NovaMaterial, JsonObject, ArmorStand) -> TileEntity)? = null,
+    val createTileEntity: ((UUID, JsonObject, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)? = null,
     val canPlace: ((Player, Location) -> Boolean)? = null,
     val isDirectional: Boolean = true,
     val legacyItemIds: IntArray? = null,
 ) {
     
     // 1 - 1000: Blocks
-    FURNACE_GENERATOR(itemName = "block.nova.furnace_generator", item = blockOf(1), createItemBuilderFunction = EnergyTileEntity::createItemBuilder, block = blockOf(1), hitbox = COBBLESTONE, createTileEntity = ::FurnaceGenerator),
+    FURNACE_GENERATOR("block.nova.furnace_generator", blockOf(1), null, EnergyTileEntity::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
     MECHANICAL_PRESS("block.nova.mechanical_press", blockOf(2), null, EnergyTileEntity::createItemBuilder, blockOf(2), COBBLESTONE, ::MechanicalPress),
     BASIC_POWER_CELL("block.nova.basic_power_cell", blockOf(3), null, EnergyTileEntity::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
     ADVANCED_POWER_CELL("block.nova.advanced_power_cell", blockOf(4), null, EnergyTileEntity::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
@@ -132,7 +132,7 @@ enum class NovaMaterial(
     ULTIMATE_CABLE("block.nova.ultimate_cable", structureBlockOf(5295), null, null, structureBlockOf((5296..5359).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::UltimateCable, isDirectional = false, legacyItemIds = intArrayOf(5019)),
     CREATIVE_CABLE("block.nova.creative_cable", structureBlockOf(5360), null, null, structureBlockOf((5361..5424).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024)),
     SCAFFOLDING("item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray()), null, null),
-    WIND_TURBINE("block.nova.wind_turbine", blockOf(5050), null, EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace),
+    WIND_TURBINE("block.nova.wind_turbine", blockOf(5050), null, EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, null, null),
     
     // 9.000 - 10.000 UI Elements
     GRAY_BUTTON("", itemOf(9001)),
@@ -202,7 +202,7 @@ enum class NovaMaterial(
      * Creates an [ItemBuilder][NovaItemBuilder] for this [NovaMaterial].
      *
      * The [TileEntity] provided must be of the same type as the [TileEntity]
-     * returned in the [createTileEntity] function.
+     * returned by the [createTileEntity] function.
      *
      * If there is no custom [createItemBuilderFunction] for this [NovaMaterial],
      * it will return the result of [createBasicItemBuilder].

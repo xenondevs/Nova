@@ -11,7 +11,6 @@ import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.util.runAsyncTask
-import java.util.*
 
 val Chunk.pos: AsyncChunkPos
     get() = AsyncChunkPos(world.uid, x, z)
@@ -29,6 +28,15 @@ object FakeArmorStandManager : Listener {
         
         Bukkit.getOnlinePlayers().forEach { player ->
             handleChunksChange(player, player.location.chunk)
+        }
+        
+        NOVA.disableHandlers += {
+            synchronized(FakeArmorStandManager) {
+                chunkArmorStands.forEach { (chunk, armorStands) ->
+                    val viewers = chunkViewers[chunk] ?: return@forEach
+                    armorStands.forEach { armorStand -> viewers.forEach { viewer -> armorStand.despawn(viewer) } }
+                }
+            }
         }
     }
     

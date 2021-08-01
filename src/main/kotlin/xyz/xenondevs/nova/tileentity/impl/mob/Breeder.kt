@@ -7,8 +7,8 @@ import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.entity.Animals
-import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -39,33 +39,34 @@ private val IDLE_TIME = NovaConfig.getInt("breeder.idle_time")!!
 private val BREED_LIMIT = NovaConfig.getInt("breeder.breed_limit")!!
 
 class Breeder(
-    ownerUUID: UUID?,
-    material: NovaMaterial,
+    uuid: UUID,
     data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
-    
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
+
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     override val gui by lazy { MobCrusherGUI() }
     override val requestedEnergy: Int
         get() = MAX_ENERGY - energy
-    
+
     private var idleTime = IDLE_TIME
     private val region = getFrontArea(7.0, 7.0, 4.0, -1.0)
-    
+
     private val inventory = getInventory("inventory", 9, true, ::handleInventoryUpdate)
-    
+
     init {
         setDefaultInventory(inventory)
     }
-    
+
     override fun handleTick() {
         if (energy >= ENERGY_PER_TICK) {
             energy -= ENERGY_PER_TICK
-            
+
             if (--idleTime == 0) {
                 idleTime = IDLE_TIME
-                
+
                 val breedableEntities =
                     location
                         .chunk
@@ -73,12 +74,12 @@ class Breeder(
                         .flatMap { it.entities.asList() }
                         .filterIsInstance<Animals>()
                         .filter { it.canBredNow && it.location in region }
-                
+
                 var breedsLeft = min(energy / ENERGY_PER_BREED, BREED_LIMIT)
                 for (animal in breedableEntities) {
                     val success = if (FoodUtils.requiresHealing(animal)) tryHeal(animal)
                     else tryBreed(animal)
-                    
+
                     if (success) {
                         breedsLeft--
                         energy -= ENERGY_PER_BREED
@@ -87,72 +88,72 @@ class Breeder(
                 }
             }
         }
-        
+
         gui.idleBar.percentage = (IDLE_TIME - idleTime) / IDLE_TIME.toDouble()
-        
+
         if (hasEnergyChanged) {
             hasEnergyChanged = false
             gui.energyBar.update()
         }
     }
-    
+
     private fun tryHeal(animal: Animals): Boolean {
         for ((index, item) in inventory.items.withIndex()) {
             if (item == null) continue
-            
+
             val healAmount = FoodUtils.getHealAmount(animal, item.type)
             if (healAmount > 0) {
                 animal.health = min(animal.health + healAmount, animal.genericMaxHealth)
                 inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
-                
+
                 val remains = FoodUtils.getItemRemains(item.type)
                 if (remains != null)
                     inventory.setItemStack(SELF_UPDATE_REASON, index, ItemStack(remains))
-                
+
                 return true
             }
         }
-        
+
         return false
     }
-    
+
     private fun tryBreed(animal: Animals): Boolean {
         for ((index, item) in inventory.items.withIndex()) {
             if (item == null) continue
-            
+
             if (FoodUtils.canUseBreedFood(animal, item.type)) {
                 animal.loveModeTicks = 600
                 inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
-                
+
                 val remains = FoodUtils.getItemRemains(item.type)
                 if (remains != null)
                     inventory.setItemStack(SELF_UPDATE_REASON, index, ItemStack(remains))
-                
+
                 return true
             }
         }
-        
+
         return false
     }
-    
+
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
         if (event.updateReason != SELF_UPDATE_REASON && !event.isRemove && !FoodUtils.isFood(event.newItemStack.type))
             event.isCancelled = true
     }
-    
+
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
         VisualRegion.removeRegion(uuid)
     }
-    
+
     inner class MobCrusherGUI : TileEntityGUI("menu.nova.breeder") {
-        
+
         private val sideConfigGUI = SideConfigGUI(
             this@Breeder,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
-        
+
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
@@ -165,16 +166,16 @@ class Breeder(
             .addIngredient('u', UpgradesTeaserItem)
             .build()
             .also { it.fillRectangle(3, 1, 3, inventory, true) }
-        
+
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
-        
+
         val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
-            
+
             override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
                 itemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.breeder.idle", idleTime))
-            
+
         }
-        
+
     }
-    
+
 }
