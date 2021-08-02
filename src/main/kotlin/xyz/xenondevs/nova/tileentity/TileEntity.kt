@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.region.Region
+import xyz.xenondevs.nova.upgrade.Upgradeable
 import xyz.xenondevs.nova.util.*
 import java.util.*
 
@@ -73,6 +74,8 @@ abstract class TileEntity(
             saveData()
             val item = material.createItemBuilder(this).build()
             if (globalData.entrySet().isNotEmpty()) item.setTileEntityData(globalData)
+            if (this is Upgradeable)
+                drops += this.upgradeHolder.dropUpgrades()
             drops += item
         }
         
@@ -129,7 +132,8 @@ abstract class TileEntity(
     open fun handleRemoved(unload: Boolean) {
         isValid = false
         gui?.closeWindows()
-        
+        if(this is Upgradeable)
+            upgradeHolder.gui.closeForAllViewers()
         if (unload) saveDataToArmorStand()
     }
     

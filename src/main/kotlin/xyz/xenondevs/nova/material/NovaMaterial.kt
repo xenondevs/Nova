@@ -120,6 +120,9 @@ enum class NovaMaterial(
     // 2000 - 3000: Upgrades and similar
     WRENCH("item.nova.wrench", itemOf(2000)),
     ITEM_FILTER("item.nova.item_filter", itemOf(2001), FilterItem),
+    SPEED_UPGRADE("item.nova.speed_upgrade", itemOf(2002)),
+    EFFICIENCY_UPGRADE("item.nova.efficiency_upgrade", itemOf(2003)),
+    ENERGY_UPGRADE("item.nova.energy_upgrade", itemOf(2004)),
     
     // 3000 - 4000: Equipment, Attachments
     JETPACK("item.nova.jetpack", ModelData(IRON_CHESTPLATE, intArrayOf(3000)), JetpackItem),
