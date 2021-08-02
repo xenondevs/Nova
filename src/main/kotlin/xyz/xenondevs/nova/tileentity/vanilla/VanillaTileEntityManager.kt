@@ -17,20 +17,19 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.SERVER_SOFTWARE
 import xyz.xenondevs.nova.util.chunkPos
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.runTaskTimer
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.*
 
 /**
  * Manages wrappers for vanilla TileEntities
  */
 object VanillaTileEntityManager : Listener {
     
-    private val tileEntityMap: MutableMap<Chunk, MutableMap<Location, VanillaTileEntity>> = SERVER_SOFTWARE.getCorrectMap()
-    private val locationCache: MutableMap<Location, VanillaTileEntity> = SERVER_SOFTWARE.getCorrectMap()
-    private val tileEntityQueue = ConcurrentLinkedQueue<VanillaTileEntity>()
+    private val tileEntityMap = HashMap<Chunk, HashMap<Location, VanillaTileEntity>>()
+    private val locationCache = HashMap<Location, VanillaTileEntity>()
+    private val tileEntityQueue = LinkedList<VanillaTileEntity>()
     
     fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
@@ -84,7 +83,7 @@ object VanillaTileEntityManager : Listener {
     
     @Synchronized
     private fun handleChunkLoad(chunk: Chunk) {
-        val chunkMap = SERVER_SOFTWARE.getCorrectMap<Location, VanillaTileEntity>()
+        val chunkMap = HashMap<Location, VanillaTileEntity>()
         chunk.tileEntities.forEach { state ->
             val tileEntity = createVanillaTileEntity(state)
             if (tileEntity != null) {
