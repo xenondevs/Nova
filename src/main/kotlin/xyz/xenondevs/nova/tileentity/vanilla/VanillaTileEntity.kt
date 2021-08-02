@@ -34,7 +34,8 @@ private val EMPTY_INVENTORIES_MAP = CUBE_FACES.associateWithTo(emptyEnumMap()) {
 
 abstract class VanillaTileEntity(tileState: TileState) {
     
-    protected val block = tileState.block
+    val block = tileState.block
+    val type = block.type
     protected val dataObject: JsonObject = if (tileState.hasTileEntityData()) tileState.getTileEntityData() else JsonObject()
     
     abstract fun handleRemoved(unload: Boolean)
