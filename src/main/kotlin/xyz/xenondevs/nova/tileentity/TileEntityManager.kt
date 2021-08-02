@@ -20,8 +20,8 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.database.asyncTransaction
 import xyz.xenondevs.nova.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
@@ -94,7 +94,6 @@ object TileEntityManager : Listener {
         material: NovaMaterial,
         data: JsonObject?
     ) {
-        
         val block = location.block
         val chunk = location.chunk
         
@@ -113,22 +112,6 @@ object TileEntityManager : Listener {
             material,
         )
         
-        // TODO: async
-        // write to database
-        transaction {
-            TileEntitiesTable.insert {
-                it[this.uuid] = uuid
-                it[world] = location.world!!.uid
-                it[chunkX] = chunk.x
-                it[chunkZ] = chunk.z
-                it[x] = location.blockX
-                it[y] = location.blockY
-                it[z] = location.blockZ
-                it[this.yaw] = spawnLocation.yaw
-                it[this.data] = "{}"
-            }
-        }
-        
         // add to tileEntities map
         val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>().also { tileEntityMap[chunk] = it }
         chunkMap[location] = tileEntity
@@ -144,8 +127,21 @@ object TileEntityManager : Listener {
             material.hitbox?.run { block.type = this }
             // handle finished initializing
             tileEntity.handleInitialized(true)
-            // save its data and write it to the database
-            tileEntity.saveAndWriteData()
+            // save the tile entity to the database
+            asyncTransaction {
+                tileEntity.saveData()
+                TileEntitiesTable.insert {
+                    it[this.uuid] = uuid
+                    it[world] = location.world!!.uid
+                    it[chunkX] = chunk.x
+                    it[chunkZ] = chunk.z
+                    it[x] = location.blockX
+                    it[y] = location.blockY
+                    it[z] = location.blockZ
+                    it[this.yaw] = spawnLocation.yaw
+                    it[this.data] = tileEntity.getDataJson()
+                }
+            }
         }
     }
     
@@ -163,8 +159,7 @@ object TileEntityManager : Listener {
         tileEntity.armorStand.remove()
         
         // remove it from the database
-        // TODO: async
-        transaction {
+        asyncTransaction {
             TileEntitiesTable.deleteWhere { TileEntitiesTable.uuid eq tileEntity.uuid }
         }
         
@@ -201,8 +196,7 @@ object TileEntityManager : Listener {
     }
     
     private fun handleChunkLoad(chunk: Chunk) {
-        // TODO: async
-        transaction {
+        asyncTransaction {
             TileEntitiesTable
                 .select { (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
                 .forEach {
@@ -216,18 +210,21 @@ object TileEntityManager : Listener {
                         it[TileEntitiesTable.z].toDouble(),
                     )
                     
-                    val tileEntity = TileEntity.create(
-                        uuid,
-                        location.clone().apply { center(); yaw = it[TileEntitiesTable.yaw] },
-                        data
-                    )
-                    
-                    val chunkMap = tileEntityMap.getOrPut(chunk) { HashMap() }
-                    chunkMap[location] = tileEntity
-                    
-                    locationCache += location
-                    
-                    tileEntity.handleInitialized(false)
+                    // create the tile entity in the main thread
+                    runTask {
+                        val tileEntity = TileEntity.create(
+                            uuid,
+                            location.clone().apply { center(); yaw = it[TileEntitiesTable.yaw] },
+                            data
+                        )
+                        
+                        val chunkMap = tileEntityMap.getOrPut(chunk) { HashMap() }
+                        chunkMap[location] = tileEntity
+                        
+                        locationCache += location
+                        
+                        tileEntity.handleInitialized(false)
+                    }
                 }
         }
     }

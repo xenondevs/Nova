@@ -15,9 +15,12 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.database.asyncTransaction
 import xyz.xenondevs.nova.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -99,12 +102,21 @@ abstract class TileEntity(
     fun saveAndWriteData() {
         saveData()
         
-        // TODO: async?
-        transaction {
+        val statement: Transaction.() -> Unit = {
             TileEntitiesTable.update({ TileEntitiesTable.uuid eq uuid }) {
-                it[data] = GSON.toJson(this@TileEntity.data)
+                it[data] = getDataJson()
             }
         }
+        
+        if (NOVA.isEnabled) asyncTransaction(statement)
+        else transaction(statement = statement)
+    }
+    
+    /**
+     * Serializes the [data] object to a JSON string.
+     */
+    fun getDataJson(): String {
+        return GSON.toJson(this@TileEntity.data)
     }
     
     /**
