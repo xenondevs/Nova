@@ -30,7 +30,7 @@ class FakeArmorStand(
     
     private var registered = false
     private var _location: Location = location.clone()
-    private var chunk = location.chunk.pos
+    private var chunk = location.chunkPos
     private val equipment = HashMap<EquipmentSlot, MItemStack>()
     
     private val viewers: List<Player>
@@ -142,7 +142,7 @@ class FakeArmorStand(
         }
         
         val previousChunk = chunk
-        val newChunk = _location.chunk.pos
+        val newChunk = _location.chunkPos
         chunk = newChunk
         
         if (previousChunk != newChunk) FakeArmorStandManager.changeArmorStandChunk(this, previousChunk, newChunk)
