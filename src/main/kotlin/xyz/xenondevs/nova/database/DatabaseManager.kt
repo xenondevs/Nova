@@ -6,7 +6,6 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.database.table.ModelsTable
 import xyz.xenondevs.nova.database.table.TileEntitiesTable
 import java.io.File
 
@@ -57,7 +56,7 @@ object DatabaseManager {
         dataSource = HikariDataSource(config)
         database = Database.connect(dataSource)
         
-        transaction { SchemaUtils.create(TileEntitiesTable, ModelsTable) }
+        transaction { SchemaUtils.create(TileEntitiesTable) }
     }
     
 }
