@@ -2,7 +2,7 @@
   "result": "nova:block_breaker",
   "shape": [
     "ipi",
-    "igi",
+    "ifi",
     "iii"
   ],
   "ingredients": [
@@ -15,8 +15,8 @@
       "item": "nova:iron_plate"
     },
     {
-      "char": "g",
-      "item": "nova:redstone_gear"
+      "char": "f",
+      "item": "nova:advanced_machine_frame"
     }
   ]
 }

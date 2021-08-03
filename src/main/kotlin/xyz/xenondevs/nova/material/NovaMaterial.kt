@@ -88,6 +88,7 @@ enum class NovaMaterial(
     LIGHTNING_EXCHANGER("block.nova.lightning_exchanger", blockOf(26), null, EnergyTileEntity::createItemBuilder, blockOf(26), BARRIER, ::LightningExchanger),
     
     // 1000 - 2000: Crafting Items
+    // Plates
     IRON_PLATE("item.nova.iron_plate", itemOf(1000)),
     GOLD_PLATE("item.nova.gold_plate", itemOf(1001)),
     DIAMOND_PLATE("item.nova.diamond_plate", itemOf(1002)),
@@ -96,6 +97,8 @@ enum class NovaMaterial(
     REDSTONE_PLATE("item.nova.redstone_plate", itemOf(1005)),
     LAPIS_PLATE("item.nova.lapis_plate", itemOf(1006)),
     COPPER_PLATE("item.nova.copper_plate", itemOf(1007)),
+    
+    // Gears
     IRON_GEAR("item.nova.iron_gear", itemOf(1010)),
     GOLD_GEAR("item.nova.gold_gear", itemOf(1011)),
     DIAMOND_GEAR("item.nova.diamond_gear", itemOf(1012)),
@@ -104,6 +107,8 @@ enum class NovaMaterial(
     REDSTONE_GEAR("item.nova.redstone_gear", itemOf(1015)),
     LAPIS_GEAR("item.nova.lapis_gear", itemOf(1016)),
     COPPER_GEAR("item.nova.copper_gear", itemOf(1017)),
+    
+    // Dust
     IRON_DUST("item.nova.iron_dust", itemOf(1020)),
     GOLD_DUST("item.nova.gold_dust", itemOf(1021)),
     DIAMOND_DUST("item.nova.diamond_dust", itemOf(1022)),
@@ -112,10 +117,18 @@ enum class NovaMaterial(
     LAPIS_DUST("item.nova.lapis_dust", itemOf(1025)),
     COAL_DUST("item.nova.coal_dust", itemOf(1026)),
     COPPER_DUST("item.nova.copper_dust", itemOf(1027)),
+    STAR_DUST("item.nova.star_dust", itemOf(1028)),
     
+    // Other
     NETHERITE_DRILL("item.nova.netherite_drill", itemOf(1030)),
     SOLAR_CELL("item.nova.solar_cell", itemOf(1031)),
     BOTTLED_MOB("item.nova.bottled_mob", itemOf(1032), BottledMobItem),
+    STAR_SHARDS("item.nova.star_shards", itemOf(1033)),
+    BASIC_MACHINE_FRAME("block.nova.basic_machine_frame", itemOf(1034)),
+    ADVANCED_MACHINE_FRAME("block.nova.advanced_machine_frame", itemOf(1035)),
+    ELITE_MACHINE_FRAME("block.nova.elite_machine_frame", itemOf(1036)),
+    ULTIMATE_MACHINE_FRAME("block.nova.ultimate_machine_frame", itemOf(1037)),
+    CREATIVE_MACHINE_FRAME("block.nova.creative_machine_frame", itemOf(1038)),
     
     // 2000 - 3000: Upgrades and similar
     WRENCH("item.nova.wrench", itemOf(2000)),

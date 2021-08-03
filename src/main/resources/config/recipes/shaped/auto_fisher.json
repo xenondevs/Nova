@@ -1,8 +1,8 @@
 {
   "result": "nova:auto_fisher",
   "shape": [
-    "igi",
-    "src",
+    "iri",
+    "sfc",
     "iti"
   ],
   "ingredients": [
@@ -11,8 +11,8 @@
       "item": "nova:iron_plate"
     },
     {
-      "char": "g",
-      "item": "nova:diamond_gear"
+      "char": "f",
+      "item": "nova:elite_machine_frame"
     },
     {
       "char": "s",

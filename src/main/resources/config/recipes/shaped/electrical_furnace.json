@@ -1,8 +1,8 @@
 {
   "result": "nova:electrical_furnace",
   "shape": [
-    "ipi",
-    "gfg",
+    "ifi",
+    "gmg",
     "iii"
   ],
   "ingredients": [
@@ -19,8 +19,8 @@
       "item": "minecraft:furnace"
     },
     {
-      "char": "p",
-      "item": "nova:gold_plate"
+      "char": "m",
+      "item": "nova:basic_machine_frame"
     }
   ]
 }

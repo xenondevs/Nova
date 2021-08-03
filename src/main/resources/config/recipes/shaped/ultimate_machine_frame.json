@@ -1,0 +1,22 @@
+{
+  "result": "nova:ultimate_machine_frame",
+  "shape": [
+    "gdg",
+    "dmd",
+    "gdg"
+  ],
+  "ingredients": [
+    {
+      "char": "g",
+      "item": "minecraft:diamond"
+    },
+    {
+      "char": "d",
+      "item": "nova:star_dust"
+    },
+    {
+      "char": "m",
+      "item": "nova:elite_machine_frame"
+    }
+  ]
+}

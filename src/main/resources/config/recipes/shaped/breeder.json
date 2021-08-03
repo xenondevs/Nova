@@ -2,7 +2,7 @@
   "result": "nova:breeder",
   "shape": [
     "ipi",
-    "cgs",
+    "cfs",
     "iii"
   ],
   "ingredients": [
@@ -23,8 +23,8 @@
       "item": "minecraft:wheat_seeds"
     },
     {
-      "char": "g",
-      "item": "nova:copper_gear"
+      "char": "f",
+      "item": "nova:elite_machine_frame"
     }
   ]
 }

@@ -2,7 +2,7 @@
   "result": "nova:planter",
   "shape": [
     "isi",
-    "wdf",
+    "wmf",
     "ihi"
   ],
   "ingredients": [
@@ -19,8 +19,8 @@
       "item": "minecraft:wheat_seeds"
     },
     {
-      "char": "d",
-      "item": "nova:diamond_gear"
+      "char": "m",
+      "item": "nova:elite_machine_frame"
     },
     {
       "char": "f",

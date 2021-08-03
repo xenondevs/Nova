@@ -2,8 +2,8 @@
   "result": "nova:mob_duplicator",
   "shape": [
     "nEn",
-    "esg",
-    "ndn"
+    "dfe",
+    "nsn"
   ],
   "ingredients": [
     {
@@ -27,8 +27,8 @@
       "item": "minecraft:nether_star"
     },
     {
-      "char": "g",
-      "item": "nova:gold_gear"
+      "char": "f",
+      "item": "nova:ultimate_machine_frame"
     }
   ]
 }

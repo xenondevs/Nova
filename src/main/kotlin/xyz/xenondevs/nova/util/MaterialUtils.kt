@@ -26,6 +26,7 @@ fun Material.isBreakable() = blastResistance < 3600000.0f
 val Material.breakSpeed: Double
     get() = 1.0 / hardness.absoluteValue
 
+// TODO: optimize
 val ItemStack.novaMaterial: NovaMaterial?
     get() {
         val customModelData = customModelData

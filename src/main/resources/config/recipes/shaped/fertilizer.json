@@ -1,9 +1,9 @@
 {
   "result": "nova:fertilizer",
   "shape": [
-    "imi",
-    "gbg",
-    "idi"
+    "gmg",
+    "dfd",
+    "ibi"
   ],
   "ingredients": [
     {
@@ -25,6 +25,10 @@
     {
       "char": "d",
       "item": "nova:diamond_gear"
+    },
+    {
+      "char": "f",
+      "item": "nova:elite_machine_frame"
     }
   ]
 }

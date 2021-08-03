@@ -3,7 +3,7 @@
   "shape": [
     "pcp",
     "cbc",
-    "pcp"
+    "pfp"
   ],
   "ingredients": [
     {
@@ -17,6 +17,10 @@
     {
       "char": "b",
       "item": "nova:advanced_power_cell"
+    },
+    {
+      "char": "f",
+      "item": "nova:elite_machine_frame"
     }
   ]
 }

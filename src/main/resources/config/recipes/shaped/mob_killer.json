@@ -2,7 +2,7 @@
   "result": "nova:mob_killer",
   "shape": [
     "isi",
-    "sgs",
+    "sfs",
     "iii"
   ],
   "ingredients": [
@@ -15,8 +15,8 @@
       "item": "nova:iron_plate"
     },
     {
-      "char": "g",
-      "item": "nova:iron_gear"
+      "char": "f",
+      "item": "nova:elite_machine_frame"
     }
   ]
 }

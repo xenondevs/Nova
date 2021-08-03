@@ -1,0 +1,22 @@
+{
+  "result": "nova:basic_machine_frame",
+  "shape": [
+    "idi",
+    "drd",
+    "idi"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "r",
+      "item": "minecraft:redstone_block"
+    },
+    {
+      "char": "d",
+      "item": "nova:star_dust"
+    }
+  ]
+}

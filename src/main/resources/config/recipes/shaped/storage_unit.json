@@ -1,8 +1,8 @@
 {
   "result": "nova:storage_unit",
   "shape": [
-    "pcp",
-    "cec",
+    "pep",
+    "cfc",
     "pcp"
   ],
   "ingredients": [
@@ -17,6 +17,10 @@
     {
       "char": "p",
       "item": "nova:iron_plate"
+    },
+    {
+      "char": "f",
+      "item": "nova:ultimate_machine_frame"
     }
   ]
 }
