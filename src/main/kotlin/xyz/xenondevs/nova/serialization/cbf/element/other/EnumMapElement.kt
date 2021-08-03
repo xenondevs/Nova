@@ -10,17 +10,18 @@ import xyz.xenondevs.nova.util.writeString
 import java.util.*
 import kotlin.reflect.KClass
 
-class EnumMapElement() : Element {
+fun EnumMap<*, *>.toElement(valueClass: KClass<*>): EnumMapElement {
+    val element = EnumMapElement()
+    this.forEach { (constant, value) ->
+        element.put(constant.name, BackedElement.createElement(if (value is Enum<*>) String::class else valueClass, value))
+    }
+    return element
+}
+
+class EnumMapElement : Element {
     val map = HashMap<String, BackedElement<*>>()
     
-    @Suppress("UNCHECKED_CAST")
-    constructor(map: EnumMap<*, *>, valueClass: KClass<*>) : this() {
-        map.forEach { (constant, value) ->
-            put(constant.name, BackedElement.createElement(if (value is Enum<*>) String::class else valueClass, value))
-        }
-    }
-    
-    override fun getTypeId() = 19.toByte()
+    override fun getTypeId() = 20.toByte()
     
     override fun write(buf: ByteBuf) {
         buf.writeShort(map.size)
