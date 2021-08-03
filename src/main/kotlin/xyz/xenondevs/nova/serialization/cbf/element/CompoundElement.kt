@@ -38,6 +38,8 @@ class CompoundElement : Element {
         return (getElement(key) as BackedElement<T>).value
     }
     
+    inline fun <reified T : Enum<T>> getEnum(key: String) = enumValueOf<T>(key)
+    
     override fun toString(): String {
         val builder = StringBuilder("{\n")
         elements.forEach { (key, value) ->

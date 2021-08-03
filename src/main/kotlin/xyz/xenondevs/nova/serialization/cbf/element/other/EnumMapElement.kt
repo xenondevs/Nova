@@ -36,20 +36,15 @@ class EnumMapElement : Element {
     
     @Suppress("UNCHECKED_CAST")
     inline fun <reified K : Enum<K>, V> toEnumMap(): EnumMap<K, V> {
-        val enumClass = K::class.java
-        val method = enumClass.getMethod("valueOf", String::class.java)
-        val enumMap = EnumMap<K, V>(enumClass)
-        map.forEach { (k, v) -> enumMap[method.invoke(null, k) as K] = v.value as V }
+        val enumMap = EnumMap<K, V>(K::class.java)
+        map.forEach { (k, v) -> enumMap[enumValueOf(k)] = v.value as V }
         return enumMap
     }
     
     inline fun <reified K : Enum<K>, reified V : Enum<V>> toDoubleEnumMap(): EnumMap<K, V> {
         val keyEnumClass = K::class.java
-        val valueEnumClass = V::class.java
-        val keyMethod = keyEnumClass.getMethod("valueOf", String::class.java)
-        val valueMethod = valueEnumClass.getMethod("valueOf", String::class.java)
         val enumMap = EnumMap<K, V>(keyEnumClass)
-        map.forEach { (k, v) -> enumMap[keyMethod.invoke(null, k) as K] = valueMethod.invoke(null, v) as V }
+        map.forEach { (k, v) -> enumMap[enumValueOf(k)] = enumValueOf(v.value as String) }
         return enumMap
     }
     
