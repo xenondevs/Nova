@@ -61,6 +61,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>de.studiocode.invui</groupId>
             <artifactId>InvUI</artifactId>
             <version>0.1-SNAPSHOT</version>
@@ -270,10 +276,10 @@
                                 </includes>
                             </artifactSet>
                             <relocations>
-                                <relocation>
-                                    <pattern>kotlin</pattern>
-                                    <shadedPattern>${shadePath}.kotlin</shadedPattern>
-                                </relocation>
+<!--                                <relocation>-->
+<!--                                    <pattern>kotlin</pattern>-->
+<!--                                    <shadedPattern>${shadePath}.kotlin</shadedPattern>-->
+<!--                                </relocation>-->
                                 <relocation>
                                     <pattern>org.intellij.lang.annotations</pattern>
                                     <shadedPattern>${shadePath}.org.intellij.lang.annotations</shadedPattern>
