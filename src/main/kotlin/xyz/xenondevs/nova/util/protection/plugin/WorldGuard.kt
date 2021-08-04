@@ -65,7 +65,7 @@ object WorldGuard : ProtectionPlugin {
             return if (hasRegion(world, vector)) {
                 val wrappedLocation = BukkitAdapter.adapt(location)
                 val query = PLATFORM.regionContainer.createQuery()
-                query.testState(wrappedLocation, localPlayer, *flags)
+                query.testBuild(wrappedLocation, localPlayer, *flags)
             } else true
         } else true
     }
