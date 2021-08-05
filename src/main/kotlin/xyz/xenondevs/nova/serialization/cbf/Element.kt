@@ -1,10 +1,15 @@
 package xyz.xenondevs.nova.serialization.cbf
 
 import io.netty.buffer.ByteBuf
+import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.serialization.cbf.element.other.ItemStackElement
+import xyz.xenondevs.nova.serialization.cbf.element.other.LocationElement
+import xyz.xenondevs.nova.serialization.cbf.element.other.NamespacedKeyElement
 import xyz.xenondevs.nova.serialization.cbf.element.other.UUIDElement
 import xyz.xenondevs.nova.serialization.cbf.element.primitive.*
+import xyz.xenondevs.nova.util.ReflectionRegistry.CB_CRAFT_ITEM_STACK_CLASS
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -39,12 +44,18 @@ interface BackedElement<T> : Element {
             DoubleArray::class to ::DoubleArrayElement,
             Array<String>::class to ::StringArrayElement,
             UUID::class to ::UUIDElement,
-            ItemStack::class to ::ItemStackElement
+            ItemStack::class to ::ItemStackElement,
+            CB_CRAFT_ITEM_STACK_CLASS.kotlin to ::ItemStackElement,
+            Location::class to ::LocationElement,
+            NamespacedKey::class to ::NamespacedKeyElement
         )
         
         @Suppress("UNCHECKED_CAST")
         inline fun <reified T : Any> createElement(value: T): BackedElement<T> {
-            return createElement(T::class, value)
+            if (value is Enum<*>) {
+                return StringElement(value.name) as BackedElement<T>
+            }
+            return TYPE_TO_ELEMENT[value::class]!!.call(value) as BackedElement<T>
         }
         
         @Suppress("UNCHECKED_CAST")
