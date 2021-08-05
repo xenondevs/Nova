@@ -3,12 +3,13 @@ package xyz.xenondevs.nova.serialization.cbf
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.serialization.cbf.element.CompoundDeserializer
 import xyz.xenondevs.nova.serialization.cbf.element.EmptyDeserializer
-import xyz.xenondevs.nova.serialization.cbf.element.other.EnumMapDeserializer
-import xyz.xenondevs.nova.serialization.cbf.element.other.ItemStackDeserializer
-import xyz.xenondevs.nova.serialization.cbf.element.other.UUIDDeserializer
+import xyz.xenondevs.nova.serialization.cbf.element.other.*
 import xyz.xenondevs.nova.serialization.cbf.element.primitive.*
+import xyz.xenondevs.nova.util.toByteBuf
 
 interface BinaryDeserializer<T : Element> {
+    
+    fun read(bytes: ByteArray) = read(bytes.toByteBuf())
     
     fun read(buf: ByteBuf): T
     
@@ -35,6 +36,10 @@ interface BinaryDeserializer<T : Element> {
             UUIDDeserializer, // 18
             ItemStackDeserializer, // 19
             EnumMapDeserializer, // 20
+            NullDeserializer, // 21
+            LocationDeserializer, // 22
+            NamespacedKeyDeserializer, // 23
+            ListDeserializer, // 24
         )
         
         fun getForType(type: Byte) = runCatching { DESERIALIZERS[type.toInt()] }.getOrNull()
