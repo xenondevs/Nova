@@ -198,7 +198,7 @@ object TileEntityManager : Listener {
     private fun handleChunkLoad(chunk: Chunk) {
         asyncTransaction {
             TileEntitiesTable
-                .select { (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
+                .select { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
                 .forEach {
                     val uuid = it[TileEntitiesTable.uuid]
                     val data = JSON_PARSER.parse(it[TileEntitiesTable.data]) as JsonObject
