@@ -12,7 +12,7 @@ object TileEntitiesTable : Table("tileEntities") {
     val y = integer("y")
     val z = integer("z")
     val yaw = float("yaw")
-    val data = text("data") // TODO: binary
+    val data = blob("data")
     
     override val primaryKey = PrimaryKey(uuid)
     
