@@ -1,15 +1,14 @@
 package xyz.xenondevs.nova.tileentity.impl.world
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
-import org.bukkit.Chunk
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -28,7 +27,7 @@ private val MAX_RANGE = NovaConfig.getInt("chunk_loader.max_range")!!
 
 class ChunkLoader(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -39,14 +38,13 @@ class ChunkLoader(
         get() = MAX_ENERGY - energy
     
     private var range = retrieveData("range") { 0 }
-    private var chunks: List<Chunk> = retrieveData("chunks") { chunk.getSurroundingChunks(range, true) }
+    private var chunks = chunk.getSurroundingChunks(range, true)
     private var active = false
     
     override val gui by lazy { ChunkLoaderGUI() }
     
     override fun saveData() {
         super.saveData()
-        storeData("chunks", chunks)
         storeData("range", range)
     }
     

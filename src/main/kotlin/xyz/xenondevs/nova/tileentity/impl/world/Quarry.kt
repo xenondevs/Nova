@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.world
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -20,6 +19,7 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -61,7 +61,7 @@ private val ENERGY_INEFFICIENCY_EXPONENT = NovaConfig.getDouble("quarry.energy_i
 
 class Quarry(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

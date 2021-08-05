@@ -20,10 +20,14 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.database.asyncTransaction
 import xyz.xenondevs.nova.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundDeserializer
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
@@ -32,20 +36,20 @@ import kotlin.math.roundToInt
 
 val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
 
-fun ItemStack.setTileEntityData(data: JsonObject) {
+fun ItemStack.setTileEntityData(data: CompoundElement) {
     if (hasItemMeta()) {
         val itemMeta = this.itemMeta!!
         val dataContainer = itemMeta.persistentDataContainer
-        dataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, data)
+        dataContainer.set(TILE_ENTITY_KEY, CompoundElementDataType, data)
         this.itemMeta = itemMeta
     }
 }
 
-fun ItemStack.getTileEntityData(): JsonObject? {
+fun ItemStack.getTileEntityData(): CompoundElement? {
     if (hasItemMeta()) {
         val dataContainer = itemMeta!!.persistentDataContainer
-        if (dataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)) {
-            return dataContainer.get(TILE_ENTITY_KEY, JsonElementDataType) as JsonObject
+        if (dataContainer.has(TILE_ENTITY_KEY, CompoundElementDataType)) {
+            return dataContainer.get(TILE_ENTITY_KEY, CompoundElementDataType)
         }
     }
     
@@ -92,7 +96,7 @@ object TileEntityManager : Listener {
         location: Location,
         yaw: Float,
         material: NovaMaterial,
-        data: JsonObject?
+        data: CompoundElement?
     ) {
         val block = location.block
         val chunk = location.chunk
@@ -107,7 +111,7 @@ object TileEntityManager : Listener {
         val tileEntity = TileEntity.create(
             uuid,
             spawnLocation,
-            data ?: JsonObject().apply { add("global", JsonObject()) },
+            data ?: CompoundElement().apply { putElement("global", CompoundElement()) },
             ownerUUID,
             material,
         )
@@ -139,7 +143,7 @@ object TileEntityManager : Listener {
                     it[y] = location.blockY
                     it[z] = location.blockZ
                     it[this.yaw] = spawnLocation.yaw
-                    it[this.data] = tileEntity.getDataJson()
+                    it[this.data] = ExposedBlob(tileEntity.getData())
                 }
             }
         }
@@ -201,7 +205,7 @@ object TileEntityManager : Listener {
                 .select { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
                 .forEach {
                     val uuid = it[TileEntitiesTable.uuid]
-                    val data = JSON_PARSER.parse(it[TileEntitiesTable.data]) as JsonObject
+                    val data = CompoundDeserializer.read(it[TileEntitiesTable.data].bytes)
                     
                     val location = Location(
                         Bukkit.getWorld(it[TileEntitiesTable.world]),
@@ -266,7 +270,7 @@ object TileEntityManager : Listener {
                             event.block.location,
                             player.location.yaw,
                             material,
-                            placedItem.getTileEntityData()?.let { JsonObject().apply { add("global", it) } }
+                            placedItem.getTileEntityData()?.let { CompoundElement().apply { put("global", it) } }
                         )
                         
                         if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--

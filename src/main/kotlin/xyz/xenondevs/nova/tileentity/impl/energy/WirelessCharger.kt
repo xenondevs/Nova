@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -14,6 +13,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.region.Region
 import xyz.xenondevs.nova.region.VisualRegion
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -31,7 +31,7 @@ private val RANGE = NovaConfig.getDouble("wireless_charger.range")!!
 
 class WirelessCharger(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

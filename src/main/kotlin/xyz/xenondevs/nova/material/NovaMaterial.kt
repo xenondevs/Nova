@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.material
 
-import com.google.gson.JsonObject
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Material.*
@@ -12,6 +11,7 @@ import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.agriculture.AutoFisher
@@ -53,7 +53,7 @@ enum class NovaMaterial(
     createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> NovaItemBuilder)? = null,
     val block: ModelData? = null,
     val hitbox: Material? = null,
-    val createTileEntity: ((UUID, JsonObject, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)? = null,
+    val createTileEntity: ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)? = null,
     val canPlace: ((Player, Location) -> Boolean)? = null,
     val isDirectional: Boolean = true,
     val legacyItemIds: IntArray? = null,

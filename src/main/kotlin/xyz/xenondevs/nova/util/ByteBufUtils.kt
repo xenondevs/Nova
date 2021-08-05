@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util
 
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 
 fun ByteBuf.writeByte(byte: Byte): ByteBuf = writeByte(byte.toInt())
 
@@ -25,4 +26,10 @@ fun ByteBuf.toByteArray(): ByteArray {
     readBytes(bytes)
     resetReaderIndex()
     return bytes
+}
+
+fun ByteArray.toByteBuf(allocator: () -> ByteBuf = Unpooled::buffer): ByteBuf {
+    val buf = allocator()
+    buf.writeBytes(this)
+    return buf
 }

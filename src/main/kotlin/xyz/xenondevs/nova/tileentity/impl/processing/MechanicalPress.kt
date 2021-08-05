@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.processing
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -21,6 +20,7 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.recipe.RecipeManager
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -44,7 +44,7 @@ enum class PressType {
 
 class MechanicalPress(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -54,7 +54,7 @@ class MechanicalPress(
     override val requestedEnergy: Int
         get() = MAX_ENERGY - energy
     
-    private var type: PressType = retrieveData("pressType") { PressType.PLATE }
+    private var type: PressType = retrieveEnum("pressType") { PressType.PLATE }
     private var pressTime: Int = retrieveData("pressTime") { 0 }
     private var currentItem: ItemStack? = retrieveOrNull("currentItem")
     

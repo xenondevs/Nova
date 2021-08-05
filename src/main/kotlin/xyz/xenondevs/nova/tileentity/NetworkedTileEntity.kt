@@ -1,17 +1,17 @@
 package xyz.xenondevs.nova.tileentity
 
-import com.google.gson.JsonObject
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.*
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
 import java.util.*
 
 abstract class NetworkedTileEntity(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

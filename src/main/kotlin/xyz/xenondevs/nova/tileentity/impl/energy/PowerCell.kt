@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -8,6 +7,7 @@ import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -19,7 +19,7 @@ open class PowerCell(
     private val creative: Boolean,
     val maxEnergy: Int,
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -80,7 +80,7 @@ open class PowerCell(
 
 class BasicPowerCell(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -96,7 +96,7 @@ class BasicPowerCell(
 
 class AdvancedPowerCell(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -112,7 +112,7 @@ class AdvancedPowerCell(
 
 class ElitePowerCell(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -128,7 +128,7 @@ class ElitePowerCell(
 
 class UltimatePowerCell(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -144,7 +144,7 @@ class UltimatePowerCell(
 
 class CreativePowerCell(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

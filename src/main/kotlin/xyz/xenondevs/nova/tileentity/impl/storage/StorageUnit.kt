@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.storage
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -13,6 +12,7 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.ItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -27,7 +27,7 @@ private val MAX_ITEMS = NovaConfig.getInt("item_storage_unit.max_items")!!
 
 class StorageUnit(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

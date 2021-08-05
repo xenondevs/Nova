@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
 import com.google.common.base.Preconditions
-import com.google.gson.JsonObject
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Axis
 import org.bukkit.Bukkit
@@ -27,6 +26,7 @@ import xyz.xenondevs.nova.network.energy.EnergyBridge
 import xyz.xenondevs.nova.network.item.ItemBridge
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -43,14 +43,14 @@ open class Cable(
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : TileEntity(uuid, data, material, ownerUUID, armorStand), EnergyBridge, ItemBridge {
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
-    override val bridgeFaces = retrieveData("bridgeFaces") { CUBE_FACES.toMutableSet() }
+    override val bridgeFaces = retrievEnumCollectionOrNull("bridgeFaces", HashSet()) ?: CUBE_FACES.toMutableSet()
     
     override val gui: TileEntityGUI? = null
     
@@ -79,7 +79,7 @@ open class Cable(
     
     override fun saveData() {
         super.saveData()
-        storeData("bridgeFaces", bridgeFaces)
+        storeList("bridgeFaces", bridgeFaces)
     }
     
     override fun handleNetworkUpdate() {
@@ -298,7 +298,7 @@ open class Cable(
 
 class BasicCable(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -314,7 +314,7 @@ class BasicCable(
 
 class AdvancedCable(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -330,7 +330,7 @@ class AdvancedCable(
 
 class EliteCable(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -346,7 +346,7 @@ class EliteCable(
 
 class UltimateCable(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
@@ -362,7 +362,7 @@ class UltimateCable(
 
 class CreativeCable(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
@@ -9,25 +8,26 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.enumMapOf
 import java.util.*
 
 abstract class ItemTileEntity(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), ItemStorage {
     
     final override val inventories: MutableMap<BlockFace, NetworkedInventory> by lazy {
-        (retrieveOrNull<Map<BlockFace, UUID>>("inventories") ?: defaultInventoryConfig)
+        (retrieveEnumMapOrNull("inventories") ?: defaultInventoryConfig)
             .mapValuesTo(enumMapOf()) { availableInventories[it.value]!! }
     }
     
     final override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
-        retrieveData("itemConfig") { CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.NONE } }
+        retrieveDoubleEnumMap("itemConfig") { CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.NONE } }
     
     lateinit var defaultInventoryConfig: Map<BlockFace, UUID>
     private val availableInventories: MutableMap<UUID, NetworkedInventory> = mutableMapOf()
@@ -62,8 +62,8 @@ abstract class ItemTileEntity(
     
     override fun saveData() {
         super.saveData()
-        storeData("itemConfig", itemConfig)
-        storeData("inventories", inventories.mapValues { findUUID(it.value) })
+        storeEnumMap("itemConfig", itemConfig)
+        storeEnumMap("inventories", inventories.mapValues { findUUID(it.value) })
     }
     
 }

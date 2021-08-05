@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.storage
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -15,6 +14,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemFilter
 import xyz.xenondevs.nova.region.Region
 import xyz.xenondevs.nova.region.VisualRegion
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.ItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -28,7 +28,7 @@ private val RANGE = NovaConfig.getDouble("vacuum_chest.range")!!
 
 class VacuumChest(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

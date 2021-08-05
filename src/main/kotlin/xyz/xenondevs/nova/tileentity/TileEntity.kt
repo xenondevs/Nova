@@ -16,6 +16,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import xyz.xenondevs.nova.NOVA
@@ -26,14 +27,21 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.region.Region
+import xyz.xenondevs.nova.serialization.cbf.BackedElement
+import xyz.xenondevs.nova.serialization.cbf.Element
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.serialization.cbf.element.other.EnumMapElement
+import xyz.xenondevs.nova.serialization.cbf.element.other.ListElement
+import xyz.xenondevs.nova.serialization.cbf.element.other.toElement
 import xyz.xenondevs.nova.util.*
 import java.util.*
 
 internal val SELF_UPDATE_REASON = object : UpdateReason {}
 
+// TODO move store/retrieve methods to a DataHolder class
 abstract class TileEntity(
     val uuid: UUID,
-    val data: JsonObject,
+    val data: CompoundElement,
     val material: NovaMaterial,
     val ownerUUID: UUID,
     val armorStand: FakeArmorStand,
@@ -41,7 +49,7 @@ abstract class TileEntity(
     
     protected abstract val gui: TileEntityGUI?
     
-    val globalData: JsonObject = data.get("global") as JsonObject
+    val globalData: CompoundElement = data.getElement("global")!!
     
     var isValid: Boolean = true
         private set
@@ -57,9 +65,9 @@ abstract class TileEntity(
     val additionalHitboxes = HashSet<Location>()
     
     init {
-        if (!data.has("material"))
+        if (!data.contains("material"))
             storeData("material", material)
-        if (!data.has("owner"))
+        if (!data.contains("owner"))
             storeData("owner", ownerUUID)
     }
     
@@ -76,7 +84,7 @@ abstract class TileEntity(
         if (dropItems) {
             saveData()
             val item = material.createItemBuilder(this).build()
-            if (globalData.entrySet().isNotEmpty()) item.setTileEntityData(globalData)
+            if (globalData.isNotEmpty()) item.setTileEntityData(globalData)
             drops += item
         }
         
@@ -104,7 +112,7 @@ abstract class TileEntity(
         
         val statement: Transaction.() -> Unit = {
             TileEntitiesTable.update({ TileEntitiesTable.uuid eq uuid }) {
-                it[data] = getDataJson()
+                it[data] = ExposedBlob(getData())
             }
         }
         
@@ -113,10 +121,10 @@ abstract class TileEntity(
     }
     
     /**
-     * Serializes the [data] object to a JSON string.
+     * Serializes the [data] to binary data.
      */
-    fun getDataJson(): String {
-        return GSON.toJson(this@TileEntity.data)
+    fun getData(): ByteArray {
+        return data.toByteArray()
     }
     
     /**
@@ -295,7 +303,40 @@ abstract class TileEntity(
      * ArmorStand of this TileEntity.
      */
     inline fun <reified T> retrieveOrNull(key: String): T? {
-        return GSON.fromJson<T>(data.get(key) ?: globalData.get(key))
+        return data.get(key) ?: globalData.get(key)
+    }
+    
+    inline fun <reified K : Enum<K>, V> retrieveEnumMap(key: String, getAlternative: () -> MutableMap<K, V>) =
+        retrieveEnumMapOrNull(key) ?: getAlternative()
+    
+    inline fun <reified K : Enum<K>, V> retrieveEnumMapOrNull(key: String): MutableMap<K, V>? {
+        val mapElement = data.getElement<EnumMapElement>(key) ?: return null
+        return mapElement.toEnumMap()
+    }
+    
+    inline fun <reified K : Enum<K>, reified V : Enum<V>> retrieveDoubleEnumMap(key: String, getAlternative: () -> MutableMap<K, V>) =
+        retrieveDoubleEnumMapOrNull(key) ?: getAlternative()
+    
+    inline fun <reified K : Enum<K>, reified V : Enum<V>> retrieveDoubleEnumMapOrNull(key: String): MutableMap<K, V>? {
+        val mapElement = data.getElement<EnumMapElement>(key) ?: return null
+        return mapElement.toDoubleEnumMap()
+    }
+    
+    inline fun <reified T : Enum<T>> retrieveEnum(key: String, getAlternative: () -> T) =
+        retrieveEnumOrNull(key) ?: getAlternative()
+    
+    inline fun <reified T : Enum<T>> retrieveEnumOrNull(key: String): T? {
+        return data.getEnumConstant<T>(key)
+    }
+    
+    inline fun <reified T, C : MutableCollection<in T>> retrievCollectionOrNull(key: String, dest: C): C? {
+        val listElement = data.getElement<ListElement<Element>>(key) ?: return null
+        return listElement.toCollection(dest)
+    }
+    
+    inline fun <reified E : Enum<E>, C : MutableCollection<in E>> retrievEnumCollectionOrNull(key: String, dest: C): C? {
+        val listElement = data.getElement<ListElement<Element>>(key) ?: return null
+        return listElement.toEnumCollection(dest)
     }
     
     /**
@@ -307,14 +348,25 @@ abstract class TileEntity(
      */
     fun storeData(key: String, value: Any?, global: Boolean = false) {
         if (global) {
-            Preconditions.checkArgument(!data.has(key), "$key is already a non-global value")
-            if (value != null) globalData.add(key, GSON.toJsonTree(value))
+            Preconditions.checkArgument(!data.contains(key), "$key is already a non-global value")
+            if (value != null) globalData.put(key, value)
             else globalData.remove(key)
         } else {
-            Preconditions.checkArgument(!globalData.has(key), "$key is already a global value")
-            if (value != null) data.add(key, GSON.toJsonTree(value))
+            Preconditions.checkArgument(!globalData.contains(key), "$key is already a global value")
+            if (value != null) data.put(key, value)
             else data.remove(key)
         }
+    }
+    
+    inline fun <reified K : Enum<K>, reified V> storeEnumMap(key: String, map: Map<K, V>) {
+        val enumMap = if (map is EnumMap) map else map.toEnumMap()
+        data.putElement(key, enumMap.toElement(V::class))
+    }
+    
+    inline fun <reified V> storeList(key: String, list: Collection<V>) {
+        val listElement = ListElement<Element>()
+        list.forEach { listElement.add(BackedElement.createElement(it!!)) }
+        data.putElement(key, listElement)
     }
     
     override fun equals(other: Any?): Boolean {
@@ -334,9 +386,9 @@ abstract class TileEntity(
         fun create(
             uuid: UUID,
             armorStandLocation: Location,
-            data: JsonObject,
-            ownerUUID: UUID = GSON.fromJson(data.get("owner"))!!,
-            material: NovaMaterial = GSON.fromJson(data.get("material"))!!
+            data: CompoundElement,
+            ownerUUID: UUID = data.getAsserted("owner"),
+            material: NovaMaterial = data.getEnumConstant<NovaMaterial>("material")!!
         ): TileEntity {
             // create the fake armor stand
             val armorStand = FakeArmorStand(armorStandLocation, false) {
@@ -358,6 +410,7 @@ abstract class TileEntity(
     }
     
 }
+
 
 abstract class TileEntityGUI(private val title: String) {
     

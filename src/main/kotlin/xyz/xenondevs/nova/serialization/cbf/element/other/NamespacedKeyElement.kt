@@ -14,6 +14,9 @@ class NamespacedKeyElement(override val value: NamespacedKey) : BackedElement<Na
         buf.writeString(value.namespace)
         buf.writeString(value.key)
     }
+    
+    override fun toString() = value.toString()
+    
 }
 
 object NamespacedKeyDeserializer : BinaryDeserializer<NamespacedKeyElement> {

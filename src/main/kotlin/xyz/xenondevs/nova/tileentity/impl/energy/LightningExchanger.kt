@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -17,6 +16,7 @@ import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -35,7 +35,7 @@ private val MAX_BURST = NovaConfig.getInt("lightning_exchanger.burst.max")!!
 
 class LightningExchanger(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

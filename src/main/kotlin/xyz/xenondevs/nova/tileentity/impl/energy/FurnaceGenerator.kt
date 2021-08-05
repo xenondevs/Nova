@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -12,6 +11,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType.PROVIDE
 import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -32,7 +32,7 @@ private val BURN_TIME_MULTIPLIER = NovaConfig.getDouble("furnace_generator.burn_
 
 class FurnaceGenerator(
     uuid: UUID,
-    data: JsonObject,
+    data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,

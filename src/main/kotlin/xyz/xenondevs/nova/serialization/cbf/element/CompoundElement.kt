@@ -1,10 +1,13 @@
 package xyz.xenondevs.nova.serialization.cbf.element
 
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import xyz.xenondevs.nova.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 import xyz.xenondevs.nova.serialization.cbf.Element
+import xyz.xenondevs.nova.serialization.cbf.element.other.NullElement
 import xyz.xenondevs.nova.util.readString
+import xyz.xenondevs.nova.util.toByteArray
 import xyz.xenondevs.nova.util.writeByte
 import xyz.xenondevs.nova.util.writeString
 
@@ -27,18 +30,40 @@ class CompoundElement : Element {
         elements[key] = value
     }
     
-    inline fun <reified T : Any> put(key: String, value: T) {
-        putElement(key, BackedElement.createElement(value))
+    // TODO add if(value is Element) -> putelement
+    inline fun <reified T : Any> put(key: String, value: T?) {
+        if (value == null) {
+            putElement(key, NullElement)
+        } else {
+            putElement(key, BackedElement.createElement(value))
+        }
     }
     
-    fun getElement(key: String) = elements[key]
+    fun remove(key: String) {
+        elements.remove(key)
+    }
+    
+    operator fun contains(key: String) = key in elements
     
     @Suppress("UNCHECKED_CAST") // Not the compounds responsibility
-    inline fun <reified T> get(key: String): T {
-        return (getElement(key) as BackedElement<T>).value
+    fun <T : Element> getElement(key: String) = elements[key] as T?
+    
+    @Suppress("UNCHECKED_CAST") // Not the compounds responsibility
+    inline fun <reified T> get(key: String): T? {
+        if (!contains(key))
+            return null
+        return getElement<BackedElement<T>>(key)!!.value
     }
     
-    inline fun <reified T : Enum<T>> getEnum(key: String) = enumValueOf<T>(key)
+    @Suppress("UNCHECKED_CAST") // Not the compounds responsibility
+    inline fun <reified T> getAsserted(key: String): T {
+        return getElement<BackedElement<T>>(key)!!.value
+    }
+    
+    inline fun <reified T : Enum<T>> getEnumConstant(key: String): T? {
+        val constant: String = get(key) ?: return null
+        return enumValueOf<T>(constant)
+    }
     
     override fun toString(): String {
         val builder = StringBuilder("{\n")
@@ -48,6 +73,12 @@ class CompoundElement : Element {
         builder.append("}")
         return builder.toString()
     }
+    
+    fun toByteArray() = Unpooled.buffer().also(this::write).toByteArray()
+    
+    fun isEmpty() = elements.isEmpty()
+    
+    fun isNotEmpty() = elements.isNotEmpty()
     
 }
 
