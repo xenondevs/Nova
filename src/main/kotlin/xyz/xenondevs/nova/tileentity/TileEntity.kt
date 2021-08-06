@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity
 
-import com.google.common.base.Preconditions
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
@@ -26,12 +25,8 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.region.Region
-import xyz.xenondevs.nova.serialization.cbf.BackedElement
-import xyz.xenondevs.nova.serialization.cbf.Element
+import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.serialization.cbf.element.other.EnumMapElement
-import xyz.xenondevs.nova.serialization.cbf.element.other.ListElement
-import xyz.xenondevs.nova.serialization.cbf.element.other.toElement
 import xyz.xenondevs.nova.util.*
 import java.util.*
 
@@ -40,15 +35,13 @@ internal val SELF_UPDATE_REASON = object : UpdateReason {}
 // TODO move store/retrieve methods to a DataHolder class
 abstract class TileEntity(
     val uuid: UUID,
-    val data: CompoundElement,
+    data: CompoundElement,
     val material: NovaMaterial,
     val ownerUUID: UUID,
     val armorStand: FakeArmorStand,
-) {
+): DataHolder(data, true) {
     
     protected abstract val gui: TileEntityGUI?
-    
-    val globalData: CompoundElement = data.getElement("global")!!
     
     var isValid: Boolean = true
         private set
@@ -285,86 +278,6 @@ abstract class TileEntity(
         
         additionalHitboxes += hitboxes
         TileEntityManager.addTileEntityLocations(this, hitboxes)
-    }
-    
-    /**
-     * Retrieves data from the data [CompoundElement] of this TileEntity.
-     * If it can't find anything under the given key, the
-     * result of the [getAlternative] lambda is returned.
-     */
-    inline fun <reified T> retrieveData(key: String, getAlternative: () -> T): T {
-        return retrieveOrNull(key) ?: getAlternative()
-    }
-    
-    /**
-     * Retrieves data using CBF deserialization from the
-     * data [CompoundElement]
-     */
-    inline fun <reified T> retrieveOrNull(key: String): T? {
-        return data.get(key) ?: globalData.get(key)
-    }
-    
-    inline fun <reified K : Enum<K>, V> retrieveEnumMap(key: String, getAlternative: () -> MutableMap<K, V>) =
-        retrieveEnumMapOrNull(key) ?: getAlternative()
-    
-    inline fun <reified K : Enum<K>, V> retrieveEnumMapOrNull(key: String): MutableMap<K, V>? {
-        val mapElement = data.getElement<EnumMapElement>(key) ?: return null
-        return mapElement.toEnumMap()
-    }
-    
-    inline fun <reified K : Enum<K>, reified V : Enum<V>> retrieveDoubleEnumMap(key: String, getAlternative: () -> MutableMap<K, V>) =
-        retrieveDoubleEnumMapOrNull(key) ?: getAlternative()
-    
-    inline fun <reified K : Enum<K>, reified V : Enum<V>> retrieveDoubleEnumMapOrNull(key: String): MutableMap<K, V>? {
-        val mapElement = data.getElement<EnumMapElement>(key) ?: return null
-        return mapElement.toDoubleEnumMap()
-    }
-    
-    inline fun <reified T : Enum<T>> retrieveEnum(key: String, getAlternative: () -> T) =
-        retrieveEnumOrNull(key) ?: getAlternative()
-    
-    inline fun <reified T : Enum<T>> retrieveEnumOrNull(key: String): T? {
-        return data.getEnumConstant<T>(key)
-    }
-    
-    inline fun <reified T, C : MutableCollection<in T>> retrievCollectionOrNull(key: String, dest: C): C? {
-        val listElement = data.getElement<ListElement<Element>>(key) ?: return null
-        return listElement.toCollection(dest)
-    }
-    
-    inline fun <reified E : Enum<E>, C : MutableCollection<in E>> retrievEnumCollectionOrNull(key: String, dest: C): C? {
-        val listElement = data.getElement<ListElement<Element>>(key) ?: return null
-        return listElement.toEnumCollection(dest)
-    }
-    
-    /**
-     * Serializes objects using CBF and stores them under the given key in
-     * the data object.
-     *
-     * @param global If the data should also be stored in the [ItemStack]
-     * of this [TileEntity].
-     */
-    fun storeData(key: String, value: Any?, global: Boolean = false) {
-        if (global) {
-            Preconditions.checkArgument(!data.contains(key), "$key is already a non-global value")
-            if (value != null) globalData.put(key, value)
-            else globalData.remove(key)
-        } else {
-            Preconditions.checkArgument(!globalData.contains(key), "$key is already a global value")
-            if (value != null) data.put(key, value)
-            else data.remove(key)
-        }
-    }
-    
-    inline fun <reified K : Enum<K>, reified V> storeEnumMap(key: String, map: Map<K, V>) {
-        val enumMap = if (map is EnumMap) map else map.toEnumMap()
-        data.putElement(key, enumMap.toElement(V::class))
-    }
-    
-    inline fun <reified V> storeList(key: String, list: Collection<V>) {
-        val listElement = ListElement<Element>()
-        list.forEach { listElement.add(BackedElement.createElement(it!!)) }
-        data.putElement(key, listElement)
     }
     
     override fun equals(other: Any?): Boolean {
