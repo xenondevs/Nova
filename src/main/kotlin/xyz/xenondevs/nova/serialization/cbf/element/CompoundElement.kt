@@ -30,12 +30,11 @@ class CompoundElement : Element {
         elements[key] = value
     }
     
-    // TODO add if(value is Element) -> putelement
     inline fun <reified T : Any> put(key: String, value: T?) {
-        if (value == null) {
-            putElement(key, NullElement)
-        } else {
-            putElement(key, BackedElement.createElement(value))
+        when (value) {
+            null -> putElement(key, NullElement)
+            is Element -> putElement(key, value)
+            else -> putElement(key, BackedElement.createElement(value))
         }
     }
     

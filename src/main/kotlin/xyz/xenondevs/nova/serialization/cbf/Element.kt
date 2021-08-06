@@ -55,7 +55,9 @@ interface BackedElement<T> : Element {
             if (value is Enum<*>) {
                 return StringElement(value.name) as BackedElement<T>
             }
-            return TYPE_TO_ELEMENT[value::class]!!.call(value) as BackedElement<T>
+            val constructor = TYPE_TO_ELEMENT[value::class]
+                ?: throw IllegalArgumentException("Couldn't find BackedElement type for " + value::class)
+            return constructor.call(value) as BackedElement<T>
         }
         
         @Suppress("UNCHECKED_CAST")
@@ -63,7 +65,9 @@ interface BackedElement<T> : Element {
             if (value is Enum<*>) {
                 return StringElement(value.name) as BackedElement<T>
             }
-            return TYPE_TO_ELEMENT[clazz]!!.call(value) as BackedElement<T>
+            val constructor = TYPE_TO_ELEMENT[clazz]
+                ?: throw IllegalArgumentException("Couldn't find BackedElement type for $clazz")
+            return constructor.call(value) as BackedElement<T>
         }
         
     }

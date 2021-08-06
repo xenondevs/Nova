@@ -32,7 +32,6 @@ import java.util.*
 
 internal val SELF_UPDATE_REASON = object : UpdateReason {}
 
-// TODO move store/retrieve methods to a DataHolder class
 abstract class TileEntity(
     val uuid: UUID,
     data: CompoundElement,
