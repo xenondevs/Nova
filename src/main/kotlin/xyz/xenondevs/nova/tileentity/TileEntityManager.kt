@@ -270,7 +270,7 @@ object TileEntityManager : Listener {
                             event.block.location,
                             player.location.yaw,
                             material,
-                            placedItem.getTileEntityData()?.let { CompoundElement().apply { put("global", it) } }
+                            placedItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
                         )
                         
                         if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
