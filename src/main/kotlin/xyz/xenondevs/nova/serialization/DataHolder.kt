@@ -26,8 +26,8 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
      * Retrieves data from the data [CompoundElement] of this TileEntity.
      * If it can't find anything under the given key, the result of the
      * [getAlternative] lambda is returned.
-     * @see retrievCollectionOrNull
-     * @see retrievEnumCollectionOrNull
+     * @see retrieveCollectionOrNull
+     * @see retrieveEnumCollectionOrNull
      * @see retrieveEnum
      * @see retrieveEnumMap
      * @see retrieveDoubleEnumMap
@@ -39,8 +39,8 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
     /**
      * Retrieves data using CBF deserialization from the data [CompoundElement].
      * If neither [data] nor [globalData] contains the given key, ``null`` is returned
-     * @see retrievCollectionOrNull
-     * @see retrievEnumCollectionOrNull
+     * @see retrieveCollectionOrNull
+     * @see retrieveEnumCollectionOrNull
      * @see retrieveEnumOrNull
      * @see retrieveEnumMapOrNull
      * @see retrieveDoubleEnumMapOrNull
@@ -104,7 +104,7 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
     /**
      * Retrieves a [ListElement] and maps Its values to the given [destination][dest]
      */
-    inline fun <reified T, C : MutableCollection<in T>> retrievCollectionOrNull(key: String, dest: C): C? {
+    inline fun <reified T, C : MutableCollection<in T>> retrieveCollectionOrNull(key: String, dest: C): C? {
         val listElement = data.getElement<ListElement<Element>>(key) ?: return null
         return listElement.toCollection(dest)
     }
@@ -112,7 +112,7 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
     /**
      * Retrieves a [ListElement] and maps Its values to enum constants and adds them the given [destination][dest]
      */
-    inline fun <reified E : Enum<E>, C : MutableCollection<in E>> retrievEnumCollectionOrNull(key: String, dest: C): C? {
+    inline fun <reified E : Enum<E>, C : MutableCollection<in E>> retrieveEnumCollectionOrNull(key: String, dest: C): C? {
         val listElement = data.getElement<ListElement<Element>>(key) ?: return null
         return listElement.toEnumCollection(dest)
     }

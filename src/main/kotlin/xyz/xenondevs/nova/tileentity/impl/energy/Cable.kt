@@ -50,7 +50,7 @@ open class Cable(
 ) : TileEntity(uuid, data, material, ownerUUID, armorStand), EnergyBridge, ItemBridge {
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
-    override val bridgeFaces = retrievEnumCollectionOrNull("bridgeFaces", HashSet()) ?: CUBE_FACES.toMutableSet()
+    override val bridgeFaces = retrieveEnumCollectionOrNull("bridgeFaces", HashSet()) ?: CUBE_FACES.toMutableSet()
     
     override val gui: TileEntityGUI? = null
     
