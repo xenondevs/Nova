@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
 import com.google.common.base.Preconditions
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
@@ -289,8 +288,7 @@ abstract class TileEntity(
     }
     
     /**
-     * Retrieves data using GSON deserialization from the
-     * ArmorStand of this TileEntity.
+     * Retrieves data from the data [CompoundElement] of this TileEntity.
      * If it can't find anything under the given key, the
      * result of the [getAlternative] lambda is returned.
      */
@@ -299,8 +297,8 @@ abstract class TileEntity(
     }
     
     /**
-     * Retrieves data using GSON deserialization from the
-     * ArmorStand of this TileEntity.
+     * Retrieves data using CBF deserialization from the
+     * data [CompoundElement]
      */
     inline fun <reified T> retrieveOrNull(key: String): T? {
         return data.get(key) ?: globalData.get(key)
@@ -340,8 +338,8 @@ abstract class TileEntity(
     }
     
     /**
-     * Serializes objects using GSON and stores them under the given key in
-     * the data object. This method does not store any data in the armor stand yet.
+     * Serializes objects using CBF and stores them under the given key in
+     * the data object.
      *
      * @param global If the data should also be stored in the [ItemStack]
      * of this [TileEntity].
