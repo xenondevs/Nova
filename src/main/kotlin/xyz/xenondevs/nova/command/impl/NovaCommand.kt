@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.getMultiModelParent
 import xyz.xenondevs.nova.tileentity.isMultiModel
 import xyz.xenondevs.nova.ui.menu.CreativeMenu
-import xyz.xenondevs.nova.ui.menu.RecipesMenu
 import xyz.xenondevs.nova.util.*
 
 object NovaCommand : PlayerCommand("nova") {
@@ -25,7 +24,7 @@ object NovaCommand : PlayerCommand("nova") {
                 .apply {
                     NovaMaterial.values().forEach { material ->
                         then(literal(material.name)
-                            .executesCatching { context -> handleGive(material, context) }
+                            .executesCatching { handleGive(material, it) }
                         )
                     }
                 })
@@ -48,8 +47,6 @@ object NovaCommand : PlayerCommand("nova") {
             .then(literal("inventory")
                 .requiresPermission("nova.creative")
                 .executesCatching { openCreativeInventory(it) })
-            .then(literal("recipes")
-                .executesCatching { openRecipesMenu(it) })
     }
     
     private fun handleGive(material: NovaMaterial, context: CommandContext<CommandSourceStack>) {
@@ -136,10 +133,6 @@ object NovaCommand : PlayerCommand("nova") {
     
     private fun openCreativeInventory(context: CommandContext<CommandSourceStack>) {
         CreativeMenu.getWindow(context.player).show()
-    }
-    
-    private fun openRecipesMenu(context: CommandContext<CommandSourceStack>) {
-        RecipesMenu.open(context.player)
     }
     
 }

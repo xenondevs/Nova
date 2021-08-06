@@ -5,6 +5,7 @@ import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.novaMaterial
 
 private fun findName(itemStack: ItemStack) =
@@ -17,6 +18,7 @@ interface NovaRecipe {
 }
 
 class ShapedNovaRecipe(
+    private val key: NamespacedKey,
     private val result: ItemBuilder,
     private val shape: List<String>,
     private val ingredientMap: Map<Char, RecipeChoice>
@@ -25,7 +27,6 @@ class ShapedNovaRecipe(
     override fun register() {
         val resultStack = result.build()
         
-        val key = NamespacedKey(NOVA, "shapedRecipe.${findName(resultStack)}")
         val recipe = ShapedRecipe(key, resultStack)
         recipe.shape(*shape.toTypedArray())
         ingredientMap.forEach { (key, material) -> recipe.setIngredient(key, material) }
@@ -38,6 +39,7 @@ class ShapedNovaRecipe(
 }
 
 class ShapelessNovaRecipe(
+    private val key: NamespacedKey,
     private val result: ItemBuilder,
     private val ingredientMap: Map<RecipeChoice, Int>
 ) : NovaRecipe {
@@ -45,7 +47,6 @@ class ShapelessNovaRecipe(
     override fun register() {
         val resultStack = result.build()
         
-        val key = NamespacedKey(NOVA, "shapelessRecipe.${findName(resultStack)}")
         val recipe = ShapelessRecipe(key, resultStack)
         
         ingredientMap.forEach { (material, count) ->
@@ -81,10 +82,30 @@ class FurnaceNovaRecipe(
     
 }
 
+/**
+ * The superclass for all Nova recipes that are not registered via Bukkit's Recipe API.
+ *
+ * The hashCode of this object is calculated during initialization.
+ *
+ * DO NOT EDIT INPUT STACKS OR THE RESULT STACK AFTER CREATING A NEW INSTANCE OF THIS CLASS.
+ */
 abstract class ConversionNovaRecipe(input: List<ItemBuilder>, result: ItemBuilder) : NovaRecipe {
     
     val inputStacks: List<ItemStack> = input.map(ItemBuilder::build)
     val resultStack: ItemStack = result.build()
+    
+    private val hashCode: Int
+    
+    init {
+        val hashCode = inputStacks.hashCode()
+        this.hashCode = 31 * hashCode + resultStack.hashCode()
+    }
+    
+    override fun equals(other: Any?): Boolean {
+        return other is ConversionNovaRecipe && inputStacks.contentEquals(other.inputStacks) && resultStack == other.resultStack
+    }
+    
+    override fun hashCode() = hashCode
     
 }
 

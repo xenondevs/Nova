@@ -1,5 +1,8 @@
 package xyz.xenondevs.nova.util
 
+val Boolean.intValue: Int
+    get() = if (this) 1 else 0
+
 object MathUtils {
     
     fun convertBooleanArrayToInt(array: BooleanArray): Int {

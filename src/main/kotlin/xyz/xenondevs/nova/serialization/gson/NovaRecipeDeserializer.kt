@@ -6,7 +6,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.recipe.*
 import xyz.xenondevs.nova.util.*
@@ -26,10 +28,13 @@ object ShapedNovaRecipeDeserializer : JsonDeserializer<ShapedNovaRecipe> {
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ShapedNovaRecipe {
         json as JsonObject
         
-        val result = getItemBuilder(json.getString("result")!!)
-        result.amount = json.getInt("amount", default = 1)
-        val shape = json.getAsJsonArray("shape").toStringList(::ArrayList)
+        val resultKey = json.getString("result")!!
+        val name = json.getString("name") ?: resultKey.split(":")[1]
+    
+        val resultBuilder = getItemBuilder(resultKey)
+        resultBuilder.amount = json.getInt("amount", default = 1)
         
+        val shape = json.getAsJsonArray("shape").toStringList(::ArrayList)
         val ingredients = HashMap<Char, RecipeChoice>()
         json.getAsJsonArray("ingredients").filterIsInstance<JsonObject>().forEach { ingredient ->
             val char = ingredient.getString("char")!!.first()
@@ -37,7 +42,7 @@ object ShapedNovaRecipeDeserializer : JsonDeserializer<ShapedNovaRecipe> {
             ingredients[char] = recipeChoice
         }
         
-        return ShapedNovaRecipe(result, shape, ingredients)
+        return ShapedNovaRecipe(NamespacedKey(NOVA, "shaped_$name"), resultBuilder, shape, ingredients)
     }
     
 }
@@ -47,15 +52,19 @@ object ShapelessNovaRecipeDeserializer : JsonDeserializer<ShapelessNovaRecipe> {
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ShapelessNovaRecipe {
         json as JsonObject
         
-        val result = getItemBuilder(json.getString("result")!!)
-        result.amount = json.getInt("amount", default = 1)
+        val resultKey = json.getString("result")!!
+        val name = json.getString("name") ?: resultKey.split(":")[1]
+        
+        val resultBuilder = getItemBuilder(resultKey)
+        resultBuilder.amount = json.getInt("amount", default = 1)
+        
         val ingredients = json.getAsJsonObject("ingredients")
             .entrySet()
             .associate { (key, value) ->
                 MaterialUtils.getRecipeChoice(key) to value.asInt
             }
         
-        return ShapelessNovaRecipe(result, ingredients)
+        return ShapelessNovaRecipe(NamespacedKey(NOVA, "shapeless_$name"), resultBuilder, ingredients)
     }
     
 }
