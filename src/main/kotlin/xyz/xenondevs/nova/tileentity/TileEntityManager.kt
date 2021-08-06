@@ -111,9 +111,9 @@ object TileEntityManager : Listener {
         val tileEntity = TileEntity.create(
             uuid,
             spawnLocation,
+            material,
             data ?: CompoundElement().apply { putElement("global", CompoundElement()) },
             ownerUUID,
-            material,
         )
         
         // add to tileEntities map
@@ -143,6 +143,7 @@ object TileEntityManager : Listener {
                     it[y] = location.blockY
                     it[z] = location.blockZ
                     it[this.yaw] = spawnLocation.yaw
+                    it[type] = material.name
                     it[this.data] = ExposedBlob(tileEntity.getData())
                 }
             }
@@ -206,6 +207,7 @@ object TileEntityManager : Listener {
                 .forEach {
                     val uuid = it[TileEntitiesTable.uuid]
                     val data = CompoundDeserializer.read(it[TileEntitiesTable.data].bytes)
+                    val material = NovaMaterial.valueOf(it[TileEntitiesTable.type])
                     
                     val location = Location(
                         Bukkit.getWorld(it[TileEntitiesTable.world]),
@@ -219,6 +221,7 @@ object TileEntityManager : Listener {
                         val tileEntity = TileEntity.create(
                             uuid,
                             location.clone().apply { center(); yaw = it[TileEntitiesTable.yaw] },
+                            material,
                             data
                         )
                         

@@ -56,8 +56,6 @@ abstract class TileEntity(
     val additionalHitboxes = HashSet<Location>()
     
     init {
-        if (!data.contains("material"))
-            storeData("material", material)
         if (!data.contains("owner"))
             storeData("owner", ownerUUID)
     }
@@ -296,9 +294,9 @@ abstract class TileEntity(
         fun create(
             uuid: UUID,
             armorStandLocation: Location,
+            material: NovaMaterial,
             data: CompoundElement,
-            ownerUUID: UUID = data.getAsserted("owner"),
-            material: NovaMaterial = data.getEnumConstant<NovaMaterial>("material")!!
+            ownerUUID: UUID = data.getAsserted("owner")
         ): TileEntity {
             // create the fake armor stand
             val armorStand = FakeArmorStand(armorStandLocation, false) {

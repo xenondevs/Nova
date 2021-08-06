@@ -12,6 +12,7 @@ object TileEntitiesTable : Table("tileEntities") {
     val y = integer("y")
     val z = integer("z")
     val yaw = float("yaw")
+    val type = varchar("type", 128)
     val data = blob("data")
     
     override val primaryKey = PrimaryKey(uuid)
