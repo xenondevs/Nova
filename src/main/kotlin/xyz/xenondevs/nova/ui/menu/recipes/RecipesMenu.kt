@@ -166,7 +166,6 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
 private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
     
     override fun getItemBuilder(): ItemBuilder {
-        println(recipeHistory[viewerUUID])
         return if (recipeHistory[viewerUUID]!!.size > 1) {
             Icon.LIGHT_ARROW_1_LEFT.itemBuilder
         } else ItemBuilder(Material.AIR)
