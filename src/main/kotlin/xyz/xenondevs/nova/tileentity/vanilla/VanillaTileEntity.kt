@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
-import com.google.gson.JsonObject
 import org.bukkit.block.*
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.network.Network
@@ -12,16 +11,24 @@ import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedBukkitInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.network.item.inventory.NetworkedRangedBukkitInventory
-import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
+import xyz.xenondevs.nova.serialization.DataHolder
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.enumMapOf
 import java.util.*
+import kotlin.collections.set
 
 private fun TileState.hasTileEntityData() =
-    persistentDataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
+    persistentDataContainer.has(TILE_ENTITY_KEY, CompoundElementDataType)
 
-private fun TileState.getTileEntityData() =
-    persistentDataContainer.get(TILE_ENTITY_KEY, JsonElementDataType) as JsonObject
+private fun TileState.getTileEntityData(): CompoundElement {
+    if (hasTileEntityData())
+        return persistentDataContainer.get(TILE_ENTITY_KEY, CompoundElementDataType) as CompoundElement
+    return CompoundElement()
+}
 
 private val EMPTY_INVENTORY: NetworkedInventory = object : NetworkedInventory {
     override val size = 0
@@ -32,27 +39,18 @@ private val EMPTY_INVENTORY: NetworkedInventory = object : NetworkedInventory {
 
 private val EMPTY_INVENTORIES_MAP = CUBE_FACES.associateWithTo(emptyEnumMap()) { EMPTY_INVENTORY }
 
-abstract class VanillaTileEntity(tileState: TileState) {
+abstract class VanillaTileEntity(tileState: TileState) : DataHolder(tileState.getTileEntityData(), false) {
     
-    protected val block = tileState.block
-    protected val dataObject: JsonObject = if (tileState.hasTileEntityData()) tileState.getTileEntityData() else JsonObject()
+    val block = tileState.block
+    val type = block.type
     
     abstract fun handleRemoved(unload: Boolean)
     
     abstract fun handleInitialized()
     
-    protected inline fun <reified T> retrieveData(alternative: T, key: String): T {
-        return retrieveOrNull(key) ?: alternative
-    }
-    
-    protected inline fun <reified T> retrieveOrNull(key: String): T? {
-        return GSON.fromJson<T>(dataObject.get(key))
-    }
-    
-    fun storeData(key: String, value: Any) {
-        dataObject.add(key, GSON.toJsonTree(value))
+    fun updateDataContainer() {
         val tileState = block.state as TileState
-        tileState.persistentDataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, dataObject)
+        tileState.persistentDataContainer.set(TILE_ENTITY_KEY, CompoundElementDataType, data)
         tileState.update()
     }
     
@@ -68,10 +66,7 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     
     final override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
-        retrieveData(
-            CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.BUFFER },
-            "itemConfig"
-        )
+        retrieveDoubleEnumMap("itemConfig") { CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.BUFFER } }
     
     final override val allowedFaces: Map<NetworkType, List<BlockFace>>
         get() = enumMapOf(
@@ -85,7 +80,10 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     }
     
     override fun handleRemoved(unload: Boolean) {
-        if (unload) storeData("itemConfig", itemConfig)
+        if (unload) {
+            storeEnumMap("itemConfig", itemConfig)
+            updateDataContainer()
+        }
         NetworkManager.handleEndPointRemove(this, unload)
     }
     

@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.agriculture
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -20,12 +19,13 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.ArmorStand
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -36,9 +36,9 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.salt
+import xyz.xenondevs.nova.util.serverLevel
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("auto_fisher.capacity")!!
@@ -46,11 +46,12 @@ private val ENERGY_PER_TICK = NovaConfig.getInt("auto_fisher.energy_per_tick")!!
 private val IDLE_TIME = NovaConfig.getInt("auto_fisher.idle_time")!!
 
 class AutoFisher(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM) }
     override val gui by lazy(::AutoFisherGUI)
@@ -63,7 +64,7 @@ class AutoFisher(
     
     private val waterBlock = location.clone().subtract(0.0, 1.0, 0.0).block
     private val random = Random(uuid.mostSignificantBits xor System.currentTimeMillis())
-    private val level = world.nmsWorld
+    private val level = world.serverLevel
     private val position = Vec3(location.x, location.y, location.z)
     private val itemDropLocation = location.clone().add(0.0, 1.0, 0.0)
     private lateinit var fakePlayer: ServerPlayer

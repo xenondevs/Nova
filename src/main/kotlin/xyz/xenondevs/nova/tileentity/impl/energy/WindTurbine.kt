@@ -1,37 +1,38 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
+import net.minecraft.core.Rotations
 import org.bukkit.Axis
 import org.bukkit.Location
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
-import org.bukkit.util.EulerAngle
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.getStraightLine
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.min
 
 private val MAX_ENERGY = NovaConfig.getInt("wind_turbine.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("wind_turbine.energy_per_tick")!!
 
 class WindTurbine(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     override val defaultEnergyConfig by lazy {
         createEnergySideConfig(
@@ -41,16 +42,19 @@ class WindTurbine(
     }
     override val gui by lazy { WindTurbineGUI() }
     
-    private val columnModel = getMultiModel("column")
-    private val turbineModel = getMultiModel("turbine")
+    private val columnModel = createMultiModel()
+    private val turbineModel = createMultiModel()
     
-    private val altitude = location.y / (world.maxHeight - 1)
+    private val altitude = (location.y + abs(world.minHeight)) / (world.maxHeight - 1 + abs(world.minHeight))
     private val energyPerTick = (altitude * ENERGY_PER_TICK).toInt()
-    private val rotationPerTick = altitude * 0.2
+    private val rotationPerTick = altitude.toFloat() * 5
+    
+    init {
+        spawnModels()
+    }
     
     override fun handleInitialized(first: Boolean) {
         super.handleInitialized(first)
-        if (first) spawnModels()
         
         setAdditionalHitboxes(first, getMultiHitboxLocations(location))
     }
@@ -67,18 +71,22 @@ class WindTurbine(
             turbineModel.addModels(Model(
                 NovaMaterial.WIND_TURBINE.block.getItem(3),
                 location,
-                EulerAngle(0.0, 0.0, Math.toRadians(blade * 120.0))
+                Rotations(0f, 0f, blade * 120f)
             ))
         }
         
         turbineModel.useArmorStands {
-            it.headPose = it.headPose.setX(Math.toRadians(90.0))
+            it.setHeadPose(it.headPose.copy(x = 90f))
+            it.updateEntityData()
         }
     }
     
     override fun handleTick() {
-        turbineModel.useArmorStands {
-            it.headPose = it.headPose.add(0.0, 0.0, rotationPerTick)
+        runAsyncTask {
+            turbineModel.useArmorStands {
+                it.setHeadPose(it.headPose.add(0f, 0f, rotationPerTick))
+                it.updateEntityData()
+            }
         }
         
         energy = min(MAX_ENERGY, energy + energyPerTick)

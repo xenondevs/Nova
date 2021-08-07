@@ -61,6 +61,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>de.studiocode.invui</groupId>
             <artifactId>InvUI</artifactId>
             <version>0.1-SNAPSHOT</version>
@@ -140,6 +146,33 @@
             <artifactId>PlotSquared-Bukkit</artifactId>
             <version>5.13.11</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-core</artifactId>
+            <version>0.32.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-jdbc</artifactId>
+            <version>0.32.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -243,10 +276,10 @@
                                 </includes>
                             </artifactSet>
                             <relocations>
-                                <relocation>
-                                    <pattern>kotlin</pattern>
-                                    <shadedPattern>${shadePath}.kotlin</shadedPattern>
-                                </relocation>
+<!--                                <relocation>-->
+<!--                                    <pattern>kotlin</pattern>-->
+<!--                                    <shadedPattern>${shadePath}.kotlin</shadedPattern>-->
+<!--                                </relocation>-->
                                 <relocation>
                                     <pattern>org.intellij.lang.annotations</pattern>
                                     <shadedPattern>${shadePath}.org.intellij.lang.annotations</shadedPattern>
@@ -270,6 +303,10 @@
                                 <relocation>
                                     <pattern>xyz.xenondevs.particle</pattern>
                                     <shadedPattern>${shadePath}.xyz.xenondevs.particle</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.zaxxer.hikari</pattern>
+                                    <shadedPattern>${shadePath}.com.zaxxer.hikari</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

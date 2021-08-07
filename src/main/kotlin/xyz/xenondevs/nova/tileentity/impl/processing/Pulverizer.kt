@@ -1,18 +1,18 @@
 package xyz.xenondevs.nova.tileentity.impl.processing
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.recipe.RecipeManager
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -30,11 +30,12 @@ private val PULVERIZE_TIME = NovaConfig.getInt("pulverizer.pulverizer_time")!!
 
 // TODO: Make PULVERIZE_TIME recipe dependent
 class Pulverizer(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
     private val outputInv = getInventory("output", 2, true, ::handleOutputUpdate)

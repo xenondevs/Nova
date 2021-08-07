@@ -1,13 +1,12 @@
 package xyz.xenondevs.nova.tileentity.impl.storage
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Item
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -15,6 +14,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemFilter
 import xyz.xenondevs.nova.region.Region
 import xyz.xenondevs.nova.region.VisualRegion
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.ItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -27,11 +27,12 @@ import java.util.*
 private val RANGE = NovaConfig.getDouble("vacuum_chest.range")!!
 
 class VacuumChest(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : ItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : ItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     private val inventory = getInventory("inventory", 12, true) {}
     private val filterInventory = getInventory("itemFilter", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate)

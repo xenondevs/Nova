@@ -8,9 +8,6 @@ import org.bukkit.block.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.util.ReflectionUtils.blockPos
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
-import xyz.xenondevs.nova.util.ReflectionUtils.send
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
 
@@ -84,7 +81,7 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
     
     val tileEntityTag = itemTag.getCompound("BlockEntityTag")?.let { if (it.isEmpty) itemTag else it }
     if (tileEntityTag != null) {
-        val world = this.world.nmsWorld
+        val world = this.world.serverLevel
         world.getTileEntity(BlockPos(x, y, z), true)?.load(tileEntityTag)
     }
 }

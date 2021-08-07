@@ -1,18 +1,17 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
 import com.google.common.base.Preconditions
-import com.google.gson.JsonObject
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Axis
 import org.bukkit.Bukkit
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Orientable
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.hitbox.Hitbox
 import xyz.xenondevs.nova.item.impl.getFilterConfig
@@ -27,6 +26,7 @@ import xyz.xenondevs.nova.network.energy.EnergyBridge
 import xyz.xenondevs.nova.network.item.ItemBridge
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -42,19 +42,15 @@ private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
 open class Cable(
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : TileEntity(
-    ownerUUID,
-    material,
-    data,
-    armorStand,
-), EnergyBridge, ItemBridge {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : TileEntity(uuid, data, material, ownerUUID, armorStand), EnergyBridge, ItemBridge {
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
-    override val bridgeFaces = retrieveData("bridgeFaces") { CUBE_FACES.toMutableSet() }
+    override val bridgeFaces = retrieveEnumCollectionOrNull("bridgeFaces", HashSet()) ?: CUBE_FACES.toMutableSet()
     
     override val gui: TileEntityGUI? = null
     
@@ -73,7 +69,7 @@ open class Cable(
         )
     }
     
-    private val multiModel = getMultiModel("cableModels")
+    private val multiModel = createMultiModel()
     private val hitboxes = ArrayList<Hitbox>()
     
     init {
@@ -83,14 +79,14 @@ open class Cable(
     
     override fun saveData() {
         super.saveData()
-        storeData("bridgeFaces", bridgeFaces)
+        storeList("bridgeFaces", bridgeFaces)
     }
     
     override fun handleNetworkUpdate() {
         if (isValid) {
             if (NOVA.isEnabled) {
                 multiModel.replaceModels(getModelsNeeded())
-                armorStand.setHeadItemSilently(getCorrectCableModel())
+                updateHeadStack()
                 updateHitbox()
             }
         }
@@ -122,7 +118,7 @@ open class Cable(
             event.isCancelled = true
     }
     
-    private fun getCorrectCableModel(): ItemStack {
+    override fun getHeadStack(): ItemStack {
         val connectedFaces = connectedNodes.values.flatMapTo(HashSet()) { it.keys }
         
         val booleans = CUBE_FACES.map { connectedFaces.contains(it) }.reversed().toBooleanArray()
@@ -301,71 +297,81 @@ open class Cable(
 }
 
 class BasicCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     NovaConfig.getInt("cable.basic.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.basic.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class AdvancedCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     NovaConfig.getInt("cable.advanced.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.advanced.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class EliteCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     NovaConfig.getInt("cable.elite.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.elite.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class UltimateCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     NovaConfig.getInt("cable.ultimate.energy_transfer_rate")!!,
     NovaConfig.getInt("cable.ultimate.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class CreativeCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     Int.MAX_VALUE,
     Int.MAX_VALUE,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )

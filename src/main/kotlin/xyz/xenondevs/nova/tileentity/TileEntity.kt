@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.tileentity
 
-import com.google.common.base.Preconditions
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
@@ -9,16 +7,26 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
+import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.database.asyncTransaction
+import xyz.xenondevs.nova.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.region.Region
+import xyz.xenondevs.nova.serialization.DataHolder
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.upgrade.Upgradeable
 import xyz.xenondevs.nova.util.*
 import java.util.*
@@ -26,38 +34,31 @@ import java.util.*
 internal val SELF_UPDATE_REASON = object : UpdateReason {}
 
 abstract class TileEntity(
-    ownerUUID: UUID?,
+    val uuid: UUID,
+    data: CompoundElement,
     val material: NovaMaterial,
-    val data: JsonObject,
-    val armorStand: ArmorStand,
-) {
+    val ownerUUID: UUID,
+    val armorStand: FakeArmorStand,
+) : DataHolder(data, true) {
     
     protected abstract val gui: TileEntityGUI?
-    
-    val globalData: JsonObject = data.get("global") as JsonObject
     
     var isValid: Boolean = true
         private set
     
-    val uuid: UUID = armorStand.uniqueId
     val location = armorStand.location.blockLocation
     val world = location.world!!
     val chunk = location.chunk
-    val facing = armorStand.facing
-    
-    val ownerUUID: UUID
+    val facing = armorStand.location.facing
     
     private val inventories = ArrayList<VirtualInventory>()
-    val multiModels = HashMap<String, MultiModel>()
+    val multiModels = ArrayList<MultiModel>()
     
     val additionalHitboxes = HashSet<Location>()
     
     init {
-        if (!data.has("material"))
-            storeData("material", material)
-        if (!data.has("owner"))
+        if (!data.contains("owner"))
             storeData("owner", ownerUUID)
-        this.ownerUUID = ownerUUID ?: retrieveOrNull("owner")!!
     }
     
     /**
@@ -73,9 +74,8 @@ abstract class TileEntity(
         if (dropItems) {
             saveData()
             val item = material.createItemBuilder(this).build()
-            if (globalData.entrySet().isNotEmpty()) item.setTileEntityData(globalData)
-            if (this is Upgradeable)
-                drops += this.upgradeHolder.dropUpgrades()
+            if (globalData.isNotEmpty()) item.setTileEntityData(globalData)
+            if (this is Upgradeable) drops += this.upgradeHolder.dropUpgrades()
             drops += item
         }
         
@@ -85,8 +85,6 @@ abstract class TileEntity(
             VirtualInventoryManager.getInstance().remove(it)
         }
         
-        multiModels.values.forEach { it.removeAllModels() }
-        
         return drops
     }
     
@@ -94,18 +92,45 @@ abstract class TileEntity(
      * Called to save all data using the [storeData] method.
      */
     open fun saveData() {
-        multiModels.forEach { (name, multiModel) ->
-            storeData("multiModel_$name", multiModel.chunks)
-        }
     }
     
     /**
      * Calls the [saveData] function and then writes the [data] object
      * to the [armor stand][armorStand] of this [TileEntity].
      */
-    fun saveDataToArmorStand() {
+    fun saveAndWriteData() {
         saveData()
-        armorStand.setTileEntityData(data)
+        
+        val statement: Transaction.() -> Unit = {
+            TileEntitiesTable.update({ TileEntitiesTable.uuid eq uuid }) {
+                it[data] = ExposedBlob(getData())
+            }
+        }
+        
+        if (NOVA.isEnabled) asyncTransaction(statement)
+        else transaction(statement = statement)
+    }
+    
+    /**
+     * Serializes the [data] to binary data.
+     */
+    fun getData(): ByteArray {
+        return data.toByteArray()
+    }
+    
+    /**
+     * Called to get the [ItemStack] to be placed as the head of the [FakeArmorStand].
+     */
+    open fun getHeadStack(): ItemStack {
+        return material.block!!.getItem()
+    }
+    
+    /**
+     * Calls the [getHeadStack] function and puts the result on the [FakeArmorStand].
+     */
+    fun updateHeadStack() {
+        armorStand.setEquipment(EquipmentSlot.HEAD, getHeadStack())
+        armorStand.updateEquipment()
     }
     
     /**
@@ -132,9 +157,11 @@ abstract class TileEntity(
     open fun handleRemoved(unload: Boolean) {
         isValid = false
         gui?.closeWindows()
-        if(this is Upgradeable)
-            upgradeHolder.gui.closeForAllViewers()
-        if (unload) saveDataToArmorStand()
+        if (this is Upgradeable) upgradeHolder.gui.closeForAllViewers()
+        
+        multiModels.forEach { it.removeAllModels() }
+        
+        if (unload) saveAndWriteData()
     }
     
     /**
@@ -178,17 +205,12 @@ abstract class TileEntity(
         getInventory(salt, size, dropItems, IntArray(size) { 64 }, itemHandler)
     
     /**
-     * Gets a [MultiModel] for this [TileEntity].
-     * The [MultiModel] will use the storage of this [TileEntity]
-     * to store data regarding the location of [Model]s.
-     * When the [TileEntity] is destroyed, all [Model]s belonging
+     * Creates a new [MultiModel] for this [TileEntity].
+     * When the [TileEntity] is removed, all [Model]s belonging
      * to this [MultiModel] will be removed.
      */
-    fun getMultiModel(name: String): MultiModel {
-        val uuid = this.uuid.salt(name)
-        val multiModel = MultiModel(uuid, retrieveData("multiModel_$name") { setOf(chunk) })
-        multiModels[name] = multiModel
-        return multiModel
+    fun createMultiModel(): MultiModel {
+        return MultiModel().also(multiModels::add)
     }
     
     /**
@@ -259,43 +281,6 @@ abstract class TileEntity(
         TileEntityManager.addTileEntityLocations(this, hitboxes)
     }
     
-    /**
-     * Retrieves data using GSON deserialization from the
-     * ArmorStand of this TileEntity.
-     * If it can't find anything under the given key, the
-     * result of the [getAlternative] lambda is returned.
-     */
-    inline fun <reified T> retrieveData(key: String, getAlternative: () -> T): T {
-        return retrieveOrNull(key) ?: getAlternative()
-    }
-    
-    /**
-     * Retrieves data using GSON deserialization from the
-     * ArmorStand of this TileEntity.
-     */
-    inline fun <reified T> retrieveOrNull(key: String): T? {
-        return GSON.fromJson<T>(data.get(key) ?: globalData.get(key))
-    }
-    
-    /**
-     * Serializes objects using GSON and stores them under the given key in
-     * the data object. This method does not store any data in the armor stand yet.
-     *
-     * @param global If the data should also be stored in the [ItemStack]
-     * of this [TileEntity].
-     */
-    fun storeData(key: String, value: Any?, global: Boolean = false) {
-        if (global) {
-            Preconditions.checkArgument(!data.has(key), "$key is already a non-global value")
-            if (value != null) globalData.add(key, GSON.toJsonTree(value))
-            else globalData.remove(key)
-        } else {
-            Preconditions.checkArgument(!globalData.has(key), "$key is already a global value")
-            if (value != null) data.add(key, GSON.toJsonTree(value))
-            else data.remove(key)
-        }
-    }
-    
     override fun equals(other: Any?): Boolean {
         return other is TileEntity && other === this
     }
@@ -310,16 +295,34 @@ abstract class TileEntity(
     
     companion object {
         
-        fun newInstance(armorStand: ArmorStand): TileEntity {
-            val data = armorStand.getTileEntityData()!!
-            val material: NovaMaterial = GSON.fromJson(data.get("material"))!!
+        fun create(
+            uuid: UUID,
+            armorStandLocation: Location,
+            material: NovaMaterial,
+            data: CompoundElement,
+            ownerUUID: UUID = data.getAsserted("owner")
+        ): TileEntity {
+            // create the fake armor stand
+            val armorStand = FakeArmorStand(armorStandLocation, false) {
+                it.isInvisible = true
+                it.isMarker = true
+                it.hasVisualFire = material.hitbox.requiresLight
+            }
             
-            return material.createTileEntity!!(null, material, data, armorStand)
+            // create the tile entity
+            val tileEntity = material.createTileEntity!!(uuid, data, material, ownerUUID, armorStand)
+            
+            // set the head stack and register
+            armorStand.setEquipment(EquipmentSlot.HEAD, tileEntity.getHeadStack())
+            armorStand.register()
+            
+            return tileEntity
         }
         
     }
     
 }
+
 
 abstract class TileEntityGUI(private val title: String) {
     

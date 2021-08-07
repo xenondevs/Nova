@@ -11,10 +11,9 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.ReflectionUtils
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsEntity
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsStack
-import xyz.xenondevs.nova.util.ReflectionUtils.send
+import xyz.xenondevs.nova.util.nmsEntity
+import xyz.xenondevs.nova.util.nmsStack
+import xyz.xenondevs.nova.util.send
 import java.util.*
 import net.minecraft.world.item.ItemStack as NMSItemStack
 
@@ -53,7 +52,7 @@ class Attachment(
         val player = player
         if (player != null) {
             armorStand = EntityUtils.spawnArmorStandSilently(player.location, itemStack, false)
-            nmsEntity = ReflectionUtils.getNMSEntity(armorStand)
+            nmsEntity = armorStand.nmsEntity
         }
     }
     

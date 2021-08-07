@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl.processing
 
-import com.google.gson.JsonObject
+
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -10,16 +10,17 @@ import de.studiocode.invui.virtualinventory.event.PlayerUpdateReason
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ExperienceOrb
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.inventory.CustomUpdateReason
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -46,11 +47,12 @@ private val ENERGY_PER_TICK = NovaConfig.getInt("electrical_furnace.energy_per_t
 private val COOK_SPEED = NovaConfig.getInt("electrical_furnace.cook_speed")!!
 
 class ElectricalFurnace(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand), Upgradeable {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradeable {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int
@@ -63,7 +65,7 @@ class ElectricalFurnace(
     
     private var currentRecipe: FurnaceRecipe? = retrieveOrNull<NamespacedKey>("currentRecipe")?.let { Bukkit.getRecipe(it) as FurnaceRecipe }
     private var timeCooked = retrieveData("timeCooked") { 0 }
-    private var experience = retrieveData("experience") { 0f }
+    private var experience = retrieveData("exp") { 0f }
     
     override val gui by lazy { ElectricalFurnaceGUI() }
     
@@ -155,7 +157,7 @@ class ElectricalFurnace(
         cookSpeed = (COOK_SPEED * upgradeHolder.getSpeedModifier()).toInt()
         maxEnergy = (MAX_ENERGY * upgradeHolder.getEnergyModifier()).toInt()
         gui.energyBar.update()
-        if(energy > maxEnergy) {
+        if (energy > maxEnergy) {
             location.world?.createExplosion(location, 5f)
         }
     }

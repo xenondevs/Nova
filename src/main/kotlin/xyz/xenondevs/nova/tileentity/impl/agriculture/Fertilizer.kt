@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.agriculture
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
@@ -14,12 +13,13 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
-import org.bukkit.entity.ArmorStand
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.region.VisualRegion
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -29,12 +29,12 @@ import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.ReflectionUtils.blockPos
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsStack
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
+import xyz.xenondevs.nova.util.blockPos
 import xyz.xenondevs.nova.util.item.PlantUtils
 import xyz.xenondevs.nova.util.item.isFullyAged
+import xyz.xenondevs.nova.util.nmsStack
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.serverLevel
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("fertilizer.capacity")!!
@@ -42,11 +42,12 @@ private val ENERGY_PER_FERTILIZE = NovaConfig.getInt("fertilizer.energy_per_fert
 private val WAIT_TIME = NovaConfig.getInt("fertilizer.wait_time")!!
 
 class Fertilizer(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val requestedEnergy: Int
@@ -83,7 +84,7 @@ class Fertilizer(
             val plant = getRandomPlant() ?: return
             
             val context = UseOnContext(
-                plant.world.nmsWorld,
+                plant.world.serverLevel,
                 null,
                 InteractionHand.MAIN_HAND,
                 item.nmsStack,

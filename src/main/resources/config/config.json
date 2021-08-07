@@ -1,7 +1,16 @@
 {
+  "armor_stand_render_distance": 4,
   "resource_pack": {
     "enabled": true,
     "url": "https://github.com/xenondevs/NovaRP/releases/download/v0.4/NovaRP.zip"
+  },
+  "mysql": {
+    "enabled": false,
+    "address": "localhost",
+    "port": 3306,
+    "username": "",
+    "password": "",
+    "database": ""
   },
   "cable": {
     "basic": {

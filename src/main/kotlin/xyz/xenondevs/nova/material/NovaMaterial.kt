@@ -1,17 +1,17 @@
 package xyz.xenondevs.nova.material
 
-import com.google.gson.JsonObject
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Material.*
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.agriculture.AutoFisher
@@ -53,14 +53,14 @@ enum class NovaMaterial(
     createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> NovaItemBuilder)? = null,
     val block: ModelData? = null,
     val hitbox: Material? = null,
-    val createTileEntity: ((UUID?, NovaMaterial, JsonObject, ArmorStand) -> TileEntity)? = null,
+    val createTileEntity: ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)? = null,
     val canPlace: ((Player, Location) -> Boolean)? = null,
     val isDirectional: Boolean = true,
     val legacyItemIds: IntArray? = null,
 ) {
     
     // 1 - 1000: Blocks
-    FURNACE_GENERATOR(itemName = "block.nova.furnace_generator", item = blockOf(1), createItemBuilderFunction = EnergyTileEntity::createItemBuilder, block = blockOf(1), hitbox = COBBLESTONE, createTileEntity = ::FurnaceGenerator),
+    FURNACE_GENERATOR("block.nova.furnace_generator", blockOf(1), null, EnergyTileEntity::createItemBuilder, blockOf(1), COBBLESTONE, ::FurnaceGenerator),
     MECHANICAL_PRESS("block.nova.mechanical_press", blockOf(2), null, EnergyTileEntity::createItemBuilder, blockOf(2), COBBLESTONE, ::MechanicalPress),
     BASIC_POWER_CELL("block.nova.basic_power_cell", blockOf(3), null, EnergyTileEntity::createItemBuilder, blockOf(3), IRON_BLOCK, ::BasicPowerCell),
     ADVANCED_POWER_CELL("block.nova.advanced_power_cell", blockOf(4), null, EnergyTileEntity::createItemBuilder, blockOf(4), IRON_BLOCK, ::AdvancedPowerCell),
@@ -223,7 +223,7 @@ enum class NovaMaterial(
      * Creates an [ItemBuilder][NovaItemBuilder] for this [NovaMaterial].
      *
      * The [TileEntity] provided must be of the same type as the [TileEntity]
-     * returned in the [createTileEntity] function.
+     * returned by the [createTileEntity] function.
      *
      * If there is no custom [createItemBuilderFunction] for this [NovaMaterial],
      * it will return the result of [createBasicItemBuilder].
