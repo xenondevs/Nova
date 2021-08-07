@@ -347,7 +347,7 @@ internal class FakeOnlinePlayer(
     }
     
     override fun breakBlock(p0: Block): Boolean {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("Player is not online")
     }
     
     override fun playEffect(loc: Location, effect: Effect, data: Int) {
@@ -761,7 +761,7 @@ internal class FakeOnlinePlayer(
     }
     
     override fun getItemInUse(): ItemStack? {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("Player is not online")
     }
     
     override fun getExpToLevel(): Int {
@@ -1054,7 +1054,7 @@ internal class FakeOnlinePlayer(
     }
     
     override fun isClimbing(): Boolean {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("Player is not online")
     }
     
     override fun setAI(ai: Boolean) {
