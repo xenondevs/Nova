@@ -61,7 +61,7 @@ class ElectricalFurnace(
     
     private var currentRecipe: FurnaceRecipe? = retrieveOrNull<NamespacedKey>("currentRecipe")?.let { Bukkit.getRecipe(it) as FurnaceRecipe }
     private var timeCooked = retrieveData("timeCooked") { 0 }
-    private var experience = retrieveData("experience") { 0f }
+    private var experience = retrieveData("exp") { 0f }
     
     override val gui by lazy { ElectricalFurnaceGUI() }
     

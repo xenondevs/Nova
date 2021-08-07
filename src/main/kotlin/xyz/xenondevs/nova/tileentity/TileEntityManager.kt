@@ -1,10 +1,8 @@
 package xyz.xenondevs.nova.tileentity
 
-import com.google.gson.JsonObject
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.*
 import org.bukkit.block.Block
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -28,7 +26,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.serialization.cbf.element.CompoundDeserializer
 import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.serialization.persistentdata.CompoundElementDataType
-import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import java.util.*
@@ -55,15 +52,6 @@ fun ItemStack.getTileEntityData(): CompoundElement? {
     
     return null
 }
-
-fun ArmorStand.setTileEntityData(data: JsonObject) =
-    persistentDataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, data)
-
-fun ArmorStand.getTileEntityData() =
-    persistentDataContainer.get(TILE_ENTITY_KEY, JsonElementDataType)?.let { it as JsonObject }
-
-fun ArmorStand.hasTileEntityData(): Boolean =
-    persistentDataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
 
 @Suppress("DEPRECATION")
 val Material?.requiresLight: Boolean
@@ -96,7 +84,8 @@ object TileEntityManager : Listener {
         location: Location,
         yaw: Float,
         material: NovaMaterial,
-        data: CompoundElement?
+        data: CompoundElement?,
+        tileEntityUUID: UUID? = null
     ) {
         val block = location.block
         val chunk = location.chunk
@@ -107,7 +96,7 @@ object TileEntityManager : Listener {
             .add(0.5, 0.0, 0.5)
             .also { it.yaw = if (material.isDirectional) ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f }
         
-        val uuid = UUID.randomUUID()
+        val uuid = tileEntityUUID ?: UUID.randomUUID()
         val tileEntity = TileEntity.create(
             uuid,
             spawnLocation,

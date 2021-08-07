@@ -44,6 +44,7 @@ class Nova : JavaPlugin() {
         AdvancementManager.loadAdvancements()
         RecipeManager.registerRecipes()
         ChunkLoadManager.init()
+        NovaLegacyDataConverter.init()
         VanillaTileEntityManager.init()
         TileEntityManager.init()
         NetworkManager.init()

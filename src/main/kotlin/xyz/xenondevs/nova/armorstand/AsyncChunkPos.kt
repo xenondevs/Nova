@@ -17,4 +17,15 @@ data class AsyncChunkPos(val world: UUID, val x: Int, val z: Int) {
         return chunks
     }
     
+    override fun equals(other: Any?): Boolean {
+        return this === other || (other is AsyncChunkPos && other.world == world && other.x == x && other.z == z)
+    }
+    
+    override fun hashCode(): Int {
+        var result = world.hashCode()
+        result = 31 * result + x
+        result = 31 * result + z
+        return result
+    }
+    
 }
