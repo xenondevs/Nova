@@ -13,7 +13,7 @@ class ListElement<T : Element> : Element {
     
     val list = ArrayList<T>()
     
-    override fun getTypeId() = 24.toByte()
+    override fun getTypeId() = 19
     
     override fun write(buf: ByteBuf) {
         require(list.size <= 65535) { "list is too large!" }

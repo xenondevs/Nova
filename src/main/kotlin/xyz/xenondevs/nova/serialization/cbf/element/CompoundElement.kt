@@ -15,7 +15,7 @@ class CompoundElement : Element {
     
     private val elements = HashMap<String, Element>()
     
-    override fun getTypeId() = 9.toByte()
+    override fun getTypeId() = 18
     
     override fun write(buf: ByteBuf) {
         elements.forEach { (key, element) ->

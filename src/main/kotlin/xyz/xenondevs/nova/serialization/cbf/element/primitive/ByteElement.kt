@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.writeByte
 
 class ByteElement(override val value: Byte) : BackedElement<Byte> {
     
-    override fun getTypeId() = 2.toByte()
+    override fun getTypeId() = 2
     
     override fun write(buf: ByteBuf) {
         buf.writeByte(value)

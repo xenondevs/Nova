@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 import xyz.xenondevs.nova.serialization.cbf.Element
 
 object EmptyElement : Element {
-    override fun getTypeId() = 0.toByte()
+    override fun getTypeId() = 0
     
     override fun write(buf: ByteBuf) = Unit
 }

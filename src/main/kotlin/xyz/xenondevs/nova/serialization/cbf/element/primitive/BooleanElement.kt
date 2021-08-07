@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 
 class BooleanElement(override val value: Boolean) : BackedElement<Boolean> {
     
-    override fun getTypeId() = 1.toByte()
+    override fun getTypeId() = 1
     
     override fun write(buf: ByteBuf) {
         buf.writeBoolean(value)

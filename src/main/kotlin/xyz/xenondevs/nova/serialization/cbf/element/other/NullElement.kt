@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 object NullElement : BackedElement<Any?> {
     override val value: Any? = null
     
-    override fun getTypeId() = 21.toByte()
+    override fun getTypeId() = 17
     
     override fun write(buf: ByteBuf) = Unit
     

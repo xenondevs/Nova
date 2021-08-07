@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 
 class IntArrayElement(override val value: IntArray) : BackedElement<IntArray> {
-    override fun getTypeId() = 12.toByte()
+    override fun getTypeId() = 11
     
     override fun write(buf: ByteBuf) {
         require(value.size <= 65535) { "Int array is too large!" }

@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.util.readString
 import xyz.xenondevs.nova.util.writeString
 
 class StringElement(override val value: String) : BackedElement<String> {
-    override fun getTypeId() = 8.toByte()
+    override fun getTypeId() = 8
     
     override fun write(buf: ByteBuf) {
         buf.writeString(value)

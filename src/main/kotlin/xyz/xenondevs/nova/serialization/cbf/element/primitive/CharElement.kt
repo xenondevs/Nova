@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.serialization.cbf.Element
 
 class CharElement(override val value: Char) : BackedElement<Char> {
     
-    override fun getTypeId() = 4.toByte()
+    override fun getTypeId() = 4
     
     override fun write(buf: ByteBuf) {
         buf.writeChar(value.code)

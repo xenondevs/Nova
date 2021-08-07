@@ -16,7 +16,7 @@ import kotlin.reflect.KFunction
 
 interface Element {
     
-    fun getTypeId(): Byte
+    fun getTypeId(): Int
     
     fun write(buf: ByteBuf)
     

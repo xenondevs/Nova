@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.serialization.cbf.Element
 
 class FloatElement(override val value: Float) : BackedElement<Float> {
     
-    override fun getTypeId() = 5.toByte()
+    override fun getTypeId() = 5
     
     override fun write(buf: ByteBuf) {
         buf.writeFloat(value)

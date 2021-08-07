@@ -24,22 +24,22 @@ interface BinaryDeserializer<T : Element> {
             LongDeserializer, // 6
             DoubleDeserializer, // 7
             StringDeserializer, // 8
-            CompoundDeserializer, // 9
-            BooleanArrayDeserializer, // 10
-            ByteArrayDeserializer, // 11
-            IntArrayDeserializer, // 12
-            CharArrayDeserializer, // 13
-            FloatArrayDeserializer, // 14
-            LongArrayDeserializer, // 15
-            DoubleArrayDeserializer, // 16
-            StringArrayDeserializer, // 17
-            UUIDDeserializer, // 18
-            ItemStackDeserializer, // 19
+            BooleanArrayDeserializer, // 9
+            ByteArrayDeserializer, // 10
+            IntArrayDeserializer, // 11
+            CharArrayDeserializer, // 12
+            FloatArrayDeserializer, // 13
+            LongArrayDeserializer, // 14
+            DoubleArrayDeserializer, // 15
+            StringArrayDeserializer, // 16
+            NullDeserializer, // 17
+            CompoundDeserializer, // 18
+            ListDeserializer, // 19
             EnumMapDeserializer, // 20
-            NullDeserializer, // 21
-            LocationDeserializer, // 22
-            NamespacedKeyDeserializer, // 23
-            ListDeserializer, // 24
+            UUIDDeserializer, // 21
+            ItemStackDeserializer, // 22
+            LocationDeserializer, // 23
+            NamespacedKeyDeserializer, // 24
         )
         
         fun getForType(type: Byte) = runCatching { DESERIALIZERS[type.toInt()] }.getOrNull()

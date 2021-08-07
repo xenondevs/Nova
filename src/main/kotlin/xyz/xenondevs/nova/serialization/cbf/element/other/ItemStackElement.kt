@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 
 class ItemStackElement(override val value: ItemStack) : BackedElement<ItemStack> {
-    override fun getTypeId() = 19.toByte()
+    override fun getTypeId() = 22
     
     override fun write(buf: ByteBuf) {
         val bytes = InventoryAccess.getItemUtils().serializeItemStack(value, true)

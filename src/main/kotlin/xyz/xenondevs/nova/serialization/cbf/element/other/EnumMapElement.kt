@@ -21,7 +21,7 @@ fun EnumMap<*, *>.toElement(valueClass: KClass<*>): EnumMapElement {
 class EnumMapElement : Element {
     val map = HashMap<String, BackedElement<*>>()
     
-    override fun getTypeId() = 20.toByte()
+    override fun getTypeId() = 20
     
     override fun write(buf: ByteBuf) {
         buf.writeShort(map.size)

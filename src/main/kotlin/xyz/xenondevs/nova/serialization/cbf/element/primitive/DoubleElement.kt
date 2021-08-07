@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.serialization.cbf.Element
 
 class DoubleElement(override val value: Double) : BackedElement<Double> {
     
-    override fun getTypeId() = 7.toByte()
+    override fun getTypeId() = 7
     
     override fun write(buf: ByteBuf) {
         buf.writeDouble(value)

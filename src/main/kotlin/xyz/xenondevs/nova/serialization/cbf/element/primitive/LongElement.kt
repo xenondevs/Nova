@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.serialization.cbf.Element
 
 class LongElement(override val value: Long): BackedElement<Long> {
     
-    override fun getTypeId() = 6.toByte()
+    override fun getTypeId() = 6
     
     override fun write(buf: ByteBuf) {
         buf.writeLong(value)

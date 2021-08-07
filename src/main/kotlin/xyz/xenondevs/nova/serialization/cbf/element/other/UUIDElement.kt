@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 import java.util.*
 
 class UUIDElement(override val value: UUID) : BackedElement<UUID> {
-    override fun getTypeId() = 18.toByte()
+    override fun getTypeId() = 21
     
     override fun write(buf: ByteBuf) {
         buf.writeLong(value.mostSignificantBits)

@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.util.readString
 import xyz.xenondevs.nova.util.writeString
 
 class StringArrayElement(override val value: Array<String>) : BackedElement<Array<String>> {
-    override fun getTypeId() = 17.toByte()
+    override fun getTypeId() = 16
     
     override fun write(buf: ByteBuf) {
         require(value.size <= 65535) { "String array is too large!" }

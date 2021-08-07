@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 import java.util.*
 
 class LocationElement(override val value: Location) : BackedElement<Location> {
-    override fun getTypeId() = 22.toByte()
+    override fun getTypeId() = 23
     
     override fun write(buf: ByteBuf) {
         buf.writeDouble(value.x)

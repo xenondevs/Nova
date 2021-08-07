@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.readString
 import xyz.xenondevs.nova.util.writeString
 
 class NamespacedKeyElement(override val value: NamespacedKey) : BackedElement<NamespacedKey> {
-    override fun getTypeId() = 23.toByte()
+    override fun getTypeId() = 24
     
     override fun write(buf: ByteBuf) {
         buf.writeString(value.namespace)

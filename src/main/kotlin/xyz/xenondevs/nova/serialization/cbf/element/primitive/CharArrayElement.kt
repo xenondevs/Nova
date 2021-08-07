@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 
 class CharArrayElement(override val value: CharArray) : BackedElement<CharArray> {
-    override fun getTypeId() = 13.toByte()
+    override fun getTypeId() = 12
     
     override fun write(buf: ByteBuf) {
         require(value.size <= 65535) { "Char array is too large!" }

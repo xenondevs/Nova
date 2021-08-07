@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 
 class BooleanArrayElement(override val value: BooleanArray) : BackedElement<BooleanArray> {
-    override fun getTypeId() = 10.toByte()
+    override fun getTypeId() = 9
     
     override fun write(buf: ByteBuf) {
         require(value.size <= 65535) { "Boolean array is too large!" }
