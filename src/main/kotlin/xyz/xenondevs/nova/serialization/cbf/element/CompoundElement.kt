@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.serialization.cbf.Element
 import xyz.xenondevs.nova.serialization.cbf.element.other.NullElement
 import xyz.xenondevs.nova.util.readString
 import xyz.xenondevs.nova.util.toByteArray
-import xyz.xenondevs.nova.util.writeByte
 import xyz.xenondevs.nova.util.writeString
 
 class CompoundElement : Element {

@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.config
 
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.structure.Structure
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
@@ -15,6 +15,8 @@ import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.addLocalizedLoreLines
+import xyz.xenondevs.nova.util.setLocalizedName
 
 class EnergySideConfigGUI(
     val energyStorage: EnergyStorage,
@@ -53,7 +55,7 @@ class EnergySideConfigGUI(
         
         private val blockFace = (energyStorage as TileEntity).getFace(blockSide)
         
-        override fun getItemBuilder(): ItemBuilder {
+        override fun getItemProvider(): ItemProvider {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (energyStorage.energyConfig[blockFace]!!) {
                 EnergyConnectionType.NONE ->

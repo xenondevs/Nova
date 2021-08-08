@@ -37,14 +37,14 @@ import xyz.xenondevs.nova.util.awardAdvancement
 import net.roxeez.advancement.AdvancementManager as RoxeezAdvancementManager
 
 fun NovaMaterial.toIcon(): Icon {
-    val itemStack = createBasicItemBuilder().build()
+    val itemStack = createItemStack()
     val material = itemStack.type
     val customModelData = itemStack.itemMeta?.customModelData ?: 0
     return Icon(material, "{CustomModelData:$customModelData}")
 }
 
 fun Advancement.addObtainCriteria(novaMaterial: NovaMaterial): Criteria {
-    val itemStack = novaMaterial.createBasicItemBuilder().build()
+    val itemStack = novaMaterial.createItemStack()
     val material = itemStack.type
     val customModelData = itemStack.itemMeta?.customModelData ?: 0
     

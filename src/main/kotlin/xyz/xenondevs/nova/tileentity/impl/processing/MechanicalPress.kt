@@ -5,7 +5,7 @@ import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Sound
@@ -172,7 +172,7 @@ class MechanicalPress(
         
         private inner class PressTypeItem(private val type: PressType) : BaseItem() {
             
-            override fun getItemBuilder(): ItemBuilder {
+            override fun getItemProvider(): ItemProvider {
                 return if (type == PressType.PLATE) {
                     if (this@MechanicalPress.type == PressType.PLATE) NovaMaterial.PLATE_OFF_BUTTON.createItemBuilder()
                     else NovaMaterial.PLATE_ON_BUTTON.item.getItemBuilder("menu.nova.mechanical_press.press_plates")

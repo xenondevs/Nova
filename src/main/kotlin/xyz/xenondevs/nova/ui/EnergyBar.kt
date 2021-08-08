@@ -1,10 +1,11 @@
 package xyz.xenondevs.nova.ui
 
 import de.studiocode.invui.gui.GUI
+import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
-import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.EnergyUtils
+import xyz.xenondevs.nova.util.addLoreLines
 import xyz.xenondevs.nova.util.localized
 
 class EnergyBar(
@@ -30,10 +31,10 @@ class EnergyBar(
         percentage = energy.toDouble() / maxEnergy.toDouble()
     }
     
-    override fun modifyItemBuilder(itemBuilder: NovaItemBuilder): NovaItemBuilder {
-        itemBuilder.displayName = EnergyUtils.getEnergyString(energy, maxEnergy)
+    override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+        itemBuilder.setDisplayName(EnergyUtils.getEnergyString(energy, maxEnergy))
         if (energyPerTick != -1)
-            itemBuilder.addLocalizedLoreLines(localized(ChatColor.GRAY, "menu.nova.energy_per_tick", EnergyUtils.getEnergyString(energyPerTick)))
+            itemBuilder.addLoreLines(localized(ChatColor.GRAY, "menu.nova.energy_per_tick", EnergyUtils.getEnergyString(energyPerTick)))
         return itemBuilder
     }
     

@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.config
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.structure.Structure
 import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
@@ -18,8 +18,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.enumMapOf
+import xyz.xenondevs.nova.util.*
 
 private val BUTTON_COLORS = listOf(
     NovaMaterial.RED_BUTTON,
@@ -41,7 +40,7 @@ class ItemSideConfigGUI(
     private val buttonBuilders = inventories.withIndex().associate { (index, triple) ->
         triple.first to BUTTON_COLORS[index]
             .createBasicItemBuilder()
-            .addLocalizedLoreLines(TranslatableComponent(triple.second).apply { color = ChatColor.AQUA })
+            .addLoreLines(TranslatableComponent(triple.second).apply { color = ChatColor.AQUA })
     }
     
     private val configItems = enumMapOf<BlockFace, MutableList<Item>>()
@@ -122,7 +121,7 @@ class ItemSideConfigGUI(
             registerConfigItem(blockFace, this)
         }
         
-        override fun getItemBuilder(): ItemBuilder {
+        override fun getItemProvider(): ItemProvider {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (itemStorage.itemConfig[blockFace]!!) {
                 ItemConnectionType.NONE ->
@@ -153,7 +152,7 @@ class ItemSideConfigGUI(
             registerConfigItem(blockFace, this)
         }
         
-        override fun getItemBuilder(): ItemBuilder {
+        override fun getItemProvider(): ItemProvider {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             val inventory = itemStorage.inventories[blockFace]!!
             return buttonBuilders[inventory]!!.clone().setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")

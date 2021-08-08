@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
 import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
+import xyz.xenondevs.nova.util.setLocalizedName
 
 class SideConfigGUI(
     endPoint: NetworkEndPoint,

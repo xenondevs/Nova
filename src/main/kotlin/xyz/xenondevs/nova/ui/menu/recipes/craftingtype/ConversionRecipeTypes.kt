@@ -47,7 +47,7 @@ abstract class ConversionRecipeType : RecipeType() {
             builder.addIngredient(
                 't', NovaMaterial.STOPWATCH_ICON
                 .createBasicItemBuilder()
-                .setLocalizedName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
+                .setDisplayName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
             )
         }
         

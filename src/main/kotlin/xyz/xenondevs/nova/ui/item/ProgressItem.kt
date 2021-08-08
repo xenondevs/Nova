@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.item
 
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -16,7 +16,7 @@ open class ProgressItem(val material: NovaMaterial, val states: Int) : BaseItem(
             notifyWindows()
         }
     
-    override fun getItemBuilder(): ItemBuilder {
+    override fun getItemProvider(): ItemProvider {
         return material.item.getItemBuilder("", (percentage * states).roundToInt())
     }
     

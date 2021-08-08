@@ -4,6 +4,7 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.server.level.ServerPlayer
@@ -21,7 +22,6 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.enchantments.Enchantment
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.item.ItemConnectionType
@@ -176,8 +176,8 @@ class AutoFisher(
         val energyBar = EnergyBar(gui = gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
         
         val idleBar = object : VerticalBar(gui = gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
-            override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
-                itemBuilder.setLocalizedName(TranslatableComponent("menu.nova.auto_fisher.idle", IDLE_TIME - idleTime))
+            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
+                itemBuilder.setDisplayName(TranslatableComponent("menu.nova.auto_fisher.idle", IDLE_TIME - idleTime))
         }
         
     }

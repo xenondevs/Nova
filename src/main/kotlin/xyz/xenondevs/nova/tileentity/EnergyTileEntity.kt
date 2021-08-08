@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.tileentity
 
+import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.network.energy.EnergyStorage
@@ -49,7 +49,7 @@ abstract class EnergyTileEntity(
     
     companion object {
         
-        fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): NovaItemBuilder {
+        fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
             val builder = material.createBasicItemBuilder()
             val energy = tileEntity?.let { (tileEntity as EnergyStorage).providedEnergy } ?: 0
             builder.addLoreLines("§7" + EnergyUtils.getEnergyString(energy))

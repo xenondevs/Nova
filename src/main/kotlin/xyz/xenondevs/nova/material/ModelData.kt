@@ -1,8 +1,9 @@
 package xyz.xenondevs.nova.material
 
+import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.item.NovaItemBuilder
+import xyz.xenondevs.nova.util.setLocalizedName
 
 class ModelData(val material: Material, val dataArray: IntArray) {
     
@@ -10,17 +11,17 @@ class ModelData(val material: Material, val dataArray: IntArray) {
         get() = dataArray[0]
     
     fun getItem(localizedName: String, dataIndex: Int = 0): ItemStack =
-        getItemBuilder(localizedName, dataIndex).build().apply { maxStackSize }
+        getItemBuilder(localizedName, dataIndex).get().apply { maxStackSize }
     
     fun getItem(dataIndex: Int = 0): ItemStack =
         getItem("", dataIndex)
     
-    fun getItemBuilder(localizedName: String, dataIndex: Int = 0): NovaItemBuilder =
-        NovaItemBuilder(material)
+    fun getItemBuilder(localizedName: String, dataIndex: Int = 0): ItemBuilder =
+        ItemBuilder(material)
             .setLocalizedName(localizedName)
-            .setCustomModelData(dataArray[dataIndex]) as NovaItemBuilder
+            .setCustomModelData(dataArray[dataIndex]) as ItemBuilder
     
-    fun getItemBuilder(dataIndex: Int = 0): NovaItemBuilder =
+    fun getItemBuilder(dataIndex: Int = 0): ItemBuilder =
         getItemBuilder("", dataIndex)
     
 }

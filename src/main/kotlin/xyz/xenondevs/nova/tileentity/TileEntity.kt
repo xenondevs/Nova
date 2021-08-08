@@ -73,7 +73,7 @@ abstract class TileEntity(
         val drops = ArrayList<ItemStack>()
         if (dropItems) {
             saveData()
-            val item = material.createItemBuilder(this).build()
+            val item = material.createItemBuilder(this).get()
             if (globalData.isNotEmpty()) item.setTileEntityData(globalData)
             if (this is Upgradeable) drops += this.upgradeHolder.dropUpgrades()
             drops += item

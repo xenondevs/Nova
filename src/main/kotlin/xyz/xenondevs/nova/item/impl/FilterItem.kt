@@ -2,7 +2,8 @@ package xyz.xenondevs.nova.item.impl
 
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
+import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.util.SlotUtils
 import de.studiocode.invui.window.impl.single.SimpleWindow
@@ -22,6 +23,7 @@ import xyz.xenondevs.nova.network.item.ItemFilter
 import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.GSON
 import xyz.xenondevs.nova.util.fromJson
+import xyz.xenondevs.nova.util.setLocalizedName
 
 private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
 
@@ -72,11 +74,7 @@ private class ItemFilterGUI(private val player: Player, private val itemStack: I
         
         private var itemStack: ItemStack? = itemFilter.items[configIndex]
         
-        override fun getItemBuilder(): ItemBuilder {
-            return object : ItemBuilder(Material.AIR) {
-                override fun build() = itemStack
-            }
-        }
+        override fun getItemProvider() = ItemWrapper(itemStack)
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             val cursorItem = event.cursor
@@ -95,7 +93,7 @@ private class ItemFilterGUI(private val player: Player, private val itemStack: I
     
     private inner class SwitchModeItem : BaseItem() {
         
-        override fun getItemBuilder(): ItemBuilder =
+        override fun getItemProvider(): ItemProvider =
             if (itemFilter.whitelist) NovaMaterial.WHITELIST_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.whitelist")
             else NovaMaterial.BLACKLIST_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.blacklist")
         

@@ -1,8 +1,7 @@
 package xyz.xenondevs.nova.ui.item
 
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
-import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -11,6 +10,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.region.Region
 import xyz.xenondevs.nova.region.VisualRegion
+import xyz.xenondevs.nova.util.setLocalizedName
 import java.util.*
 
 class VisualizeRegionItem(
@@ -18,13 +18,17 @@ class VisualizeRegionItem(
     private val region: Region
 ) : BaseItem() {
     
-    override fun getItemBuilder(): ItemBuilder {
-        return object : ItemBuilder(Material.AIR) {
+    override fun getItemProvider(): ItemProvider {
+        return object : ItemProvider {
             
-            override fun buildFor(playerUUID: UUID): ItemStack {
+            override fun get(): ItemStack? {
+                return null
+            }
+            
+            override fun getFor(playerUUID: UUID): ItemStack {
                 val visible = VisualRegion.isVisible(playerUUID, regionUUID)
                 return (if (visible) NovaMaterial.AREA_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.visual_region.hide")
-                else NovaMaterial.AREA_OFF_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.visual_region.show")).buildFor(playerUUID)
+                else NovaMaterial.AREA_OFF_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.visual_region.show")).getFor(playerUUID)
             }
             
         }

@@ -4,7 +4,7 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
@@ -479,11 +479,11 @@ class Quarry(
         
         private inner class NumberDisplayItem(private val getNumber: () -> Int) : BaseItem() {
             
-            override fun getItemBuilder(): ItemBuilder {
+            override fun getItemProvider(): ItemProvider {
                 val number = getNumber()
                 return NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
-                    .setLocalizedName(TranslatableComponent("menu.nova.quarry.size", number, number))
-                    .addLocalizedLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
+                    .setDisplayName(TranslatableComponent("menu.nova.quarry.size", number, number))
+                    .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
             }
             
             override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit

@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.serialization.cbf.element.primitive
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
-import xyz.xenondevs.nova.serialization.cbf.Element
 
 class CharElement(override val value: Char) : BackedElement<Char> {
     

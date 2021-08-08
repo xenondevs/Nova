@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.ui.item
 
 import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -17,7 +18,7 @@ open class ChangeNumberItem(
     private val offBuilder: ItemBuilder
 ) : BaseItem() {
     
-    override fun getItemBuilder() = if (canModify()) onBuilder else offBuilder
+    override fun getItemProvider(): ItemProvider = if (canModify()) onBuilder else offBuilder
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         if (canModify()) {
@@ -32,7 +33,7 @@ open class ChangeNumberItem(
 
 class DisplayNumberItem(private val getNumber: () -> Int) : BaseItem() {
     
-    override fun getItemBuilder() = NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
+    override fun getItemProvider(): ItemProvider = NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
     
     override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
     

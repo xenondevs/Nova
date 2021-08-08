@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.window.impl.single.SimpleWindow
@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.NetworkManager
 import xyz.xenondevs.nova.network.item.ItemConnectionType
 import xyz.xenondevs.nova.network.item.ItemStorage
+import xyz.xenondevs.nova.util.setLocalizedName
 
 class CableItemConfigGUI(
     private val itemStorage: ItemStorage,
@@ -54,7 +55,7 @@ class CableItemConfigGUI(
             get() = itemStorage.itemConfig[face]!!.insert
             set(value) = itemStorage.setInsert(face, value)
         
-        override fun getItemBuilder(): ItemBuilder =
+        override fun getItemProvider(): ItemProvider =
             (if (state) NovaMaterial.GREEN_BUTTON else NovaMaterial.GRAY_BUTTON)
                 .createBasicItemBuilder().setLocalizedName("menu.nova.cable_config.insert")
         
@@ -71,7 +72,7 @@ class CableItemConfigGUI(
             get() = itemStorage.itemConfig[face]!!.extract
             set(value) = itemStorage.setExtract(face, value)
         
-        override fun getItemBuilder(): ItemBuilder =
+        override fun getItemProvider(): ItemProvider =
             (if (state) NovaMaterial.GREEN_BUTTON else NovaMaterial.GRAY_BUTTON)
                 .createBasicItemBuilder().setLocalizedName("menu.nova.cable_config.extract")
         

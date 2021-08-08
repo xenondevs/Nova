@@ -25,7 +25,7 @@ class ShapedNovaRecipe(
 ) : NovaRecipe {
     
     override fun register() {
-        val resultStack = result.build()
+        val resultStack = result.get()
         
         val recipe = ShapedRecipe(key, resultStack)
         recipe.shape(*shape.toTypedArray())
@@ -45,7 +45,7 @@ class ShapelessNovaRecipe(
 ) : NovaRecipe {
     
     override fun register() {
-        val resultStack = result.build()
+        val resultStack = result.get()
         
         val recipe = ShapelessRecipe(key, resultStack)
         
@@ -71,7 +71,7 @@ class FurnaceNovaRecipe(
 ) : NovaRecipe {
     
     override fun register() {
-        val resultStack = result.build()
+        val resultStack = result.get()
         
         val key = NamespacedKey(NOVA, "furnaceRecipe.${findName(resultStack)}")
         val recipe = FurnaceRecipe(key, resultStack, input, experience, cookingTime)
@@ -91,8 +91,8 @@ class FurnaceNovaRecipe(
  */
 abstract class ConversionNovaRecipe(input: List<ItemBuilder>, result: ItemBuilder) : NovaRecipe {
     
-    val inputStacks: List<ItemStack> = input.map(ItemBuilder::build)
-    val resultStack: ItemStack = result.build()
+    val inputStacks: List<ItemStack> = input.map(ItemBuilder::get)
+    val resultStack: ItemStack = result.get()
     
     private val hashCode: Int
     

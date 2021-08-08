@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item
 
+import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -23,7 +24,7 @@ abstract class NovaItem {
     
     open fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {}
     
-    open fun getDefaultItemBuilder(itemBuilder: NovaItemBuilder): NovaItemBuilder = itemBuilder
+    open fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     
     inline fun <reified K> retrieveData(itemStack: ItemStack, key: NamespacedKey): K? {
         return itemStack.itemMeta?.persistentDataContainer?.get(key)

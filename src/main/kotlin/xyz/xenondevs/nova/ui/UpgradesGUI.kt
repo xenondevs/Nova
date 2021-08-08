@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.resourcepack.Icon
@@ -53,7 +53,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     // TODO counter with inventory background
     inner class UpgradeCounter(val type: UpgradeType) : BaseItem() {
         
-        override fun getItemBuilder(): ItemBuilder {
+        override fun getItemProvider(): ItemProvider {
             return type.material.createBasicItemBuilder()
                 .setAmount(upgradeHolder.upgrades[type] ?: 0)
         }

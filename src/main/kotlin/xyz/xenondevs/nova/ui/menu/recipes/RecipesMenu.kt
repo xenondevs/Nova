@@ -76,7 +76,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
             .withIndex()
             .forEach { (index, craftingType) ->
                 if (!::currentType.isInitialized) currentType = craftingType
-                mainGUI.addControlItem(2 + index, CraftingTabItem(craftingType, index))
+                mainGUI.setItem(2 + index, CraftingTabItem(craftingType, index))
             }
         
     }
@@ -111,7 +111,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
     
     inner class CraftingTabItem(private val recipeType: RecipeType, tab: Int) : TabItem(tab) {
         
-        override fun getItemBuilder(gui: TabGUI) = recipeType.icon
+        override fun getItemProvider(gui: TabGUI) = recipeType.icon
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             super.handleClick(clickType, player, event)
@@ -125,7 +125,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
     
     inner class PageBackItem : PageItem(false) {
         
-        override fun getItemBuilder(gui: PagedGUI) =
+        override fun getItemProvider(gui: PagedGUI) =
             (if (gui.hasPageBefore()) NovaMaterial.ARROW_LEFT_ON_BUTTON else NovaMaterial.ARROW_LEFT_OFF_BUTTON)
                 .createBasicItemBuilder()
         
@@ -139,7 +139,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
     
     inner class PageForwardItem : PageItem(true) {
         
-        override fun getItemBuilder(gui: PagedGUI) =
+        override fun getItemProvider(gui: PagedGUI) =
             (if (gui.hasNextPage()) NovaMaterial.ARROW_RIGHT_ON_BUTTON else NovaMaterial.ARROW_RIGHT_OFF_BUTTON)
                 .createBasicItemBuilder()
         
@@ -165,7 +165,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
 
 private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
     
-    override fun getItemBuilder(): ItemBuilder {
+    override fun getItemProvider(): ItemBuilder {
         return if (recipeHistory[viewerUUID]!!.size > 1) {
             Icon.LIGHT_ARROW_1_LEFT.itemBuilder
         } else ItemBuilder(Material.AIR)

@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.serialization.cbf.BinaryDeserializer
 import xyz.xenondevs.nova.serialization.cbf.Element
-import xyz.xenondevs.nova.util.writeByte
 
 /**
  * Currently only supports 1 type (WITHOUT CHECKS!)

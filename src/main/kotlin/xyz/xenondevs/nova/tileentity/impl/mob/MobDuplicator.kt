@@ -5,6 +5,7 @@ import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.ChatColor
@@ -16,7 +17,6 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
@@ -140,8 +140,8 @@ class MobDuplicator(
         
         private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
             
-            override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
-                itemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - idleTime))
+            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
+                itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - idleTime))
             
         }
         
@@ -151,7 +151,7 @@ class MobDuplicator(
         
         private inner class ToggleNBTModeItem : BaseItem() {
             
-            override fun getItemBuilder(): ItemBuilder {
+            override fun getItemProvider(): ItemProvider {
                 return (if (keepNbt) NovaMaterial.NBT_ON_BUTTON else NovaMaterial.NBT_OFF_BUTTON)
                     .createBasicItemBuilder().setLocalizedName("menu.nova.mob_duplicator.nbt")
             }

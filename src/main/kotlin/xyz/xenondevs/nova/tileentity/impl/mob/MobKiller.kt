@@ -3,12 +3,12 @@ package xyz.xenondevs.nova.tileentity.impl.mob
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.region.VisualRegion
@@ -118,8 +118,8 @@ class MobKiller(
         
         val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
             
-            override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
-                itemBuilder.setLocalizedName(localized(ChatColor.GRAY, "menu.nova.mob_killer.idle", idleTime))
+            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
+                itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_killer.idle", idleTime))
             
         }
         

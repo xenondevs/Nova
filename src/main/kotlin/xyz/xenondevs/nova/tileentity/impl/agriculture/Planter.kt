@@ -4,7 +4,7 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Material
@@ -34,6 +34,7 @@ import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.item.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.setLocalizedName
 import xyz.xenondevs.nova.util.soundGroup
 import java.util.*
 import kotlin.random.Random
@@ -208,7 +209,7 @@ class Planter(
         
         private inner class AutoTillingItem : BaseItem() {
             
-            override fun getItemBuilder(): ItemBuilder {
+            override fun getItemProvider(): ItemProvider {
                 return (if (autoTill) NovaMaterial.HOE_ON_BUTTON else NovaMaterial.HOE_OFF_BUTTON)
                     .createBasicItemBuilder().setLocalizedName("menu.nova.planter.autotill")
             }

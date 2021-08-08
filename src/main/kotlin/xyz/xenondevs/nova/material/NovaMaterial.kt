@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.material
 
+import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Material.*
@@ -7,7 +8,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
@@ -50,7 +50,7 @@ enum class NovaMaterial(
     val itemName: String,
     val item: ModelData,
     val novaItem: NovaItem? = null,
-    createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> NovaItemBuilder)? = null,
+    createItemBuilderFunction: ((NovaMaterial, TileEntity?) -> ItemBuilder)? = null,
     val block: ModelData? = null,
     val hitbox: Material? = null,
     val createTileEntity: ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)? = null,
@@ -206,21 +206,21 @@ enum class NovaMaterial(
     NUMBER("", itemOf((100_000..100_999).toIntArray()));
     
     val isBlock = block != null && createTileEntity != null
-    private val createItemBuilderFunction: ((TileEntity?) -> NovaItemBuilder)? = if (createItemBuilderFunction != null) {
+    private val createItemBuilderFunction: ((TileEntity?) -> ItemBuilder)? = if (createItemBuilderFunction != null) {
         { createItemBuilderFunction(this, it) }
     } else null
     
     /**
-     * Creates a basic [ItemBuilder][NovaItemBuilder] without any additional information
+     * Creates a basic [ItemBuilder][ItemBuilder] without any additional information
      * like an energy bar added to the [ItemStack].
      *
      * Can be used for just previewing the item type or as a base in
      * a `createItemBuilder` function for a [TileEntity].
      */
-    fun createBasicItemBuilder(): NovaItemBuilder = item.getItemBuilder(itemName)
+    fun createBasicItemBuilder(): ItemBuilder = item.getItemBuilder(itemName)
     
     /**
-     * Creates an [ItemBuilder][NovaItemBuilder] for this [NovaMaterial].
+     * Creates an [ItemBuilder][ItemBuilder] for this [NovaMaterial].
      *
      * The [TileEntity] provided must be of the same type as the [TileEntity]
      * returned by the [createTileEntity] function.
@@ -228,7 +228,7 @@ enum class NovaMaterial(
      * If there is no custom [createItemBuilderFunction] for this [NovaMaterial],
      * it will return the result of [createBasicItemBuilder].
      */
-    fun createItemBuilder(tileEntity: TileEntity? = null): NovaItemBuilder =
+    fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder =
         createItemBuilderFunction?.invoke(tileEntity) ?: novaItem?.getDefaultItemBuilder(createBasicItemBuilder())
         ?: createBasicItemBuilder()
     
@@ -237,13 +237,13 @@ enum class NovaMaterial(
      *
      * This is the same as calling `createItemBuilder.build()`
      */
-    fun createItemStack(): ItemStack = createItemBuilder().build()
+    fun createItemStack(): ItemStack = createItemBuilder().get()
     
     /**
      * Creates an [ItemStack] with the specified amount for this [NovaMaterial].
      *
      * This is the same as calling `createItemBuilder.setAmount([amount]).build()`
      */
-    fun createItemStack(amount: Int): ItemStack = createItemBuilder().setAmount(amount).build()
+    fun createItemStack(amount: Int): ItemStack = createItemBuilder().setAmount(amount).get()
     
 }

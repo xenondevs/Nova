@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item.impl
 
+import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -20,7 +21,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
@@ -103,11 +103,11 @@ object BottledMobItem : NovaItem(), Listener {
         val data = EntityUtils.serialize(entity, true)
         setEntityData(itemStack, entity.type, data)
         
-        itemStack.itemMeta = NovaItemBuilder(itemStack).addLocalizedLoreLines(localized(
+        itemStack.itemMeta = ItemBuilder(itemStack).addLoreLines(localized(
             ChatColor.DARK_GRAY,
             "item.nova.bottled_mob.type",
             coloredText(ChatColor.YELLOW, entity.type.name.lowercase().replace('_', ' ').capitalizeAll())
-        )).build().itemMeta
+        )).get().itemMeta
     }
     
 }

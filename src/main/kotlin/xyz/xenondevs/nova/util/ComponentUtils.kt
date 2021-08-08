@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
@@ -22,4 +23,16 @@ fun <T> T.clean(): T where T : BaseComponent {
     if (isItalicRaw == null) isItalic = false
     
     return this
+}
+
+fun ItemBuilder.setLocalizedName(name: String): ItemBuilder {
+    return setDisplayName(TranslatableComponent(name))
+}
+
+fun ItemBuilder.addLocalizedLoreLines(vararg lines: String): ItemBuilder {
+    return addLoreLines(*lines.map { arrayOf(TranslatableComponent(it)) }.toTypedArray())
+}
+
+fun ItemBuilder.addLoreLines(vararg lines: BaseComponent): ItemBuilder {
+    return addLoreLines(*lines.map { arrayOf(it) }.toTypedArray())
 }
