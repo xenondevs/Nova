@@ -30,7 +30,7 @@ object ShapedNovaRecipeDeserializer : JsonDeserializer<ShapedNovaRecipe> {
         
         val resultKey = json.getString("result")!!
         val name = json.getString("name") ?: resultKey.split(":")[1]
-    
+        
         val resultBuilder = getItemBuilder(resultKey)
         resultBuilder.amount = json.getInt("amount", default = 1)
         

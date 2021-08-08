@@ -18,7 +18,7 @@ object DustAdvancement : Advancement(NamespacedKey(NOVA, "dust")) {
             .map { addObtainCriteria(it) }
         
         addRequirements(*criteria.toTypedArray())
-    
+        
         setDisplayLocalized {
             it.setIcon(NovaMaterial.COPPER_DUST.toIcon())
         }

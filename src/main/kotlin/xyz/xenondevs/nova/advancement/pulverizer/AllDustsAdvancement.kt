@@ -16,7 +16,7 @@ object AllDustsAdvancement : Advancement(NamespacedKey(NOVA, "all_dusts")) {
         NovaMaterial.values()
             .filter { it.name.endsWith("DUST") }
             .forEach { addObtainCriteria(it) }
-    
+        
         setDisplayLocalized {
             it.setIcon(NovaMaterial.DIAMOND_DUST.toIcon())
         }

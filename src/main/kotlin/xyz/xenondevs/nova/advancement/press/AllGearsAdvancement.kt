@@ -16,7 +16,7 @@ object AllGearsAdvancement : Advancement(NamespacedKey(NOVA, "all_gears")) {
         NovaMaterial.values()
             .filter { it.name.endsWith("GEAR") }
             .forEach { addObtainCriteria(it) }
-    
+        
         setDisplayLocalized {
             it.setIcon(NovaMaterial.DIAMOND_GEAR.toIcon())
         }

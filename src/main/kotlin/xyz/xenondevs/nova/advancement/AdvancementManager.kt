@@ -15,11 +15,11 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.advancement.agriculture.AutoFisherAdvancement
 import xyz.xenondevs.nova.advancement.agriculture.FertilizerAdvancement
 import xyz.xenondevs.nova.advancement.agriculture.HarvesterAdvancement
+import xyz.xenondevs.nova.advancement.agriculture.PlanterAdvancement
 import xyz.xenondevs.nova.advancement.cable.AdvancedCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.BasicCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.EliteCableAdvancement
 import xyz.xenondevs.nova.advancement.cable.UltimateCableAdvancement
-import xyz.xenondevs.nova.advancement.agriculture.PlanterAdvancement
 import xyz.xenondevs.nova.advancement.mob.BottledMobAdvancement
 import xyz.xenondevs.nova.advancement.mob.BreederAdvancement
 import xyz.xenondevs.nova.advancement.mob.MobDuplicatorAdvancement
@@ -65,7 +65,7 @@ fun Display.setDescriptionLocalized(translate: String, vararg with: Any) {
 }
 
 fun Advancement.setDisplayLocalized(run: (Display) -> Unit) {
-    setDisplay { 
+    setDisplay {
         it.setTitleLocalized("advancement.nova.${key.key}.title")
         it.setDescriptionLocalized("advancement.nova.${key.key}.description")
         run(it)

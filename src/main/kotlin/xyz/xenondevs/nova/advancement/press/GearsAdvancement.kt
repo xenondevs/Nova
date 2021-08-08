@@ -18,7 +18,7 @@ object GearsAdvancement : Advancement(NamespacedKey(NOVA, "gears")) {
             .map { addObtainCriteria(it) }
         
         addRequirements(*criteria.toTypedArray())
-    
+        
         setDisplayLocalized {
             it.setIcon(NovaMaterial.COPPER_GEAR.toIcon())
         }

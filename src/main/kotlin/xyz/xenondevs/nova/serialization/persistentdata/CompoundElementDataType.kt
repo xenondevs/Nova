@@ -5,7 +5,7 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.serialization.cbf.element.CompoundDeserializer
 import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 
-object CompoundElementDataType: PersistentDataType<ByteArray, CompoundElement> {
+object CompoundElementDataType : PersistentDataType<ByteArray, CompoundElement> {
     override fun getPrimitiveType() = ByteArray::class.java
     
     override fun getComplexType() = CompoundElement::class.java

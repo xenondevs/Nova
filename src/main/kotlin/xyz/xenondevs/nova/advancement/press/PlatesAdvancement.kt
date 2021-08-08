@@ -18,7 +18,7 @@ object PlatesAdvancement : Advancement(NamespacedKey(NOVA, "plates")) {
             .map { addObtainCriteria(it) }
         
         addRequirements(*criteria.toTypedArray())
-    
+        
         setDisplayLocalized {
             it.setIcon(NovaMaterial.COPPER_PLATE.toIcon())
         }

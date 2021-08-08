@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 
 object ChargerAdvancement : Advancement(NamespacedKey(NOVA, "charger")) {
     
-    init { 
+    init {
         setParent(BasicCableAdvancement.key)
         addObtainCriteria(NovaMaterial.CHARGER)
         setDisplayLocalized {

@@ -16,7 +16,7 @@ object AllPlatesAdvancement : Advancement(NamespacedKey(NOVA, "all_plates")) {
         NovaMaterial.values()
             .filter { it.name.endsWith("PLATE") }
             .forEach { addObtainCriteria(it) }
-    
+        
         setDisplayLocalized {
             it.setIcon(NovaMaterial.DIAMOND_PLATE.toIcon())
         }

@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 
 object WirelessChargerAdvancement : Advancement(NamespacedKey(NOVA, "wireless_charger")) {
     
-    init { 
+    init {
         setParent(ChargerAdvancement.key)
         addObtainCriteria(NovaMaterial.WIRELESS_CHARGER)
         setDisplayLocalized {

@@ -24,44 +24,44 @@ open class PowerCell(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
-
+    
     override val defaultEnergyConfig by lazy { createEnergySideConfig(BUFFER) }
     override val requestedEnergy: Int
         get() = if (creative) Int.MAX_VALUE else maxEnergy - energy
-
+    
     override val gui by lazy { PowerCellGUI() }
-
+    
     init {
         if (creative) energy = Int.MAX_VALUE
     }
-
+    
     override fun handleTick() {
         if (hasEnergyChanged) {
             gui.energyBar.update()
             hasEnergyChanged = false
         }
     }
-
+    
     override fun addEnergy(energy: Int) {
         if (!creative) {
             super.addEnergy(energy)
         }
     }
-
+    
     override fun removeEnergy(energy: Int) {
         if (!creative) {
             super.removeEnergy(energy)
         }
     }
-
+    
     inner class PowerCellGUI : TileEntityGUI("menu.nova.power_cell") {
-
+        
         private val sideConfigGUI = SideConfigGUI(
             this@PowerCell,
             listOf(NONE, PROVIDE, CONSUME, BUFFER),
             null
         ) { openWindow(it) }
-
+        
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
@@ -71,11 +71,11 @@ open class PowerCell(
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
-
+        
         val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, maxEnergy, -1) }
-
+        
     }
-
+    
 }
 
 class BasicPowerCell(

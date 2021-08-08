@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import java.io.File
 
 fun asyncTransaction(statement: Transaction.() -> Unit) {
-    runAsyncTask { 
+    runAsyncTask {
         transaction(statement = statement)
     }
 }

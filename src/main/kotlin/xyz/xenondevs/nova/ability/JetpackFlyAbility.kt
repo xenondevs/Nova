@@ -34,7 +34,7 @@ internal class JetpackFlyAbility(player: Player) : Ability(player) {
     
     override fun handleTick(tick: Int) {
         if (!::jetpackItem.isInitialized) {
-            if(player.equipment?.chestplate == null) {
+            if (player.equipment?.chestplate == null) {
                 AbilityManager.takeAbility(player, AbilityType.JETPACK)
                 return
             }
