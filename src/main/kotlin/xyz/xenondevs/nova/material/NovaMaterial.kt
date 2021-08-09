@@ -69,7 +69,7 @@ enum class NovaMaterial(
     CREATIVE_POWER_CELL("block.nova.creative_power_cell", blockOf(7), null, EnergyTileEntity::createItemBuilder, blockOf(7), IRON_BLOCK, ::CreativePowerCell),
     PULVERIZER("block.nova.pulverizer", blockOf(8), null, EnergyTileEntity::createItemBuilder, blockOf(8), COBBLESTONE, ::Pulverizer),
     SOLAR_PANEL("block.nova.solar_panel", blockOf(9), null, EnergyTileEntity::createItemBuilder, blockOf(9), BARRIER, ::SolarPanel),
-    QUARRY("block.nova.quarry", blockOf(10), null, EnergyTileEntity::createItemBuilder, blockOf(10), COBBLESTONE, ::Quarry),
+    QUARRY("block.nova.quarry", blockOf(10), null, EnergyTileEntity::createItemBuilder, blockOf(10), COBBLESTONE, ::Quarry, Quarry::canPlace),
     ELECTRICAL_FURNACE("block.nova.electrical_furnace", blockOf(11), null, EnergyTileEntity::createItemBuilder, blockOf(11), COBBLESTONE, ::ElectricalFurnace),
     CHUNK_LOADER("block.nova.chunk_loader", blockOf(12), null, EnergyTileEntity::createItemBuilder, blockOf(12), COBBLESTONE, ::ChunkLoader),
     BLOCK_BREAKER("block.nova.block_breaker", blockOf(13), null, EnergyTileEntity::createItemBuilder, blockOf(13), COBBLESTONE, ::BlockBreaker),

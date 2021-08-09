@@ -94,7 +94,7 @@ object TileEntityManager : Listener {
         val spawnLocation = location
             .clone()
             .add(0.5, 0.0, 0.5)
-            .also { it.yaw = if (material.isDirectional) ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f }
+            .also { it.yaw = calculateTileEntityYaw(material, yaw) }
         
         val uuid = tileEntityUUID ?: UUID.randomUUID()
         val tileEntity = TileEntity.create(
@@ -138,6 +138,9 @@ object TileEntityManager : Listener {
             }
         }
     }
+    
+    private fun calculateTileEntityYaw(material: NovaMaterial, playerYaw: Float): Float =
+        if (material.isDirectional) ((playerYaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f
     
     fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
         val location = tileEntity.location
@@ -253,14 +256,21 @@ object TileEntityManager : Listener {
             
             if (material.isBlock) {
                 val location = event.block.location
-                if (getTileEntityAt(location) == null && material.canPlace?.invoke(player, location) != false) {
+                val playerLocation = player.location
+                
+                if (getTileEntityAt(location) == null
+                    && material.canPlace?.invoke(
+                        player,
+                        location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
+                    ) != false
+                ) {
                     val uuid = player.uniqueId
                     val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
                     if (result == PlaceResult.ALLOW) {
                         placeTileEntity(
                             uuid,
                             event.block.location,
-                            player.location.yaw,
+                            playerLocation.yaw,
                             material,
                             placedItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
                         )

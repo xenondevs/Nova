@@ -172,7 +172,7 @@ fun Location.getRectangle(to: Location, omitCorners: Boolean): Map<Axis, List<Lo
     return rectangle
 }
 
-fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
+inline fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
     Preconditions.checkArgument(world != null && to.world == world)
     
     val (min, max) = LocationUtils.sort(this, to)
@@ -243,11 +243,12 @@ fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double =
 
 fun Location.createColoredParticle(color: Color): Any = ParticleBuilder(ParticleEffect.REDSTONE, this).setColor(color).toPacket()
 
-fun Location.getNextBlockBelow(countSelf: Boolean): Location? {
+fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Location? {
     val location = clone()
     if (!countSelf) location.y -= 1
     while (location.y >= 0) {
-        if (location.block.type != Material.AIR) return location
+        val type = location.block.type
+        if (!type.isAir && (!requiresSolid || type.isSolid)) return location
         location.y -= 1
     }
     

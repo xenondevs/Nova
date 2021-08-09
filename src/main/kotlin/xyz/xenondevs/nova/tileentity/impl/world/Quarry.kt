@@ -11,6 +11,7 @@ import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -29,6 +30,7 @@ import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.max
@@ -120,22 +122,15 @@ class Quarry(
     }
     
     private fun updateBounds(): Boolean {
-        val back = getFace(BlockSide.BACK)
-        val right = getFace(BlockSide.RIGHT)
-        val modX = back.modX.takeUnless { it == 0 } ?: right.modX
-        val modZ = back.modZ.takeUnless { it == 0 } ?: right.modZ
-        
-        val distanceX = modX * (sizeX + 1)
-        val distanceZ = modZ * (sizeZ + 1)
-        
-        minX = min(location.blockX, location.blockX + distanceX)
-        minZ = min(location.blockZ, location.blockZ + distanceZ)
-        maxX = max(location.blockX, location.blockX + distanceX)
-        maxZ = max(location.blockZ, location.blockZ + distanceZ)
+        val positions = getMinMaxPositions(location, sizeX, sizeZ, getFace(BlockSide.BACK), getFace(BlockSide.RIGHT))
+        minX = positions[0]
+        minZ = positions[1]
+        maxX = positions[2]
+        maxZ = positions[3]
         
         updateEnergyPerTick()
         
-        if (isRegionProtected()) {
+        if (!canPlace(uuid, location, positions)) {
             if (sizeX == MIN_SIZE && sizeZ == MIN_SIZE) {
                 runTaskLater(3) { TileEntityManager.destroyAndDropTileEntity(this, true) }
                 return false
@@ -164,19 +159,6 @@ class Quarry(
             
             createScaffolding()
         }
-    }
-    
-    private fun isRegionProtected(): Boolean {
-        val minLoc = Location(world, minX.toDouble(), y.toDouble(), minZ.toDouble())
-        val maxLoc = Location(world, maxX.toDouble(), y.toDouble(), maxZ.toDouble())
-        var protected = false
-        
-        minLoc.fullCuboidTo(maxLoc) {
-            protected = !ProtectionUtils.canBreak(ownerUUID, it)
-            return@fullCuboidTo !protected
-        }
-        
-        return protected
     }
     
     private fun updateEnergyPerTick() {
@@ -402,7 +384,7 @@ class Quarry(
         for (corner in getCornerLocations(location.y)) {
             corner.y -= 1
             
-            val blockBelow = corner.getNextBlockBelow(true)
+            val blockBelow = corner.getNextBlockBelow(countSelf = true, requiresSolid = true)
             if (blockBelow != null && blockBelow.positionEquals(corner)) continue
             
             corner
@@ -442,6 +424,57 @@ class Quarry(
     
     private fun createVerticalScaffolding(model: MultiModel, location: Location) {
         model.addModels(Model(FULL_VERTICAL, location.center()))
+    }
+    
+    companion object {
+        
+        fun canPlace(player: Player, location: Location): Boolean {
+            return canPlace(player.uniqueId, location, location.yaw, MIN_SIZE, MIN_SIZE)
+        }
+        
+        private fun canPlace(uuid: UUID, location: Location, yaw: Float, sizeX: Int, sizeZ: Int): Boolean {
+            val positions = getMinMaxPositions(
+                location,
+                sizeX, sizeZ,
+                BlockSide.BACK.getBlockFace(yaw),
+                BlockSide.RIGHT.getBlockFace(yaw)
+            )
+            
+            return canPlace(uuid, location, positions)
+        }
+        
+        private fun canPlace(uuid: UUID, location: Location, positions: IntArray): Boolean {
+            val minLoc = Location(location.world, positions[0].toDouble(), location.y, positions[1].toDouble())
+            val maxLoc = Location(location.world, positions[2].toDouble(), location.y, positions[3].toDouble())
+    
+            minLoc.fullCuboidTo(maxLoc) {
+                if (!ProtectionUtils.canBreak(uuid, it)) {
+                    ParticleBuilder(ParticleEffect.SMOKE_NORMAL, it.clone().center()).display()
+                    return@canPlace false
+                } else {
+                    ParticleBuilder(ParticleEffect.FLAME, it.clone().center()).display()
+                    return@fullCuboidTo true
+                }
+            }
+    
+            return true
+        }
+        
+        private fun getMinMaxPositions(location: Location, sizeX: Int, sizeZ: Int, back: BlockFace, right: BlockFace): IntArray {
+            val modX = back.modX.takeUnless { it == 0 } ?: right.modX
+            val modZ = back.modZ.takeUnless { it == 0 } ?: right.modZ
+            
+            val distanceX = modX * (sizeX + 1)
+            val distanceZ = modZ * (sizeZ + 1)
+            
+            val minX = min(location.blockX, location.blockX + distanceX)
+            val minZ = min(location.blockZ, location.blockZ + distanceZ)
+            val maxX = max(location.blockX, location.blockX + distanceX)
+            val maxZ = max(location.blockZ, location.blockZ + distanceZ)
+            
+            return intArrayOf(minX, minZ, maxX, maxZ)
+        }
+        
     }
     
     inner class QuarryGUI : TileEntityGUI("menu.nova.quarry") {
