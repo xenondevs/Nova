@@ -3,11 +3,14 @@ package xyz.xenondevs.nova.upgrade
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.serialization.cbf.element.other.UpgradesElement
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.UpgradesGUI
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.runTaskLater
+import java.util.*
 import kotlin.math.pow
 
 // TODO nerf
@@ -19,15 +22,21 @@ private fun ItemStack.getUpgradeType(): UpgradeType? {
     return UpgradeType.values().firstOrNull { it.material == novaType }
 }
 
-class UpgradeHolder(val upgradeable: Upgradeable, lazyGUI: () -> TileEntityGUI, vararg allowed: UpgradeType) {
-    
-    constructor(upgradeable: Upgradeable, lazyGUI: () -> TileEntityGUI) : this(upgradeable, lazyGUI, *UpgradeType.values())
+class UpgradeHolder(val upgradeable: Upgradeable, data: CompoundElement, lazyGUI: () -> TileEntityGUI, vararg allowed: UpgradeType) {
     
     val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleNewInput) }
     val allowed = allowed.toList()
-    val upgrades = HashMap<UpgradeType, Int>()
+    val upgrades = EnumMap<UpgradeType, Int>(UpgradeType::class.java)
     
     val gui by lazy { UpgradesGUI(this) { lazyGUI().openWindow(it) } }
+    
+    constructor(upgradeable: Upgradeable, data: CompoundElement, lazyGUI: () -> TileEntityGUI) : this(upgradeable, data, lazyGUI, *UpgradeType.values())
+    
+    init {
+        val savedUpgrades = data.get<EnumMap<UpgradeType, Int>>("upgrades")
+        if(savedUpgrades != null)
+            upgrades.putAll(savedUpgrades)
+    }
     
     /**
      * Tries adding the given amount of upgrades and
@@ -98,5 +107,9 @@ class UpgradeHolder(val upgradeable: Upgradeable, lazyGUI: () -> TileEntityGUI, 
     }
     
     fun dropUpgrades() = upgrades.map { (type, amount) -> type.material.createItemStack(amount) }
+    
+    fun save(compound: CompoundElement) {
+        compound.putElement("upgrades", UpgradesElement(upgrades))
+    }
     
 }

@@ -92,6 +92,8 @@ abstract class TileEntity(
      * Called to save all data using the [storeData] method.
      */
     open fun saveData() {
+        if (this is Upgradeable)
+            upgradeHolder.save(data)
     }
     
     /**

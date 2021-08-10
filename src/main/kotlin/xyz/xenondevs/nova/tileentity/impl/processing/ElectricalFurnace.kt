@@ -58,7 +58,7 @@ class ElectricalFurnace(
     override val requestedEnergy: Int
         get() = maxEnergy - energy
     
-    override val upgradeHolder = UpgradeHolder(this) { gui }
+    override val upgradeHolder = UpgradeHolder(this, data) { gui }
     
     private val inputInventory = getInventory("input", 1, true, ::handleInputInventoryUpdate)
     private val outputInventory = getInventory("output", 1, true, ::handleOutputInventoryUpdate)
