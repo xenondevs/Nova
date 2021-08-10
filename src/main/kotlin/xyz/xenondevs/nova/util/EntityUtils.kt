@@ -178,7 +178,9 @@ object EntityUtils {
         val server = (Bukkit.getServer() as CraftServer).server
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
-        return ServerPlayer(server, world, gameProfile)
+        val serverPlayer = ServerPlayer(server, world, gameProfile)
+        serverPlayer.advancements.stopListening()
+        return serverPlayer
     }
     
 }
