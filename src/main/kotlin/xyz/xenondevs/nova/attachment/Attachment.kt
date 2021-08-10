@@ -108,7 +108,7 @@ class Attachment(
                 buffer.writeVarIntArray(passengers)
                 
                 val packet = ClientboundSetPassengersPacket(buffer)
-                player.send(packet)
+                Bukkit.getOnlinePlayers().forEach { it.send(packet) }
             }
         }
     }
