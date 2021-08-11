@@ -40,7 +40,7 @@ interface BinaryDeserializer<T : Element> {
             ItemStackDeserializer, // 22
             LocationDeserializer, // 23
             NamespacedKeyDeserializer, // 24
-            UpgradesDeserializer, // 26
+            UpgradesDeserializer, // 25
         )
         
         fun getForType(type: Byte) = runCatching { DESERIALIZERS[type.toInt()] }.getOrNull()
