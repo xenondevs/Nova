@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.database.DatabaseManager
 import xyz.xenondevs.nova.equipment.ArmorEquipListener
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.NetworkManager
+import xyz.xenondevs.nova.packet.PacketListener
 import xyz.xenondevs.nova.recipe.RecipeManager
 import xyz.xenondevs.nova.recipe.RecipeRegistry
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
@@ -55,6 +56,7 @@ class Nova : JavaPlugin() {
         CommandManager.init()
         ArmorEquipListener.init()
         AbilityManager.init()
+        PacketListener.init()
         forceResourcePack()
         
         Metrics(this, 11927)
