@@ -30,7 +30,7 @@ object TableRecipeType : RecipeType() {
                 ". . . . . . . . ." +
                 ". . . . . . . r ." +
                 ". . . . . . . . .")
-            .addIngredient('r', SimpleItem(ItemBuilder(recipe.result)))
+            .addIngredient('r', createRecipeChoiceItem(listOf(recipe.result)))
             .build()
         
         if (recipe is ShapedRecipe) {

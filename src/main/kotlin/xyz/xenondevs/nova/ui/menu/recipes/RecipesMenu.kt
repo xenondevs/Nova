@@ -10,7 +10,7 @@ import de.studiocode.invui.gui.impl.TabGUI
 import de.studiocode.invui.gui.structure.Structure
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.item.impl.controlitem.PageItem
+import de.studiocode.invui.item.impl.controlitem.ControlItem
 import de.studiocode.invui.item.impl.controlitem.TabItem
 import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.Window
@@ -127,30 +127,34 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
         
     }
     
-    inner class PageBackItem : PageItem(false) {
+    inner class PageBackItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
             (if (gui.hasPageBefore()) NovaMaterial.ARROW_LEFT_ON_BUTTON else NovaMaterial.ARROW_LEFT_OFF_BUTTON)
                 .createBasicItemBuilder()
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            if (gui.hasPageBefore()) player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-            super.handleClick(clickType, player, event)
-            updateTitle()
+            if (clickType == ClickType.LEFT && gui.hasPageBefore()) {
+                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                gui.goBack()
+                updateTitle()
+            }
         }
         
     }
     
-    inner class PageForwardItem : PageItem(true) {
+    inner class PageForwardItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
             (if (gui.hasNextPage()) NovaMaterial.ARROW_RIGHT_ON_BUTTON else NovaMaterial.ARROW_RIGHT_OFF_BUTTON)
                 .createBasicItemBuilder()
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            if (gui.hasNextPage()) player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-            super.handleClick(clickType, player, event)
-            updateTitle()
+            if (clickType == ClickType.LEFT && gui.hasNextPage()) {
+                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                gui.goForward()
+                updateTitle()
+            }
         }
         
     }

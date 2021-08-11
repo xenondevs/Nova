@@ -41,7 +41,7 @@ abstract class ConversionRecipeType : RecipeType() {
                 ". . i . . . r . ." +
                 ". . . . . . . . .")
             .addIngredient('i', inputUIItem)
-            .addIngredient('r', ItemBuilder(outputItem))
+            .addIngredient('r', createRecipeChoiceItem(listOf(outputItem)))
         
         if (time != -1) {
             builder.addIngredient(

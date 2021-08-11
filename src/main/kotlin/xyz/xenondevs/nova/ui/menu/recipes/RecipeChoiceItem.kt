@@ -13,22 +13,22 @@ import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.recipe.RecipeRegistry
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
-    val itemBuilders = if (recipeChoice is RecipeChoice.MaterialChoice) recipeChoice.choices.map { ItemWrapper(ItemStack(it)) }
+    val itemProviders = if (recipeChoice is RecipeChoice.MaterialChoice) recipeChoice.choices.map { ItemWrapper(ItemStack(it)) }
     else (recipeChoice as RecipeChoice.ExactChoice).choices.map(::ItemWrapper)
-    return createRecipeChoiceItem(itemBuilders)
+    return createRecipeChoiceItem(itemProviders)
 }
 
 @JvmName("createRecipeChoiceItemItemStacks")
 fun createRecipeChoiceItem(itemStacks: List<ItemStack>): Item {
-    val itemBuilders = itemStacks.map(::ItemWrapper)
-    return createRecipeChoiceItem(itemBuilders)
+    val itemProviders = itemStacks.map(::ItemWrapper)
+    return createRecipeChoiceItem(itemProviders)
 }
 
 @JvmName("createRecipeChoiceItemItemBuilders")
-fun createRecipeChoiceItem(itemBuilders: List<ItemProvider>): Item {
-    return if (itemBuilders.size > 1)
-        CyclingRecipeChoiceItem(itemBuilders.toTypedArray())
-    else StaticRecipeChoiceItem(itemBuilders[0])
+fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item {
+    return if (itemProviders.size > 1)
+        CyclingRecipeChoiceItem(itemProviders.toTypedArray())
+    else StaticRecipeChoiceItem(itemProviders[0])
 }
 
 private fun handleRecipeChoiceClick(player: Player, clickType: ClickType, itemProvider: ItemProvider) {
