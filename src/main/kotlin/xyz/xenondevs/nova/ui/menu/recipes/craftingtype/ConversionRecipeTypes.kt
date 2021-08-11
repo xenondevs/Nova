@@ -11,7 +11,7 @@ import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.overlay.NovaOverlay
+import xyz.xenondevs.nova.overlay.CustomCharacters
 import xyz.xenondevs.nova.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.recipes.createRecipeChoiceItem
@@ -59,17 +59,17 @@ abstract class ConversionRecipeType : RecipeType() {
 object SmeltingRecipeType : ConversionRecipeType() {
     override val priority = 1
     override val icon = ItemBuilder(Material.FURNACE)
-    override val overlay = NovaOverlay.FURNACE_RECIPE
+    override val overlay = CustomCharacters.FURNACE_RECIPE
 }
 
 object PulverizingRecipeType : ConversionRecipeType() {
     override val priority = 2
     override val icon = NovaMaterial.PULVERIZER.createBasicItemBuilder()
-    override val overlay = NovaOverlay.PULVERIZER_RECIPE
+    override val overlay = CustomCharacters.PULVERIZER_RECIPE
 }
 
 object PressingRecipeType : ConversionRecipeType() {
     override val priority = 3
     override val icon = NovaMaterial.MECHANICAL_PRESS.createBasicItemBuilder()
-    override val overlay = NovaOverlay.PRESS_RECIPE
+    override val overlay = CustomCharacters.PRESS_RECIPE
 }

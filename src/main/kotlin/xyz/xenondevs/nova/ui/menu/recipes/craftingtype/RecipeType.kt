@@ -5,7 +5,7 @@ import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
-import xyz.xenondevs.nova.overlay.NovaOverlay
+import xyz.xenondevs.nova.overlay.CustomCharacters
 import xyz.xenondevs.nova.recipe.GearPressNovaRecipe
 import xyz.xenondevs.nova.recipe.PlatePressNovaRecipe
 import xyz.xenondevs.nova.recipe.PulverizerNovaRecipe
@@ -15,7 +15,7 @@ abstract class RecipeType : Comparable<RecipeType> {
     
     private val guiCache = HashMap<RecipeContainer, GUI>()
     
-    abstract val overlay: NovaOverlay
+    abstract val overlay: CustomCharacters
     abstract val icon: ItemBuilder
     abstract val priority: Int
     

@@ -24,7 +24,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.overlay.NovaOverlay
+import xyz.xenondevs.nova.overlay.CustomCharacters
 import xyz.xenondevs.nova.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.recipes.craftingtype.RecipeType
 import java.util.*
@@ -95,10 +95,14 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
         val pageNumberString = "${currentTab.currentPageIndex + 1} / ${currentTab.pageAmount}"
         
         return ComponentBuilder()
-            .append(NovaOverlay.getMovingComponent(8.toUByte())) // move to side to place overlay
+            .append(CustomCharacters.getMovingComponent(-8)) // move to side to place overlay
             .append(currentType.overlay.component)
-            .append(NovaOverlay.getMovingComponent(90.toUByte())) // move back to the middle
-            .append(NovaOverlay.getMovingComponent((pageNumberString.length * 2).toUByte())) // make number string centered
+            .append(CustomCharacters.getMovingComponent(-84)) // move back to the middle
+            .append(CustomCharacters.getMovingComponent((
+                CustomCharacters.getStringLength(pageNumberString) // this would be the string length in the default font
+                    + pageNumberString.replace(" ", "").length // non-space characters are generally one pixel bigger in this font
+                ) / -2 // divided by -2 to center it
+            ))
             .append(pageNumberString)
             .font("nova:recipes_numbers")
             .color(ChatColor.WHITE)

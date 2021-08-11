@@ -10,7 +10,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
-import xyz.xenondevs.nova.overlay.NovaOverlay
+import xyz.xenondevs.nova.overlay.CustomCharacters
 import xyz.xenondevs.nova.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.util.intValue
@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.util.intValue
 object TableRecipeType : RecipeType() {
     
     override val priority = 0
-    override val overlay = NovaOverlay.CRAFTING_RECIPE
+    override val overlay = CustomCharacters.CRAFTING_RECIPE
     override val icon = ItemBuilder(Material.CRAFTING_TABLE)
     
     override fun createGUI(holder: RecipeContainer): GUI {
