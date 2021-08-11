@@ -5,7 +5,7 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import kotlin.math.abs
 
-enum class NovaOverlay(fontName: String, char: Char) {
+enum class CustomCharacters(fontName: String, char: Char) {
     
     CRAFTING_RECIPE("gui", '0'),
     FURNACE_RECIPE("gui", '1'),
