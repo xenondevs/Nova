@@ -4,9 +4,10 @@ import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.ability.AbilityManager.AbilityType
 import xyz.xenondevs.nova.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.JetpackItem
+import xyz.xenondevs.nova.overlay.ActionbarOverlayManager
+import xyz.xenondevs.nova.overlay.impl.JetpackOverlay
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 
@@ -19,29 +20,29 @@ internal class JetpackFlyAbility(player: Player) : Ability(player) {
     private val wasAllowFlight = player.allowFlight
     private val previousFlySpeed = player.flySpeed
     
-    private lateinit var jetpackItem: ItemStack
+    private val overlay = JetpackOverlay()
+    private val jetpackItem: ItemStack
+        get() = player.equipment!!.chestplate!!
     
     init {
         player.isFlying = false
         player.flySpeed = FLY_SPEED
+        
+        ActionbarOverlayManager.registerOverlay(player, overlay)
     }
     
     override fun handleRemove() {
         player.allowFlight = wasAllowFlight
         player.isFlying = wasFlying
         player.flySpeed = previousFlySpeed
+        
+        ActionbarOverlayManager.unregisterOverlay(player, overlay)
     }
     
     override fun handleTick(tick: Int) {
-        if (!::jetpackItem.isInitialized) {
-            if (player.equipment?.chestplate == null) {
-                AbilityManager.takeAbility(player, AbilityType.JETPACK)
-                return
-            }
-            jetpackItem = player.equipment!!.chestplate!!
-        }
-        
         val energyLeft = JetpackItem.getEnergy(jetpackItem)
+        overlay.percentage = energyLeft / JetpackItem.maxEnergy.toDouble()
+        
         if (energyLeft > ENERGY_PER_TICK) {
             if (player.isFlying) {
                 JetpackItem.addEnergy(jetpackItem, -ENERGY_PER_TICK)

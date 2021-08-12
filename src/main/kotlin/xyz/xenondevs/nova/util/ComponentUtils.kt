@@ -44,6 +44,6 @@ fun Component.toBaseComponentArray(): Array<BaseComponent> {
     return ComponentSerializer.parse(CraftChatMessage.fromComponent(this))
 }
 
-fun Array<BaseComponent>.toComponent(): Component {
+fun Array<BaseComponent>.toComponent(): Component? {
     return CraftChatMessage.fromJSON(ComponentSerializer.toString(this))
 }
