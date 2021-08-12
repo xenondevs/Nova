@@ -64,11 +64,17 @@ class CompoundElement : Element {
     }
     
     override fun toString(): String {
+        return toString(depth = 0)
+    }
+    
+    fun toString(depth: Int): String {
+        val depthPrefix = " ".repeat(depth)
         val builder = StringBuilder("{\n")
         elements.forEach { (key, value) ->
-            builder.append("\"$key\": $value\n")
+            val valueString = if (value is CompoundElement) value.toString(depth + 1) else value.toString()
+            builder.append("$depthPrefix\"$key\": $valueString\n")
         }
-        builder.append("}")
+        builder.append("$depthPrefix}")
         return builder.toString()
     }
     
