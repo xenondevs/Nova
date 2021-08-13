@@ -63,6 +63,6 @@ internal class DeserializersTest {
     }
     
     private inline fun <reified T> assertValueEquals(expected: T, actualElement: BackedElement<T>) =
-        expected == actualElement.value
+        assertEquals(expected, actualElement.value)
     
 }
