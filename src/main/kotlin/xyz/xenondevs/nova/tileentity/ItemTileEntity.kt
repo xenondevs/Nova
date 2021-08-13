@@ -2,15 +2,15 @@ package xyz.xenondevs.nova.tileentity
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.network.item.ItemStorage
-import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.network.item.inventory.NetworkedVirtualInventory
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
+import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedVirtualInventory
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.enumMapOf
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
 abstract class ItemTileEntity(

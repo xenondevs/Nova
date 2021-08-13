@@ -20,15 +20,14 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.enchantments.Enchantment
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -39,6 +38,7 @@ import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.serverLevel
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("auto_fisher.capacity")!!

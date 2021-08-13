@@ -2,8 +2,9 @@ package xyz.xenondevs.nova.serialization.cbf.element
 
 import io.netty.buffer.Unpooled
 import org.junit.jupiter.api.Test
-import xyz.xenondevs.nova.serialization.cbf.element.primitive.*
-import xyz.xenondevs.nova.util.toByteArray
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.cbf.element.primitive.*
+import xyz.xenondevs.nova.util.data.toByteArray
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

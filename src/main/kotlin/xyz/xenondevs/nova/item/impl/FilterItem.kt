@@ -17,13 +17,13 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.item.ItemFilter
-import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
-import xyz.xenondevs.nova.util.GSON
-import xyz.xenondevs.nova.util.fromJson
-import xyz.xenondevs.nova.util.setLocalizedName
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
+import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.fromJson
+import xyz.xenondevs.nova.util.data.setLocalizedName
 
 private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
 

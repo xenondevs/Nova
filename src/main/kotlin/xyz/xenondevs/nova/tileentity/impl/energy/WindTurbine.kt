@@ -7,18 +7,18 @@ import net.minecraft.core.Rotations
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.protection.ProtectionManager
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
@@ -100,7 +100,7 @@ class WindTurbine(
     companion object {
         
         fun canPlace(player: Player, location: Location) =
-            getMultiHitboxLocations(location).all { it.block.type.isAir && ProtectionUtils.canPlace(player, it) }
+            getMultiHitboxLocations(location).all { it.block.type.isAir && ProtectionManager.canPlace(player, it) }
         
         fun getMultiHitboxLocations(location: Location) =
             location.clone().add(0.0, 1.0, 0.0).getStraightLine(Axis.Y, location.blockY + 3)

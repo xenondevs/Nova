@@ -16,6 +16,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*

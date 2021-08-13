@@ -3,24 +3,24 @@ package xyz.xenondevs.nova
 import de.studiocode.invui.resourcepack.ForceResourcePack
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
-import xyz.xenondevs.nova.ability.AbilityManager
-import xyz.xenondevs.nova.advancement.AdvancementManager
-import xyz.xenondevs.nova.armorstand.FakeArmorStandManager
-import xyz.xenondevs.nova.attachment.AttachmentManager
 import xyz.xenondevs.nova.command.CommandManager
-import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.database.DatabaseManager
-import xyz.xenondevs.nova.equipment.ArmorEquipListener
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.database.DatabaseManager
+import xyz.xenondevs.nova.data.recipe.RecipeManager
+import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.item.ItemManager
-import xyz.xenondevs.nova.network.NetworkManager
-import xyz.xenondevs.nova.packet.PacketListener
-import xyz.xenondevs.nova.recipe.RecipeManager
-import xyz.xenondevs.nova.recipe.RecipeRegistry
+import xyz.xenondevs.nova.network.PacketListener
+import xyz.xenondevs.nova.player.ability.AbilityManager
+import xyz.xenondevs.nova.player.advancement.AdvancementManager
+import xyz.xenondevs.nova.player.attachment.AttachmentManager
+import xyz.xenondevs.nova.player.equipment.ArmorEquipListener
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 
 lateinit var NOVA: Nova
 var IS_VERSION_CHANGE: Boolean = false

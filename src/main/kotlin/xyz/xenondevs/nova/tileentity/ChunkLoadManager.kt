@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.Chunk
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.data.config.PermanentStorage
 import java.util.*
 
 object ChunkLoadManager {

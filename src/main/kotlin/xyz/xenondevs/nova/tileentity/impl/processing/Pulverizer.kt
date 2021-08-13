@@ -6,15 +6,14 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.recipe.RecipeManager
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.recipe.RecipeManager
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -22,6 +21,7 @@ import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("pulverizer.capacity")!!

@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.serialization.cbf.element
 
 import org.junit.jupiter.api.Test
-import xyz.xenondevs.nova.serialization.cbf.BackedElement
-import xyz.xenondevs.nova.serialization.cbf.element.primitive.*
+import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
+import xyz.xenondevs.nova.data.serialization.cbf.element.EmptyDeserializer
+import xyz.xenondevs.nova.data.serialization.cbf.element.EmptyElement
+import xyz.xenondevs.nova.data.serialization.cbf.element.primitive.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

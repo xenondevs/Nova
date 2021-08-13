@@ -4,15 +4,14 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.ItemBuilder
-import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.util.SlotUtils
 import org.bukkit.Material
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
-import xyz.xenondevs.nova.overlay.CustomCharacters
-import xyz.xenondevs.nova.recipe.RecipeContainer
+import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.recipes.createRecipeChoiceItem
+import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 import xyz.xenondevs.nova.util.intValue
 
 object TableRecipeType : RecipeType() {

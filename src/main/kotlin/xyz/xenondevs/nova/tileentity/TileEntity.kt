@@ -18,17 +18,17 @@ import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.database.asyncTransaction
-import xyz.xenondevs.nova.database.table.TileEntitiesTable
+import xyz.xenondevs.nova.data.database.asyncTransaction
+import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
+import xyz.xenondevs.nova.data.serialization.DataHolder
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.region.Region
-import xyz.xenondevs.nova.serialization.DataHolder
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.upgrade.Upgradeable
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradeable
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.region.Region
 import java.util.*
 
 internal val SELF_UPDATE_REASON = object : UpdateReason {}

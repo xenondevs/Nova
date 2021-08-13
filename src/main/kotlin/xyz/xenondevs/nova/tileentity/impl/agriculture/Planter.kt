@@ -14,17 +14,14 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.region.Region
-import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -32,10 +29,13 @@ import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.item.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
-import xyz.xenondevs.nova.util.setLocalizedName
 import xyz.xenondevs.nova.util.soundGroup
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.world.region.Region
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.random.Random
 
@@ -128,7 +128,7 @@ class Planter(
             
             // Search for a block that has no block on top of it and is dirt/farmland
             // If the soil or plant block is protected, skip this block
-            if (!ProtectionUtils.canPlace(ownerUUID, block.location) || !ProtectionUtils.canBreak(ownerUUID, soilBlock.location))
+            if (!ProtectionManager.canPlace(ownerUUID, block.location) || !ProtectionManager.canBreak(ownerUUID, soilBlock.location))
                 return@indexOfFirst false
             
             // If the plant block is already occupied return false

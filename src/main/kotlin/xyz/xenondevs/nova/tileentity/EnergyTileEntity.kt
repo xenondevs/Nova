@@ -2,12 +2,12 @@ package xyz.xenondevs.nova.tileentity
 
 import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.energy.EnergyStorage
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyStorage
 import xyz.xenondevs.nova.util.EnergyUtils
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
 abstract class EnergyTileEntity(

@@ -10,11 +10,11 @@ import org.bukkit.Material
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
+import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.overlay.CustomCharacters
-import xyz.xenondevs.nova.recipe.ConversionNovaRecipe
-import xyz.xenondevs.nova.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.recipes.createRecipeChoiceItem
+import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 
 abstract class ConversionRecipeType : RecipeType() {
     

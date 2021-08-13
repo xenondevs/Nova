@@ -14,9 +14,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.config.BackItem
-import xyz.xenondevs.nova.upgrade.UpgradeHolder
-import xyz.xenondevs.nova.upgrade.UpgradeType
 import xyz.xenondevs.nova.util.addItemCorrectly
 
 class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Unit) {

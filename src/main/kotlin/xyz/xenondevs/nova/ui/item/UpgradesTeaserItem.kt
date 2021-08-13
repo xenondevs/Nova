@@ -7,9 +7,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.util.addLoreLines
-import xyz.xenondevs.nova.util.localized
-import xyz.xenondevs.nova.util.setLocalizedName
+import xyz.xenondevs.nova.util.data.addLoreLines
+import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.data.setLocalizedName
 
 object UpgradesTeaserItem : BaseItem() {
     

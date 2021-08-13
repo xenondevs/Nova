@@ -7,8 +7,8 @@ import org.bukkit.SoundGroup
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.RecipeChoice.MaterialChoice
+import xyz.xenondevs.nova.data.recipe.NovaRecipeChoice
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.recipe.NovaRecipeChoice
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 

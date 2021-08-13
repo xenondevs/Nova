@@ -15,13 +15,12 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.*
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -29,7 +28,10 @@ import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.data.addLoreLines
+import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.protection.ProtectionManager
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
@@ -297,7 +299,7 @@ class Quarry(
             minX + 1, 0, minZ + 1,
             maxX - 1, y - 2, maxZ - 1
         )
-            .filter { ProtectionUtils.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
+            .filter { ProtectionManager.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
             .sortedBy { it.distance(pointerLocation) }
             .maxByOrNull { it.y }
             ?.center()
@@ -448,7 +450,7 @@ class Quarry(
             val maxLoc = Location(location.world, positions[2].toDouble(), location.y, positions[3].toDouble())
     
             minLoc.fullCuboidTo(maxLoc) {
-                if (!ProtectionUtils.canBreak(uuid, it)) {
+                if (!ProtectionManager.canBreak(uuid, it)) {
                     ParticleBuilder(ParticleEffect.SMOKE_NORMAL, it.clone().center()).display()
                     return@canPlace false
                 } else {

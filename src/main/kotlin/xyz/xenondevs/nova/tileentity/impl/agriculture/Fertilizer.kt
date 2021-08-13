@@ -13,16 +13,14 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -33,8 +31,10 @@ import xyz.xenondevs.nova.util.blockPos
 import xyz.xenondevs.nova.util.item.PlantUtils
 import xyz.xenondevs.nova.util.item.isFullyAged
 import xyz.xenondevs.nova.util.nmsStack
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import xyz.xenondevs.nova.util.serverLevel
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("fertilizer.capacity")!!
@@ -101,7 +101,7 @@ class Fertilizer(
     private fun getRandomPlant(): Block? =
         fertilizeRegion.blocks
             .filter {
-                ProtectionUtils.canUse(ownerUUID, it.location)
+                ProtectionManager.canUse(ownerUUID, it.location)
                     && ((it.blockData is Ageable && !it.isFullyAged()) || (it.blockData !is Ageable && it.type in PlantUtils.PLANTS))
             }
             .randomOrNull()

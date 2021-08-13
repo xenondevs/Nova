@@ -13,12 +13,16 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.NetworkManager
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.network.item.ItemStorage
-import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
+import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
+import xyz.xenondevs.nova.util.data.addLoreLines
+import xyz.xenondevs.nova.util.data.setLocalizedName
+import xyz.xenondevs.nova.util.enumMapOf
 
 private val BUTTON_COLORS = listOf(
     NovaMaterial.RED_BUTTON,

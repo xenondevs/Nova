@@ -4,18 +4,18 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import org.bukkit.Material
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.*
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.protection.ProtectionManager
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("block_placer.capacity")!!
@@ -73,7 +73,7 @@ class BlockPlacer(
         if (energy >= ENERGY_PER_PLACE
             && type == Material.AIR
             && TileEntityManager.getTileEntityAt(placeLocation) == null
-            && ProtectionUtils.canPlace(ownerUUID, placeBlock.location)
+            && ProtectionManager.canPlace(ownerUUID, placeBlock.location)
         ) {
             if (placeBlock()) energy -= ENERGY_PER_PLACE
         }

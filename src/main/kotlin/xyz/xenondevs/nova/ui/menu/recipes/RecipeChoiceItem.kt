@@ -10,7 +10,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.recipe.RecipeRegistry
+import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
     val itemProviders = if (recipeChoice is RecipeChoice.MaterialChoice) recipeChoice.choices.map { ItemWrapper(ItemStack(it)) }

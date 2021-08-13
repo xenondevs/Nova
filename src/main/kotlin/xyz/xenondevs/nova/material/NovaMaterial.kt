@@ -6,12 +6,11 @@ import org.bukkit.Material
 import org.bukkit.Material.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.impl.agriculture.AutoFisher
@@ -32,6 +31,7 @@ import xyz.xenondevs.nova.tileentity.impl.world.BlockPlacer
 import xyz.xenondevs.nova.tileentity.impl.world.ChunkLoader
 import xyz.xenondevs.nova.tileentity.impl.world.Quarry
 import xyz.xenondevs.nova.util.toIntArray
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
 private fun blockOf(data: IntArray) = ModelData(BARRIER, data)

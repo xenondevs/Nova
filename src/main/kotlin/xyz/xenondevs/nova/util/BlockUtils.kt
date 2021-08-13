@@ -8,6 +8,7 @@ import org.bukkit.block.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
 

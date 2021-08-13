@@ -2,13 +2,13 @@ package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.World
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.util.GSON
 import xyz.xenondevs.nova.util.PermissionUtils
+import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.fromJson
 import xyz.xenondevs.nova.util.enumMapOf
-import xyz.xenondevs.nova.util.fromJson
 import java.util.*
 import kotlin.math.max
 

@@ -14,14 +14,14 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.NetworkEndPoint
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.energy.EnergyStorage
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.network.item.ItemStorage
-import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyStorage
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
+import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
-import xyz.xenondevs.nova.util.setLocalizedName
+import xyz.xenondevs.nova.util.data.setLocalizedName
 
 class SideConfigGUI(
     endPoint: NetworkEndPoint,

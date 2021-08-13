@@ -5,11 +5,11 @@ import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
-import xyz.xenondevs.nova.overlay.CustomCharacters
-import xyz.xenondevs.nova.recipe.GearPressNovaRecipe
-import xyz.xenondevs.nova.recipe.PlatePressNovaRecipe
-import xyz.xenondevs.nova.recipe.PulverizerNovaRecipe
-import xyz.xenondevs.nova.recipe.RecipeContainer
+import xyz.xenondevs.nova.data.recipe.GearPressNovaRecipe
+import xyz.xenondevs.nova.data.recipe.PlatePressNovaRecipe
+import xyz.xenondevs.nova.data.recipe.PulverizerNovaRecipe
+import xyz.xenondevs.nova.data.recipe.RecipeContainer
+import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 
 abstract class RecipeType : Comparable<RecipeType> {
     

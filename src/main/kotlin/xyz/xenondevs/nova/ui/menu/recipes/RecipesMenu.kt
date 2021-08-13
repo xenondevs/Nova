@@ -23,10 +23,10 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.overlay.CustomCharacters
-import xyz.xenondevs.nova.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.recipes.craftingtype.RecipeType
+import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 import java.util.*
 
 private val recipeHistory = HashMap<UUID, LinkedList<RecipesWindow>>()

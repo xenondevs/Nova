@@ -5,14 +5,14 @@ import com.mojang.brigadier.context.CommandContext
 import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import xyz.xenondevs.nova.command.*
-import xyz.xenondevs.nova.debug.NetworkDebugger
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.NetworkType
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
+import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.ui.menu.CreativeMenu
-import xyz.xenondevs.nova.util.coloredText
+import xyz.xenondevs.nova.util.data.coloredText
+import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
-import xyz.xenondevs.nova.util.localized
 
 
 object NovaCommand : PlayerCommand("nova") {

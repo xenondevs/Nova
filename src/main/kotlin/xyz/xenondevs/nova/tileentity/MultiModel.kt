@@ -4,7 +4,7 @@ import net.minecraft.core.Rotations
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 
 class MultiModel {
     

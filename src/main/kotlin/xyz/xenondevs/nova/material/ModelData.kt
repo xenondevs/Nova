@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.material
 import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.util.setLocalizedName
+import xyz.xenondevs.nova.util.data.setLocalizedName
 
 class ModelData(val material: Material, val dataArray: IntArray) {
     

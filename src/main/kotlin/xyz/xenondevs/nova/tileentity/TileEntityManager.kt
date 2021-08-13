@@ -20,14 +20,15 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.database.asyncTransaction
-import xyz.xenondevs.nova.database.table.TileEntitiesTable
+import xyz.xenondevs.nova.data.database.asyncTransaction
+import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundDeserializer
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundDeserializer
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.world.protection.ProtectionManager
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -303,13 +304,13 @@ object TileEntityManager : Listener {
         if (action == Action.RIGHT_CLICK_BLOCK && !event.player.isSneaking) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
-            if (tileEntity != null && ProtectionUtils.canUse(player, block.location)) tileEntity.handleRightClick(event)
+            if (tileEntity != null && ProtectionManager.canUse(player, block.location)) tileEntity.handleRightClick(event)
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             if ((block.type == Material.BARRIER || block.type == Material.CHAIN)
                 && event.player.gameMode == GameMode.SURVIVAL
                 && getTileEntityAt(block.location) != null
-                && ProtectionUtils.canBreak(player, block.location)) {
+                && ProtectionManager.canBreak(player, block.location)) {
                 
                 event.isCancelled = true
                 Bukkit.getPluginManager().callEvent(BlockBreakEvent(block, player))

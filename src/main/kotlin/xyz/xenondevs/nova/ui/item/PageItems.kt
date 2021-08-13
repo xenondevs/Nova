@@ -6,8 +6,8 @@ import de.studiocode.invui.item.impl.controlitem.PageItem
 import de.studiocode.invui.resourcepack.Icon
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
-import xyz.xenondevs.nova.util.addLoreLines
-import xyz.xenondevs.nova.util.setLocalizedName
+import xyz.xenondevs.nova.util.data.addLoreLines
+import xyz.xenondevs.nova.util.data.setLocalizedName
 
 class PageBackItem : PageItem(false) {
     

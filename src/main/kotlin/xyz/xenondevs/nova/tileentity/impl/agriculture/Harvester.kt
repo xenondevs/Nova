@@ -10,16 +10,14 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -30,7 +28,9 @@ import xyz.xenondevs.nova.util.addAll
 import xyz.xenondevs.nova.util.breakAndTakeDrops
 import xyz.xenondevs.nova.util.dropItemsNaturally
 import xyz.xenondevs.nova.util.item.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("harvester.capacity")!!
@@ -105,7 +105,7 @@ class Harvester(
                 val (block, expectedType) = queuedBlocks.first
                 queuedBlocks.removeFirst()
                 
-                if (!ProtectionUtils.canBreak(ownerUUID, block.location)) {
+                if (!ProtectionManager.canBreak(ownerUUID, block.location)) {
                     // skip block if it is protected
                     tryAgain = true
                     continue

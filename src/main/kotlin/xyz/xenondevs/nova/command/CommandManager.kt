@@ -7,7 +7,7 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.craftbukkit.v1_17_R1.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.command.impl.NovaCommand
-import xyz.xenondevs.nova.util.ReflectionUtils
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 
 val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher
 

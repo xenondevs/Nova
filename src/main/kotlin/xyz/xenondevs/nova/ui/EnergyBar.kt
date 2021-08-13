@@ -5,8 +5,8 @@ import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.EnergyUtils
-import xyz.xenondevs.nova.util.addLoreLines
-import xyz.xenondevs.nova.util.localized
+import xyz.xenondevs.nova.util.data.addLoreLines
+import xyz.xenondevs.nova.util.data.localized
 
 class EnergyBar(
     gui: GUI,

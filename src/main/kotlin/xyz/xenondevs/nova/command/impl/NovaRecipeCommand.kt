@@ -5,8 +5,8 @@ import net.minecraft.commands.CommandSourceStack
 import xyz.xenondevs.nova.command.PlayerCommand
 import xyz.xenondevs.nova.command.executesCatching
 import xyz.xenondevs.nova.command.player
-import xyz.xenondevs.nova.recipe.RecipeContainer
-import xyz.xenondevs.nova.recipe.RecipeRegistry
+import xyz.xenondevs.nova.data.recipe.RecipeContainer
+import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.ui.menu.recipes.RecipesWindow
 import xyz.xenondevs.nova.ui.menu.recipes.craftingtype.RecipeType
 
