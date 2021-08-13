@@ -14,13 +14,14 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.entity.EntityType
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.util.*
 
 val Entity.nmsEntity: net.minecraft.world.entity.Entity
@@ -30,13 +31,13 @@ val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
 val ItemStack.nmsStack: net.minecraft.world.item.ItemStack
-    get() = ReflectionRegistry.CB_CRAFT_ITEM_STACK_AS_NMS_COPY_METHOD.invoke(null, this) as net.minecraft.world.item.ItemStack
+    get() = CraftItemStack.asNMSCopy(this)
 
 val Location.blockPos: BlockPos
     get() = BlockPos(blockX, blockY, blockZ)
 
 val World.serverLevel: ServerLevel
-    get() = ReflectionRegistry.CB_CRAFT_WORLD_GET_HANDLE_METHOD.invoke(this) as ServerLevel
+    get() = (this as CraftWorld).handle
 
 val Player.connection: ServerGamePacketListenerImpl
     get() = serverPlayer.connection

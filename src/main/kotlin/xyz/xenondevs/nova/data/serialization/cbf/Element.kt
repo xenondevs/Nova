@@ -3,13 +3,13 @@ package xyz.xenondevs.nova.data.serialization.cbf
 import io.netty.buffer.ByteBuf
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ItemStackElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.LocationElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.NamespacedKeyElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.UUIDElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.primitive.*
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_CRAFT_ITEM_STACK_CLASS
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -45,7 +45,7 @@ interface BackedElement<T> : Element {
             Array<String>::class to ::StringArrayElement,
             UUID::class to ::UUIDElement,
             ItemStack::class to ::ItemStackElement,
-            CB_CRAFT_ITEM_STACK_CLASS.kotlin to ::ItemStackElement,
+            CraftItemStack::class to ::ItemStackElement,
             Location::class to ::LocationElement,
             NamespacedKey::class to ::NamespacedKeyElement
         )

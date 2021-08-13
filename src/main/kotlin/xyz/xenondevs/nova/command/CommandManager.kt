@@ -7,7 +7,7 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.craftbukkit.v1_17_R1.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.command.impl.NovaCommand
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
 val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher
 
@@ -38,7 +38,19 @@ object CommandManager {
     }
     
     private fun unregisterCommands() {
-        registeredCommands.forEach { ReflectionUtils.unregisterCommand(it) }
+        registeredCommands.forEach { unregisterCommand(it) }
+    }
+    
+    private fun unregisterCommand(name: String) {
+        val rootNode = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher.root
+        
+        val children = ReflectionRegistry.COMMAND_NODE_CHILDREN_FIELD.get(rootNode) as MutableMap<*, *>
+        val literals = ReflectionRegistry.COMMAND_NODE_LITERALS_FIELD.get(rootNode) as MutableMap<*, *>
+        val arguments = ReflectionRegistry.COMMAND_NODE_ARGUMENTS_FIELD.get(rootNode) as MutableMap<*, *>
+        
+        children.remove(name)
+        literals.remove(name)
+        arguments.remove(name)
     }
     
 }
