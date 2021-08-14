@@ -1,9 +1,10 @@
-package xyz.xenondevs.nova.world.protection
+package xyz.xenondevs.nova.integration.protection
 
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
+import xyz.xenondevs.nova.integration.Integration
 
-interface ProtectionPlugin {
+interface ProtectionIntegration : Integration {
     
     fun canBreak(player: OfflinePlayer, location: Location): Boolean
     

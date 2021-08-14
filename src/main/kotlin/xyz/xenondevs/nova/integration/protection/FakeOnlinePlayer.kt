@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.protection
+package xyz.xenondevs.nova.integration.protection
 
 import org.bukkit.*
 import org.bukkit.advancement.Advancement

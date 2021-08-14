@@ -31,7 +31,7 @@ import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*

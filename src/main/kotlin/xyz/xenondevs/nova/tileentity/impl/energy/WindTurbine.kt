@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.min

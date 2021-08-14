@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.protection.plugin
+package xyz.xenondevs.nova.integration.protection.plugin
 
 import com.sk89q.wepif.PermissionsResolverManager
 import com.sk89q.worldedit.blocks.BaseItemStack
@@ -21,10 +21,10 @@ import com.sk89q.worldguard.protection.flags.StateFlag
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
-import xyz.xenondevs.nova.world.protection.ProtectionPlugin
+import xyz.xenondevs.nova.integration.protection.ProtectionIntegration
 import java.util.*
 
-object WorldGuard : ProtectionPlugin {
+object WorldGuard : ProtectionIntegration {
     
     private val PLUGIN: WorldGuardPlugin?
     private val PLATFORM: WorldGuardPlatform?
@@ -38,6 +38,8 @@ object WorldGuard : ProtectionPlugin {
             PLATFORM = null
         }
     }
+    
+    override fun isInstalled() = PLATFORM != null && PLUGIN != null
     
     override fun canBreak(player: OfflinePlayer, location: Location): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true

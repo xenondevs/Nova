@@ -30,7 +30,7 @@ import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getTargetLocation
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 
 private val DATA_KEY = NamespacedKey(NOVA, "entityData")
 private val TYPE_KEY = NamespacedKey(NOVA, "entityType")

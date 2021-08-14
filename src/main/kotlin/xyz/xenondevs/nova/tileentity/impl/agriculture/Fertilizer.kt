@@ -33,7 +33,7 @@ import xyz.xenondevs.nova.util.item.isFullyAged
 import xyz.xenondevs.nova.util.nmsStack
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 

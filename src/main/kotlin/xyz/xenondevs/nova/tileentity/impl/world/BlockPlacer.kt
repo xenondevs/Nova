@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("block_placer.capacity")!!

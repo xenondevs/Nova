@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.castRay
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.isCompletelyDenied
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 
 object HitboxManager : Listener {
     

@@ -33,7 +33,7 @@ import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.item.*
 import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*

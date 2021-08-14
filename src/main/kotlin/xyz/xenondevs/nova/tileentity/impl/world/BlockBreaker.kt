@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt

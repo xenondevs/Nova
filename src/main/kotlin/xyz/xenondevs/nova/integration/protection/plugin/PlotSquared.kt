@@ -1,12 +1,14 @@
-package xyz.xenondevs.nova.world.protection.plugin
+package xyz.xenondevs.nova.integration.protection.plugin
 
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
-import xyz.xenondevs.nova.world.protection.ProtectionPlugin
+import xyz.xenondevs.nova.integration.protection.ProtectionIntegration
 import com.plotsquared.core.location.Location as PlotLocation
 
-object PlotSquared : ProtectionPlugin {
+object PlotSquared : ProtectionIntegration {
+    
+    override fun isInstalled() = HAS_PLOT_SQUARED
     
     private val HAS_PLOT_SQUARED = Bukkit.getPluginManager().getPlugin("PlotSquared") != null
     

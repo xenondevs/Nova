@@ -28,7 +28,7 @@ import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataT
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.world.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import java.util.*
 import kotlin.math.roundToInt
 
