@@ -6,6 +6,8 @@ import de.studiocode.invui.gui.builder.GUIType
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.other.ItemsAdder
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -15,7 +17,6 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("block_placer.capacity")!!
@@ -62,6 +63,11 @@ class BlockPlacer(
                 
                 inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
                 return true
+            } else if (ItemsAdder.isInstalled()) {
+                if (ItemsAdder.placeItem(item, placeBlock.location)) {
+                    inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
+                    return true
+                }
             }
         }
         

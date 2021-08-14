@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import dev.lone.itemsadder.api.CustomBlock
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
@@ -7,6 +8,7 @@ import org.bukkit.Material
 import org.bukkit.block.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.integration.other.ItemsAdder
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.particle.ParticleEffect
@@ -25,21 +27,27 @@ fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true
     val tileEntity = TileEntityManager.getTileEntityAt(location)
     if (tileEntity != null) {
         return TileEntityManager.destroyTileEntity(tileEntity, true)
-    } else {
-        val drops = this.getDrops(tool).toMutableList()
-        val state = state
-        if (state is Chest) {
-            drops += state.blockInventory.contents.filterNotNull()
-            state.blockInventory.clear()
-        } else if (state is Container && state !is ShulkerBox) {
-            drops += state.inventory.contents.filterNotNull()
-            state.inventory.clear()
-        }
-        
-        type = Material.AIR
-        
-        return drops
     }
+    
+    if (ItemsAdder.isInstalled()) {
+        val customBlock = CustomBlock.byAlreadyPlaced(this)
+        if (customBlock != null)
+            return ItemsAdder.breakCustomBlock(customBlock)
+    }
+    
+    val drops = this.getDrops(tool).toMutableList()
+    val state = state
+    if (state is Chest) {
+        drops += state.blockInventory.contents.filterNotNull()
+        state.blockInventory.clear()
+    } else if (state is Container && state !is ShulkerBox) {
+        drops += state.inventory.contents.filterNotNull()
+        state.inventory.clear()
+    }
+    
+    type = Material.AIR
+    
+    return drops
 }
 
 fun Block.playBreakEffects() {
