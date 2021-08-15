@@ -22,7 +22,9 @@ object ItemsAdder : Integration {
     
     fun placeItem(item: ItemStack, location: Location): Boolean {
         // Note: CustomBlock.byItemStack(item) can't be used because of an illegal cast in the ItemsAdder API
-        val customItem = CustomStack.byItemStack(item) ?: return false
+        val customItem = CustomStack.byItemStack(item)
+        if (customItem == null || !customItem.isBlock)
+            return false
         CustomBlock.place(customItem.namespacedID, location)
         Material.STONE.playPlaceSoundEffect(location)
         return true
