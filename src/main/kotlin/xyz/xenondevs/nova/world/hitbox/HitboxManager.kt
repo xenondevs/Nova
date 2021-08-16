@@ -9,10 +9,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.castRay
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.isCompletelyDenied
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 
 object HitboxManager : Listener {
     

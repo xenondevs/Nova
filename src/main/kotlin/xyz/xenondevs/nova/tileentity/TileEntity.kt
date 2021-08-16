@@ -124,7 +124,7 @@ abstract class TileEntity(
      * Called to get the [ItemStack] to be placed as the head of the [FakeArmorStand].
      */
     open fun getHeadStack(): ItemStack {
-        return material.block!!.getItem()
+        return material.block!!.createItemStack()
     }
     
     /**
@@ -277,7 +277,7 @@ abstract class TileEntity(
      * in the [TileEntityManager].
      */
     fun setAdditionalHitboxes(placeBlocks: Boolean, hitboxes: List<Location>) {
-        if (placeBlocks) hitboxes.forEach { it.block.type = material.hitbox!! }
+        if (placeBlocks) hitboxes.forEach { it.block.type = material.hitboxType!! }
         
         additionalHitboxes += hitboxes
         TileEntityManager.addTileEntityLocations(this, hitboxes)
@@ -308,11 +308,11 @@ abstract class TileEntity(
             val armorStand = FakeArmorStand(armorStandLocation, false) {
                 it.isInvisible = true
                 it.isMarker = true
-                it.hasVisualFire = material.hitbox.requiresLight
+                it.hasVisualFire = material.hitboxType.requiresLight
             }
             
             // create the tile entity
-            val tileEntity = material.createTileEntity!!(uuid, data, material, ownerUUID, armorStand)
+            val tileEntity = material.tileEntityConstructor!!(uuid, data, material, ownerUUID, armorStand)
             
             // set the head stack and register
             armorStand.setEquipment(EquipmentSlot.HEAD, tileEntity.getHeadStack())

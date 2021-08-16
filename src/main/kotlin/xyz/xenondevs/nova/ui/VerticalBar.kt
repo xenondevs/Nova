@@ -43,7 +43,7 @@ open class VerticalBar(
             val displayPercentage = max(min((percentage - displayPercentageStart) * totalSections, 1.0), 0.0)
             val state = round(displayPercentage * 16).toInt()
             
-            return modifyItemBuilder(barMaterial.item.getItemBuilder(state))
+            return modifyItemBuilder(barMaterial.item.createItemBuilder(state))
         }
         
         override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit

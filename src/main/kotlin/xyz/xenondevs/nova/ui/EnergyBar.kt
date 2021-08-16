@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.EnergyUtils
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
@@ -13,7 +13,7 @@ class EnergyBar(
     x: Int, y: Int,
     height: Int,
     private val getEnergyValues: () -> Triple<Int, Int, Int>
-) : VerticalBar(gui, x, y, height, NovaMaterial.RED_BAR) {
+) : VerticalBar(gui, x, y, height, NovaMaterialRegistry.RED_BAR) {
     
     private var energy: Int = 0
     private var maxEnergy: Int = 0

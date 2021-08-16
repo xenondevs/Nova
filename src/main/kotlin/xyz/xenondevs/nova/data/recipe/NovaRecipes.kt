@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.novaMaterial
 
 private fun findName(itemStack: ItemStack) =
-    itemStack.novaMaterial?.name ?: itemStack.type.name
+    itemStack.novaMaterial?.typeName ?: itemStack.type.name
 
 interface NovaRecipe {
     

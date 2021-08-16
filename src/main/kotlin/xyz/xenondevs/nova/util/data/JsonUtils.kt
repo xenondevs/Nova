@@ -2,7 +2,15 @@ package xyz.xenondevs.nova.util.data
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
+import org.bukkit.Chunk
+import org.bukkit.Location
+import org.bukkit.World
+import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.recipe.*
 import xyz.xenondevs.nova.data.serialization.gson.*
+import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.player.attachment.Attachment
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*
@@ -13,24 +21,25 @@ val JSON_PARSER = JsonParser()
 val GSON: Gson =
     GsonBuilder()
         .setPrettyPrinting()
-        .registerTypeHierarchyAdapter(UUIDTypeAdapter)
-        .registerTypeHierarchyAdapter(ItemStackSerializer)
-        .registerTypeHierarchyAdapter(ItemStackDeserializer)
-        .registerTypeHierarchyAdapter(ItemFilterSerializer)
-        .registerTypeHierarchyAdapter(ItemFilterDeserializer)
-        .registerTypeHierarchyAdapter(ShapedNovaRecipeDeserializer)
-        .registerTypeHierarchyAdapter(ShapelessNovaRecipeDeserializer)
-        .registerTypeHierarchyAdapter(FurnaceNovaRecipeDeserializer)
-        .registerTypeHierarchyAdapter(PulverizerNovaRecipeDeserializer)
-        .registerTypeHierarchyAdapter(PlatePressNovaRecipeDeserializer)
-        .registerTypeHierarchyAdapter(GearPressNovaRecipeDeserializer)
-        .registerTypeHierarchyAdapter(ChunkSerializer)
-        .registerTypeHierarchyAdapter(ChunkDeserializer)
-        .registerTypeHierarchyAdapter(LocationSerializer)
-        .registerTypeHierarchyAdapter(LocationDeserializer)
-        .registerTypeHierarchyAdapter(AttachmentSerializer)
-        .registerTypeHierarchyAdapter(AttachmentDeserializer)
-        .registerTypeHierarchyAdapter(WorldTypeAdapter)
+        .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
+        .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerializer)
+        .registerTypeHierarchyAdapter<ItemStack>(ItemStackDeserializer)
+        .registerTypeHierarchyAdapter<ItemFilter>(ItemFilterSerializer)
+        .registerTypeHierarchyAdapter<ItemFilter>(ItemFilterDeserializer)
+        .registerTypeHierarchyAdapter<ShapedNovaRecipe>(ShapedNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter<ShapelessNovaRecipe>(ShapelessNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter<FurnaceNovaRecipe>(FurnaceNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter<PulverizerNovaRecipe>(PulverizerNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter<PlatePressNovaRecipe>(PlatePressNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter<GearPressNovaRecipe>(GearPressNovaRecipeDeserializer)
+        .registerTypeHierarchyAdapter<Chunk>(ChunkSerializer)
+        .registerTypeHierarchyAdapter<Chunk>(ChunkDeserializer)
+        .registerTypeHierarchyAdapter<Location>(LocationSerializer)
+        .registerTypeHierarchyAdapter<Location>(LocationDeserializer)
+        .registerTypeHierarchyAdapter<Attachment>(AttachmentSerializer)
+        .registerTypeHierarchyAdapter<Attachment>(AttachmentDeserializer)
+        .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
+        .registerTypeHierarchyAdapter<NovaMaterial>(NovaMaterialSerialization)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
         .enableComplexMapKeySerialization()
         .create()
@@ -118,22 +127,7 @@ inline fun <reified T> Gson.fromJson(jsonElement: JsonElement?): T? {
     return fromJson(jsonElement, type<T>())
 }
 
-inline fun <reified T> GsonBuilder.registerTypeAdapter(typeAdapter: TypeAdapter<T>): GsonBuilder =
-    registerTypeAdapter(type<T>(), typeAdapter)
-
-inline fun <reified T> GsonBuilder.registerTypeAdapter(typeAdapter: JsonSerializer<T>): GsonBuilder =
-    registerTypeAdapter(type<T>(), typeAdapter)
-
-inline fun <reified T> GsonBuilder.registerTypeAdapter(typeAdapter: JsonDeserializer<T>): GsonBuilder =
-    registerTypeAdapter(type<T>(), typeAdapter)
-
-inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: TypeAdapter<T>): GsonBuilder =
-    registerTypeHierarchyAdapter(T::class.java, typeAdapter)
-
-inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: JsonSerializer<T>): GsonBuilder =
-    registerTypeHierarchyAdapter(T::class.java, typeAdapter)
-
-inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: JsonDeserializer<T>): GsonBuilder =
+inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: Any): GsonBuilder = 
     registerTypeHierarchyAdapter(T::class.java, typeAdapter)
 
 inline fun <reified T> type(): Type = object : TypeToken<T>() {}.type

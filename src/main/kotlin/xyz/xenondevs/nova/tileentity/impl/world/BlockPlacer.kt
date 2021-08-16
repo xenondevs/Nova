@@ -54,7 +54,7 @@ class BlockPlacer(
                 if (novaMaterial != null && novaMaterial.isBlock) {
                     if (TileEntityLimits.canPlaceTileEntity(ownerUUID, world, novaMaterial) == PlaceResult.ALLOW) {
                         TileEntityManager.placeTileEntity(ownerUUID, placeBlock.location, armorStand.location.yaw, novaMaterial, null)
-                        novaMaterial.hitbox?.playPlaceSoundEffect(placeBlock.location)
+                        novaMaterial.hitboxType?.playPlaceSoundEffect(placeBlock.location)
                     } else continue
                 } else {
                     placeBlock.place(item)

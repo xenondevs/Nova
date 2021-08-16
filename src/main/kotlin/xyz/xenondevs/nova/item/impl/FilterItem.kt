@@ -19,7 +19,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLACKLIST_BUTTON
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.WHITELIST_BUTTON
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
@@ -94,8 +95,8 @@ private class ItemFilterGUI(private val player: Player, private val itemStack: I
     private inner class SwitchModeItem : BaseItem() {
         
         override fun getItemProvider(): ItemProvider =
-            if (itemFilter.whitelist) NovaMaterial.WHITELIST_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.whitelist")
-            else NovaMaterial.BLACKLIST_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.blacklist")
+            if (itemFilter.whitelist) WHITELIST_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.whitelist")
+            else BLACKLIST_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.blacklist")
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             itemFilter.whitelist = !itemFilter.whitelist

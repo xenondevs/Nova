@@ -16,7 +16,9 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -33,7 +35,6 @@ import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.item.*
 import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
@@ -197,7 +198,7 @@ class Planter(
                 "| . . . # h # . |" +
                 "| . . . # f # . |" +
                 "3 - - - - - - - 4")
-            .addIngredient('h', VISlotElement(hoesInventory, 0, NovaMaterial.HOE_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('h', VISlotElement(hoesInventory, 0, NovaMaterialRegistry.HOE_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('a', VisualizeRegionItem(uuid, plantRegion))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('f', AutoTillingItem())
@@ -210,7 +211,7 @@ class Planter(
         private inner class AutoTillingItem : BaseItem() {
             
             override fun getItemProvider(): ItemProvider {
-                return (if (autoTill) NovaMaterial.HOE_ON_BUTTON else NovaMaterial.HOE_OFF_BUTTON)
+                return (if (autoTill) NovaMaterialRegistry.HOE_ON_BUTTON else NovaMaterialRegistry.HOE_OFF_BUTTON)
                     .createBasicItemBuilder().setLocalizedName("menu.nova.planter.autotill")
             }
             

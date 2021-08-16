@@ -12,7 +12,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
@@ -25,13 +25,13 @@ import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.enumMapOf
 
 private val BUTTON_COLORS = listOf(
-    NovaMaterial.RED_BUTTON,
-    NovaMaterial.ORANGE_BUTTON,
-    NovaMaterial.YELLOW_BUTTON,
-    NovaMaterial.GREEN_BUTTON,
-    NovaMaterial.BLUE_BUTTON,
-    NovaMaterial.PINK_BUTTON,
-    NovaMaterial.WHITE_BUTTON
+    NovaMaterialRegistry.RED_BUTTON,
+    NovaMaterialRegistry.ORANGE_BUTTON,
+    NovaMaterialRegistry.YELLOW_BUTTON,
+    NovaMaterialRegistry.GREEN_BUTTON,
+    NovaMaterialRegistry.BLUE_BUTTON,
+    NovaMaterialRegistry.PINK_BUTTON,
+    NovaMaterialRegistry.WHITE_BUTTON
 )
 
 class ItemSideConfigGUI(
@@ -129,13 +129,13 @@ class ItemSideConfigGUI(
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (itemStorage.itemConfig[blockFace]!!) {
                 ItemConnectionType.NONE ->
-                    NovaMaterial.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
+                    NovaMaterialRegistry.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
                 ItemConnectionType.EXTRACT ->
-                    NovaMaterial.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
+                    NovaMaterialRegistry.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
                 ItemConnectionType.INSERT ->
-                    NovaMaterial.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
+                    NovaMaterialRegistry.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
                 ItemConnectionType.BUFFER ->
-                    NovaMaterial.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
+                    NovaMaterialRegistry.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
             }.setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         

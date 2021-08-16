@@ -10,7 +10,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.recipe.*
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.MaterialUtils
 import xyz.xenondevs.nova.util.data.*
 import java.lang.reflect.Type
@@ -18,7 +18,7 @@ import java.lang.reflect.Type
 @Suppress("LiftReturnOrAssignment", "CascadeIf")
 private fun getItemBuilder(name: String): ItemBuilder {
     if (name.startsWith("nova:")) {
-        return NovaMaterial.valueOf(name.substringAfter(':').uppercase()).createItemBuilder()
+        return NovaMaterialRegistry.get(name.substringAfter(':').uppercase()).createItemBuilder()
     } else if (name.startsWith("minecraft:")) {
         return ItemBuilder(Material.valueOf(name.substringAfter(':').uppercase()))
     } else throw IllegalArgumentException("Invalid item name: $name")

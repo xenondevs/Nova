@@ -25,10 +25,11 @@ import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundDeserializer
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -118,7 +119,7 @@ object TileEntityManager : Listener {
         
         runTaskLater(1) {
             // set the hitbox block (1 tick later to prevent interference with the BlockBreakEvent)
-            material.hitbox?.run { block.type = this }
+            material.hitboxType?.run { block.type = this }
             // handle finished initializing
             tileEntity.handleInitialized(true)
             // save the tile entity to the database
@@ -133,7 +134,7 @@ object TileEntityManager : Listener {
                     it[y] = location.blockY
                     it[z] = location.blockZ
                     it[this.yaw] = spawnLocation.yaw
-                    it[type] = material.name
+                    it[type] = material.typeName
                     it[this.data] = ExposedBlob(tileEntity.getData())
                 }
             }
@@ -200,7 +201,7 @@ object TileEntityManager : Listener {
                 .forEach {
                     val uuid = it[TileEntitiesTable.uuid]
                     val data = CompoundDeserializer.read(it[TileEntitiesTable.data].bytes)
-                    val material = NovaMaterial.valueOf(it[TileEntitiesTable.type])
+                    val material = NovaMaterialRegistry.get(it[TileEntitiesTable.type])
                     
                     val location = Location(
                         Bukkit.getWorld(it[TileEntitiesTable.world]),
@@ -260,7 +261,7 @@ object TileEntityManager : Listener {
                 val playerLocation = player.location
                 
                 if (getTileEntityAt(location) == null
-                    && material.canPlace?.invoke(
+                    && material.placeCheck?.invoke(
                         player,
                         location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
                     ) != false

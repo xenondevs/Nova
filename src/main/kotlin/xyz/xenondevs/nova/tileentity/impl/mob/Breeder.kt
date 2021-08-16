@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -169,7 +170,7 @@ class Breeder(
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
         
-        val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
+        val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.breeder.idle", idleTime))

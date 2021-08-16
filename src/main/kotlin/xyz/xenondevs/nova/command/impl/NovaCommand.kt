@@ -6,6 +6,7 @@ import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkType
@@ -22,8 +23,8 @@ object NovaCommand : PlayerCommand("nova") {
             .then(literal("give")
                 .requiresPermission("nova.creative")
                 .apply {
-                    NovaMaterial.values().forEach { material ->
-                        then(literal(material.name)
+                    NovaMaterialRegistry.values.forEach { material ->
+                        then(literal(material.typeName)
                             .executesCatching { handleGive(material, it) }
                         )
                     }
@@ -45,7 +46,7 @@ object NovaCommand : PlayerCommand("nova") {
     private fun handleGive(material: NovaMaterial, context: CommandContext<CommandSourceStack>) {
         val player = context.player
         player.inventory.addItem(material.createItemStack())
-        val itemName = material.itemName.ifBlank { material.name }
+        val itemName = material.localizedName.ifBlank { material.typeName }
         
         player.spigot().sendMessage(localized(
             ChatColor.GRAY,

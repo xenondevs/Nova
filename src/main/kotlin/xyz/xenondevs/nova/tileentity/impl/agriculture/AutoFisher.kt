@@ -23,6 +23,7 @@ import org.bukkit.enchantments.Enchantment
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -168,14 +169,14 @@ class AutoFisher(
                 "| . . . . # . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('f', VISlotElement(fishingRodInventory, 0, NovaMaterial.FISHING_ROD_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('f', VISlotElement(fishingRodInventory, 0, NovaMaterialRegistry.FISHING_ROD_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('u', UpgradesTeaserItem)
             .build()
             .apply { fillRectangle(1, 2, 6, inventory, true) }
         
         val energyBar = EnergyBar(gui = gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
         
-        val idleBar = object : VerticalBar(gui = gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
+        val idleBar = object : VerticalBar(gui = gui, x = 6, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(TranslatableComponent("menu.nova.auto_fisher.idle", IDLE_TIME - idleTime))
         }

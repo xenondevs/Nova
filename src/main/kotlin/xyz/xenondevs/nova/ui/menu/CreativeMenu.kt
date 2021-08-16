@@ -9,11 +9,12 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 
 object CreativeMenu {
     
     fun getWindow(player: Player): SimpleWindow {
-        val items = NovaMaterial.values().filter { it.item.data < 9000 }.map(::ObtainItem)
+        val items = NovaMaterialRegistry.sortedValues.filter { it.item.data < 9000 }.map(::ObtainItem)
         val gui = GUIBuilder(GUIType.SCROLL, 9, 6).setStructure("" +
             "x x x x x x x x #" +
             "x x x x x x x x u" +
@@ -28,9 +29,10 @@ object CreativeMenu {
     }
 }
 
-class ObtainItem(val material: NovaMaterial) : SimpleItem(material.createItemBuilder()) {
+class ObtainItem(val material: NovaMaterial) : SimpleItem(material.itemProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.inventory.addItem(material.createItemStack())
     }
+    
 }

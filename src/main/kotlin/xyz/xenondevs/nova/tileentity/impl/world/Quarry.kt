@@ -17,7 +17,9 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
@@ -31,7 +33,6 @@ import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
@@ -41,14 +42,14 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
-private val SCAFFOLDING_STACKS = NovaMaterial.SCAFFOLDING.block!!.let { modelData -> modelData.dataArray.indices.map { modelData.getItem(it) } }
+private val SCAFFOLDING_STACKS = NovaMaterialRegistry.SCAFFOLDING.block!!.let { modelData -> modelData.dataArray.indices.map { modelData.createItemStack(it) } }
 private val FULL_HORIZONTAL = SCAFFOLDING_STACKS[0]
 private val FULL_VERTICAL = SCAFFOLDING_STACKS[1]
 private val CORNER_DOWN = SCAFFOLDING_STACKS[2]
 private val SMALL_HORIZONTAL = SCAFFOLDING_STACKS[3]
 private val FULL_SLIM_VERTICAL = SCAFFOLDING_STACKS[4]
 private val SLIM_VERTICAL_DOWN = SCAFFOLDING_STACKS[5]
-private val DRILL = NovaMaterial.NETHERITE_DRILL.createItemStack()
+private val DRILL = NovaMaterialRegistry.NETHERITE_DRILL.createItemStack()
 
 private val MIN_SIZE = NovaConfig.getInt("quarry.min_size")!!
 private val MAX_SIZE = NovaConfig.getInt("quarry.max_size")!!
@@ -516,7 +517,7 @@ class Quarry(
             
             override fun getItemProvider(): ItemProvider {
                 val number = getNumber()
-                return NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
+                return NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
                     .setDisplayName(TranslatableComponent("menu.nova.quarry.size", number, number))
                     .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
             }

@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -137,14 +138,14 @@ class MobDuplicator(
                 "| u # # # # . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('i', VISlotElement(inventory, 0, NovaMaterial.BOTTLED_MOB_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('i', VISlotElement(inventory, 0, NovaMaterialRegistry.BOTTLED_MOB_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('n', ToggleNBTModeItem())
             .addIngredient('u', UpgradesTeaserItem)
             .build()
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -energyPerTick) }
         
-        private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
+        private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - idleTime))
@@ -158,7 +159,7 @@ class MobDuplicator(
         private inner class ToggleNBTModeItem : BaseItem() {
             
             override fun getItemProvider(): ItemProvider {
-                return (if (keepNbt) NovaMaterial.NBT_ON_BUTTON else NovaMaterial.NBT_OFF_BUTTON)
+                return (if (keepNbt) NovaMaterialRegistry.NBT_ON_BUTTON else NovaMaterialRegistry.NBT_OFF_BUTTON)
                     .createBasicItemBuilder().setLocalizedName("menu.nova.mob_duplicator.nbt")
             }
             

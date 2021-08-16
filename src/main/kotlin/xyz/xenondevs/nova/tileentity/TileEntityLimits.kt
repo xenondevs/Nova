@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.PermissionUtils
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
-import xyz.xenondevs.nova.util.enumMapOf
 import java.util.*
 import kotlin.math.max
 
@@ -18,10 +17,10 @@ object TileEntityLimits {
         GSON.fromJson<HashSet<World>>(NovaConfig.getArray("tile_entity_world_blacklist"))!!
     
     private val TYPE_WORLD_BLACKLIST: Map<NovaMaterial, Set<World>> =
-        GSON.fromJson<EnumMap<NovaMaterial, HashSet<World>>>(NovaConfig.getObject("tile_entity_type_world_blacklist"))!!
+        GSON.fromJson<HashMap<NovaMaterial, HashSet<World>>>(NovaConfig.getObject("tile_entity_type_world_blacklist"))!!
     
     private val TYPE_AMOUNT_LIMIT: Map<NovaMaterial, Int> =
-        GSON.fromJson<EnumMap<NovaMaterial, Int>>(NovaConfig.getObject("tile_entity_limit"))!!
+        GSON.fromJson<HashMap<NovaMaterial, Int>>(NovaConfig.getObject("tile_entity_limit"))!!
     
     private val placedTileEntities: MutableMap<UUID, MutableMap<NovaMaterial, Int>>
     
@@ -46,12 +45,12 @@ object TileEntityLimits {
     }
     
     fun handleTileEntityCreate(uuid: UUID, type: NovaMaterial) {
-        val materialMap = placedTileEntities.getOrPut(uuid) { enumMapOf() }
+        val materialMap = placedTileEntities.getOrPut(uuid) { hashMapOf() }
         materialMap[type] = (materialMap[type] ?: 0) + 1
     }
     
     fun handleTileEntityRemove(uuid: UUID, type: NovaMaterial) {
-        val materialMap = placedTileEntities.getOrPut(uuid) { enumMapOf() }
+        val materialMap = placedTileEntities.getOrPut(uuid) { hashMapOf() }
         materialMap[type] = max(0, (materialMap[type] ?: 0) - 1)
     }
     

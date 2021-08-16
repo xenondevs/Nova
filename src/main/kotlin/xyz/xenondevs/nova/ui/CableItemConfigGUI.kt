@@ -12,7 +12,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
@@ -33,8 +33,8 @@ class CableItemConfigGUI(
             "# # # # # # # # #")
         .addIngredient('i', InsertItem())
         .addIngredient('e', ExtractItem())
-        .addIngredient('1', VISlotElement(insertFilterInventory, 0, NovaMaterial.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
-        .addIngredient('2', VISlotElement(extractFilterInventory, 0, NovaMaterial.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
+        .addIngredient('1', VISlotElement(insertFilterInventory, 0, NovaMaterialRegistry.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
+        .addIngredient('2', VISlotElement(extractFilterInventory, 0, NovaMaterialRegistry.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
         .build()
     
     fun openWindow(player: Player) {
@@ -56,7 +56,7 @@ class CableItemConfigGUI(
             set(value) = itemStorage.setInsert(face, value)
         
         override fun getItemProvider(): ItemProvider =
-            (if (state) NovaMaterial.GREEN_BUTTON else NovaMaterial.GRAY_BUTTON)
+            (if (state) NovaMaterialRegistry.GREEN_BUTTON else NovaMaterialRegistry.GRAY_BUTTON)
                 .createBasicItemBuilder().setLocalizedName("menu.nova.cable_config.insert")
         
         override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) {
@@ -73,7 +73,7 @@ class CableItemConfigGUI(
             set(value) = itemStorage.setExtract(face, value)
         
         override fun getItemProvider(): ItemProvider =
-            (if (state) NovaMaterial.GREEN_BUTTON else NovaMaterial.GRAY_BUTTON)
+            (if (state) NovaMaterialRegistry.GREEN_BUTTON else NovaMaterialRegistry.GRAY_BUTTON)
                 .createBasicItemBuilder().setLocalizedName("menu.nova.cable_config.extract")
         
         override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) {

@@ -3,9 +3,10 @@ package xyz.xenondevs.nova.ui.menu.recipes.craftingtype
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.util.SlotUtils
 import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
@@ -18,7 +19,7 @@ object TableRecipeType : RecipeType() {
     
     override val priority = 0
     override val overlay = CustomCharacters.CRAFTING_RECIPE
-    override val icon = ItemBuilder(Material.CRAFTING_TABLE)
+    override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
     override fun createGUI(holder: RecipeContainer): GUI {
         require(holder.isCraftingRecipe)

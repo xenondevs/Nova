@@ -9,7 +9,9 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -18,7 +20,6 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
@@ -62,14 +63,14 @@ class WindTurbine(
     private fun spawnModels() {
         val location = armorStand.location.clone()
         location.y += 2
-        columnModel.addModels(Model(NovaMaterial.WIND_TURBINE.block!!.getItem(1), location))
+        columnModel.addModels(Model(NovaMaterialRegistry.WIND_TURBINE.block!!.createItemStack(1), location))
         
         location.y += 1.0 / 32.0
-        turbineModel.addModels(Model(NovaMaterial.WIND_TURBINE.block.getItem(2), location))
+        turbineModel.addModels(Model(NovaMaterialRegistry.WIND_TURBINE.block.createItemStack(2), location))
         
         for (blade in 0..2) {
             turbineModel.addModels(Model(
-                NovaMaterial.WIND_TURBINE.block.getItem(3),
+                NovaMaterialRegistry.WIND_TURBINE.block.createItemStack(3),
                 location,
                 Rotations(0f, 0f, blade * 120f)
             ))

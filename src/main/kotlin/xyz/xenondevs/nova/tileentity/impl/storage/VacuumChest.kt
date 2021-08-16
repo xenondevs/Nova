@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.ItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
@@ -86,7 +87,7 @@ class VacuumChest(
     
     private fun handleFilterInventoryUpdate(event: ItemUpdateEvent) {
         val newStack = event.newItemStack
-        if (newStack?.novaMaterial == NovaMaterial.ITEM_FILTER)
+        if (newStack?.novaMaterial == NovaMaterialRegistry.ITEM_FILTER)
             filter = newStack.getFilterConfig()
         else if (newStack != null) event.isCancelled = true
     }
@@ -110,7 +111,7 @@ class VacuumChest(
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('r', VisualizeRegionItem(uuid, region))
-            .addIngredient('f', VISlotElement(filterInventory, 0, NovaMaterial.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('f', VISlotElement(filterInventory, 0, NovaMaterialRegistry.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
             .build()
             .also { it.fillRectangle(3, 1, 4, inventory, true) }
         

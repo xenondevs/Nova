@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.CONSUME
@@ -174,11 +175,11 @@ class MechanicalPress(
             
             override fun getItemProvider(): ItemProvider {
                 return if (type == PressType.PLATE) {
-                    if (this@MechanicalPress.type == PressType.PLATE) NovaMaterial.PLATE_OFF_BUTTON.createItemBuilder()
-                    else NovaMaterial.PLATE_ON_BUTTON.item.getItemBuilder("menu.nova.mechanical_press.press_plates")
+                    if (this@MechanicalPress.type == PressType.PLATE) NovaMaterialRegistry.PLATE_OFF_BUTTON.createItemBuilder()
+                    else NovaMaterialRegistry.PLATE_ON_BUTTON.item.createItemBuilder("menu.nova.mechanical_press.press_plates")
                 } else {
-                    if (this@MechanicalPress.type == PressType.GEAR) NovaMaterial.GEAR_OFF_BUTTON.createItemBuilder()
-                    else NovaMaterial.GEAR_ON_BUTTON.item.getItemBuilder("menu.nova.mechanical_press.press_gears")
+                    if (this@MechanicalPress.type == PressType.GEAR) NovaMaterialRegistry.GEAR_OFF_BUTTON.createItemBuilder()
+                    else NovaMaterialRegistry.GEAR_ON_BUTTON.item.createItemBuilder("menu.nova.mechanical_press.press_gears")
                 }
             }
             

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -116,7 +117,7 @@ class MobKiller(
         
         val energyBar = EnergyBar(gui, x = 3, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
         
-        val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
+        val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_killer.idle", idleTime))

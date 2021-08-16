@@ -4,7 +4,7 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.GUIType
 import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemWrapper
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
 import org.bukkit.inventory.FurnaceRecipe
@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 
@@ -45,7 +45,7 @@ abstract class ConversionRecipeType : RecipeType() {
         
         if (time != -1) {
             builder.addIngredient(
-                't', NovaMaterial.STOPWATCH_ICON
+                't', NovaMaterialRegistry.STOPWATCH_ICON
                 .createBasicItemBuilder()
                 .setDisplayName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
             )
@@ -58,18 +58,18 @@ abstract class ConversionRecipeType : RecipeType() {
 
 object SmeltingRecipeType : ConversionRecipeType() {
     override val priority = 1
-    override val icon = ItemBuilder(Material.FURNACE)
+    override val icon = ItemWrapper(ItemStack(Material.FURNACE))
     override val overlay = CustomCharacters.FURNACE_RECIPE
 }
 
 object PulverizingRecipeType : ConversionRecipeType() {
     override val priority = 2
-    override val icon = NovaMaterial.PULVERIZER.createBasicItemBuilder()
+    override val icon = NovaMaterialRegistry.PULVERIZER.basicItemProvider
     override val overlay = CustomCharacters.PULVERIZER_RECIPE
 }
 
 object PressingRecipeType : ConversionRecipeType() {
     override val priority = 3
-    override val icon = NovaMaterial.MECHANICAL_PRESS.createBasicItemBuilder()
+    override val icon = NovaMaterialRegistry.MECHANICAL_PRESS.basicItemProvider
     override val overlay = CustomCharacters.PRESS_RECIPE
 }

@@ -20,8 +20,9 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.addPrioritized
 import xyz.xenondevs.nova.util.capitalizeAll
@@ -30,7 +31,6 @@ import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getTargetLocation
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 
 private val DATA_KEY = NamespacedKey(NOVA, "entityData")
 private val TYPE_KEY = NamespacedKey(NOVA, "entityType")
@@ -62,7 +62,7 @@ object BottledMobItem : NovaItem(), Listener {
                 Bukkit.getPluginManager().callEvent(fakeDamageEvent)
                 
                 if (!fakeDamageEvent.isCancelled && fakeDamageEvent.damage != 0.0) {
-                    val itemStack = NovaMaterial.BOTTLED_MOB.createItemStack()
+                    val itemStack = NovaMaterialRegistry.BOTTLED_MOB.createItemStack()
                     absorbEntity(itemStack, clicked)
                     
                     player.inventory.getItem(event.hand).amount -= 1

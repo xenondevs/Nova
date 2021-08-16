@@ -9,7 +9,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -59,13 +59,13 @@ class EnergySideConfigGUI(
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (energyStorage.energyConfig[blockFace]!!) {
                 EnergyConnectionType.NONE ->
-                    NovaMaterial.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
+                    NovaMaterialRegistry.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
                 EnergyConnectionType.PROVIDE ->
-                    NovaMaterial.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
+                    NovaMaterialRegistry.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
                 EnergyConnectionType.CONSUME ->
-                    NovaMaterial.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
+                    NovaMaterialRegistry.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
                 EnergyConnectionType.BUFFER ->
-                    NovaMaterial.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
+                    NovaMaterialRegistry.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
             }.setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         

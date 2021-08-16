@@ -48,7 +48,7 @@ fun Advancement.addObtainCriteria(novaMaterial: NovaMaterial): Criteria {
     val material = itemStack.type
     val customModelData = itemStack.itemMeta?.customModelData ?: 0
     
-    return addCriteria("obtain_${novaMaterial.name.lowercase()}", TriggerType.INVENTORY_CHANGED) {
+    return addCriteria("obtain_${novaMaterial.typeName.lowercase()}", TriggerType.INVENTORY_CHANGED) {
         it.hasItemMatching { data ->
             data.setType(material)
             data.setNbt("{CustomModelData:$customModelData}")

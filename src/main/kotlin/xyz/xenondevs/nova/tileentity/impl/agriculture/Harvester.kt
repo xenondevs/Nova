@@ -12,7 +12,9 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -29,7 +31,6 @@ import xyz.xenondevs.nova.util.breakAndTakeDrops
 import xyz.xenondevs.nova.util.dropItemsNaturally
 import xyz.xenondevs.nova.util.item.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
@@ -213,9 +214,9 @@ class Harvester(
                 "3 - - - - - - - 4")
             .addIngredient('c', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('v', VisualizeRegionItem(uuid, harvestRegion))
-            .addIngredient('s', VISlotElement(shearInventory, 0, NovaMaterial.SHEARS_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('a', VISlotElement(axeInventory, 0, NovaMaterial.AXE_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('h', VISlotElement(hoeInventory, 0, NovaMaterial.HOE_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('s', VISlotElement(shearInventory, 0, NovaMaterialRegistry.SHEARS_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('a', VISlotElement(axeInventory, 0, NovaMaterialRegistry.AXE_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('h', VISlotElement(hoeInventory, 0, NovaMaterialRegistry.HOE_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('u', UpgradesTeaserItem)
             .build()
             .apply { fillRectangle(1, 3, 6, inventory, true) }

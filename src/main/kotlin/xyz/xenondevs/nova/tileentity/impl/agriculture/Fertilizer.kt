@@ -15,6 +15,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
@@ -33,7 +34,6 @@ import xyz.xenondevs.nova.util.item.isFullyAged
 import xyz.xenondevs.nova.util.nmsStack
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 

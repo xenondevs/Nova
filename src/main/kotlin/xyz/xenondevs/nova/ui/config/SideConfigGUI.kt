@@ -13,7 +13,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyStorage
@@ -49,12 +49,12 @@ class SideConfigGUI(
                     "i x x x x x x x x")
                 .addIngredient('b', BackItem(openPrevious))
                 .addIngredient('e', ClickyTabItem(0) {
-                    if (it.currentTab == 0) NovaMaterial.ENERGY_OFF_BUTTON.createBasicItemBuilder()
-                    else NovaMaterial.ENERGY_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.energy")
+                    if (it.currentTab == 0) NovaMaterialRegistry.ENERGY_OFF_BUTTON.createBasicItemBuilder()
+                    else NovaMaterialRegistry.ENERGY_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.energy")
                 })
                 .addIngredient('i', ClickyTabItem(1) {
-                    if (it.currentTab == 1) NovaMaterial.ITEM_OFF_BUTTON.createBasicItemBuilder()
-                    else NovaMaterial.ITEM_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.item")
+                    if (it.currentTab == 1) NovaMaterialRegistry.ITEM_OFF_BUTTON.createBasicItemBuilder()
+                    else NovaMaterialRegistry.ITEM_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.item")
                 })
                 .addGUI(energyConfigGUI)
                 .addGUI(itemConfigGUI)
@@ -74,7 +74,7 @@ class SideConfigGUI(
     
 }
 
-class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterial.SIDE_CONFIG_BUTTON.item.getItemBuilder("menu.nova.side_config")) {
+class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterialRegistry.SIDE_CONFIG_BUTTON.item.createItemBuilder("menu.nova.side_config")) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

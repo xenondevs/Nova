@@ -24,7 +24,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.recipes.craftingtype.RecipeType
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 import java.util.*
@@ -130,7 +130,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
     inner class PageBackItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
-            (if (gui.hasPageBefore()) NovaMaterial.ARROW_LEFT_ON_BUTTON else NovaMaterial.ARROW_LEFT_OFF_BUTTON)
+            (if (gui.hasPageBefore()) NovaMaterialRegistry.ARROW_LEFT_ON_BUTTON else NovaMaterialRegistry.ARROW_LEFT_OFF_BUTTON)
                 .createBasicItemBuilder()
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -146,7 +146,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
     inner class PageForwardItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
-            (if (gui.hasNextPage()) NovaMaterial.ARROW_RIGHT_ON_BUTTON else NovaMaterial.ARROW_RIGHT_OFF_BUTTON)
+            (if (gui.hasNextPage()) NovaMaterialRegistry.ARROW_RIGHT_ON_BUTTON else NovaMaterialRegistry.ARROW_RIGHT_OFF_BUTTON)
                 .createBasicItemBuilder()
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

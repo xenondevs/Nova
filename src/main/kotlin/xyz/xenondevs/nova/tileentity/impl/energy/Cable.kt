@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -114,7 +115,7 @@ open class Cable(
         filterInventories[type]?.get(blockFace)?.getItemStack(0)?.getFilterConfig()
     
     private fun handleFilterInventoryUpdate(event: ItemUpdateEvent) {
-        if (event.newItemStack != null && event.newItemStack?.novaMaterial != NovaMaterial.ITEM_FILTER)
+        if (event.newItemStack != null && event.newItemStack?.novaMaterial != NovaMaterialRegistry.ITEM_FILTER)
             event.isCancelled = true
     }
     
@@ -123,7 +124,7 @@ open class Cable(
         
         val booleans = CUBE_FACES.map { connectedFaces.contains(it) }.reversed().toBooleanArray()
         val number = MathUtils.convertBooleanArrayToInt(booleans)
-        return material.block!!.getItem(number)
+        return material.block!!.createItemStack(number)
     }
     
     private fun getModelsNeeded(): List<Model> {
@@ -147,7 +148,7 @@ open class Cable(
                     else -> 0
                 }
                 
-                val itemStack = material.block!!.getItem(ATTACHMENTS[attachmentIndex])
+                val itemStack = material.block!!.createItemStack(ATTACHMENTS[attachmentIndex])
                 items += itemStack to getRotation(blockFace)
             }
         
@@ -202,7 +203,7 @@ open class Cable(
             
             hitboxes += Hitbox(
                 from, to,
-                { it.action.isRightClick() && it.hasItem() && it.item!!.novaMaterial == NovaMaterial.WRENCH },
+                { it.action.isRightClick() && it.hasItem() && it.item!!.novaMaterial == NovaMaterialRegistry.WRENCH },
                 { handleCableWrenchHit(it, blockFace) }
             )
         }

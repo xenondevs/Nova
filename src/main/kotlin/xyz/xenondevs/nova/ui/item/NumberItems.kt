@@ -7,7 +7,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 
 open class ChangeNumberItem(
     private val range: IntRange,
@@ -33,7 +33,7 @@ open class ChangeNumberItem(
 
 class DisplayNumberItem(private val getNumber: () -> Int) : BaseItem() {
     
-    override fun getItemProvider(): ItemProvider = NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
+    override fun getItemProvider(): ItemProvider = NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
     
     override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
     
@@ -48,8 +48,8 @@ class AddNumberItem(
     1,
     getNumber,
     setNumber,
-    NovaMaterial.PLUS_ON_BUTTON.createBasicItemBuilder(),
-    NovaMaterial.PLUS_OFF_BUTTON.createBasicItemBuilder()
+    NovaMaterialRegistry.PLUS_ON_BUTTON.createBasicItemBuilder(),
+    NovaMaterialRegistry.PLUS_OFF_BUTTON.createBasicItemBuilder()
 )
 
 class RemoveNumberItem(
@@ -61,6 +61,6 @@ class RemoveNumberItem(
     -1,
     getNumber,
     setNumber,
-    NovaMaterial.MINUS_ON_BUTTON.createBasicItemBuilder(),
-    NovaMaterial.MINUS_OFF_BUTTON.createBasicItemBuilder()
+    NovaMaterialRegistry.MINUS_ON_BUTTON.createBasicItemBuilder(),
+    NovaMaterialRegistry.MINUS_OFF_BUTTON.createBasicItemBuilder()
 )

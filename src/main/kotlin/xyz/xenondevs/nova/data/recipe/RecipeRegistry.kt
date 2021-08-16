@@ -126,7 +126,7 @@ object RecipeRegistry {
     fun getNameKey(itemStack: ItemStack): String {
         val novaMaterial = itemStack.novaMaterial
         
-        return if (novaMaterial != null) "nova:${novaMaterial.name.lowercase()}"
+        return if (novaMaterial != null) "nova:${novaMaterial.typeName.lowercase()}"
         else "minecraft:${itemStack.type.name.lowercase()}"
     }
     

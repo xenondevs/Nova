@@ -13,7 +13,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.config.BackItem
@@ -67,7 +67,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     
 }
 
-class OpenUpgradesItem(val upgradesGUI: UpgradesGUI) : SimpleItem(NovaMaterial.UPGRADES_BUTTON.item.getItemBuilder("menu.nova.upgrades")) {
+class OpenUpgradesItem(val upgradesGUI: UpgradesGUI) : SimpleItem(NovaMaterialRegistry.UPGRADES_BUTTON.item.createItemBuilder("menu.nova.upgrades")) {
     
     constructor(upgradeHolder: UpgradeHolder) : this(upgradeHolder.gui)
     
