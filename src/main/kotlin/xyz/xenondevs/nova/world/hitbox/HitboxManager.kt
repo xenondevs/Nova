@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.hitbox
 
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -11,7 +12,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.castRay
-import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.isCompletelyDenied
 
 object HitboxManager : Listener {
@@ -45,30 +45,28 @@ object HitboxManager : Listener {
             
             var lastChunk: Chunk? = null
             var surroundingHitboxes: List<Hitbox>? = null
-            player.eyeLocation.castRay(0.1, 8.0) { location ->
+            player.eyeLocation.castRay(0.1, if (player.gameMode == GameMode.CREATIVE) 8.0 else 4.0) { location ->
                 val block = location.block
                 if (block.type.isTraversable() || !block.boundingBox.contains(location.x, location.y, location.z)) {
                     val chunk = block.chunk
+                    
                     if (chunk != lastChunk) {
                         // if the ray has moved out of the chunk it was previously in, the surrounding hitboxes need to be recalculated
                         lastChunk = chunk
-                        val chunks = chunk.getSurroundingChunks(range = 1, includeCurrent = true)
-                        surroundingHitboxes = chunks.flatMap {
-                            hitboxes[it] ?: emptyList()
-                        }.filter { it.checkQualify(event) }
+                        surroundingHitboxes = hitboxes[chunk]?.filter { it.checkQualify(event) } ?: emptyList()
                     }
                     
-                    val hitHitboxes = surroundingHitboxes!!.filter { it.isInHitbox(location) }
-                    if (hitHitboxes.isNotEmpty()) {
-                        if (ProtectionManager.canUse(player, location))
-                            hitHitboxes.forEach { it.handleHit(event) }
-                        return@castRay false // don't continue ray
-                    }
-                } else {
-                    return@castRay false // don't continue ray
-                }
-                
-                return@castRay true // continue ray
+                    var continueRay = true
+                    surroundingHitboxes!!.stream()
+                        .filter { it.isInHitbox(location) && ProtectionManager.canUse(player, location) }
+                        .findFirst()
+                        .ifPresent {
+                            continueRay = false
+                            it.handleHit(event)
+                        }
+                    
+                    return@castRay continueRay
+                } else return@castRay false // block not traversable, don't continue ray
             }
         }
     }

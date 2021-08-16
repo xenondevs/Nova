@@ -59,14 +59,13 @@ inline fun <reified T> Location.getNeighboringTileEntitiesOfType(): Map<BlockFac
     return tileEntities
 }
 
-fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
+inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
     val vector = direction.multiply(stepSize)
     val location = clone()
     var distance = 0.0
-    while (run(location)) {
+    while (run(location) && distance <= maxDistance) {
         location.add(vector)
         distance += stepSize
-        if (distance > maxDistance) break
     }
 }
 
