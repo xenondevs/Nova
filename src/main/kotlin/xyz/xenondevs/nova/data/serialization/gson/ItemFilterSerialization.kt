@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
 import java.lang.reflect.Type
 
-object ItemFilterSerializer : JsonSerializer<ItemFilter> {
+object ItemFilterSerialization : JsonSerializer<ItemFilter>, JsonDeserializer<ItemFilter> {
     
     override fun serialize(src: ItemFilter, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         val jsonObject = JsonObject()
@@ -15,10 +15,6 @@ object ItemFilterSerializer : JsonSerializer<ItemFilter> {
         jsonObject.add("items", GSON.toJsonTree(src.items))
         return jsonObject
     }
-    
-}
-
-object ItemFilterDeserializer : JsonDeserializer<ItemFilter> {
     
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ItemFilter {
         json as JsonObject

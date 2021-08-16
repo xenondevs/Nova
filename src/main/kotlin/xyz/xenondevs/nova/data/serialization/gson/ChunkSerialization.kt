@@ -5,7 +5,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import java.lang.reflect.Type
 
-object ChunkSerializer : JsonSerializer<Chunk> {
+object ChunkSerialization : JsonSerializer<Chunk>, JsonDeserializer<Chunk> {
     
     override fun serialize(src: Chunk, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         val jsonObject = JsonObject()
@@ -15,10 +15,6 @@ object ChunkSerializer : JsonSerializer<Chunk> {
         
         return jsonObject
     }
-    
-}
-
-object ChunkDeserializer : JsonDeserializer<Chunk> {
     
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Chunk {
         json as JsonObject

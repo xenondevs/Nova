@@ -5,7 +5,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import java.lang.reflect.Type
 
-object LocationSerializer : JsonSerializer<Location> {
+object LocationSerialization : JsonSerializer<Location>, JsonDeserializer<Location> {
     
     override fun serialize(src: Location, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         val obj = JsonObject()
@@ -17,9 +17,6 @@ object LocationSerializer : JsonSerializer<Location> {
         obj.addProperty("world", src.world?.name ?: "")
         return obj
     }
-}
-
-object LocationDeserializer : JsonDeserializer<Location> {
     
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Location {
         val obj = json.asJsonObject

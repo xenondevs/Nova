@@ -22,25 +22,20 @@ val GSON: Gson =
     GsonBuilder()
         .setPrettyPrinting()
         .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
-        .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerializer)
-        .registerTypeHierarchyAdapter<ItemStack>(ItemStackDeserializer)
-        .registerTypeHierarchyAdapter<ItemFilter>(ItemFilterSerializer)
-        .registerTypeHierarchyAdapter<ItemFilter>(ItemFilterDeserializer)
+        .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerialization)
+        .registerTypeHierarchyAdapter<ItemFilter>(ItemFilterSerialization)
         .registerTypeHierarchyAdapter<ShapedNovaRecipe>(ShapedNovaRecipeDeserializer)
         .registerTypeHierarchyAdapter<ShapelessNovaRecipe>(ShapelessNovaRecipeDeserializer)
         .registerTypeHierarchyAdapter<FurnaceNovaRecipe>(FurnaceNovaRecipeDeserializer)
         .registerTypeHierarchyAdapter<PulverizerNovaRecipe>(PulverizerNovaRecipeDeserializer)
         .registerTypeHierarchyAdapter<PlatePressNovaRecipe>(PlatePressNovaRecipeDeserializer)
         .registerTypeHierarchyAdapter<GearPressNovaRecipe>(GearPressNovaRecipeDeserializer)
-        .registerTypeHierarchyAdapter<Chunk>(ChunkSerializer)
-        .registerTypeHierarchyAdapter<Chunk>(ChunkDeserializer)
-        .registerTypeHierarchyAdapter<Location>(LocationSerializer)
-        .registerTypeHierarchyAdapter<Location>(LocationDeserializer)
-        .registerTypeHierarchyAdapter<Attachment>(AttachmentSerializer)
-        .registerTypeHierarchyAdapter<Attachment>(AttachmentDeserializer)
+        .registerTypeHierarchyAdapter<Chunk>(ChunkSerialization)
+        .registerTypeHierarchyAdapter<Location>(LocationSerialization)
+        .registerTypeHierarchyAdapter<Attachment>(AttachmentSerialization)
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
         .registerTypeHierarchyAdapter<NovaMaterial>(NovaMaterialSerialization)
-        .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator())
+        .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()
         .create()
 
@@ -127,7 +122,7 @@ inline fun <reified T> Gson.fromJson(jsonElement: JsonElement?): T? {
     return fromJson(jsonElement, type<T>())
 }
 
-inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: Any): GsonBuilder = 
+inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: Any): GsonBuilder =
     registerTypeHierarchyAdapter(T::class.java, typeAdapter)
 
 inline fun <reified T> type(): Type = object : TypeToken<T>() {}.type

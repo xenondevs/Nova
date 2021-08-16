@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.data.getString
 import java.lang.reflect.Type
 import java.util.*
 
-object AttachmentSerializer : JsonSerializer<Attachment> {
+object AttachmentSerialization : JsonSerializer<Attachment>, JsonDeserializer<Attachment> {
     
     override fun serialize(src: Attachment, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         val jsonObject = JsonObject()
@@ -21,10 +21,6 @@ object AttachmentSerializer : JsonSerializer<Attachment> {
         
         return jsonObject
     }
-    
-}
-
-object AttachmentDeserializer : JsonDeserializer<Attachment> {
     
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Attachment {
         json as JsonObject
