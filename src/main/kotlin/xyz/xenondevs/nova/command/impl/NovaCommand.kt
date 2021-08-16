@@ -14,6 +14,9 @@ import xyz.xenondevs.nova.ui.menu.CreativeMenu
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
 
 
 object NovaCommand : PlayerCommand("nova") {
@@ -41,6 +44,10 @@ object NovaCommand : PlayerCommand("nova") {
             .then(literal("inventory")
                 .requiresPermission("nova.creative")
                 .executesCatching { openCreativeInventory(it) })
+            .then(literal("renderDistance")
+                .requiresPermission("nova.armor_stand_render_distance")
+                .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
+                    .executesCatching { setRenderDistance(it) }))
     }
     
     private fun handleGive(material: NovaMaterial, context: CommandContext<CommandSourceStack>) {
@@ -80,6 +87,18 @@ object NovaCommand : PlayerCommand("nova") {
     
     private fun openCreativeInventory(context: CommandContext<CommandSourceStack>) {
         CreativeMenu.getWindow(context.player).show()
+    }
+    
+    private fun setRenderDistance(context: CommandContext<CommandSourceStack>) {
+        val player = context.player
+        val distance: Int = context["distance"]
+        player.armorStandRenderDistance = distance
+        
+        player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.render_distance",
+            coloredText(ChatColor.AQUA, distance)
+        ))
     }
     
 }

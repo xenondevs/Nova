@@ -1,5 +1,4 @@
 {
-  "armor_stand_render_distance": 4,
   "resource_pack": {
     "enabled": true,
     "url": "https://github.com/xenondevs/NovaRP/releases/download/v0.4/NovaRP.zip"
@@ -11,6 +10,11 @@
     "username": "",
     "password": "",
     "database": ""
+  },
+  "armor_stand_render_distance": {
+    "min": 1,
+    "max": 6,
+    "default": 4
   },
   "cable": {
     "basic": {
