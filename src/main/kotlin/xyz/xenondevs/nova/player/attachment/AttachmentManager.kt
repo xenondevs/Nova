@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.data.GSON
@@ -23,6 +24,7 @@ object AttachmentManager : Listener {
     private var tick = 0
     
     fun init() {
+        LOGGER.info("Initializing AttachmentManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getOnlinePlayers().forEach { loadAttachments(it) }
         NOVA.disableHandlers.add { Bukkit.getOnlinePlayers().forEach { saveAndRemoveAttachments(it) } }

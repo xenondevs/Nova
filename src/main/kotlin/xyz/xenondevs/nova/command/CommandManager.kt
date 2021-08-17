@@ -5,6 +5,7 @@ import net.minecraft.commands.CommandSourceStack
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.craftbukkit.v1_17_R1.command.VanillaCommandWrapper
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.command.impl.NovaCommand
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -16,6 +17,7 @@ object CommandManager {
     private val registeredCommands = ArrayList<String>()
     
     fun init() {
+        LOGGER.info("Registering Commands")
         registerCommands()
         NOVA.disableHandlers += this::unregisterCommands
     }

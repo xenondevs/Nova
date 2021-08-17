@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -47,6 +48,7 @@ object RecipeManager : Listener {
     val gearPressRecipes = ArrayList<GearPressNovaRecipe>()
     
     fun registerRecipes() {
+        LOGGER.info("Loading recipes")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         NovaConfig.loadRecipes().forEach(NovaRecipe::register)
     }

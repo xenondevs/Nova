@@ -21,8 +21,10 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import java.util.logging.Logger
 
 lateinit var NOVA: Nova
+lateinit var LOGGER: Logger
 var IS_VERSION_CHANGE: Boolean = false
 
 class Nova : JavaPlugin() {
@@ -34,6 +36,7 @@ class Nova : JavaPlugin() {
     
     override fun onEnable() {
         NOVA = this
+        LOGGER = logger
         
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
         PermanentStorage.store("last_version", description.version)
@@ -60,6 +63,8 @@ class Nova : JavaPlugin() {
         forceResourcePack()
         
         Metrics(this, 11927)
+        
+        LOGGER.info("Done loading")
     }
     
     override fun onDisable() {

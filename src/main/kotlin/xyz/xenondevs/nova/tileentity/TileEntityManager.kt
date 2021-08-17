@@ -19,6 +19,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.asyncTransaction
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
@@ -67,6 +68,7 @@ object TileEntityManager : Listener {
         get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
     
     fun init() {
+        LOGGER.info("Initializing TileEntityManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkLoad)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkUnload) }

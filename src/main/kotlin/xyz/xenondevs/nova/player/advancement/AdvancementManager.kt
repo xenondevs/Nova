@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.player.advancement.agriculture.AutoFisherAdvancement
@@ -79,6 +80,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
     }
     
     fun loadAdvancements() {
+        LOGGER.info("Loading advancements")
         registerAll(
             RootAdvancement,
             BasicCableAdvancement, AdvancedCableAdvancement, EliteCableAdvancement, UltimateCableAdvancement,

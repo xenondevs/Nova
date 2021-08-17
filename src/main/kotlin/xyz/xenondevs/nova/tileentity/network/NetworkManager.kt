@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.network
 
 import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.enumMapOf
@@ -13,6 +14,7 @@ object NetworkManager {
     val networks = ArrayList<Network>()
     
     fun init() {
+        LOGGER.info("Initializing NetworkManager")
         runTaskTimer(0, 1) {
             networks.forEach(Network::handleTick)
         }

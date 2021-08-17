@@ -62,6 +62,7 @@ object NovaLegacyDataConverter : Listener {
     private val convertedTileChunks = PermanentStorage.retrieve("convertedTileChunks") { HashSet<AsyncChunkPos>() }
     
     fun init() {
+        LOGGER.info("Initializing LegacyDataConverter")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::convertChunk)
         
@@ -119,24 +120,24 @@ object NovaLegacyDataConverter : Listener {
     }
     
     private fun convertLegacyVanillaTileEntity(tile: TileState) {
-        println("[NovaLegacyDataConverter] Converting Vanilla-TileEntity at ${tile.location}")
+        LOGGER.info("Converting Vanilla-TileEntity at ${tile.location}")
         
         val data = tile.getLegacyData()
-        println("[NovaLegacyDataConverter] Converting JSON: $data")
+        LOGGER.info("Converting JSON: $data")
         
         val itemConfig: EnumMap<BlockFace, ItemConnectionType>? = GSON.fromJson(data.get("itemConfig"))
         
         val convertedData = CompoundElement()
         if (itemConfig != null) convertedData.putElement("itemConfig", itemConfig.toElement(ItemConnectionType::class))
         
-        println("[NovaLegacyDataConverter] Converted to: $convertedData")
+        LOGGER.info("Converted to: $convertedData")
         
         tile.setVanillaTileEntityData(convertedData)
     }
     
     private fun convertLegacyArmorStand(armorStand: ArmorStand) {
         if (armorStand.hasTileEntityData()) {
-            println("[NovaLegacyDataConverter] Converting Nova-TileEntity at ${armorStand.location}")
+            LOGGER.info("Converting Nova-TileEntity at ${armorStand.location}")
             val tileEntityData = armorStand.getTileEntityData()
             val (material, ownerUUID, convertedData) = convertTileEntityData(tileEntityData)
             
@@ -154,7 +155,7 @@ object NovaLegacyDataConverter : Listener {
     }
     
     private fun convertTileEntityData(tileEntityData: JsonObject): Triple<NovaMaterial, UUID, CompoundElement> {
-        println("[NovaLegacyDataConverter] Converting JSON: $tileEntityData")
+        LOGGER.info("Converting JSON: $tileEntityData")
         val material: NovaMaterial = GSON.fromJson(tileEntityData.get("material"))!!
         val ownerUUID: UUID = GSON.fromJson(tileEntityData.get("owner"))!!
         
@@ -178,7 +179,7 @@ object NovaLegacyDataConverter : Listener {
         }
         
         val triple = Triple(material, ownerUUID, convertedData)
-        println("[NovaLegacyDataConverter] Converted to: $triple")
+        LOGGER.info("Converted to: $triple")
         return triple
     }
     
@@ -199,7 +200,7 @@ object NovaLegacyDataConverter : Listener {
             } else if (jsonElement is JsonPrimitive) {
                 convertedData.putJsonPrimitive(key, jsonElement)
             } else {
-                println("[NovaLegacyDataConverter] Could not convert $key ($jsonElement)")
+                LOGGER.warning("Could not convert $key ($jsonElement)")
             }
         }
         

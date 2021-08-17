@@ -16,6 +16,7 @@ import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.chunkPos
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
@@ -32,6 +33,7 @@ object VanillaTileEntityManager : Listener {
     private val tileEntityQueue = LinkedList<VanillaTileEntity>()
     
     fun init() {
+        LOGGER.info("Initializing VanillaTileEntityManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::handleChunkLoad)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::handleChunkUnload) }

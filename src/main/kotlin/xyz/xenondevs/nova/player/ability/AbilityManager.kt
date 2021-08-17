@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
@@ -25,6 +26,7 @@ object AbilityManager : Listener {
     private var tick = 0
     
     fun init() {
+        LOGGER.info("Initializing AbilityManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerJoin)
         runTaskTimer(0, 1) {

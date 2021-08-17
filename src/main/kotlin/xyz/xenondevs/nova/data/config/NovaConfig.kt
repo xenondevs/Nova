@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.config
 
 import com.google.gson.JsonObject
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.recipe.*
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
@@ -14,6 +15,7 @@ object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
     private val internalConfig = JsonConfig(JSON_PARSER.parse(getResourceAsStream("config/config.json")!!.reader()).asJsonObject)
     
     fun init() {
+        LOGGER.info("Loading config")
         extractNeededFiles()
         reload()
         defaultConfig.reload()

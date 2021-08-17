@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.util.runAsyncTask
@@ -39,6 +40,7 @@ object FakeArmorStandManager : Listener {
     private val chunkArmorStands = HashMap<AsyncChunkPos, MutableList<FakeArmorStand>>()
     
     fun init() {
+        LOGGER.info("Initializing FakeArmorStandManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         
         Bukkit.getOnlinePlayers().forEach { player ->

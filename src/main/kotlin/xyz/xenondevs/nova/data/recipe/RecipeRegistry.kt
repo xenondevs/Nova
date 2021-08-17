@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.recipe
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.inventory.*
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.ui.menu.recipes.craftingtype.RecipeType
@@ -23,11 +24,11 @@ object RecipeRegistry {
     
     fun init() {
         runAsyncTask {
-            println("[Nova] Initializing recipe registry")
+            LOGGER.info("Initializing recipe registry")
             BUKKIT_RECIPES = loadBukkitRecipes()
             CREATION_RECIPES = loadCreationRecipes()
             USAGE_RECIPES = loadUsageRecipes()
-            println("[Nova] Finished initializing recipe registry")
+            LOGGER.info("Finished initializing recipe registry")
             
             runTask {
                 CommandManager.registerCommand(NovaRecipeCommand)

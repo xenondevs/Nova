@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.Chunk
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import java.util.*
@@ -10,6 +11,7 @@ object ChunkLoadManager {
     private val forceLoadedChunks = PermanentStorage.retrieve("forceLoadedChunks") { HashMap<Chunk, HashSet<UUID>>() }
     
     fun init() {
+        LOGGER.info("Initializing ChunkLoadManager")
         NOVA.disableHandlers.add { PermanentStorage.store("forceLoadedChunks", forceLoadedChunks) }
         forceLoadedChunks.keys.forEach { it.world.setChunkForceLoaded(it.x, it.z, true) }
     }
