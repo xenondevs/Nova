@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
+import net.dzikoysk.exposed.upsert.upsert
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.*
 import org.bukkit.block.Block
@@ -13,12 +14,13 @@ import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
+import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.asyncTransaction
@@ -124,22 +126,6 @@ object TileEntityManager : Listener {
             material.hitboxType?.run { block.type = this }
             // handle finished initializing
             tileEntity.handleInitialized(true)
-            // save the tile entity to the database
-            asyncTransaction {
-                tileEntity.saveData()
-                TileEntitiesTable.insert {
-                    it[this.uuid] = uuid
-                    it[world] = location.world!!.uid
-                    it[chunkX] = chunk.x
-                    it[chunkZ] = chunk.z
-                    it[x] = location.blockX
-                    it[y] = location.blockY
-                    it[z] = location.blockZ
-                    it[this.yaw] = spawnLocation.yaw
-                    it[type] = material.typeName
-                    it[this.data] = ExposedBlob(tileEntity.getData())
-                }
-            }
         }
     }
     
@@ -233,10 +219,50 @@ object TileEntityManager : Listener {
     }
     
     private fun handleChunkUnload(chunk: Chunk) {
+        saveChunk(chunk)
+        
         val tileEntities = tileEntityMap[chunk]
         tileEntityMap -= chunk
         locationCache.removeAll { it.chunk == chunk }
         tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
+    }
+    
+    private fun saveChunk(chunk: Chunk) {
+        val tileEntities = tileEntityMap[chunk]?.values ?: return
+        
+        transaction {
+            tileEntities.forEach { tileEntity ->
+                tileEntity.saveData()
+                
+                TileEntitiesTable.upsert(
+                    conflictColumn = TileEntitiesTable.uuid,
+                    
+                    insertBody = {
+                        val location = tileEntity.location
+                        
+                        it[uuid] = tileEntity.uuid
+                        it[world] = tileEntity.location.world!!.uid
+                        it[chunkX] = chunk.x
+                        it[chunkZ] = chunk.z
+                        it[x] = location.blockX
+                        it[y] = location.blockY
+                        it[z] = location.blockZ
+                        it[yaw] = tileEntity.armorStand.location.yaw
+                        it[type] = tileEntity.material.typeName
+                        it[data] = ExposedBlob(tileEntity.getData())
+                    },
+                    
+                    updateBody = {
+                        it[data] = ExposedBlob(tileEntity.getData())
+                    }
+                )
+            }
+        }
+    }
+    
+    @EventHandler
+    fun handleWorldSave(event: WorldSaveEvent) {
+        runAsyncTask { event.world.loadedChunks.forEach { saveChunk(it) } }
     }
     
     @EventHandler

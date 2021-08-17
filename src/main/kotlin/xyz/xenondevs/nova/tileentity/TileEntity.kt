@@ -13,13 +13,6 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import org.jetbrains.exposed.sql.Transaction
-import org.jetbrains.exposed.sql.statements.api.ExposedBlob
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
-import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.database.asyncTransaction
-import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -97,23 +90,6 @@ abstract class TileEntity(
     }
     
     /**
-     * Calls the [saveData] function and then writes the [data] object
-     * to the [armor stand][armorStand] of this [TileEntity].
-     */
-    fun saveAndWriteData() {
-        saveData()
-        
-        val statement: Transaction.() -> Unit = {
-            TileEntitiesTable.update({ TileEntitiesTable.uuid eq uuid }) {
-                it[data] = ExposedBlob(getData())
-            }
-        }
-        
-        if (NOVA.isEnabled) asyncTransaction(statement)
-        else transaction(statement = statement)
-    }
-    
-    /**
      * Serializes the [data] to binary data.
      */
     fun getData(): ByteArray {
@@ -162,8 +138,6 @@ abstract class TileEntity(
         if (this is Upgradeable) upgradeHolder.gui.closeForAllViewers()
         
         multiModels.forEach { it.removeAllModels() }
-        
-        if (unload) saveAndWriteData()
     }
     
     /**
