@@ -4,6 +4,7 @@ import dev.lone.itemsadder.api.CustomBlock
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.*
 import org.bukkit.entity.Player
@@ -93,4 +94,10 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
         val world = this.world.serverLevel
         world.getTileEntity(BlockPos(x, y, z), true)?.load(tileEntityTag)
     }
+}
+
+fun Location.getBlockName(): String {
+    val tileEntity = TileEntityManager.getTileEntityAt(this)
+    return if (tileEntity != null) "nova:" + tileEntity.material.typeName.lowercase()
+    else "minecraft:" + block.type.name.lowercase()
 }

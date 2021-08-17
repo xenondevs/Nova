@@ -3,12 +3,15 @@ package xyz.xenondevs.nova.integration.protection.plugin
 import com.griefdefender.api.GriefDefender
 import com.griefdefender.api.claim.TrustType
 import com.griefdefender.api.claim.TrustTypes
+import com.griefdefender.api.permission.Context
 import com.griefdefender.api.permission.flag.Flag
 import com.griefdefender.api.permission.flag.Flags
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.integration.protection.ProtectionIntegration
+import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.getBlockName
 
 object GriefDefender : ProtectionIntegration {
     
@@ -18,9 +21,12 @@ object GriefDefender : ProtectionIntegration {
         val user = GriefDefender.getCore().getUser(player.uniqueId)
         val claim = GriefDefender.getCore().getClaimAt(location)
         
+        val contexts = HashSet<Context>()
+        contexts += Context("block", location.getBlockName())
+        
         return GriefDefender
             .getPermissionManager()
-            .getActiveFlagPermissionValue(claim, user, flag, mutableSetOf(), trustType)
+            .getActiveFlagPermissionValue(claim, user, flag, contexts, trustType)
             .asBoolean()
     }
     
