@@ -18,5 +18,7 @@ object GriefPrevention : ProtectionIntegration {
     
     override fun canPlace(player: OfflinePlayer, location: Location) =
         GRIEF_PREVENTION?.allowBuild(FakeOnlinePlayer(player, location.world!!), location) == null
+    
     override fun canUse(player: OfflinePlayer, location: Location) = canBreak(player, location)
+    
 }

@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.integration.Integration
+import xyz.xenondevs.nova.integration.protection.plugin.GriefDefender
 import xyz.xenondevs.nova.integration.protection.plugin.GriefPrevention
 import xyz.xenondevs.nova.integration.protection.plugin.PlotSquared
 import xyz.xenondevs.nova.integration.protection.plugin.WorldGuard
@@ -12,7 +13,8 @@ import java.util.*
 
 object ProtectionManager {
     
-    val PROTECTION_PLUGINS = listOf(GriefPrevention, PlotSquared, WorldGuard).filter(Integration::isInstalled)
+    private val PROTECTION_PLUGINS = listOf(GriefPrevention, PlotSquared, WorldGuard, GriefDefender)
+        .filter(Integration::isInstalled)
     
     fun canPlace(uuid: UUID, location: Location) =
         canPlace(Bukkit.getOfflinePlayer(uuid), location)

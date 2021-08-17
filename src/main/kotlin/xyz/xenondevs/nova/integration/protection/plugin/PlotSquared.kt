@@ -30,5 +30,4 @@ object PlotSquared : ProtectionIntegration {
     private fun Location.toPlotLocation() =
         PlotLocation(world!!.name, blockX, blockY, blockZ, yaw, pitch)
     
-    
 }

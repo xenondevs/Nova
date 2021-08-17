@@ -33,7 +33,6 @@ import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.max
@@ -133,7 +132,7 @@ class Quarry(
         
         updateEnergyPerTick()
         
-        if (!canPlace(uuid, location, positions)) {
+        if (!canPlace(ownerUUID, location, positions)) {
             if (sizeX == MIN_SIZE && sizeZ == MIN_SIZE) {
                 runTaskLater(3) { TileEntityManager.destroyAndDropTileEntity(this, true) }
                 return false
@@ -449,17 +448,13 @@ class Quarry(
         private fun canPlace(uuid: UUID, location: Location, positions: IntArray): Boolean {
             val minLoc = Location(location.world, positions[0].toDouble(), location.y, positions[1].toDouble())
             val maxLoc = Location(location.world, positions[2].toDouble(), location.y, positions[3].toDouble())
-    
+            
             minLoc.fullCuboidTo(maxLoc) {
-                if (!ProtectionManager.canBreak(uuid, it)) {
-                    ParticleBuilder(ParticleEffect.SMOKE_NORMAL, it.clone().center()).display()
-                    return@canPlace false
-                } else {
-                    ParticleBuilder(ParticleEffect.FLAME, it.clone().center()).display()
+                if (ProtectionManager.canBreak(uuid, it))
                     return@fullCuboidTo true
-                }
+                else return@canPlace false
             }
-    
+            
             return true
         }
         
