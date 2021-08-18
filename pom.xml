@@ -39,6 +39,10 @@
             <id>intellectualsites</id>
             <url>https://mvn.intellectualsites.com/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>panda-lang</id>
+            <url>https://repo.panda-lang.org/releases</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -76,11 +80,6 @@
             <groupId>com.github.NichtStudioCode.InvUI</groupId>
             <artifactId>InvUI</artifactId>
             <version>4b945d903b</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.NichtStudioCode</groupId>
-            <artifactId>exposed-upsert</artifactId>
-            <version>297be27e8a</version>
         </dependency>
         <dependency>
             <groupId>xyz.xenondevs</groupId>
@@ -192,6 +191,11 @@
             <groupId>org.jetbrains.exposed</groupId>
             <artifactId>exposed-jdbc</artifactId>
             <version>0.33.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.dzikoysk</groupId>
+            <artifactId>exposed-upsert</artifactId>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
