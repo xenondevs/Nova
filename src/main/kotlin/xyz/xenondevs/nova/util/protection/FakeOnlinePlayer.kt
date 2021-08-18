@@ -384,6 +384,10 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun sendSignChange(loc: Location, lines: Array<out String>?, dyeColor: DyeColor, hasGlowingText: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun sendMap(map: MapView) {
         throw UnsupportedOperationException("Player is not online")
     }

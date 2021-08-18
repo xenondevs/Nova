@@ -37,7 +37,7 @@ object ReflectionRegistry {
     val CB_CRAFT_ENTITY_GET_HANDLE_METHOD = getMethod(CB_CRAFT_ENTITY_CLASS, false, "getHandle")
     val CB_CRAFT_WORLD_GET_HANDLE_METHOD = getMethod(CB_CRAFT_WORLD_CLASS, false, "getHandle")
     val CB_CRAFT_WORLD_CREATE_ENTITY_METHOD = getMethod(CB_CRAFT_WORLD_CLASS, false, "createEntity", Location::class.java, Class::class.java)
-    val CB_CRAFT_WORLD_ADD_ENTITY_METHOD = getMethod(CB_CRAFT_WORLD_CLASS, false, "addEntity", Entity::class.java, SpawnReason::class.java, Consumer::class.java)
+    val CB_CRAFT_WORLD_ADD_ENTITY_METHOD = getMethod(CB_CRAFT_WORLD_CLASS, false, "addEntity", Entity::class.java, SpawnReason::class.java)
     val CB_CRAFT_ITEM_STACK_AS_NMS_COPY_METHOD = getMethod(CB_CRAFT_ITEM_STACK_CLASS, false, "asNMSCopy", ItemStack::class.java)
     val CB_CRAFT_SERVER_GET_COMMAND_MAP_METHOD = getMethod(CB_CRAFT_SERVER_CLASS, false, "getCommandMap")
     val CB_CRAFT_COMMAND_MAP_GET_COMMAND_METHOD = getMethod(CB_CRAFT_COMMAND_MAP_CLASS, false, "getCommand", String::class.java)

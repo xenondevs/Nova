@@ -115,7 +115,7 @@ object ReflectionUtils {
     }
     
     fun addNMSEntityToWorld(world: World, entity: Any): Entity {
-        return CB_CRAFT_WORLD_ADD_ENTITY_METHOD.invoke(world, entity, CreatureSpawnEvent.SpawnReason.CUSTOM, null) as Entity
+        return CB_CRAFT_WORLD_ADD_ENTITY_METHOD.invoke(world, entity, CreatureSpawnEvent.SpawnReason.CUSTOM) as Entity
     }
     
 }
