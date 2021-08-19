@@ -142,6 +142,7 @@ abstract class TileEntity(
         gui?.closeWindows()
         if (this is Upgradeable) upgradeHolder.gui.closeForAllViewers()
         
+        armorStand.remove()
         multiModels.forEach { it.removeAllModels() }
         particleTasks.forEach { it.stop() }
     }

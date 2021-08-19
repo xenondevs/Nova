@@ -144,7 +144,6 @@ object TileEntityManager : Listener {
             tileEntityMap[it.chunk]?.remove(it)
             locationCache -= it
         }
-        tileEntity.armorStand.remove()
         
         // remove it from the database
         asyncTransaction {
