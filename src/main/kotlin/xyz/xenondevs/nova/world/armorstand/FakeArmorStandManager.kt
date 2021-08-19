@@ -5,10 +5,12 @@ import org.bukkit.Chunk
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -59,7 +61,7 @@ object FakeArmorStandManager : Listener {
     
     @Synchronized
     fun getViewersOf(chunk: AsyncChunkPos): List<Player> {
-        return chunkViewers[chunk]?: emptyList()
+        return chunkViewers[chunk] ?: emptyList()
     }
     
     @Synchronized
@@ -142,6 +144,15 @@ object FakeArmorStandManager : Listener {
     
     @EventHandler
     fun handleMove(event: PlayerMoveEvent) {
+        val newChunk = event.to!!.chunk
+        if (event.from.chunk != newChunk) {
+            val player = event.player
+            runAsyncTask { handleChunksChange(player, newChunk) }
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun handleTeleport(event: PlayerTeleportEvent) {
         val newChunk = event.to!!.chunk
         if (event.from.chunk != newChunk) {
             val player = event.player
