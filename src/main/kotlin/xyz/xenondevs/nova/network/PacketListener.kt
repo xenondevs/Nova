@@ -30,7 +30,7 @@ object PacketListener : Listener {
     
     private fun unregisterHandler(player: Player) {
         val pipeline = player.serverPlayer.connection.connection.channel.pipeline()
-        pipeline.context("nova_packet_handler")?.handler()?.run { pipeline.remove(this) }
+        pipeline.context("nova_packet_handler")?.handler()?.run(pipeline::remove)
     }
     
 }
