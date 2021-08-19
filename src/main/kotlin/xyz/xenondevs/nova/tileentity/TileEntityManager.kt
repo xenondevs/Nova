@@ -60,7 +60,7 @@ fun ItemStack.getTileEntityData(): CompoundElement? {
 
 @Suppress("DEPRECATION")
 val Material?.requiresLight: Boolean
-    get() = this != null && !isTransparent
+    get() = this != null && !isTransparent && isOccluding
 
 object TileEntityManager : Listener {
     

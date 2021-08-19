@@ -282,7 +282,7 @@ abstract class TileEntity(
             val armorStand = FakeArmorStand(armorStandLocation, false) {
                 it.isInvisible = true
                 it.isMarker = true
-                it.hasVisualFire = material.hitboxType.requiresLight
+                it.setSharedFlagOnFire(material.hitboxType.requiresLight)
             }
             
             // create the tile entity
