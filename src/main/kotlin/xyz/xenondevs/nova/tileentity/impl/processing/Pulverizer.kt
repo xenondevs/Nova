@@ -21,7 +21,10 @@ import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.particle
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("pulverizer.capacity")!!
@@ -49,6 +52,14 @@ class Pulverizer(
     
     override val gui by lazy { PulverizerGUI() }
     
+    private val particleTask = createParticleTask(listOf(
+        particle(ParticleEffect.SMOKE_NORMAL) {
+            location(armorStand.location.advance(getFace(BlockSide.FRONT), 0.6).apply { y += 0.8 })
+            offset(0.05, 0.2, 0.05)
+            speed(0f)
+        }
+    ), 6)
+    
     init {
         addAvailableInventories(inputInv, outputInv)
         setDefaultInventory(inputInv)
@@ -56,10 +67,15 @@ class Pulverizer(
     
     override fun handleTick() {
         if (energy >= ENERGY_PER_TICK) {
-            if (pulverizeTime == 0) takeItem()
-            else {
+            if (pulverizeTime == 0) {
+                takeItem()
+                
+                if (particleTask.isRunning()) particleTask.stop()
+            } else {
                 pulverizeTime--
                 energy -= ENERGY_PER_TICK
+                
+                if (!particleTask.isRunning()) particleTask.start()
                 
                 if (pulverizeTime == 0) {
                     outputInv.addItem(null, currentItem)
@@ -68,7 +84,8 @@ class Pulverizer(
                 
                 gui.updateProgress()
             }
-        }
+            
+        } else if (particleTask.isRunning()) particleTask.stop()
         
         if (hasEnergyChanged) {
             gui.energyBar.update()

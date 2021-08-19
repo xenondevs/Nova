@@ -18,10 +18,11 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.BlockSide.FRONT
 import xyz.xenondevs.nova.util.item.fuel
-import xyz.xenondevs.nova.util.toItemStack
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -39,17 +40,39 @@ class FurnaceGenerator(
 ) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
     override val defaultEnergyConfig by lazy { createEnergySideConfig(PROVIDE, FRONT) }
+    private val inventory = getInventory("fuel", 1, true, ::handleInventoryUpdate)
+    override val gui by lazy { FurnaceGeneratorGUI() }
     
     private var burnTime: Int = retrieveData("burnTime") { 0 }
     private var totalBurnTime: Int = retrieveData("totalBurnTime") { 0 }
+    private var active = burnTime != 0
+        set(value) {
+            if (field != value) {
+                field = value
+                if (value) particleTask.start()
+                else particleTask.stop()
+                
+                updateHeadStack()
+            }
+        }
     
-    private val inventory = getInventory("fuel", 1, true, ::handleInventoryUpdate)
-    
-    override val gui by lazy { FurnaceGeneratorGUI() }
+    private val particleTask = createParticleTask(listOf(
+        particle(ParticleEffect.SMOKE_NORMAL) {
+            location(armorStand.location.advance(getFace(FRONT), 0.6).apply { y += 0.8 })
+            offset(getFace(BlockSide.RIGHT).axis, 0.15f)
+            offsetY(0.1f)
+            speed(0f)
+            amount(5)
+        }
+    ), 1)
     
     init {
         setDefaultInventory(inventory)
+        if (active) particleTask.start()
     }
+    
+    override fun getHeadStack() =
+        material.block!!.createItemStack(active.intValue)
     
     override fun handleTick() {
         if (burnTime == 0) burnItem()
@@ -60,7 +83,9 @@ class FurnaceGenerator(
             
             gui.progressItem.percentage = burnTime.toDouble() / totalBurnTime.toDouble()
             hasEnergyChanged = true
-        }
+            
+            if (!active) active = true
+        } else if (active) active = false
         
         if (hasEnergyChanged) {
             gui.energyBar.update()

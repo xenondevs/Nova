@@ -58,6 +58,11 @@ object FakeArmorStandManager : Listener {
     }
     
     @Synchronized
+    fun getViewersOf(chunk: AsyncChunkPos): List<Player> {
+        return chunkViewers[chunk]?: emptyList()
+    }
+    
+    @Synchronized
     fun addArmorStand(chunk: AsyncChunkPos, armorStand: FakeArmorStand) {
         val armorStands = chunkArmorStands.getOrPut(chunk) { mutableListOf() }
         armorStands.add(armorStand)

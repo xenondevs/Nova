@@ -18,10 +18,10 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.inventory.CustomUpdateReason
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradeable
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
@@ -73,6 +74,14 @@ class ElectricalFurnace(
     private var cookSpeed = (COOK_SPEED * upgradeHolder.getSpeedModifier()).toInt()
     private var maxEnergy = (MAX_ENERGY * upgradeHolder.getEnergyModifier()).toInt()
     
+    private var active: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                updateHeadStack()
+            }
+        }
+    
     init {
         addAvailableInventories(inputInventory, outputInventory)
         setDefaultInventory(inputInventory)
@@ -85,6 +94,10 @@ class ElectricalFurnace(
         storeData("experience", experience)
     }
     
+    override fun getHeadStack(): ItemStack {
+        return material.block!!.createItemStack(active.intValue)
+    }
+    
     private fun handleInputInventoryUpdate(event: ItemUpdateEvent) {
         if (event.newItemStack != null) {
             val itemStack = event.newItemStack
@@ -94,7 +107,8 @@ class ElectricalFurnace(
     
     private fun handleOutputInventoryUpdate(event: ItemUpdateEvent) {
         val updateReason = event.updateReason
-        if (updateReason is CustomUpdateReason && updateReason.message == "EF") return
+        if (updateReason == SELF_UPDATE_REASON) return
+        
         if (event.isRemove) {
             if (updateReason is PlayerUpdateReason) {
                 val player = updateReason.player
@@ -113,8 +127,15 @@ class ElectricalFurnace(
     }
     
     private fun spawnExperienceOrb(location: Location, experience: Float) {
+        if (experience == 0f) return
+        
         val orb = location.world!!.spawnEntity(location, EntityType.EXPERIENCE_ORB) as ExperienceOrb
         orb.experience += experience.toInt()
+    }
+    
+    override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
+        spawnExperienceOrb(armorStand.location, experience)
+        return super.destroy(dropItems)
     }
     
     override fun handleTick() {
@@ -126,8 +147,10 @@ class ElectricalFurnace(
                     if (recipe != null && outputInventory.canHold(recipe.result)) {
                         currentRecipe = recipe
                         inputInventory.addItemAmount(null, 0, -1)
-                    }
-                }
+                        
+                        active = true
+                    } else active = false
+                } else active = false
             }
             
             val currentRecipe = currentRecipe
@@ -136,7 +159,7 @@ class ElectricalFurnace(
                 timeCooked += cookSpeed
                 
                 if (timeCooked >= currentRecipe.cookingTime) {
-                    outputInventory.addItem(CustomUpdateReason("EF"), currentRecipe.result)
+                    outputInventory.addItem(SELF_UPDATE_REASON, currentRecipe.result)
                     experience += currentRecipe.experience
                     timeCooked = 0
                     this.currentRecipe = null
@@ -144,7 +167,7 @@ class ElectricalFurnace(
                 
                 gui.updateProgress()
             }
-        }
+        } else active = false
         
         if (hasEnergyChanged) {
             gui.energyBar.update()

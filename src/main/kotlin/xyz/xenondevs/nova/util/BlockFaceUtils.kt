@@ -36,6 +36,13 @@ val BlockFace.axis: Axis
         else -> throw IllegalArgumentException("Illegal facing")
     }
 
+val BlockFace.mod: Int
+    get() = when (this.axis) {
+        Axis.X -> modX
+        Axis.Y -> modY
+        Axis.Z -> modZ
+    }
+
 val BlockFace.rotationValues: Pair<Int, Int>
     get() = when (this) {
         NORTH -> 0 to 0

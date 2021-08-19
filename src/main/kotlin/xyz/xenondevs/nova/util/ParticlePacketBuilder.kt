@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -44,6 +45,15 @@ class ParticlePacketBuilder(val effect: ParticleEffect, location: Location? = nu
     
     fun offset(x: Double, y: Double, z: Double): ParticlePacketBuilder {
         builder.setOffset(x.toFloat(), y.toFloat(), z.toFloat())
+        return this
+    }
+    
+    fun offset(axis: Axis, offset: Float): ParticlePacketBuilder {
+        when (axis) {
+            Axis.X -> offsetX(offset)
+            Axis.Y -> offsetY(offset)
+            Axis.Z -> offsetZ(offset)
+        }
         return this
     }
     

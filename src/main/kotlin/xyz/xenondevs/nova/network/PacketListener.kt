@@ -14,8 +14,8 @@ object PacketListener : Listener {
     fun init() {
         LOGGER.info("Initializing PacketListener")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        Bukkit.getOnlinePlayers().forEach(::registerHandler)
-        NOVA.disableHandlers += { Bukkit.getOnlinePlayers().forEach(::unregisterHandlers)}
+        Bukkit.getOnlinePlayers().forEach { unregisterHandler(it); registerHandler(it) }
+        NOVA.disableHandlers += { Bukkit.getOnlinePlayers().forEach(::unregisterHandler) }
     }
     
     @EventHandler
@@ -28,10 +28,9 @@ object PacketListener : Listener {
         pipeline.addBefore("packet_handler", "nova_packet_handler", PacketHandler(player))
     }
     
-    private fun unregisterHandlers(player: Player) {
+    private fun unregisterHandler(player: Player) {
         val pipeline = player.serverPlayer.connection.connection.channel.pipeline()
-        pipeline.remove("nova_packet_handler")
-        println(pipeline.names().joinToString())
+        pipeline.context("nova_packet_handler")?.handler()?.run { pipeline.remove(this) }
     }
     
 }

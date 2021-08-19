@@ -45,7 +45,7 @@ object NovaMaterialRegistry {
     val sortedValues: Set<NovaMaterial> by lazy { materialsByTypeName.values.toSortedSet() }
     
     // 1 - 1000: Blocks
-    val FURNACE_GENERATOR = registerDefaultTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", 1, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::FurnaceGenerator)
+    // 1: Reserved for legacy furnace generator
     val MECHANICAL_PRESS = registerDefaultTileEntity("MECHANICAL_PRESS", "block.nova.mechanical_press", 2, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::MechanicalPress)
     val BASIC_POWER_CELL = registerDefaultTileEntity("BASIC_POWER_CELL", "block.nova.basic_power_cell", 3, EnergyTileEntity::createItemBuilder, IRON_BLOCK, ::BasicPowerCell)
     val ADVANCED_POWER_CELL = registerDefaultTileEntity("ADVANCED_POWER_CELL", "block.nova.advanced_power_cell", 4, EnergyTileEntity::createItemBuilder, IRON_BLOCK, ::AdvancedPowerCell)
@@ -55,7 +55,7 @@ object NovaMaterialRegistry {
     val PULVERIZER = registerDefaultTileEntity("PULVERIZER", "block.nova.pulverizer", 8, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Pulverizer)
     val SOLAR_PANEL = registerDefaultTileEntity("SOLAR_PANEL", "block.nova.solar_panel", 9, EnergyTileEntity::createItemBuilder, BARRIER, ::SolarPanel)
     val QUARRY = registerDefaultTileEntity("QUARRY", "block.nova.quarry", 10, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Quarry, Quarry::canPlace)
-    val ELECTRICAL_FURNACE = registerDefaultTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", 11, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::ElectricalFurnace)
+    // 11: Reserved for legacy electrical furnace
     val CHUNK_LOADER = registerDefaultTileEntity("CHUNK_LOADER", "block.nova.chunk_loader", 12, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::ChunkLoader)
     val BLOCK_BREAKER = registerDefaultTileEntity("BLOCK_BREAKER", "block.nova.block_breaker", 13, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::BlockBreaker)
     val BLOCK_PLACER = registerDefaultTileEntity("BLOCK_PLACER", "block.nova.block_placer", 14, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::BlockPlacer)
@@ -125,8 +125,8 @@ object NovaMaterialRegistry {
     // 3000 - 4000: Equipment, Attachments
     val JETPACK = registerItem("JETPACK", "item.nova.jetpack", ModelData(IRON_CHESTPLATE, intArrayOf(3000)), JetpackItem)
     
-    // 5000 - 10.000 MultiModel Blocks
-    // !!! DO NOT USE 5000 - 5100: LEGACY CABLES !!!
+    // 5000 - 9.000 MultiModel Blocks
+    // 5000 - 5100: Reserved for legacy cables
     val BASIC_CABLE = registerTileEntity("BASIC_CABLE", "block.nova.basic_cable", structureBlockOf(5100), null, structureBlockOf((5101..5164).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::BasicCable, isDirectional = false, legacyItemIds = intArrayOf(5004))
     val ADVANCED_CABLE = registerTileEntity("ADVANCED_CABLE", "block.nova.advanced_cable", structureBlockOf(5165), null, structureBlockOf((5166..5229).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::AdvancedCable, isDirectional = false, legacyItemIds = intArrayOf(5009))
     val ELITE_CABLE = registerTileEntity("ELITE_CABLE", "block.nova.elite_cable", structureBlockOf(5230), null, structureBlockOf((5231..5294).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::EliteCable, isDirectional = false, legacyItemIds = intArrayOf(5014))
@@ -134,6 +134,8 @@ object NovaMaterialRegistry {
     val CREATIVE_CABLE = registerTileEntity("CREATIVE_CABLE", "block.nova.creative_cable", structureBlockOf(5360), null, structureBlockOf((5361..5424).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024))
     val SCAFFOLDING = register(NovaMaterial("SCAFFOLDING", "item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray())))
     val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", blockOf(5050), EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace)
+    val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), EnergyTileEntity::createItemBuilder, blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, null, true, intArrayOf(1))
+    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), EnergyTileEntity::createItemBuilder, blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, null, true, intArrayOf(11))
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)

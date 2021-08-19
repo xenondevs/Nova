@@ -9,6 +9,7 @@ import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
+import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
@@ -21,6 +22,8 @@ import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradeable
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import xyz.xenondevs.nova.world.armorstand.pos
 import xyz.xenondevs.nova.world.region.Region
 import java.util.*
 
@@ -42,10 +45,12 @@ abstract class TileEntity(
     val location = armorStand.location.blockLocation
     val world = location.world!!
     val chunk = location.chunk
+    val chunkPos = chunk.pos
     val facing = armorStand.location.facing
     
     private val inventories = ArrayList<VirtualInventory>()
-    val multiModels = ArrayList<MultiModel>()
+    private val multiModels = ArrayList<MultiModel>()
+    private val particleTasks = ArrayList<TileEntityParticleTask>()
     
     val additionalHitboxes = HashSet<Location>()
     
@@ -138,6 +143,7 @@ abstract class TileEntity(
         if (this is Upgradeable) upgradeHolder.gui.closeForAllViewers()
         
         multiModels.forEach { it.removeAllModels() }
+        particleTasks.forEach { it.stop() }
     }
     
     /**
@@ -190,9 +196,46 @@ abstract class TileEntity(
     }
     
     /**
+     * Creates a new [TileEntityParticleTask] for this [TileEntity].
+     * When the [TileEntity] is removed, the [TileEntityParticleTask]
+     * will automatically be stopped as well.
+     */
+    fun createParticleTask(particles: List<Any>, tickDelay: Int): TileEntityParticleTask {
+        val task = TileEntityParticleTask(this, particles, tickDelay)
+        particleTasks += task
+        return task
+    }
+    
+    /**
+     * Plays a sound effect to all viewers of this [TileEntity]
+     */
+    fun playSoundEffect(sound: Sound, volume: Float, pitch: Float) {
+        getViewers().forEach {
+            it.playSound(location, sound, volume, pitch)
+        }
+    }
+    
+    /**
+     * Plays a sound effect to all viewers of this [TileEntity]
+     */
+    fun playSoundEffect(sound: String, volume: Float, pitch: Float) {
+        getViewers().forEach {
+            it.playSound(location, sound, volume, pitch)
+        }
+    }
+    
+    /**
+     * Gets a [List] of all [players][Player] that this [TileEntity] is
+     * visible for.
+     */
+    fun getViewers(): List<Player> =
+        FakeArmorStandManager.getViewersOf(chunkPos)
+    
+    /**
      * Gets the correct direction a block side.
      */
-    fun getFace(blockSide: BlockSide) = blockSide.getBlockFace(armorStand.location.yaw)
+    fun getFace(blockSide: BlockSide): BlockFace =
+        blockSide.getBlockFace(armorStand.location.yaw)
     
     /**
      * Creates an energy side config
