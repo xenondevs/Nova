@@ -29,14 +29,15 @@ class FakeArmorStand(
     private val despawnPacket = ClientboundRemoveEntitiesPacket(id)
     
     private var registered = false
-    private var _location: Location = location.clone()
+    private var expectedLocation: Location = location.clone()
+    private var actualLocation: Location = location.clone()
     private var chunk = location.chunkPos
     private val equipment = HashMap<EquipmentSlot, MItemStack>()
     
     private val viewers: List<Player>
         get() = FakeArmorStandManager.getChunkViewers(chunk)
     val location: Location
-        get() = _location.clone()
+        get() = expectedLocation.clone()
     
     init {
         EquipmentSlot.values().forEach { equipment[it] = MItemStack.EMPTY }
@@ -68,7 +69,7 @@ class FakeArmorStand(
      * Also sends entity data and equipment.
      */
     fun spawn(player: Player) {
-        if (spawnPacket == null) spawnPacket = NMSUtils.createAddMobPacket(id, uuid, EntityType.ARMOR_STAND, _location)
+        if (spawnPacket == null) spawnPacket = NMSUtils.createAddMobPacket(id, uuid, EntityType.ARMOR_STAND, actualLocation)
         if (equipmentPacket == null) equipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
         if (dataPacket == null) dataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
         player.send(spawnPacket!!, dataPacket!!, equipmentPacket!!)
@@ -98,7 +99,7 @@ class FakeArmorStand(
      * This function automatically chooses which packet (Teleport / Pos / PosRot / Rot) to send.
      */
     fun teleport(newLocation: Location) {
-        if (newLocation.world != _location.world) throw UnsupportedOperationException("Teleporting to different worlds is not supported.")
+        if (newLocation.world != actualLocation.world) throw UnsupportedOperationException("Teleporting to different worlds is not supported.")
         
         // invalidate the spawn packet as the location has changed
         spawnPacket = null
@@ -108,27 +109,27 @@ class FakeArmorStand(
             var packet: Packet<ClientGamePacketListener>? = null
             
             // get the correct packet for this kind of movement
-            if (_location.positionEquals(newLocation)) {
+            if (actualLocation.positionEquals(newLocation)) {
                 if (newLocation.yaw != bukkitYaw || newLocation.pitch != xRot) {
                     packet = ClientboundMoveEntityPacket.Rot(id, newLocation.yaw.toPackedByte(), newLocation.pitch.toPackedByte(), true)
-                    _location = newLocation.clone() // position won't be changed, exact rotation is not necessary
+                    actualLocation = newLocation.clone() // position won't be changed, exact rotation is not necessary
                 }
-            } else if (_location.distance(newLocation) > 8) {
+            } else if (actualLocation.distance(newLocation) > 8) {
                 packet = NMSUtils.createTeleportPacket(id, newLocation)
-                _location = newLocation.clone() // exact position will be displayed to user
+                actualLocation = newLocation.clone() // exact position will be displayed to user
             } else {
-                val deltaX = (newLocation.x - _location.x).toFixedPoint()
-                val deltaY = (newLocation.y - _location.y).toFixedPoint()
-                val deltaZ = (newLocation.z - _location.z).toFixedPoint()
+                val deltaX = (newLocation.x - actualLocation.x).toFixedPoint()
+                val deltaY = (newLocation.y - actualLocation.y).toFixedPoint()
+                val deltaZ = (newLocation.z - actualLocation.z).toFixedPoint()
                 
                 // removes precision that cannot be displayed to players to prevent desyncing
-                _location.add(deltaX.fromFixedPoint(), deltaY.fromFixedPoint(), deltaZ.fromFixedPoint())
+                actualLocation.add(deltaX.fromFixedPoint(), deltaY.fromFixedPoint(), deltaZ.fromFixedPoint())
                 
                 if (newLocation.yaw != bukkitYaw || newLocation.pitch != xRot) {
                     // rotation also loses precision (a lot actually) but it isn't necessary to reflect that in the
                     // armor stand location as no rotation deltas are sent
-                    _location.yaw = newLocation.yaw
-                    _location.pitch = newLocation.pitch
+                    actualLocation.yaw = newLocation.yaw
+                    actualLocation.pitch = newLocation.pitch
                     
                     packet = ClientboundMoveEntityPacket.PosRot(id, deltaX, deltaY, deltaZ, newLocation.yaw.toPackedByte(), newLocation.pitch.toPackedByte(), true)
                 } else {
@@ -138,11 +139,13 @@ class FakeArmorStand(
             
             if (packet != null) viewers.forEach { it.send(packet) }
         } else {
-            _location = newLocation
+            actualLocation = newLocation.clone()
         }
         
+        expectedLocation = newLocation.clone()
+        
         val previousChunk = chunk
-        val newChunk = _location.chunkPos
+        val newChunk = actualLocation.chunkPos
         chunk = newChunk
         
         if (previousChunk != newChunk) FakeArmorStandManager.changeArmorStandChunk(this, previousChunk, newChunk)
@@ -152,7 +155,7 @@ class FakeArmorStand(
      * Sends a teleport packet to the current position.
      */
     fun syncPosition() {
-        val teleportPacket = NMSUtils.createTeleportPacket(id, _location)
+        val teleportPacket = NMSUtils.createTeleportPacket(id, actualLocation)
         viewers.forEach { it.send(teleportPacket) }
     }
     
