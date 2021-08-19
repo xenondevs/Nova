@@ -65,6 +65,7 @@ val Material?.requiresLight: Boolean
 object TileEntityManager : Listener {
     
     private val tileEntityMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
+    private val additionalHitboxMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
     private val locationCache = HashSet<Location>()
     val tileEntities: List<TileEntity>
         get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
@@ -169,13 +170,17 @@ object TileEntityManager : Listener {
         runTaskLater(1) { tileEntity.location.dropItems(drops) }
     }
     
-    fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)
+    fun getTileEntityAt(location: Location, additionalHitboxes: Boolean = true): TileEntity? {
+        val chunk = location.chunk
+        return tileEntityMap[chunk]?.get(location)
+            ?: if (additionalHitboxes) additionalHitboxMap[chunk]?.get(location) else null
+    }
     
     fun getTileEntitiesInChunk(chunk: Chunk) = tileEntityMap[chunk]?.values?.toList() ?: emptyList()
     
-    fun addTileEntityLocations(tileEntity: TileEntity, locations: List<Location>) {
+    fun addTileEntityHitboxLocations(tileEntity: TileEntity, locations: List<Location>) {
         locations.forEach {
-            val chunkMap = tileEntityMap.getOrPut(it.chunk) { HashMap() }
+            val chunkMap = additionalHitboxMap.getOrPut(it.chunk) { HashMap() }
             chunkMap[it] = tileEntity
             
             locationCache += it

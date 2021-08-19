@@ -48,7 +48,7 @@ class WindTurbine(
     
     private val altitude = (location.y + abs(world.minHeight)) / (world.maxHeight - 1 + abs(world.minHeight))
     private val energyPerTick = (altitude * ENERGY_PER_TICK).toInt()
-    private val rotationPerTick = altitude.toFloat() * 5
+    private val rotationPerTick = altitude.toFloat() * 15
     
     init {
         spawnModels()

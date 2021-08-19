@@ -254,7 +254,7 @@ abstract class TileEntity(
         if (placeBlocks) hitboxes.forEach { it.block.type = material.hitboxType!! }
         
         additionalHitboxes += hitboxes
-        TileEntityManager.addTileEntityLocations(this, hitboxes)
+        TileEntityManager.addTileEntityHitboxLocations(this, hitboxes)
     }
     
     override fun equals(other: Any?): Boolean {

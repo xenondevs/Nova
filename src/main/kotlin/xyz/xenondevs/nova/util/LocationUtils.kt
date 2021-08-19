@@ -43,15 +43,15 @@ fun Location.advance(blockFace: BlockFace, stepSize: Double = 1.0) =
         blockFace.modZ.toDouble() * stepSize
     )
 
-fun Location.getNeighboringTileEntities(): Map<BlockFace, TileEntity> {
-    return getNeighboringTileEntitiesOfType()
+fun Location.getNeighboringTileEntities(additionalHitboxes: Boolean): Map<BlockFace, TileEntity> {
+    return getNeighboringTileEntitiesOfType(additionalHitboxes)
 }
 
-inline fun <reified T> Location.getNeighboringTileEntitiesOfType(): Map<BlockFace, T> {
+inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitboxes: Boolean): Map<BlockFace, T> {
     val tileEntities = HashMap<BlockFace, T>()
     CUBE_FACES.forEach {
         val location = blockLocation.advance(it)
-        val tileEntity = TileEntityManager.getTileEntityAt(location)
+        val tileEntity = TileEntityManager.getTileEntityAt(location, additionalHitboxes)
             ?: VanillaTileEntityManager.getTileEntityAt(location)
         if (tileEntity != null && tileEntity is T) tileEntities[it] = tileEntity as T
     }

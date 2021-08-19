@@ -47,12 +47,12 @@ interface NetworkNode {
         }
     }
     
-    fun getNearbyNodes() = location.getNeighboringTileEntitiesOfType<NetworkNode>()
+    fun getNearbyNodes() = location.getNeighboringTileEntitiesOfType<NetworkNode>(false)
     
-    fun getNearbyEndPoints() = location.getNeighboringTileEntitiesOfType<NetworkEndPoint>()
+    fun getNearbyEndPoints() = location.getNeighboringTileEntitiesOfType<NetworkEndPoint>(false)
     
     fun getNearbyBridges() =
-        location.getNeighboringTileEntitiesOfType<NetworkBridge>().filter { (_, bridge) -> bridge.networks.isNotEmpty() }
+        location.getNeighboringTileEntitiesOfType<NetworkBridge>(false).filter { (_, bridge) -> bridge.networks.isNotEmpty() }
     
     fun getNearbyBridges(networkType: NetworkType) =
         getNearbyBridges().filter { (_, bridge) -> bridge.networks[networkType] != null }

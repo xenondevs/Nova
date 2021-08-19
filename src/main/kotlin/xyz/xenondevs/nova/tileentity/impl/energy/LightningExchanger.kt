@@ -92,7 +92,7 @@ class LightningExchanger(
             val struckBlock = event.lightning.location.advance(BlockFace.DOWN).block
             if (event.cause != Cause.WEATHER || struckBlock.type != Material.LIGHTNING_ROD)
                 return
-            val tile = TileEntityManager.getTileEntityAt(struckBlock.location.advance(BlockFace.DOWN))
+            val tile = TileEntityManager.getTileEntityAt(struckBlock.location.advance(BlockFace.DOWN), false)
             if (tile !is LightningExchanger)
                 return
             tile.addEnergyBurst()
