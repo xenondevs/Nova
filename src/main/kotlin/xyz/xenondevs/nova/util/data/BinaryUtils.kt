@@ -2,6 +2,9 @@ package xyz.xenondevs.nova.util.data
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import java.io.ByteArrayOutputStream
+import java.util.zip.Deflater
+import java.util.zip.Inflater
 
 fun ByteBuf.writeByte(byte: Byte): ByteBuf = writeByte(byte.toInt())
 
@@ -32,4 +35,33 @@ fun ByteArray.toByteBuf(allocator: () -> ByteBuf = Unpooled::buffer): ByteBuf {
     val buf = allocator()
     buf.writeBytes(this)
     return buf
+}
+
+fun ByteArray.compress(): ByteArray {
+    val deflater = Deflater()
+    val buffer = ByteArray(512)
+    deflater.setInput(this)
+    deflater.finish()
+    
+    ByteArrayOutputStream().use { out ->
+        while (!deflater.finished()) {
+            val count = deflater.deflate(buffer)
+            out.write(buffer, 0, count)
+        }
+        return out.toByteArray()
+    }
+}
+
+fun ByteArray.decompress() : ByteArray {
+    val inflater = Inflater()
+    val buffer = ByteArray(512)
+    inflater.setInput(this)
+    
+    ByteArrayOutputStream().use { out ->
+        while (!inflater.finished()) {
+            val count = inflater.inflate(buffer)
+            out.write(buffer, 0, count)
+        }
+        return out.toByteArray()
+    }
 }
