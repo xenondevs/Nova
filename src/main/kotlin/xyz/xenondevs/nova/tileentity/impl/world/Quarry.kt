@@ -37,7 +37,6 @@ import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
@@ -60,8 +59,8 @@ private val DRILL_SPEED_MULTIPLIER = NovaConfig.getDouble("quarry.drill_speed_mu
 private val DRILL_SPEED_CLAMP = NovaConfig.getDouble("quarry.drill_speed_clamp")!!
 
 private val MAX_ENERGY = NovaConfig.getInt("quarry.capacity")!!
-private val ENERGY_CONSUMPTION_BASE = NovaConfig.getInt("quarry.energy_consumption_base")!!
-private val ENERGY_INEFFICIENCY_EXPONENT = NovaConfig.getDouble("quarry.energy_inefficiency_exponent")!!
+private val BASE_ENERGY_CONSUMPTION = NovaConfig.getInt("quarry.base_energy_consumption")!!
+private val ENERGY_PER_SQUARE_BLOCK = NovaConfig.getInt("quarry.energy_consumption_per_square_block")!!
 
 class Quarry(
     uuid: UUID,
@@ -164,7 +163,7 @@ class Quarry(
     }
     
     private fun updateEnergyPerTick() {
-        energyPerTick = (ENERGY_CONSUMPTION_BASE + (sizeX * sizeZ).toDouble().pow(ENERGY_INEFFICIENCY_EXPONENT)).toInt()
+        energyPerTick = BASE_ENERGY_CONSUMPTION + sizeX * sizeZ * ENERGY_PER_SQUARE_BLOCK
     }
     
     override fun handleInitialized(first: Boolean) {

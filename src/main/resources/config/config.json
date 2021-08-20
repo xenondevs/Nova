@@ -18,15 +18,15 @@
   },
   "cable": {
     "basic": {
-      "energy_transfer_rate": 100,
+      "energy_transfer_rate": 500,
       "item_transfer_rate": 1
     },
     "advanced": {
-      "energy_transfer_rate": 1000,
+      "energy_transfer_rate": 2000,
       "item_transfer_rate": 2
     },
     "elite": {
-      "energy_transfer_rate": 10000,
+      "energy_transfer_rate": 20000,
       "item_transfer_rate": 4
     },
     "ultimate": {
@@ -50,12 +50,12 @@
   },
   "furnace_generator": {
     "capacity": 10000,
-    "energy_per_tick": 20,
-    "burn_time_multiplier": 0.1
+    "energy_per_tick": 80,
+    "burn_time_multiplier": 0.2
   },
   "solar_panel": {
     "capacity": 10000,
-    "energy_per_tick": 10
+    "energy_per_tick": 40
   },
   "pulverizer": {
     "capacity": 10000,
@@ -74,8 +74,8 @@
   },
   "quarry": {
     "capacity": 100000,
-    "energy_consumption_base": 100,
-    "energy_inefficiency_exponent": 1.5,
+    "base_energy_consumption": 300,
+    "energy_consumption_per_square_block": 1,
     "max_size": 30,
     "min_size": 1,
     "default_size_x": 10,
@@ -97,7 +97,7 @@
   },
   "block_placer": {
     "capacity": 10000,
-    "energy_per_place": 500
+    "energy_per_place": 200
   },
   "item_storage_unit": {
     "max_items": 2147483647
@@ -109,12 +109,17 @@
   },
   "charger": {
     "capacity": 1000000,
-    "charge_speed": 100
+    "charge_speed": 500
+  },
+  "wireless_charger": {
+    "capacity": 1000000,
+    "charge_speed": 300,
+    "range": 10
   },
   "mob_killer": {
     "capacity": 10000,
-    "energy_per_tick": 20,
-    "energy_per_damage": 300,
+    "energy_per_tick": 10,
+    "energy_per_damage": 150,
     "idle_time": 20,
     "kill_limit": 3,
     "damage": 10
@@ -143,7 +148,7 @@
   },
   "wind_turbine": {
     "capacity": 10000,
-    "energy_per_tick": 80
+    "energy_per_tick": 100
   },
   "harvester": {
     "capacity": 10000,
@@ -154,11 +159,6 @@
     "capacity": 10000,
     "energy_per_fertilize": 30,
     "wait_time": 10
-  },
-  "wireless_charger": {
-    "capacity": 1000000,
-    "charge_speed": 80,
-    "range": 10
   },
   "auto_fisher": {
     "capacity": 10000,
@@ -178,10 +178,7 @@
     "ENDER_DRAGON",
     "ELDER_GUARDIAN"
   ],
-  "tile_entity_world_blacklist": [
-  ],
-  "tile_entity_type_world_blacklist": {
-  },
-  "tile_entity_limit": {
-  }
+  "tile_entity_world_blacklist": [],
+  "tile_entity_type_world_blacklist": {},
+  "tile_entity_limit": {}
 }
