@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkType
-import xyz.xenondevs.nova.ui.menu.CreativeMenu
+import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
@@ -26,7 +26,7 @@ object NovaCommand : PlayerCommand("nova") {
             .then(literal("give")
                 .requiresPermission("nova.creative")
                 .apply {
-                    NovaMaterialRegistry.values.forEach { material ->
+                    NovaMaterialRegistry.sortedObtainables.forEach { material ->
                         then(literal(material.typeName)
                             .executesCatching { handleGive(material, it) }
                         )
@@ -41,17 +41,17 @@ object NovaCommand : PlayerCommand("nova") {
                     .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
                 .then(literal("itemNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) }))
-            .then(literal("inventory")
-                .requiresPermission("nova.creative")
-                .executesCatching { openCreativeInventory(it) })
+            .then(literal("items")
+                .requiresPermission("nova.items")
+                .executesCatching { openItemInventory(it) })
             .then(literal("renderDistance")
                 .requiresPermission("nova.armor_stand_render_distance")
                 .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
                     .executesCatching { setRenderDistance(it) }))
     }
     
-    private fun handleGive(material: NovaMaterial, context: CommandContext<CommandSourceStack>) {
-        val player = context.player
+    private fun handleGive(material: NovaMaterial, ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
         player.inventory.addItem(material.createItemStack())
         val itemName = material.localizedName.ifBlank { material.typeName }
         
@@ -62,9 +62,9 @@ object NovaCommand : PlayerCommand("nova") {
         ))
     }
     
-    private fun removeTileEntities(context: CommandContext<CommandSourceStack>) {
-        val player = context.player
-        val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
+    private fun removeTileEntities(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
         val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it) }
         tileEntities.forEach { TileEntityManager.destroyTileEntity(it, false) }
         
@@ -75,8 +75,8 @@ object NovaCommand : PlayerCommand("nova") {
         ))
     }
     
-    private fun toggleNetworkDebugging(type: NetworkType, context: CommandContext<CommandSourceStack>) {
-        val player = context.player
+    private fun toggleNetworkDebugging(type: NetworkType, ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
         NetworkDebugger.toggleDebugger(type, player)
         
         player.spigot().sendMessage(localized(
@@ -85,13 +85,13 @@ object NovaCommand : PlayerCommand("nova") {
         ))
     }
     
-    private fun openCreativeInventory(context: CommandContext<CommandSourceStack>) {
-        CreativeMenu.getWindow(context.player).show()
+    private fun openItemInventory(ctx: CommandContext<CommandSourceStack>) {
+        ItemsWindow(ctx.player).show()
     }
     
-    private fun setRenderDistance(context: CommandContext<CommandSourceStack>) {
-        val player = context.player
-        val distance: Int = context["distance"]
+    private fun setRenderDistance(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val distance: Int = ctx["distance"]
         player.armorStandRenderDistance = distance
         
         player.spigot().sendMessage(localized(

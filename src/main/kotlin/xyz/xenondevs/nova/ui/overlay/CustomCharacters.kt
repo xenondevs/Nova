@@ -11,7 +11,9 @@ enum class CustomCharacters(fontName: String, char: Char) {
     FURNACE_RECIPE("gui", '1'),
     PULVERIZER_RECIPE("gui", '2'),
     PRESS_RECIPE("gui", '3'),
-    CONVERSION_RECIPE("gui", '4');
+    CONVERSION_RECIPE("gui", '4'),
+    EMPTY_GUI("gui", '5'),
+    SEARCH("gui", '6');
     
     val component: BaseComponent = ComponentBuilder(char.toString())
         .font("nova:$fontName")

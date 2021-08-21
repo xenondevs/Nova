@@ -6,7 +6,7 @@ import org.bukkit.inventory.*
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
-import xyz.xenondevs.nova.ui.menu.recipes.craftingtype.RecipeType
+import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeType
 import xyz.xenondevs.nova.util.data.plus
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.runAsyncTask

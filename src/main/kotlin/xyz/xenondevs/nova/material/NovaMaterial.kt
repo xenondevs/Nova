@@ -39,6 +39,8 @@ class NovaMaterial(
     val basicItemProvider: ItemProvider = ItemWrapper(createBasicItemBuilder().get())
     val itemProvider: ItemProvider = ItemWrapper(createItemStack())
     
+    val maxStackSize = item.material.maxStackSize
+    
     init {
         require(item.dataArray.isNotEmpty())
     }

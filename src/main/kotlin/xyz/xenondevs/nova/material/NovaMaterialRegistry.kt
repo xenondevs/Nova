@@ -43,6 +43,7 @@ object NovaMaterialRegistry {
         get() = materialsByTypeName.values
     
     val sortedValues: Set<NovaMaterial> by lazy { materialsByTypeName.values.toSortedSet() }
+    val sortedObtainables: Set<NovaMaterial> by lazy { sortedValues.filterTo(LinkedHashSet()) { it.item.data < 9000 } }
     
     // 1 - 1000: Blocks
     // 1: Reserved for legacy furnace generator
@@ -172,7 +173,9 @@ object NovaMaterialRegistry {
     val ARROW_LEFT_OFF_BUTTON = registerItem("ARROW_LEFT_OFF_BUTTON", "", 9123)
     val ARROW_RIGHT_ON_BUTTON = registerItem("ARROW_RIGHT_ON_BUTTON", "", 9124)
     val ARROW_RIGHT_OFF_BUTTON = registerItem("ARROW_RIGHT_OFF_BUTTON", "", 9125)
+    val INVISIBLE_ITEM = registerItem("INVISIBLE", "", 9399)
     val STOPWATCH_ICON = registerItem("STOPWATCH_ICON", "", 9400)
+    val SEARCH_ICON = registerItem("SEARCH_ICON", "", 9401)
     val HOE_PLACEHOLDER = registerItem("HOE_PLACEHOLDER", "", 9500)
     val AXE_PLACEHOLDER = registerItem("AXE_PLACEHOLDER", "", 9501)
     val SHEARS_PLACEHOLDER = registerItem("SHEARS_PLACEHOLDER", "", 9502)

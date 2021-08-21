@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui.menu.recipes
+package xyz.xenondevs.nova.ui.menu.item.recipes
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -25,16 +25,15 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.ui.menu.recipes.craftingtype.RecipeType
+import xyz.xenondevs.nova.ui.menu.item.ItemMenu
+import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeType
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 import java.util.*
-
-private val recipeHistory = HashMap<UUID, LinkedList<RecipesWindow>>()
 
 /**
  * A menu that displays the given list of recipes.
  */
-class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeContainer>>) {
+class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeContainer>>) : ItemMenu {
     
     private val RECIPES_GUI_STRUCTURE = Structure("" +
         "< . . . . . . . >" +
@@ -81,11 +80,8 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
         
     }
     
-    fun show() {
-        val userHistory = recipeHistory.getOrPut(viewerUUID) { LinkedList() }
-        userHistory += this
-        if (userHistory.size >= 10) userHistory.removeFirst()
-        
+    override fun show() {
+        ItemMenu.addToHistory(viewerUUID, this)
         window = SimpleWindow(viewerUUID, getCurrentTitle(), mainGUI)
         window.show()
     }
@@ -174,17 +170,13 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
 private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
     
     override fun getItemProvider(): ItemBuilder {
-        return if (recipeHistory[viewerUUID]!!.size > 1) {
+        return if (ItemMenu.hasHistory(viewerUUID)) {
             Icon.LIGHT_ARROW_1_LEFT.itemBuilder
         } else ItemBuilder(Material.AIR)
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        if (clickType == ClickType.LEFT) {
-            val userHistory = recipeHistory[viewerUUID]
-            userHistory?.removeLast()
-            userHistory?.pollLast()?.show()
-        }
+        if (clickType == ClickType.LEFT) ItemMenu.showPreviousMenu(viewerUUID)
     }
     
 }

@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.PacketListener
 import xyz.xenondevs.nova.player.ability.AbilityManager
@@ -45,6 +46,7 @@ class Nova : JavaPlugin() {
         setGlobalIngredients()
         NovaConfig.init()
         DatabaseManager.connect()
+        LocaleManager.init()
         FakeArmorStandManager.init()
         AdvancementManager.loadAdvancements()
         RecipeManager.registerRecipes()

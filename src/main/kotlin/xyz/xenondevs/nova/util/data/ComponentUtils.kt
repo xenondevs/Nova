@@ -25,6 +25,10 @@ fun ItemBuilder.setLocalizedName(name: String): ItemBuilder {
     return setDisplayName(TranslatableComponent(name))
 }
 
+fun ItemBuilder.setLocalizedName(chatColor: ChatColor, name: String): ItemBuilder {
+    return setDisplayName(localized(chatColor, name))
+}
+
 fun ItemBuilder.addLocalizedLoreLines(vararg lines: String): ItemBuilder {
     return addLoreLines(*lines.map { arrayOf(TranslatableComponent(it)) }.toTypedArray())
 }

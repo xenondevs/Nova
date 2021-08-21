@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui.menu.recipes
+package xyz.xenondevs.nova.ui.menu.item.recipes
 
 import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemProvider
@@ -31,7 +31,7 @@ fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item {
     else StaticRecipeChoiceItem(itemProviders[0])
 }
 
-private fun handleRecipeChoiceClick(player: Player, clickType: ClickType, itemProvider: ItemProvider) {
+fun openCorrespondingRecipesWindow(player: Player, clickType: ClickType, itemProvider: ItemProvider) {
     val name = RecipeRegistry.getNameKey(itemProvider.get())
     if (clickType == ClickType.LEFT) {
         val recipes = RecipeRegistry.CREATION_RECIPES[name]
@@ -45,7 +45,7 @@ private fun handleRecipeChoiceClick(player: Player, clickType: ClickType, itemPr
 class CyclingRecipeChoiceItem(itemProviders: Array<ItemProvider>) : AutoCycleItem(20, *itemProviders) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) handleRecipeChoiceClick(player, clickType, itemProvider)
+        if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) openCorrespondingRecipesWindow(player, clickType, itemProvider)
     }
     
 }
@@ -53,7 +53,7 @@ class CyclingRecipeChoiceItem(itemProviders: Array<ItemProvider>) : AutoCycleIte
 class StaticRecipeChoiceItem(itemProvider: ItemProvider) : SimpleItem(itemProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) handleRecipeChoiceClick(player, clickType, itemProvider)
+        if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) openCorrespondingRecipesWindow(player, clickType, itemProvider)
     }
     
 }
