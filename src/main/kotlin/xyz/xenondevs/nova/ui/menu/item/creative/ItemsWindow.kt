@@ -102,7 +102,7 @@ class ItemsWindow(val player: Player) : ItemMenu {
         
         builder.append(
             if (filter == "") TranslatableComponent("menu.nova.items")
-            else TranslatableComponent("menu.nova.items.searched").apply { addWith(coloredText(ChatColor.AQUA, filter)) }
+            else TranslatableComponent("menu.nova.items.searched").apply { addWith(coloredText(ChatColor.GRAY, filter)) }
         ).font("default").color(ChatColor.DARK_GRAY)
         
         SimpleWindow(player, builder.create(), mainGUI).show()
