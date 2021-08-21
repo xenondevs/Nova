@@ -61,6 +61,7 @@ src/test/kotlin/Test.kt
 
 # Logs
 logs/
+*.log
 
 # output folder if not defined in command line
 ${dir}/
