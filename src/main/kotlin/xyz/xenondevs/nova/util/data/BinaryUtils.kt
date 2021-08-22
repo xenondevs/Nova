@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.ByteArrayOutputStream
 import java.util.zip.Deflater
+import java.util.zip.Deflater.DEFAULT_COMPRESSION
 import java.util.zip.Inflater
 
 fun ByteBuf.writeByte(byte: Byte): ByteBuf = writeByte(byte.toInt())
@@ -37,8 +38,8 @@ fun ByteArray.toByteBuf(allocator: () -> ByteBuf = Unpooled::buffer): ByteBuf {
     return buf
 }
 
-fun ByteArray.compress(): ByteArray {
-    val deflater = Deflater()
+fun ByteArray.compress(compressType: Int = DEFAULT_COMPRESSION): ByteArray {
+    val deflater = Deflater(compressType)
     val buffer = ByteArray(512)
     deflater.setInput(this)
     deflater.finish()
