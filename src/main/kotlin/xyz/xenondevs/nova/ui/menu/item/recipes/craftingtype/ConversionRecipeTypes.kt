@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemWrapper
 import net.md_5.bungee.api.chat.TranslatableComponent

@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.menu.item.recipes
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.gui.impl.PagedGUI
 import de.studiocode.invui.gui.impl.SimplePagedNestedGUI
 import de.studiocode.invui.gui.impl.SimpleTabGUI

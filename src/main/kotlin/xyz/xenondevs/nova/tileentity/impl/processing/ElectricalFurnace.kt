@@ -4,7 +4,7 @@ package xyz.xenondevs.nova.tileentity.impl.processing
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.PlayerUpdateReason
 import org.bukkit.Bukkit

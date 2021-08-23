@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.impl.energy
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.NovaConfig

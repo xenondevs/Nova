@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.github.NichtStudioCode.InvUI</groupId>
             <artifactId>InvUI</artifactId>
-            <version>4b945d903b</version>
+            <version>d0bddc126b</version>
         </dependency>
         <dependency>
             <groupId>xyz.xenondevs</groupId>

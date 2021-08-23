@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.impl.agriculture
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.minecraft.core.Direction
 import net.minecraft.world.InteractionHand

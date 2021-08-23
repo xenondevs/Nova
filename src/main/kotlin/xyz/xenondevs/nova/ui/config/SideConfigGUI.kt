@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.config
 import com.google.common.base.Preconditions
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.resourcepack.Icon

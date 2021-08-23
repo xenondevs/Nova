@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.menu.item.creative
 
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.impl.SimplePagedItemsGUI
 import de.studiocode.invui.item.Item
@@ -124,7 +124,7 @@ class ItemsWindow(val player: Player) : ItemMenu {
             builder.create(),
             anvilSearchGUI,
             previewGUI
-        ) { filter = it; println("filter text changed to '$it'") }.show()
+        ) { filter = it }.show()
     }
     
     override fun show() {
