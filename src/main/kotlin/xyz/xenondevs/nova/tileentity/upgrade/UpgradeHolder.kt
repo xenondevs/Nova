@@ -11,26 +11,26 @@ import xyz.xenondevs.nova.ui.UpgradesGUI
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.runTaskLater
 import java.util.*
-import kotlin.math.pow
-
-// TODO nerf
-private val DEFAULT_MODIFIERS by lazy { (0..10).associateWith { if (it == 0) 1.0 else if (it == 1) it + 0.25 else it - 0.25 } }
-private val SPEED_MODIFIERS by lazy { (0..10).associateWith { it.toDouble().pow(0.95) + 1 } }
 
 private fun ItemStack.getUpgradeType(): UpgradeType? {
     val novaType = novaMaterial ?: return null
     return UpgradeType.values().firstOrNull { it.material == novaType }
 }
 
-class UpgradeHolder(val upgradeable: Upgradeable, data: CompoundElement, lazyGUI: () -> TileEntityGUI, vararg allowed: UpgradeType) {
+class UpgradeHolder(
+    private val upgradeable: Upgradeable,
+    data: CompoundElement,
+    vararg allowed: UpgradeType,
+    lazyGUI: () -> TileEntityGUI
+) {
     
-    val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleNewInput) }
+    val input = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(10)).apply { setItemUpdateHandler(::handleNewInput) }
     val allowed = allowed.toList()
     val upgrades = EnumMap<UpgradeType, Int>(UpgradeType::class.java)
     
     val gui by lazy { UpgradesGUI(this) { lazyGUI().openWindow(it) } }
     
-    constructor(upgradeable: Upgradeable, data: CompoundElement, lazyGUI: () -> TileEntityGUI) : this(upgradeable, data, lazyGUI, *UpgradeType.values())
+    constructor(upgradeable: Upgradeable, data: CompoundElement, lazyGUI: () -> TileEntityGUI) : this(upgradeable, data, allowed = UpgradeType.values(), lazyGUI)
     
     init {
         val savedUpgrades = data.get<EnumMap<UpgradeType, Int>>("upgrades")
@@ -44,11 +44,10 @@ class UpgradeHolder(val upgradeable: Upgradeable, data: CompoundElement, lazyGUI
      */
     @Suppress("LiftReturnOrAssignment")
     fun addUpgrade(type: UpgradeType, amount: Int): Int {
-        if (type !in allowed)
+        if (type !in allowed || amount == 0)
             return amount
-        
-        upgrades.putIfAbsent(type, 0)
-        val current = upgrades[type]!!
+    
+        val current = upgrades[type] ?: 0
         if (10 - current < amount) {
             upgrades[type] = 10
             return amount - (10 - current)
@@ -58,20 +57,23 @@ class UpgradeHolder(val upgradeable: Upgradeable, data: CompoundElement, lazyGUI
         }
     }
     
-    fun removeUpgrade(type: UpgradeType): ItemStack? {
-        if (type !in upgrades)
-            return null
-        val amount = upgrades[type]!!
-        upgrades -= type
+    fun removeUpgrade(type: UpgradeType, all: Boolean): ItemStack? {
+        val amount = upgrades[type] ?: return null
+        
+        if (all) {
+            upgrades.remove(type)
+        } else {
+            if (amount - 1 == 0) upgrades.remove(type)
+            else upgrades[type] = amount - 1
+        }
+        
         handleUpgradeUpdates()
-        return type.material.createItemStack(amount)
+        return type.material.createItemStack(if (all) amount else 1)
     }
     
     fun getModifier(type: UpgradeType): Double {
         val amount = upgrades[type] ?: 0
-        if (type == UpgradeType.SPEED)
-            return SPEED_MODIFIERS[amount]!!
-        return DEFAULT_MODIFIERS[amount]!!
+        return type.modifiers[amount]
     }
     
     fun getSpeedModifier() = getModifier(UpgradeType.SPEED)
@@ -80,14 +82,30 @@ class UpgradeHolder(val upgradeable: Upgradeable, data: CompoundElement, lazyGUI
     
     fun getEnergyModifier() = getModifier(UpgradeType.ENERGY)
     
+    fun getRangeModifier() = getModifier(UpgradeType.RANGE)
+    
     private fun handleNewInput(event: ItemUpdateEvent) {
         if (event.updateReason == SELF_UPDATE_REASON || event.isRemove || event.newItemStack == null)
             return
+        
         val upgradeType = event.newItemStack.getUpgradeType()
-        if (upgradeType == null) {
+        if (upgradeType == null || upgradeType !in allowed) {
             event.isCancelled = true
             return
         }
+        
+        val currentAmount = upgrades[upgradeType] ?: 0
+        if (currentAmount == 10) {
+            event.isCancelled = true
+            return
+        }
+        
+        var addedAmount = event.addedAmount
+        if (addedAmount + currentAmount > 10) {
+            addedAmount = 10 - currentAmount
+            event.newItemStack.amount = addedAmount
+        }
+        
         runTaskLater(1) {
             val vi = event.virtualInventory
             var item = vi.items[0]

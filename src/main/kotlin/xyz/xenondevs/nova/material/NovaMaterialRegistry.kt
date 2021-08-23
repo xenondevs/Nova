@@ -122,6 +122,7 @@ object NovaMaterialRegistry {
     val SPEED_UPGRADE = registerItem("SPEED_UPGRADE", "item.nova.speed_upgrade", 2002)
     val EFFICIENCY_UPGRADE = registerItem("EFFICIENCY_UPGRADE", "item.nova.efficiency_upgrade", 2003)
     val ENERGY_UPGRADE = registerItem("ENERGY_UPGRADE", "item.nova.energy_upgrade", 2004)
+    val RANGE_UPGRADE = registerItem("RANGE_UPGRADE", "item.nova.range_upgrade", 2005)
     
     // 3000 - 4000: Equipment, Attachments
     val JETPACK = registerItem("JETPACK", "item.nova.jetpack", ModelData(IRON_CHESTPLATE, intArrayOf(3000)), JetpackItem)
@@ -168,7 +169,7 @@ object NovaMaterialRegistry {
     val NBT_OFF_BUTTON = registerItem("NBT_OFF_BUTTON", "", 9118)
     val HOE_ON_BUTTON = registerItem("HOE_ON_BUTTON", "", 9119)
     val HOE_OFF_BUTTON = registerItem("HOE_OFF_BUTTON", "", 9120)
-    val UPGRADES_BUTTON = registerItem("UPGRADES_BUTTON", "", 9121)
+    val UPGRADES_BUTTON = registerItem("UPGRADES_BUTTON", "menu.nova.upgrades", 9121)
     val ARROW_LEFT_ON_BUTTON = registerItem("ARROW_LEFT_ON_BUTTON", "", 9122)
     val ARROW_LEFT_OFF_BUTTON = registerItem("ARROW_LEFT_OFF_BUTTON", "", 9123)
     val ARROW_RIGHT_ON_BUTTON = registerItem("ARROW_RIGHT_ON_BUTTON", "", 9124)
@@ -176,6 +177,10 @@ object NovaMaterialRegistry {
     val INVISIBLE_ITEM = registerItem("INVISIBLE", "", 9399)
     val STOPWATCH_ICON = registerItem("STOPWATCH_ICON", "", 9400)
     val SEARCH_ICON = registerItem("SEARCH_ICON", "", 9401)
+    val SPEED_UPGRADE_ICON = registerItem("SPEED_UPGRADE_ICON", "", 9402)
+    val EFFICIENCY_UPGRADE_ICON = registerItem("EFFICIENCY_UPGRADE_ICON", "", 9403)
+    val ENERGY_UPGRADE_ICON = registerItem("ENERGY_UPGRADE_ICON", "", 9404)
+    val RANGE_UPGRADE_ICON = registerItem("RANGE_UPGRADE_ICON", "", 9405)
     val HOE_PLACEHOLDER = registerItem("HOE_PLACEHOLDER", "", 9500)
     val AXE_PLACEHOLDER = registerItem("AXE_PLACEHOLDER", "", 9501)
     val SHEARS_PLACEHOLDER = registerItem("SHEARS_PLACEHOLDER", "", 9502)

@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradeable
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
@@ -59,7 +60,7 @@ class ElectricalFurnace(
     override val requestedEnergy: Int
         get() = maxEnergy - energy
     
-    override val upgradeHolder = UpgradeHolder(this, data) { gui }
+    override val upgradeHolder = UpgradeHolder(this, data, UpgradeType.SPEED, UpgradeType.EFFICIENCY, UpgradeType.ENERGY) { gui }
     
     private val inputInventory = getInventory("input", 1, true, ::handleInputInventoryUpdate)
     private val outputInventory = getInventory("output", 1, true, ::handleOutputInventoryUpdate)
