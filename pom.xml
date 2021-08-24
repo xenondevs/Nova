@@ -10,12 +10,13 @@
 
     <properties>
         <kotlin.version>1.5.30-RC</kotlin.version>
+        <exposed.version>0.33.1</exposed.version>
+        <spigot.version>1.17.1-R0.1-SNAPSHOT</spigot.version>
+        <shadePath>xyz.xenondevs.nova.lib</shadePath>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
-        <shadePath>xyz.xenondevs.nova.lib</shadePath>
-        <spigotVersion>1.17.1-R0.1-SNAPSHOT</spigotVersion>
     </properties>
 
     <repositories>
@@ -61,54 +62,12 @@
     </pluginRepositories>
 
     <dependencies>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.8.0-M1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.NichtStudioCode.InvUI</groupId>
-            <artifactId>InvUI</artifactId>
-            <version>d0bddc126b</version>
-        </dependency>
-        <dependency>
-            <groupId>xyz.xenondevs</groupId>
-            <artifactId>particle</artifactId>
-            <version>1.6.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.NichtStudioCode</groupId>
-            <artifactId>AdvancementAPI</artifactId>
-            <version>4a8d5e64ad</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>2.2.1</version>
-        </dependency>
+        <!-- Provided through Spigot-->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <classifier>remapped-mojang</classifier>
-            <version>${spigotVersion}</version>
+            <version>${spigot.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -135,6 +94,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.32</version> <!-- May not be the exact version bundled with Minecraft -->
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Provided through plugins -->
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
@@ -166,12 +133,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.LoneDev6</groupId>
-            <artifactId>api-itemsadder</artifactId>
-            <version>2.4.7</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.griefdefender</groupId>
             <artifactId>api</artifactId>
             <version>2.0.0-SNAPSHOT</version>
@@ -184,41 +145,81 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>com.github.LoneDev6</groupId>
+            <artifactId>api-itemsadder</artifactId>
+            <version>2.4.7</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Not provided -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.exposed</groupId>
             <artifactId>exposed-core</artifactId>
-            <version>0.33.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${exposed.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.exposed</groupId>
             <artifactId>exposed-jdbc</artifactId>
-            <version>0.33.1</version>
+            <version>${exposed.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs</groupId>
+            <artifactId>particle</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+        <dependency>
+            <groupId>me.xdrop</groupId>
+            <artifactId>fuzzywuzzy</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.NichtStudioCode.InvUI</groupId>
+            <artifactId>InvUI</artifactId>
+            <version>d0bddc126b</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.NichtStudioCode</groupId>
+            <artifactId>AdvancementAPI</artifactId>
+            <version>4a8d5e64ad</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>2.2.1</version>
         </dependency>
         <dependency>
             <groupId>net.dzikoysk</groupId>
             <artifactId>exposed-upsert</artifactId>
             <version>1.0.2</version>
         </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.0-M1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>me.xdrop</groupId>
-            <artifactId>fuzzywuzzy</artifactId>
-            <version>1.3.1</version>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test-junit</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -273,10 +274,10 @@
                         </goals>
                         <id>remap-obf</id>
                         <configuration>
-                            <srgIn>org.spigotmc:minecraft-server:${spigotVersion}:txt:maps-mojang</srgIn>
+                            <srgIn>org.spigotmc:minecraft-server:${spigot.version}:txt:maps-mojang</srgIn>
                             <reverse>true</reverse>
                             <remappedDependencies>
-                                org.spigotmc:spigot:${spigotVersion}:jar:remapped-mojang
+                                org.spigotmc:spigot:${spigot.version}:jar:remapped-mojang
                             </remappedDependencies>
                             <remappedArtifactAttached>true</remappedArtifactAttached>
                             <remappedClassifierName>remapped-obf</remappedClassifierName>
@@ -292,9 +293,9 @@
                             <inputFile>
                                 ${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar
                             </inputFile>
-                            <srgIn>org.spigotmc:minecraft-server:${spigotVersion}:csrg:maps-spigot</srgIn>
+                            <srgIn>org.spigotmc:minecraft-server:${spigot.version}:csrg:maps-spigot</srgIn>
                             <remappedDependencies>
-                                org.spigotmc:spigot:${spigotVersion}:jar:remapped-obf
+                                org.spigotmc:spigot:${spigot.version}:jar:remapped-obf
                             </remappedDependencies>
                         </configuration>
                     </execution>
@@ -322,17 +323,12 @@
                                 </includes>
                             </artifactSet>
                             <relocations>
-<!--                                <relocation>-->
-<!--                                    <pattern>kotlin</pattern>-->
-<!--                                    <shadedPattern>${shadePath}.kotlin</shadedPattern>-->
-<!--                                </relocation>-->
+                                <!-- Kotlin cannot be relocated as kotlin-reflect cannot find Kotlin built-ins -->
+                                <!-- Jetbrains Exposed can also not be relocated -->
+                                <!-- Relocating dependencies of non-relocated dependencies does not make sense (coroutines, annotations...) -->
                                 <relocation>
-                                    <pattern>org.intellij.lang.annotations</pattern>
-                                    <shadedPattern>${shadePath}.org.intellij.lang.annotations</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.jetbrains.annotations</pattern>
-                                    <shadedPattern>${shadePath}.org.jetbrains.annotations</shadedPattern>
+                                    <pattern>com.zaxxer.hikari</pattern>
+                                    <shadedPattern>${shadePath}.com.zaxxer.hikari</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
@@ -351,8 +347,12 @@
                                     <shadedPattern>${shadePath}.xyz.xenondevs.particle</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.zaxxer.hikari</pattern>
-                                    <shadedPattern>${shadePath}.com.zaxxer.hikari</shadedPattern>
+                                    <pattern>me.xdrop</pattern>
+                                    <shadedPattern>${shadePath}.me.xdrop</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>net.dzikoysk</pattern>
+                                    <shadedPattern>${shadePath}.net.dzikoysk</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
