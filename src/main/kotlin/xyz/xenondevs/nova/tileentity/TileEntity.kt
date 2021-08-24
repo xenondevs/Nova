@@ -140,7 +140,6 @@ abstract class TileEntity(
     open fun handleRemoved(unload: Boolean) {
         isValid = false
         gui?.closeWindows()
-        if (this is Upgradeable) upgradeHolder.gui.closeForAllViewers()
         
         armorStand.remove()
         multiModels.forEach { it.removeAllModels() }
@@ -346,10 +345,29 @@ abstract class TileEntity(
 
 abstract class TileEntityGUI(private val title: String) {
     
+    /**
+     * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
+     * the owning [TileEntity] is destroyed.
+     */
     abstract val gui: GUI
     
+    /**
+     * A list of [GUIs][GUI] that are not a part of [gui] but should still be closed
+     * when the [TileEntity] is destroyed.
+     */
+    val subGUIs = ArrayList<GUI>()
+    
+    /**
+     * Opens a Window of the [gui] to the specified [player].
+     */
     fun openWindow(player: Player) = SimpleWindow(player, arrayOf(TranslatableComponent(title)), gui).show()
     
-    fun closeWindows() = gui.closeForAllViewers()
+    /**
+     * Closes all Windows connected to this [TileEntityGUI].
+     */
+    fun closeWindows() {
+        gui.closeForAllViewers()
+        subGUIs.forEach(GUI::closeForAllViewers)
+    }
     
 }

@@ -45,11 +45,13 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         .addIngredient('d', UpgradeCounter(UpgradeType.RANGE))
         .build()
     
+    init {
+        upgradeHolder.lazyGUI().subGUIs += gui
+    }
+    
     fun openWindow(player: Player) {
         SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.upgrades")), gui).show()
     }
-    
-    fun closeForAllViewers() = gui.closeForAllViewers()
     
     fun updateUpgrades() {
         upgradeItems.forEach(Item::notifyWindows)

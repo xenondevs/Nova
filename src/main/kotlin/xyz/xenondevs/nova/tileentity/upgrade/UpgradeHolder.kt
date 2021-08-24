@@ -21,7 +21,7 @@ class UpgradeHolder(
     private val upgradeable: Upgradeable,
     data: CompoundElement,
     vararg allowed: UpgradeType,
-    lazyGUI: () -> TileEntityGUI
+    val lazyGUI: () -> TileEntityGUI
 ) {
     
     val input = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(10)).apply { setItemUpdateHandler(::handleNewInput) }
