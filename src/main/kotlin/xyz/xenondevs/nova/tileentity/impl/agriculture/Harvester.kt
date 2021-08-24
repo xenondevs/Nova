@@ -213,7 +213,7 @@ class Harvester(
                 "| . . . . . . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('c', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('v', VisualizeRegionItem(uuid, harvestRegion))
+            .addIngredient('v', VisualizeRegionItem(uuid) { harvestRegion })
             .addIngredient('s', VISlotElement(shearInventory, 0, NovaMaterialRegistry.SHEARS_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('a', VISlotElement(axeInventory, 0, NovaMaterialRegistry.AXE_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('h', VISlotElement(hoeInventory, 0, NovaMaterialRegistry.HOE_PLACEHOLDER.createBasicItemBuilder()))

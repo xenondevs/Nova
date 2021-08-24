@@ -102,8 +102,8 @@ class ChunkLoader(
                 "# 3 - - - - - 4 ."
             )
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('p', AddNumberItem(0..MAX_RANGE, { range }, ::setRange).also(rangeItems::add))
-            .addIngredient('m', RemoveNumberItem(0..MAX_RANGE, { range }, ::setRange).also(rangeItems::add))
+            .addIngredient('p', AddNumberItem({ 0..MAX_RANGE }, { range }, ::setRange).also(rangeItems::add))
+            .addIngredient('m', RemoveNumberItem({ 0..MAX_RANGE }, { range }, ::setRange).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range + 1 }.also(rangeItems::add))
             .build()
         

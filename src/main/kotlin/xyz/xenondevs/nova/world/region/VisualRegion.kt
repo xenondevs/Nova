@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.util.getBoxOutline
 import xyz.xenondevs.particle.task.TaskManager
 import java.awt.Color
 import java.util.*
+import kotlin.collections.ArrayList
 
 object VisualRegion {
     
@@ -47,6 +48,13 @@ object VisualRegion {
         viewers.remove(regionUUID)
     }
     
+    fun updateRegion(regionUUID: UUID, region: Region) {
+        if (regionUUID in taskId) 
+            TaskManager.getTaskManager().stopTask(taskId[regionUUID]!!)
+        
+        startShowingRegion(regionUUID, region)
+    }
+    
     private fun getViewerList(regionUUID: UUID, region: Region): MutableList<UUID> {
         if (regionUUID in viewers)
             return viewers[regionUUID]!!
@@ -56,7 +64,7 @@ object VisualRegion {
     
     private fun startShowingRegion(regionUUID: UUID, region: Region) {
         val packets = getParticlePackets(regionUUID, region)
-        viewers[regionUUID] = ArrayList()
+        viewers.computeIfAbsent(regionUUID) { ArrayList() }
         val id = TaskManager.startSuppliedTask(packets, 3) {
             viewers[regionUUID]!!
                 .mapNotNull(Bukkit::getPlayer)
@@ -69,4 +77,5 @@ object VisualRegion {
         val color = Color(regionUUID.hashCode())
         return region.min.getBoxOutline(region.max, false).map { it.createColoredParticle(color) }
     }
+    
 }

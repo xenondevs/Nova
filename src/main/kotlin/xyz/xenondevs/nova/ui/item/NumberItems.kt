@@ -10,8 +10,8 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 
 open class ChangeNumberItem(
-    private val range: IntRange,
     private val sizeModifier: Int,
+    private val getRange: () -> IntRange,
     private val getNumber: () -> Int,
     private val setNumber: (Int) -> Unit,
     private val onBuilder: ItemBuilder,
@@ -27,7 +27,7 @@ open class ChangeNumberItem(
         }
     }
     
-    private fun canModify() = getNumber() + sizeModifier in range
+    private fun canModify() = getNumber() + sizeModifier in getRange()
     
 }
 
@@ -40,12 +40,12 @@ class DisplayNumberItem(private val getNumber: () -> Int) : BaseItem() {
 }
 
 class AddNumberItem(
-    range: IntRange,
+    getRange: () -> IntRange,
     getNumber: () -> Int,
     setNumber: (Int) -> Unit
 ) : ChangeNumberItem(
-    range,
     1,
+    getRange,
     getNumber,
     setNumber,
     NovaMaterialRegistry.PLUS_ON_BUTTON.createBasicItemBuilder(),
@@ -53,12 +53,12 @@ class AddNumberItem(
 )
 
 class RemoveNumberItem(
-    range: IntRange,
+    getRange: () -> IntRange,
     getNumber: () -> Int,
     setNumber: (Int) -> Unit,
 ) : ChangeNumberItem(
-    range,
     -1,
+    getRange,
     getNumber,
     setNumber,
     NovaMaterialRegistry.MINUS_ON_BUTTON.createBasicItemBuilder(),

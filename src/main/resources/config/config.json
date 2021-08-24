@@ -125,7 +125,10 @@
     "damage": 10
   },
   "vacuum_chest": {
-    "range": 5
+    "range": {
+      "min": 1,
+      "max": 5
+    }
   },
   "breeder": {
     "capacity": 10000,

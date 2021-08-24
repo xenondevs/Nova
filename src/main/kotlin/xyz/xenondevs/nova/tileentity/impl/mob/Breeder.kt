@@ -163,7 +163,7 @@ class Breeder(
                 "| u # . . . . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('r', VisualizeRegionItem(uuid, region))
+            .addIngredient('r', VisualizeRegionItem(uuid) { region })
             .addIngredient('u', UpgradesTeaserItem)
             .build()
             .also { it.fillRectangle(3, 1, 3, inventory, true) }

@@ -15,28 +15,22 @@ import java.util.*
 
 class VisualizeRegionItem(
     private val regionUUID: UUID,
-    private val region: Region
+    private val getRegion: () -> Region,
 ) : BaseItem() {
     
-    override fun getItemProvider(): ItemProvider {
-        return object : ItemProvider {
-            
-            override fun get(): ItemStack? {
-                return null
-            }
-            
+    override fun getItemProvider() =
+        object : ItemProvider {
+            override fun get() = null
             override fun getFor(playerUUID: UUID): ItemStack {
                 val visible = VisualRegion.isVisible(playerUUID, regionUUID)
                 return (if (visible) NovaMaterialRegistry.AREA_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.visual_region.hide")
                 else NovaMaterialRegistry.AREA_OFF_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.visual_region.show")).getFor(playerUUID)
             }
-            
         }
-    }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-        VisualRegion.toggleView(player, regionUUID, region)
+        VisualRegion.toggleView(player, regionUUID, getRegion())
         notifyWindows()
     }
     

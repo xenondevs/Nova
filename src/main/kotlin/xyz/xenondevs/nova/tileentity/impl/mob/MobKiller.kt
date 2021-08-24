@@ -111,7 +111,7 @@ class MobKiller(
                 "| u # . # . # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('r', VisualizeRegionItem(uuid, region))
+            .addIngredient('r', VisualizeRegionItem(uuid) { region })
             .addIngredient('u', UpgradesTeaserItem)
             .build()
         

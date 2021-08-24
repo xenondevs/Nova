@@ -110,7 +110,7 @@ class WirelessCharger(
                 "| u # # . # # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('v', VisualizeRegionItem(uuid, region))
+            .addIngredient('v', VisualizeRegionItem(uuid) { region })
             .addIngredient('u', UpgradesTeaserItem)
             .build()
         

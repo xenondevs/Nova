@@ -133,7 +133,7 @@ class Fertilizer(
                 "| v . . . . # . |" +
                 "| u . . . . # . |" +
                 "3 - - - - - - - 4")
-            .addIngredient('v', VisualizeRegionItem(uuid, fertilizeRegion))
+            .addIngredient('v', VisualizeRegionItem(uuid) { fertilizeRegion })
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', UpgradesTeaserItem)
             .build()

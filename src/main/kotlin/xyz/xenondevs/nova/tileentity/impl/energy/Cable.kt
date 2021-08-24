@@ -73,11 +73,6 @@ open class Cable(
     private val multiModel = createMultiModel()
     private val hitboxes = ArrayList<Hitbox>()
     
-    init {
-        // cables from older version do not have the correct rotation
-        armorStand.teleport { yaw = 180f }
-    }
-    
     override fun saveData() {
         super.saveData()
         storeList("bridgeFaces", bridgeFaces)
