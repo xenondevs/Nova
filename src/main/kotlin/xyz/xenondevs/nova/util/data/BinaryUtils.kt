@@ -53,7 +53,7 @@ fun ByteArray.compress(compressType: Int = DEFAULT_COMPRESSION): ByteArray {
     }
 }
 
-fun ByteArray.decompress() : ByteArray {
+fun ByteArray.decompress(): ByteArray {
     val inflater = Inflater()
     val buffer = ByteArray(512)
     inflater.setInput(this)

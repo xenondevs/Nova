@@ -32,6 +32,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.data.decompress
 import xyz.xenondevs.nova.util.data.localized
 import java.util.*
 import kotlin.math.roundToInt
@@ -192,7 +193,7 @@ object TileEntityManager : Listener {
                 .select { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
                 .forEach {
                     val uuid = it[TileEntitiesTable.uuid]
-                    val data = CompoundDeserializer.read(it[TileEntitiesTable.data].bytes)
+                    val data = CompoundDeserializer.read(it[TileEntitiesTable.data].bytes.decompress())
                     val material = NovaMaterialRegistry.get(it[TileEntitiesTable.type])
                     
                     val location = Location(

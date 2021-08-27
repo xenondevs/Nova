@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradeable
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.data.compress
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.armorstand.pos
@@ -98,7 +99,7 @@ abstract class TileEntity(
      * Serializes the [data] to binary data.
      */
     fun getData(): ByteArray {
-        return data.toByteArray()
+        return data.toByteArray().compress()
     }
     
     /**
