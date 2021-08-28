@@ -20,18 +20,15 @@ object LocaleManager {
             LOGGER.info("Loading translations")
             val translationProviders = HashMap<String, HashMap<String, String>>()
             ZipInputStream(url.openStream()).use { zis ->
-                while (true) {
-                    val entry = zis.nextEntry ?: break
-                    if (entry.isDirectory) continue
-                    
-                    if (!entry.isDirectory && entry.name.startsWith("assets/minecraft/lang/")) {
+                generateSequence { zis.nextEntry }
+                    .filter { !it.isDirectory && it.name.startsWith("assets/minecraft/lang/") }
+                    .forEach { entry ->
                         val fileContent = zis.readNBytes(entry.size.toInt())
                         val langName = entry.name.substringAfterLast('/').substringBeforeLast('.')
                         val langObject = JSON_PARSER.parse(String(fileContent)) as JsonObject
                         
                         translationProviders[langName] = langObject.entrySet().associateTo(HashMap()) { it.key to it.value.asString }
                     }
-                }
             }
             
             this.translationProviders = translationProviders
