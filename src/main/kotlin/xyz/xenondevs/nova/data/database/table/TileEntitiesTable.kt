@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.database.table
 
 import org.jetbrains.exposed.sql.Table
+import xyz.xenondevs.nova.data.database.columtype.mediumBlob
 
 object TileEntitiesTable : Table("tileEntities") {
     
@@ -13,7 +14,7 @@ object TileEntitiesTable : Table("tileEntities") {
     val z = integer("z")
     val yaw = float("yaw")
     val type = varchar("type", 128)
-    val data = blob("data")
+    val data = mediumBlob("data")
     
     override val primaryKey = PrimaryKey(uuid)
     
