@@ -20,7 +20,7 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
             data.putElement("global", globalData)
     }
     
-    /* --------------- BackedElement data retrieval --------------- */
+    //region BackedElement data retrieval
     
     /**
      * Retrieves data from the data [CompoundElement] of this TileEntity.
@@ -49,7 +49,9 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
         return data.get(key) ?: globalData.get(key)
     }
     
-    /* --------------- Enum data retrieval --------------- */
+    //endregion
+    
+    //region Enum data retrieval
     
     /**
      * Retrieves an enum constant. If it can't find anything under the
@@ -99,7 +101,9 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
         return mapElement.toDoubleEnumMap()
     }
     
-    /* --------------- Collection data retrieval --------------- */
+    //endregion
+    
+    //region Collection data retrieval
     
     /**
      * Retrieves a [ListElement] and maps Its values to the given [destination][dest]
@@ -117,7 +121,9 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
         return listElement.toEnumCollection(dest)
     }
     
-    /* --------------- Automated data storage --------------- */
+    //endregion
+    
+    //region Data storage
     
     /**
      * Serializes objects using CBF and stores them under the given key in
@@ -140,8 +146,6 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
         }
     }
     
-    /* --------------- Manual data storage --------------- */
-    
     /**
      * Serializes [EnumMaps][EnumMap] using CBF and stores them in the [data] [CompoundElement]
      */
@@ -158,5 +162,7 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
         list.forEach { listElement.add(BackedElement.createElement(it!!)) }
         data.putElement(key, listElement)
     }
+    
+    //endregion
     
 }
