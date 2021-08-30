@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.database.table
 import org.jetbrains.exposed.sql.Table
 import xyz.xenondevs.nova.data.database.columtype.mediumBlob
 
-object TileEntitiesTable : Table("tileEntities") {
+object TileEntitiesTable : Table("TileEntities") {
     
     val uuid = uuid("uuid")
     val world = uuid("world")
