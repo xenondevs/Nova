@@ -1,10 +1,15 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.World
+import org.jetbrains.exposed.sql.count
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.PermissionUtils
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
@@ -22,10 +27,23 @@ object TileEntityLimits {
     private val TYPE_AMOUNT_LIMIT: Map<NovaMaterial, Int> =
         GSON.fromJson<HashMap<NovaMaterial, Int>>(NovaConfig.getObject("tile_entity_limit"))!!
     
-    private val placedTileEntities: MutableMap<UUID, MutableMap<NovaMaterial, Int>>
+    private val placedTileEntities = HashMap<UUID, MutableMap<NovaMaterial, Int>>()
     
     init {
-        placedTileEntities = PermanentStorage.retrieve("placedTileEntities") { HashMap() }
+        transaction {
+            val countExpr = TileEntitiesTable.owner.count()
+            TileEntitiesTable
+                .slice(TileEntitiesTable.owner, TileEntitiesTable.type, countExpr)
+                .selectAll()
+                .groupBy(TileEntitiesTable.owner, TileEntitiesTable.type)
+                .forEach { row ->
+                    val owner = row[TileEntitiesTable.owner]
+                    val type = NovaMaterialRegistry.get(row[TileEntitiesTable.type])
+                    val count = row[countExpr].toInt()
+                    placedTileEntities.putIfAbsent(owner, HashMap())
+                    placedTileEntities[owner]!![type] = count
+                }
+        }
         NOVA.disableHandlers += { PermanentStorage.store("placedTileEntities", placedTileEntities) }
     }
     
