@@ -65,6 +65,8 @@ object NovaLegacyDataConverter : Listener {
         LOGGER.info("Initializing LegacyDataConverter")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::convertChunk)
+        if(IS_VERSION_CHANGE)
+            PermanentStorage.remove("placedTileEntities")
         
         NOVA.disableHandlers += {
             PermanentStorage.store("convertedEntityChunks", convertedEntityChunks)

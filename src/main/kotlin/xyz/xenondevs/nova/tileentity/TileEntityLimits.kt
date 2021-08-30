@@ -4,9 +4,7 @@ import org.bukkit.World
 import org.jetbrains.exposed.sql.count
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -40,11 +38,11 @@ object TileEntityLimits {
                     val owner = row[TileEntitiesTable.owner]
                     val type = NovaMaterialRegistry.get(row[TileEntitiesTable.type])
                     val count = row[countExpr].toInt()
-                    placedTileEntities.putIfAbsent(owner, HashMap())
+                    if (owner !in placedTileEntities)
+                        placedTileEntities[owner] = HashMap()
                     placedTileEntities[owner]!![type] = count
                 }
         }
-        NOVA.disableHandlers += { PermanentStorage.store("placedTileEntities", placedTileEntities) }
     }
     
     fun canPlaceTileEntity(uuid: UUID, world: World, type: NovaMaterial): PlaceResult {

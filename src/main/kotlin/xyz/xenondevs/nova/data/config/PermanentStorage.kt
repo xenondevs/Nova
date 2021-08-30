@@ -16,6 +16,11 @@ object PermanentStorage {
         file.writeText(GSON.toJson(mainObj))
     }
     
+    fun remove(key: String) {
+        mainObj.remove(key)
+        file.writeText(GSON.toJson(mainObj))
+    }
+    
     inline fun <reified T> retrieve(key: String, alternativeProvider: () -> T): T {
         return retrieveOrNull(key) ?: alternativeProvider()
     }
