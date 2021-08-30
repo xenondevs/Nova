@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.tileentity.impl.energy
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
-import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -84,21 +83,25 @@ class WirelessCharger(
         storeData("range", range)
     }
     
+    private var players: List<Player> = emptyList()
+    private var findPlayersCooldown = 0
+    
     override fun handleTick() {
-        var energyTransferred = 0
+        var energyTransferred: Int
         
-        if (energyHolder.energy != 0) {
-            chargeLoop@ for (entity in world.entities) {
-                if (entity.location in region) {
-                    if (entity is Player) {
-                        for (itemStack in entity.inventory) {
-                            energyTransferred += chargeItemStack(energyTransferred, itemStack)
-                            if (energyTransferred == energyHolder.energyConsumption || energyHolder.energy == 0) break@chargeLoop
-                        }
-                    } else if (entity is Item) {
-                        energyTransferred += chargeItemStack(energyTransferred, entity.itemStack)
-                        if (energyTransferred == CHARGE_SPEED || energyHolder.energy == 0) break@chargeLoop
-                    }
+        if (--findPlayersCooldown <= 0) {
+            findPlayersCooldown = 100
+            players = world.players.filter { it.location in region }
+        }
+        
+        if (energyHolder.energy != 0 && players.isNotEmpty()) {
+            playerLoop@ for (player in players) {
+                energyTransferred = 0
+                if (energyHolder.energy == 0) break
+                for (itemStack in player.inventory) {
+                    energyTransferred += chargeItemStack(energyTransferred, itemStack)
+                    if (energyHolder.energy == 0) break@playerLoop
+                    if (energyTransferred == energyHolder.energyConsumption) break
                 }
             }
         }
@@ -111,7 +114,7 @@ class WirelessCharger(
             val maxEnergy = novaItem.maxEnergy
             val currentEnergy = novaItem.getEnergy(itemStack)
             
-            val energyToTransfer = minOf(CHARGE_SPEED - alreadyTransferred, maxEnergy - currentEnergy, energyHolder.energy)
+            val energyToTransfer = minOf(energyHolder.energyConsumption - alreadyTransferred, maxEnergy - currentEnergy, energyHolder.energy)
             energyHolder.energy -= energyToTransfer
             novaItem.addEnergy(itemStack, energyToTransfer)
             

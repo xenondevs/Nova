@@ -56,11 +56,6 @@ abstract class TileEntity(
     
     val additionalHitboxes = HashSet<Location>()
     
-    init {
-        if (!data.contains("owner"))
-            storeData("owner", ownerUUID)
-    }
-    
     /**
      * Called when the TileEntity is being broken.
      *
@@ -321,7 +316,7 @@ abstract class TileEntity(
             armorStandLocation: Location,
             material: NovaMaterial,
             data: CompoundElement,
-            ownerUUID: UUID = data.getAsserted("owner")
+            ownerUUID: UUID
         ): TileEntity {
             // create the fake armor stand
             val armorStand = FakeArmorStand(armorStandLocation, false) {
