@@ -1,9 +1,5 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
-import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
-import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
-
 enum class ItemConnectionType(val insert: Boolean, val extract: Boolean) {
     
     NONE(false, false),

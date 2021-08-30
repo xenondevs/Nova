@@ -82,7 +82,7 @@ class Charger(
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
     }
     

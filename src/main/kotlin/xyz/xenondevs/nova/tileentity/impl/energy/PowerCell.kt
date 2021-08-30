@@ -50,7 +50,7 @@ open class PowerCell(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-         val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
         
     }
     

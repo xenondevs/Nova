@@ -107,7 +107,7 @@ class BlockPlacer(
             .build()
             .also { it.fillRectangle(3, 1, 3, inventory, true) }
         
-         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
     }
     

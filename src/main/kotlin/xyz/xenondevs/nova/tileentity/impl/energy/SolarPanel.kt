@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.util.untilHeightLimit
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 private val MAX_ENERGY = NovaConfig.getInt("solar_panel.capacity")!!

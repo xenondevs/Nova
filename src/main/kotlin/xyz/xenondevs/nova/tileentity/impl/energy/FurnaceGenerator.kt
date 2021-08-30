@@ -15,9 +15,9 @@ import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.PROVIDE
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ProviderEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -165,7 +165,7 @@ class FurnaceGenerator(
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, energyHolder)
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, energyHolder)
         
     }
     

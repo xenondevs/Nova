@@ -118,7 +118,7 @@ class ChunkLoader(
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-         val energyBar = EnergyBar(gui, 8, 0, 3, energyHolder)
+        val energyBar = EnergyBar(gui, 8, 0, 3, energyHolder)
         
         private fun setRange(range: Int) {
             this@ChunkLoader.setRange(range)

@@ -28,7 +28,7 @@ class StaticVanillaItemHolder(
 class DynamicVanillaItemHolder(
     endPoint: ItemStorageVanillaTileEntity,
     val inventoriesGetter: () -> MutableMap<BlockFace, NetworkedInventory>
-): VanillaItemHolder(endPoint) {
+) : VanillaItemHolder(endPoint) {
     
     override val inventories: MutableMap<BlockFace, NetworkedInventory>
         get() = inventoriesGetter()

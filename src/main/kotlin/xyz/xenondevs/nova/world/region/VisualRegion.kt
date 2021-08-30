@@ -7,7 +7,6 @@ import xyz.xenondevs.nova.util.getBoxOutline
 import xyz.xenondevs.particle.task.TaskManager
 import java.awt.Color
 import java.util.*
-import kotlin.collections.ArrayList
 
 object VisualRegion {
     

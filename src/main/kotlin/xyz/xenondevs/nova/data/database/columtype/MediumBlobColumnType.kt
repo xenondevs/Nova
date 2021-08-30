@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.IColumnType
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 
-fun Table.mediumBlob(name: String) : Column<ExposedBlob> = registerColumn(name, MediumBlobColumnType())
+fun Table.mediumBlob(name: String): Column<ExposedBlob> = registerColumn(name, MediumBlobColumnType())
 
 class MediumBlobColumnType : IColumnType by BlobColumnType() {
     override fun sqlType() = "MEDIUMBLOB"

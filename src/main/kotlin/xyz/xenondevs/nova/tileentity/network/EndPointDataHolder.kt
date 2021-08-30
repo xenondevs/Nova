@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
-import xyz.xenondevs.nova.tileentity.network.NetworkType
 
 /**
  * Holds the [NetworkType]-specific data for [End Points][NetworkEndPoint].
