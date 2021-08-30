@@ -161,7 +161,6 @@ object NovaLegacyDataConverter : Listener {
         
         val convertedData = tileEntityData.convertToCompoundElement().apply {
             putElement("global", tileEntityData.get("global").asJsonObject.convertToCompoundElement())
-            put("owner", ownerUUID)
         }
         
         val itemConfig: EnumMap<BlockFace, ItemConnectionType>? = GSON.fromJson(tileEntityData.get("itemConfig"))

@@ -7,6 +7,7 @@ object TileEntitiesTable : Table("tileEntities") {
     
     val uuid = uuid("uuid")
     val world = uuid("world")
+    val owner = uuid("owner")
     val chunkX = integer("chunkX")
     val chunkZ = integer("chunkZ")
     val x = integer("x")

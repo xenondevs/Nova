@@ -193,6 +193,7 @@ object TileEntityManager : Listener {
                 .select { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
                 .forEach {
                     val uuid = it[TileEntitiesTable.uuid]
+                    val owner = it[TileEntitiesTable.owner]
                     val data = CompoundDeserializer.read(it[TileEntitiesTable.data].bytes.decompress())
                     val material = NovaMaterialRegistry.get(it[TileEntitiesTable.type])
                     
@@ -209,7 +210,8 @@ object TileEntityManager : Listener {
                             uuid,
                             location.clone().apply { center(); yaw = it[TileEntitiesTable.yaw] },
                             material,
-                            data
+                            data,
+                            owner
                         )
                         
                         val chunkMap = tileEntityMap.getOrPut(chunk) { HashMap() }
@@ -247,6 +249,7 @@ object TileEntityManager : Listener {
                         
                         it[uuid] = tileEntity.uuid
                         it[world] = tileEntity.location.world!!.uid
+                        it[owner] = tileEntity.ownerUUID
                         it[chunkX] = chunk.x
                         it[chunkZ] = chunk.z
                         it[x] = location.blockX
