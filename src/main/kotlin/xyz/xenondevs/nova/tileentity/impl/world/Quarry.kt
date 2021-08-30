@@ -22,13 +22,18 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
@@ -68,14 +73,13 @@ class Quarry(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
-    
-    override val gui by lazy { QuarryGUI() }
+    override val gui = lazy { QuarryGUI() }
     private val inventory = getInventory("quarryInventory", 9, true) {}
+    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, 0, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, inventory)
     
     private val entityId = uuid.hashCode()
     
@@ -90,7 +94,11 @@ class Quarry(
     private val armY = createMultiModel()
     private val drill = createMultiModel()
     
-    private val y: Int
+    private var maxSize = 0
+    private var drillSpeedMultiplier = 0.0
+    private var moveSpeed = 0.0
+    
+    private val y = location.blockY
     private var minX = 0
     private var minZ = 0
     private var maxX = 0
@@ -105,21 +113,28 @@ class Quarry(
     private var done = retrieveData("done") { false }
     
     private val energySufficiency: Double
-        get() = min(1.0, energy.toDouble() / energyPerTick.toDouble())
+        get() = min(1.0, energyHolder.energy.toDouble() / energyPerTick.toDouble())
     
     private val currentMoveSpeed: Double
-        get() = MOVE_SPEED * energySufficiency
+        get() = moveSpeed * energySufficiency
     
     private val currentDrillSpeedMultiplier: Double
-        get() = DRILL_SPEED_MULTIPLIER * energySufficiency
+        get() = drillSpeedMultiplier * energySufficiency
     
     init {
-        setDefaultInventory(inventory)
-        y = location.blockY
+        handleUpgradeUpdates()
         updateBounds()
         
         pointerLocation = retrieveOrNull("pointerLocation") ?: Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
         lastPointerLocation = retrieveOrNull("lastPointerLocation") ?: Location(world, 0.0, 0.0, 0.0)
+    }
+    
+    private fun handleUpgradeUpdates() {
+        updateEnergyPerTick()
+        
+        maxSize = MAX_SIZE + upgradeHolder.getRangeModifier()
+        drillSpeedMultiplier = DRILL_SPEED_MULTIPLIER * upgradeHolder.getSpeedModifier()
+        moveSpeed = MOVE_SPEED * upgradeHolder.getSpeedModifier()
     }
     
     private fun updateBounds(): Boolean {
@@ -163,7 +178,8 @@ class Quarry(
     }
     
     private fun updateEnergyPerTick() {
-        energyPerTick = BASE_ENERGY_CONSUMPTION + sizeX * sizeZ * ENERGY_PER_SQUARE_BLOCK
+        energyPerTick = ((BASE_ENERGY_CONSUMPTION + sizeX * sizeZ * ENERGY_PER_SQUARE_BLOCK)
+            * upgradeHolder.getSpeedModifier() / upgradeHolder.getEfficiencyModifier()).toInt()
     }
     
     override fun handleInitialized(first: Boolean) {
@@ -184,7 +200,7 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (energy == 0) return
+        if (energyHolder.energy == 0) return
         
         if (!done) {
             if (!drilling) {
@@ -200,10 +216,9 @@ class Quarry(
                 } else done = true
             } else drill()
             
-            energy = max(0, energy - energyPerTick)
+            energyHolder.energy -= energyPerTick
         }
         
-        if (hasEnergyChanged) gui.energyBar.update()
     }
     
     private fun moveToPointer(pointerDestination: Location) {
@@ -479,7 +494,7 @@ class Quarry(
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         private val sizeItems = ArrayList<Item>()
@@ -494,13 +509,13 @@ class Quarry(
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
-            .addIngredient('p', AddNumberItem({ MIN_SIZE..MAX_SIZE }, { sizeX }, ::setSize).also(sizeItems::add))
-            .addIngredient('m', RemoveNumberItem({ MIN_SIZE..MAX_SIZE }, { sizeX }, ::setSize).also(sizeItems::add))
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('p', AddNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('m', RemoveNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
             .also { it.fillRectangle(4, 2, 3, inventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, if (!done) -energyPerTick else 0) }
+         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, energyHolder)
         
         private fun setSize(size: Int) {
             resize(size, size)

@@ -6,7 +6,6 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.impl.agriculture.AutoFisher
 import xyz.xenondevs.nova.tileentity.impl.agriculture.Fertilizer
 import xyz.xenondevs.nova.tileentity.impl.agriculture.Harvester
@@ -24,6 +23,7 @@ import xyz.xenondevs.nova.tileentity.impl.world.BlockBreaker
 import xyz.xenondevs.nova.tileentity.impl.world.BlockPlacer
 import xyz.xenondevs.nova.tileentity.impl.world.ChunkLoader
 import xyz.xenondevs.nova.tileentity.impl.world.Quarry
+import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.toIntArray
 
 private fun blockOf(data: IntArray) = ModelData(BARRIER, data)
@@ -47,31 +47,32 @@ object NovaMaterialRegistry {
     
     // 1 - 1000: Blocks
     // 1: Reserved for legacy furnace generator
-    val MECHANICAL_PRESS = registerDefaultTileEntity("MECHANICAL_PRESS", "block.nova.mechanical_press", 2, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::MechanicalPress)
-    val BASIC_POWER_CELL = registerDefaultTileEntity("BASIC_POWER_CELL", "block.nova.basic_power_cell", 3, EnergyTileEntity::createItemBuilder, IRON_BLOCK, ::BasicPowerCell)
-    val ADVANCED_POWER_CELL = registerDefaultTileEntity("ADVANCED_POWER_CELL", "block.nova.advanced_power_cell", 4, EnergyTileEntity::createItemBuilder, IRON_BLOCK, ::AdvancedPowerCell)
-    val ELITE_POWER_CELL = registerDefaultTileEntity("ELITE_POWER_CELL", "block.nova.elite_power_cell", 5, EnergyTileEntity::createItemBuilder, IRON_BLOCK, ::ElitePowerCell)
-    val ULTIMATE_POWER_CELL = registerDefaultTileEntity("ULTIMATE_POWER_CELL", "block.nova.ultimate_power_cell", 6, EnergyTileEntity::createItemBuilder, IRON_BLOCK, ::UltimatePowerCell)
-    val CREATIVE_POWER_CELL = registerDefaultTileEntity("CREATIVE_POWER_CELL", "block.nova.creative_power_cell", 7, EnergyTileEntity::createItemBuilder, IRON_BLOCK, ::CreativePowerCell)
-    val PULVERIZER = registerDefaultTileEntity("PULVERIZER", "block.nova.pulverizer", 8, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Pulverizer)
-    val SOLAR_PANEL = registerDefaultTileEntity("SOLAR_PANEL", "block.nova.solar_panel", 9, EnergyTileEntity::createItemBuilder, BARRIER, ::SolarPanel)
-    val QUARRY = registerDefaultTileEntity("QUARRY", "block.nova.quarry", 10, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Quarry, Quarry::canPlace)
+    val MECHANICAL_PRESS = registerDefaultTileEntity("MECHANICAL_PRESS", "block.nova.mechanical_press", 2, EnergyHolder::createItemBuilder, COBBLESTONE, ::MechanicalPress)
+    val BASIC_POWER_CELL = registerDefaultTileEntity("BASIC_POWER_CELL", "block.nova.basic_power_cell", 3, EnergyHolder::createItemBuilder, IRON_BLOCK, ::BasicPowerCell)
+    val ADVANCED_POWER_CELL = registerDefaultTileEntity("ADVANCED_POWER_CELL", "block.nova.advanced_power_cell", 4, EnergyHolder::createItemBuilder, IRON_BLOCK, ::AdvancedPowerCell)
+    val ELITE_POWER_CELL = registerDefaultTileEntity("ELITE_POWER_CELL", "block.nova.elite_power_cell", 5, EnergyHolder::createItemBuilder, IRON_BLOCK, ::ElitePowerCell)
+    val ULTIMATE_POWER_CELL = registerDefaultTileEntity("ULTIMATE_POWER_CELL", "block.nova.ultimate_power_cell", 6, EnergyHolder::createItemBuilder, IRON_BLOCK, ::UltimatePowerCell)
+    val CREATIVE_POWER_CELL = registerDefaultTileEntity("CREATIVE_POWER_CELL", "block.nova.creative_power_cell", 7, EnergyHolder::createItemBuilder, IRON_BLOCK, ::CreativePowerCell)
+    val PULVERIZER = registerDefaultTileEntity("PULVERIZER", "block.nova.pulverizer", 8, EnergyHolder::createItemBuilder, COBBLESTONE, ::Pulverizer)
+    val SOLAR_PANEL = registerDefaultTileEntity("SOLAR_PANEL", "block.nova.solar_panel", 9, EnergyHolder::createItemBuilder, BARRIER, ::SolarPanel)
+    val QUARRY = registerDefaultTileEntity("QUARRY", "block.nova.quarry", 10, EnergyHolder::createItemBuilder, COBBLESTONE, ::Quarry, Quarry::canPlace)
+    
     // 11: Reserved for legacy electrical furnace
-    val CHUNK_LOADER = registerDefaultTileEntity("CHUNK_LOADER", "block.nova.chunk_loader", 12, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::ChunkLoader)
-    val BLOCK_BREAKER = registerDefaultTileEntity("BLOCK_BREAKER", "block.nova.block_breaker", 13, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::BlockBreaker)
-    val BLOCK_PLACER = registerDefaultTileEntity("BLOCK_PLACER", "block.nova.block_placer", 14, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::BlockPlacer)
+    val CHUNK_LOADER = registerDefaultTileEntity("CHUNK_LOADER", "block.nova.chunk_loader", 12, EnergyHolder::createItemBuilder, COBBLESTONE, ::ChunkLoader)
+    val BLOCK_BREAKER = registerDefaultTileEntity("BLOCK_BREAKER", "block.nova.block_breaker", 13, EnergyHolder::createItemBuilder, COBBLESTONE, ::BlockBreaker)
+    val BLOCK_PLACER = registerDefaultTileEntity("BLOCK_PLACER", "block.nova.block_placer", 14, EnergyHolder::createItemBuilder, COBBLESTONE, ::BlockPlacer)
     val STORAGE_UNIT = registerDefaultTileEntity("STORAGE_UNIT", "block.nova.storage_unit", 15, null, BARRIER, ::StorageUnit)
-    val CHARGER = registerDefaultTileEntity("CHARGER", "block.nova.charger", 16, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Charger)
-    val MOB_KILLER = registerDefaultTileEntity("MOB_KILLER", "block.nova.mob_killer", 17, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::MobKiller)
+    val CHARGER = registerDefaultTileEntity("CHARGER", "block.nova.charger", 16, EnergyHolder::createItemBuilder, COBBLESTONE, ::Charger)
+    val MOB_KILLER = registerDefaultTileEntity("MOB_KILLER", "block.nova.mob_killer", 17, EnergyHolder::createItemBuilder, COBBLESTONE, ::MobKiller)
     val VACUUM_CHEST = registerDefaultTileEntity("VACUUM_CHEST", "block.nova.vacuum_chest", 18, null, BARRIER, ::VacuumChest)
-    val BREEDER = registerDefaultTileEntity("BREEDER", "block.nova.breeder", 19, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Breeder)
-    val MOB_DUPLICATOR = registerDefaultTileEntity("MOB_DUPLICATOR", "block.nova.mob_duplicator", 20, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::MobDuplicator)
-    val PLANTER = registerDefaultTileEntity("PLANTER", "block.nova.planter", 21, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Planter)
-    val HARVESTER = registerDefaultTileEntity("HARVESTER", "block.nova.harvester", 22, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Harvester)
-    val FERTILIZER = registerDefaultTileEntity("FERTILIZER", "block.nova.fertilizer", 23, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::Fertilizer)
-    val WIRELESS_CHARGER = registerDefaultTileEntity("WIRELESS_CHARGER", "block.nova.wireless_charger", 24, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::WirelessCharger)
-    val AUTO_FISHER = registerDefaultTileEntity("AUTO_FISHER", "block.nova.auto_fisher", 25, EnergyTileEntity::createItemBuilder, COBBLESTONE, ::AutoFisher)
-    val LIGHTNING_EXCHANGER = registerDefaultTileEntity("LIGHTNING_EXCHANGER", "block.nova.lightning_exchanger", 26, EnergyTileEntity::createItemBuilder, BARRIER, ::LightningExchanger)
+    val BREEDER = registerDefaultTileEntity("BREEDER", "block.nova.breeder", 19, EnergyHolder::createItemBuilder, COBBLESTONE, ::Breeder)
+    val MOB_DUPLICATOR = registerDefaultTileEntity("MOB_DUPLICATOR", "block.nova.mob_duplicator", 20, EnergyHolder::createItemBuilder, COBBLESTONE, ::MobDuplicator)
+    val PLANTER = registerDefaultTileEntity("PLANTER", "block.nova.planter", 21, EnergyHolder::createItemBuilder, COBBLESTONE, ::Planter)
+    val HARVESTER = registerDefaultTileEntity("HARVESTER", "block.nova.harvester", 22, EnergyHolder::createItemBuilder, COBBLESTONE, ::Harvester)
+    val FERTILIZER = registerDefaultTileEntity("FERTILIZER", "block.nova.fertilizer", 23, EnergyHolder::createItemBuilder, COBBLESTONE, ::Fertilizer)
+    val WIRELESS_CHARGER = registerDefaultTileEntity("WIRELESS_CHARGER", "block.nova.wireless_charger", 24, EnergyHolder::createItemBuilder, COBBLESTONE, ::WirelessCharger)
+    val AUTO_FISHER = registerDefaultTileEntity("AUTO_FISHER", "block.nova.auto_fisher", 25, EnergyHolder::createItemBuilder, COBBLESTONE, ::AutoFisher)
+    val LIGHTNING_EXCHANGER = registerDefaultTileEntity("LIGHTNING_EXCHANGER", "block.nova.lightning_exchanger", 26, EnergyHolder::createItemBuilder, BARRIER, ::LightningExchanger)
     
     // 1000 - 2000: Crafting Items
     // Plates
@@ -135,9 +136,9 @@ object NovaMaterialRegistry {
     val ULTIMATE_CABLE = registerTileEntity("ULTIMATE_CABLE", "block.nova.ultimate_cable", structureBlockOf(5295), null, structureBlockOf((5296..5359).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::UltimateCable, isDirectional = false, legacyItemIds = intArrayOf(5019))
     val CREATIVE_CABLE = registerTileEntity("CREATIVE_CABLE", "block.nova.creative_cable", structureBlockOf(5360), null, structureBlockOf((5361..5424).toIntArray() + (5025..5033).toIntArray()), CHAIN, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024))
     val SCAFFOLDING = register(NovaMaterial("SCAFFOLDING", "item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray())))
-    val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", blockOf(5050), EnergyTileEntity::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace)
-    val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), EnergyTileEntity::createItemBuilder, blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, null, true, intArrayOf(1))
-    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), EnergyTileEntity::createItemBuilder, blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, null, true, intArrayOf(11))
+    val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", blockOf(5050), EnergyHolder::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace)
+    val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, null, true, intArrayOf(1))
+    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, null, true, intArrayOf(11))
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)
@@ -211,7 +212,7 @@ object NovaMaterialRegistry {
         id: Int,
         itemBuilderCreator: ItemBuilderCreatorFun?,
         hitboxType: Material,
-        tileEntityConstructor: TileEntityConstructor,
+        tileEntityConstructor: TileEntityConstructor?,
         placeCheck: PlaceCheckFun? = null,
         isDirectional: Boolean = true,
         legacyItemIds: IntArray? = null,
@@ -228,7 +229,7 @@ object NovaMaterialRegistry {
         itemBuilderCreator: ItemBuilderCreatorFun?,
         block: ModelData,
         hitboxType: Material,
-        tileEntityConstructor: TileEntityConstructor,
+        tileEntityConstructor: TileEntityConstructor?,
         placeCheck: PlaceCheckFun? = null,
         isDirectional: Boolean = true,
         legacyItemIds: IntArray? = null,

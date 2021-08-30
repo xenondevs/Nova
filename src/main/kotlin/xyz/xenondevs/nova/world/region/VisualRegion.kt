@@ -49,10 +49,10 @@ object VisualRegion {
     }
     
     fun updateRegion(regionUUID: UUID, region: Region) {
-        if (regionUUID in taskId) 
+        if (regionUUID in taskId) {
             TaskManager.getTaskManager().stopTask(taskId[regionUUID]!!)
-        
-        startShowingRegion(regionUUID, region)
+            startShowingRegion(regionUUID, region)
+        }
     }
     
     private fun getViewerList(regionUUID: UUID, region: Region): MutableList<UUID> {

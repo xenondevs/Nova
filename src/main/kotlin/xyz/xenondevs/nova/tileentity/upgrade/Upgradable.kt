@@ -1,9 +1,7 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
-interface Upgradeable {
+interface Upgradable {
     
     val upgradeHolder: UpgradeHolder
-    
-    fun handleUpgradeUpdates()
     
 }

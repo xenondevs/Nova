@@ -13,13 +13,14 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.tileentity.ItemTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.tileentity.upgrade.Upgradeable
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -39,6 +40,7 @@ import de.studiocode.invui.item.Item as UIItem
 
 private val MIN_RANGE = NovaConfig.getInt("vacuum_chest.range.min")!!
 private val MAX_RANGE = NovaConfig.getInt("vacuum_chest.range.max")!!
+private val DEFAULT_RANGE = NovaConfig.getInt("vacuum_chest.range.default")!!
 
 class VacuumChest(
     uuid: UUID,
@@ -46,24 +48,26 @@ class VacuumChest(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : ItemTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradeable {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val upgradeHolder = UpgradeHolder(this, data, UpgradeType.RANGE) { gui }
     private val inventory: VirtualInventory
-    override val gui by lazy { VacuumChestGUI() }
+    override val itemHolder: NovaItemHolder
+    
+    override val gui = lazy { VacuumChestGUI() }
+    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)
     private val filterInventory = getInventory("itemFilter", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate)
     private var filter: ItemFilter? = filterInventory.getItemStack(0)?.getFilterConfig()
     private val items = ArrayList<Item>()
     
     private lateinit var region: Region
-    private var range = retrieveData("range") { MAX_RANGE }
+    private var range = retrieveData("range") { DEFAULT_RANGE }
         set(value) {
             field = value
             updateRegion()
-            gui.updateRangeItems()
+            if (gui.isInitialized()) gui.value.updateRangeItems()
         }
     private val maxRange: Int
-        get() = MAX_RANGE + upgradeHolder.getRangeModifier().toInt()
+        get() = MAX_RANGE + upgradeHolder.getRangeModifier()
     
     private var tick = 0
     
@@ -81,7 +85,7 @@ class VacuumChest(
         // -- End legacy support --
         
         inventory = getInventory("inventory", 9, true) {}
-        setDefaultInventory(inventory)
+        itemHolder = NovaItemHolder(this, inventory)
     }
     
     override fun saveData() {
@@ -97,10 +101,10 @@ class VacuumChest(
         VisualRegion.updateRegion(uuid, region)
     }
     
-    override fun handleUpgradeUpdates() {
+    private fun handleUpgradeUpdates() {
         if (range > maxRange) {
             range = maxRange // the setter will update everything else
-        } else gui.updateRangeItems()
+        } else if (gui.isInitialized()) gui.value.updateRangeItems()
     }
     
     override fun handleRemoved(unload: Boolean) {
@@ -148,7 +152,7 @@ class VacuumChest(
             this@VacuumChest,
             null,
             listOf(
-                Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES)
+                Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES)
             ),
         ) { openWindow(it) }
         

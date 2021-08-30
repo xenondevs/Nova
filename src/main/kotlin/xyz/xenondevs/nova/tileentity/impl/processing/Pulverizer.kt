@@ -10,26 +10,33 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.particle
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.particle.ParticleEffect
+import java.lang.Integer.max
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("pulverizer.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("pulverizer.energy_per_tick")!!
 private val PULVERIZE_TIME = NovaConfig.getInt("pulverizer.pulverizer_time")!!
+private val PULVERIZE_SPEED = NovaConfig.getInt("pulverizer.speed")!!
 
 // TODO: Make PULVERIZE_TIME recipe dependent
 class Pulverizer(
@@ -38,19 +45,21 @@ class Pulverizer(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
+    
+    override val gui = lazy { PulverizerGUI() }
     
     private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
     private val outputInv = getInventory("output", 2, true, ::handleOutputUpdate)
+    
+    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, inputInv, outputInv)
+    
     private var pulverizeTime = retrieveData("pulverizerTime") { 0 }
+    private var pulverizeSpeed = 0
     
     private var currentItem: ItemStack? = retrieveOrNull("currentItem")
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
-    
-    override val gui by lazy { PulverizerGUI() }
     
     private val particleTask = createParticleTask(listOf(
         particle(ParticleEffect.SMOKE_NORMAL) {
@@ -61,19 +70,22 @@ class Pulverizer(
     ), 6)
     
     init {
-        addAvailableInventories(inputInv, outputInv)
-        setDefaultInventory(inputInv)
+        handleUpgradeUpdates()
+    }
+    
+    private fun handleUpgradeUpdates() {
+        pulverizeSpeed = (PULVERIZE_SPEED * upgradeHolder.getSpeedModifier()).toInt()
     }
     
     override fun handleTick() {
-        if (energy >= ENERGY_PER_TICK) {
+        if (energyHolder.energyConsumption >= energyHolder.energyConsumption) {
             if (pulverizeTime == 0) {
                 takeItem()
                 
                 if (particleTask.isRunning()) particleTask.stop()
             } else {
-                pulverizeTime--
-                energy -= ENERGY_PER_TICK
+                pulverizeTime = max(pulverizeTime - pulverizeSpeed, 0)
+                energyHolder.energy -= energyHolder.energyConsumption
                 
                 if (!particleTask.isRunning()) particleTask.start()
                 
@@ -82,15 +94,10 @@ class Pulverizer(
                     currentItem = null
                 }
                 
-                gui.updateProgress()
+                if (gui.isInitialized()) gui.value.updateProgress()
             }
             
         } else if (particleTask.isRunning()) particleTask.stop()
-        
-        if (hasEnergyChanged) {
-            gui.energyBar.update()
-            hasEnergyChanged = false
-        }
     }
     
     private fun takeItem() {
@@ -133,8 +140,8 @@ class Pulverizer(
             this@Pulverizer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inputInv), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(outputInv), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES)
+                Triple(itemHolder.getNetworkedInventory(inputInv), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
+                Triple(itemHolder.getNetworkedInventory(outputInv), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES)
             ),
         ) { openWindow(it) }
         
@@ -151,10 +158,10 @@ class Pulverizer(
             .addIngredient(',', mainProgress)
             .addIngredient('c', pulverizerProgress)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, if (currentItem != null) -ENERGY_PER_TICK else 0) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         init {
             updateProgress()

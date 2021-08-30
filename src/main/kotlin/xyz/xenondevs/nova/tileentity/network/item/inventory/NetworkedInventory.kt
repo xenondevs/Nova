@@ -61,7 +61,6 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
     override fun equals(other: Any?) =
         if (other is NetworkedVirtualInventory) other.virtualInventory.uuid == virtualInventory.uuid else false
     
-    
     override fun hashCode() = virtualInventory.uuid.hashCode()
     
 }

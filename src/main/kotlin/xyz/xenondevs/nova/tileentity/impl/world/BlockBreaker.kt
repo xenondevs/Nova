@@ -8,12 +8,18 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.*
@@ -33,23 +39,18 @@ class BlockBreaker(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
-    
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     private val inventory = getInventory("inventory", 9, true) { if (it.isAdd && it.updateReason != SELF_UPDATE_REASON) it.isCancelled = true }
+    override val gui = lazy { BlockBreakerGUI() }
+    override val upgradeHolder = UpgradeHolder(data, gui, allowed = UpgradeType.ALL_ENERGY)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, inventory)
+    
     private val entityId = uuid.hashCode()
     private val block = location.clone().advance(getFace(BlockSide.FRONT)).block
     private var lastType: Material? = null
     private var breakProgress = retrieveData("breakProgress") { 0.0 }
-    
-    override val gui by lazy { BlockBreakerGUI() }
-    
-    init {
-        setDefaultInventory(inventory)
-    }
     
     override fun saveData() {
         super.saveData()
@@ -58,13 +59,13 @@ class BlockBreaker(
     
     override fun handleTick() {
         val type = block.type
-        if (energy >= ENERGY_PER_TICK
+        if (energyHolder.energy >= ENERGY_PER_TICK
             && !type.isTraversable()
             && type.isBreakable()
             && ProtectionManager.canBreak(ownerUUID, block.location)
         ) {
             // consume energy
-            energy -= ENERGY_PER_TICK
+            energyHolder.energy -= energyHolder.energyConsumption
             
             // reset progress when block changed
             if (lastType != null && type != lastType) breakProgress = 0.0
@@ -73,7 +74,7 @@ class BlockBreaker(
             lastType = type
             
             // add progress
-            val additionalProgress = min(BREAK_SPEED_CLAMP, block.type.breakSpeed * BREAK_SPEED_MULTIPLIER)
+            val additionalProgress = min(BREAK_SPEED_CLAMP, block.type.breakSpeed * BREAK_SPEED_MULTIPLIER * upgradeHolder.getSpeedModifier())
             breakProgress += additionalProgress
             
             if (breakProgress >= 1.0) {
@@ -97,11 +98,6 @@ class BlockBreaker(
             }
             
         }
-        
-        if (hasEnergyChanged) {
-            gui.energyBar.update()
-            hasEnergyChanged = false
-        }
     }
     
     inner class BlockBreakerGUI : TileEntityGUI("menu.nova.block_breaker") {
@@ -109,21 +105,22 @@ class BlockBreaker(
         private val sideConfigGUI = SideConfigGUI(
             this@BlockBreaker,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES))
+            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s # . . . # . |" +
-                "| # # . . . # . |" +
+                "| u # . . . # . |" +
                 "| # # . . . # . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
             .also { it.fillRectangle(3, 1, 3, inventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
     }
     

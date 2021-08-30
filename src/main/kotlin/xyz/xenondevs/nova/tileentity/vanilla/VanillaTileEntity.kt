@@ -6,12 +6,10 @@ import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
-import xyz.xenondevs.nova.tileentity.network.Network
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.tileentity.network.NetworkNode
-import xyz.xenondevs.nova.tileentity.network.NetworkType
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
+import xyz.xenondevs.nova.tileentity.network.*
+import xyz.xenondevs.nova.tileentity.network.item.holder.DynamicVanillaItemHolder
+import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
+import xyz.xenondevs.nova.tileentity.network.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedBukkitInventory
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedRangedBukkitInventory
@@ -56,24 +54,17 @@ abstract class VanillaTileEntity(tileState: TileState) : DataHolder(tileState.ge
     
 }
 
-abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileEntity(tileState), ItemStorage {
+abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileEntity(tileState), NetworkEndPoint {
     
+    abstract val itemHolder: ItemHolder
     override val location = tileState.location
     
     final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> =
-        NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
+        NetworkType.values().associateWithTo(emptyEnumMap()) { emptyEnumMap() }
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
-        NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
-    
-    final override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
-        retrieveDoubleEnumMap("itemConfig") { CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.BUFFER } }
-    
-    final override val allowedFaces: Map<NetworkType, List<BlockFace>>
-        get() = enumMapOf(
-            NetworkType.ITEMS to itemConfig
-                .filter { it.value != ItemConnectionType.NONE }
-                .map { it.key }
-        )
+        NetworkType.values().associateWithTo(emptyEnumMap()) { emptyEnumMap() }
+    final override val holders: MutableMap<NetworkType, EndPointDataHolder>
+        by lazy { enumMapOf(NetworkType.ITEMS to itemHolder) }
     
     override fun handleInitialized() {
         NetworkManager.handleEndPointAdd(this)
@@ -81,7 +72,7 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     
     override fun handleRemoved(unload: Boolean) {
         if (unload) {
-            storeEnumMap("itemConfig", itemConfig)
+            storeEnumMap("itemConfig", itemHolder.itemConfig)
             updateDataContainer()
         }
         NetworkManager.handleEndPointRemove(this, unload)
@@ -91,44 +82,47 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
 
 class VanillaContainerTileEntity(container: Container) : ItemStorageVanillaTileEntity(container) {
     
-    override val inventories: MutableMap<BlockFace, NetworkedInventory>
+    override val itemHolder: StaticVanillaItemHolder
     
     init {
         val inventory = NetworkedBukkitInventory(container.inventory)
-        inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+        val inventories = CUBE_FACES.associateWithTo(emptyEnumMap<BlockFace, NetworkedInventory>()) { inventory }
+        itemHolder = StaticVanillaItemHolder(this, inventories)
     }
     
 }
 
 class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest) {
     
-    private var inventory = chest.inventory
+    private var lastInventory = chest.inventory
+    override val itemHolder = DynamicVanillaItemHolder(this, ::getInventories)
     
-    override val inventories: EnumMap<BlockFace, NetworkedInventory>
-        get() {
-            val state = location.block.state
-            return if (state is Chest) {
-                if (state.inventory.size != inventory.size) inventory = state.inventory
-                val inventory = NetworkedBukkitInventory(inventory)
-                CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
-            } else EMPTY_INVENTORIES_MAP
-        }
+    private fun getInventories(): EnumMap<BlockFace, NetworkedInventory> {
+        val state = block.state
+        return if (state is Chest) {
+            if (state.inventory.size != lastInventory.size) lastInventory = state.inventory
+            val inventory = NetworkedBukkitInventory(lastInventory)
+            CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+        } else EMPTY_INVENTORIES_MAP
+    }
     
 }
 
 class VanillaFurnaceTileEntity(furnace: Furnace) : ItemStorageVanillaTileEntity(furnace) {
     
-    override val inventories: MutableMap<BlockFace, NetworkedInventory>
+    override val itemHolder = StaticVanillaItemHolder(this, getInventories(furnace))
     
-    init {
+    private fun getInventories(furnace: Furnace): EnumMap<BlockFace, NetworkedInventory> {
         val bukkitInventory = furnace.inventory
         val inputInventory = NetworkedRangedBukkitInventory(bukkitInventory, 0)
         val fuelInventory = NetworkedRangedBukkitInventory(bukkitInventory, 1)
         val outputInventory = NetworkedRangedBukkitInventory(bukkitInventory, 2)
         
-        inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { fuelInventory }
+        val inventories = CUBE_FACES.associateWithTo(emptyEnumMap<BlockFace, NetworkedInventory>()) { fuelInventory }
         inventories[BlockFace.UP] = inputInventory
         inventories[BlockFace.DOWN] = outputInventory
+        
+        return inventories
     }
     
 }

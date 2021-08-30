@@ -46,7 +46,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         .build()
     
     init {
-        upgradeHolder.lazyGUI().subGUIs += gui
+        upgradeHolder.lazyGUI.value.subGUIs += gui
     }
     
     fun openWindow(player: Player) {

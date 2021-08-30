@@ -15,10 +15,11 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.tileentity.network.energy.EnergyStorage
+import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
 import xyz.xenondevs.nova.util.data.setLocalizedName
@@ -31,10 +32,10 @@ class SideConfigGUI(
 ) {
     
     private val energyConfigGUI = if (allowedEnergyTypes != null)
-        EnergySideConfigGUI(endPoint as EnergyStorage, allowedEnergyTypes) else null
+        EnergySideConfigGUI(endPoint.holders[NetworkType.ENERGY] as EnergyHolder, allowedEnergyTypes) else null
     
     private val itemConfigGUI = if (inventories != null)
-        ItemSideConfigGUI(endPoint as ItemStorage, inventories) else null
+        ItemSideConfigGUI(endPoint.holders[NetworkType.ITEMS] as ItemHolder, inventories) else null
     
     private val mainGUI: GUI
     

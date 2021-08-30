@@ -23,4 +23,10 @@ enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial, val m
     ENERGY(ENERGY_UPGRADE, ENERGY_UPGRADE_ICON, DEFAULT_MODIFIERS),
     RANGE(RANGE_UPGRADE, RANGE_UPGRADE_ICON, RANGE_MODIFIERS);
     
+    companion object {
+        val ALL_ENERGY = arrayOf(SPEED, EFFICIENCY, ENERGY)
+        val ENERGY_AND_RANGE = arrayOf(SPEED, EFFICIENCY, ENERGY, RANGE)
+    }
+    
+    
 }

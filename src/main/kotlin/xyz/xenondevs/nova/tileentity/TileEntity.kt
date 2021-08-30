@@ -19,7 +19,8 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.upgrade.Upgradeable
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.compress
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -38,7 +39,7 @@ abstract class TileEntity(
     val armorStand: FakeArmorStand,
 ) : DataHolder(data, true) {
     
-    protected abstract val gui: TileEntityGUI?
+    abstract val gui: Lazy<TileEntityGUI>?
     
     var isValid: Boolean = true
         private set
@@ -74,7 +75,7 @@ abstract class TileEntity(
             saveData()
             val item = material.createItemBuilder(this).get()
             if (globalData.isNotEmpty()) item.setTileEntityData(globalData)
-            if (this is Upgradeable) drops += this.upgradeHolder.dropUpgrades()
+            if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
             drops += item
         }
         
@@ -91,7 +92,7 @@ abstract class TileEntity(
      * Called to save all data using the [storeData] method.
      */
     open fun saveData() {
-        if (this is Upgradeable)
+        if (this is Upgradable)
             upgradeHolder.save(data)
     }
     
@@ -140,7 +141,7 @@ abstract class TileEntity(
      */
     open fun handleRemoved(unload: Boolean) {
         isValid = false
-        gui?.closeWindows()
+        if (gui?.isInitialized() == true) gui!!.value.closeWindows()
         
         armorStand.remove()
         multiModels.forEach { it.removeAllModels() }
@@ -155,7 +156,7 @@ abstract class TileEntity(
     open fun handleRightClick(event: PlayerInteractEvent) {
         if (gui != null) {
             event.isCancelled = true
-            gui!!.openWindow(event.player)
+            gui!!.value.openWindow(event.player)
         }
     }
     
@@ -371,4 +372,9 @@ abstract class TileEntityGUI(private val title: String) {
         subGUIs.forEach(GUI::closeForAllViewers)
     }
     
+    init {
+        println("Init TileEntityGUI \"$title\"")
+    }
+    
 }
+

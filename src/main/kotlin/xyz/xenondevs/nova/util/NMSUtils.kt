@@ -8,12 +8,15 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundAddMobPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.entity.EntityType
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
@@ -52,6 +55,11 @@ fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
 
 fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
+
+val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).server
+
+val serverTick: Int
+    get() = minecraftServer.tickCount
 
 object NMSUtils {
     

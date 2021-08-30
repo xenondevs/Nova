@@ -10,10 +10,11 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.ItemTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
@@ -31,17 +32,14 @@ class StorageUnit(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : ItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
+    override val gui = lazy { ItemStorageGUI() }
     private val inventory = StorageUnitInventory(retrieveOrNull("type"), retrieveOrNull("amount") ?: 0)
+    override val itemHolder = NovaItemHolder(this, uuid to inventory)
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
     private val outputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleOutputInventoryUpdate) }
-    override val gui by lazy { ItemStorageGUI() }
     
-    init {
-        addAvailableInventories(uuid to inventory)
-        setDefaultInventory(inventory)
-    }
     
     private fun handleInputInventoryUpdate(event: ItemUpdateEvent) {
         if (event.isAdd && inventory.type != null && !inventory.type!!.isSimilar(event.newItemStack))
@@ -58,7 +56,7 @@ class StorageUnit(
             inventory.amount -= event.removedAmount
             if (inventory.amount == 0) inventory.type = null
             
-            runTaskLater(1, gui::updateWindows)
+            runTaskLater(1) { if (gui.isInitialized()) gui.value.updateWindows() }
         }
     }
     
@@ -71,7 +69,7 @@ class StorageUnit(
     
     override fun handleInitialized(first: Boolean) {
         super.handleInitialized(first)
-        gui.updateWindows()
+        if (gui.isInitialized()) gui.value.updateWindows()
     }
     
     override fun handleTick() {
@@ -144,7 +142,7 @@ class StorageUnit(
                 } else remaining = item.clone().also { amount -= leeway }  // Not all items fit so a few will remain
             } else remaining = item // The item isn't the same as the one stored in the unit
             
-            gui.updateWindows()
+            if (gui.isInitialized()) gui.value.updateWindows()
             return remaining
         }
         
@@ -154,7 +152,7 @@ class StorageUnit(
                 type = item
             
             if (amount == 0) type = null
-            gui.updateWindows()
+            if (gui.isInitialized()) gui.value.updateWindows()
         }
     }
     

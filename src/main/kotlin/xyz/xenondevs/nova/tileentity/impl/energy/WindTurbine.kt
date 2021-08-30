@@ -12,17 +12,20 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
 import xyz.xenondevs.nova.tileentity.Model
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ProviderEnergyHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.min
 
 private val MAX_ENERGY = NovaConfig.getInt("wind_turbine.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("wind_turbine.energy_per_tick")!!
@@ -33,25 +36,31 @@ class WindTurbine(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy {
+    override val gui = lazy { WindTurbineGUI() }
+    override val upgradeHolder = UpgradeHolder(data, gui, ::updateEnergyPerTick, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
+    override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, upgradeHolder) {
         createEnergySideConfig(
             EnergyConnectionType.PROVIDE,
             BlockSide.TOP, BlockSide.RIGHT, BlockSide.LEFT, BlockSide.BACK
         )
     }
-    override val gui by lazy { WindTurbineGUI() }
     
     private val columnModel = createMultiModel()
     private val turbineModel = createMultiModel()
     
     private val altitude = (location.y + abs(world.minHeight)) / (world.maxHeight - 1 + abs(world.minHeight))
-    private val energyPerTick = (altitude * ENERGY_PER_TICK).toInt()
     private val rotationPerTick = altitude.toFloat() * 15
+    private var energyPerTick = 0
     
     init {
+        updateEnergyPerTick()
         spawnModels()
+    }
+    
+    private fun updateEnergyPerTick() {
+        energyPerTick = (altitude * energyHolder.energyGeneration).toInt()
     }
     
     override fun handleInitialized(first: Boolean) {
@@ -90,12 +99,7 @@ class WindTurbine(
             }
         }
         
-        energy = min(MAX_ENERGY, energy + energyPerTick)
-        
-        if (hasEnergyChanged) {
-            hasEnergyChanged = false
-            gui.energyBar.update()
-        }
+        energyHolder.energy += energyPerTick
     }
     
     companion object {
@@ -117,10 +121,10 @@ class WindTurbine(
                 "| # # # . # # # |" +
                 "| # # # . # # # |" +
                 "3 - - - - - - - 4")
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, energyPerTick) }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
         
     }
     

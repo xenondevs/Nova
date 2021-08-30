@@ -20,15 +20,20 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.center
@@ -51,47 +56,50 @@ class MobDuplicator(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     private val inventory = getInventory("inventory", 1, true, ::handleInventoryUpdate)
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.TOP) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+    override val gui = lazy { MobDuplicatorGUI() }
+    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_TICK_NBT, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.TOP) }
+    override val itemHolder = NovaItemHolder(this, inventory)
     private val energyPerTick: Int
-        get() = if (keepNbt) ENERGY_PER_TICK_NBT else ENERGY_PER_TICK
+        get() = if (keepNbt) energyHolder.specialEnergyConsumption else energyHolder.energyConsumption
     private val totalIdleTime: Int
-        get() = if (keepNbt) IDLE_TIME_NBT else IDLE_TIME
+        get() = if (keepNbt) idleTimeNBT else idleTime
+    
+    private var idleTimeNBT = 0
+    private var idleTime = 0
     
     private val spawnLocation = location.clone().center().add(0.0, 1.0, 0.0)
-    private var idleTime = 0
+    private var timePassed = 0
     private var entityType: EntityType? = null
     private var entityData: ByteArray? = null
     private var keepNbt = retrieveData("keepNbt") { false }
     
-    override val gui by lazy { MobDuplicatorGUI() }
     
     init {
-        setDefaultInventory(inventory)
-        
+        handleUpgradeUpdates()
         updateEntityData(inventory.getItemStack(0))
     }
     
+    private fun handleUpgradeUpdates() {
+        idleTimeNBT = (IDLE_TIME_NBT / upgradeHolder.getSpeedModifier()).toInt()
+        idleTime = (IDLE_TIME / upgradeHolder.getSpeedModifier()).toInt()
+        if (timePassed > totalIdleTime) timePassed = totalIdleTime
+    }
+    
     override fun handleTick() {
-        if (entityData != null && entityType != null && energy >= energyPerTick) {
-            energy -= energyPerTick
+        if (entityData != null && entityType != null && energyHolder.energy >= energyPerTick) {
+            energyHolder.energy -= energyPerTick
             
-            if (idleTime++ == totalIdleTime) {
-                idleTime = 0
+            if (timePassed++ == totalIdleTime) {
+                timePassed = 0
                 
                 spawnEntity()
             }
             
-            gui.updateIdleBar()
-        }
-        
-        if (hasEnergyChanged) {
-            hasEnergyChanged = false
-            gui.energyBar.update()
+            if (gui.isInitialized()) gui.value.updateIdleBar()
         }
     }
     
@@ -113,8 +121,8 @@ class MobDuplicator(
     private fun setEntityData(type: EntityType?, data: ByteArray?) {
         entityData = data
         entityType = type
-        idleTime = 0
-        gui.updateIdleBar()
+        timePassed = 0
+        if (gui.isInitialized()) gui.value.updateIdleBar()
     }
     
     private fun spawnEntity() {
@@ -127,7 +135,7 @@ class MobDuplicator(
         private val sideConfigGUI = SideConfigGUI(
             this@MobDuplicator,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
@@ -140,20 +148,20 @@ class MobDuplicator(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('i', VISlotElement(inventory, 0, NovaMaterialRegistry.BOTTLED_MOB_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('n', ToggleNBTModeItem())
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -energyPerTick) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
-                itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - idleTime))
+                itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - timePassed))
             
         }
         
         fun updateIdleBar() {
-            idleBar.percentage = idleTime.toDouble() / totalIdleTime.toDouble()
+            idleBar.percentage = timePassed.toDouble() / totalIdleTime.toDouble()
         }
         
         private inner class ToggleNBTModeItem : BaseItem() {
@@ -167,7 +175,7 @@ class MobDuplicator(
                 keepNbt = !keepNbt
                 notifyWindows()
                 
-                idleTime = 0
+                timePassed = 0
                 updateIdleBar()
                 
                 player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

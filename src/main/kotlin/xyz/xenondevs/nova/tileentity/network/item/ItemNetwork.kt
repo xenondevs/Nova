@@ -3,11 +3,9 @@ package xyz.xenondevs.nova.tileentity.network.item
 import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.tileentity.network.Network
-import xyz.xenondevs.nova.tileentity.network.NetworkBridge
-import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
-import xyz.xenondevs.nova.tileentity.network.NetworkNode
+import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType.*
+import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
@@ -23,8 +21,8 @@ class ItemNetwork : Network {
     
     private val _nodes = HashSet<NetworkNode>()
     private val bridges = HashSet<ItemBridge>()
-    private val providers = HashSet<Pair<ItemStorage, BlockFace>>()
-    private val consumers = HashSet<Pair<ItemStorage, BlockFace>>()
+    private val providers = HashSet<Pair<ItemHolder, BlockFace>>()
+    private val consumers = HashSet<Pair<ItemHolder, BlockFace>>()
     
     private val transferRate: Int
         get() = bridges.map { it.itemTransferRate }.minOrNull() ?: 1
@@ -46,11 +44,10 @@ class ItemNetwork : Network {
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
-        Preconditions.checkArgument(endPoint is ItemStorage, "Illegal EndPoint Type")
-        endPoint as ItemStorage
+        val itemHolder = endPoint.holders[NetworkType.ITEMS] as ItemHolder
         
-        val pair = endPoint to face
-        when (val connectionType = endPoint.itemConfig[face]!!) {
+        val pair = itemHolder to face
+        when (val connectionType = itemHolder.itemConfig[face]!!) {
             
             EXTRACT -> providers += pair
             INSERT -> consumers += pair
@@ -68,9 +65,10 @@ class ItemNetwork : Network {
     
     override fun removeNode(node: NetworkNode) {
         _nodes -= node
-        if (node is ItemStorage) {
-            providers.removeIf { it.first == node }
-            consumers.removeIf { it.first == node }
+        if (node is NetworkEndPoint) {
+            val itemHolder = node.holders[NetworkType.ITEMS] as ItemHolder
+            providers.removeIf { it.first == itemHolder }
+            consumers.removeIf { it.first == itemHolder }
         } else if (node is ItemBridge) {
             bridges -= node
         }
@@ -141,10 +139,10 @@ class ItemNetwork : Network {
         }
         
         val filterMap = HashMap<NetworkedInventory, MutableList<ItemFilter>>()
-        itemStorages.forEach { (itemStorage, face) ->
-            val inventory = itemStorage.inventories[face]!!
+        itemStorages.forEach { (itemHolder, face) ->
+            val inventory = itemHolder.inventories[face]!!
             val filterList = filterMap[inventory] ?: ArrayList()
-            val node = itemStorage.getNearbyNodes()[face]
+            val node = itemHolder.endPoint.getNearbyNodes()[face]
             if (node is ItemBridge) {
                 val filter = node.getFilter(type, face.oppositeFace) ?: ItemFilter(false, emptyArray())
                 filterList.add(filter)

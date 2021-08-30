@@ -14,13 +14,17 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.PROVIDE
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ProviderEnergyHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -39,30 +43,37 @@ class LightningExchanger(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy {
+    override val gui = lazy { LightningExchangerGUI() }
+    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
+    override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, 0, upgradeHolder) {
         CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))
         { if (it == BlockFace.DOWN) PROVIDE else NONE }
     }
-    override val gui by lazy { LightningExchangerGUI() }
     
+    private var minBurst = 0
+    private var maxBurst = 0
     private var toCharge = 0
+    
+    init {
+        handleUpgradeUpdates()
+    }
+    
+    private fun handleUpgradeUpdates() {
+        minBurst = (MIN_BURST * upgradeHolder.getEfficiencyModifier()).toInt()
+        maxBurst = (MAX_BURST * upgradeHolder.getEfficiencyModifier()).toInt()
+    }
     
     override fun handleTick() {
         val charge = min(CONVERSION_RATE, toCharge)
-        energy += charge
+        energyHolder.energy += charge
         toCharge -= charge
-        
-        if (hasEnergyChanged) {
-            gui.energyBar.update()
-            hasEnergyChanged = false
-        }
     }
     
     fun addEnergyBurst() {
-        val leeway = MAX_ENERGY - energy - toCharge
-        toCharge += (if (leeway <= MAX_BURST) leeway else Random.nextInt(MIN_BURST, MAX_BURST))
+        val leeway = energyHolder.maxEnergy - energyHolder.energy - toCharge
+        toCharge += (if (leeway <= maxBurst) leeway else Random.nextInt(minBurst, maxBurst))
     }
     
     inner class LightningExchangerGUI : TileEntityGUI("menu.nova.lightning_exchanger") {
@@ -74,10 +85,10 @@ class LightningExchanger(
                 "| # # # . # # # |" +
                 "| # # # . # # # |" +
                 "3 - - - - - - - 4")
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, min(5000, toCharge)) }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
         
     }
     

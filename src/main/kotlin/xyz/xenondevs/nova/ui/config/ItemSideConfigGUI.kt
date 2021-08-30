@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
+import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
@@ -35,7 +35,7 @@ private val BUTTON_COLORS = listOf(
 )
 
 class ItemSideConfigGUI(
-    val itemStorage: ItemStorage,
+    val itemHolder: ItemHolder,
     inventories: List<Triple<NetworkedInventory, String, List<ItemConnectionType>>>
 ) : SimpleGUI(8, 3) {
     
@@ -76,19 +76,19 @@ class ItemSideConfigGUI(
     }
     
     private fun changeConnectionType(blockFace: BlockFace, forward: Boolean): Boolean {
-        val allowedTypes = allowedTypes[itemStorage.inventories[blockFace]!!]!!
+        val allowedTypes = allowedTypes[itemHolder.inventories[blockFace]!!]!!
         if (allowedTypes.size < 2) return false
         
-        NetworkManager.handleEndPointRemove(itemStorage, false)
+        NetworkManager.handleEndPointRemove(itemHolder.endPoint, false)
         
-        val currentType = itemStorage.itemConfig[blockFace]!!
+        val currentType = itemHolder.itemConfig[blockFace]!!
         var index = allowedTypes.indexOf(currentType)
         if (forward) index++ else index--
         if (index < 0) index = allowedTypes.lastIndex
         else if (index == allowedTypes.size) index = 0
-        itemStorage.itemConfig[blockFace] = allowedTypes[index]
+        itemHolder.itemConfig[blockFace] = allowedTypes[index]
         
-        NetworkManager.handleEndPointAdd(itemStorage)
+        NetworkManager.handleEndPointAdd(itemHolder.endPoint)
         
         return true
     }
@@ -96,30 +96,30 @@ class ItemSideConfigGUI(
     private fun changeInventory(blockFace: BlockFace, forward: Boolean): Boolean {
         if (inventories.size < 2) return false
         
-        NetworkManager.handleEndPointRemove(itemStorage, false)
+        NetworkManager.handleEndPointRemove(itemHolder.endPoint, false)
         
-        val currentInventory = itemStorage.inventories[blockFace]!!
+        val currentInventory = itemHolder.inventories[blockFace]!!
         var index = inventories.indexOf(currentInventory)
         if (forward) index++ else index--
         if (index < 0) index = inventories.lastIndex
         else if (index == inventories.size) index = 0
         
         val newInventory = inventories[index]
-        itemStorage.inventories[blockFace] = newInventory
+        itemHolder.inventories[blockFace] = newInventory
         
         val allowedTypes = allowedTypes[newInventory]!!
-        if (!allowedTypes.contains(itemStorage.itemConfig[blockFace]!!)) {
-            itemStorage.itemConfig[blockFace] = allowedTypes[0]
+        if (!allowedTypes.contains(itemHolder.itemConfig[blockFace]!!)) {
+            itemHolder.itemConfig[blockFace] = allowedTypes[0]
         }
         
-        NetworkManager.handleEndPointAdd(itemStorage)
+        NetworkManager.handleEndPointAdd(itemHolder.endPoint)
         
         return true
     }
     
     private inner class ConnectionConfigItem(val blockSide: BlockSide) : BaseItem() {
         
-        private val blockFace = (itemStorage as TileEntity).getFace(blockSide)
+        private val blockFace = (itemHolder.endPoint as TileEntity).getFace(blockSide)
         
         init {
             registerConfigItem(blockFace, this)
@@ -127,7 +127,7 @@ class ItemSideConfigGUI(
         
         override fun getItemProvider(): ItemProvider {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
-            return when (itemStorage.itemConfig[blockFace]!!) {
+            return when (itemHolder.itemConfig[blockFace]!!) {
                 ItemConnectionType.NONE ->
                     NovaMaterialRegistry.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
                 ItemConnectionType.EXTRACT ->
@@ -150,7 +150,7 @@ class ItemSideConfigGUI(
     
     private inner class InventoryConfigItem(val blockSide: BlockSide) : BaseItem() {
         
-        private val blockFace = (itemStorage as TileEntity).getFace(blockSide)
+        private val blockFace = (itemHolder.endPoint as TileEntity).getFace(blockSide)
         
         init {
             registerConfigItem(blockFace, this)
@@ -158,7 +158,7 @@ class ItemSideConfigGUI(
         
         override fun getItemProvider(): ItemProvider {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
-            val inventory = itemStorage.inventories[blockFace]!!
+            val inventory = itemHolder.inventories[blockFace]!!
             return buttonBuilders[inventory]!!.clone().setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         

@@ -19,16 +19,13 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
-import xyz.xenondevs.nova.tileentity.network.Network
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.tileentity.network.NetworkNode
-import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.NetworkType.ENERGY
 import xyz.xenondevs.nova.tileentity.network.NetworkType.ITEMS
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyBridge
 import xyz.xenondevs.nova.tileentity.network.item.ItemBridge
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
+import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.ui.CableItemConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -39,6 +36,9 @@ import java.util.*
 private val ATTACHMENTS: IntArray = (64..72).toIntArray()
 
 private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
+
+private val NetworkNode.itemHolder: ItemHolder?
+    get() = if (this is NetworkEndPoint && holders.contains(ITEMS)) holders[ITEMS] as ItemHolder else null
 
 open class Cable(
     override val energyTransferRate: Int,
@@ -53,7 +53,7 @@ open class Cable(
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = retrieveEnumCollectionOrNull("bridgeFaces", HashSet()) ?: CUBE_FACES.toMutableSet()
     
-    override val gui: TileEntityGUI? = null
+    override val gui: Lazy<TileEntityGUI>? = null
     
     override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
@@ -128,11 +128,11 @@ open class Cable(
         val items = ArrayList<Pair<ItemStack, Float>>()
         
         connectedNodes[ITEMS]!!
-            .filter { it.value is ItemStorage }
-            .forEach { (blockFace, itemStorage) ->
-                itemStorage as ItemStorage
+            .filter { val node = it.value; node is NetworkEndPoint && node.holders.contains(ITEMS) }
+            .forEach { (blockFace, node) ->
+                val itemHolder = (node as NetworkEndPoint).holders[ITEMS] as ItemHolder
                 
-                val attachmentIndex = when (itemStorage.itemConfig[blockFace.oppositeFace] ?: ItemConnectionType.NONE) {
+                val attachmentIndex = when (itemHolder.itemConfig[blockFace.oppositeFace] ?: ItemConnectionType.NONE) {
                     ItemConnectionType.INSERT -> 0
                     ItemConnectionType.EXTRACT -> 1
                     ItemConnectionType.BUFFER -> 2
@@ -208,8 +208,11 @@ open class Cable(
         val neighborEndPoints = connectedNodes
             .values
             .flatMap { it.entries }
-            .filter { (blockFace, node) -> node is ItemStorage && node.itemConfig[blockFace.oppositeFace] != ItemConnectionType.NONE }
-            .associate { it.key to it.value as ItemStorage }
+            .filter { (blockFace, node) ->
+                val itemHolder = node.itemHolder
+                itemHolder != null && itemHolder.itemConfig[blockFace.oppositeFace] != ItemConnectionType.NONE
+            }
+            .associate { it.key to it.value.itemHolder!! }
         
         neighborEndPoints
             .map { it.key }
@@ -259,10 +262,10 @@ open class Cable(
         }
     }
     
-    private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemStorage: ItemStorage) {
+    private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemHolder: ItemHolder) {
         event.isCancelled = true
         CableItemConfigGUI(
-            itemStorage,
+            itemHolder,
             face.oppositeFace,
             filterInventories[ItemConnectionType.INSERT]!![face]!!,
             filterInventories[ItemConnectionType.EXTRACT]!![face]!!

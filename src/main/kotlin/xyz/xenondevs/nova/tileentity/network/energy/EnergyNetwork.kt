@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
+import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
@@ -21,10 +22,9 @@ private fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Int): Int {
 }
 
 /**
- * An EnergyNetwork consists of EnergyProviders, which provide
- * energy to the it and EnergyConsumers, which consume energy from it.
- *
- * Cables connect EnergyProviders to EnergyConsumers.
+ * An EnergyNetwork consists of [NetworkBridge] that connect [NetworkEndPoint]
+ * and their [EnergyHolder].<br>
+ * [EnergyHolders][EnergyHolder] can provide, consume or buffer energy.
  */
 class EnergyNetwork : Network {
     
@@ -33,14 +33,14 @@ class EnergyNetwork : Network {
     
     private val _nodes = HashSet<NetworkNode>()
     private val bridges = HashSet<EnergyBridge>()
-    private val providers = HashSet<EnergyStorage>()
-    private val consumers = HashSet<EnergyStorage>()
-    private val buffers = HashSet<EnergyStorage>()
+    private val providers = HashSet<EnergyHolder>()
+    private val consumers = HashSet<EnergyHolder>()
+    private val buffers = HashSet<EnergyHolder>()
     
     private val availableProviderEnergy: Int
-        get() = providers.sumOfNoOverflow { it.providedEnergy }
+        get() = providers.sumOfNoOverflow { it.energy }
     private val availableBufferEnergy: Int
-        get() = buffers.sumOfNoOverflow { it.providedEnergy }
+        get() = buffers.sumOfNoOverflow { it.energy }
     private val requestedConsumerEnergy: Int
         get() = consumers.sumOfNoOverflow { it.requestedEnergy }
     private val transferRate: Int
@@ -64,35 +64,35 @@ class EnergyNetwork : Network {
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
-        Preconditions.checkArgument(endPoint is EnergyStorage, "Illegal EndPoint Type")
+        val holder = endPoint.holders[NetworkType.ENERGY] as EnergyHolder
         
-        when (val connectionType = (endPoint as EnergyStorage).energyConfig[face]!!) {
+        when (val connectionType = holder.energyConfig[face]!!) {
             
             PROVIDE -> {
-                if (!buffers.contains(endPoint)) {
-                    if (consumers.contains(endPoint)) {
-                        consumers -= endPoint
-                        buffers += endPoint
+                if (!buffers.contains(holder)) {
+                    if (consumers.contains(holder)) {
+                        consumers -= holder
+                        buffers += holder
                     } else {
-                        providers += endPoint
+                        providers += holder
                     }
                 }
             }
             
             CONSUME -> {
-                if (!buffers.contains(endPoint)) {
-                    if (providers.contains(endPoint)) {
-                        providers -= endPoint
-                        buffers += endPoint
+                if (!buffers.contains(holder)) {
+                    if (providers.contains(holder)) {
+                        providers -= holder
+                        buffers += holder
                     } else {
-                        consumers += endPoint
+                        consumers += holder
                     }
                 }
             }
             
             BUFFER -> {
                 removeNode(endPoint) // remove from provider / consumer set
-                buffers += endPoint
+                buffers += holder
             }
             
             else -> throw IllegalArgumentException("Illegal ConnectionType: $connectionType")
@@ -104,10 +104,11 @@ class EnergyNetwork : Network {
     
     override fun removeNode(node: NetworkNode) {
         _nodes -= node
-        if (node is EnergyStorage) {
-            providers -= node
-            consumers -= node
-            buffers -= node
+        if (node is NetworkEndPoint) {
+            val holder = node.holders[NetworkType.ENERGY] as EnergyHolder
+            providers -= holder
+            consumers -= holder
+            buffers -= holder
         } else if (node is EnergyBridge) {
             bridges -= node
         }
@@ -140,10 +141,10 @@ class EnergyNetwork : Network {
         if (energyDeficit != 0) throw NetworkException("Not enough energy: $energyDeficit") // should never happen
     }
     
-    private fun distributeEqually(energy: Int, consumers: Iterable<EnergyStorage>): Int {
+    private fun distributeEqually(energy: Int, consumers: Iterable<EnergyHolder>): Int {
         var availableEnergy = energy
         
-        val consumerMap = ConcurrentHashMap<EnergyStorage, Int>()
+        val consumerMap = ConcurrentHashMap<EnergyHolder, Int>()
         consumerMap += consumers
             .filterNot { it.requestedEnergy == 0 }
             .map { it to it.requestedEnergy }
@@ -154,7 +155,7 @@ class EnergyNetwork : Network {
             if (distribution != 0) {
                 for ((consumer, requestedAmount) in consumerMap) {
                     val energyToGive = min(distribution, requestedAmount)
-                    consumer.addEnergy(energyToGive)
+                    consumer.energy += energyToGive
                     if (energyToGive == requestedAmount) consumerMap -= consumer // consumer is satisfied
                     else consumerMap[consumer] = requestedAmount - energyToGive // consumer is not satisfied
                     availableEnergy -= energyToGive
@@ -168,12 +169,12 @@ class EnergyNetwork : Network {
         return availableEnergy
     }
     
-    private fun giveFirst(energy: Int, consumers: Iterable<EnergyStorage>): Int {
+    private fun giveFirst(energy: Int, consumers: Iterable<EnergyHolder>): Int {
         var availableEnergy = energy
         for (consumer in consumers) {
             val energyToGive = min(availableEnergy, consumer.requestedEnergy)
             availableEnergy -= energyToGive
-            consumer.addEnergy(energyToGive)
+            consumer.energy += energyToGive
             
             if (availableEnergy == 0) break
         }
@@ -181,13 +182,13 @@ class EnergyNetwork : Network {
         return availableEnergy
     }
     
-    private fun takeEqually(energy: Int, providers: Iterable<EnergyStorage>): Int {
+    private fun takeEqually(energy: Int, providers: Iterable<EnergyHolder>): Int {
         var energyDeficit = energy
         
-        val providerMap = ConcurrentHashMap<EnergyStorage, Int>()
+        val providerMap = ConcurrentHashMap<EnergyHolder, Int>()
         providerMap += providers
-            .filterNot { it.providedEnergy == 0 }
-            .map { it to it.providedEnergy }
+            .filterNot { it.energy == 0 }
+            .map { it to it.energy }
         
         while (energyDeficit != 0 && providerMap.isNotEmpty()) {
             val distribution = energyDeficit / providerMap.size
@@ -195,7 +196,7 @@ class EnergyNetwork : Network {
                 for ((provider, providedAmount) in providerMap) {
                     val take = min(distribution, providedAmount)
                     energyDeficit -= take
-                    provider.removeEnergy(take)
+                    provider.energy -= take
                     if (take == providedAmount) providerMap -= provider // provider has no more energy
                     else providerMap[provider] = providedAmount - take // provider has less energy
                 }
@@ -208,12 +209,12 @@ class EnergyNetwork : Network {
         return energyDeficit
     }
     
-    private fun takeFirst(energy: Int, providers: Iterable<EnergyStorage>): Int {
+    private fun takeFirst(energy: Int, providers: Iterable<EnergyHolder>): Int {
         var energyDeficit = energy
         for (provider in providers) {
-            val take = min(energyDeficit, provider.providedEnergy)
+            val take = min(energyDeficit, provider.energy)
             energyDeficit -= take
-            provider.removeEnergy(take)
+            provider.energy -= take
             
             if (energyDeficit == 0) break
         }

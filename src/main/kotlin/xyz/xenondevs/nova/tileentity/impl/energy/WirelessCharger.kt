@@ -10,13 +10,20 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.ChargeableItem
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.ui.item.AddNumberItem
+import xyz.xenondevs.nova.ui.item.DisplayNumberItem
+import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.novaMaterial
@@ -24,10 +31,13 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
+import de.studiocode.invui.item.Item as UIItem
 
 private val MAX_ENERGY = NovaConfig.getInt("wireless_charger.capacity")!!
 private val CHARGE_SPEED = NovaConfig.getInt("wireless_charger.charge_speed")!!
-private val RANGE = NovaConfig.getDouble("wireless_charger.range")!!
+private val MIN_RANGE = NovaConfig.getInt("wireless_charger.range.min")!!
+private val MAX_RANGE = NovaConfig.getInt("wireless_charger.range.max")!!
+private val DEFAULT_RANGE = NovaConfig.getInt("wireless_charger.range.default")!!
 
 class WirelessCharger(
     uuid: UUID,
@@ -35,40 +45,62 @@ class WirelessCharger(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME) }
-    override val gui by lazy(::WirelessChargerGUI)
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+    override val gui = lazy(::WirelessChargerGUI)
+    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.SPEED, UpgradeType.ENERGY, UpgradeType.RANGE)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, CHARGE_SPEED, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     
-    private val region = Region(
-        location.clone().center().subtract(RANGE, RANGE, RANGE),
-        location.clone().center().add(RANGE, RANGE, RANGE)
-    )
+    private var maxRange = 0
+    private var range = retrieveData("range") { DEFAULT_RANGE }
+        set(value) {
+            field = value
+            updateRegion()
+            if (gui.isInitialized()) gui.value.updateRangeItems()
+        }
+    
+    private lateinit var region: Region
+    
+    init {
+        handleUpgradeUpdates()
+        updateRegion()
+    }
+    
+    private fun handleUpgradeUpdates() {
+        maxRange = MAX_RANGE + upgradeHolder.getRangeModifier()
+        if (maxRange < range) range = maxRange
+    }
+    
+    private fun updateRegion() {
+        region = Region(
+            location.clone().center().subtract(range.toDouble(), range.toDouble(), range.toDouble()),
+            location.clone().center().add(range.toDouble(), range.toDouble(), range.toDouble())
+        )
+        VisualRegion.updateRegion(uuid, region)
+    }
+    
+    override fun saveData() {
+        super.saveData()
+        storeData("range", range)
+    }
     
     override fun handleTick() {
         var energyTransferred = 0
         
-        if (energy != 0) {
+        if (energyHolder.energy != 0) {
             chargeLoop@ for (entity in world.entities) {
                 if (entity.location in region) {
                     if (entity is Player) {
                         for (itemStack in entity.inventory) {
                             energyTransferred += chargeItemStack(energyTransferred, itemStack)
-                            if (energyTransferred == CHARGE_SPEED || energy == 0) break@chargeLoop
+                            if (energyTransferred == energyHolder.energyConsumption || energyHolder.energy == 0) break@chargeLoop
                         }
                     } else if (entity is Item) {
                         energyTransferred += chargeItemStack(energyTransferred, entity.itemStack)
-                        if (energyTransferred == CHARGE_SPEED || energy == 0) break@chargeLoop
+                        if (energyTransferred == CHARGE_SPEED || energyHolder.energy == 0) break@chargeLoop
                     }
                 }
             }
-        }
-        
-        if (hasEnergyChanged) {
-            hasEnergyChanged = false
-            gui.energyBar.update()
         }
     }
     
@@ -79,8 +111,8 @@ class WirelessCharger(
             val maxEnergy = novaItem.maxEnergy
             val currentEnergy = novaItem.getEnergy(itemStack)
             
-            val energyToTransfer = minOf(CHARGE_SPEED - alreadyTransferred, maxEnergy - currentEnergy, energy)
-            energy -= energyToTransfer
+            val energyToTransfer = minOf(CHARGE_SPEED - alreadyTransferred, maxEnergy - currentEnergy, energyHolder.energy)
+            energyHolder.energy -= energyToTransfer
             novaItem.addEnergy(itemStack, energyToTransfer)
             
             return energyToTransfer
@@ -102,19 +134,26 @@ class WirelessCharger(
             null
         ) { openWindow(it) }
         
+        private val rangeItems = ArrayList<UIItem>()
+        
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # . # # # |" +
-                "| v # # . # # # |" +
-                "| u # # . # # # |" +
+                "| s # # . # # p |" +
+                "| v # # . # # n |" +
+                "| u # # . # # m |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('v', VisualizeRegionItem(uuid) { region })
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
+        
+        fun updateRangeItems() = rangeItems.forEach(UIItem::notifyWindows)
         
     }
     

@@ -60,7 +60,8 @@
   "pulverizer": {
     "capacity": 10000,
     "energy_per_tick": 50,
-    "pulverizer_time": 200
+    "pulverizer_time": 200,
+    "speed": 1
   },
   "electrical_furnace": {
     "capacity": 10000,
@@ -70,7 +71,8 @@
   "mechanical_press": {
     "capacity": 10000,
     "energy_per_tick": 100,
-    "press_time": 200
+    "press_time": 200,
+    "speed": 1
   },
   "quarry": {
     "capacity": 100000,
@@ -114,7 +116,11 @@
   "wireless_charger": {
     "capacity": 1000000,
     "charge_speed": 300,
-    "range": 10
+    "range": {
+      "min": 1,
+      "max": 10,
+      "default": 10
+    }
   },
   "mob_killer": {
     "capacity": 10000,
@@ -122,12 +128,18 @@
     "energy_per_damage": 150,
     "idle_time": 20,
     "kill_limit": 3,
-    "damage": 10
+    "damage": 10,
+    "range": {
+      "min": 1,
+      "max": 10,
+      "default": 10
+    }
   },
   "vacuum_chest": {
     "range": {
       "min": 1,
-      "max": 5
+      "max": 5,
+      "default": 5
     }
   },
   "breeder": {
@@ -135,19 +147,30 @@
     "energy_per_tick": 10,
     "energy_per_breed": 100,
     "idle_time": 200,
-    "breed_limit": 5
+    "breed_limit": 5,
+    "range": {
+      "min": 1,
+      "max": 7,
+      "default": 7
+    }
   },
   "mob_duplicator": {
-    "capacity": 10000,
-    "energy_per_tick": 500,
-    "energy_per_tick_nbt": 2000,
+    "capacity": 50000,
+    "energy_per_tick": 300,
+    "energy_per_tick_nbt": 1500,
     "idle_time": 400,
     "idle_time_nbt": 1000
   },
   "planter": {
     "capacity": 10000,
+    "energy_per_tick": 2,
     "energy_per_plant": 20,
-    "wait_time": 40
+    "idle_time": 40,
+    "range": {
+      "min": 1,
+      "max": 7,
+      "default": 7
+    }
   },
   "wind_turbine": {
     "capacity": 10000,
@@ -155,13 +178,25 @@
   },
   "harvester": {
     "capacity": 10000,
+    "energy_per_tick": 2,
     "energy_per_break": 40,
-    "wait_time": 3
+    "idle_time": 6,
+    "range": {
+      "min": 1,
+      "max": 11,
+      "default": 11
+    }
   },
   "fertilizer": {
     "capacity": 10000,
+    "energy_per_tick": 2,
     "energy_per_fertilize": 30,
-    "wait_time": 10
+    "idle_time": 10,
+    "range": {
+      "min": 1,
+      "max": 7,
+      "default": 7
+    }
   },
   "auto_fisher": {
     "capacity": 10000,

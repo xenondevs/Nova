@@ -8,11 +8,15 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ProviderEnergyHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.isGlass
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -32,17 +36,17 @@ class SolarPanel(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy {
+    override val gui = lazy { SolarPanelGUI() }
+    override val upgradeHolder = UpgradeHolder(data, gui, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
+    override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, upgradeHolder) {
         CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))
         { if (it == BlockFace.DOWN) EnergyConnectionType.PROVIDE else EnergyConnectionType.NONE }
     }
     
     private val obstructionTask = runTaskTimer(0, 20 * 5, ::checkSkyObstruction)
     private var obstructed = true
-    
-    override val gui by lazy { SolarPanelGUI() }
     
     private fun checkSkyObstruction() {
         obstructed = false
@@ -57,8 +61,7 @@ class SolarPanel(
     }
     
     override fun handleTick() {
-        energy = min(energy + calculateCurrentEnergyOutput(), MAX_ENERGY)
-        if (hasEnergyChanged) gui.energyBar.update()
+        energyHolder.energy += calculateCurrentEnergyOutput()
     }
     
     private fun calculateCurrentEnergyOutput(): Int {
@@ -66,7 +69,7 @@ class SolarPanel(
         if (!obstructed && time < 13_000) {
             val bestTime = 6_500
             val multiplier = (bestTime - abs(bestTime - time)) / bestTime.toDouble()
-            return (ENERGY_PER_TICK * multiplier).roundToInt()
+            return (energyHolder.energyGeneration * multiplier).roundToInt()
         }
         return 0
     }
@@ -85,10 +88,10 @@ class SolarPanel(
                 "| # # # . # # # |" +
                 "| # # # . # # # |" +
                 "3 - - - - - - - 4")
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, calculateCurrentEnergyOutput()) }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
         
     }
     

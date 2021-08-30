@@ -18,23 +18,29 @@ private fun ItemStack.getUpgradeType(): UpgradeType? {
 }
 
 class UpgradeHolder(
-    private val upgradeable: Upgradeable,
     data: CompoundElement,
-    vararg allowed: UpgradeType,
-    val lazyGUI: () -> TileEntityGUI
+    val lazyGUI: Lazy<TileEntityGUI>,
+    private val defaultUpdateHandler: (() -> Unit)?,
+    vararg allowed: UpgradeType
 ) {
     
     val input = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(10)).apply { setItemUpdateHandler(::handleNewInput) }
     val allowed = allowed.toList()
     val upgrades = EnumMap<UpgradeType, Int>(UpgradeType::class.java)
     
-    val gui by lazy { UpgradesGUI(this) { lazyGUI().openWindow(it) } }
+    val gui by lazy { UpgradesGUI(this) { lazyGUI.value.openWindow(it) } }
     
-    constructor(upgradeable: Upgradeable, data: CompoundElement, lazyGUI: () -> TileEntityGUI) : this(upgradeable, data, allowed = UpgradeType.values(), lazyGUI)
+    val upgradeUpdateHandlers = ArrayList<() -> Unit>()
+    
+    constructor(data: CompoundElement, lazyGUI: Lazy<TileEntityGUI>, vararg allowed: UpgradeType) :
+        this(data, lazyGUI, null, allowed = allowed)
+    
+    constructor(data: CompoundElement, lazyGUI: Lazy<TileEntityGUI>, defaultUpdateHandler: (() -> Unit)? = null) :
+        this(data, lazyGUI, defaultUpdateHandler, allowed = UpgradeType.values())
     
     init {
         val savedUpgrades = data.get<EnumMap<UpgradeType, Int>>("upgrades")
-        if(savedUpgrades != null)
+        if (savedUpgrades != null)
             upgrades.putAll(savedUpgrades)
     }
     
@@ -46,7 +52,7 @@ class UpgradeHolder(
     fun addUpgrade(type: UpgradeType, amount: Int): Int {
         if (type !in allowed || amount == 0)
             return amount
-    
+        
         val current = upgrades[type] ?: 0
         if (10 - current < amount) {
             upgrades[type] = 10
@@ -76,13 +82,16 @@ class UpgradeHolder(
         return type.modifiers[amount]
     }
     
+    fun calculateEnergyUsage(baseUsage: Int) =
+        (baseUsage * getSpeedModifier() / getEfficiencyModifier()).toInt()
+    
     fun getSpeedModifier() = getModifier(UpgradeType.SPEED)
     
     fun getEfficiencyModifier() = getModifier(UpgradeType.EFFICIENCY)
     
     fun getEnergyModifier() = getModifier(UpgradeType.ENERGY)
     
-    fun getRangeModifier() = getModifier(UpgradeType.RANGE)
+    fun getRangeModifier() = getModifier(UpgradeType.RANGE).toInt()
     
     private fun handleNewInput(event: ItemUpdateEvent) {
         if (event.updateReason == SELF_UPDATE_REASON || event.isRemove || event.newItemStack == null)
@@ -121,7 +130,8 @@ class UpgradeHolder(
     
     private fun handleUpgradeUpdates() {
         gui.updateUpgrades()
-        upgradeable.handleUpgradeUpdates()
+        upgradeUpdateHandlers.forEach { it() }
+        defaultUpdateHandler?.invoke() // This is separate from the arraylist, so it is always called last.
     }
     
     fun dropUpgrades() = upgrades.map { (type, amount) -> type.material.createItemStack(amount) }

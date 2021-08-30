@@ -1,46 +1,20 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.tileentity.network.energy.EnergyStorage
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
-import java.util.*
+import xyz.xenondevs.nova.util.emptyEnumMap
 
 interface NetworkEndPoint : NetworkNode {
     
     val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>>
-    val allowedFaces: Map<NetworkType, List<BlockFace>>
-        get() {
-            val map = HashMap<NetworkType, List<BlockFace>>()
-            
-            if (this is EnergyStorage) {
-                val faces = energyConfig
-                    .filterNot { it.value == EnergyConnectionType.NONE }
-                    .keys
-                    .toList()
-                
-                if (faces.isNotEmpty()) map[NetworkType.ENERGY] = faces
-            }
-            
-            if (this is ItemStorage) {
-                val faces = itemConfig
-                    .filterNot { it.value == ItemConnectionType.NONE }
-                    .keys
-                    .toList()
-                
-                if (faces.isNotEmpty()) map[NetworkType.ITEMS] = faces
-            }
-            
-            return map
-        }
+    val holders: Map<NetworkType, EndPointDataHolder>
+    val allowedFaces: Map<NetworkType, Set<BlockFace>>
+        get() = holders.entries.associate { (type, holder) -> type to holder.allowedFaces }
     
     fun getNetworks(): List<Pair<BlockFace, Network>> =
         networks.values.flatMap { networkMap -> networkMap.map { faceMap -> faceMap.key to faceMap.value } }
     
     fun getFaceMap(networkType: NetworkType): MutableMap<BlockFace, Network> {
-        return networks[networkType]
-            ?: EnumMap<BlockFace, Network>(BlockFace::class.java).also { networks[networkType] = it }
+        return networks.getOrPut(networkType) { emptyEnumMap() }
     }
     
     fun setNetwork(networkType: NetworkType, face: BlockFace, network: Network) {

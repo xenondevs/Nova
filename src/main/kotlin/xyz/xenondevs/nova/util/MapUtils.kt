@@ -8,6 +8,12 @@ inline fun <reified K : Enum<K>, V> emptyEnumMap() = EnumMap<K, V>(K::class.java
 
 inline fun <reified K : Enum<K>, V> Map<K, V>.toEnumMap() = this.toMap(EnumMap(K::class.java))
 
+inline fun <reified K : Enum<K>, V> Iterable<K>.associateWithToEnumMap(valueSelector: (K) -> V): EnumMap<K, V> {
+    val destination = EnumMap<K, V>(K::class.java)
+    for (element in this) destination[element] = valueSelector(element)
+    return destination
+}
+
 @Suppress("UNCHECKED_CAST")
 inline fun <reified R, K, V> Map<K, V>.filterIsInstanceValues() = filter { it.value is R } as Map<K, R>
 

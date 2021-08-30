@@ -15,11 +15,11 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemStorage
+import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.data.setLocalizedName
 
 class CableItemConfigGUI(
-    private val itemStorage: ItemStorage,
+    private val itemHolder: ItemHolder,
     private val face: BlockFace,
     insertFilterInventory: VirtualInventory,
     extractFilterInventory: VirtualInventory
@@ -42,18 +42,18 @@ class CableItemConfigGUI(
     }
     
     private fun updateState(run: () -> Unit) {
-        NetworkManager.handleEndPointRemove(itemStorage, false)
+        NetworkManager.handleEndPointRemove(itemHolder.endPoint, false)
         run()
-        if (itemStorage.itemConfig[face]!! != ItemConnectionType.NONE) {
-            NetworkManager.handleEndPointAdd(itemStorage)
+        if (itemHolder.itemConfig[face]!! != ItemConnectionType.NONE) {
+            NetworkManager.handleEndPointAdd(itemHolder.endPoint)
         }
     }
     
     private inner class InsertItem : BaseItem() {
         
         private var state: Boolean
-            get() = itemStorage.itemConfig[face]!!.insert
-            set(value) = itemStorage.setInsert(face, value)
+            get() = itemHolder.itemConfig[face]!!.insert
+            set(value) = itemHolder.setInsert(face, value)
         
         override fun getItemProvider(): ItemProvider =
             (if (state) NovaMaterialRegistry.GREEN_BUTTON else NovaMaterialRegistry.GRAY_BUTTON)
@@ -69,8 +69,8 @@ class CableItemConfigGUI(
     private inner class ExtractItem : BaseItem() {
         
         private var state: Boolean
-            get() = itemStorage.itemConfig[face]!!.extract
-            set(value) = itemStorage.setExtract(face, value)
+            get() = itemHolder.itemConfig[face]!!.extract
+            set(value) = itemHolder.setExtract(face, value)
         
         override fun getItemProvider(): ItemProvider =
             (if (state) NovaMaterialRegistry.GREEN_BUTTON else NovaMaterialRegistry.GRAY_BUTTON)

@@ -17,14 +17,16 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.tileentity.upgrade.Upgradeable
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
@@ -54,26 +56,22 @@ class ElectricalFurnace(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradeable {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val requestedEnergy: Int
-        get() = maxEnergy - energy
-    
-    override val upgradeHolder = UpgradeHolder(this, data, UpgradeType.SPEED, UpgradeType.EFFICIENCY, UpgradeType.ENERGY) { gui }
+    override val gui = lazy { ElectricalFurnaceGUI() }
     
     private val inputInventory = getInventory("input", 1, true, ::handleInputInventoryUpdate)
     private val outputInventory = getInventory("output", 1, true, ::handleOutputInventoryUpdate)
+    
+    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, inputInventory, outputInventory)
     
     private var currentRecipe: FurnaceRecipe? = retrieveOrNull<NamespacedKey>("currentRecipe")?.let { Bukkit.getRecipe(it) as FurnaceRecipe }
     private var timeCooked = retrieveData("timeCooked") { 0 }
     private var experience = retrieveData("exp") { 0f }
     
-    override val gui by lazy { ElectricalFurnaceGUI() }
-    
-    private var energyPerTick = (ENERGY_PER_TICK * upgradeHolder.getSpeedModifier() / upgradeHolder.getEfficiencyModifier()).toInt()
-    private var cookSpeed = (COOK_SPEED * upgradeHolder.getSpeedModifier()).toInt()
-    private var maxEnergy = (MAX_ENERGY * upgradeHolder.getEnergyModifier()).toInt()
+    private var cookSpeed = 0
     
     private var active: Boolean = false
         set(value) {
@@ -84,8 +82,7 @@ class ElectricalFurnace(
         }
     
     init {
-        addAvailableInventories(inputInventory, outputInventory)
-        setDefaultInventory(inputInventory)
+        handleUpgradeUpdates()
     }
     
     override fun saveData() {
@@ -140,7 +137,7 @@ class ElectricalFurnace(
     }
     
     override fun handleTick() {
-        if (energy >= energyPerTick) {
+        if (energyHolder.energy >= energyHolder.energyConsumption) {
             if (currentRecipe == null) {
                 val item = inputInventory.getItemStack(0)
                 if (item != null) {
@@ -156,7 +153,7 @@ class ElectricalFurnace(
             
             val currentRecipe = currentRecipe
             if (currentRecipe != null) {
-                energy -= energyPerTick
+                energyHolder.energy -= energyHolder.energyConsumption
                 timeCooked += cookSpeed
                 
                 if (timeCooked >= currentRecipe.cookingTime) {
@@ -166,24 +163,13 @@ class ElectricalFurnace(
                     this.currentRecipe = null
                 }
                 
-                gui.updateProgress()
+                if (gui.isInitialized()) gui.value.updateProgress()
             }
         } else active = false
-        
-        if (hasEnergyChanged) {
-            gui.energyBar.update()
-            hasEnergyChanged = false
-        }
     }
     
-    override fun handleUpgradeUpdates() {
-        energyPerTick = (ENERGY_PER_TICK * upgradeHolder.getSpeedModifier() / upgradeHolder.getEfficiencyModifier()).toInt()
+    private fun handleUpgradeUpdates() {
         cookSpeed = (COOK_SPEED * upgradeHolder.getSpeedModifier()).toInt()
-        maxEnergy = (MAX_ENERGY * upgradeHolder.getEnergyModifier()).toInt()
-        gui.energyBar.update()
-        if (energy > maxEnergy) {
-            location.world?.createExplosion(location, 5f)
-        }
     }
     
     inner class ElectricalFurnaceGUI : TileEntityGUI("menu.nova.electrical_furnace") {
@@ -194,8 +180,8 @@ class ElectricalFurnace(
             this@ElectricalFurnace,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inputInventory), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(outputInventory), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES)
+                Triple(itemHolder.getNetworkedInventory(inputInventory), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
+                Triple(itemHolder.getNetworkedInventory(outputInventory), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES)
             )
         ) { openWindow(it) }
         
@@ -213,7 +199,7 @@ class ElectricalFurnace(
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, maxEnergy, if (currentRecipe != null) -energyPerTick else 0) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         init {
             updateProgress()

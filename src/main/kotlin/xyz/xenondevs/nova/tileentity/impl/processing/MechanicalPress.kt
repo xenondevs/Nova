@@ -18,29 +18,34 @@ import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.NONE
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.PressProgressItem
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
+import kotlin.math.max
 
 private val MAX_ENERGY = NovaConfig.getInt("mechanical_press.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("mechanical_press.energy_per_tick")!!
 private val PRESS_TIME = NovaConfig.getInt("mechanical_press.press_time")!!
+private val PRESS_SPEED = NovaConfig.getInt("mechanical_press.speed")!!
 
 enum class PressType {
-    
     PLATE,
     GEAR
-    
 }
 
 class MechanicalPress(
@@ -49,46 +54,45 @@ class MechanicalPress(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyItemTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(CONSUME, FRONT) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
-    
-    private var type: PressType = retrieveEnum("pressType") { PressType.PLATE }
-    private var pressTime: Int = retrieveData("pressTime") { 0 }
-    private var currentItem: ItemStack? = retrieveOrNull("currentItem")
+    override val gui = lazy { MechanicalPressGUI() }
     
     private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
     private val outputInv = getInventory("output", 1, true, ::handleOutputUpdate)
     
-    override val gui by lazy { MechanicalPressGUI() }
+    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(CONSUME, FRONT) }
+    override val itemHolder = NovaItemHolder(this, inputInv, outputInv)
+    
+    private var type: PressType = retrieveEnum("pressType") { PressType.PLATE }
+    private var pressTime: Int = retrieveData("pressTime") { 0 }
+    private var pressSpeed = 0
+    
+    private var currentItem: ItemStack? = retrieveOrNull("currentItem")
     
     init {
-        addAvailableInventories(inputInv, outputInv)
-        setDefaultInventory(inputInv)
+        handleUpgradeUpdates()
+    }
+    
+    private fun handleUpgradeUpdates() {
+        pressSpeed = (PRESS_SPEED * upgradeHolder.getSpeedModifier()).toInt()
     }
     
     override fun handleTick() {
-        if (energy >= ENERGY_PER_TICK) { // has energy to do anything
+        if (energyHolder.energy >= energyHolder.energyConsumption) {
             if (pressTime == 0) takeItem()
             if (pressTime != 0) { // is pressing
-                pressTime--
-                energy -= ENERGY_PER_TICK
+                pressTime = max(pressTime - pressSpeed, 0)
+                energyHolder.energy -= energyHolder.energyConsumption
                 
                 if (pressTime == 0) {
                     outputInv.putItemStack(null, 0, currentItem!!)
                     currentItem = null
                 }
                 
-                gui.updateProgress()
-                hasEnergyChanged = true
+                if (gui.isInitialized()) gui.value.updateProgress()
             }
-        }
-        
-        if (hasEnergyChanged) {
-            gui.energyBar.update()
-            hasEnergyChanged = false
         }
     }
     
@@ -124,10 +128,6 @@ class MechanicalPress(
         storeData("currentItem", currentItem)
     }
     
-    override fun handleRemoved(unload: Boolean) {
-        super.handleRemoved(unload)
-        if (!unload) gui.close()
-    }
     
     inner class MechanicalPressGUI : TileEntityGUI("menu.nova.mechanical_press") {
         
@@ -138,8 +138,8 @@ class MechanicalPress(
             this@MechanicalPress,
             listOf(NONE, CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inputInv), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(outputInv), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES),
+                Triple(itemHolder.getNetworkedInventory(inputInv), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
+                Triple(itemHolder.getNetworkedInventory(outputInv), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES),
             )
         ) { openWindow(it) }
         
@@ -147,8 +147,8 @@ class MechanicalPress(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| p g # i # # . |" +
-                "| u # # , # # . |" +
-                "| s # # o # # . |" +
+                "| # # # , # # . |" +
+                "| s u # o # # . |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', VISlotElement(inputInv, 0))
             .addIngredient('o', VISlotElement(outputInv, 0))
@@ -156,10 +156,10 @@ class MechanicalPress(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('p', PressTypeItem(PressType.PLATE).apply(pressTypeItems::add))
             .addIngredient('g', PressTypeItem(PressType.GEAR).apply(pressTypeItems::add))
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, if (currentItem != null) -ENERGY_PER_TICK else 0) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         init {
             updateProgress()
@@ -168,8 +168,6 @@ class MechanicalPress(
         fun updateProgress() {
             pressProgress.percentage = if (pressTime == 0) 0.0 else (PRESS_TIME - pressTime).toDouble() / PRESS_TIME.toDouble()
         }
-        
-        fun close() = gui.closeForAllViewers()
         
         private inner class PressTypeItem(private val type: PressType) : BaseItem() {
             

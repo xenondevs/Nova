@@ -8,10 +8,15 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
@@ -31,17 +36,26 @@ class ChunkLoader(
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : EnergyTileEntity(uuid, data, material, ownerUUID, armorStand) {
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+    override val gui = lazy { ChunkLoaderGUI() }
+    
+    override val upgradeHolder = UpgradeHolder(data, gui, ::updateEnergyPerTick, UpgradeType.ENERGY, UpgradeType.EFFICIENCY)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, 0, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     
     private var range = retrieveData("range") { 0 }
     private var chunks = chunk.getSurroundingChunks(range, true)
     private var active = false
     
-    override val gui by lazy { ChunkLoaderGUI() }
+    private var energyPerTick = 0
+    
+    init {
+        updateEnergyPerTick()
+    }
+    
+    private fun updateEnergyPerTick() {
+        energyPerTick = (ENERGY_PER_CHUNK * chunks.size / upgradeHolder.getEfficiencyModifier()).toInt()
+    }
     
     override fun saveData() {
         super.saveData()
@@ -49,8 +63,8 @@ class ChunkLoader(
     }
     
     override fun handleTick() {
-        if (energy >= (ENERGY_PER_CHUNK * chunks.size)) {
-            energy -= (ENERGY_PER_CHUNK * chunks.size)
+        if (energyHolder.energy >= energyPerTick) {
+            energyHolder.energy -= energyPerTick
             if (!active) {
                 setChunksForceLoaded(true)
                 active = true
@@ -58,11 +72,6 @@ class ChunkLoader(
         } else if (active) {
             setChunksForceLoaded(false)
             active = false
-        }
-        
-        if (hasEnergyChanged) {
-            gui.energyBar.update()
-            hasEnergyChanged = false
         }
     }
     
@@ -78,6 +87,7 @@ class ChunkLoader(
         setChunksForceLoaded(false)
         chunks = chunk.getSurroundingChunks(range, true)
         active = false
+        updateEnergyPerTick()
     }
     
     override fun handleRemoved(unload: Boolean) {
@@ -97,17 +107,18 @@ class ChunkLoader(
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 3)
             .setStructure("" +
-                "# 1 - - - - - 2 ." +
-                "# | # m n p # | ." +
-                "# 3 - - - - - 4 ."
+                "1 - - - - - - 2 ." +
+                "| u # m n p # | ." +
+                "3 - - - - - - 4 ."
             )
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('p', AddNumberItem({ 0..MAX_RANGE }, { range }, ::setRange).also(rangeItems::add))
             .addIngredient('m', RemoveNumberItem({ 0..MAX_RANGE }, { range }, ::setRange).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range + 1 }.also(rangeItems::add))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, 8, 0, 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_CHUNK * chunks.size) }
+         val energyBar = EnergyBar(gui, 8, 0, 3, energyHolder)
         
         private fun setRange(range: Int) {
             this@ChunkLoader.setRange(range)
