@@ -97,7 +97,7 @@ class Harvester(
     }
     
     private fun updateRegion() {
-        harvestRegion = getFrontArea(range.toDouble(), range.toDouble(), range.toDouble(), 0.0)
+        harvestRegion = getBlockFrontRegion(range, range, range * 2, 0)
         VisualRegion.updateRegion(uuid, harvestRegion)
     }
     

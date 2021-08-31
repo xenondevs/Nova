@@ -94,7 +94,7 @@ class Fertilizer(
     }
     
     private fun updateRegion() {
-        fertilizeRegion = getFrontArea(range.toDouble(), range.toDouble(), 1.0, 0.0)
+        fertilizeRegion = getBlockFrontRegion(range, range, 1, 0)
         VisualRegion.updateRegion(uuid, fertilizeRegion)
     }
     

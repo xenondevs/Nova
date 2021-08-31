@@ -20,7 +20,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
-import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.compress
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -264,21 +263,47 @@ abstract class TileEntity(
     }
     
     /**
-     * Creates a [Pair] of [Locations][Location] which mark the edge points of an area with the
-     * given [length], [width], [height] and [vertical translation][translateVertical] in front
-     * of this [TileEntity].
+     * Creates a [Region] of a specified [size] that surrounds this [TileEntity].
      */
-    fun getFrontArea(length: Double, width: Double, height: Double, translateVertical: Double): Region {
+    fun getSurroundingRegion(size: Int): Region {
+        val d = size + 0.5
+        return Region(
+            location.clone().center().subtract(d, d, d),
+            location.clone().center().add(d, d, d)
+        )
+    }
+    
+    /**
+     * Creates a block [Region] with the given [length], [width], [height] and
+     * [vertical translation][translateVertical] in front of this [TileEntity].
+     */
+    fun getBlockFrontRegion(length: Int, width: Int, height: Int, translateVertical: Int): Region {
+        return getFrontRegion(length * 2.0 + 1, width + 0.5, width + 0.5, height.toDouble(), translateVertical.toDouble())
+    }
+    
+    /**
+     * Creates a [Region] with the  given [length], [width], [height] and
+     * [vertical translation][translateVertical] in front of this [TileEntity].
+     */
+    fun getFrontRegion(length: Double, width: Double, height: Double, translateVertical: Double): Region {
+        return getFrontRegion(length, width / 2.0, width / 2.0, height, translateVertical)
+    }
+    
+    /**
+     * Creates a [Region] with the  given [length], [left] and [right] movement, [height] and
+     * [vertical translation][translateVertical] in front of this [TileEntity].
+     */
+    fun getFrontRegion(length: Double, left: Double, right: Double, height: Double, translateVertical: Double): Region {
         val frontFace = getFace(BlockSide.FRONT)
         val startLocation = location.clone().center().advance(frontFace, 0.5)
         
         val pos1 = startLocation.clone().apply {
-            advance(getFace(BlockSide.LEFT), width / 2.0)
+            advance(getFace(BlockSide.LEFT), left)
             y += translateVertical
         }
         
         val pos2 = startLocation.clone().apply {
-            advance(getFace(BlockSide.RIGHT), width / 2.0)
+            advance(getFace(BlockSide.RIGHT), right)
             advance(frontFace, length)
             y += height + translateVertical
         }

@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
-import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.region.Region
@@ -71,10 +70,7 @@ class WirelessCharger(
     }
     
     private fun updateRegion() {
-        region = Region(
-            location.clone().center().subtract(range.toDouble(), range.toDouble(), range.toDouble()),
-            location.clone().center().add(range.toDouble(), range.toDouble(), range.toDouble())
-        )
+        region = getSurroundingRegion(range)
         VisualRegion.updateRegion(uuid, region)
     }
     

@@ -101,7 +101,7 @@ class Planter(
     }
     
     private fun updateRegion() {
-        plantRegion = getFrontArea(range.toDouble(), range.toDouble(), 1.0, 0.0)
+        plantRegion = getBlockFrontRegion(range, range, 1, 0)
         soilRegion = Region(plantRegion.min.clone().advance(BlockFace.DOWN), plantRegion.max.clone().advance(BlockFace.DOWN))
         
         VisualRegion.updateRegion(uuid, plantRegion)

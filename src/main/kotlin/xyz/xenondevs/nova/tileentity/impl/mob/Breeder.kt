@@ -92,7 +92,7 @@ class Breeder(
     }
     
     private fun updateRegion() {
-        region = getFrontArea(range.toDouble(), range.toDouble(), 4.0, -1.0)
+        region = getBlockFrontRegion(range, range, 4, -1)
         VisualRegion.updateRegion(uuid, region)
     }
     
