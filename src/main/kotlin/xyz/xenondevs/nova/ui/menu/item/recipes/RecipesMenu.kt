@@ -176,7 +176,7 @@ private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        if (clickType == ClickType.LEFT) ItemMenu.showPreviousMenu(viewerUUID)
+        if (clickType == ClickType.LEFT && ItemMenu.hasHistory(viewerUUID)) ItemMenu.showPreviousMenu(viewerUUID)
     }
     
 }
