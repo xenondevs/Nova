@@ -48,7 +48,7 @@ fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true
     
     type = Material.AIR
     
-    return drops
+    return drops.filterNot { it.type.isAir }
 }
 
 fun Block.playBreakEffects() {
