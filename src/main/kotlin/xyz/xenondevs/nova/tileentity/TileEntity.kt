@@ -392,9 +392,5 @@ abstract class TileEntityGUI(private val title: String) {
         subGUIs.forEach(GUI::closeForAllViewers)
     }
     
-    init {
-        println("Init TileEntityGUI \"$title\"")
-    }
-    
 }
 
