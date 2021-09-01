@@ -195,10 +195,11 @@ class Breeder(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s p . . . . . |" +
-                "| r n . . . . . |" +
-                "| u m . . . . . |" +
+                "| s p i i i . . |" +
+                "| r n i i i . . |" +
+                "| u m i i i . . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('r', VisualizeRegionItem(uuid) { region })
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
@@ -206,7 +207,6 @@ class Breeder(
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .build()
-            .also { it.fillRectangle(3, 1, 3, inventory, true) }
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         

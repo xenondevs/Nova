@@ -170,14 +170,14 @@ class AutoFisher(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s u # # f . . |" +
-                "| . . . . # . . |" +
-                "| . . . . # . . |" +
+                "| i i i i # . . |" +
+                "| i i i i # . . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('f', VISlotElement(fishingRodInventory, 0, NovaMaterialRegistry.FISHING_ROD_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
-            .apply { fillRectangle(1, 2, 6, inventory, true) }
         
         val energyBar = EnergyBar(gui = gui, x = 7, y = 1, height = 3, energyHolder)
         

@@ -230,9 +230,10 @@ class Planter(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s u v # # p . |" +
-                "| . . . # h n . |" +
-                "| . . . # f m . |" +
+                "| i i i # h n . |" +
+                "| i i i # f m . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inputInventory)
             .addIngredient('h', VISlotElement(hoesInventory, 0, NovaMaterialRegistry.HOE_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('v', VisualizeRegionItem(uuid) { plantRegion })
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
@@ -242,7 +243,6 @@ class Planter(
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .build()
-            .also { it.fillRectangle(1, 2, 3, inputInventory, true) }
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         

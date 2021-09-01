@@ -169,10 +169,11 @@ class Fertilizer(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s p . . . . . |" +
-                "| v n . . . . . |" +
-                "| u m . . . . . |" +
+                "| s p i i i i . |" +
+                "| v n i i i i . |" +
+                "| u m i i i i . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', fertilizerInventory)
             .addIngredient('v', VisualizeRegionItem(uuid) { fertilizeRegion })
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
@@ -180,7 +181,6 @@ class Fertilizer(
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .build()
-            .also { it.fillRectangle(3, 1, 4, fertilizerInventory, true) }
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         

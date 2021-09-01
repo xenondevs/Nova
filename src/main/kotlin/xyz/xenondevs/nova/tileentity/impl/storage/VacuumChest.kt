@@ -54,7 +54,7 @@ class VacuumChest(
     
     override val gui = lazy { VacuumChestGUI() }
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)
-    private val filterInventory = getInventory("itemFilter", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate)
+    private val filterInventory = getInventory("itemFilter", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate).apply { guiShiftPriority = 1 }
     private var filter: ItemFilter? = filterInventory.getItemStack(0)?.getFilterConfig()
     private val items = ArrayList<Item>()
     
@@ -157,10 +157,11 @@ class VacuumChest(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s u # . . . p |" +
-                "| r # # . . . d |" +
-                "| f # # . . . m |" +
+                "| s u # i i i p |" +
+                "| r # # i i i d |" +
+                "| f # # i i i m |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .addIngredient('r', VisualizeRegionItem(uuid) { region })
@@ -169,7 +170,6 @@ class VacuumChest(
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('d', DisplayNumberItem { range }.also(rangeItems::add))
             .build()
-            .also { it.fillRectangle(4, 1, 3, inventory, true) }
         
         fun updateRangeItems() {
             rangeItems.forEach(UIItem::notifyWindows)

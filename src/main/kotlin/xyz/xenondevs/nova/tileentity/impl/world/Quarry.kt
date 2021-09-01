@@ -503,17 +503,17 @@ class Quarry(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s u # # # # . |" +
-                "| # # # . . . . |" +
-                "| m n p . . . . |" +
-                "| # # # . . . . |" +
+                "| # # # i i i . |" +
+                "| m n p i i i . |" +
+                "| # # # i i i . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
             .addIngredient('p', AddNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
             .addIngredient('m', RemoveNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
-            .also { it.fillRectangle(4, 2, 3, inventory, true) }
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, energyHolder)
         

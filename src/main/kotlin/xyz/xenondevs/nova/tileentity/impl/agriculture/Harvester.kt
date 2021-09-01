@@ -249,9 +249,10 @@ class Harvester(
                 "1 - - - - - - - 2" +
                 "| c v u s a h . |" +
                 "| m n p # # # . |" +
-                "| . . . . . . . |" +
-                "| . . . . . . . |" +
+                "| i i i i i i . |" +
+                "| i i i i i i . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('c', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('v', VisualizeRegionItem(uuid) { harvestRegion })
             .addIngredient('s', VISlotElement(shearInventory, 0, NovaMaterialRegistry.SHEARS_PLACEHOLDER.createBasicItemBuilder()))
@@ -262,7 +263,6 @@ class Harvester(
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
-            .apply { fillRectangle(1, 3, 6, inventory, true) }
         
         val energyBar = EnergyBar(gui, 7, 1, 4, energyHolder)
         
