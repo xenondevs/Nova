@@ -92,6 +92,10 @@ open class Cable(
         NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
     }
     
+    override fun handleHitboxPlaced() {
+        updateBlockHitbox()
+    }
+    
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
         NetworkManager.handleBridgeRemove(this, unload)
@@ -237,6 +241,9 @@ open class Cable(
     }
     
     private fun updateBlockHitbox() {
+        val block = location.block
+        if (block.type != material.hitboxType) return
+        
         val neighborFaces = connectedNodes.flatMapTo(HashSet()) { it.value.keys }
         val axis = when {
             neighborFaces.contains(BlockFace.EAST) && neighborFaces.contains(BlockFace.WEST) -> Axis.X
@@ -251,15 +258,9 @@ open class Cable(
             }
         }
         
-        // run later because this might be called during an event
-        runTaskLater(1) {
-            if (isValid) {
-                val block = armorStand.location.block
-                val blockData = block.blockData as Orientable
-                blockData.axis = axis
-                block.setBlockData(blockData, false)
-            }
-        }
+        val blockData = block.blockData as Orientable
+        blockData.axis = axis
+        block.setBlockData(blockData, false)
     }
     
     private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemHolder: ItemHolder) {

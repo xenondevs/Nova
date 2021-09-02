@@ -123,11 +123,15 @@ object TileEntityManager : Listener {
         // count for TileEntity limits
         TileEntityLimits.handleTileEntityCreate(ownerUUID, material)
         
+        // call handleInitialized
+        tileEntity.handleInitialized(true)
+        
+        // set the hitbox block (1 tick later to prevent interference with the BlockBreakEvent)
         runTaskLater(1) {
-            // set the hitbox block (1 tick later to prevent interference with the BlockBreakEvent)
-            material.hitboxType?.run { block.type = this }
-            // handle finished initializing
-            tileEntity.handleInitialized(true)
+            if (tileEntity.isValid) { // check that the tile entity hasn't been destroyed already
+                material.hitboxType?.run { block.type = this }
+                tileEntity.handleHitboxPlaced()
+            }
         }
     }
     

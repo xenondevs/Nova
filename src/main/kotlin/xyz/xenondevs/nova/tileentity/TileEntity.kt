@@ -127,6 +127,12 @@ abstract class TileEntity(
     abstract fun handleInitialized(first: Boolean)
     
     /**
+     * Called after the hitbox block has been placed.
+     * This action happens one tick after [handleInitialized] with first: true.
+     */
+    open fun handleHitboxPlaced() = Unit
+    
+    /**
      * Called after the TileEntity has been removed from the
      * TileEntityManager's TileEntity map because it either got
      * unloaded or destroyed.
