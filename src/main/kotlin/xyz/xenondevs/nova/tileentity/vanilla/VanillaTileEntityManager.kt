@@ -21,6 +21,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.chunkPos
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
+import xyz.xenondevs.nova.world.armorstand.pos
 import java.util.*
 
 /**
@@ -28,7 +30,7 @@ import java.util.*
  */
 object VanillaTileEntityManager : Listener {
     
-    private val tileEntityMap = HashMap<Chunk, HashMap<Location, VanillaTileEntity>>()
+    private val tileEntityMap = HashMap<AsyncChunkPos, HashMap<Location, VanillaTileEntity>>()
     private val locationCache = HashMap<Location, VanillaTileEntity>()
     private val tileEntityQueue = LinkedList<VanillaTileEntity>()
     
@@ -72,7 +74,7 @@ object VanillaTileEntityManager : Listener {
     }
     
     @Synchronized
-    fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)
+    fun getTileEntityAt(location: Location) = tileEntityMap[location.chunkPos]?.get(location)
     
     @Synchronized
     private fun createVanillaTileEntity(state: BlockState) =
@@ -94,14 +96,14 @@ object VanillaTileEntityManager : Listener {
                 locationCache[location] = tileEntity
             }
         }
-        tileEntityMap[chunk] = chunkMap
+        tileEntityMap[chunk.pos] = chunkMap
         chunkMap.values.forEach(VanillaTileEntity::handleInitialized)
     }
     
     @Synchronized
     private fun handleChunkUnload(chunk: Chunk) {
-        val tileEntities = tileEntityMap[chunk]
-        tileEntityMap.remove(chunk)
+        val tileEntities = tileEntityMap[chunk.pos]
+        tileEntityMap.remove(chunk.pos)
         tileEntities?.forEach { (location, tileEntity) ->
             locationCache -= location
             tileEntity.handleRemoved(unload = true)
@@ -110,7 +112,7 @@ object VanillaTileEntityManager : Listener {
     
     @Synchronized
     private fun handleTileEntityDestroy(location: Location) {
-        val chunkMap = tileEntityMap[location.chunk]!!
+        val chunkMap = tileEntityMap[location.chunk.pos]!!
         val tileEntity = chunkMap[location]!!
         chunkMap -= location
         locationCache -= location
@@ -133,7 +135,7 @@ object VanillaTileEntityManager : Listener {
         val tileEntity = createVanillaTileEntity(state)
         if (tileEntity != null) {
             val location = block.location
-            tileEntityMap[location.chunk]!![location] = tileEntity
+            tileEntityMap[location.chunk.pos]!![location] = tileEntity
             locationCache[location] = tileEntity
             tileEntity.handleInitialized()
         }

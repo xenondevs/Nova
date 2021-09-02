@@ -114,7 +114,7 @@ object TileEntityManager : Listener {
         )
         
         // add to tileEntities map
-        val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>().also { tileEntityMap[chunk] = it }
+        val chunkMap = tileEntityMap.getOrPut(chunk) { HashMap() }
         chunkMap[location] = tileEntity
         
         // add to location cache

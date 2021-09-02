@@ -7,7 +7,6 @@ import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.chat.TranslatableComponent
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.projectile.FishingHook
 import net.minecraft.world.level.storage.loot.BuiltInLootTables
 import net.minecraft.world.level.storage.loot.LootContext
@@ -74,7 +73,7 @@ class AutoFisher(
     private val level = world.serverLevel
     private val position = Vec3(location.x, location.y, location.z)
     private val itemDropLocation = location.clone().add(0.0, 1.0, 0.0)
-    private lateinit var fakePlayer: ServerPlayer
+    private val fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID.salt(uuid.toString()), "AutoFisher")
     
     init {
         handleUpgradeUpdates()
@@ -83,12 +82,6 @@ class AutoFisher(
     private fun handleUpgradeUpdates() {
         maxIdleTime = (IDLE_TIME / upgradeHolder.getSpeedModifier()).toInt()
         if (timePassed > maxIdleTime) timePassed = maxIdleTime
-    }
-    
-    override fun handleInitialized(first: Boolean) {
-        super.handleInitialized(first)
-        
-        fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID.salt(uuid.toString()), "AutoFisher")
     }
     
     override fun handleTick() {

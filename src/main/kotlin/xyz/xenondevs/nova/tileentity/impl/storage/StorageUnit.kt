@@ -40,7 +40,6 @@ class StorageUnit(
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
     private val outputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleOutputInventoryUpdate) }
     
-    
     private fun handleInputInventoryUpdate(event: ItemUpdateEvent) {
         if (event.isAdd && inventory.type != null && !inventory.type!!.isSimilar(event.newItemStack))
             event.isCancelled = true
@@ -56,7 +55,7 @@ class StorageUnit(
             inventory.amount -= event.removedAmount
             if (inventory.amount == 0) inventory.type = null
             
-            runTaskLater(1) { if (gui.isInitialized()) gui.value.updateWindows() }
+            runTaskLater(1) { if (gui.isInitialized()) gui.value.update() }
         }
     }
     
@@ -65,11 +64,6 @@ class StorageUnit(
             outputInventory.setItemStack(SELF_UPDATE_REASON, 0, null)
         else
             outputInventory.setItemStack(SELF_UPDATE_REASON, 0, inventory.type!!.apply { amount = min(type.maxStackSize, inventory.amount) })
-    }
-    
-    override fun handleInitialized(first: Boolean) {
-        super.handleInitialized(first)
-        if (gui.isInitialized()) gui.value.updateWindows()
     }
     
     override fun handleTick() {
@@ -108,10 +102,15 @@ class StorageUnit(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        fun updateWindows() {
+        init {
+            update()
+        }
+        
+        fun update() {
             storageUnitDisplay.notifyWindows()
             updateOutputSlot()
         }
+        
     }
     
     
@@ -142,7 +141,7 @@ class StorageUnit(
                 } else remaining = item.clone().also { amount -= leeway }  // Not all items fit so a few will remain
             } else remaining = item // The item isn't the same as the one stored in the unit
             
-            if (gui.isInitialized()) gui.value.updateWindows()
+            if (gui.isInitialized()) gui.value.update()
             return remaining
         }
         
@@ -152,7 +151,7 @@ class StorageUnit(
                 type = item
             
             if (amount == 0) type = null
-            if (gui.isInitialized()) gui.value.updateWindows()
+            if (gui.isInitialized()) gui.value.update()
         }
     }
     

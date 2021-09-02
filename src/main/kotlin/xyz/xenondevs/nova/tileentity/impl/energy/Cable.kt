@@ -58,10 +58,7 @@ open class Cable(
     override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     
-    private var filterInventoriesInitialized = false
-    private val filterInventories by lazy {
-        filterInventoriesInitialized = true
-        
+    private val filterInventories = lazy {
         mapOf(
             ItemConnectionType.INSERT to
                 CUBE_FACES.associateWith { getInventory("filter_insert_$it", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate) },
@@ -79,17 +76,20 @@ open class Cable(
     }
     
     override fun handleNetworkUpdate() {
-        if (isValid) {
-            if (NOVA.isEnabled) {
-                multiModel.replaceModels(getModelsNeeded())
-                updateHeadStack()
-                updateHitbox()
-            }
+        // assume that we have NetworkManager.LOCK
+        if (isValid && NOVA.isEnabled) {
+            multiModel.replaceModels(getModelsNeeded())
+            updateHeadStack()
+            // !! Needs to be run in the server thread (updating blocks)
+            // !! Also needs to be synchronized with NetworkManager as connectedNodes are retrieved
+            // This is not using a simple synchronized call as it would (in the worst case) block the main thread
+            // until all other tasks accessing the NetworkManager have run, defeating the purpose of doing this async.
+            runSyncTaskWhenUnlocked(NetworkManager.LOCK, ::updateHitbox)
         }
     }
     
     override fun handleInitialized(first: Boolean) {
-        NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+        runAsyncTask { NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES) }
     }
     
     override fun handleHitboxPlaced() {
@@ -101,8 +101,8 @@ open class Cable(
         NetworkManager.handleBridgeRemove(this, unload)
         hitboxes.forEach { it.remove() }
         
-        if (!unload && filterInventoriesInitialized) {
-            filterInventories.values
+        if (!unload && filterInventories.isInitialized()) {
+            filterInventories.value.values
                 .flatMap { it.values.toList() }
                 .flatMap { it.windows }
                 .mapNotNull { it.currentViewer }
@@ -111,7 +111,9 @@ open class Cable(
     }
     
     override fun getFilter(type: ItemConnectionType, blockFace: BlockFace) =
-        filterInventories[type]?.get(blockFace)?.getItemStack(0)?.getFilterConfig()
+        if (filterInventories.isInitialized())
+            filterInventories.value[type]?.get(blockFace)?.getItemStack(0)?.getFilterConfig()
+        else null
     
     private fun handleFilterInventoryUpdate(event: ItemUpdateEvent) {
         if (event.newItemStack != null && event.newItemStack?.novaMaterial != NovaMaterialRegistry.ITEM_FILTER)
@@ -268,8 +270,8 @@ open class Cable(
         CableItemConfigGUI(
             itemHolder,
             face.oppositeFace,
-            filterInventories[ItemConnectionType.INSERT]!![face]!!,
-            filterInventories[ItemConnectionType.EXTRACT]!![face]!!
+            filterInventories.value[ItemConnectionType.INSERT]!![face]!!,
+            filterInventories.value[ItemConnectionType.EXTRACT]!![face]!!
         ).openWindow(event.player)
     }
     

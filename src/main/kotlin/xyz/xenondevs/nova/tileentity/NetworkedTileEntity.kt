@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.actualDelegate
+import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
@@ -41,7 +42,7 @@ abstract class NetworkedTileEntity(
     }
     
     override fun handleInitialized(first: Boolean) {
-        NetworkManager.handleEndPointAdd(this)
+        runAsyncTask { NetworkManager.handleEndPointAdd(this) }
     }
     
     override fun handleRemoved(unload: Boolean) {

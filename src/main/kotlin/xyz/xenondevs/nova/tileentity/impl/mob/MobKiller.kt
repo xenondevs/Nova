@@ -7,7 +7,6 @@ import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.entity.Mob
-import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -58,6 +57,7 @@ class MobKiller(
     override val gui = lazy { MobCrusherGUI() }
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_DAMAGE, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
+    private val fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID, "Mob Killer").bukkitEntity
     
     private var timePassed = 0
     private var maxIdleTime = 0
@@ -69,8 +69,6 @@ class MobKiller(
             if (gui.isInitialized()) gui.value.updateRangeItems()
         }
     private lateinit var region: Region
-    
-    private lateinit var fakePlayer: Player
     
     init {
         handleUpgradeUpdates()
@@ -93,12 +91,6 @@ class MobKiller(
     private fun updateRegion() {
         region = getBlockFrontRegion(range, range, 4, -1)
         VisualRegion.updateRegion(uuid, region)
-    }
-    
-    override fun handleInitialized(first: Boolean) {
-        super.handleInitialized(first)
-        
-        fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID, "Mob Killer").bukkitEntity
     }
     
     override fun handleTick() {

@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.NOVA
+import java.util.concurrent.locks.ReentrantLock
 
 fun runTaskLater(delay: Long, run: () -> Unit) =
     Bukkit.getScheduler().runTaskLater(NOVA, run, delay)
@@ -20,3 +21,7 @@ fun runAsyncTaskLater(delay: Long, run: () -> Unit) =
 
 fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit) =
     Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA, run, delay, period)
+
+fun runSyncTaskWhenUnlocked(lock: ReentrantLock, run: () -> Unit) {
+    runTaskLater(1) { if (!lock.tryLockAndRun(run)) runSyncTaskWhenUnlocked(lock, run) }
+}
