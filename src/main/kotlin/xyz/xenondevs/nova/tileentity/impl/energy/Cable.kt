@@ -5,6 +5,7 @@ import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import org.bukkit.Axis
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Orientable
 import org.bukkit.event.block.BlockBreakEvent
@@ -125,7 +126,7 @@ open class Cable(
         super.handleRemoved(unload)
         NetworkManager.handleBridgeRemove(this, unload)
         hitboxes.forEach { it.remove() }
-    
+        
         if (!unload) configGUIs.values.forEach(CableItemConfigGUI::closeForAllViewers)
     }
     
@@ -153,7 +154,7 @@ open class Cable(
             .filter { val node = it.value; node is NetworkEndPoint && node.holders.contains(ITEMS) }
             .forEach { (blockFace, node) ->
                 val itemHolder = (node as NetworkEndPoint).holders[ITEMS] as ItemHolder
-    
+                
                 val attachmentIndex = when (itemHolder.itemConfig[blockFace.oppositeFace]
                     ?: ItemConnectionType.NONE) {
                     ItemConnectionType.INSERT -> 0
@@ -165,7 +166,7 @@ open class Cable(
                     BlockFace.UP -> 2
                     else -> 0
                 }
-    
+                
                 val itemStack = material.block!!.createItemStack(ATTACHMENTS[attachmentIndex])
                 items += itemStack to getRotation(blockFace)
             }
@@ -197,15 +198,8 @@ open class Cable(
     
     private fun createCableHitboxes() {
         CUBE_FACES.forEach { blockFace ->
-            val pointA: Point3D
-            val pointB: Point3D
-            if (connectedNodes.values.any { it.containsKey(blockFace) }) {
-                pointA = Point3D(0.3, 0.3, 0.0)
-                pointB = Point3D(0.7, 0.7, 0.5)
-            } else {
-                pointA = Point3D(0.3, 0.3, 0.3)
-                pointB = Point3D(0.7, 0.7, 0.5)
-            }
+            val pointA = Point3D(0.3, 0.3, 0.0)
+            val pointB = Point3D(0.7, 0.7, 0.5)
             
             val origin = Point3D(0.5, 0.5, 0.5)
             
@@ -261,25 +255,23 @@ open class Cable(
     
     private fun updateBlockHitbox() {
         val block = location.block
-        if (block.type != material.hitboxType) return
         
         val neighborFaces = connectedNodes.flatMapTo(HashSet()) { it.value.keys }
         val axis = when {
             neighborFaces.contains(BlockFace.EAST) && neighborFaces.contains(BlockFace.WEST) -> Axis.X
             neighborFaces.contains(BlockFace.NORTH) && neighborFaces.contains(BlockFace.SOUTH) -> Axis.Z
             neighborFaces.contains(BlockFace.UP) && neighborFaces.contains(BlockFace.DOWN) -> Axis.Y
-            else -> {
-                connectedNodes.values
-                    .mapNotNull { faceMap -> faceMap.keys.firstOrNull() }
-                    .firstOrNull()
-                    ?.axis
-                    ?: Axis.X
-            }
+            else -> null
         }
-    
-        val blockData = block.blockData as Orientable
-        blockData.axis = axis
-        block.setBlockData(blockData, false)
+        
+        if (axis != null) {
+            block.type = Material.CHAIN
+            val blockData = block.blockData as Orientable
+            blockData.axis = axis
+            block.setBlockData(blockData, false)
+        } else {
+            block.type = Material.STRUCTURE_VOID
+        }
     }
     
     private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemHolder: ItemHolder) {
