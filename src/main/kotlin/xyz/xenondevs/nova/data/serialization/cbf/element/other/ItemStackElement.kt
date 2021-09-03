@@ -6,7 +6,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 
-class ItemStackElement(override val value: ItemStack) : BackedElement<ItemStack> {
+class ItemStackElement(override val value: ItemStack) : BackedElement<ItemStack>() {
+    
     override fun getTypeId() = 22
     
     override fun write(buf: ByteBuf) {

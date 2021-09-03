@@ -6,7 +6,8 @@ import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 import xyz.xenondevs.nova.util.data.readString
 import xyz.xenondevs.nova.util.data.writeString
 
-class StringArrayElement(override val value: Array<String>) : BackedElement<Array<String>> {
+class StringArrayElement(override val value: Array<String>) : BackedElement<Array<String>>() {
+    
     override fun getTypeId() = 16
     
     override fun write(buf: ByteBuf) {
@@ -18,6 +19,15 @@ class StringArrayElement(override val value: Array<String>) : BackedElement<Arra
     override fun toString(): String {
         return value.contentToString()
     }
+    
+    override fun equals(other: Any?): Boolean {
+        return other is StringArrayElement && value.contentEquals(other.value)
+    }
+    
+    override fun hashCode(): Int {
+        return value.contentHashCode()
+    }
+    
 }
 
 object StringArrayDeserializer : BinaryDeserializer<StringArrayElement> {

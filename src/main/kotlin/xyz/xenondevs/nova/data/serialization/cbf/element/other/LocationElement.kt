@@ -8,7 +8,8 @@ import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 import java.util.*
 
-class LocationElement(override val value: Location) : BackedElement<Location> {
+class LocationElement(override val value: Location) : BackedElement<Location>() {
+    
     override fun getTypeId() = 23
     
     override fun write(buf: ByteBuf) {

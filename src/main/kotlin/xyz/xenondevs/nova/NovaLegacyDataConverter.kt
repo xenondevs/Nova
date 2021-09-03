@@ -16,8 +16,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
-import xyz.xenondevs.nova.data.serialization.cbf.Element
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.toElement
@@ -65,7 +63,7 @@ object NovaLegacyDataConverter : Listener {
         LOGGER.info("Initializing LegacyDataConverter")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::convertChunk)
-        if(IS_VERSION_CHANGE)
+        if (IS_VERSION_CHANGE)
             PermanentStorage.remove("placedTileEntities")
         
         NOVA.disableHandlers += {
@@ -174,8 +172,8 @@ object NovaLegacyDataConverter : Listener {
         if (inventories != null) convertedData.putElement("inventories", inventories.toElement(UUID::class))
         if (energyConfig != null) convertedData.putElement("energyConfig", energyConfig.toElement(EnergyConnectionType::class))
         if (bridgeFaces != null) {
-            val listElement = ListElement<Element>()
-            bridgeFaces.forEach { listElement.add(BackedElement.createElement(it)) }
+            val listElement = ListElement()
+            bridgeFaces.forEach { listElement.add(it) }
             convertedData.putElement("bridgeFaces", listElement)
         }
         

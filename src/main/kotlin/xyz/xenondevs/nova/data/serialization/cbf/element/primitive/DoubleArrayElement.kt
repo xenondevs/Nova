@@ -4,7 +4,8 @@ import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 
-class DoubleArrayElement(override val value: DoubleArray) : BackedElement<DoubleArray> {
+class DoubleArrayElement(override val value: DoubleArray) : BackedElement<DoubleArray>() {
+    
     override fun getTypeId() = 15
     
     override fun write(buf: ByteBuf) {
@@ -16,6 +17,15 @@ class DoubleArrayElement(override val value: DoubleArray) : BackedElement<Double
     override fun toString(): String {
         return value.contentToString()
     }
+    
+    override fun equals(other: Any?): Boolean {
+        return other is DoubleArrayElement && value.contentEquals(other.value)
+    }
+    
+    override fun hashCode(): Int {
+        return value.contentHashCode()
+    }
+    
 }
 
 object DoubleArrayDeserializer : BinaryDeserializer<DoubleArrayElement> {

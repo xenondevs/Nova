@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.data.readString
 import xyz.xenondevs.nova.util.data.writeString
 import java.util.*
 
-class UpgradesElement(override val value: EnumMap<UpgradeType, Int>) : BackedElement<EnumMap<UpgradeType, Int>> {
+class UpgradesElement(override val value: EnumMap<UpgradeType, Int>) : BackedElement<EnumMap<UpgradeType, Int>>() {
     
     override fun getTypeId() = 25
     

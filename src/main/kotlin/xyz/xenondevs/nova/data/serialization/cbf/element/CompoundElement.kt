@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.data.readString
 import xyz.xenondevs.nova.util.data.toByteArray
 import xyz.xenondevs.nova.util.data.writeString
 
-class CompoundElement : BackedElement<CompoundElement> {
+class CompoundElement : BackedElement<CompoundElement>() {
     
     override val value = this
     private val elements = HashMap<String, Element>()
@@ -46,6 +46,8 @@ class CompoundElement : BackedElement<CompoundElement> {
     
     @Suppress("UNCHECKED_CAST") // Not the compounds responsibility
     fun <T : Element> getElement(key: String) = elements[key] as T?
+    
+    fun <T : Element> getAssertedElement(key: String) = getElement<T>(key)!!
     
     @Suppress("UNCHECKED_CAST") // Not the compounds responsibility
     inline fun <reified T> get(key: String): T? {

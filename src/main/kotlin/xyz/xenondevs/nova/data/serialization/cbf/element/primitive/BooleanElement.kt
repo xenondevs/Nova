@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 
-class BooleanElement(override val value: Boolean) : BackedElement<Boolean> {
+class BooleanElement(override val value: Boolean) : BackedElement<Boolean>() {
     
     override fun getTypeId() = 1
     

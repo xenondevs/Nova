@@ -6,7 +6,8 @@ import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 import xyz.xenondevs.nova.util.data.readString
 import xyz.xenondevs.nova.util.data.writeString
 
-class StringElement(override val value: String) : BackedElement<String> {
+class StringElement(override val value: String) : BackedElement<String>() {
+    
     override fun getTypeId() = 8
     
     override fun write(buf: ByteBuf) {

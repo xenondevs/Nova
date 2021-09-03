@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 import xyz.xenondevs.nova.util.data.writeByte
 
-class ByteElement(override val value: Byte) : BackedElement<Byte> {
+class ByteElement(override val value: Byte) : BackedElement<Byte>() {
     
     override fun getTypeId() = 2
     

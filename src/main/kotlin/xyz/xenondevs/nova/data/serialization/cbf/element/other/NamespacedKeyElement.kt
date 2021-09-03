@@ -7,7 +7,8 @@ import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 import xyz.xenondevs.nova.util.data.readString
 import xyz.xenondevs.nova.util.data.writeString
 
-class NamespacedKeyElement(override val value: NamespacedKey) : BackedElement<NamespacedKey> {
+class NamespacedKeyElement(override val value: NamespacedKey) : BackedElement<NamespacedKey>() {
+    
     override fun getTypeId() = 24
     
     override fun write(buf: ByteBuf) {

@@ -20,8 +20,17 @@ interface Element {
     
 }
 
-interface BackedElement<T> : Element {
-    val value: T
+abstract class BackedElement<T> : Element {
+    
+    abstract val value: T
+    
+    override fun equals(other: Any?): Boolean {
+        return other is BackedElement<*> && value == other.value
+    }
+    
+    override fun hashCode(): Int {
+        return value?.hashCode() ?: 0
+    }
     
     companion object BackedElementRegistry {
         
@@ -46,7 +55,6 @@ interface BackedElement<T> : Element {
             CraftItemStack::class to ::ItemStackElement,
             Location::class to ::LocationElement,
             NamespacedKey::class to ::NamespacedKeyElement,
-            Array<ItemStack>::class to ::ItemStackArrayElement,
             CompoundElement::class to ::returnSelf,
         )
         

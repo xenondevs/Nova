@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.data.serialization
 
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
-import xyz.xenondevs.nova.data.serialization.cbf.Element
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.EnumMapElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
@@ -103,13 +101,13 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
     
     //endregion
     
-    //region Collection data retrieval
+    // region Collection data retrieval
     
     /**
      * Retrieves a [ListElement] and maps Its values to the given [destination][dest]
      */
     inline fun <reified T, C : MutableCollection<in T>> retrieveCollectionOrNull(key: String, dest: C): C? {
-        val listElement = data.getElement<ListElement<Element>>(key) ?: return null
+        val listElement = data.getElement<ListElement>(key) ?: return null
         return listElement.toCollection(dest)
     }
     
@@ -117,13 +115,13 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
      * Retrieves a [ListElement] and maps Its values to enum constants and adds them the given [destination][dest]
      */
     inline fun <reified E : Enum<E>, C : MutableCollection<in E>> retrieveEnumCollectionOrNull(key: String, dest: C): C? {
-        val listElement = data.getElement<ListElement<Element>>(key) ?: return null
+        val listElement = data.getElement<ListElement>(key) ?: return null
         return listElement.toEnumCollection(dest)
     }
     
-    //endregion
+    // endregion
     
-    //region Data storage
+    // region Data storage
     
     /**
      * Serializes objects using CBF and stores them under the given key in
@@ -158,11 +156,11 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
      * Serializes [Collections][Collection] using CBF and stores them in the [data] [CompoundElement]
      */
     inline fun <reified V> storeList(key: String, list: Collection<V>) {
-        val listElement = ListElement<Element>()
-        list.forEach { listElement.add(BackedElement.createElement(it!!)) }
+        val listElement = ListElement()
+        list.forEach { listElement.add(it) }
         data.putElement(key, listElement)
     }
     
-    //endregion
+    // endregion
     
 }

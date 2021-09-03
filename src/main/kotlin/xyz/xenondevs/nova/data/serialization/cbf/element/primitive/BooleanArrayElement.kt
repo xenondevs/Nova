@@ -3,8 +3,10 @@ package xyz.xenondevs.nova.data.serialization.cbf.element.primitive
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
+import java.util.*
 
-class BooleanArrayElement(override val value: BooleanArray) : BackedElement<BooleanArray> {
+class BooleanArrayElement(override val value: BooleanArray) : BackedElement<BooleanArray>() {
+    
     override fun getTypeId() = 9
     
     override fun write(buf: ByteBuf) {
@@ -15,6 +17,14 @@ class BooleanArrayElement(override val value: BooleanArray) : BackedElement<Bool
     
     override fun toString(): String {
         return value.contentToString()
+    }
+    
+    override fun equals(other: Any?): Boolean {
+        return other is BooleanArrayElement && value.contentEquals(other.value)
+    }
+    
+    override fun hashCode(): Int {
+        return value.contentHashCode()
     }
     
 }

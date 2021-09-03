@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 
-class IntElement(override val value: Int) : BackedElement<Int> {
+class IntElement(override val value: Int) : BackedElement<Int>() {
     
     override fun getTypeId() = 3
     

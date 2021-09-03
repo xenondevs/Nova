@@ -5,7 +5,8 @@ import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 import java.util.*
 
-class UUIDElement(override val value: UUID) : BackedElement<UUID> {
+class UUIDElement(override val value: UUID) : BackedElement<UUID>() {
+    
     override fun getTypeId() = 21
     
     override fun write(buf: ByteBuf) {
