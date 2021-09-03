@@ -5,11 +5,13 @@ import com.mojang.brigadier.context.CommandContext
 import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import xyz.xenondevs.nova.command.*
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
@@ -37,6 +39,8 @@ object NovaCommand : PlayerCommand("nova") {
                 .then(literal("removeTileEntities")
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching { removeTileEntities(it) }))
+                .then(literal("getTileEntityData")
+                    .executesCatching { showTileEntityData(it) })
                 .then(literal("energyNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
                 .then(literal("itemNet")
@@ -73,6 +77,35 @@ object NovaCommand : PlayerCommand("nova") {
             "command.nova.remove_tile_entities.success",
             coloredText(ChatColor.AQUA, tileEntities.count())
         ))
+    }
+    
+    private fun showTileEntityData(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        
+        fun sendFailure() = player.spigot().sendMessage(localized(
+            ChatColor.RED,
+            "command.nova.show_tile_entity_data.failure"
+        ))
+        
+        fun sendSuccess(name: String, data: CompoundElement) = player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.show_tile_entity_data.success",
+            localized(ChatColor.AQUA, name),
+            coloredText(ChatColor.WHITE, data.toString())
+        ))
+        
+        val location = player.getTargetBlockExact(8)?.location
+        if (location != null) {
+            val tileEntity = TileEntityManager.getTileEntityAt(location, true)
+            if (tileEntity != null) {
+                sendSuccess(tileEntity.material.localizedName, tileEntity.data)
+            } else {
+                val vanillaTileEntity = VanillaTileEntityManager.getTileEntityAt(location)
+                if (vanillaTileEntity != null) sendSuccess(vanillaTileEntity.type.name, vanillaTileEntity.data)
+                else sendFailure()
+            }
+        } else sendFailure()
+        
     }
     
     private fun toggleNetworkDebugging(type: NetworkType, ctx: CommandContext<CommandSourceStack>) {
