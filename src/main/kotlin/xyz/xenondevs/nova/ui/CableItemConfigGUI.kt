@@ -41,6 +41,10 @@ class CableItemConfigGUI(
         SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.cable_config")), gui).show()
     }
     
+    fun closeForAllViewers() {
+        gui.closeForAllViewers()
+    }
+    
     private fun updateState(run: () -> Unit) {
         NetworkManager.handleEndPointRemove(itemHolder.endPoint, false)
         run()

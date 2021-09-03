@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.*
 import xyz.xenondevs.nova.data.serialization.cbf.element.primitive.*
 import java.util.*
@@ -45,7 +46,8 @@ interface BackedElement<T> : Element {
             CraftItemStack::class to ::ItemStackElement,
             Location::class to ::LocationElement,
             NamespacedKey::class to ::NamespacedKeyElement,
-            Array<ItemStack>::class to ::ItemStackArrayElement
+            Array<ItemStack>::class to ::ItemStackArrayElement,
+            CompoundElement::class to ::returnSelf,
         )
         
         @Suppress("UNCHECKED_CAST")
@@ -67,6 +69,8 @@ interface BackedElement<T> : Element {
                 ?: throw IllegalArgumentException("Couldn't find BackedElement type for $clazz")
             return constructor.call(value) as BackedElement<T>
         }
+        
+        fun returnSelf(element: BackedElement<*>) = element
         
     }
     

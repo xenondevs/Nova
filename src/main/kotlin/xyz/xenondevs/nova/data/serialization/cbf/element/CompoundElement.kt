@@ -10,8 +10,9 @@ import xyz.xenondevs.nova.util.data.readString
 import xyz.xenondevs.nova.util.data.toByteArray
 import xyz.xenondevs.nova.util.data.writeString
 
-class CompoundElement : Element {
+class CompoundElement : BackedElement<CompoundElement> {
     
+    override val value = this
     private val elements = HashMap<String, Element>()
     
     override fun getTypeId() = 18

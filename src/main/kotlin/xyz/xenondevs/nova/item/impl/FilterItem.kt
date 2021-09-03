@@ -36,14 +36,13 @@ fun ItemStack.getFilterConfig(): ItemFilter? {
     return if (container.has(ITEM_FILTER_KEY, CompoundElementDataType))
         ItemFilter(container.get(ITEM_FILTER_KEY, CompoundElementDataType)!!)
     else if (container.has(LEGACY_ITEM_FILTER_KEY, JsonElementDataType))
-        GSON.fromJson(itemMeta!!.persistentDataContainer.get(LEGACY_ITEM_FILTER_KEY, JsonElementDataType))
+        GSON.fromJson(container.get(LEGACY_ITEM_FILTER_KEY, JsonElementDataType))
     else null
 }
 
 fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     val itemMeta = itemMeta!!
     itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, CompoundElementDataType, itemFilter.compound)
-    println("saving filter config: ${itemFilter.compound}")
     setItemMeta(itemMeta)
 }
 
