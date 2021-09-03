@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.util.data.writeString
 import java.util.*
 
 class UpgradesElement(override val value: EnumMap<UpgradeType, Int>) : BackedElement<EnumMap<UpgradeType, Int>> {
+    
     override fun getTypeId() = 25
     
     override fun write(buf: ByteBuf) {
@@ -20,6 +21,11 @@ class UpgradesElement(override val value: EnumMap<UpgradeType, Int>) : BackedEle
             }
         }
     }
+    
+    override fun toString(): String {
+        return value.toString()
+    }
+    
 }
 
 object UpgradesDeserializer : BinaryDeserializer<UpgradesElement> {
