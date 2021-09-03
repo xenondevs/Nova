@@ -5,10 +5,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.serialization.cbf.element.other.ItemStackElement
-import xyz.xenondevs.nova.data.serialization.cbf.element.other.LocationElement
-import xyz.xenondevs.nova.data.serialization.cbf.element.other.NamespacedKeyElement
-import xyz.xenondevs.nova.data.serialization.cbf.element.other.UUIDElement
+import xyz.xenondevs.nova.data.serialization.cbf.element.other.*
 import xyz.xenondevs.nova.data.serialization.cbf.element.primitive.*
 import java.util.*
 import kotlin.reflect.KClass
@@ -47,7 +44,8 @@ interface BackedElement<T> : Element {
             ItemStack::class to ::ItemStackElement,
             CraftItemStack::class to ::ItemStackElement,
             Location::class to ::LocationElement,
-            NamespacedKey::class to ::NamespacedKeyElement
+            NamespacedKey::class to ::NamespacedKeyElement,
+            Array<ItemStack>::class to ::ItemStackArrayElement
         )
         
         @Suppress("UNCHECKED_CAST")
