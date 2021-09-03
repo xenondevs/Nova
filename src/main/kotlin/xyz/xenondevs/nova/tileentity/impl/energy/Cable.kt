@@ -70,7 +70,7 @@ open class Cable(
     init {
         // Convert legacy virtual inventories holding the filter items to ItemFilter configs
         val manager = VirtualInventoryManager.getInstance()
-        fun VirtualInventory.toFilterConfig() = getItemStack(0).getFilterConfig()
+        fun VirtualInventory.toFilterConfig(): ItemFilter? = getItemStack(0)?.getFilterConfig()
         
         CUBE_FACES.associateWithTo(emptyEnumMap()) {
             manager.getByUuid(uuid.salt("filter_insert_$it"))
@@ -124,7 +124,10 @@ open class Cable(
     
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
-        NetworkManager.handleBridgeRemove(this, unload)
+        
+        val task = { NetworkManager.handleBridgeRemove(this, unload) }
+        if (NOVA.isEnabled) runAsyncTask(task) else task()
+        
         hitboxes.forEach { it.remove() }
         
         if (!unload) configGUIs.values.forEach(CableItemConfigGUI::closeForAllViewers)

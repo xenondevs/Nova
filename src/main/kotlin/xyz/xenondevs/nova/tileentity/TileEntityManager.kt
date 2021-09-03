@@ -34,6 +34,8 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.decompress
 import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
+import xyz.xenondevs.nova.world.armorstand.pos
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -65,8 +67,8 @@ val Material?.requiresLight: Boolean
 
 object TileEntityManager : Listener {
     
-    private val tileEntityMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
-    private val additionalHitboxMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
+    private val tileEntityMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
+    private val additionalHitboxMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
     private val locationCache = HashSet<Location>()
     val tileEntities: List<TileEntity>
         get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
@@ -76,17 +78,20 @@ object TileEntityManager : Listener {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkLoad)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkUnload) }
-        runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
+        runTaskTimer(0, 1) { synchronized(this) { tileEntities.forEach(TileEntity::handleTick) } }
         
         runTaskTimer(0, 1200) {
-            // In some special cases no event is called when replacing a block. So we check for air blocks every minute.
-            tileEntities.associateWith(TileEntity::location).forEach { (tileEntity, location) ->
-                if (Material.AIR == location.block.type)
-                    destroyTileEntity(tileEntity, false)
+            synchronized(this) {
+                // In some special cases no event is called when replacing a block. So we check for air blocks every minute.
+                tileEntities.associateWith(TileEntity::location).forEach { (tileEntity, location) ->
+                    if (Material.AIR == location.block.type)
+                        destroyTileEntity(tileEntity, false)
+                }
             }
         }
     }
     
+    @Synchronized
     fun placeTileEntity(
         ownerUUID: UUID,
         location: Location,
@@ -114,7 +119,7 @@ object TileEntityManager : Listener {
         )
         
         // add to tileEntities map
-        val chunkMap = tileEntityMap.getOrPut(chunk) { HashMap() }
+        val chunkMap = tileEntityMap.getOrPut(chunk.pos) { HashMap() }
         chunkMap[location] = tileEntity
         
         // add to location cache
@@ -138,15 +143,16 @@ object TileEntityManager : Listener {
     private fun calculateTileEntityYaw(material: NovaMaterial, playerYaw: Float): Float =
         if (material.isDirectional) ((playerYaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f
     
+    @Synchronized
     fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
         val location = tileEntity.location
-        val chunk = location.chunk
+        val chunkPos = location.chunkPos
         
         // remove TileEntity and ArmorStand
-        tileEntityMap[chunk]?.remove(location)
+        tileEntityMap[chunkPos]?.remove(location)
         locationCache -= location
         tileEntity.additionalHitboxes.forEach {
-            tileEntityMap[it.chunk]?.remove(it)
+            tileEntityMap[it.chunkPos]?.remove(it)
             locationCache -= it
         }
         
@@ -167,6 +173,7 @@ object TileEntityManager : Listener {
         return drops
     }
     
+    @Synchronized
     fun destroyAndDropTileEntity(tileEntity: TileEntity, dropItems: Boolean) {
         val drops = destroyTileEntity(tileEntity, dropItems)
         
@@ -174,23 +181,27 @@ object TileEntityManager : Listener {
         runTaskLater(1) { tileEntity.location.dropItems(drops) }
     }
     
+    @Synchronized
     fun getTileEntityAt(location: Location, additionalHitboxes: Boolean = true): TileEntity? {
-        val chunk = location.chunk
-        return tileEntityMap[chunk]?.get(location)
-            ?: if (additionalHitboxes) additionalHitboxMap[chunk]?.get(location) else null
+        val chunkPos = location.chunkPos
+        return tileEntityMap[chunkPos]?.get(location)
+            ?: if (additionalHitboxes) additionalHitboxMap[chunkPos]?.get(location) else null
     }
     
-    fun getTileEntitiesInChunk(chunk: Chunk) = tileEntityMap[chunk]?.values?.toList() ?: emptyList()
+    @Synchronized
+    fun getTileEntitiesInChunk(chunkPos: AsyncChunkPos) = tileEntityMap[chunkPos]?.values?.toList() ?: emptyList()
     
+    @Synchronized
     fun addTileEntityHitboxLocations(tileEntity: TileEntity, locations: List<Location>) {
         locations.forEach {
-            val chunkMap = additionalHitboxMap.getOrPut(it.chunk) { HashMap() }
+            val chunkMap = additionalHitboxMap.getOrPut(it.chunkPos) { HashMap() }
             chunkMap[it] = tileEntity
             
             locationCache += it
         }
     }
     
+    @Synchronized
     private fun handleChunkLoad(chunk: Chunk) {
         asyncTransaction {
             TileEntitiesTable
@@ -218,7 +229,7 @@ object TileEntityManager : Listener {
                             owner
                         )
                         
-                        val chunkMap = tileEntityMap.getOrPut(chunk) { HashMap() }
+                        val chunkMap = tileEntityMap.getOrPut(chunk.pos) { HashMap() }
                         chunkMap[location] = tileEntity
                         
                         locationCache += location
@@ -229,17 +240,20 @@ object TileEntityManager : Listener {
         }
     }
     
+    @Synchronized
     private fun handleChunkUnload(chunk: Chunk) {
         saveChunk(chunk)
         
-        val tileEntities = tileEntityMap[chunk]
-        tileEntityMap -= chunk
+        val chunkPos = chunk.pos
+        val tileEntities = tileEntityMap[chunkPos]
+        tileEntityMap -= chunkPos
         locationCache.removeAll { it.chunk == chunk }
         tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
     }
     
+    @Synchronized
     private fun saveChunk(chunk: Chunk) {
-        val tileEntities = tileEntityMap[chunk]?.values ?: return
+        val tileEntities = tileEntityMap[chunk.pos]?.values ?: return
         
         transaction {
             tileEntities.forEach { tileEntity ->

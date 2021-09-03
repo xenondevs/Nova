@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.util
 
 import java.util.concurrent.locks.ReentrantLock
 
-fun ReentrantLock.tryLockAndRun(run: () -> Unit): Boolean {
+fun ObservableLock.tryLockAndRun(run: () -> Unit): Boolean {
     return if (tryLock()) {
         try {
             run()
@@ -13,11 +13,19 @@ fun ReentrantLock.tryLockAndRun(run: () -> Unit): Boolean {
     } else false
 }
 
-fun ReentrantLock.lockAndRun(run: () -> Unit) {
+fun ObservableLock.lockAndRun(run: () -> Unit) {
     lock()
     try {
         run()
     } finally {
         unlock()
     }
+}
+
+class ObservableLock : ReentrantLock() {
+    
+    public override fun getOwner(): Thread? {
+        return super.getOwner()
+    }
+    
 }

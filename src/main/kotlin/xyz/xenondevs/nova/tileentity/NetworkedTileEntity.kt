@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.network.*
@@ -47,7 +48,8 @@ abstract class NetworkedTileEntity(
     
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
-        NetworkManager.handleEndPointRemove(this, unload)
+        val task = { NetworkManager.handleEndPointRemove(this, unload) }
+        if (NOVA.isEnabled) runAsyncTask(task) else task()
     }
     
 }

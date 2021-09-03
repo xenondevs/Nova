@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
+import xyz.xenondevs.nova.world.armorstand.pos
 
 
 object NovaCommand : PlayerCommand("nova") {
@@ -69,7 +70,7 @@ object NovaCommand : PlayerCommand("nova") {
     private fun removeTileEntities(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
-        val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it) }
+        val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it.pos) }
         tileEntities.forEach { TileEntityManager.destroyTileEntity(it, false) }
         
         player.spigot().sendMessage(localized(

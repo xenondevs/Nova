@@ -5,11 +5,10 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.*
-import java.util.concurrent.locks.ReentrantLock
 
 object NetworkManager {
     
-    val LOCK = ReentrantLock()
+    val LOCK = ObservableLock()
     val networks = ArrayList<Network>()
     
     fun init() {
