@@ -50,8 +50,12 @@ class ListElement : Element {
     
     inline operator fun <reified T : Any> minusAssign(value: T?) = remove(value)
     
-    inline operator fun <reified V : Any> get(index: Int): V {
-        return (list[index] as BackedElement<V>).value
+    inline operator fun <reified T : Any> get(index: Int): T {
+        return (list[index] as BackedElement<T>).value
+    }
+    
+    fun <T : Element> getElement(index: Int): T {
+        return list[index] as T
     }
     
     inline fun <reified V, C : MutableCollection<in V>> toCollection(dest: C): C {
