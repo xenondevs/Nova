@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.ui.CableItemConfigGUI
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.data.plus
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.hitbox.Hitbox
 import xyz.xenondevs.nova.world.point.Point3D
@@ -106,6 +107,18 @@ open class Cable(
         if (isValid && NOVA.isEnabled) {
             multiModel.replaceModels(getModelsNeeded())
             updateHeadStack()
+            
+            configGUIs.forEach { (face, gui) ->
+                if (gui != null) {
+                    val neighbor = connectedNodes[ITEMS]?.get(face)
+                    if (neighbor is NetworkEndPoint && neighbor.holders.contains(ITEMS)) {
+                        val itemHolder = neighbor.holders[ITEMS] as ItemHolder
+                        gui.itemHolder = itemHolder
+                        gui.updateButtons()
+                    } else gui.itemHolder = null
+                }
+            }
+            
             // !! Needs to be run in the server thread (updating blocks)
             // !! Also needs to be synchronized with NetworkManager as connectedNodes are retrieved
             // This is not using a simple synchronized call as it would (in the worst case) block the main thread
@@ -120,6 +133,17 @@ open class Cable(
     
     override fun handleHitboxPlaced() {
         updateBlockHitbox()
+    }
+    
+    override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
+        val items = super.destroy(dropItems)
+        if (dropItems) {
+            (extractFilters.values.stream() + insertFilters.values.stream())
+                .map { it.createFilterItem() }
+                .forEach(items::add)
+        }
+        
+        return items
     }
     
     override fun handleRemoved(unload: Boolean) {
