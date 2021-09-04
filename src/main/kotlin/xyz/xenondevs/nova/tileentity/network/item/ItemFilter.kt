@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 
 class ItemFilter(
     var whitelist: Boolean,
-    val items: Array<ItemStack?>
+    var items: Array<ItemStack?>
 ) {
     
     constructor(compound: CompoundElement) : 
