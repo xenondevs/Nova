@@ -127,7 +127,7 @@ object VanillaTileEntityManager : Listener {
     }
     
     @Synchronized
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handlePlace(event: BlockPlaceEvent) {
         val block = event.block
         val state = block.state
@@ -141,13 +141,13 @@ object VanillaTileEntityManager : Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
         val location = event.block.location
         handleBlockBreak(location)
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handlePhysics(event: BlockPhysicsEvent) {
         val location = event.block.location
         if (event.block.type == Material.AIR) handleBlockBreak(location)

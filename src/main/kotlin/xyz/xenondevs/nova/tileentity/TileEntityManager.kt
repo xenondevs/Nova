@@ -303,46 +303,48 @@ object TileEntityManager : Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePlace(event: BlockPlaceEvent) {
-        val player = event.player
-        val placedItem = event.itemInHand
-        val material = placedItem.novaMaterial
+        val location = event.blockPlaced.location
         
-        if (material != null) {
-            event.isCancelled = true
+        if (getTileEntityAt(location) == null) {
+            val player = event.player
+            val placedItem = event.itemInHand
+            val material = placedItem.novaMaterial
             
-            if (material.isBlock) {
-                val location = event.block.location
-                val playerLocation = player.location
+            if (material != null) {
+                event.isCancelled = true
                 
-                if (getTileEntityAt(location) == null
-                    && material.placeCheck?.invoke(
-                        player,
-                        location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
-                    ) != false
-                ) {
-                    val uuid = player.uniqueId
-                    val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
-                    if (result == PlaceResult.ALLOW) {
-                        placeTileEntity(
-                            uuid,
-                            event.block.location,
-                            playerLocation.yaw,
-                            material,
-                            placedItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
-                        )
-                        
-                        if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
-                    } else {
-                        player.spigot().sendMessage(
-                            localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
-                        )
+                if (material.isBlock) {
+                    val playerLocation = player.location
+                    
+                    if (material.placeCheck?.invoke(
+                            player,
+                            location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
+                        ) != false
+                    ) {
+                        val uuid = player.uniqueId
+                        val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
+                        if (result == PlaceResult.ALLOW) {
+                            placeTileEntity(
+                                uuid,
+                                event.block.location,
+                                playerLocation.yaw,
+                                material,
+                                placedItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
+                            )
+                            
+                            if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
+                        } else {
+                            player.spigot().sendMessage(
+                                localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
+                            )
+                        }
                     }
                 }
             }
-        }
+        } else event.isCancelled = true
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
         val location = event.block.location
         val tileEntity = getTileEntityAt(location)
@@ -397,7 +399,7 @@ object TileEntityManager : Listener {
         if (event.blocks.any { it.location in locationCache }) event.isCancelled = true
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleBlockPhysics(event: BlockPhysicsEvent) {
         val location = event.block.location
         if (location in locationCache && Material.AIR == event.block.type) {
