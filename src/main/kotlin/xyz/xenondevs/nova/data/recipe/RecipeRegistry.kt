@@ -21,6 +21,7 @@ object RecipeRegistry {
         private set
     var USAGE_RECIPES: Map<String, Map<RecipeType, Set<RecipeContainer>>> = HashMap()
         private set
+    var RECIPES_BY_TYPE: Map<RecipeType, List<RecipeContainer>> = HashMap()
     
     fun init() {
         runAsyncTask {
@@ -28,6 +29,7 @@ object RecipeRegistry {
             BUKKIT_RECIPES = loadBukkitRecipes()
             CREATION_RECIPES = loadCreationRecipes()
             USAGE_RECIPES = loadUsageRecipes()
+            RECIPES_BY_TYPE = loadRecipesByType()
             LOGGER.info("Finished initializing recipe registry")
             
             runTask {
@@ -87,6 +89,14 @@ object RecipeRegistry {
             }
         }
         
+        return map
+    }
+    
+    private fun loadRecipesByType(): Map<RecipeType, List<RecipeContainer>> {
+        val map = HashMap<RecipeType, MutableList<RecipeContainer>>()
+        (getBukkitRecipeStream() + getNovaRecipeStream()).forEach {
+            map.getOrPut(RecipeType.of(it)) { ArrayList() } += RecipeContainer(it)
+        }
         return map
     }
     

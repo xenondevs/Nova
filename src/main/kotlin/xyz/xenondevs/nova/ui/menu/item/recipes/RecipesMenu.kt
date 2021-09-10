@@ -24,6 +24,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
+import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeType
@@ -118,6 +119,9 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
             if (clickType == ClickType.LEFT) {
                 currentType = recipeType
                 updateTitle()
+            } else if (clickType == ClickType.RIGHT) {
+                val recipes = RecipeRegistry.RECIPES_BY_TYPE[recipeType]
+                if (recipes != null) RecipesWindow(player, mapOf(recipeType to recipes)).show()
             }
         }
         
