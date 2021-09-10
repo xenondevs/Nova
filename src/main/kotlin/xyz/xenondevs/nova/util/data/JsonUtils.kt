@@ -6,8 +6,7 @@ import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.*
-import xyz.xenondevs.nova.data.serialization.gson.*
+import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.player.attachment.Attachment
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter

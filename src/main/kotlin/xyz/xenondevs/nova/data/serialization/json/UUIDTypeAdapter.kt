@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.serialization.gson
+package xyz.xenondevs.nova.data.serialization.json
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader

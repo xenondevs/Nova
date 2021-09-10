@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.data.recipe
 
 import com.google.gson.JsonObject
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.serialization.gson.*
+import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
 
