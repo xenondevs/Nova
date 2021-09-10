@@ -8,12 +8,13 @@ import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
+import org.bukkit.NamespacedKey
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.recipe.CustomNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -40,7 +41,6 @@ import kotlin.math.max
 
 private val MAX_ENERGY = NovaConfig.getInt("mechanical_press.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("mechanical_press.energy_per_tick")!!
-private val PRESS_TIME = NovaConfig.getInt("mechanical_press.press_time")!!
 private val PRESS_SPEED = NovaConfig.getInt("mechanical_press.speed")!!
 
 enum class PressType {
@@ -66,13 +66,20 @@ class MechanicalPress(
     override val itemHolder = NovaItemHolder(this, inputInv, outputInv)
     
     private var type: PressType = retrieveEnum("pressType") { PressType.PLATE }
-    private var pressTime: Int = retrieveData("pressTime") { 0 }
+    private var timeLeft: Int = retrieveData("pressTime") { 0 }
     private var pressSpeed = 0
     
-    private var currentItem: ItemStack? = retrieveOrNull("currentItem")
+    private var currentRecipe: CustomNovaRecipe? =
+        retrieveOrNull<NamespacedKey>("currentRecipe")?.let {
+            when (type) {
+                PressType.PLATE -> RecipeManager.platePressRecipes[it]
+                PressType.GEAR -> RecipeManager.gearPressRecipes[it]
+            }
+        }
     
     init {
         handleUpgradeUpdates()
+        if (currentRecipe == null) timeLeft = 0
     }
     
     private fun handleUpgradeUpdates() {
@@ -81,14 +88,14 @@ class MechanicalPress(
     
     override fun handleTick() {
         if (energyHolder.energy >= energyHolder.energyConsumption) {
-            if (pressTime == 0) takeItem()
-            if (pressTime != 0) { // is pressing
-                pressTime = max(pressTime - pressSpeed, 0)
+            if (timeLeft == 0) takeItem()
+            if (timeLeft != 0) { // is pressing
+                timeLeft = max(timeLeft - pressSpeed, 0)
                 energyHolder.energy -= energyHolder.energyConsumption
                 
-                if (pressTime == 0) {
-                    outputInv.putItemStack(null, 0, currentItem!!)
-                    currentItem = null
+                if (timeLeft == 0) {
+                    outputInv.putItemStack(null, 0, currentRecipe!!.resultStack)
+                    currentRecipe = null
                 }
                 
                 if (gui.isInitialized()) gui.value.updateProgress()
@@ -99,11 +106,11 @@ class MechanicalPress(
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val outputStack = RecipeManager.getPressOutputFor(inputItem, type)
-            if (outputStack != null && outputInv.simulateAdd(outputStack)[0] == 0) {
+            val recipe = RecipeManager.getPressRecipeFor(inputItem, type)
+            if (recipe != null && outputInv.canHold(recipe.resultStack)) {
                 inputInv.addItemAmount(null, 0, -1)
-                currentItem = outputStack
-                pressTime = PRESS_TIME
+                timeLeft = recipe.time
+                currentRecipe = recipe
             }
         }
     }
@@ -111,7 +118,7 @@ class MechanicalPress(
     private fun handleInputUpdate(event: ItemUpdateEvent) {
         if (event.updateReason != null
             && event.newItemStack != null
-            && RecipeManager.getPressOutputFor(event.newItemStack, type) == null) {
+            && RecipeManager.getPressRecipeFor(event.newItemStack, type) == null) {
             
             event.isCancelled = true
         }
@@ -124,8 +131,8 @@ class MechanicalPress(
     override fun saveData() {
         super.saveData()
         storeData("pressType", type)
-        storeData("pressTime", pressTime)
-        storeData("currentItem", currentItem)
+        storeData("pressTime", timeLeft)
+        storeData("currentRecipe", currentRecipe?.key)
     }
     
     
@@ -166,7 +173,8 @@ class MechanicalPress(
         }
         
         fun updateProgress() {
-            pressProgress.percentage = if (pressTime == 0) 0.0 else (PRESS_TIME - pressTime).toDouble() / PRESS_TIME.toDouble()
+            val recipeTime = currentRecipe?.time ?: 0
+            pressProgress.percentage = if (timeLeft == 0) 0.0 else (recipeTime - timeLeft).toDouble() / recipeTime.toDouble()
         }
         
         private inner class PressTypeItem(private val type: PressType) : BaseItem() {

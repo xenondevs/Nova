@@ -10,7 +10,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
+import xyz.xenondevs.nova.data.recipe.CustomNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
@@ -23,16 +23,16 @@ abstract class ConversionRecipeType : RecipeType() {
             val recipe = holder.recipe as FurnaceRecipe
             createConversionRecipeGUI(recipe.inputChoice, recipe.result, recipe.cookingTime)
         } else {
-            val recipe = holder.recipe as ConversionNovaRecipe
-            createConversionRecipeGUI(recipe.inputStacks, recipe.resultStack)
+            val recipe = holder.recipe as CustomNovaRecipe
+            createConversionRecipeGUI(recipe.inputStacks, recipe.resultStack, recipe.time)
         }
     }
     
     private fun createConversionRecipeGUI(input: RecipeChoice, result: ItemStack, time: Int): GUI =
         createConversionRecipeGUI(createRecipeChoiceItem(input), result, time)
     
-    private fun createConversionRecipeGUI(input: List<ItemStack>, result: ItemStack): GUI =
-        createConversionRecipeGUI(createRecipeChoiceItem(input), result, -1)
+    private fun createConversionRecipeGUI(input: List<ItemStack>, result: ItemStack, time: Int): GUI =
+        createConversionRecipeGUI(createRecipeChoiceItem(input), result, time)
     
     private fun createConversionRecipeGUI(inputUIItem: Item, outputItem: ItemStack, time: Int): GUI {
         val builder = GUIBuilder(GUIType.NORMAL, 9, 3)
@@ -43,13 +43,11 @@ abstract class ConversionRecipeType : RecipeType() {
             .addIngredient('i', inputUIItem)
             .addIngredient('r', createRecipeChoiceItem(listOf(outputItem)))
         
-        if (time != -1) {
-            builder.addIngredient(
-                't', NovaMaterialRegistry.STOPWATCH_ICON
-                .createBasicItemBuilder()
-                .setDisplayName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
-            )
-        }
+        builder.addIngredient(
+            't', NovaMaterialRegistry.STOPWATCH_ICON
+            .createBasicItemBuilder()
+            .setDisplayName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
+        )
         
         return builder.build()
     }

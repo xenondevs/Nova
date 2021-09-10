@@ -12,7 +12,6 @@ import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.impl.processing.PressType
 import xyz.xenondevs.nova.util.customModelData
@@ -42,28 +41,28 @@ object RecipeManager : Listener {
     internal val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
     internal val shapelessRecipes = ArrayList<ShapelessRecipe>()
     
-    internal val recipes = ArrayList<NamespacedKey>()
-    val pulverizerRecipes = ArrayList<PulverizerNovaRecipe>()
-    val platePressRecipes = ArrayList<PlatePressNovaRecipe>()
-    val gearPressRecipes = ArrayList<GearPressNovaRecipe>()
+    internal val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
+    val pulverizerRecipes = HashMap<NamespacedKey, PulverizerNovaRecipe>()
+    val platePressRecipes = HashMap<NamespacedKey, PlatePressNovaRecipe>()
+    val gearPressRecipes = HashMap<NamespacedKey, GearPressNovaRecipe>()
     
     fun registerRecipes() {
         LOGGER.info("Loading recipes")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        NovaConfig.loadRecipes().forEach(NovaRecipe::register)
+        RecipesLoader.loadRecipes().forEach(NovaRecipe::register)
     }
     
-    fun getPulverizerOutputFor(itemStack: ItemStack): ItemStack? =
-        pulverizerRecipes.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }?.resultStack
+    fun getPulverizerRecipeFor(itemStack: ItemStack): PulverizerNovaRecipe? =
+        pulverizerRecipes.values.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }
     
-    fun getPressOutputFor(itemStack: ItemStack, type: PressType): ItemStack? {
-        return if (type == PressType.PLATE) platePressRecipes.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }?.resultStack
-        else gearPressRecipes.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }?.resultStack
+    fun getPressRecipeFor(itemStack: ItemStack, type: PressType): CustomNovaRecipe? {
+        return if (type == PressType.PLATE) platePressRecipes.values.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }
+        else gearPressRecipes.values.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }
     }
     
     @EventHandler
     fun handleJoin(event: PlayerJoinEvent) {
-        recipes.forEach(event.player::discoverRecipe)
+        vanillaRegisteredRecipeKeys.forEach(event.player::discoverRecipe)
     }
     
     @EventHandler

@@ -99,10 +99,10 @@ object RecipeRegistry {
             }
     }
     
-    private fun getNovaRecipeStream(): Stream<out ConversionNovaRecipe> {
-        return (RecipeManager.pulverizerRecipes.stream()
-            + RecipeManager.platePressRecipes.stream()
-            + RecipeManager.gearPressRecipes.stream())
+    private fun getNovaRecipeStream(): Stream<out CustomNovaRecipe> {
+        return (RecipeManager.pulverizerRecipes.values.stream()
+            + RecipeManager.platePressRecipes.values.stream()
+            + RecipeManager.gearPressRecipes.values.stream())
     }
     
     private fun Recipe.getInputStacks(): List<ItemStack> =
@@ -135,7 +135,7 @@ object RecipeRegistry {
 
 class RecipeContainer(val recipe: Any) {
     
-    val result = if (recipe is Recipe) recipe.result else (recipe as ConversionNovaRecipe).resultStack
+    val result = if (recipe is Recipe) recipe.result else (recipe as CustomNovaRecipe).resultStack
     val isCraftingRecipe = recipe is ShapedRecipe || recipe is ShapelessRecipe
     val isSmeltingRecipe = recipe is FurnaceRecipe
     val isPulverizingRecipe = recipe is PulverizerNovaRecipe

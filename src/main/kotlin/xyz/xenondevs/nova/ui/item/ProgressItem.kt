@@ -9,11 +9,11 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import kotlin.math.roundToInt
 
-open class ProgressItem(val material: NovaMaterial, val states: Int) : BaseItem() {
+open class ProgressItem(val material: NovaMaterial, private val states: Int) : BaseItem() {
     
     var percentage: Double = 0.0
         set(value) {
-            field = value
+            field = value.coerceIn(0.0, 1.0)
             notifyWindows()
         }
     

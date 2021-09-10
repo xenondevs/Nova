@@ -1,5 +1,6 @@
 {
   "input": "minecraft:raw_iron",
   "result": "nova:iron_dust",
-  "amount": 2
+  "amount": 2,
+  "time": 200
 }

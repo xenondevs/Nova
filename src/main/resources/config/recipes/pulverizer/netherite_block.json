@@ -1,5 +1,6 @@
 {
   "input": "minecraft:netherite_block",
   "result": "nova:netherite_dust",
-  "amount": 9
+  "amount": 9,
+  "time": 200
 }

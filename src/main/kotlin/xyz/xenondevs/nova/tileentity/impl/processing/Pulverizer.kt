@@ -5,8 +5,9 @@ import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import org.bukkit.inventory.ItemStack
+import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.recipe.PulverizerNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -35,10 +36,8 @@ import java.util.*
 
 private val MAX_ENERGY = NovaConfig.getInt("pulverizer.capacity")!!
 private val ENERGY_PER_TICK = NovaConfig.getInt("pulverizer.energy_per_tick")!!
-private val PULVERIZE_TIME = NovaConfig.getInt("pulverizer.pulverizer_time")!!
 private val PULVERIZE_SPEED = NovaConfig.getInt("pulverizer.speed")!!
 
-// TODO: Make PULVERIZE_TIME recipe dependent
 class Pulverizer(
     uuid: UUID,
     data: CompoundElement,
@@ -56,10 +55,11 @@ class Pulverizer(
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val itemHolder = NovaItemHolder(this, inputInv, outputInv)
     
-    private var pulverizeTime = retrieveData("pulverizerTime") { 0 }
+    private var timeLeft = retrieveData("pulverizerTime") { 0 }
     private var pulverizeSpeed = 0
     
-    private var currentItem: ItemStack? = retrieveOrNull("currentItem")
+    private var currentRecipe: PulverizerNovaRecipe? =
+        retrieveOrNull<NamespacedKey>("currentRecipe")?.let(RecipeManager.pulverizerRecipes::get)
     
     private val particleTask = createParticleTask(listOf(
         particle(ParticleEffect.SMOKE_NORMAL) {
@@ -71,6 +71,7 @@ class Pulverizer(
     
     init {
         handleUpgradeUpdates()
+        if (currentRecipe == null) timeLeft = 0
     }
     
     private fun handleUpgradeUpdates() {
@@ -78,20 +79,20 @@ class Pulverizer(
     }
     
     override fun handleTick() {
-        if (energyHolder.energyConsumption >= energyHolder.energyConsumption) {
-            if (pulverizeTime == 0) {
+        if (energyHolder.energy >= energyHolder.energyConsumption) {
+            if (timeLeft == 0) {
                 takeItem()
                 
                 if (particleTask.isRunning()) particleTask.stop()
             } else {
-                pulverizeTime = max(pulverizeTime - pulverizeSpeed, 0)
+                timeLeft = max(timeLeft - pulverizeSpeed, 0)
                 energyHolder.energy -= energyHolder.energyConsumption
                 
                 if (!particleTask.isRunning()) particleTask.start()
                 
-                if (pulverizeTime == 0) {
-                    outputInv.addItem(null, currentItem)
-                    currentItem = null
+                if (timeLeft == 0) {
+                    outputInv.addItem(null, currentRecipe!!.resultStack)
+                    currentRecipe = null
                 }
                 
                 if (gui.isInitialized()) gui.value.updateProgress()
@@ -103,11 +104,12 @@ class Pulverizer(
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val recipeOutput = RecipeManager.getPulverizerOutputFor(inputItem)!!
-            if (outputInv.simulateAdd(recipeOutput)[0] == 0) {
+            val recipe = RecipeManager.getPulverizerRecipeFor(inputItem)!!
+            val result = recipe.resultStack
+            if (outputInv.canHold(result)) {
                 inputInv.addItemAmount(null, 0, -1)
-                currentItem = recipeOutput
-                pulverizeTime = PULVERIZE_TIME
+                timeLeft = recipe.time
+                currentRecipe = recipe
             }
         }
     }
@@ -115,7 +117,7 @@ class Pulverizer(
     private fun handleInputUpdate(event: ItemUpdateEvent) {
         if (event.updateReason != null
             && event.newItemStack != null
-            && RecipeManager.getPulverizerOutputFor(event.newItemStack) == null) {
+            && RecipeManager.getPulverizerRecipeFor(event.newItemStack) == null) {
             
             event.isCancelled = true
         }
@@ -127,8 +129,8 @@ class Pulverizer(
     
     override fun saveData() {
         super.saveData()
-        storeData("pulverizerTime", pulverizeTime)
-        storeData("currentItem", currentItem)
+        storeData("pulverizerTime", timeLeft)
+        storeData("currentRecipe", currentRecipe?.key)
     }
     
     inner class PulverizerGUI : TileEntityGUI("menu.nova.pulverizer") {
@@ -168,7 +170,8 @@ class Pulverizer(
         }
         
         fun updateProgress() {
-            val percentage = if (pulverizeTime == 0) 0.0 else (PULVERIZE_TIME - pulverizeTime).toDouble() / PULVERIZE_TIME.toDouble()
+            val recipeTime = currentRecipe?.time ?: 0
+            val percentage = if (timeLeft == 0) 0.0 else (recipeTime - timeLeft).toDouble() / recipeTime.toDouble()
             mainProgress.percentage = percentage
             pulverizerProgress.percentage = percentage
         }

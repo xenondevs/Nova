@@ -1,4 +1,5 @@
 {
   "input": "minecraft:netherite_ingot",
-  "result": "nova:netherite_gear"
+  "result": "nova:netherite_gear",
+  "time": 200
 }

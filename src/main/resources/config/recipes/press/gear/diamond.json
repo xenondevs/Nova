@@ -1,4 +1,5 @@
 {
   "input": "minecraft:diamond",
-  "result": "nova:diamond_gear"
+  "result": "nova:diamond_gear",
+  "time": 200
 }

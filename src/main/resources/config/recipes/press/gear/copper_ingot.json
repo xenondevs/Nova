@@ -1,4 +1,5 @@
 {
   "input": "minecraft:copper_ingot",
-  "result": "nova:copper_gear"
+  "result": "nova:copper_gear",
+  "time": 200
 }

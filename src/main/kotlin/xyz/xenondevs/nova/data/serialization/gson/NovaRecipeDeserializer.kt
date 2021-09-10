@@ -1,8 +1,5 @@
 package xyz.xenondevs.nova.data.serialization.gson
 
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Material
@@ -13,7 +10,7 @@ import xyz.xenondevs.nova.data.recipe.*
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.MaterialUtils
 import xyz.xenondevs.nova.util.data.*
-import java.lang.reflect.Type
+import java.io.File
 
 @Suppress("LiftReturnOrAssignment", "CascadeIf")
 private fun getItemBuilder(name: String): ItemBuilder {
@@ -24,13 +21,19 @@ private fun getItemBuilder(name: String): ItemBuilder {
     } else throw IllegalArgumentException("Invalid item name: $name")
 }
 
-object ShapedNovaRecipeDeserializer : JsonDeserializer<ShapedNovaRecipe> {
+private fun getRecipeKey(recipeType: String, file: File): NamespacedKey =
+    NamespacedKey(NOVA, "nova.$recipeType.${file.name}")
+
+interface NovaRecipeDeserializer<T : NovaRecipe> {
     
-    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ShapedNovaRecipe {
-        json as JsonObject
-        
+    fun deserialize(json: JsonObject, file: File): T
+    
+}
+
+object ShapedNovaRecipeDeserializer : NovaRecipeDeserializer<ShapedNovaRecipe> {
+    
+    override fun deserialize(json: JsonObject, file: File): ShapedNovaRecipe {
         val resultKey = json.getString("result")!!
-        val name = json.getString("name") ?: resultKey.split(":")[1]
         
         val resultBuilder = getItemBuilder(resultKey)
         resultBuilder.amount = json.getInt("amount", default = 1)
@@ -43,18 +46,15 @@ object ShapedNovaRecipeDeserializer : JsonDeserializer<ShapedNovaRecipe> {
             ingredients[char] = recipeChoice
         }
         
-        return ShapedNovaRecipe(NamespacedKey(NOVA, "shaped_$name"), resultBuilder, shape, ingredients)
+        return ShapedNovaRecipe(getRecipeKey("shaped", file), resultBuilder, shape, ingredients)
     }
     
 }
 
-object ShapelessNovaRecipeDeserializer : JsonDeserializer<ShapelessNovaRecipe> {
+object ShapelessNovaRecipeDeserializer : NovaRecipeDeserializer<ShapelessNovaRecipe> {
     
-    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ShapelessNovaRecipe {
-        json as JsonObject
-        
+    override fun deserialize(json: JsonObject, file: File): ShapelessNovaRecipe {
         val resultKey = json.getString("result")!!
-        val name = json.getString("name") ?: resultKey.split(":")[1]
         
         val resultBuilder = getItemBuilder(resultKey)
         resultBuilder.amount = json.getInt("amount", default = 1)
@@ -65,34 +65,31 @@ object ShapelessNovaRecipeDeserializer : JsonDeserializer<ShapelessNovaRecipe> {
                 MaterialUtils.getRecipeChoice(key) to value.asInt
             }
         
-        return ShapelessNovaRecipe(NamespacedKey(NOVA, "shapeless_$name"), resultBuilder, ingredients)
+        return ShapelessNovaRecipe(getRecipeKey("shapeless", file), resultBuilder, ingredients)
     }
     
 }
 
-object FurnaceNovaRecipeDeserializer : JsonDeserializer<FurnaceNovaRecipe> {
+object FurnaceNovaRecipeDeserializer : NovaRecipeDeserializer<FurnaceNovaRecipe> {
     
-    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): FurnaceNovaRecipe {
-        json as JsonObject
-        
+    override fun deserialize(json: JsonObject, file: File): FurnaceNovaRecipe {
         val result = getItemBuilder(json.getString("result")!!)
         result.amount = json.getInt("amount", default = 1)
         val input = MaterialUtils.getRecipeChoice(json.getString("input")!!)
         val experience = json.getFloat("experience")!!
         val cookingTime = json.getInt("cookingTime")!!
         
-        return FurnaceNovaRecipe(input, result, experience, cookingTime)
+        return FurnaceNovaRecipe(getRecipeKey("furnace", file), input, result, experience, cookingTime)
     }
     
 }
 
-abstract class ConversionNovaRecipeDeserializer<T : ConversionNovaRecipe>(
-    private val constructor: (List<ItemBuilder>, ItemBuilder) -> T
-) : JsonDeserializer<T> {
+abstract class CustomNovaRecipeDeserializer<T : CustomNovaRecipe>(
+    private val type: String,
+    private val constructor: (NamespacedKey, List<ItemBuilder>, ItemBuilder, Int) -> T
+) : NovaRecipeDeserializer<T> {
     
-    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): T {
-        json as JsonObject
-        
+    override fun deserialize(json: JsonObject, file: File): T {
         val input = if (json.hasString("input")) {
             listOf(getItemBuilder(json.getString("input")!!))
         } else {
@@ -103,14 +100,15 @@ abstract class ConversionNovaRecipeDeserializer<T : ConversionNovaRecipe>(
         
         val result = getItemBuilder(json.getString("result")!!)
         result.amount = json.getInt("amount", default = 1)
+        val time = json.getInt("time")!!
         
-        return constructor(input, result)
+        return constructor(getRecipeKey(type, file), input, result, time)
     }
     
 }
 
-object PulverizerNovaRecipeDeserializer : ConversionNovaRecipeDeserializer<PulverizerNovaRecipe>(::PulverizerNovaRecipe)
+object PulverizerNovaRecipeDeserializer : CustomNovaRecipeDeserializer<PulverizerNovaRecipe>("pulverizer", ::PulverizerNovaRecipe)
 
-object PlatePressNovaRecipeDeserializer : ConversionNovaRecipeDeserializer<PlatePressNovaRecipe>(::PlatePressNovaRecipe)
+object PlatePressNovaRecipeDeserializer : CustomNovaRecipeDeserializer<PlatePressNovaRecipe>("plate_press", ::PlatePressNovaRecipe)
 
-object GearPressNovaRecipeDeserializer : ConversionNovaRecipeDeserializer<GearPressNovaRecipe>(::GearPressNovaRecipe)
+object GearPressNovaRecipeDeserializer : CustomNovaRecipeDeserializer<GearPressNovaRecipe>("gear_press", ::GearPressNovaRecipe)

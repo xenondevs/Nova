@@ -4,5 +4,6 @@
     "minecraft:deepslate_gold_ore"
   ],
   "result": "nova:gold_dust",
-  "amount": 2
+  "amount": 2,
+  "time": 200
 }

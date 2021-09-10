@@ -31,7 +31,7 @@ class EnergyBar(
     fun update() {
         energy = energyHolder.energy
         maxEnergy = energyHolder.maxEnergy
-        percentage = energy.toDouble() / maxEnergy.toDouble()
+        percentage = (energy.toDouble() / maxEnergy.toDouble()).coerceIn(0.0, 1.0)
     }
     
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {

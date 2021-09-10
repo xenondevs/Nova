@@ -1,5 +1,6 @@
 {
   "input": "minecraft:lapis_block",
   "result": "nova:lapis_dust",
-  "amount": 9
+  "amount": 9,
+  "time": 200
 }

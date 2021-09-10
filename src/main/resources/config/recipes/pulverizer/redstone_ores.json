@@ -4,5 +4,6 @@
     "minecraft:deepslate_redstone_ore"
   ],
   "result": "minecraft:redstone",
-  "amount": 10
+  "amount": 10,
+  "time": 200
 }

@@ -1,5 +1,6 @@
 {
   "input": "minecraft:redstone_block",
   "result": "minecraft:redstone",
-  "amount": 9
+  "amount": 9,
+  "time": 200
 }
