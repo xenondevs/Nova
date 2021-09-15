@@ -60,10 +60,10 @@ class Harvester(
     armorStand: FakeArmorStand,
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    private val inventory = getInventory("harvest", 12, true, ::handleInventoryUpdate)
-    private val shearInventory = getInventory("shears", 1, true, ::handleShearInventoryUpdate)
-    private val axeInventory = getInventory("axe", 1, true, ::handleAxeInventoryUpdate)
-    private val hoeInventory = getInventory("hoe", 1, true, ::handleHoeInventoryUpdate)
+    private val inventory = getInventory("harvest", 12, ::handleInventoryUpdate)
+    private val shearInventory = getInventory("shears", 1, ::handleShearInventoryUpdate)
+    private val axeInventory = getInventory("axe", 1, ::handleAxeInventoryUpdate)
+    private val hoeInventory = getInventory("hoe", 1, ::handleHoeInventoryUpdate)
     override val gui = lazy(::HarvesterGUI)
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_BREAK, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }

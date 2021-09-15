@@ -58,7 +58,7 @@ class MobDuplicator(
     armorStand: FakeArmorStand,
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    private val inventory = getInventory("inventory", 1, true, ::handleInventoryUpdate)
+    private val inventory = getInventory("inventory", 1, ::handleInventoryUpdate)
     override val gui = lazy { MobDuplicatorGUI() }
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_TICK_NBT, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.TOP) }

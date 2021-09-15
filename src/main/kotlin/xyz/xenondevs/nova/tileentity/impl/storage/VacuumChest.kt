@@ -54,7 +54,7 @@ class VacuumChest(
     
     override val gui = lazy { VacuumChestGUI() }
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)
-    private val filterInventory = getInventory("itemFilter", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate).apply { guiShiftPriority = 1 }
+    private val filterInventory = getInventory("itemFilter", 1, intArrayOf(1), ::handleFilterInventoryUpdate).apply { guiShiftPriority = 1 }
     private var filter: ItemFilter? = filterInventory.getItemStack(0)?.getFilterConfig()
     private val items = ArrayList<Item>()
     
@@ -83,7 +83,7 @@ class VacuumChest(
         }
         // -- End legacy support --
         
-        inventory = getInventory("inventory", 9, true) {}
+        inventory = getInventory("inventory", 9) {}
         itemHolder = NovaItemHolder(this, inventory)
     }
     

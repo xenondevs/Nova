@@ -58,8 +58,8 @@ class MechanicalPress(
     
     override val gui = lazy { MechanicalPressGUI() }
     
-    private val inputInv = getInventory("input", 1, true, ::handleInputUpdate)
-    private val outputInv = getInventory("output", 1, true, ::handleOutputUpdate)
+    private val inputInv = getInventory("input", 1, ::handleInputUpdate)
+    private val outputInv = getInventory("output", 1, ::handleOutputUpdate)
     
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(CONSUME, FRONT) }

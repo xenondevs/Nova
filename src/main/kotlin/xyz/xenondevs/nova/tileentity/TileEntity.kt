@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.tileentity
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
@@ -74,10 +73,8 @@ abstract class TileEntity(
         }
         
         // inventory drops ignore the dropItems parameter
-        inventories.forEach {
-            drops += it.items.filterNotNull()
-            VirtualInventoryManager.getInstance().remove(it)
-        }
+        inventories.forEach { drops += it.items.filterNotNull() }
+        TileInventoryManager.removeInventories(uuid, inventories)
         
         return drops
     }
@@ -168,15 +165,14 @@ abstract class TileEntity(
     fun getInventory(
         salt: String,
         size: Int,
-        dropItems: Boolean,
         stackSizes: IntArray,
         itemHandler: (ItemUpdateEvent) -> Unit
     ): VirtualInventory {
-        val inventory = VirtualInventoryManager
-            .getInstance()
-            .getOrCreate(uuid.salt(salt), size, arrayOfNulls(size), stackSizes)
+        val inventory = TileInventoryManager.getOrCreate(
+            uuid, uuid.salt(salt), size, arrayOfNulls(size), stackSizes
+        )
         inventory.setItemUpdateHandler(itemHandler)
-        if (dropItems) inventories += inventory
+        inventories += inventory
         return inventory
     }
     
@@ -185,8 +181,8 @@ abstract class TileEntity(
      * When [dropItems] is true, the [VirtualInventory] will automatically be
      * deleted and its contents dropped when the [TileEntity] is destroyed.
      */
-    fun getInventory(salt: String, size: Int, dropItems: Boolean, itemHandler: (ItemUpdateEvent) -> Unit) =
-        getInventory(salt, size, dropItems, IntArray(size) { 64 }, itemHandler)
+    fun getInventory(salt: String, size: Int, itemHandler: (ItemUpdateEvent) -> Unit) =
+        getInventory(salt, size, IntArray(size) { 64 }, itemHandler)
     
     /**
      * Creates a new [MultiModel] for this [TileEntity].

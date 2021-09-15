@@ -46,7 +46,7 @@ class FurnaceGenerator(
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     override val gui = lazy { FurnaceGeneratorGUI() }
-    private val inventory = getInventory("fuel", 1, true, ::handleInventoryUpdate)
+    private val inventory = getInventory("fuel", 1, ::handleInventoryUpdate)
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = ACCEPTED_UPGRADE_TYPES)
     override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, upgradeHolder) { createEnergySideConfig(PROVIDE, FRONT) }
     override val itemHolder = NovaItemHolder(this, inventory)

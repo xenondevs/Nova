@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.vanilla
 
 import org.bukkit.block.*
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
@@ -16,6 +17,7 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedRangedBukki
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
+import xyz.xenondevs.nova.util.runAsyncTask
 import java.util.*
 import kotlin.collections.set
 
@@ -75,7 +77,10 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
             storeEnumMap("itemConfig", itemHolder.itemConfig)
             updateDataContainer()
         }
-        NetworkManager.handleEndPointRemove(this, unload)
+        
+        val task = { NetworkManager.handleEndPointRemove(this, unload) }
+        if (NOVA.isEnabled) runAsyncTask(task)
+        else task()
     }
     
 }

@@ -4,7 +4,7 @@ import org.jetbrains.exposed.sql.ReferenceOption.CASCADE
 import org.jetbrains.exposed.sql.Table
 import xyz.xenondevs.nova.data.database.columtype.mediumBlob
 
-object TileEntityInventoriesTable : Table() {
+object TileInventoriesTable : Table() {
     
     val uuid = uuid("uuid")
     val tileEntityId = uuid("tileEntityId").references(

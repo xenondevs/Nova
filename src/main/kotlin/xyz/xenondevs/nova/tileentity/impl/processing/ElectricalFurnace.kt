@@ -60,8 +60,8 @@ class ElectricalFurnace(
     
     override val gui = lazy { ElectricalFurnaceGUI() }
     
-    private val inputInventory = getInventory("input", 1, true, ::handleInputInventoryUpdate)
-    private val outputInventory = getInventory("output", 1, true, ::handleOutputInventoryUpdate)
+    private val inputInventory = getInventory("input", 1, ::handleInputInventoryUpdate)
+    private val outputInventory = getInventory("output", 1, ::handleOutputInventoryUpdate)
     
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }

@@ -58,8 +58,8 @@ class AutoFisher(
     armorStand: FakeArmorStand,
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    private val inventory = getInventory("inventory", 12, true, ::handleInventoryUpdate)
-    private val fishingRodInventory = getInventory("fishingRod", 1, true, ::handleFishingRodInventoryUpdate)
+    private val inventory = getInventory("inventory", 12, ::handleInventoryUpdate)
+    private val fishingRodInventory = getInventory("fishingRod", 1, ::handleFishingRodInventoryUpdate)
     override val gui = lazy(::AutoFisherGUI)
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM) }

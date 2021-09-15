@@ -65,8 +65,8 @@ class Planter(
     armorStand: FakeArmorStand,
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    private val inputInventory = getInventory("input", 6, true, ::handleSeedUpdate)
-    private val hoesInventory = getInventory("hoes", 1, true, ::handleHoeUpdate)
+    private val inputInventory = getInventory("input", 6, ::handleSeedUpdate)
+    private val hoesInventory = getInventory("hoes", 1, ::handleHoeUpdate)
     override val gui = lazy(::PlanterGUI)
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_PLANT, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }

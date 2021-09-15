@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
+import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import xyz.xenondevs.nova.util.runAsyncTask
 import java.io.File
 
@@ -23,9 +24,11 @@ object DatabaseManager {
     private lateinit var database: Database
     private lateinit var dataSource: HikariDataSource
     
+    val MYSQL = NovaConfig.getBoolean("mysql.enabled")
+    
     fun connect() {
         LOGGER.info("Connecting to database")
-        if (NovaConfig.getBoolean("mysql.enabled")) {
+        if (MYSQL) {
             val address = NovaConfig.getString("mysql.address")!!
             val port = NovaConfig.getInt("mysql.port")!!
             val username = NovaConfig.getString("mysql.username")!!
@@ -66,7 +69,9 @@ object DatabaseManager {
         dataSource = HikariDataSource(config)
         database = Database.connect(dataSource)
         
-        transaction { SchemaUtils.create(TileEntitiesTable) }
+        transaction {
+            SchemaUtils.create(TileEntitiesTable, TileInventoriesTable)
+        }
     }
     
 }
