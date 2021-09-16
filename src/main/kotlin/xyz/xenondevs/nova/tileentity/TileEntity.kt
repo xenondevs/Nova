@@ -94,13 +94,6 @@ abstract class TileEntity(
     }
     
     /**
-     * Serializes the [data] to binary data.
-     */
-    fun getData(): ByteArray {
-        return data.toByteArray().compress()
-    }
-    
-    /**
      * Called to get the [ItemStack] to be placed as the head of the [FakeArmorStand].
      */
     open fun getHeadStack(): ItemStack {
@@ -347,8 +340,8 @@ abstract class TileEntity(
         fun create(row: ResultRow, location: Location): TileEntity {
             val uuid = row[TileEntitiesTable.uuid]
             val owner = row[TileEntitiesTable.owner]
-            val data = CompoundDeserializer.read(row[TileEntitiesTable.data].bytes.decompress())
-            val material = NovaMaterialRegistry.get(row[TileEntitiesTable.type])
+            val data = row[TileEntitiesTable.data]
+            val material = row[TileEntitiesTable.type]
             
             return create(uuid, location.clone().apply { center(); yaw = row[TileEntitiesTable.yaw] }, material, data, owner)
         }

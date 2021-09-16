@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.data.database.table
 
 import org.jetbrains.exposed.sql.ReferenceOption.CASCADE
 import org.jetbrains.exposed.sql.Table
-import xyz.xenondevs.nova.data.database.columtype.mediumBlob
+import xyz.xenondevs.nova.data.database.columtype.virtualInventory
 
 object TileInventoriesTable : Table() {
     
@@ -13,6 +13,6 @@ object TileInventoriesTable : Table() {
         onUpdate = CASCADE,
         fkName = "FK_inventory_tile_entity"
     )
-    val data = mediumBlob("data")
+    val data = virtualInventory("data")
     
 }

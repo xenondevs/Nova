@@ -19,21 +19,17 @@ import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.asyncTransaction
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundDeserializer
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.data.decompress
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
 import xyz.xenondevs.nova.world.armorstand.pos
@@ -213,8 +209,8 @@ object TileEntityManager : Listener {
                 .forEach { tile ->
                     val tileEntityUUID = tile[TileEntitiesTable.uuid]
                     val ownerUUID = tile[TileEntitiesTable.owner]
-                    val tileEntityData = CompoundDeserializer.read(tile[TileEntitiesTable.data].bytes.decompress())
-                    val material = NovaMaterialRegistry.get(tile[TileEntitiesTable.type])
+                    val tileEntityData = tile[TileEntitiesTable.data]
+                    val material = tile[TileEntitiesTable.type]
                     
                     val location = Location(
                         Bukkit.getWorld(tile[TileEntitiesTable.world]),
@@ -227,8 +223,8 @@ object TileEntityManager : Listener {
                         .select { TileInventoriesTable.tileEntityId eq tileEntityUUID }
                         .forEach { inventory ->
                             val inventoryUUID = inventory[TileInventoriesTable.uuid]
-                            val serializedInventory = inventory[TileInventoriesTable.data].bytes
-                            TileInventoryManager.loadInventory(tileEntityUUID, inventoryUUID, serializedInventory)
+                            val inventory = inventory[TileInventoriesTable.data]
+                            TileInventoryManager.loadInventory(tileEntityUUID, inventoryUUID, inventory)
                         }
                     
                     // create the tile entity in the main thread
@@ -286,12 +282,12 @@ object TileEntityManager : Listener {
                         it[y] = location.blockY
                         it[z] = location.blockZ
                         it[yaw] = tileEntity.armorStand.location.yaw
-                        it[type] = tileEntity.material.typeName
-                        it[data] = ExposedBlob(tileEntity.getData())
+                        it[type] = tileEntity.material
+                        it[data] = tileEntity.data
                     },
                     
                     updateBody = {
-                        it[data] = ExposedBlob(tileEntity.getData())
+                        it[data] = tileEntity.data
                     }
                 )
             }

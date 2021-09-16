@@ -5,12 +5,10 @@ import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.database.asyncTransaction
-import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -25,8 +23,8 @@ object TileInventoryManager {
         NOVA.disableHandlers += ::saveInventories
     }
     
-    fun loadInventory(tileEntityUUID: UUID, inventoryUUID: UUID, data: ByteArray) {
-        inventories[inventoryUUID] = tileEntityUUID to deserializeInventory(data)
+    fun loadInventory(tileEntityUUID: UUID, inventoryUUID: UUID, inventory: VirtualInventory) {
+        inventories[inventoryUUID] = tileEntityUUID to inventory
     }
     
     private fun saveInventories() {
@@ -38,7 +36,7 @@ object TileInventoryManager {
                 TileInventoriesTable.insert {
                     it[uuid] = inventoryUUID
                     it[tileEntityId] = tileEntityUUID
-                    it[data] = ExposedBlob(serializeInventory(inventory))
+                    it[data] = inventory
                 }
             }
         }
@@ -81,14 +79,5 @@ object TileInventoryManager {
             ?.let { tileEntityUUID to it }
             ?.also { inventories[inventoryUUID] = it }
     }
-    
-    private fun serializeInventory(inventory: VirtualInventory): ByteArray {
-        val stream = ByteArrayOutputStream()
-        manager.serializeInventory(inventory, stream)
-        return stream.toByteArray()
-    }
-    
-    private fun deserializeInventory(bytes: ByteArray): VirtualInventory =
-        manager.deserializeInventory(ByteArrayInputStream(bytes))
     
 }

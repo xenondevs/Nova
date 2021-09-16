@@ -36,7 +36,7 @@ object TileEntityLimits {
                 .groupBy(TileEntitiesTable.owner, TileEntitiesTable.type)
                 .forEach { row ->
                     val owner = row[TileEntitiesTable.owner]
-                    val type = NovaMaterialRegistry.get(row[TileEntitiesTable.type])
+                    val type = row[TileEntitiesTable.type]
                     val count = row[countExpr].toInt()
                     if (owner !in placedTileEntities)
                         placedTileEntities[owner] = HashMap()
