@@ -1,8 +1,13 @@
 package xyz.xenondevs.nova.world.armorstand
 
+import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import java.util.*
 
 data class AsyncChunkPos(val world: UUID, val x: Int, val z: Int) {
+    
+    val chunk: Chunk
+        get() = Bukkit.getWorld(world)!!.getChunkAt(x, z)
     
     fun getInRange(range: Int): Set<AsyncChunkPos> {
         val length = 2 * range + 1
