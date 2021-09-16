@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_17_R1.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.command.impl.NovaCommand
+import xyz.xenondevs.nova.command.impl.TestCommand
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
 val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher
@@ -26,7 +27,7 @@ object CommandManager {
         registerCommand(NovaCommand)
     }
     
-    fun registerCommand(command: PlayerCommand) {
+    fun registerCommand(command: Command) {
         registeredCommands += command.name
         COMMAND_DISPATCHER.register(command.builder)
         

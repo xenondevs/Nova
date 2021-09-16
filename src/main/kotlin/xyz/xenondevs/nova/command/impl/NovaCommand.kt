@@ -22,7 +22,7 @@ import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
 import xyz.xenondevs.nova.world.armorstand.pos
 
 
-object NovaCommand : PlayerCommand("nova") {
+object NovaCommand : Command("nova") {
     
     init {
         builder = builder
