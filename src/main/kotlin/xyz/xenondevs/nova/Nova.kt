@@ -36,6 +36,7 @@ class Nova : JavaPlugin() {
     val disableHandlers = ArrayList<() -> Unit>()
     val pluginFile
         get() = file
+    var isUninstalled = false
     
     override fun onEnable() {
         NOVA = this

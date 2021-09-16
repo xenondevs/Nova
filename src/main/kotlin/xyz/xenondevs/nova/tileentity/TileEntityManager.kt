@@ -73,6 +73,8 @@ object TileEntityManager : Listener {
     private val locationCache = HashSet<Location>()
     private val tileEntities: Sequence<TileEntity>
         get() = tileEntityMap.asSequence().flatMap { (_, chunkMap) -> chunkMap.values }
+    val tileEntityChunks: Sequence<Chunk>
+        get() = tileEntityMap.keys.asSequence().map(AsyncChunkPos::chunk)
     
     fun init() {
         LOGGER.info("Initializing TileEntityManager")
@@ -145,7 +147,7 @@ object TileEntityManager : Listener {
         if (material.isDirectional) ((playerYaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f
     
     @Synchronized
-    fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
+    fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean, deleteInDatabase: Boolean = true): List<ItemStack> {
         val location = tileEntity.location
         val chunkPos = location.chunkPos
         
@@ -157,9 +159,10 @@ object TileEntityManager : Listener {
             locationCache -= it
         }
         
-        // remove it from the database
-        asyncTransaction {
-            TileEntitiesTable.deleteWhere { TileEntitiesTable.uuid eq tileEntity.uuid }
+        if (deleteInDatabase) { // remove it from the database
+            asyncTransaction {
+                TileEntitiesTable.deleteWhere { TileEntitiesTable.uuid eq tileEntity.uuid }
+            }
         }
         
         location.block.type = Material.AIR
@@ -261,7 +264,7 @@ object TileEntityManager : Listener {
     }
     
     @Synchronized
-    private fun saveChunk(chunk: Chunk) {
+    fun saveChunk(chunk: Chunk) {
         val tileEntities = tileEntityMap[chunk.pos]?.values ?: return
         
         transaction {

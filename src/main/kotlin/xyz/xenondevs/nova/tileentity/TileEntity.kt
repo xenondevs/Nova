@@ -7,20 +7,26 @@ import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.world.entity.EquipmentSlot
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.exposed.sql.ResultRow
+import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.serialization.DataHolder
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundDeserializer
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.compress
+import xyz.xenondevs.nova.util.data.decompress
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.armorstand.pos
@@ -337,6 +343,15 @@ abstract class TileEntity(
     }
     
     companion object {
+        
+        fun create(row: ResultRow, location: Location): TileEntity {
+            val uuid = row[TileEntitiesTable.uuid]
+            val owner = row[TileEntitiesTable.owner]
+            val data = CompoundDeserializer.read(row[TileEntitiesTable.data].bytes.decompress())
+            val material = NovaMaterialRegistry.get(row[TileEntitiesTable.type])
+            
+            return create(uuid, location.clone().apply { center(); yaw = row[TileEntitiesTable.yaw] }, material, data, owner)
+        }
         
         fun create(
             uuid: UUID,

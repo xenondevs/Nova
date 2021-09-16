@@ -12,7 +12,10 @@ object ChunkLoadManager {
     
     fun init() {
         LOGGER.info("Initializing ChunkLoadManager")
-        NOVA.disableHandlers.add { PermanentStorage.store("forceLoadedChunks", forceLoadedChunks) }
+        NOVA.disableHandlers += {
+            if (!NOVA.isUninstalled)
+                PermanentStorage.store("forceLoadedChunks", forceLoadedChunks)
+        }
         forceLoadedChunks.keys.forEach { it.world.setChunkForceLoaded(it.x, it.z, true) }
     }
     
