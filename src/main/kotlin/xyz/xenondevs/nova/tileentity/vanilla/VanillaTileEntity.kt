@@ -69,7 +69,7 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
         by lazy { enumMapOf(NetworkType.ITEMS to itemHolder) }
     
     override fun handleInitialized() {
-        NetworkManager.handleEndPointAdd(this)
+        runAsyncTask { NetworkManager.handleEndPointAdd(this) }
     }
     
     override fun handleRemoved(unload: Boolean) {

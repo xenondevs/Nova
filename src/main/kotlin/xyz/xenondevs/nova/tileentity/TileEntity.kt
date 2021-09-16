@@ -80,7 +80,7 @@ abstract class TileEntity(
         
         // inventory drops ignore the dropItems parameter
         inventories.forEach { drops += it.items.filterNotNull() }
-        TileInventoryManager.removeInventories(uuid, inventories)
+        TileInventoryManager.remove(uuid, inventories)
         
         return drops
     }

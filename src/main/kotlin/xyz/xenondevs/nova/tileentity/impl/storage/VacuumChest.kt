@@ -5,7 +5,6 @@ import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.entity.Item
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -14,7 +13,9 @@ import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
+import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.TileInventoryManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
@@ -50,12 +51,12 @@ class VacuumChest(
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     private val inventory: VirtualInventory
+    private val filterInventory: VirtualInventory
     override val itemHolder: NovaItemHolder
     
     override val gui = lazy { VacuumChestGUI() }
     override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)
-    private val filterInventory = getInventory("itemFilter", 1, intArrayOf(1), ::handleFilterInventoryUpdate).apply { guiShiftPriority = 1 }
-    private var filter: ItemFilter? = filterInventory.getItemStack(0)?.getFilterConfig()
+    private var filter: ItemFilter? = retrieveOrNull<CompoundElement>("itemFilter")?.let { ItemFilter(it) }
     private val items = ArrayList<Item>()
     
     private lateinit var region: Region
@@ -73,22 +74,33 @@ class VacuumChest(
     init {
         updateRegion()
         
-        // -- Start legacy support --
+        // region Legacy support
         // this drops all items of the previously 12 slot inventory and then deletes the inventory
-        val inventoryUUID = uuid.salt("inventory")
-        val legacyInventory = VirtualInventoryManager.getInstance().getByUuid(inventoryUUID)
+        val legacyInventory = TileInventoryManager.getByUuid(uuid, uuid.salt("inventory"))
         if (legacyInventory != null && legacyInventory.size != 9) {
             location.dropItems(legacyInventory.items.filterNotNull())
-            VirtualInventoryManager.getInstance().remove(legacyInventory)
+            TileInventoryManager.remove(legacyInventory)
         }
-        // -- End legacy support --
+        
+        val legacyFilterInventory = TileInventoryManager.getByUuid(uuid, uuid.salt("itemFilter"))
+        if (legacyFilterInventory != null) {
+            if (!legacyFilterInventory.isEmpty)
+                filter = legacyFilterInventory.getItemStack(0).getFilterConfig()
+            TileInventoryManager.remove(legacyFilterInventory)
+        }
+        // endregion
         
         inventory = getInventory("inventory", 9) {}
         itemHolder = NovaItemHolder(this, inventory)
+        
+        filterInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1))
+        filterInventory.setItemUpdateHandler(::handleFilterInventoryUpdate)
+        filter?.also { filterInventory.setItemStack(SELF_UPDATE_REASON, 0, it.createFilterItem()) }
     }
     
     override fun saveData() {
         storeData("range", range)
+        storeData("itemFilter", filter?.compound)
         super.saveData()
     }
     
