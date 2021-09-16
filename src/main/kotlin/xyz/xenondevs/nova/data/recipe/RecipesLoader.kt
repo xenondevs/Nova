@@ -23,6 +23,7 @@ object RecipesLoader {
                 if (recipeFileHash.contentEquals(savedHash))
                     recipeFile.writeBytes(getResourceData(entry))
             } else {
+                recipeFile.parentFile.mkdirs()
                 recipeFile.writeBytes(getResourceData(entry))
                 hashFile.writeBytes(HashUtils.getFileHash(recipeFile, "MD5"))
             }
@@ -30,7 +31,7 @@ object RecipesLoader {
     }
     
     private fun getHashFile(originalFile: File): File =
-        File(originalFile.parent, ".${originalFile.name}.hash")
+        File(originalFile.parent, ".${originalFile.name}.md5")
     
     fun loadRecipes(): List<NovaRecipe> {
         val recipes = ArrayList<NovaRecipe>()
