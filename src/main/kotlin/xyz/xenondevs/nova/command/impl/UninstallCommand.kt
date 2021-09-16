@@ -34,7 +34,7 @@ object UninstallCommand : Command("nvuninstall") {
         
     }
     
-    fun uninstall() {
+    private fun uninstall() {
         TileEntityManager.tileEntityChunks.forEach(TileEntityManager::saveChunk)
         transaction {
             TileEntitiesTable.selectAll()
@@ -51,7 +51,7 @@ object UninstallCommand : Command("nvuninstall") {
         LOGGER.warning("Please remember to stop your server and delete " + NOVA.pluginFile.name + "!")
     }
     
-    fun uninstallWorld(world: World) {
+    private fun uninstallWorld(world: World) {
         if (Bukkit.getWorld(world.uid) == null) {
             LOGGER.warning(world.name.capitalize() + " doesn't exist anymore.")
             return
