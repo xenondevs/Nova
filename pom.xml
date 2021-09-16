@@ -191,6 +191,28 @@
             <groupId>com.github.NichtStudioCode.InvUI</groupId>
             <artifactId>InvUI</artifactId>
             <version>77ee58439d</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <artifactId>IA-R1</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <artifactId>IA-R2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <artifactId>IA-R3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <artifactId>IA-R4</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <artifactId>IA-R5</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.github.NichtStudioCode</groupId>
