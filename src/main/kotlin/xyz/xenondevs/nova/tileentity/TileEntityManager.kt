@@ -71,8 +71,8 @@ object TileEntityManager : Listener {
     private val tileEntityMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
     private val additionalHitboxMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
     private val locationCache = HashSet<Location>()
-    val tileEntities: List<TileEntity>
-        get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
+    private val tileEntities: Sequence<TileEntity>
+        get() = tileEntityMap.asSequence().flatMap { (_, chunkMap) -> chunkMap.values }
     
     fun init() {
         LOGGER.info("Initializing TileEntityManager")
