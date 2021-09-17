@@ -157,7 +157,7 @@ object TileEntityManager : Listener {
         
         if (deleteInDatabase) { // remove it from the database
             asyncTransaction {
-                TileEntitiesTable.deleteWhere { TileEntitiesTable.uuid eq tileEntity.uuid }
+                TileEntitiesTable.deleteWhere { TileEntitiesTable.id eq tileEntity.uuid }
             }
         }
         
@@ -207,7 +207,7 @@ object TileEntityManager : Listener {
             TileEntitiesTable
                 .select { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
                 .forEach { tile ->
-                    val tileEntityUUID = tile[TileEntitiesTable.uuid]
+                    val tileEntityUUID = tile[TileEntitiesTable.id].value
                     val ownerUUID = tile[TileEntitiesTable.owner]
                     val tileEntityData = tile[TileEntitiesTable.data]
                     val material = tile[TileEntitiesTable.type]
@@ -221,9 +221,9 @@ object TileEntityManager : Listener {
                     
                     TileInventoriesTable
                         .select { TileInventoriesTable.tileEntityId eq tileEntityUUID }
-                        .forEach { inventory ->
-                            val inventoryUUID = inventory[TileInventoriesTable.uuid]
-                            val inventory = inventory[TileInventoriesTable.data]
+                        .forEach { inventoryRow ->
+                            val inventoryUUID = inventoryRow[TileInventoriesTable.id].value
+                            val inventory = inventoryRow[TileInventoriesTable.data]
                             TileInventoryManager.loadInventory(tileEntityUUID, inventoryUUID, inventory)
                         }
                     
@@ -268,12 +268,12 @@ object TileEntityManager : Listener {
                 tileEntity.saveData()
                 
                 TileEntitiesTable.upsert(
-                    conflictColumn = TileEntitiesTable.uuid,
+                    conflictColumn = TileEntitiesTable.id,
                     
                     insertBody = {
                         val location = tileEntity.location
                         
-                        it[uuid] = tileEntity.uuid
+                        it[id] = tileEntity.uuid
                         it[world] = tileEntity.location.world!!.uid
                         it[owner] = tileEntity.ownerUUID
                         it[chunkX] = chunk.x

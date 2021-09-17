@@ -1,18 +1,21 @@
 package xyz.xenondevs.nova.data.database.table
 
+import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.ReferenceOption.CASCADE
-import org.jetbrains.exposed.sql.Table
 import xyz.xenondevs.nova.data.database.columtype.virtualInventory
+import java.util.*
 
-object TileInventoriesTable : Table() {
+object TileInventoriesTable : IdTable<UUID>() {
     
-    val uuid = uuid("uuid")
-    val tileEntityId = uuid("tileEntityId").references(
-        TileEntitiesTable.uuid,
+    override val id = uuid("id").entityId()
+    val tileEntityId = reference(
+        "tileEntityId",
+        TileEntitiesTable,
         onDelete = CASCADE,
         onUpdate = CASCADE,
-        fkName = "FK_inventory_tile_entity"
-    )
+        fkName = "FK_inventory_tile_entity")
     val data = virtualInventory("data")
+    
+    override val primaryKey = PrimaryKey(id)
     
 }

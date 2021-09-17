@@ -63,7 +63,7 @@ object TileInventoryManager {
         
         if (!DatabaseManager.MYSQL) {
             asyncTransaction {
-                TileInventoriesTable.deleteWhere { TileInventoriesTable.uuid eq inventory.uuid }
+                TileInventoriesTable.deleteWhere { TileInventoriesTable.id eq inventory.uuid }
             }
         }
     }

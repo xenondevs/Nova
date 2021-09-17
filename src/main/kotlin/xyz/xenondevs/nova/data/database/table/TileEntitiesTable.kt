@@ -1,12 +1,13 @@
 package xyz.xenondevs.nova.data.database.table
 
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.dao.id.IdTable
 import xyz.xenondevs.nova.data.database.columtype.compound
 import xyz.xenondevs.nova.data.database.columtype.novaMaterial
+import java.util.*
 
-object TileEntitiesTable : Table() {
+object TileEntitiesTable : IdTable<UUID>() {
     
-    val uuid = uuid("uuid")
+    override val id = uuid("id").entityId()
     val world = uuid("world")
     val owner = uuid("owner")
     val chunkX = integer("chunkX")
@@ -18,6 +19,6 @@ object TileEntitiesTable : Table() {
     val type = novaMaterial("type")
     val data = compound("data")
     
-    override val primaryKey = PrimaryKey(uuid)
+    override val primaryKey = PrimaryKey(id)
     
 }

@@ -338,7 +338,7 @@ abstract class TileEntity(
     companion object {
         
         fun create(row: ResultRow, location: Location): TileEntity {
-            val uuid = row[TileEntitiesTable.uuid]
+            val uuid = row[TileEntitiesTable.id].value
             val owner = row[TileEntitiesTable.owner]
             val data = row[TileEntitiesTable.data]
             val material = row[TileEntitiesTable.type]
