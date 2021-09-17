@@ -313,15 +313,30 @@ class Quarry(
             world,
             minX + 1, 0, minZ + 1,
             maxX - 1, y - 2, maxZ - 1
-        )
-            .filter { ProtectionManager.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
-            .sortedBy { it.distance(pointerLocation) }
-            .maxByOrNull { it.y }
+        ).asSequence()
+            .sortedBy { prioritizedDistance(pointerLocation, it) }
+            .firstOrNull { ProtectionManager.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
             ?.center()
             ?.apply { y += 1 }
         
         pointerDestination = destination
         return destination
+    }
+    
+    /**
+     * Returns the square of a modified distance that discourages travelling downwards
+     * and encourages travelling upwards.
+     */
+    private fun prioritizedDistance(location: Location, destination: Location): Double {
+        val deltaX = destination.x - location.x
+        val deltaZ = destination.z - location.z
+        
+        // encourage travelling up, discourage travelling down
+        var deltaY = (destination.y - location.y)
+        if (deltaY > 0) deltaY *= 0.05
+        else if (deltaY < 0) deltaY *= 2
+        
+        return deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ
     }
     
     private fun spawnDrillParticles(block: Block) {
