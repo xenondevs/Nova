@@ -7,5 +7,8 @@
     "min": 1,
     "max": 3,
     "default": 3
+  },
+  "upgrade_modifiers": {
+    "range": [0, 1, 2, 3, 4, 5, 6, 7]
   }
 }

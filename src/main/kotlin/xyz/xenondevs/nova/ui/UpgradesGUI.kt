@@ -69,7 +69,9 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
             if (type in upgradeHolder.allowed) {
                 builder.setDisplayName(localized(
                     ChatColor.GRAY,
-                    "menu.nova.upgrades.type.$typeName", upgradeHolder.upgrades[type] ?: 0
+                    "menu.nova.upgrades.type.$typeName",
+                    upgradeHolder.upgrades[type] ?: 0,
+                    upgradeHolder.getLimit(type)
                 ))
             } else builder.setDisplayName(localized(ChatColor.RED, "menu.nova.upgrades.type.$typeName.off"))
             
