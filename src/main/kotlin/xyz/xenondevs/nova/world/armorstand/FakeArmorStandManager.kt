@@ -92,10 +92,15 @@ object FakeArmorStandManager : Listener {
         chunkArmorStands.getOrPut(newChunk) { mutableListOf() }.add(armorStand)
         
         // find all players that saw the old chunk but don't see the new one and despawn it for them
-        val newChunksViewers = chunkViewers.getOrPut(newChunk) { mutableListOf() }
+        val newChunkViewers = chunkViewers.getOrPut(newChunk) { mutableListOf() }
         chunkViewers[previousChunk]!!.stream()
-            .filter { !newChunksViewers.contains(it) }
+            .filter { !newChunkViewers.contains(it) }
             .forEach { armorStand.despawn(it) }
+        
+        // find all players that didn't see the old chunk but should see the armor stand now and spawn it for them
+        newChunkViewers.stream()
+            .filter { !(chunkViewers[previousChunk]?.contains(it) ?: false) }
+            .forEach { armorStand.spawn(it) }
     }
     
     @Synchronized
