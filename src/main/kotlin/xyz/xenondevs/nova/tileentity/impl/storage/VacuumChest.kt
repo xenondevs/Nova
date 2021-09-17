@@ -56,7 +56,7 @@ class VacuumChest(
     override val itemHolder: NovaItemHolder
     
     override val gui = lazy { VacuumChestGUI() }
-    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)
     private var filter: ItemFilter? = retrieveOrNull<CompoundElement>("itemFilter")?.let { ItemFilter(it) }
     private val items = ArrayList<Item>()
     

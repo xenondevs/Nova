@@ -48,7 +48,7 @@ class FurnaceGenerator(
     
     override val gui = lazy { FurnaceGeneratorGUI() }
     private val inventory = getInventory("fuel", 1, ::handleInventoryUpdate)
-    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, allowed = ACCEPTED_UPGRADE_TYPES)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = ACCEPTED_UPGRADE_TYPES)
     override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, upgradeHolder) { createEnergySideConfig(PROVIDE, FRONT) }
     override val itemHolder = NovaItemHolder(this, inventory)
     

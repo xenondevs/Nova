@@ -6,10 +6,12 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.UpgradesElement
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
+import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.ui.UpgradesGUI
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.runTaskLater
+import java.lang.Integer.min
 import java.util.*
 
 private fun ItemStack.getUpgradeType(): UpgradeType? {
@@ -18,13 +20,15 @@ private fun ItemStack.getUpgradeType(): UpgradeType? {
 }
 
 class UpgradeHolder(
-    data: CompoundElement,
+    tileEntity: TileEntity,
     val lazyGUI: Lazy<TileEntityGUI>,
     private val defaultUpdateHandler: (() -> Unit)?,
     vararg allowed: UpgradeType
 ) {
     
-    val input = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(10)).apply { setItemUpdateHandler(::handleNewInput) }
+    val data = tileEntity.data
+    val material = tileEntity.material
+    val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleNewInput) }
     val allowed = allowed.toList()
     val upgrades = EnumMap<UpgradeType, Int>(UpgradeType::class.java)
     
@@ -32,11 +36,11 @@ class UpgradeHolder(
     
     val upgradeUpdateHandlers = ArrayList<() -> Unit>()
     
-    constructor(data: CompoundElement, lazyGUI: Lazy<TileEntityGUI>, vararg allowed: UpgradeType) :
-        this(data, lazyGUI, null, allowed = allowed)
+    constructor(tileEntity: TileEntity, lazyGUI: Lazy<TileEntityGUI>, vararg allowed: UpgradeType) :
+        this(tileEntity, lazyGUI, null, allowed = allowed)
     
-    constructor(data: CompoundElement, lazyGUI: Lazy<TileEntityGUI>, defaultUpdateHandler: (() -> Unit)? = null) :
-        this(data, lazyGUI, defaultUpdateHandler, allowed = UpgradeType.values())
+    constructor(tileEntity: TileEntity, lazyGUI: Lazy<TileEntityGUI>, defaultUpdateHandler: (() -> Unit)? = null) :
+        this(tileEntity, lazyGUI, defaultUpdateHandler, allowed = UpgradeType.values())
     
     init {
         val savedUpgrades = data.get<EnumMap<UpgradeType, Int>>("upgrades")
@@ -53,10 +57,12 @@ class UpgradeHolder(
         if (type !in allowed || amount == 0)
             return amount
         
+        val limit = getLimit(type)
+        
         val current = upgrades[type] ?: 0
-        if (10 - current < amount) {
-            upgrades[type] = 10
-            return amount - (10 - current)
+        if (limit - current < amount) {
+            upgrades[type] = limit
+            return amount - (limit - current)
         } else {
             upgrades[type] = current + amount
             return 0
@@ -79,8 +85,10 @@ class UpgradeHolder(
     
     fun getModifier(type: UpgradeType): Double {
         val amount = upgrades[type] ?: 0
-        return type.modifiers[amount]
+        return type[material][amount]
     }
+    
+    fun getLimit(type: UpgradeType): Int = min(type[material].size - 1, 999)
     
     fun calculateEnergyUsage(baseUsage: Int) =
         (baseUsage * getSpeedModifier() / getEfficiencyModifier()).toInt()
@@ -103,15 +111,17 @@ class UpgradeHolder(
             return
         }
         
+        val limit = getLimit(upgradeType)
+        
         val currentAmount = upgrades[upgradeType] ?: 0
-        if (currentAmount == 10) {
+        if (currentAmount == limit) {
             event.isCancelled = true
             return
         }
         
         var addedAmount = event.addedAmount
-        if (addedAmount + currentAmount > 10) {
-            addedAmount = 10 - currentAmount
+        if (addedAmount + currentAmount > limit) {
+            addedAmount = limit - currentAmount
             event.newItemStack.amount = addedAmount
         }
         

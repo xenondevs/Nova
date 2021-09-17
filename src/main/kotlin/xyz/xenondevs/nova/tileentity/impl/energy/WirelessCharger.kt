@@ -47,7 +47,7 @@ class WirelessCharger(
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     override val gui = lazy(::WirelessChargerGUI)
-    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.SPEED, UpgradeType.ENERGY, UpgradeType.RANGE)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.SPEED, UpgradeType.ENERGY, UpgradeType.RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, CHARGE_SPEED, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     
     private var maxRange = 0

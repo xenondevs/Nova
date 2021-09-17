@@ -40,7 +40,7 @@ class Charger(
     
     private val inventory = getInventory("inventory", 1, ::handleInventoryUpdate)
     override val gui = lazy { ChargerGUI() }
-    override val upgradeHolder = UpgradeHolder(data, gui, UpgradeType.ENERGY, UpgradeType.SPEED)
+    override val upgradeHolder = UpgradeHolder(this, gui, UpgradeType.ENERGY, UpgradeType.SPEED)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     override val itemHolder = NovaItemHolder(this, inventory)
     

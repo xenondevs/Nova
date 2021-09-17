@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.EFFICIENCY_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.EFFICIENCY_UPGRADE_ICON
@@ -9,24 +11,30 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE_ICON
-import kotlin.math.pow
+import xyz.xenondevs.nova.util.data.getAllDoubles
 
-// TODO nerf
-private val DEFAULT_MODIFIERS = (0..10).map { if (it == 0) 1.0 else if (it == 1) it + 0.25 else it - 0.25 }.toDoubleArray()
-private val SPEED_MODIFIERS = (0..10).map { it.toDouble().pow(0.95) + 1 }.toDoubleArray()
-private val RANGE_MODIFIERS = (0..10).map { it.toDouble() }.toDoubleArray()
-
-enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial, val modifiers: DoubleArray) {
+enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial) {
     
-    SPEED(SPEED_UPGRADE, SPEED_UPGRADE_ICON, SPEED_MODIFIERS),
-    EFFICIENCY(EFFICIENCY_UPGRADE, EFFICIENCY_UPGRADE_ICON, DEFAULT_MODIFIERS),
-    ENERGY(ENERGY_UPGRADE, ENERGY_UPGRADE_ICON, DEFAULT_MODIFIERS),
-    RANGE(RANGE_UPGRADE, RANGE_UPGRADE_ICON, RANGE_MODIFIERS);
+    SPEED(SPEED_UPGRADE, SPEED_UPGRADE_ICON),
+    EFFICIENCY(EFFICIENCY_UPGRADE, EFFICIENCY_UPGRADE_ICON),
+    ENERGY(ENERGY_UPGRADE, ENERGY_UPGRADE_ICON),
+    RANGE(RANGE_UPGRADE, RANGE_UPGRADE_ICON);
+    
+    private val modifierCache = HashMap<NovaMaterial, DoubleArray>()
+    
+    operator fun get(material: NovaMaterial): DoubleArray {
+        return modifierCache.getOrPut(material) {
+            val specificConfig = NovaConfig[material]
+            return@getOrPut readConfiguredModifier(specificConfig) ?: readConfiguredModifier(DEFAULT_CONFIG)!!
+        }
+    }
+    
+    private fun readConfiguredModifier(config: NovaConfig): DoubleArray? =
+        config.getArray("upgrade_modifiers.${name.lowercase()}")?.getAllDoubles()?.toDoubleArray()
     
     companion object {
         val ALL_ENERGY = arrayOf(SPEED, EFFICIENCY, ENERGY)
         val ENERGY_AND_RANGE = arrayOf(SPEED, EFFICIENCY, ENERGY, RANGE)
     }
-    
     
 }

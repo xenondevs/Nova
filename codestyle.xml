@@ -1,5 +1,8 @@
 <code_scheme name="XenonDevs" version="173">
   <option name="FORMATTER_TAGS_ENABLED" value="true" />
+  <JSON>
+    <option name="ARRAY_WRAPPING" value="0" />
+  </JSON>
   <JetCodeStyleSettings>
     <option name="CONTINUATION_INDENT_IN_PARAMETER_LISTS" value="true" />
     <option name="CONTINUATION_INDENT_IN_ARGUMENT_LISTS" value="true" />

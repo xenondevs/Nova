@@ -44,7 +44,7 @@ class BlockBreaker(
     
     private val inventory = getInventory("inventory", 9) { if (it.isAdd && it.updateReason != SELF_UPDATE_REASON) it.isCancelled = true }
     override val gui = lazy { BlockBreakerGUI() }
-    override val upgradeHolder = UpgradeHolder(data, gui, allowed = UpgradeType.ALL_ENERGY)
+    override val upgradeHolder = UpgradeHolder(this, gui, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val itemHolder = NovaItemHolder(this, inventory)
     

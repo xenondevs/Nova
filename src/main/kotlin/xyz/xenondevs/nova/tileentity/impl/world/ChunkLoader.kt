@@ -41,7 +41,7 @@ class ChunkLoader(
     
     override val gui = lazy { ChunkLoaderGUI() }
     
-    override val upgradeHolder = UpgradeHolder(data, gui, ::updateEnergyPerTick, UpgradeType.ENERGY, UpgradeType.EFFICIENCY)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::updateEnergyPerTick, UpgradeType.ENERGY, UpgradeType.EFFICIENCY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, 0, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     
     private var range = retrieveData("range") { 0 }

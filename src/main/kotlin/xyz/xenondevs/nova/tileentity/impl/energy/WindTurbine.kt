@@ -39,7 +39,7 @@ class WindTurbine(
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     override val gui = lazy { WindTurbineGUI() }
-    override val upgradeHolder = UpgradeHolder(data, gui, ::updateEnergyPerTick, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::updateEnergyPerTick, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
     override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, upgradeHolder) {
         createEnergySideConfig(
             EnergyConnectionType.PROVIDE,

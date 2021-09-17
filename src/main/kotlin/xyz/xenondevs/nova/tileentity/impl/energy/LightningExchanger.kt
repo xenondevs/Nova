@@ -47,7 +47,7 @@ class LightningExchanger(
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     override val gui = lazy { LightningExchangerGUI() }
-    override val upgradeHolder = UpgradeHolder(data, gui, ::handleUpgradeUpdates, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
     override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, 0, upgradeHolder) {
         CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))
         { if (it == BlockFace.DOWN) PROVIDE else NONE }

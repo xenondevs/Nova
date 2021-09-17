@@ -39,7 +39,7 @@ class SolarPanel(
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     override val gui = lazy { SolarPanelGUI() }
-    override val upgradeHolder = UpgradeHolder(data, gui, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
+    override val upgradeHolder = UpgradeHolder(this, gui, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
     override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, upgradeHolder) {
         CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java))
         { if (it == BlockFace.DOWN) EnergyConnectionType.PROVIDE else EnergyConnectionType.NONE }
