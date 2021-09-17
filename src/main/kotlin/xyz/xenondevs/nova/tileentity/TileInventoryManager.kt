@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.tileentity
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.VirtualInventoryManager
+import net.dzikoysk.exposed.upsert.upsert
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.DatabaseManager
@@ -31,11 +31,19 @@ object TileInventoryManager {
         transaction {
             inventories.forEach { (inventoryUUID, pair) ->
                 val (tileEntityUUID, inventory) = pair
-                TileInventoriesTable.insert {
-                    it[uuid] = inventoryUUID
-                    it[tileEntityId] = tileEntityUUID
-                    it[data] = inventory
-                }
+                TileInventoriesTable.upsert(
+                    conflictColumn = TileInventoriesTable.id,
+                    
+                    insertBody = {
+                        it[id] = inventoryUUID
+                        it[tileEntityId] = tileEntityUUID
+                        it[data] = inventory
+                    },
+                    
+                    updateBody = {
+                        it[data] = inventory
+                    }
+                )
             }
         }
     }
