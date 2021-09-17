@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.QUARRY
 import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -54,18 +55,18 @@ private val FULL_SLIM_VERTICAL = SCAFFOLDING_STACKS[4]
 private val SLIM_VERTICAL_DOWN = SCAFFOLDING_STACKS[5]
 private val DRILL = NovaMaterialRegistry.NETHERITE_DRILL.createItemStack()
 
-private val MIN_SIZE = NovaConfig.getInt("quarry.min_size")!!
-private val MAX_SIZE = NovaConfig.getInt("quarry.max_size")!!
-private val DEFAULT_SIZE_X = NovaConfig.getInt("quarry.default_size_x")!!
-private val DEFAULT_SIZE_Z = NovaConfig.getInt("quarry.default_size_z")!!
+private val MIN_SIZE = NovaConfig[QUARRY].getInt("min_size")!!
+private val MAX_SIZE = NovaConfig[QUARRY].getInt("max_size")!!
+private val DEFAULT_SIZE_X = NovaConfig[QUARRY].getInt("default_size_x")!!
+private val DEFAULT_SIZE_Z = NovaConfig[QUARRY].getInt("default_size_z")!!
 
-private val MOVE_SPEED = NovaConfig.getDouble("quarry.move_speed")!!
-private val DRILL_SPEED_MULTIPLIER = NovaConfig.getDouble("quarry.drill_speed_multiplier")!!
-private val DRILL_SPEED_CLAMP = NovaConfig.getDouble("quarry.drill_speed_clamp")!!
+private val MOVE_SPEED = NovaConfig[QUARRY].getDouble("move_speed")!!
+private val DRILL_SPEED_MULTIPLIER = NovaConfig[QUARRY].getDouble("drill_speed_multiplier")!!
+private val DRILL_SPEED_CLAMP = NovaConfig[QUARRY].getDouble("drill_speed_clamp")!!
 
-private val MAX_ENERGY = NovaConfig.getInt("quarry.capacity")!!
-private val BASE_ENERGY_CONSUMPTION = NovaConfig.getInt("quarry.base_energy_consumption")!!
-private val ENERGY_PER_SQUARE_BLOCK = NovaConfig.getInt("quarry.energy_consumption_per_square_block")!!
+private val MAX_ENERGY = NovaConfig[QUARRY].getInt("capacity")!!
+private val BASE_ENERGY_CONSUMPTION = NovaConfig[QUARRY].getInt("base_energy_consumption")!!
+private val ENERGY_PER_SQUARE_BLOCK = NovaConfig[QUARRY].getInt("energy_consumption_per_square_block")!!
 
 class Quarry(
     uuid: UUID,

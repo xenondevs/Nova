@@ -2,36 +2,32 @@ package xyz.xenondevs.nova.data.config
 
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.util.data.JSON_PARSER
-import xyz.xenondevs.nova.util.data.getResourceAsStream
-import xyz.xenondevs.nova.util.data.getResourceData
-import xyz.xenondevs.nova.util.data.set
+import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.util.data.*
 import java.io.File
 
-object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
+val DEFAULT_CONFIG = NovaConfig["config"]
+
+class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataFolder}/$configPath"), false) {
     
-    private val DEFAULT_CONFIG_VALUES_FILE = File("plugins/Nova/defaultConfigValues.do-not-edit")
+    private val defaultConfigValuesFile = File(file!!.parentFile, ".${file.nameWithoutExtension}.defaults")
     
-    private val defaultConfig = JsonConfig(DEFAULT_CONFIG_VALUES_FILE, false)
-    private val internalConfig = JsonConfig(JSON_PARSER.parse(getResourceAsStream("config/config.json")!!.reader()).asJsonObject)
+    private val defaultConfig = JsonConfig(defaultConfigValuesFile, false)
+    private val internalConfig = JsonConfig(JSON_PARSER.parse(getResourceAsStream(configPath)!!.reader()).asJsonObject)
     
-    fun init() {
-        LOGGER.info("Loading config")
+    init {
         extractConfigFiles()
         reload()
         defaultConfig.reload()
         
         updateUnchangedConfigValues()
-        
-        if (IS_VERSION_CHANGE) {
-            set("resource_pack.url", internalConfig.getString("resource_pack.url")!!)
-            save(true)
-        }
     }
     
     private fun extractConfigFiles() {
-        if (!file!!.exists()) file.writeBytes(getResourceData("config/config.json"))
-        if (!DEFAULT_CONFIG_VALUES_FILE.exists()) file.copyTo(DEFAULT_CONFIG_VALUES_FILE)
+        file!!.parentFile.mkdirs()
+        if (!file.exists()) file.writeBytes(getResourceData(configPath))
+        if (!defaultConfigValuesFile.exists()) file.copyTo(defaultConfigValuesFile)
     }
     
     private fun updateUnchangedConfigValues() {
@@ -61,5 +57,34 @@ object NovaConfig : JsonConfig(File("plugins/Nova/config.json"), false) {
     
     override fun get(path: List<String>) =
         super.get(path) ?: internalConfig.get(path)
+    
+    companion object {
+        
+        private val configs = HashMap<String, NovaConfig>()
+        
+        fun init() {
+            LOGGER.info("Loading configs")
+            
+            getResources("config/")
+                .filterNot { it.startsWith("config/recipes/") }
+                .forEach {
+                    val configName = it.substring(7).substringBeforeLast('.')
+                    configs[configName] = NovaConfig(it)
+                }
+            
+            if (IS_VERSION_CHANGE) {
+                val defaultConfig = configs["config"]!!
+                defaultConfig["resource_pack.url"] = defaultConfig.internalConfig.getString("resource_pack.url")!!
+                defaultConfig.save(true)
+            }
+    
+            println(configs.keys.joinToString())
+        }
+        
+        operator fun get(name: String) = configs[name]!!
+        
+        operator fun get(material: NovaMaterial) = configs["machine/${material.typeName.lowercase()}"]!!
+        
+    }
     
 }

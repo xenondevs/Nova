@@ -1,0 +1,5 @@
+{
+  "capacity": 10000,
+  "energy_per_tick": 20,
+  "idle_time": 600
+}

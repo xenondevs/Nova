@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.MOB_KILLER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -36,15 +37,15 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.math.min
 
-private val MAX_ENERGY = NovaConfig.getInt("mob_killer.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("mob_killer.energy_per_tick")!!
-private val ENERGY_PER_DAMAGE = NovaConfig.getInt("mob_killer.energy_per_damage")!!
-private val IDLE_TIME = NovaConfig.getInt("mob_killer.idle_time")!!
-private val KILL_LIMIT = NovaConfig.getInt("mob_killer.kill_limit")!!
-private val DAMAGE = NovaConfig.getDouble("mob_killer.damage")!!
-private val MIN_RANGE = NovaConfig.getInt("mob_killer.range.min")!!
-private val MAX_RANGE = NovaConfig.getInt("mob_killer.range.max")!!
-private val DEFAULT_RANGE = NovaConfig.getInt("mob_killer.range.default")!!
+private val MAX_ENERGY = NovaConfig[MOB_KILLER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[MOB_KILLER].getInt("energy_per_tick")!!
+private val ENERGY_PER_DAMAGE = NovaConfig[MOB_KILLER].getInt("energy_per_damage")!!
+private val IDLE_TIME = NovaConfig[MOB_KILLER].getInt("idle_time")!!
+private val KILL_LIMIT = NovaConfig[MOB_KILLER].getInt("kill_limit")!!
+private val DAMAGE = NovaConfig[MOB_KILLER].getDouble("damage")!!
+private val MIN_RANGE = NovaConfig[MOB_KILLER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[MOB_KILLER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[MOB_KILLER].getInt("range.default")!!
 
 class MobKiller(
     uuid: UUID,

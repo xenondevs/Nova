@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.MECHANICAL_PRESS
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.CONSUME
@@ -39,9 +40,9 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.max
 
-private val MAX_ENERGY = NovaConfig.getInt("mechanical_press.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("mechanical_press.energy_per_tick")!!
-private val PRESS_SPEED = NovaConfig.getInt("mechanical_press.speed")!!
+private val MAX_ENERGY = NovaConfig[MECHANICAL_PRESS].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[MECHANICAL_PRESS].getInt("energy_per_tick")!!
+private val PRESS_SPEED = NovaConfig[MECHANICAL_PRESS].getInt("speed")!!
 
 enum class PressType {
     PLATE,

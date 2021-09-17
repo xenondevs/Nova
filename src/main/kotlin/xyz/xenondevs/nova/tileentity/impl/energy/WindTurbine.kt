@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.WIND_TURBINE
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -27,8 +27,8 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.abs
 
-private val MAX_ENERGY = NovaConfig.getInt("wind_turbine.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("wind_turbine.energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[WIND_TURBINE].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[WIND_TURBINE].getInt("energy_per_tick")!!
 
 class WindTurbine(
     uuid: UUID,
@@ -72,14 +72,14 @@ class WindTurbine(
     private fun spawnModels() {
         val location = armorStand.location.clone()
         location.y += 2
-        columnModel.addModels(Model(NovaMaterialRegistry.WIND_TURBINE.block!!.createItemStack(1), location))
+        columnModel.addModels(Model(WIND_TURBINE.block!!.createItemStack(1), location))
         
         location.y += 1.0 / 32.0
-        turbineModel.addModels(Model(NovaMaterialRegistry.WIND_TURBINE.block.createItemStack(2), location))
+        turbineModel.addModels(Model(WIND_TURBINE.block.createItemStack(2), location))
         
         for (blade in 0..2) {
             turbineModel.addModels(Model(
-                NovaMaterialRegistry.WIND_TURBINE.block.createItemStack(3),
+                WIND_TURBINE.block.createItemStack(3),
                 location,
                 Rotations(0f, 0f, blade * 120f)
             ))

@@ -6,13 +6,15 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.JetpackItem
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.JETPACK
 import xyz.xenondevs.nova.ui.overlay.ActionbarOverlayManager
 import xyz.xenondevs.nova.ui.overlay.impl.JetpackOverlay
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 
-private val ENERGY_PER_TICK = NovaConfig.getInt("jetpack.energy_per_tick")!!
-private val FLY_SPEED = NovaConfig.getFloat("jetpack.fly_speed")!!
+private val ENERGY_PER_TICK = NovaConfig[JETPACK].getInt("energy_per_tick")!!
+private val FLY_SPEED = NovaConfig[JETPACK].getFloat("fly_speed")!!
 
 internal class JetpackFlyAbility(player: Player) : Ability(player) {
     

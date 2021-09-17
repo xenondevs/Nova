@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.i18n
 import com.google.gson.JsonObject
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.data.JSON_PARSER
@@ -15,7 +16,7 @@ object LocaleManager {
     private lateinit var translationProviders: Map<String, Map<String, String>>
     
     fun init() {
-        val url = URL(NovaConfig.getString("resource_pack.url"))
+        val url = URL(DEFAULT_CONFIG.getString("resource_pack.url"))
         runAsyncTask {
             LOGGER.info("Loading translations")
             val translationProviders = HashMap<String, HashMap<String, String>>()

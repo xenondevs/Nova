@@ -1,0 +1,7 @@
+{
+  "range": {
+    "min": 1,
+    "max": 2,
+    "default": 2
+  }
+}

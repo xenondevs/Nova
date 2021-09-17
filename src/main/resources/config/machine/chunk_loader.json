@@ -1,0 +1,5 @@
+{
+  "capacity": 100000,
+  "energy_per_chunk": 250,
+  "max_range": 3
+}

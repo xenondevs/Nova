@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLOCK_BREAKER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -28,10 +29,10 @@ import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private val MAX_ENERGY = NovaConfig.getInt("block_breaker.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("block_breaker.energy_per_tick")!!
-private val BREAK_SPEED_MULTIPLIER = NovaConfig.getDouble("block_breaker.break_speed_multiplier")!!
-private val BREAK_SPEED_CLAMP = NovaConfig.getDouble("block_breaker.break_speed_clamp")!!
+private val MAX_ENERGY = NovaConfig[BLOCK_BREAKER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[BLOCK_BREAKER].getInt("energy_per_tick")!!
+private val BREAK_SPEED_MULTIPLIER = NovaConfig[BLOCK_BREAKER].getDouble("break_speed_multiplier")!!
+private val BREAK_SPEED_CLAMP = NovaConfig[BLOCK_BREAKER].getDouble("break_speed_clamp")!!
 
 class BlockBreaker(
     uuid: UUID,

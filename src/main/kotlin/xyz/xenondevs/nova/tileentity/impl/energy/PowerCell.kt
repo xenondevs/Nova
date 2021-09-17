@@ -6,6 +6,7 @@ import de.studiocode.invui.gui.builder.guitype.GUIType
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
@@ -56,6 +57,11 @@ open class PowerCell(
     
 }
 
+private val BASIC_CAPACITY = NovaConfig[NovaMaterialRegistry.BASIC_POWER_CELL].getInt("capacity")!!
+private val ADVANCED_CAPACITY = NovaConfig[NovaMaterialRegistry.ADVANCED_POWER_CELL].getInt("capacity")!!
+private val ELITE_CAPACITY = NovaConfig[NovaMaterialRegistry.ELITE_POWER_CELL].getInt("capacity")!!
+private val ULTIMATE_CAPACITY = NovaConfig[NovaMaterialRegistry.ULTIMATE_POWER_CELL].getInt("capacity")!!
+
 class BasicPowerCell(
     uuid: UUID,
     data: CompoundElement,
@@ -64,7 +70,7 @@ class BasicPowerCell(
     armorStand: FakeArmorStand,
 ) : PowerCell(
     false,
-    NovaConfig.getInt("power_cell.basic.capacity")!!,
+    BASIC_CAPACITY,
     uuid,
     data,
     material,
@@ -80,7 +86,7 @@ class AdvancedPowerCell(
     armorStand: FakeArmorStand,
 ) : PowerCell(
     false,
-    NovaConfig.getInt("power_cell.advanced.capacity")!!,
+    ADVANCED_CAPACITY,
     uuid,
     data,
     material,
@@ -96,7 +102,7 @@ class ElitePowerCell(
     armorStand: FakeArmorStand,
 ) : PowerCell(
     false,
-    NovaConfig.getInt("power_cell.elite.capacity")!!,
+    ELITE_CAPACITY,
     uuid,
     data,
     material,
@@ -112,7 +118,7 @@ class UltimatePowerCell(
     armorStand: FakeArmorStand,
 ) : PowerCell(
     false,
-    NovaConfig.getInt("power_cell.ultimate.capacity")!!,
+    ULTIMATE_CAPACITY,
     uuid,
     data,
     material,

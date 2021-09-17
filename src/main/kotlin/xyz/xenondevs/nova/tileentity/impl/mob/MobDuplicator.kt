@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.MOB_DUPLICATOR
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -44,11 +45,11 @@ import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("mob_duplicator.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("mob_duplicator.energy_per_tick")!!
-private val ENERGY_PER_TICK_NBT = NovaConfig.getInt("mob_duplicator.energy_per_tick_nbt")!!
-private val IDLE_TIME = NovaConfig.getInt("mob_duplicator.idle_time")!!
-private val IDLE_TIME_NBT = NovaConfig.getInt("mob_duplicator.idle_time_nbt")!!
+private val MAX_ENERGY = NovaConfig[MOB_DUPLICATOR].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[MOB_DUPLICATOR].getInt("energy_per_tick")!!
+private val ENERGY_PER_TICK_NBT = NovaConfig[MOB_DUPLICATOR].getInt("energy_per_tick_nbt")!!
+private val IDLE_TIME = NovaConfig[MOB_DUPLICATOR].getInt("idle_time")!!
+private val IDLE_TIME_NBT = NovaConfig[MOB_DUPLICATOR].getInt("idle_time_nbt")!!
 
 class MobDuplicator(
     uuid: UUID,

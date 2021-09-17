@@ -1,0 +1,8 @@
+{
+  "capacity": 1000000,
+  "conversion_rate": 5000,
+  "burst": {
+    "min": 70000,
+    "max": 100000
+  }
+}

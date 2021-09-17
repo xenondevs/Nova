@@ -7,6 +7,7 @@ import de.studiocode.invui.item.Item
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.CHUNK_LOADER
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -26,9 +27,9 @@ import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("chunk_loader.capacity")!!
-private val ENERGY_PER_CHUNK = NovaConfig.getInt("chunk_loader.energy_per_chunk")!!
-private val MAX_RANGE = NovaConfig.getInt("chunk_loader.max_range")!!
+private val MAX_ENERGY = NovaConfig[CHUNK_LOADER].getInt("capacity")!!
+private val ENERGY_PER_CHUNK = NovaConfig[CHUNK_LOADER].getInt("energy_per_chunk")!!
+private val MAX_RANGE = NovaConfig[CHUNK_LOADER].getInt("max_range")!!
 
 class ChunkLoader(
     uuid: UUID,

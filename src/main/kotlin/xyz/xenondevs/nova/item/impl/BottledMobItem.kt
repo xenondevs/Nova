@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.NovaItem
@@ -36,7 +37,7 @@ private val DATA_KEY = NamespacedKey(NOVA, "entityData")
 private val TYPE_KEY = NamespacedKey(NOVA, "entityType")
 private val TIME_KEY = NamespacedKey(NOVA, "fillTime")
 
-private val BLACKLISTED_ENTITY_TYPES = NovaConfig
+private val BLACKLISTED_ENTITY_TYPES = DEFAULT_CONFIG
     .getArray("bottled_mob_blacklist")!!
     .getAllStrings()
     .mapTo(HashSet(), EntityType::valueOf)

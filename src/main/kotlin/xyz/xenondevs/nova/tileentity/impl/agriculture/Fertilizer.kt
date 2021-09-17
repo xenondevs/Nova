@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.FERTILIZER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -47,13 +48,13 @@ import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("fertilizer.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("fertilizer.energy_per_tick")!!
-private val ENERGY_PER_FERTILIZE = NovaConfig.getInt("fertilizer.energy_per_fertilize")!!
-private val IDLE_TIME = NovaConfig.getInt("fertilizer.idle_time")!!
-private val MIN_RANGE = NovaConfig.getInt("fertilizer.range.min")!!
-private val MAX_RANGE = NovaConfig.getInt("fertilizer.range.max")!!
-private val DEFAULT_RANGE = NovaConfig.getInt("fertilizer.range.default")!!
+private val MAX_ENERGY = NovaConfig[FERTILIZER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[FERTILIZER].getInt("energy_per_tick")!!
+private val ENERGY_PER_FERTILIZE = NovaConfig[FERTILIZER].getInt("energy_per_fertilize")!!
+private val IDLE_TIME = NovaConfig[FERTILIZER].getInt("idle_time")!!
+private val MIN_RANGE = NovaConfig[FERTILIZER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[FERTILIZER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[FERTILIZER].getInt("range.default")!!
 
 class Fertilizer(
     uuid: UUID,

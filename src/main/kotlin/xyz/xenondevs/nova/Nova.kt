@@ -3,9 +3,8 @@ package xyz.xenondevs.nova
 import de.studiocode.invui.resourcepack.ForceResourcePack
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
-import org.sqlite.SQLiteJDBCLoader
-import org.sqlite.util.OSInfo
 import xyz.xenondevs.nova.command.CommandManager
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.database.DatabaseManager
@@ -80,8 +79,8 @@ class Nova : JavaPlugin() {
     }
     
     private fun forceResourcePack() {
-        if (NovaConfig.getBoolean("resource_pack.enabled"))
-            ForceResourcePack.getInstance().resourcePackUrl = NovaConfig.getString("resource_pack.url")
+        if (DEFAULT_CONFIG.getBoolean("resource_pack.enabled"))
+            ForceResourcePack.getInstance().resourcePackUrl = DEFAULT_CONFIG.getString("resource_pack.url")
     }
     
 }

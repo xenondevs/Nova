@@ -4,6 +4,7 @@ import org.bukkit.World
 import org.jetbrains.exposed.sql.count
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -17,13 +18,13 @@ import kotlin.math.max
 object TileEntityLimits {
     
     private val WORLD_BLACKLIST: Set<World> =
-        GSON.fromJson<HashSet<World>>(NovaConfig.getArray("tile_entity_world_blacklist"))!!
+        GSON.fromJson<HashSet<World>>(DEFAULT_CONFIG.getArray("tile_entity_world_blacklist"))!!
     
     private val TYPE_WORLD_BLACKLIST: Map<NovaMaterial, Set<World>> =
-        GSON.fromJson<HashMap<NovaMaterial, HashSet<World>>>(NovaConfig.getObject("tile_entity_type_world_blacklist"))!!
+        GSON.fromJson<HashMap<NovaMaterial, HashSet<World>>>(DEFAULT_CONFIG.getObject("tile_entity_type_world_blacklist"))!!
     
     private val TYPE_AMOUNT_LIMIT: Map<NovaMaterial, Int> =
-        GSON.fromJson<HashMap<NovaMaterial, Int>>(NovaConfig.getObject("tile_entity_limit"))!!
+        GSON.fromJson<HashMap<NovaMaterial, Int>>(DEFAULT_CONFIG.getObject("tile_entity_limit"))!!
     
     private val placedTileEntities = HashMap<UUID, MutableMap<NovaMaterial, Int>>()
     

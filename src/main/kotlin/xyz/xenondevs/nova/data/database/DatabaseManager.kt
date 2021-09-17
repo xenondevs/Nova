@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
@@ -24,16 +25,16 @@ object DatabaseManager {
     private lateinit var database: Database
     private lateinit var dataSource: HikariDataSource
     
-    val MYSQL = NovaConfig.getBoolean("mysql.enabled")
+    val MYSQL = DEFAULT_CONFIG.getBoolean("mysql.enabled")
     
     fun connect() {
         LOGGER.info("Connecting to database")
         if (MYSQL) {
-            val address = NovaConfig.getString("mysql.address")!!
-            val port = NovaConfig.getInt("mysql.port")!!
-            val username = NovaConfig.getString("mysql.username")!!
-            val password = NovaConfig.getString("mysql.password")!!
-            val databaseName = NovaConfig.getString("mysql.database")!!
+            val address = DEFAULT_CONFIG.getString("mysql.address")!!
+            val port = DEFAULT_CONFIG.getInt("mysql.port")!!
+            val username = DEFAULT_CONFIG.getString("mysql.username")!!
+            val password = DEFAULT_CONFIG.getString("mysql.password")!!
+            val databaseName = DEFAULT_CONFIG.getString("mysql.database")!!
             
             connectMySql(address, port, username, password, databaseName)
         } else connectSqlite()

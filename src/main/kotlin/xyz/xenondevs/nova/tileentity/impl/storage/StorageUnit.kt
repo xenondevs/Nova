@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.STORAGE_UNIT
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -24,7 +25,7 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.min
 
-private val MAX_ITEMS = NovaConfig.getInt("item_storage_unit.max_items")!!
+private val MAX_ITEMS = NovaConfig[STORAGE_UNIT].getInt("max_items")!!
 
 class StorageUnit(
     uuid: UUID,

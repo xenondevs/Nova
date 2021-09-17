@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.LIGHTNING_EXCHANGER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -32,10 +33,10 @@ import java.util.*
 import kotlin.math.min
 import kotlin.random.Random
 
-private val MAX_ENERGY = NovaConfig.getInt("lightning_exchanger.capacity")!!
-private val CONVERSION_RATE = NovaConfig.getInt("lightning_exchanger.conversion_rate")!!
-private val MIN_BURST = NovaConfig.getInt("lightning_exchanger.burst.min")!!
-private val MAX_BURST = NovaConfig.getInt("lightning_exchanger.burst.max")!!
+private val MAX_ENERGY = NovaConfig[LIGHTNING_EXCHANGER].getInt("capacity")!!
+private val CONVERSION_RATE = NovaConfig[LIGHTNING_EXCHANGER].getInt("conversion_rate")!!
+private val MIN_BURST = NovaConfig[LIGHTNING_EXCHANGER].getInt("burst.min")!!
+private val MAX_BURST = NovaConfig[LIGHTNING_EXCHANGER].getInt("burst.max")!!
 
 class LightningExchanger(
     uuid: UUID,

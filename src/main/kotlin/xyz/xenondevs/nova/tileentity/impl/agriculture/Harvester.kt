@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.HARVESTER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -44,13 +45,13 @@ import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("harvester.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("harvester.energy_per_tick")!!
-private val ENERGY_PER_BREAK = NovaConfig.getInt("harvester.energy_per_break")!!
-private val IDLE_TIME = NovaConfig.getInt("harvester.idle_time")!!
-private val MIN_RANGE = NovaConfig.getInt("harvester.range.min")!!
-private val MAX_RANGE = NovaConfig.getInt("harvester.range.max")!!
-private val DEFAULT_RANGE = NovaConfig.getInt("harvester.range.default")!!
+private val MAX_ENERGY = NovaConfig[HARVESTER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[HARVESTER].getInt("energy_per_tick")!!
+private val ENERGY_PER_BREAK = NovaConfig[HARVESTER].getInt("energy_per_break")!!
+private val IDLE_TIME = NovaConfig[HARVESTER].getInt("idle_time")!!
+private val MIN_RANGE = NovaConfig[HARVESTER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[HARVESTER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[HARVESTER].getInt("range.default")!!
 
 class Harvester(
     uuid: UUID,

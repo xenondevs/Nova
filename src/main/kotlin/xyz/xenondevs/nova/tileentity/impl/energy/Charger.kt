@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.ChargeableItem
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.CHARGER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -26,8 +27,8 @@ import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("charger.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("charger.charge_speed")!!
+private val MAX_ENERGY = NovaConfig[CHARGER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[CHARGER].getInt("charge_speed")!!
 
 class Charger(
     uuid: UUID,

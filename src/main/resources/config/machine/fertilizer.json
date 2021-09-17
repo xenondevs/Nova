@@ -1,0 +1,11 @@
+{
+  "capacity": 10000,
+  "energy_per_tick": 2,
+  "energy_per_fertilize": 30,
+  "idle_time": 10,
+  "range": {
+    "min": 1,
+    "max": 3,
+    "default": 3
+  }
+}

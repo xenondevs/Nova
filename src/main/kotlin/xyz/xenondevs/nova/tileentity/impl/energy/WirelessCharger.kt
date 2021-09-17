@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.ChargeableItem
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.WIRELESS_CHARGER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -31,11 +32,11 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import de.studiocode.invui.item.Item as UIItem
 
-private val MAX_ENERGY = NovaConfig.getInt("wireless_charger.capacity")!!
-private val CHARGE_SPEED = NovaConfig.getInt("wireless_charger.charge_speed")!!
-private val MIN_RANGE = NovaConfig.getInt("wireless_charger.range.min")!!
-private val MAX_RANGE = NovaConfig.getInt("wireless_charger.range.max")!!
-private val DEFAULT_RANGE = NovaConfig.getInt("wireless_charger.range.default")!!
+private val MAX_ENERGY = NovaConfig[WIRELESS_CHARGER].getInt("capacity")!!
+private val CHARGE_SPEED = NovaConfig[WIRELESS_CHARGER].getInt("charge_speed")!!
+private val MIN_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.default")!!
 
 class WirelessCharger(
     uuid: UUID,

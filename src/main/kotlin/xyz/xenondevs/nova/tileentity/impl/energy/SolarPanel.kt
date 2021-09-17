@@ -8,6 +8,7 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.SOLAR_PANEL
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -26,8 +27,8 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-private val MAX_ENERGY = NovaConfig.getInt("solar_panel.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("solar_panel.energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[SOLAR_PANEL].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[SOLAR_PANEL].getInt("energy_per_tick")!!
 
 class SolarPanel(
     uuid: UUID,

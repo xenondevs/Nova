@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.data.recipe.PulverizerNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.PULVERIZER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -34,9 +35,9 @@ import xyz.xenondevs.particle.ParticleEffect
 import java.lang.Integer.max
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("pulverizer.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("pulverizer.energy_per_tick")!!
-private val PULVERIZE_SPEED = NovaConfig.getInt("pulverizer.speed")!!
+private val MAX_ENERGY = NovaConfig[PULVERIZER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[PULVERIZER].getInt("energy_per_tick")!!
+private val PULVERIZE_SPEED = NovaConfig[PULVERIZER].getInt("speed")!!
 
 class Pulverizer(
     uuid: UUID,

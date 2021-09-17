@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.other.ItemsAdder
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLOCK_PLACER
 import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -25,8 +26,8 @@ import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("block_placer.capacity")!!
-private val ENERGY_PER_PLACE = NovaConfig.getInt("block_placer.energy_per_place")!!
+private val MAX_ENERGY = NovaConfig[BLOCK_PLACER].getInt("capacity")!!
+private val ENERGY_PER_PLACE = NovaConfig[BLOCK_PLACER].getInt("energy_per_place")!!
 
 class BlockPlacer(
     uuid: UUID,

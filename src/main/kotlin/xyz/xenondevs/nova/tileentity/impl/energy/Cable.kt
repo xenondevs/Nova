@@ -361,6 +361,18 @@ open class Cable(
     
 }
 
+private val BASIC_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getInt("energy_transfer_rate")!!
+private val BASIC_ITEM_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getInt("energy_transfer_rate")!!
+
+private val ADVANCED_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getInt("energy_transfer_rate")!!
+private val ADVANCED_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getInt("energy_transfer_rate")!!
+
+private val ELITE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getInt("energy_transfer_rate")!!
+private val ELITE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getInt("energy_transfer_rate")!!
+
+private val ULTIMATE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getInt("energy_transfer_rate")!!
+private val ULTIMATE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getInt("energy_transfer_rate")!!
+
 class BasicCable(
     uuid: UUID,
     data: CompoundElement,
@@ -368,8 +380,8 @@ class BasicCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
-    NovaConfig.getInt("cable.basic.energy_transfer_rate")!!,
-    NovaConfig.getInt("cable.basic.item_transfer_rate")!!,
+    BASIC_ENERGY_RATE,
+    BASIC_ITEM_RATE,
     uuid,
     data,
     material,
@@ -384,8 +396,8 @@ class AdvancedCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
-    NovaConfig.getInt("cable.advanced.energy_transfer_rate")!!,
-    NovaConfig.getInt("cable.advanced.item_transfer_rate")!!,
+    ADVANCED_ENERGY_RATE,
+    ADVANCED_ITEM_RATE,
     uuid,
     data,
     material,
@@ -400,8 +412,8 @@ class EliteCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
-    NovaConfig.getInt("cable.elite.energy_transfer_rate")!!,
-    NovaConfig.getInt("cable.elite.item_transfer_rate")!!,
+    ELITE_ENERGY_RATE,
+    ELITE_ITEM_RATE,
     uuid,
     data,
     material,
@@ -416,8 +428,8 @@ class UltimateCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
-    NovaConfig.getInt("cable.ultimate.energy_transfer_rate")!!,
-    NovaConfig.getInt("cable.ultimate.item_transfer_rate")!!,
+    ULTIMATE_ENERGY_RATE,
+    ULTIMATE_ITEM_RATE,
     uuid,
     data,
     material,

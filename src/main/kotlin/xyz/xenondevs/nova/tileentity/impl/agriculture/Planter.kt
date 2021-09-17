@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.PLANTER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -49,13 +50,13 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.random.Random
 
-private val MAX_ENERGY = NovaConfig.getInt("planter.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("planter.energy_per_tick")!!
-private val ENERGY_PER_PLANT = NovaConfig.getInt("planter.energy_per_plant")!!
-private val IDLE_TIME = NovaConfig.getInt("planter.idle_time")!!
-private val MIN_RANGE = NovaConfig.getInt("planter.range.min")!!
-private val MAX_RANGE = NovaConfig.getInt("planter.range.max")!!
-private val DEFAULT_RANGE = NovaConfig.getInt("planter.range.default")!!
+private val MAX_ENERGY = NovaConfig[PLANTER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[PLANTER].getInt("energy_per_tick")!!
+private val ENERGY_PER_PLANT = NovaConfig[PLANTER].getInt("energy_per_plant")!!
+private val IDLE_TIME = NovaConfig[PLANTER].getInt("idle_time")!!
+private val MIN_RANGE = NovaConfig[PLANTER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[PLANTER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[PLANTER].getInt("range.default")!!
 
 class Planter(
     uuid: UUID,

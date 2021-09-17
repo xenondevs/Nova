@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.util.data
 
 import xyz.xenondevs.nova.NOVA
 import java.io.InputStream
-import java.util.stream.Collectors
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import kotlin.streams.asSequence
 
 private val ZIP_FILE = ZipFile(NOVA.pluginFile)
 
@@ -13,10 +13,10 @@ private val ZIP_FILE = ZipFile(NOVA.pluginFile)
  *
  * @param directory The directory the resources should be in
  */
-fun getResources(directory: String = ""): List<String> {
-    return ZIP_FILE.stream().filter {
+fun getResources(directory: String = ""): Sequence<String> {
+    return ZIP_FILE.stream().asSequence().filter {
         it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
-    }.map(ZipEntry::getName).collect(Collectors.toList())
+    }.map(ZipEntry::getName)
 }
 
 /**

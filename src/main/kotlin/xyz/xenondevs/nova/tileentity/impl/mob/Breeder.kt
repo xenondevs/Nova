@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.BREEDER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -43,14 +44,14 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.math.min
 
-private val MAX_ENERGY = NovaConfig.getInt("breeder.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("breeder.energy_per_tick")!!
-private val ENERGY_PER_BREED = NovaConfig.getInt("breeder.energy_per_breed")!!
-private val IDLE_TIME = NovaConfig.getInt("breeder.idle_time")!!
-private val BREED_LIMIT = NovaConfig.getInt("breeder.breed_limit")!!
-private val MIN_RANGE = NovaConfig.getInt("breeder.range.min")!!
-private val MAX_RANGE = NovaConfig.getInt("breeder.range.max")!!
-private val DEFAULT_RANGE = NovaConfig.getInt("breeder.range.default")!!
+private val MAX_ENERGY = NovaConfig[BREEDER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[BREEDER].getInt("energy_per_tick")!!
+private val ENERGY_PER_BREED = NovaConfig[BREEDER].getInt("energy_per_breed")!!
+private val IDLE_TIME = NovaConfig[BREEDER].getInt("idle_time")!!
+private val BREED_LIMIT = NovaConfig[BREEDER].getInt("breed_limit")!!
+private val MIN_RANGE = NovaConfig[BREEDER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[BREEDER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[BREEDER].getInt("range.default")!!
 
 class Breeder(
     uuid: UUID,

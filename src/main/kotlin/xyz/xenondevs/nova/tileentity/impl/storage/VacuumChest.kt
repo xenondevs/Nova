@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.VACUUM_CHEST
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -38,9 +39,9 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import de.studiocode.invui.item.Item as UIItem
 
-private val MIN_RANGE = NovaConfig.getInt("vacuum_chest.range.min")!!
-private val MAX_RANGE = NovaConfig.getInt("vacuum_chest.range.max")!!
-private val DEFAULT_RANGE = NovaConfig.getInt("vacuum_chest.range.default")!!
+private val MIN_RANGE = NovaConfig[VACUUM_CHEST].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[VACUUM_CHEST].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[VACUUM_CHEST].getInt("range.default")!!
 
 class VacuumChest(
     uuid: UUID,

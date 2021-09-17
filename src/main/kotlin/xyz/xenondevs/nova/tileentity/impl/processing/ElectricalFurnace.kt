@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.ELECTRICAL_FURNACE
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
@@ -46,9 +47,9 @@ private val RECIPES: List<FurnaceRecipe> by lazy {
 private fun getRecipe(input: ItemStack) =
     RECIPES.firstOrNull { it.input.isSimilar(input) }
 
-private val MAX_ENERGY = NovaConfig.getInt("electrical_furnace.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("electrical_furnace.energy_per_tick")!!
-private val COOK_SPEED = NovaConfig.getInt("electrical_furnace.cook_speed")!!
+private val MAX_ENERGY = NovaConfig[ELECTRICAL_FURNACE].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[ELECTRICAL_FURNACE].getInt("energy_per_tick")!!
+private val COOK_SPEED = NovaConfig[ELECTRICAL_FURNACE].getInt("cook_speed")!!
 
 class ElectricalFurnace(
     uuid: UUID,
