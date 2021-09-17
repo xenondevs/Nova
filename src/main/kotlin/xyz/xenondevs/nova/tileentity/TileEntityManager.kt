@@ -18,13 +18,12 @@ import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.asyncTransaction
+import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
-import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -204,44 +203,22 @@ object TileEntityManager : Listener {
     @Synchronized
     private fun handleChunkLoad(chunk: Chunk) {
         asyncTransaction {
-            TileEntitiesTable
-                .select { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
+            DaoTileEntity.find { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
                 .forEach { tile ->
-                    val tileEntityUUID = tile[TileEntitiesTable.id].value
-                    val ownerUUID = tile[TileEntitiesTable.owner]
-                    val tileEntityData = tile[TileEntitiesTable.data]
-                    val material = tile[TileEntitiesTable.type]
-                    
-                    val location = Location(
-                        Bukkit.getWorld(tile[TileEntitiesTable.world]),
-                        tile[TileEntitiesTable.x].toDouble(),
-                        tile[TileEntitiesTable.y].toDouble(),
-                        tile[TileEntitiesTable.z].toDouble(),
-                    )
-                    
-                    TileInventoriesTable
-                        .select { TileInventoriesTable.tileEntityId eq tileEntityUUID }
-                        .forEach { inventoryRow ->
-                            val inventoryUUID = inventoryRow[TileInventoriesTable.id].value
-                            val inventory = inventoryRow[TileInventoriesTable.data]
-                            TileInventoryManager.loadInventory(tileEntityUUID, inventoryUUID, inventory)
-                        }
-                    
+                    tile.inventories.forEach { inventory ->
+                        TileInventoryManager.loadInventory(tile.id.value, inventory.id.value, inventory.data)
+                    }
+    
                     // create the tile entity in the main thread
                     runTask {
-                        val tileEntity = TileEntity.create(
-                            tileEntityUUID,
-                            location.clone().apply { center(); yaw = tile[TileEntitiesTable.yaw] },
-                            material,
-                            tileEntityData,
-                            ownerUUID
-                        )
-                        
+                        val location = tile.location
+                        val tileEntity = TileEntity.create(tile, location)
+        
                         val chunkMap = tileEntityMap.getOrPut(chunk.pos) { HashMap() }
                         chunkMap[location] = tileEntity
-                        
+        
                         locationCache += location
-                        
+        
                         tileEntity.handleInitialized(false)
                     }
                 }

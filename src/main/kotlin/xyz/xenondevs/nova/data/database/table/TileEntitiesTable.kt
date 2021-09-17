@@ -8,8 +8,8 @@ import java.util.*
 object TileEntitiesTable : IdTable<UUID>() {
     
     override val id = uuid("id").entityId()
-    val world = uuid("world")
     val owner = uuid("owner")
+    val world = uuid("world")
     val chunkX = integer("chunkX")
     val chunkZ = integer("chunkZ")
     val x = integer("x")

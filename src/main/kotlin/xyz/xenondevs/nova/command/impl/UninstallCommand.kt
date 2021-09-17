@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.executesCatching
 import xyz.xenondevs.nova.command.requiresConsole
+import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -37,7 +38,7 @@ object UninstallCommand : Command("nvuninstall") {
     private fun uninstall() {
         TileEntityManager.tileEntityChunks.forEach(TileEntityManager::saveChunk)
         transaction {
-            TileEntitiesTable.selectAll()
+            DaoTileEntity.all()
                 .map { getOrCreateTileEntity(it) }
                 .forEach { TileEntityManager.destroyTileEntity(it, dropItems = false) }
             
@@ -58,8 +59,8 @@ object UninstallCommand : Command("nvuninstall") {
         }
         TileEntityManager.tileEntityChunks.filter { it.world == world }.forEach(TileEntityManager::saveChunk)
         transaction {
-            TileEntitiesTable
-                .select { TileEntitiesTable.world eq world.uid }
+            DaoTileEntity
+                .find { TileEntitiesTable.world eq world.uid }
                 .map { getOrCreateTileEntity(it) }
                 .forEach { TileEntityManager.destroyTileEntity(it, dropItems = false) }
             
@@ -69,16 +70,11 @@ object UninstallCommand : Command("nvuninstall") {
     }
     
     
-    private fun getOrCreateTileEntity(row: ResultRow): TileEntity {
-        val location = Location(
-            Bukkit.getWorld(row[TileEntitiesTable.world]),
-            row[TileEntitiesTable.x].toDouble(),
-            row[TileEntitiesTable.y].toDouble(),
-            row[TileEntitiesTable.z].toDouble(),
-        )
+    private fun getOrCreateTileEntity(tile: DaoTileEntity): TileEntity {
+        val location = tile.location
         var tileEntity = TileEntityManager.getTileEntityAt(location, false)
         if (tileEntity == null) {
-            tileEntity = TileEntity.create(row, location)
+            tileEntity = TileEntity.create(tile, location)
             tileEntity.handleInitialized(false)
         }
         return tileEntity
