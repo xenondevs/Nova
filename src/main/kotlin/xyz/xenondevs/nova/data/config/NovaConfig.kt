@@ -77,8 +77,6 @@ class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataF
                 defaultConfig["resource_pack.url"] = defaultConfig.internalConfig.getString("resource_pack.url")!!
                 defaultConfig.save(true)
             }
-    
-            println(configs.keys.joinToString())
         }
         
         operator fun get(name: String) = configs[name]!!
