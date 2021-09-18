@@ -30,8 +30,11 @@ object LootGeneration : Listener {
     fun handleLootGenerationEvent(event: LootGenerateEvent) {
         for (material in possibleLoot) {
             val name = material.typeName.lowercase()
-            val (min, max) = lootFrequency.getOrPut(name)
-            { DEFAULT_CONFIG.getInt("loot_frequency.$name.min")!! to DEFAULT_CONFIG.getInt("loot_frequency.$name.min")!! }
+            val (min, max) = lootFrequency.getOrPut(name) {
+                val min = DEFAULT_CONFIG.getInt("loot_frequency.$name.min")!!
+                val max = DEFAULT_CONFIG.getInt("loot_frequency.$name.max")!!
+                min to max
+            }
             val amount = Random.nextInt(min, max)
             event.loot.add(material.createItemStack(amount))
         }
