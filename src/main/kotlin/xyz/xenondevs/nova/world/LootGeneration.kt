@@ -12,6 +12,7 @@ import kotlin.random.Random
 
 object LootGeneration : Listener {
     
+    private val lootFrequency = HashMap<String, Pair<Int, Int>>()
     private val addedLoot = ArrayList<NovaMaterial>()
     
     fun init() {
@@ -27,11 +28,15 @@ object LootGeneration : Listener {
     
     @EventHandler
     fun handleLootGenerationEvent(event: LootGenerateEvent) {
-        println(event.lootContext)
         for (material in addedLoot) {
-            val min = DEFAULT_CONFIG.getInt("loot_frequency.${material.typeName.lowercase()}.min")!!
-            val max = DEFAULT_CONFIG.getInt("loot_frequency.${material.typeName.lowercase()}.max")!!
-            val ammount = Random.Default.nextInt(min, max)
+            val name = material.typeName.lowercase()
+            if (name !in lootFrequency) {
+                val min = DEFAULT_CONFIG.getInt("loot_frequency.$name.min")!!
+                val max = DEFAULT_CONFIG.getInt("loot_frequency.$name.max")!!
+                lootFrequency[name] = min to max
+            }
+            val (min, max) = lootFrequency[name]!!
+            val ammount = Random.nextInt(min, max)
             event.loot.add(material.createItemStack(ammount))
         }
     }
