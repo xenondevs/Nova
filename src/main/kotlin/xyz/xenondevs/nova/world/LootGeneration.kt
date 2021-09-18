@@ -13,31 +13,27 @@ import kotlin.random.Random
 object LootGeneration : Listener {
     
     private val lootFrequency = HashMap<String, Pair<Int, Int>>()
-    private val addedLoot = ArrayList<NovaMaterial>()
+    private val possibleLoot = ArrayList<NovaMaterial>()
     
     fun init() {
-        addLoot()
+        addPossibleLoot()
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }
     
-    private fun addLoot() {
-        // min and max loot ammounts have to be added to the config
+    private fun addPossibleLoot() {
+        // min and max loot amounts have to be added to the config
         // at loot_frequency.<material_name>.min and loot_frequency.<material_name>.max
-        addedLoot.add(NovaMaterialRegistry.STAR_SHARDS)
+        possibleLoot.add(NovaMaterialRegistry.STAR_SHARDS)
     }
     
     @EventHandler
     fun handleLootGenerationEvent(event: LootGenerateEvent) {
-        for (material in addedLoot) {
+        for (material in possibleLoot) {
             val name = material.typeName.lowercase()
-            if (name !in lootFrequency) {
-                val min = DEFAULT_CONFIG.getInt("loot_frequency.$name.min")!!
-                val max = DEFAULT_CONFIG.getInt("loot_frequency.$name.max")!!
-                lootFrequency[name] = min to max
-            }
-            val (min, max) = lootFrequency[name]!!
-            val ammount = Random.nextInt(min, max)
-            event.loot.add(material.createItemStack(ammount))
+            val (min, max) = lootFrequency.getOrPut(name)
+            { DEFAULT_CONFIG.getInt("loot_frequency.$name.min")!! to DEFAULT_CONFIG.getInt("loot_frequency.$name.min")!! }
+            val amount = Random.nextInt(min, max)
+            event.loot.add(material.createItemStack(amount))
         }
     }
     
