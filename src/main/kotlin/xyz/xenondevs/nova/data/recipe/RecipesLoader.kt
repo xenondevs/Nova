@@ -23,8 +23,10 @@ object RecipesLoader {
             
             if (recipeFile.exists() && savedHash != null) {
                 val recipeFileHash = HashUtils.getFileHash(recipeFile, "MD5")
-                if (recipeFileHash.contentEquals(savedHash))
+                if (recipeFileHash.contentEquals(savedHash)) {
                     recipeFile.writeBytes(getResourceData(entry))
+                    storeFileHash(recipeFile)
+                }
             } else if (savedHash == null) {
                 recipeFile.parentFile.mkdirs()
                 recipeFile.writeBytes(getResourceData(entry))
