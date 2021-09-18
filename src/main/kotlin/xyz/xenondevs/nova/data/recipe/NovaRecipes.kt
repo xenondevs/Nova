@@ -5,7 +5,6 @@ import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.util.contentEquals
-import xyz.xenondevs.nova.util.novaMaterial
 
 interface NovaRecipe {
     fun register()

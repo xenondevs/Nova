@@ -6,7 +6,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.item.impl.JetpackItem
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.JETPACK
 import xyz.xenondevs.nova.ui.overlay.ActionbarOverlayManager
 import xyz.xenondevs.nova.ui.overlay.impl.JetpackOverlay

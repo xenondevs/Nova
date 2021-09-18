@@ -4,7 +4,6 @@ import com.google.gson.JsonObject
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.data.JSON_PARSER
 import xyz.xenondevs.nova.util.runAsyncTask

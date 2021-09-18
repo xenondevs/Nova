@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.data.serialization.cbf.element.primitive
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
-import java.util.*
 
 class BooleanArrayElement(override val value: BooleanArray) : BackedElement<BooleanArray>() {
     

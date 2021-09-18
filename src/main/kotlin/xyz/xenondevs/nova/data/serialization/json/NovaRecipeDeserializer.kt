@@ -21,7 +21,7 @@ private fun getItemBuilder(name: String): ItemBuilder {
             return ItemBuilder(Material.valueOf(name.substringAfter(':').uppercase()))
         } else throw IllegalArgumentException("Invalid item name: $name")
     } catch (ex: Exception) {
-        throw IllegalArgumentException("Unknown item $name")
+        throw IllegalArgumentException("Unknown item $name", ex)
     }
 }
 

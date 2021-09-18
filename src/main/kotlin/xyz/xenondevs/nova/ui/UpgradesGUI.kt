@@ -8,7 +8,6 @@ import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.SimpleItem
-import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent

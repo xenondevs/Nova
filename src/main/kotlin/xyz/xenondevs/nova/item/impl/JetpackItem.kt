@@ -3,8 +3,6 @@ package xyz.xenondevs.nova.item.impl
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.JETPACK
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.player.ability.AbilityManager.AbilityType
