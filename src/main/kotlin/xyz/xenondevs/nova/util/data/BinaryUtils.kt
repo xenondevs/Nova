@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.data
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import java.io.ByteArrayOutputStream
+import java.util.*
 import java.util.zip.Deflater
 import java.util.zip.Deflater.DEFAULT_COMPRESSION
 import java.util.zip.Inflater
@@ -66,3 +67,7 @@ fun ByteArray.decompress(): ByteArray {
         return out.toByteArray()
     }
 }
+
+fun ByteArray.encodeWithBase64(): String = Base64.getEncoder().encodeToString(this)
+
+fun String.decodeWithBase64(): ByteArray = Base64.getDecoder().decode(this)

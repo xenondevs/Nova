@@ -2,36 +2,43 @@ package xyz.xenondevs.nova.data.recipe
 
 import com.google.gson.JsonObject
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
 
 object RecipesLoader {
     
+    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve("recipeFileHashes") { HashMap() }
+    
     init {
         extractRecipes()
+        PermanentStorage.store("recipeFileHashes", fileHashes)
     }
     
     private fun extractRecipes() {
         getResources("config/recipes").forEach { entry ->
             val recipeFile = File(NOVA.dataFolder, "recipes/${entry.substring(14)}")
-            val hashFile = getHashFile(recipeFile)
+            val savedHash = getFileHash(recipeFile)
             
-            if (recipeFile.exists() && hashFile.exists()) {
+            if (recipeFile.exists() && savedHash != null) {
                 val recipeFileHash = HashUtils.getFileHash(recipeFile, "MD5")
-                val savedHash = hashFile.readBytes()
                 if (recipeFileHash.contentEquals(savedHash))
                     recipeFile.writeBytes(getResourceData(entry))
-            } else {
+            } else if (savedHash == null) {
                 recipeFile.parentFile.mkdirs()
                 recipeFile.writeBytes(getResourceData(entry))
-                hashFile.writeBytes(HashUtils.getFileHash(recipeFile, "MD5"))
+                storeFileHash(recipeFile)
             }
         }
     }
     
-    private fun getHashFile(originalFile: File): File =
-        File(originalFile.parent, ".${originalFile.name}.md5")
+    private fun storeFileHash(originalFile: File) {
+        fileHashes[originalFile.absolutePath] = HashUtils.getFileHash(originalFile, "MD5").encodeWithBase64()
+    }
+    
+    private fun getFileHash(originalFile: File): ByteArray? =
+        fileHashes[originalFile.absolutePath]?.decodeWithBase64()
     
     fun loadRecipes(): List<NovaRecipe> {
         val recipes = ArrayList<NovaRecipe>()
