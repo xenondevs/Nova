@@ -1,9 +1,9 @@
 {
   "result": "nova:block_placer",
   "shape": [
-    "iii",
-    "ifi",
-    "iii"
+    "ici",
+    "cfc",
+    "ici"
   ],
   "ingredients": [
     {
@@ -13,6 +13,10 @@
     {
       "char": "f",
       "item": "nova:advanced_machine_frame"
+    },
+    {
+      "char": "c",
+      "item": "minecraft:cobblestone"
     }
   ]
 }

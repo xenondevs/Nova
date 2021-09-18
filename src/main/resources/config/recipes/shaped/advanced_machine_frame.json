@@ -8,11 +8,11 @@
   "ingredients": [
     {
       "char": "g",
-      "item": "minecraft:glowstone_dust"
+      "item": "minecraft:gold_ingot"
     },
     {
       "char": "d",
-      "item": "nova:star_dust"
+      "item": "minecraft:glowstone_dust"
     },
     {
       "char": "m",

@@ -1,7 +1,7 @@
 {
   "result": "nova:mob_duplicator",
   "shape": [
-    "nEn",
+    "ngn",
     "dfe",
     "nsn"
   ],
@@ -11,8 +11,8 @@
       "item": "nova:netherite_plate"
     },
     {
-      "char": "E",
-      "item": "minecraft:dragon_egg"
+      "char": "g",
+      "item": "nova:gold_gear"
     },
     {
       "char": "d",

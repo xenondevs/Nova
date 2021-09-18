@@ -1,6 +1,6 @@
 {
   "result": "nova:basic_cable",
-  "amount": 8,
+  "amount": 16,
   "shape": [
     "iii",
     "rrr",

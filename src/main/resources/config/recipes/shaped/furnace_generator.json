@@ -1,8 +1,8 @@
 {
   "result": "nova:furnace_generator",
   "shape": [
-    "iii",
-    "ifi",
+    "ici",
+    "cfc",
     "iri"
   ],
   "ingredients": [
@@ -17,6 +17,10 @@
     {
       "char": "r",
       "item": "minecraft:redstone"
+    },
+    {
+      "char": "c",
+      "item": "nova:basic_cable"
     }
   ]
 }
