@@ -5,6 +5,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.type
 import java.lang.reflect.Type
 import java.util.*
@@ -24,7 +25,8 @@ val PERSISTENT_DATA_TYPES: Map<Type, PersistentDataType<*, *>> = mapOf(
     type<Array<PersistentDataContainer>>() to PersistentDataType.TAG_CONTAINER_ARRAY,
     type<UUID>() to UUIDDataType,
     type<JsonElement>() to JsonElementDataType,
-    type<CompoundElement>() to CompoundElementDataType
+    type<CompoundElement>() to CompoundElementDataType,
+    type<Version>() to VersionDataType
 )
 
 inline fun <reified K> PersistentDataContainer.get(key: NamespacedKey): K? {

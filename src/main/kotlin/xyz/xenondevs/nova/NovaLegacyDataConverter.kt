@@ -19,8 +19,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.toElement
-import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
-import xyz.xenondevs.nova.data.serialization.persistentdata.JsonElementDataType
+import xyz.xenondevs.nova.data.serialization.persistentdata.*
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -28,11 +27,9 @@ import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.util.blockLocation
 import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.fromJson
 import xyz.xenondevs.nova.util.hasNovaData
-import xyz.xenondevs.nova.util.runTaskLater
-import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
-import xyz.xenondevs.nova.world.armorstand.pos
 import java.util.*
 
 private fun ArmorStand.getTileEntityData() =
@@ -52,23 +49,19 @@ private fun TileState.setVanillaTileEntityData(compound: CompoundElement) {
     update()
 }
 
+private val VERSION_KEY = NamespacedKey(NOVA, "version")
+
 object NovaLegacyDataConverter : Listener {
     
     private val IGNORED_MANUAL_KEYS = hashSetOf("global", "material", "owner", "itemConfig", "inventories", "energyConfig", "bridgeFaces")
-    
-    private val convertedEntityChunks = PermanentStorage.retrieve("convertedEntityChunks") { HashSet<AsyncChunkPos>() }
-    private val convertedTileChunks = PermanentStorage.retrieve("convertedTileChunks") { HashSet<AsyncChunkPos>() }
     
     fun init() {
         LOGGER.info("Initializing LegacyDataConverter")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::convertChunk)
-        if (IS_VERSION_CHANGE)
+        if (IS_VERSION_CHANGE) {
             PermanentStorage.remove("placedTileEntities")
-        
-        NOVA.disableHandlers += {
-            PermanentStorage.store("convertedEntityChunks", convertedEntityChunks)
-            PermanentStorage.store("convertedTileChunks", convertedTileChunks)
+            
         }
     }
     
@@ -78,47 +71,35 @@ object NovaLegacyDataConverter : Listener {
     }
     
     private fun convertChunk(chunk: Chunk) {
-        val chunkPos = chunk.pos
-        if (convertedEntityChunks.contains(chunkPos)) return
-        val world = chunk.world
-        
-        // tile entities are not loaded async, we don't need to wait here
-        if (chunkPos !in convertedTileChunks) {
-            chunk.tileEntities
-                .filterIsInstance<TileState>()
-                .filter { it.hasLegacyData() }
-                .forEach {
-                    try {
-                        convertLegacyVanillaTileEntity(it)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            
-            convertedTileChunks += chunkPos
+        if (chunk.persistentDataContainer.has(VERSION_KEY, VersionDataType)) {
+            val chunkVersion = chunk.persistentDataContainer.get<Version>(VERSION_KEY)!!
+            if (NOVA.version.compareTo(chunkVersion, true) == 1) return
         }
         
-        // async entity loading is still not supported by spigot,
-        // so we wait 10s and hope that all entities are loaded by then
-        runTaskLater(20 * 10) {
-            // do not convert when the chunk has already been converted or is no longer loaded
-            if (convertedEntityChunks.contains(chunkPos) || !world.isChunkLoaded(chunkPos.x, chunkPos.z))
-                return@runTaskLater
-            
-            chunk.entities
-                .filterIsInstance<ArmorStand>()
-                .filter { it.persistentDataContainer.hasNovaData() }
-                .forEach {
-                    try {
-                        convertLegacyArmorStand(it)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+        chunk.tileEntities
+            .filterIsInstance<TileState>()
+            .filter { it.hasLegacyData() }
+            .forEach {
+                try {
+                    convertLegacyVanillaTileEntity(it)
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-            
-            convertedEntityChunks += chunkPos
-        }
+            }
         
+        
+        chunk.entities
+            .filterIsInstance<ArmorStand>()
+            .filter { it.persistentDataContainer.hasNovaData() }
+            .forEach {
+                try {
+                    convertLegacyArmorStand(it)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        
+        chunk.persistentDataContainer.set(VERSION_KEY, NOVA.version)
     }
     
     private fun convertLegacyVanillaTileEntity(tile: TileState) {
