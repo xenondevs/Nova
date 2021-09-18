@@ -56,13 +56,17 @@ fun Material.playPlaceSoundEffect(location: Location) {
 object MaterialUtils {
     
     fun getRecipeChoice(name: String): RecipeChoice {
-        if (name.startsWith("nova:")) {
-            val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
-            return NovaRecipeChoice(material)
-        } else if (name.startsWith("minecraft:")) {
-            val material = Material.valueOf(name.drop(10).uppercase())
-            return MaterialChoice(material)
-        } else throw IllegalArgumentException("Invalid item name: $name")
+        try {
+            if (name.startsWith("nova:")) {
+                val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
+                return NovaRecipeChoice(material)
+            } else if (name.startsWith("minecraft:")) {
+                val material = Material.valueOf(name.drop(10).uppercase())
+                return MaterialChoice(material)
+            } else throw IllegalArgumentException("Invalid item name: $name")
+        } catch (ex: Exception) {
+            throw IllegalArgumentException("Unknown item $name")
+        }
     }
     
 }

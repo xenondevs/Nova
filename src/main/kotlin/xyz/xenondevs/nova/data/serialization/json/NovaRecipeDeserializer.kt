@@ -14,11 +14,15 @@ import java.io.File
 
 @Suppress("LiftReturnOrAssignment", "CascadeIf")
 private fun getItemBuilder(name: String): ItemBuilder {
-    if (name.startsWith("nova:")) {
-        return NovaMaterialRegistry.get(name.substringAfter(':').uppercase()).createItemBuilder()
-    } else if (name.startsWith("minecraft:")) {
-        return ItemBuilder(Material.valueOf(name.substringAfter(':').uppercase()))
-    } else throw IllegalArgumentException("Invalid item name: $name")
+    try {
+        if (name.startsWith("nova:")) {
+            return NovaMaterialRegistry.get(name.substringAfter(':').uppercase()).createItemBuilder()
+        } else if (name.startsWith("minecraft:")) {
+            return ItemBuilder(Material.valueOf(name.substringAfter(':').uppercase()))
+        } else throw IllegalArgumentException("Invalid item name: $name")
+    } catch (ex: Exception) {
+        throw IllegalArgumentException("Unknown item $name")
+    }
 }
 
 private fun getRecipeKey(recipeType: String, file: File): NamespacedKey =
