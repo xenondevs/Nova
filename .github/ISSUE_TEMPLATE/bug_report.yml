@@ -1,0 +1,54 @@
+name: Bug Report
+description: Create a report to help us improve.
+title: Bug Report
+labels: bug
+body:
+  - type: checkboxes
+    attributes:
+      label: Agreements
+      description: Please agree to the following.
+      options:
+        - label: I am running the latest version of Nova.
+          required: true
+        - label: I am running the latest version of Spigot or a Spigot fork.
+          required: true
+        - label: I have checked for similar issues.
+          required: true
+  - type: input
+    attributes:
+      label: Plugin Version and Server Software
+      description: "The plugin version and server software that were used to cause this bug. Use /version to get your server version."
+      placeholder: "Nova: 0.4.1, Spigot: 3241-Spigot-6c1c1b2-1492826 (MC: 1.17.1)"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Observed/Actual behavior
+      description: What you actually saw.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce this behavior.
+      placeholder: "1. Place [...]\n2. Attach [...]\n3. Click on [...] then [...]"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Errors
+      description: If any errors or stacktraces appeared in the console, please link to them here. Please use Pastebin to post stacktraces.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
+    validations:
+      required: false

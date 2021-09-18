@@ -1,0 +1,23 @@
+name: New Block Request
+description: Suggest an idea for a new block.
+title: "[Request - Block]"
+labels: new block
+body:
+  - type: input
+    attributes:
+      label: Potential name of the block
+      description: What should this block be named?
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Describe the block
+      description: Describe what the block is and what it should be able to do.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
+    validations:
+      required: false
