@@ -83,18 +83,20 @@ object NovaLegacyDataConverter : Listener {
         val world = chunk.world
         
         // tile entities are not loaded async, we don't need to wait here
-        chunk.tileEntities
-            .filterIsInstance<TileState>()
-            .filter { it.hasLegacyData() }
-            .forEach {
-                try {
-                    convertLegacyVanillaTileEntity(it)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+        if (chunkPos !in convertedTileChunks) {
+            chunk.tileEntities
+                .filterIsInstance<TileState>()
+                .filter { it.hasLegacyData() }
+                .forEach {
+                    try {
+                        convertLegacyVanillaTileEntity(it)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-            }
-        
-        convertedTileChunks += chunkPos
+            
+            convertedTileChunks += chunkPos
+        }
         
         // async entity loading is still not supported by spigot,
         // so we wait 10s and hope that all entities are loaded by then
