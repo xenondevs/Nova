@@ -29,7 +29,7 @@ permissions:
   nova.command.items:
     description: Allows players to open the nova items menu.
     default: true
-  nova.command.render_distance:
+  nova.command.renderDistance:
     description: Allows players to configure their armor stand render distance.
     default: true
   nova.command.nvrecipe:

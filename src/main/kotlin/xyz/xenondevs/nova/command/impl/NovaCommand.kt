@@ -50,7 +50,7 @@ object NovaCommand : Command("nova") {
                 .requiresPermission("nova.command.items")
                 .executesCatching { openItemInventory(it) })
             .then(literal("renderDistance")
-                .requiresPermission("nova.command.render_distance")
+                .requiresPermission("nova.command.renderDistance")
                 .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
                     .executesCatching { setRenderDistance(it) }))
     }
