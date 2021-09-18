@@ -44,7 +44,7 @@ object UpdateReminder : Listener {
     @EventHandler
     fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
-        if (player.hasPermission("nova.updatereminder") && needsUpdate) {
+        if (player.hasPermission("nova.misc.updateReminder") && needsUpdate) {
             val message = ComponentBuilder()
                 .append(TranslatableComponent("nova.outdated_version"))
                 .appendLegacy("§bhttps://spigotmc.org/resources/93648")

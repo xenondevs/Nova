@@ -1,11 +1,44 @@
 name: Nova
 version: ${project.version}
 authors: [ "StudioCode", "ByteZ1337", "flimosch" ]
+website: "https://github.com/xenondevs/Nova/"
 main: xyz.xenondevs.nova.Nova
 api-version: 1.17
 softdepend:
   - WorldGuard
   - GriefPrevention
+  - PlotSquared
   - GriefDefender
   - Vault
   - ItemsAdder
+
+permissions:
+  nova.command.*:
+    description: Gives access to all Nova commands.
+    children:
+      - nova.command.give
+      - nova.command.debug
+      - nova.command.items
+      - nova.command.render_distance
+      - nova.command.nvrecipe
+      - nova.command.nvusage
+  nova.command.give:
+    description: Allows players to cheat nova items using /nova give.
+  nova.command.debug:
+    description: Allows the usage of the /nova debug command.
+  nova.command.items:
+    description: Allows players to open the nova items menu.
+    default: true
+  nova.command.render_distance:
+    description: Allows players to configure their armor stand render distance.
+    default: true
+  nova.command.nvrecipe:
+    description: Allows players to use the /nvrecipe command.
+    default: true
+  nova.command.nvusage:
+    description: Allows players to use the /nvusage command.
+    default: true
+  nova.misc.updateReminder:
+    description: Players with this permission will be reminded if a new version is available
+  nova.misc.bypassTileEntityLimits:
+    description: Players with this permission will be able to bypass the tile entity limits set in the config.
