@@ -11,14 +11,18 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE_ICON
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_EFFICIENCY_UPGRADE_ICON
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_ENERGY_UPGRADE_ICON
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_RANGE_UPGRADE_ICON
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_SPEED_UPGRADE_ICON
 import xyz.xenondevs.nova.util.data.getAllDoubles
 
-enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial) {
+enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial, val grayIcon: NovaMaterial) {
     
-    SPEED(SPEED_UPGRADE, SPEED_UPGRADE_ICON),
-    EFFICIENCY(EFFICIENCY_UPGRADE, EFFICIENCY_UPGRADE_ICON),
-    ENERGY(ENERGY_UPGRADE, ENERGY_UPGRADE_ICON),
-    RANGE(RANGE_UPGRADE, RANGE_UPGRADE_ICON);
+    SPEED(SPEED_UPGRADE, SPEED_UPGRADE_ICON, TRANSLUCENT_SPEED_UPGRADE_ICON),
+    EFFICIENCY(EFFICIENCY_UPGRADE, EFFICIENCY_UPGRADE_ICON, TRANSLUCENT_EFFICIENCY_UPGRADE_ICON),
+    ENERGY(ENERGY_UPGRADE, ENERGY_UPGRADE_ICON, TRANSLUCENT_ENERGY_UPGRADE_ICON),
+    RANGE(RANGE_UPGRADE, RANGE_UPGRADE_ICON, TRANSLUCENT_RANGE_UPGRADE_ICON);
     
     private val modifierCache = HashMap<NovaMaterial, DoubleArray>()
     

@@ -8,6 +8,7 @@ import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.SimpleItem
+import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
@@ -64,7 +65,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         }
         
         override fun getItemProvider(): ItemProvider {
-            val builder = type.icon.createBasicItemBuilder()
+            val builder = (if (type in upgradeHolder.allowed) type.icon else type.grayIcon).createBasicItemBuilder()
             val typeName = type.name.lowercase()
             if (type in upgradeHolder.allowed) {
                 builder.setDisplayName(localized(
@@ -95,7 +96,9 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         }
         
         override fun getItemProvider(): ItemProvider {
-            return NovaMaterialRegistry.NUMBER.item.createItemBuilder(upgradeHolder.upgrades[type] ?: 0)
+            return if (type in upgradeHolder.allowed)
+                NovaMaterialRegistry.NUMBER.item.createItemBuilder(upgradeHolder.upgrades[type] ?: 0)
+            else NovaMaterialRegistry.NO_NUMBER.createBasicItemBuilder()
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
