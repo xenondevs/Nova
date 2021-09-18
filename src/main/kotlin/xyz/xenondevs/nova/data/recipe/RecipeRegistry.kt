@@ -6,6 +6,7 @@ import org.bukkit.inventory.*
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
+import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeType
 import xyz.xenondevs.nova.util.data.plus
 import xyz.xenondevs.nova.util.novaMaterial
@@ -34,6 +35,7 @@ object RecipeRegistry {
             
             runTask {
                 CommandManager.registerCommand(NovaRecipeCommand)
+                CommandManager.registerCommand(NovaUsageCommand)
             }
         }
     }
