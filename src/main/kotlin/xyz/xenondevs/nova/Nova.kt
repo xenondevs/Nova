@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
+import xyz.xenondevs.nova.world.LootGeneration
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import java.util.logging.Logger
 
@@ -64,6 +65,7 @@ class Nova : JavaPlugin() {
         ArmorEquipListener.init()
         AbilityManager.init()
         PacketListener.init()
+        LootGeneration.init()
         forceResourcePack()
         
         Metrics(this, 11927)
