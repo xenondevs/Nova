@@ -39,7 +39,7 @@ object WorldGuard : ProtectionIntegration {
         }
     }
     
-    override fun isInstalled() = PLATFORM != null && PLUGIN != null
+    override val isInstalled = PLATFORM != null && PLUGIN != null
     
     override fun canBreak(player: OfflinePlayer, location: Location): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true

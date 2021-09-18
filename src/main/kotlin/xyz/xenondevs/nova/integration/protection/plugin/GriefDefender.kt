@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.util.getBlockName
 
 object GriefDefender : ProtectionIntegration {
     
-    override fun isInstalled() = Bukkit.getPluginManager().getPlugin("GriefDefender") != null
+    override val isInstalled = Bukkit.getPluginManager().getPlugin("GriefDefender") != null
     
     private fun testFlag(player: OfflinePlayer, location: Location, flag: Flag, trustType: TrustType): Boolean {
         val user = GriefDefender.getCore().getUser(player.uniqueId)

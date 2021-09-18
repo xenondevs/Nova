@@ -8,9 +8,7 @@ import com.plotsquared.core.location.Location as PlotLocation
 
 object PlotSquared : ProtectionIntegration {
     
-    override fun isInstalled() = HAS_PLOT_SQUARED
-    
-    private val HAS_PLOT_SQUARED = Bukkit.getPluginManager().getPlugin("PlotSquared") != null
+    override val isInstalled = Bukkit.getPluginManager().getPlugin("PlotSquared") != null
     
     override fun canBreak(player: OfflinePlayer, location: Location) = isAllowed(player, location)
     
@@ -19,7 +17,7 @@ object PlotSquared : ProtectionIntegration {
     override fun canUse(player: OfflinePlayer, location: Location) = isAllowed(player, location)
     
     fun isAllowed(offlinePlayer: OfflinePlayer, location: Location): Boolean {
-        if (!HAS_PLOT_SQUARED) return true
+        if (!isInstalled) return true
         val plotLocation = location.toPlotLocation()
         if (plotLocation.isPlotRoad) return false
         return if (plotLocation.isPlotArea) {

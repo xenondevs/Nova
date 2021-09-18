@@ -65,7 +65,7 @@ class BlockPlacer(
                 
                 inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
                 return true
-            } else if (ItemsAdder.isInstalled()) {
+            } else if (ItemsAdder.isInstalled) {
                 if (ItemsAdder.placeItem(item, placeBlock.location)) {
                     inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
                     return true

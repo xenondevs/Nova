@@ -30,7 +30,7 @@ fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true
         return TileEntityManager.destroyTileEntity(tileEntity, true)
     }
     
-    if (ItemsAdder.isInstalled()) {
+    if (ItemsAdder.isInstalled) {
         val customBlock = CustomBlock.byAlreadyPlaced(this)
         if (customBlock != null)
             return ItemsAdder.breakCustomBlock(customBlock)

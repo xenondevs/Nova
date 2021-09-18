@@ -10,9 +10,7 @@ import xyz.xenondevs.nova.integration.Integration
 import xyz.xenondevs.nova.util.playPlaceSoundEffect
 
 object ItemsAdder : Integration {
-    override fun isInstalled() = HAS_ITEMS_ADDER
-    
-    private val HAS_ITEMS_ADDER = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null
+    override val isInstalled = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null
     
     fun breakCustomBlock(block: CustomBlock): List<ItemStack> {
         val loot = block.getLoot(true)
