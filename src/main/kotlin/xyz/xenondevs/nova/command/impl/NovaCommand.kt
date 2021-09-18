@@ -27,7 +27,7 @@ object NovaCommand : Command("nova") {
     init {
         builder = builder
             .then(literal("give")
-                .requiresPermission("nova.creative")
+                .requiresPermission("nova.command.give")
                 .apply {
                     NovaMaterialRegistry.sortedObtainables.forEach { material ->
                         then(literal(material.typeName)
@@ -36,7 +36,7 @@ object NovaCommand : Command("nova") {
                     }
                 })
             .then(literal("debug")
-                .requiresPermission("nova.debug")
+                .requiresPermission("nova.command.debug")
                 .then(literal("removeTileEntities")
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching { removeTileEntities(it) }))
@@ -47,10 +47,10 @@ object NovaCommand : Command("nova") {
                 .then(literal("itemNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) }))
             .then(literal("items")
-                .requiresPermission("nova.items")
+                .requiresPermission("nova.command.items")
                 .executesCatching { openItemInventory(it) })
             .then(literal("renderDistance")
-                .requiresPermission("nova.armor_stand_render_distance")
+                .requiresPermission("nova.command.render_distance")
                 .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
                     .executesCatching { setRenderDistance(it) }))
     }

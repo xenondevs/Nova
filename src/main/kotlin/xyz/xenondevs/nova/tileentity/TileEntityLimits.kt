@@ -45,7 +45,7 @@ object TileEntityLimits {
     }
     
     fun canPlaceTileEntity(uuid: UUID, world: World, type: NovaMaterial): PlaceResult {
-        if (PermissionUtils.hasPermission(world, uuid, "nova.bypassTileEntityLimits")) return PlaceResult.ALLOW
+        if (PermissionUtils.hasPermission(world, uuid, "nova.misc.bypassTileEntityLimits")) return PlaceResult.ALLOW
         
         if (WORLD_BLACKLIST.contains(world)) return PlaceResult.DENY_BLACKLIST
         if (TYPE_WORLD_BLACKLIST.containsKey(type) && TYPE_WORLD_BLACKLIST[type]?.contains(world) == true) return PlaceResult.DENY_BLACKLIST_TYPE
