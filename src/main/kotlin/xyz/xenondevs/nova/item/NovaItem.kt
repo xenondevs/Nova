@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item
 
+import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -7,10 +8,10 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.serialization.persistentdata.get
-import xyz.xenondevs.nova.serialization.persistentdata.set
+import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 
 /**
  * Handles actions performed on [ItemStack]s of a [NovaMaterial]
@@ -23,7 +24,7 @@ abstract class NovaItem {
     
     open fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {}
     
-    open fun getDefaultItemBuilder(itemBuilder: NovaItemBuilder): NovaItemBuilder = itemBuilder
+    open fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     
     inline fun <reified K> retrieveData(itemStack: ItemStack, key: NamespacedKey): K? {
         return itemStack.itemMeta?.persistentDataContainer?.get(key)

@@ -1,13 +1,17 @@
 package xyz.xenondevs.nova.util
 
 import com.google.common.base.Preconditions
-import org.bukkit.*
+import org.bukkit.Axis
+import org.bukkit.Chunk
+import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
+import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
@@ -18,6 +22,9 @@ val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
 
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
+
+val Location.chunkPos: AsyncChunkPos
+    get() = AsyncChunkPos(world!!.uid, x.toInt() shr 4, z.toInt() shr 4)
 
 fun Location.dropItems(items: Iterable<ItemStack>) {
     val world = world!!
@@ -36,15 +43,15 @@ fun Location.advance(blockFace: BlockFace, stepSize: Double = 1.0) =
         blockFace.modZ.toDouble() * stepSize
     )
 
-fun Location.getNeighboringTileEntities(): Map<BlockFace, TileEntity> {
-    return getNeighboringTileEntitiesOfType()
+fun Location.getNeighboringTileEntities(additionalHitboxes: Boolean): Map<BlockFace, TileEntity> {
+    return getNeighboringTileEntitiesOfType(additionalHitboxes)
 }
 
-inline fun <reified T> Location.getNeighboringTileEntitiesOfType(): Map<BlockFace, T> {
+inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitboxes: Boolean): Map<BlockFace, T> {
     val tileEntities = HashMap<BlockFace, T>()
     CUBE_FACES.forEach {
         val location = blockLocation.advance(it)
-        val tileEntity = TileEntityManager.getTileEntityAt(location)
+        val tileEntity = TileEntityManager.getTileEntityAt(location, additionalHitboxes)
             ?: VanillaTileEntityManager.getTileEntityAt(location)
         if (tileEntity != null && tileEntity is T) tileEntities[it] = tileEntity as T
     }
@@ -52,14 +59,13 @@ inline fun <reified T> Location.getNeighboringTileEntitiesOfType(): Map<BlockFac
     return tileEntities
 }
 
-fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
+inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
     val vector = direction.multiply(stepSize)
     val location = clone()
     var distance = 0.0
-    while (run(location)) {
+    while (run(location) && distance <= maxDistance) {
         location.add(vector)
         distance += stepSize
-        if (distance > maxDistance) break
     }
 }
 
@@ -168,7 +174,7 @@ fun Location.getRectangle(to: Location, omitCorners: Boolean): Map<Axis, List<Lo
     return rectangle
 }
 
-fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
+inline fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
     Preconditions.checkArgument(world != null && to.world == world)
     
     val (min, max) = LocationUtils.sort(this, to)
@@ -239,11 +245,12 @@ fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double =
 
 fun Location.createColoredParticle(color: Color): Any = ParticleBuilder(ParticleEffect.REDSTONE, this).setColor(color).toPacket()
 
-fun Location.getNextBlockBelow(countSelf: Boolean): Location? {
+fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Location? {
     val location = clone()
     if (!countSelf) location.y -= 1
     while (location.y >= 0) {
-        if (location.block.type != Material.AIR) return location
+        val type = location.block.type
+        if (!type.isAir && (!requiresSolid || type.isSolid)) return location
         location.y -= 1
     }
     

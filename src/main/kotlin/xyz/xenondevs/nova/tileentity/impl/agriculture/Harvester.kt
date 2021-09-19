@@ -1,82 +1,126 @@
 package xyz.xenondevs.nova.tileentity.impl.agriculture
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.item.Item
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
-import org.bukkit.entity.ArmorStand
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.HARVESTER
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.ui.item.AddNumberItem
+import xyz.xenondevs.nova.ui.item.DisplayNumberItem
+import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.addAll
+import xyz.xenondevs.nova.util.breakAndTakeDrops
+import xyz.xenondevs.nova.util.dropItemsNaturally
 import xyz.xenondevs.nova.util.item.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.region.Region
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("harvester.capacity")!!
-private val ENERGY_PER_BREAK = NovaConfig.getInt("harvester.energy_per_break")!!
-private val WAIT_TIME = NovaConfig.getInt("harvester.wait_time")!!
+private val MAX_ENERGY = NovaConfig[HARVESTER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[HARVESTER].getInt("energy_per_tick")!!
+private val ENERGY_PER_BREAK = NovaConfig[HARVESTER].getInt("energy_per_break")!!
+private val IDLE_TIME = NovaConfig[HARVESTER].getInt("idle_time")!!
+private val MIN_RANGE = NovaConfig[HARVESTER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[HARVESTER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[HARVESTER].getInt("range.default")!!
 
 class Harvester(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val gui by lazy(::HarvesterGUI)
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+    private val inventory = getInventory("harvest", 12, ::handleInventoryUpdate)
+    private val shearInventory = getInventory("shears", 1, ::handleShearInventoryUpdate)
+    private val axeInventory = getInventory("axe", 1, ::handleAxeInventoryUpdate)
+    private val hoeInventory = getInventory("hoe", 1, ::handleHoeInventoryUpdate)
+    override val gui = lazy(::HarvesterGUI)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_BREAK, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, inventory, shearInventory, axeInventory, hoeInventory)
     
-    private val inventory = getInventory("harvest", 12, true, ::handleInventoryUpdate)
-    private val shearInventory = getInventory("shears", 1, true, ::handleShearInventoryUpdate)
-    private val axeInventory = getInventory("axe", 1, true, ::handleAxeInventoryUpdate)
-    private val hoeInventory = getInventory("hoe", 1, true, ::handleHoeInventoryUpdate)
-    private val harvestRegion = getFrontArea(11.0, 11.0, 11.0, 0.0)
+    private var maxIdleTime = 0
+    private var maxRange = 0
+    private var range = retrieveData("range") { DEFAULT_RANGE }
+        set(value) {
+            field = value
+            updateRegion()
+            if (gui.isInitialized()) gui.value.updateRangeItems()
+        }
+    private lateinit var harvestRegion: Region
     
     private val queuedBlocks = LinkedList<Pair<Block, Material>>()
-    private var idleTime = 0
+    private var timePassed = 0
     private var loadCooldown = 0
     
     init {
-        setDefaultInventory(inventory)
-        addAvailableInventories(shearInventory, axeInventory, hoeInventory)
+        handleUpgradeUpdates()
+        updateRegion()
+    }
+    
+    private fun handleUpgradeUpdates() {
+        maxIdleTime = (IDLE_TIME / upgradeHolder.getSpeedModifier()).toInt()
+        if (timePassed > maxIdleTime) timePassed = maxIdleTime
+        
+        maxRange = MAX_RANGE + upgradeHolder.getRangeModifier()
+        if (range > maxRange) range = maxRange
+    }
+    
+    private fun updateRegion() {
+        harvestRegion = getBlockFrontRegion(range, range, range * 2, 0)
+        VisualRegion.updateRegion(uuid, harvestRegion)
+    }
+    
+    override fun saveData() {
+        super.saveData()
+        storeData("range", range)
     }
     
     override fun handleTick() {
-        if (energy >= ENERGY_PER_BREAK) {
-            loadCooldown--
+        if (energyHolder.energy >= energyHolder.energyConsumption) {
+            energyHolder.energy -= energyHolder.energyConsumption
             
-            if (--idleTime <= 0) {
-                idleTime = WAIT_TIME
+            if (energyHolder.energy >= energyHolder.specialEnergyConsumption) {
+                loadCooldown--
                 
-                if (queuedBlocks.isEmpty()) loadBlocks()
-                harvestNextBlock()
+                if (timePassed++ >= maxIdleTime) {
+                    timePassed = 0
+                    
+                    if (queuedBlocks.isEmpty()) loadBlocks()
+                    harvestNextBlock()
+                }
             }
-            
-        }
-        
-        if (hasEnergyChanged) {
-            hasEnergyChanged = false
-            gui.energyBar.update()
         }
     }
     
@@ -101,7 +145,7 @@ class Harvester(
                 val (block, expectedType) = queuedBlocks.first
                 queuedBlocks.removeFirst()
                 
-                if (!ProtectionUtils.canBreak(ownerUUID, block.location)) {
+                if (!ProtectionManager.canBreak(ownerUUID, block.location)) {
                     // skip block if it is protected
                     tryAgain = true
                     continue
@@ -138,7 +182,7 @@ class Harvester(
                         // use complex harvesting method to harvest this block
                         listOf(PlantUtils.COMPLEX_HARVESTABLE_BLOCKS[expectedType]!!.second(block))
                     } else {
-                        // break the drops with the provided tool 
+                        // break the drops with the provided tool
                         block.breakAndTakeDrops(tool)
                     }
                     
@@ -148,7 +192,7 @@ class Harvester(
                     else world.dropItemsNaturally(block.location, drops)
                     
                     // take energy
-                    energy -= ENERGY_PER_BREAK
+                    energyHolder.energy -= energyHolder.specialEnergyConsumption
                 } else tryAgain = true
             }
             
@@ -192,31 +236,38 @@ class Harvester(
             this@Harvester,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inventory), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES),
-                Triple(getNetworkedInventory(shearInventory), "inventory.nova.shears", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(axeInventory), "inventory.nova.axes", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(hoeInventory), "inventory.nova.hoes", ItemConnectionType.ALL_TYPES)
+                Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES),
+                Triple(itemHolder.getNetworkedInventory(shearInventory), "inventory.nova.shears", ItemConnectionType.ALL_TYPES),
+                Triple(itemHolder.getNetworkedInventory(axeInventory), "inventory.nova.axes", ItemConnectionType.ALL_TYPES),
+                Triple(itemHolder.getNetworkedInventory(hoeInventory), "inventory.nova.hoes", ItemConnectionType.ALL_TYPES)
             )
         ) { openWindow(it) }
+        
+        private val rangeItems = ArrayList<Item>()
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| c v u s a h . |" +
-                "| # # # # # # . |" +
-                "| . . . . . . . |" +
-                "| . . . . . . . |" +
+                "| m n p # # # . |" +
+                "| i i i i i i . |" +
+                "| i i i i i i . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('c', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('v', VisualizeRegionItem(uuid, harvestRegion))
-            .addIngredient('s', VISlotElement(shearInventory, 0, NovaMaterial.SHEARS_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('a', VISlotElement(axeInventory, 0, NovaMaterial.AXE_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('h', VISlotElement(hoeInventory, 0, NovaMaterial.HOE_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('v', VisualizeRegionItem(uuid) { harvestRegion })
+            .addIngredient('s', VISlotElement(shearInventory, 0, NovaMaterialRegistry.SHEARS_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('a', VISlotElement(axeInventory, 0, NovaMaterialRegistry.AXE_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('h', VISlotElement(hoeInventory, 0, NovaMaterialRegistry.HOE_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
-            .apply { fillRectangle(1, 3, 6, inventory, true) }
         
-        val energyBar = EnergyBar(gui, 7, 1, 4) { Triple(energy, MAX_ENERGY, -1) }
+        val energyBar = EnergyBar(gui, 7, 1, 4, energyHolder)
+        
+        fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
         
     }
     

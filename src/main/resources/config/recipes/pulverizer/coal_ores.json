@@ -4,5 +4,6 @@
     "minecraft:deepslate_coal_ore"
   ],
   "result": "nova:coal_dust",
-  "amount": 2
+  "amount": 2,
+  "time": 200
 }

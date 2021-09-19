@@ -1,85 +1,121 @@
 package xyz.xenondevs.nova.tileentity.impl.agriculture
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.item.Item
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.region.Region
-import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.PLANTER
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.ui.item.AddNumberItem
+import xyz.xenondevs.nova.ui.item.DisplayNumberItem
+import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.item.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
 import xyz.xenondevs.nova.util.soundGroup
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.region.Region
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.random.Random
 
-private val MAX_ENERGY = NovaConfig.getInt("planter.capacity")!!
-private val ENERGY_PER_PLANT = NovaConfig.getInt("planter.energy_per_plant")!!
-private val WAIT_TIME = NovaConfig.getInt("planter.wait_time")!!
+private val MAX_ENERGY = NovaConfig[PLANTER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[PLANTER].getInt("energy_per_tick")!!
+private val ENERGY_PER_PLANT = NovaConfig[PLANTER].getInt("energy_per_plant")!!
+private val IDLE_TIME = NovaConfig[PLANTER].getInt("idle_time")!!
+private val MIN_RANGE = NovaConfig[PLANTER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[PLANTER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[PLANTER].getInt("range.default")!!
 
 class Planter(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
-    
-    private val inputInventory = getInventory("input", 6, true, ::handleSeedUpdate)
-    private val hoesInventory = getInventory("hoes", 1, true, ::handleHoeUpdate)
-    override val gui by lazy(::PlanterGUI)
-    
-    private val plantRegion = getFrontArea(7.0, 7.0, 1.0, 0.0)
-    private val soilRegion = Region(plantRegion.min.clone().advance(BlockFace.DOWN), plantRegion.max.clone().advance(BlockFace.DOWN))
+    private val inputInventory = getInventory("input", 6, ::handleSeedUpdate)
+    private val hoesInventory = getInventory("hoes", 1, ::handleHoeUpdate)
+    override val gui = lazy(::PlanterGUI)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_PLANT, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, inputInventory, hoesInventory)
     
     private var autoTill = retrieveData("autoTill") { true }
-    private var idleTime = WAIT_TIME
+    private var maxIdleTime = 0
+    private var timePassed = 0
+    
+    private var maxRange = 0
+    private var range = retrieveData("range") { DEFAULT_RANGE }
+        set(value) {
+            field = value
+            updateRegion()
+            if (gui.isInitialized()) gui.value.updateRangeItems()
+        }
+    
+    private lateinit var plantRegion: Region
+    private lateinit var soilRegion: Region
     
     init {
-        addAvailableInventories(inputInventory, hoesInventory)
-        setDefaultInventory(inputInventory)
+        handleUpgradeUpdates()
+        updateRegion()
+    }
+    
+    private fun handleUpgradeUpdates() {
+        maxIdleTime = (IDLE_TIME / upgradeHolder.getSpeedModifier()).toInt()
+        if (timePassed > maxIdleTime) timePassed = maxIdleTime
+        
+        maxRange = MAX_RANGE + upgradeHolder.getRangeModifier()
+        if (maxRange < range) range = maxRange
+    }
+    
+    private fun updateRegion() {
+        plantRegion = getBlockFrontRegion(range, range, 1, 0)
+        soilRegion = Region(plantRegion.min.clone().advance(BlockFace.DOWN), plantRegion.max.clone().advance(BlockFace.DOWN))
+        
+        VisualRegion.updateRegion(uuid, plantRegion)
     }
     
     override fun handleTick() {
-        if (energy >= ENERGY_PER_PLANT) {
-            if (idleTime > 0) idleTime--
-            else {
-                idleTime = WAIT_TIME
+        if (energyHolder.energy >= energyHolder.energyConsumption) {
+            energyHolder.energy -= energyHolder.energyConsumption // idle energy consumption
+            
+            if (energyHolder.energy >= energyHolder.specialEnergyConsumption && timePassed++ >= maxIdleTime) {
+                timePassed = 0
                 placeNextSeed()
             }
-        }
-        
-        if (hasEnergyChanged) {
-            hasEnergyChanged = false
-            gui.energyBar.update()
         }
     }
     
@@ -91,7 +127,7 @@ class Planter(
                 
                 // find a location to place this seed or skip to the next one if there isn't one
                 val (plant, soil) = getNextBlock(item.type) ?: continue
-                energy -= ENERGY_PER_PLANT
+                energyHolder.energy -= energyHolder.specialEnergyConsumption
                 
                 // till dirt if possible
                 if (soil.type.isTillable() && autoTill && !hoesInventory.isEmpty) tillDirt(soil)
@@ -109,7 +145,7 @@ class Planter(
         } else if (autoTill && !hoesInventory.isEmpty) {
             val block = getNextBlock(null)?.second
             if (block != null) {
-                energy -= ENERGY_PER_PLANT
+                energyHolder.energy -= energyHolder.specialEnergyConsumption
                 tillDirt(block)
             }
         }
@@ -126,7 +162,7 @@ class Planter(
             
             // Search for a block that has no block on top of it and is dirt/farmland
             // If the soil or plant block is protected, skip this block
-            if (!ProtectionUtils.canPlace(ownerUUID, block.location) || !ProtectionUtils.canBreak(ownerUUID, soilBlock.location))
+            if (!ProtectionManager.canPlace(ownerUUID, block.location) || !ProtectionManager.canBreak(ownerUUID, soilBlock.location))
                 return@indexOfFirst false
             
             // If the plant block is already occupied return false
@@ -175,6 +211,7 @@ class Planter(
     override fun saveData() {
         super.saveData()
         storeData("autoTill", autoTill)
+        storeData("range", range)
     }
     
     inner class PlanterGUI : TileEntityGUI("menu.nova.planter") {
@@ -183,32 +220,39 @@ class Planter(
             this@Planter,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inputInventory), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
-                Triple(getNetworkedInventory(hoesInventory), "inventory.nova.hoes", ItemConnectionType.INSERT_TYPES)
+                Triple(itemHolder.getNetworkedInventory(inputInventory), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
+                Triple(itemHolder.getNetworkedInventory(hoesInventory), "inventory.nova.hoes", ItemConnectionType.INSERT_TYPES)
             ),
         ) { openWindow(it) }
+        
+        private val rangeItems = ArrayList<Item>()
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s u a # # # . |" +
-                "| . . . # h # . |" +
-                "| . . . # f # . |" +
+                "| s u v # # p . |" +
+                "| i i i # h n . |" +
+                "| i i i # f m . |" +
                 "3 - - - - - - - 4")
-            .addIngredient('h', VISlotElement(hoesInventory, 0, NovaMaterial.HOE_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('a', VisualizeRegionItem(uuid, plantRegion))
+            .addIngredient('i', inputInventory)
+            .addIngredient('h', VISlotElement(hoesInventory, 0, NovaMaterialRegistry.HOE_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('v', VisualizeRegionItem(uuid) { plantRegion })
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('f', AutoTillingItem())
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .build()
-            .also { it.fillRectangle(1, 2, 3, inputInventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
+        
+        fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
         
         private inner class AutoTillingItem : BaseItem() {
             
-            override fun getItemBuilder(): ItemBuilder {
-                return (if (autoTill) NovaMaterial.HOE_ON_BUTTON else NovaMaterial.HOE_OFF_BUTTON)
+            override fun getItemProvider(): ItemProvider {
+                return (if (autoTill) NovaMaterialRegistry.HOE_ON_BUTTON else NovaMaterialRegistry.HOE_OFF_BUTTON)
                     .createBasicItemBuilder().setLocalizedName("menu.nova.planter.autotill")
             }
             

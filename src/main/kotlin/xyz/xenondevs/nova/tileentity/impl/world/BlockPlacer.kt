@@ -1,46 +1,50 @@
 package xyz.xenondevs.nova.tileentity.impl.world
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import org.bukkit.Material
-import org.bukkit.entity.ArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.other.ItemsAdder
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLOCK_PLACER
 import xyz.xenondevs.nova.tileentity.*
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("block_placer.capacity")!!
-private val ENERGY_PER_PLACE = NovaConfig.getInt("block_placer.energy_per_place")!!
+private val MAX_ENERGY = NovaConfig[BLOCK_PLACER].getInt("capacity")!!
+private val ENERGY_PER_PLACE = NovaConfig[BLOCK_PLACER].getInt("energy_per_place")!!
 
 class BlockPlacer(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+    private val inventory = getInventory("inventory", 9) {}
+    override val gui = lazy { BlockPlacerGUI() }
+    override val upgradeHolder = UpgradeHolder(this, gui, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_PLACE, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, inventory)
     
-    private val inventory = getInventory("inventory", 9, true) { }
     private val placeLocation = location.clone().advance(getFace(BlockSide.FRONT))
     private val placeBlock = location.clone().advance(getFace(BlockSide.FRONT)).block
-    
-    override val gui by lazy { BlockPlacerGUI() }
-    
-    init {
-        setDefaultInventory(inventory)
-    }
     
     private fun placeBlock(): Boolean {
         for ((index, item) in inventory.items.withIndex()) {
@@ -52,7 +56,7 @@ class BlockPlacer(
                 if (novaMaterial != null && novaMaterial.isBlock) {
                     if (TileEntityLimits.canPlaceTileEntity(ownerUUID, world, novaMaterial) == PlaceResult.ALLOW) {
                         TileEntityManager.placeTileEntity(ownerUUID, placeBlock.location, armorStand.location.yaw, novaMaterial, null)
-                        novaMaterial.hitbox?.playPlaceSoundEffect(placeBlock.location)
+                        novaMaterial.hitboxType?.playPlaceSoundEffect(placeBlock.location)
                     } else continue
                 } else {
                     placeBlock.place(item)
@@ -61,6 +65,11 @@ class BlockPlacer(
                 
                 inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
                 return true
+            } else if (ItemsAdder.isInstalled) {
+                if (ItemsAdder.placeItem(item, placeBlock.location)) {
+                    inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
+                    return true
+                }
             }
         }
         
@@ -69,17 +78,13 @@ class BlockPlacer(
     
     override fun handleTick() {
         val type = placeBlock.type
-        if (energy >= ENERGY_PER_PLACE
+        if (energyHolder.energy >= energyHolder.energyConsumption
+            && !inventory.isEmpty
             && type == Material.AIR
             && TileEntityManager.getTileEntityAt(placeLocation) == null
-            && ProtectionUtils.canPlace(ownerUUID, placeBlock.location)
+            && ProtectionManager.canPlace(ownerUUID, placeBlock.location)
         ) {
-            if (placeBlock()) energy -= ENERGY_PER_PLACE
-        }
-        
-        if (hasEnergyChanged) {
-            gui.energyBar.update()
-            hasEnergyChanged = false
+            if (placeBlock()) energyHolder.energy -= energyHolder.energyConsumption
         }
     }
     
@@ -88,21 +93,22 @@ class BlockPlacer(
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # . . . # . |" +
-                "| # # . . . # . |" +
-                "| # # . . . # . |" +
+                "| s # i i i # . |" +
+                "| u # i i i # . |" +
+                "| # # i i i # . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
-            .also { it.fillRectangle(3, 1, 3, inventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
     }
     

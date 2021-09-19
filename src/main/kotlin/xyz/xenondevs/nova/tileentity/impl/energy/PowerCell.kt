@@ -1,57 +1,37 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
-import org.bukkit.entity.ArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import de.studiocode.invui.gui.builder.guitype.GUIType
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType.*
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
+import xyz.xenondevs.nova.tileentity.network.energy.holder.BufferEnergyHolder
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
 open class PowerCell(
-    private val creative: Boolean,
+    creative: Boolean,
     val maxEnergy: Int,
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand,
-) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(BUFFER) }
-    override val requestedEnergy: Int
-        get() = if (creative) Int.MAX_VALUE else maxEnergy - energy
+    final override val energyHolder = BufferEnergyHolder(this, maxEnergy, creative) { createEnergySideConfig(BUFFER) }
     
-    override val gui by lazy { PowerCellGUI() }
+    override val gui = lazy { PowerCellGUI() }
     
-    init {
-        if (creative) energy = Int.MAX_VALUE
-    }
-    
-    override fun handleTick() {
-        if (hasEnergyChanged) {
-            gui.energyBar.update()
-            hasEnergyChanged = false
-        }
-    }
-    
-    override fun addEnergy(energy: Int) {
-        if (!creative) {
-            super.addEnergy(energy)
-        }
-    }
-    
-    override fun removeEnergy(energy: Int) {
-        if (!creative) {
-            super.removeEnergy(energy)
-        }
-    }
+    override fun handleTick() = Unit
     
     inner class PowerCellGUI : TileEntityGUI("menu.nova.power_cell") {
         
@@ -71,78 +51,93 @@ open class PowerCell(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, maxEnergy, -1) }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
         
     }
     
 }
 
+private val BASIC_CAPACITY = NovaConfig[NovaMaterialRegistry.BASIC_POWER_CELL].getInt("capacity")!!
+private val ADVANCED_CAPACITY = NovaConfig[NovaMaterialRegistry.ADVANCED_POWER_CELL].getInt("capacity")!!
+private val ELITE_CAPACITY = NovaConfig[NovaMaterialRegistry.ELITE_POWER_CELL].getInt("capacity")!!
+private val ULTIMATE_CAPACITY = NovaConfig[NovaMaterialRegistry.ULTIMATE_POWER_CELL].getInt("capacity")!!
+
 class BasicPowerCell(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : PowerCell(
     false,
-    NovaConfig.getInt("power_cell.basic.capacity")!!,
-    ownerUUID,
-    material,
+    BASIC_CAPACITY,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class AdvancedPowerCell(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : PowerCell(
     false,
-    NovaConfig.getInt("power_cell.advanced.capacity")!!,
-    ownerUUID,
-    material,
+    ADVANCED_CAPACITY,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class ElitePowerCell(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : PowerCell(
     false,
-    NovaConfig.getInt("power_cell.elite.capacity")!!,
-    ownerUUID,
-    material,
+    ELITE_CAPACITY,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class UltimatePowerCell(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : PowerCell(
     false,
-    NovaConfig.getInt("power_cell.ultimate.capacity")!!,
-    ownerUUID,
-    material,
+    ULTIMATE_CAPACITY,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class CreativePowerCell(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : PowerCell(
     true,
     Int.MAX_VALUE,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )

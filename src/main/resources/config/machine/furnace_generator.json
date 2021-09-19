@@ -1,0 +1,5 @@
+{
+  "capacity": 10000,
+  "energy_per_tick": 80,
+  "burn_time_multiplier": 0.2
+}

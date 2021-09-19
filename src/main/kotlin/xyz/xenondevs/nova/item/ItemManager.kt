@@ -6,14 +6,16 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.novaMaterial
 
 object ItemManager : Listener {
     
     fun init() {
+        LOGGER.info("Initializing ItemManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }
     

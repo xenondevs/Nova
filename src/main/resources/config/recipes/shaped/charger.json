@@ -1,8 +1,8 @@
 {
   "result": "nova:charger",
   "shape": [
-    "iri",
-    "rgr",
+    "igi",
+    "rfr",
     "iri"
   ],
   "ingredients": [
@@ -17,6 +17,10 @@
     {
       "char": "r",
       "item": "nova:redstone_plate"
+    },
+    {
+      "char": "f",
+      "item": "nova:basic_machine_frame"
     }
   ]
 }

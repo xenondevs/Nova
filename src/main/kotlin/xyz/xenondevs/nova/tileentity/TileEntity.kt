@@ -1,63 +1,58 @@
 package xyz.xenondevs.nova.tileentity
 
-import com.google.common.base.Preconditions
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
+import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
+import org.bukkit.Sound
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
+import xyz.xenondevs.nova.data.serialization.DataHolder
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.region.Region
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import xyz.xenondevs.nova.world.armorstand.pos
+import xyz.xenondevs.nova.world.region.Region
 import java.util.*
 
 internal val SELF_UPDATE_REASON = object : UpdateReason {}
 
 abstract class TileEntity(
-    ownerUUID: UUID?,
+    val uuid: UUID,
+    data: CompoundElement,
     val material: NovaMaterial,
-    val data: JsonObject,
-    val armorStand: ArmorStand,
-) {
+    val ownerUUID: UUID,
+    val armorStand: FakeArmorStand,
+) : DataHolder(data, true) {
     
-    protected abstract val gui: TileEntityGUI?
-    
-    val globalData: JsonObject = data.get("global") as JsonObject
+    abstract val gui: Lazy<TileEntityGUI>?
     
     var isValid: Boolean = true
         private set
     
-    val uuid: UUID = armorStand.uniqueId
     val location = armorStand.location.blockLocation
     val world = location.world!!
     val chunk = location.chunk
-    val facing = armorStand.facing
-    
-    val ownerUUID: UUID
+    val chunkPos = chunk.pos
+    val facing = armorStand.location.facing
     
     private val inventories = ArrayList<VirtualInventory>()
-    val multiModels = HashMap<String, MultiModel>()
+    private val multiModels = ArrayList<MultiModel>()
+    private val particleTasks = ArrayList<TileEntityParticleTask>()
     
     val additionalHitboxes = HashSet<Location>()
-    
-    init {
-        if (!data.has("material"))
-            storeData("material", material)
-        if (!data.has("owner"))
-            storeData("owner", ownerUUID)
-        this.ownerUUID = ownerUUID ?: retrieveOrNull("owner")!!
-    }
     
     /**
      * Called when the TileEntity is being broken.
@@ -71,18 +66,15 @@ abstract class TileEntity(
         val drops = ArrayList<ItemStack>()
         if (dropItems) {
             saveData()
-            val item = material.createItemBuilder(this).build()
-            if (globalData.entrySet().isNotEmpty()) item.setTileEntityData(globalData)
+            val item = material.createItemBuilder(this).get()
+            if (globalData.isNotEmpty()) item.setTileEntityData(globalData)
+            if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
             drops += item
         }
         
         // inventory drops ignore the dropItems parameter
-        inventories.forEach {
-            drops += it.items.filterNotNull()
-            VirtualInventoryManager.getInstance().remove(it)
-        }
-        
-        multiModels.values.forEach { it.removeAllModels() }
+        inventories.forEach { drops += it.items.filterNotNull() }
+        TileInventoryManager.remove(uuid, inventories)
         
         return drops
     }
@@ -91,9 +83,23 @@ abstract class TileEntity(
      * Called to save all data using the [storeData] method.
      */
     open fun saveData() {
-        multiModels.forEach { (name, multiModel) ->
-            storeData("multiModel_$name", multiModel.chunks)
-        }
+        if (this is Upgradable)
+            upgradeHolder.save(data)
+    }
+    
+    /**
+     * Called to get the [ItemStack] to be placed as the head of the [FakeArmorStand].
+     */
+    open fun getHeadStack(): ItemStack {
+        return material.block!!.createItemStack()
+    }
+    
+    /**
+     * Calls the [getHeadStack] function and puts the result on the [FakeArmorStand].
+     */
+    fun updateHeadStack() {
+        armorStand.setEquipment(EquipmentSlot.HEAD, getHeadStack())
+        armorStand.updateEquipment()
     }
     
     /**
@@ -111,6 +117,12 @@ abstract class TileEntity(
     abstract fun handleInitialized(first: Boolean)
     
     /**
+     * Called after the hitbox block has been placed.
+     * This action happens one tick after [handleInitialized] with first: true.
+     */
+    open fun handleHitboxPlaced() = Unit
+    
+    /**
      * Called after the TileEntity has been removed from the
      * TileEntityManager's TileEntity map because it either got
      * unloaded or destroyed.
@@ -119,12 +131,11 @@ abstract class TileEntity(
      */
     open fun handleRemoved(unload: Boolean) {
         isValid = false
-        gui?.closeWindows()
+        if (gui?.isInitialized() == true) gui!!.value.closeWindows()
         
-        if (unload) {
-            saveData()
-            armorStand.setTileEntityData(data)
-        }
+        armorStand.remove()
+        multiModels.forEach { it.removeAllModels() }
+        particleTasks.forEach { it.stop() }
     }
     
     /**
@@ -135,7 +146,7 @@ abstract class TileEntity(
     open fun handleRightClick(event: PlayerInteractEvent) {
         if (gui != null) {
             event.isCancelled = true
-            gui!!.openWindow(event.player)
+            gui!!.value.openWindow(event.player)
         }
     }
     
@@ -147,15 +158,14 @@ abstract class TileEntity(
     fun getInventory(
         salt: String,
         size: Int,
-        dropItems: Boolean,
         stackSizes: IntArray,
         itemHandler: (ItemUpdateEvent) -> Unit
     ): VirtualInventory {
-        val inventory = VirtualInventoryManager
-            .getInstance()
-            .getOrCreate(uuid.salt(salt), size, arrayOfNulls(size), stackSizes)
+        val inventory = TileInventoryManager.getOrCreate(
+            uuid, uuid.salt(salt), size, arrayOfNulls(size), stackSizes
+        )
         inventory.setItemUpdateHandler(itemHandler)
-        if (dropItems) inventories += inventory
+        inventories += inventory
         return inventory
     }
     
@@ -164,27 +174,59 @@ abstract class TileEntity(
      * When [dropItems] is true, the [VirtualInventory] will automatically be
      * deleted and its contents dropped when the [TileEntity] is destroyed.
      */
-    fun getInventory(salt: String, size: Int, dropItems: Boolean, itemHandler: (ItemUpdateEvent) -> Unit) =
-        getInventory(salt, size, dropItems, IntArray(size) { 64 }, itemHandler)
+    fun getInventory(salt: String, size: Int, itemHandler: (ItemUpdateEvent) -> Unit) =
+        getInventory(salt, size, IntArray(size) { 64 }, itemHandler)
     
     /**
-     * Gets a [MultiModel] for this [TileEntity].
-     * The [MultiModel] will use the storage of this [TileEntity]
-     * to store data regarding the location of [Model]s.
-     * When the [TileEntity] is destroyed, all [Model]s belonging
+     * Creates a new [MultiModel] for this [TileEntity].
+     * When the [TileEntity] is removed, all [Model]s belonging
      * to this [MultiModel] will be removed.
      */
-    fun getMultiModel(name: String): MultiModel {
-        val uuid = this.uuid.salt(name)
-        val multiModel = MultiModel(uuid, retrieveData("multiModel_$name") { setOf(chunk) })
-        multiModels[name] = multiModel
-        return multiModel
+    fun createMultiModel(): MultiModel {
+        return MultiModel().also(multiModels::add)
     }
+    
+    /**
+     * Creates a new [TileEntityParticleTask] for this [TileEntity].
+     * When the [TileEntity] is removed, the [TileEntityParticleTask]
+     * will automatically be stopped as well.
+     */
+    fun createParticleTask(particles: List<Any>, tickDelay: Int): TileEntityParticleTask {
+        val task = TileEntityParticleTask(this, particles, tickDelay)
+        particleTasks += task
+        return task
+    }
+    
+    /**
+     * Plays a sound effect to all viewers of this [TileEntity]
+     */
+    fun playSoundEffect(sound: Sound, volume: Float, pitch: Float) {
+        getViewers().forEach {
+            it.playSound(location, sound, volume, pitch)
+        }
+    }
+    
+    /**
+     * Plays a sound effect to all viewers of this [TileEntity]
+     */
+    fun playSoundEffect(sound: String, volume: Float, pitch: Float) {
+        getViewers().forEach {
+            it.playSound(location, sound, volume, pitch)
+        }
+    }
+    
+    /**
+     * Gets a [List] of all [players][Player] that this [TileEntity] is
+     * visible for.
+     */
+    fun getViewers(): List<Player> =
+        FakeArmorStandManager.getViewersOf(chunkPos)
     
     /**
      * Gets the correct direction a block side.
      */
-    fun getFace(blockSide: BlockSide) = blockSide.getBlockFace(armorStand.location.yaw)
+    fun getFace(blockSide: BlockSide): BlockFace =
+        blockSide.getBlockFace(armorStand.location.yaw)
     
     /**
      * Creates an energy side config
@@ -216,21 +258,47 @@ abstract class TileEntity(
     }
     
     /**
-     * Creates a [Pair] of [Locations][Location] which mark the edge points of an area with the
-     * given [length], [width], [height] and [vertical translation][translateVertical] in front
-     * of this [TileEntity].
+     * Creates a [Region] of a specified [size] that surrounds this [TileEntity].
      */
-    fun getFrontArea(length: Double, width: Double, height: Double, translateVertical: Double): Region {
+    fun getSurroundingRegion(size: Int): Region {
+        val d = size + 0.5
+        return Region(
+            location.clone().center().subtract(d, d, d),
+            location.clone().center().add(d, d, d)
+        )
+    }
+    
+    /**
+     * Creates a block [Region] with the given [length], [width], [height] and
+     * [vertical translation][translateVertical] in front of this [TileEntity].
+     */
+    fun getBlockFrontRegion(length: Int, width: Int, height: Int, translateVertical: Int): Region {
+        return getFrontRegion(length * 2.0 + 1, width + 0.5, width + 0.5, height.toDouble(), translateVertical.toDouble())
+    }
+    
+    /**
+     * Creates a [Region] with the  given [length], [width], [height] and
+     * [vertical translation][translateVertical] in front of this [TileEntity].
+     */
+    fun getFrontRegion(length: Double, width: Double, height: Double, translateVertical: Double): Region {
+        return getFrontRegion(length, width / 2.0, width / 2.0, height, translateVertical)
+    }
+    
+    /**
+     * Creates a [Region] with the  given [length], [left] and [right] movement, [height] and
+     * [vertical translation][translateVertical] in front of this [TileEntity].
+     */
+    fun getFrontRegion(length: Double, left: Double, right: Double, height: Double, translateVertical: Double): Region {
         val frontFace = getFace(BlockSide.FRONT)
         val startLocation = location.clone().center().advance(frontFace, 0.5)
         
         val pos1 = startLocation.clone().apply {
-            advance(getFace(BlockSide.LEFT), width / 2.0)
+            advance(getFace(BlockSide.LEFT), left)
             y += translateVertical
         }
         
         val pos2 = startLocation.clone().apply {
-            advance(getFace(BlockSide.RIGHT), width / 2.0)
+            advance(getFace(BlockSide.RIGHT), right)
             advance(frontFace, length)
             y += height + translateVertical
         }
@@ -243,47 +311,10 @@ abstract class TileEntity(
      * in the [TileEntityManager].
      */
     fun setAdditionalHitboxes(placeBlocks: Boolean, hitboxes: List<Location>) {
-        if (placeBlocks) hitboxes.forEach { it.block.type = material.hitbox!! }
+        if (placeBlocks) hitboxes.forEach { it.block.type = material.hitboxType!! }
         
         additionalHitboxes += hitboxes
-        TileEntityManager.addTileEntityLocations(this, hitboxes)
-    }
-    
-    /**
-     * Retrieves data using GSON deserialization from the
-     * ArmorStand of this TileEntity.
-     * If it can't find anything under the given key, the
-     * result of the [getAlternative] lambda is returned.
-     */
-    inline fun <reified T> retrieveData(key: String, getAlternative: () -> T): T {
-        return retrieveOrNull(key) ?: getAlternative()
-    }
-    
-    /**
-     * Retrieves data using GSON deserialization from the
-     * ArmorStand of this TileEntity.
-     */
-    inline fun <reified T> retrieveOrNull(key: String): T? {
-        return GSON.fromJson<T>(data.get(key) ?: globalData.get(key))
-    }
-    
-    /**
-     * Serializes objects using GSON and stores them under the given key in
-     * the data object. This method does not store any data in the armor stand yet.
-     *
-     * @param global If the data should also be stored in the [ItemStack]
-     * of this [TileEntity].
-     */
-    fun storeData(key: String, value: Any?, global: Boolean = false) {
-        if (global) {
-            Preconditions.checkArgument(!data.has(key), "$key is already a non-global value")
-            if (value != null) globalData.add(key, GSON.toJsonTree(value))
-            else globalData.remove(key)
-        } else {
-            Preconditions.checkArgument(!globalData.has(key), "$key is already a global value")
-            if (value != null) data.add(key, GSON.toJsonTree(value))
-            else data.remove(key)
-        }
+        TileEntityManager.addTileEntityHitboxLocations(this, hitboxes)
     }
     
     override fun equals(other: Any?): Boolean {
@@ -300,23 +331,71 @@ abstract class TileEntity(
     
     companion object {
         
-        fun newInstance(armorStand: ArmorStand): TileEntity {
-            val data = armorStand.getTileEntityData()!!
-            val material: NovaMaterial = GSON.fromJson(data.get("material"))!!
+        fun create(tileEntity: DaoTileEntity, location: Location) : TileEntity {
+            return create(
+                tileEntity.id.value,
+                location.clone().apply { center(); yaw = tileEntity.yaw },
+                tileEntity.type,
+                tileEntity.data,
+                tileEntity.owner
+            )
+        }
+        
+        fun create(
+            uuid: UUID,
+            armorStandLocation: Location,
+            material: NovaMaterial,
+            data: CompoundElement,
+            ownerUUID: UUID
+        ): TileEntity {
+            // create the fake armor stand
+            val armorStand = FakeArmorStand(armorStandLocation, false) {
+                it.isInvisible = true
+                it.isMarker = true
+                it.setSharedFlagOnFire(material.hitboxType.requiresLight)
+            }
             
-            return material.createTileEntity!!(null, material, data, armorStand)
+            // create the tile entity
+            val tileEntity = material.tileEntityConstructor!!(uuid, data, material, ownerUUID, armorStand)
+            
+            // set the head stack and register
+            armorStand.setEquipment(EquipmentSlot.HEAD, tileEntity.getHeadStack())
+            armorStand.register()
+            
+            return tileEntity
         }
         
     }
     
 }
 
+
 abstract class TileEntityGUI(private val title: String) {
     
+    /**
+     * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
+     * the owning [TileEntity] is destroyed.
+     */
     abstract val gui: GUI
     
+    /**
+     * A list of [GUIs][GUI] that are not a part of [gui] but should still be closed
+     * when the [TileEntity] is destroyed.
+     */
+    val subGUIs = ArrayList<GUI>()
+    
+    /**
+     * Opens a Window of the [gui] to the specified [player].
+     */
     fun openWindow(player: Player) = SimpleWindow(player, arrayOf(TranslatableComponent(title)), gui).show()
     
-    fun closeWindows() = gui.closeForAllViewers()
+    /**
+     * Closes all Windows connected to this [TileEntityGUI].
+     */
+    fun closeWindows() {
+        gui.closeForAllViewers()
+        subGUIs.forEach(GUI::closeForAllViewers)
+    }
     
 }
+

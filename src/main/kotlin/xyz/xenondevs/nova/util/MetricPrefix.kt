@@ -30,6 +30,7 @@ enum class MetricPrefix(exponent: Int, val prefixName: String, val prefixSymbol:
     
     companion object {
         
+        // TODO: optimize
         fun findBestPrefix(number: BigDecimal, vararg ignoredPrefixes: MetricPrefix): Pair<BigDecimal, MetricPrefix> {
             val prefix = values()
                 .filterNot { ignoredPrefixes.contains(it) }

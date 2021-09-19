@@ -8,21 +8,24 @@ import net.minecraft.server.level.ServerPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
+import org.bukkit.World
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsEntity
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsStack
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
+import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
+import net.minecraft.world.entity.Entity as NMSEntity
 import net.minecraft.world.entity.EntityType as NMSEntityType
 import net.minecraft.world.entity.decoration.ArmorStand as NMSArmorStand
 import net.minecraft.world.item.ItemStack as NMSItemStack
@@ -44,6 +47,12 @@ fun PersistentDataContainer.hasNovaData(): Boolean {
     return keys.any { it.namespace == novaNameSpace }
 }
 
+@Suppress("UNCHECKED_CAST")
+fun ArmorStand.setHeadItemSilently(headStack: ItemStack) {
+    val armorItems = ReflectionRegistry.ARMOR_STAND_ARMOR_ITEMS_FIELD.get(nmsEntity) as NonNullList<NMSItemStack>
+    armorItems[3] = headStack.nmsStack
+}
+
 object EntityUtils {
     
     @Suppress("UNCHECKED_CAST")
@@ -56,7 +65,7 @@ object EntityUtils {
         val world = location.world!!
         
         // create EntityArmorStand
-        val nmsArmorStand = ReflectionUtils.createNMSEntity(world, location, EntityType.ARMOR_STAND) as NMSArmorStand
+        val nmsArmorStand = createNMSEntity(world, location, EntityType.ARMOR_STAND) as NMSArmorStand
         
         // set head item silently
         val armorItems = ReflectionRegistry.ARMOR_STAND_ARMOR_ITEMS_FIELD.get(nmsArmorStand) as NonNullList<NMSItemStack>
@@ -74,7 +83,7 @@ object EntityUtils {
         if (modify != null) armorStand.modify()
         
         // add ArmorStand to world
-        ReflectionUtils.addNMSEntityToWorld(world, nmsArmorStand)
+        addNMSEntityToWorld(world, nmsArmorStand)
         
         return armorStand
     }
@@ -146,7 +155,7 @@ object EntityUtils {
     ) {
         // get world
         val world = location.world!!
-        val level = world.nmsWorld
+        val level = world.serverLevel
         
         // read data to compound tag
         var compoundTag = NbtIo.readCompressed(ByteArrayInputStream(data))
@@ -171,11 +180,21 @@ object EntityUtils {
         }
     }
     
+    fun createNMSEntity(world: World, location: Location, entityType: EntityType): Any {
+        return (world as CraftWorld).createEntity(location, entityType.entityClass)
+    }
+    
+    fun addNMSEntityToWorld(world: World, entity: NMSEntity): Entity {
+        return (world as CraftWorld).addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)
+    }
+    
     fun createFakePlayer(location: Location, uuid: UUID, name: String): ServerPlayer {
         val server = (Bukkit.getServer() as CraftServer).server
-        val world = location.world!!.nmsWorld
+        val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
-        return ServerPlayer(server, world, gameProfile)
+        val serverPlayer = ServerPlayer(server, world, gameProfile)
+        serverPlayer.advancements.stopListening()
+        return serverPlayer
     }
     
 }

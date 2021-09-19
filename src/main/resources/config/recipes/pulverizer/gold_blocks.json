@@ -4,5 +4,6 @@
     "minecraft:raw_gold_block"
   ],
   "result": "nova:gold_dust",
-  "amount": 9
+  "amount": 9,
+  "time": 200
 }

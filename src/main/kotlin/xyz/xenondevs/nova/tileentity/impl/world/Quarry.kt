@@ -1,77 +1,86 @@
 package xyz.xenondevs.nova.tileentity.impl.world
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.block.Block
-import org.bukkit.entity.ArmorStand
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.QUARRY
 import xyz.xenondevs.nova.tileentity.*
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.data.addLoreLines
+import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
-private val SCAFFOLDING_STACKS = NovaMaterial.SCAFFOLDING.block!!.let { modelData -> modelData.dataArray.indices.map { modelData.getItem(it) } }
+private val SCAFFOLDING_STACKS = NovaMaterialRegistry.SCAFFOLDING.block!!.let { modelData -> modelData.dataArray.indices.map { modelData.createItemStack(it) } }
 private val FULL_HORIZONTAL = SCAFFOLDING_STACKS[0]
 private val FULL_VERTICAL = SCAFFOLDING_STACKS[1]
 private val CORNER_DOWN = SCAFFOLDING_STACKS[2]
 private val SMALL_HORIZONTAL = SCAFFOLDING_STACKS[3]
 private val FULL_SLIM_VERTICAL = SCAFFOLDING_STACKS[4]
 private val SLIM_VERTICAL_DOWN = SCAFFOLDING_STACKS[5]
-private val DRILL = NovaMaterial.NETHERITE_DRILL.createItemStack()
+private val DRILL = NovaMaterialRegistry.NETHERITE_DRILL.createItemStack()
 
-private val MIN_SIZE = NovaConfig.getInt("quarry.min_size")!!
-private val MAX_SIZE = NovaConfig.getInt("quarry.max_size")!!
-private val DEFAULT_SIZE_X = NovaConfig.getInt("quarry.default_size_x")!!
-private val DEFAULT_SIZE_Z = NovaConfig.getInt("quarry.default_size_z")!!
+private val MIN_SIZE = NovaConfig[QUARRY].getInt("min_size")!!
+private val MAX_SIZE = NovaConfig[QUARRY].getInt("max_size")!!
+private val DEFAULT_SIZE_X = NovaConfig[QUARRY].getInt("default_size_x")!!
+private val DEFAULT_SIZE_Z = NovaConfig[QUARRY].getInt("default_size_z")!!
 
-private val MOVE_SPEED = NovaConfig.getDouble("quarry.move_speed")!!
-private val DRILL_SPEED_MULTIPLIER = NovaConfig.getDouble("quarry.drill_speed_multiplier")!!
-private val DRILL_SPEED_CLAMP = NovaConfig.getDouble("quarry.drill_speed_clamp")!!
+private val MOVE_SPEED = NovaConfig[QUARRY].getDouble("move_speed")!!
+private val DRILL_SPEED_MULTIPLIER = NovaConfig[QUARRY].getDouble("drill_speed_multiplier")!!
+private val DRILL_SPEED_CLAMP = NovaConfig[QUARRY].getDouble("drill_speed_clamp")!!
 
-private val MAX_ENERGY = NovaConfig.getInt("quarry.capacity")!!
-private val ENERGY_CONSUMPTION_BASE = NovaConfig.getInt("quarry.energy_consumption_base")!!
-private val ENERGY_INEFFICIENCY_EXPONENT = NovaConfig.getDouble("quarry.energy_inefficiency_exponent")!!
+private val MAX_ENERGY = NovaConfig[QUARRY].getInt("capacity")!!
+private val BASE_ENERGY_CONSUMPTION = NovaConfig[QUARRY].getInt("base_energy_consumption")!!
+private val ENERGY_PER_SQUARE_BLOCK = NovaConfig[QUARRY].getInt("energy_consumption_per_square_block")!!
 
 class Quarry(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
-    
-    override val gui by lazy { QuarryGUI() }
-    private val inventory = getInventory("quarryInventory", 9, true) {}
+    override val gui = lazy { QuarryGUI() }
+    private val inventory = getInventory("quarryInventory", 9) {}
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, 0, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, inventory)
     
     private val entityId = uuid.hashCode()
     
@@ -80,13 +89,17 @@ class Quarry(
     
     private var energyPerTick by Delegates.notNull<Int>()
     
-    private val solidScaffolding = getMultiModel("solidScaffolding")
-    private val armX = getMultiModel("armX")
-    private val armZ = getMultiModel("armZ")
-    private val armY = getMultiModel("armY")
-    private val drill = getMultiModel("drill")
+    private val solidScaffolding = createMultiModel()
+    private val armX = createMultiModel()
+    private val armZ = createMultiModel()
+    private val armY = createMultiModel()
+    private val drill = createMultiModel()
     
-    private val y: Int
+    private var maxSize = 0
+    private var drillSpeedMultiplier = 0.0
+    private var moveSpeed = 0.0
+    
+    private val y = location.blockY
     private var minX = 0
     private var minZ = 0
     private var maxX = 0
@@ -101,40 +114,40 @@ class Quarry(
     private var done = retrieveData("done") { false }
     
     private val energySufficiency: Double
-        get() = min(1.0, energy.toDouble() / energyPerTick.toDouble())
+        get() = min(1.0, energyHolder.energy.toDouble() / energyPerTick.toDouble())
     
     private val currentMoveSpeed: Double
-        get() = MOVE_SPEED * energySufficiency
+        get() = moveSpeed * energySufficiency
     
     private val currentDrillSpeedMultiplier: Double
-        get() = DRILL_SPEED_MULTIPLIER * energySufficiency
+        get() = drillSpeedMultiplier * energySufficiency
     
     init {
-        setDefaultInventory(inventory)
-        y = location.blockY
+        handleUpgradeUpdates()
         updateBounds()
         
         pointerLocation = retrieveOrNull("pointerLocation") ?: Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
         lastPointerLocation = retrieveOrNull("lastPointerLocation") ?: Location(world, 0.0, 0.0, 0.0)
     }
     
+    private fun handleUpgradeUpdates() {
+        updateEnergyPerTick()
+        
+        maxSize = MAX_SIZE + upgradeHolder.getRangeModifier()
+        drillSpeedMultiplier = DRILL_SPEED_MULTIPLIER * upgradeHolder.getSpeedModifier()
+        moveSpeed = MOVE_SPEED * upgradeHolder.getSpeedModifier()
+    }
+    
     private fun updateBounds(): Boolean {
-        val back = getFace(BlockSide.BACK)
-        val right = getFace(BlockSide.RIGHT)
-        val modX = back.modX.takeUnless { it == 0 } ?: right.modX
-        val modZ = back.modZ.takeUnless { it == 0 } ?: right.modZ
-        
-        val distanceX = modX * (sizeX + 1)
-        val distanceZ = modZ * (sizeZ + 1)
-        
-        minX = min(location.blockX, location.blockX + distanceX)
-        minZ = min(location.blockZ, location.blockZ + distanceZ)
-        maxX = max(location.blockX, location.blockX + distanceX)
-        maxZ = max(location.blockZ, location.blockZ + distanceZ)
+        val positions = getMinMaxPositions(location, sizeX, sizeZ, getFace(BlockSide.BACK), getFace(BlockSide.RIGHT))
+        minX = positions[0]
+        minZ = positions[1]
+        maxX = positions[2]
+        maxZ = positions[3]
         
         updateEnergyPerTick()
         
-        if (isRegionProtected()) {
+        if (!canPlace(ownerUUID, location, positions)) {
             if (sizeX == MIN_SIZE && sizeZ == MIN_SIZE) {
                 runTaskLater(3) { TileEntityManager.destroyAndDropTileEntity(this, true) }
                 return false
@@ -165,26 +178,14 @@ class Quarry(
         }
     }
     
-    private fun isRegionProtected(): Boolean {
-        val minLoc = Location(world, minX.toDouble(), y.toDouble(), minZ.toDouble())
-        val maxLoc = Location(world, maxX.toDouble(), y.toDouble(), maxZ.toDouble())
-        var protected = false
-        
-        minLoc.fullCuboidTo(maxLoc) {
-            protected = !ProtectionUtils.canBreak(ownerUUID, it)
-            return@fullCuboidTo !protected
-        }
-        
-        return protected
-    }
-    
     private fun updateEnergyPerTick() {
-        energyPerTick = (ENERGY_CONSUMPTION_BASE + (sizeX * sizeZ).toDouble().pow(ENERGY_INEFFICIENCY_EXPONENT)).toInt()
+        energyPerTick = ((BASE_ENERGY_CONSUMPTION + sizeX * sizeZ * ENERGY_PER_SQUARE_BLOCK)
+            * upgradeHolder.getSpeedModifier() / upgradeHolder.getEfficiencyModifier()).toInt()
     }
     
     override fun handleInitialized(first: Boolean) {
         super.handleInitialized(first)
-        if (first) createScaffolding()
+        createScaffolding()
     }
     
     override fun saveData() {
@@ -200,7 +201,7 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (energy == 0) return
+        if (energyHolder.energy == 0) return
         
         if (!done) {
             if (!drilling) {
@@ -216,10 +217,9 @@ class Quarry(
                 } else done = true
             } else drill()
             
-            energy = max(0, energy - energyPerTick)
+            energyHolder.energy -= energyPerTick
         }
         
-        if (hasEnergyChanged) gui.energyBar.update()
     }
     
     private fun moveToPointer(pointerDestination: Location) {
@@ -278,23 +278,25 @@ class Quarry(
     }
     
     private fun updatePointer(force: Boolean = false) {
-        if (force || lastPointerLocation.z != pointerLocation.z)
-            armX.useArmorStands { it.teleport { z = pointerLocation.z } }
-        if (force || lastPointerLocation.x != pointerLocation.x)
-            armZ.useArmorStands { it.teleport { x = pointerLocation.x } }
-        if (force || lastPointerLocation.x != pointerLocation.x || lastPointerLocation.z != pointerLocation.z)
-            armY.useArmorStands { it.teleport { x = pointerLocation.x; z = pointerLocation.z } }
-        if (force || lastPointerLocation.y != pointerLocation.y) updateVerticalArmModels()
-        
-        drill.useArmorStands {
-            val location = pointerLocation.clone()
-            location.yaw = it.location.yaw.mod(360f)
-            if (drilling) location.yaw += 25f * (2 - drillProgress.toFloat())
-            else location.yaw += 10f
-            it.teleport(location)
+        runAsyncTask {
+            if (force || lastPointerLocation.z != pointerLocation.z)
+                armX.useArmorStands { it.teleport { z = pointerLocation.z } }
+            if (force || lastPointerLocation.x != pointerLocation.x)
+                armZ.useArmorStands { it.teleport { x = pointerLocation.x } }
+            if (force || lastPointerLocation.x != pointerLocation.x || lastPointerLocation.z != pointerLocation.z)
+                armY.useArmorStands { it.teleport { x = pointerLocation.x; z = pointerLocation.z } }
+            if (force || lastPointerLocation.y != pointerLocation.y) updateVerticalArmModels()
+            
+            drill.useArmorStands {
+                val location = pointerLocation.clone()
+                location.yaw = it.location.yaw.mod(360f)
+                if (drilling) location.yaw += 25f * (2 - drillProgress.toFloat())
+                else location.yaw += 10f
+                it.teleport(location)
+            }
+            
+            lastPointerLocation = pointerLocation.clone()
         }
-        
-        lastPointerLocation = pointerLocation.clone()
     }
     
     private fun updateVerticalArmModels() {
@@ -311,15 +313,30 @@ class Quarry(
             world,
             minX + 1, 0, minZ + 1,
             maxX - 1, y - 2, maxZ - 1
-        )
-            .filter { ProtectionUtils.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
-            .sortedBy { it.distance(pointerLocation) }
-            .maxByOrNull { it.y }
+        ).asSequence()
+            .sortedBy { prioritizedDistance(pointerLocation, it) }
+            .firstOrNull { ProtectionManager.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
             ?.center()
             ?.apply { y += 1 }
         
         pointerDestination = destination
         return destination
+    }
+    
+    /**
+     * Returns the square of a modified distance that discourages travelling downwards
+     * and encourages travelling upwards.
+     */
+    private fun prioritizedDistance(location: Location, destination: Location): Double {
+        val deltaX = destination.x - location.x
+        val deltaZ = destination.z - location.z
+        
+        // encourage travelling up, discourage travelling down
+        var deltaY = (destination.y - location.y)
+        if (deltaY > 0) deltaY *= 0.05
+        else if (deltaY < 0) deltaY *= 2
+        
+        return deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ
     }
     
     private fun spawnDrillParticles(block: Block) {
@@ -339,13 +356,16 @@ class Quarry(
     }
     
     private fun createScaffolding() {
-        createScaffoldingOutlines()
-        createScaffoldingCorners()
-        createScaffoldingPillars()
-        createScaffoldingArms()
-        
-        drill.addModels(Model(DRILL, pointerLocation))
-        runTaskLater(1) { updatePointer(true) }
+        runAsyncTask {
+            createScaffoldingOutlines()
+            createScaffoldingCorners()
+            createScaffoldingPillars()
+            createScaffoldingArms()
+            
+            drill.addModels(Model(DRILL, pointerLocation))
+            
+            runTaskLater(1) { updatePointer(true) }
+        }
     }
     
     private fun createScaffoldingOutlines() {
@@ -396,7 +416,7 @@ class Quarry(
         for (corner in getCornerLocations(location.y)) {
             corner.y -= 1
             
-            val blockBelow = corner.getNextBlockBelow(true)
+            val blockBelow = corner.getNextBlockBelow(countSelf = true, requiresSolid = true)
             if (blockBelow != null && blockBelow.positionEquals(corner)) continue
             
             corner
@@ -438,12 +458,59 @@ class Quarry(
         model.addModels(Model(FULL_VERTICAL, location.center()))
     }
     
+    companion object {
+        
+        fun canPlace(player: Player, location: Location): Boolean {
+            return canPlace(player.uniqueId, location, location.yaw, MIN_SIZE, MIN_SIZE)
+        }
+        
+        private fun canPlace(uuid: UUID, location: Location, yaw: Float, sizeX: Int, sizeZ: Int): Boolean {
+            val positions = getMinMaxPositions(
+                location,
+                sizeX, sizeZ,
+                BlockSide.BACK.getBlockFace(yaw),
+                BlockSide.RIGHT.getBlockFace(yaw)
+            )
+            
+            return canPlace(uuid, location, positions)
+        }
+        
+        private fun canPlace(uuid: UUID, location: Location, positions: IntArray): Boolean {
+            val minLoc = Location(location.world, positions[0].toDouble(), location.y, positions[1].toDouble())
+            val maxLoc = Location(location.world, positions[2].toDouble(), location.y, positions[3].toDouble())
+            
+            minLoc.fullCuboidTo(maxLoc) {
+                if (ProtectionManager.canBreak(uuid, it))
+                    return@fullCuboidTo true
+                else return@canPlace false
+            }
+            
+            return true
+        }
+        
+        private fun getMinMaxPositions(location: Location, sizeX: Int, sizeZ: Int, back: BlockFace, right: BlockFace): IntArray {
+            val modX = back.modX.takeUnless { it == 0 } ?: right.modX
+            val modZ = back.modZ.takeUnless { it == 0 } ?: right.modZ
+            
+            val distanceX = modX * (sizeX + 1)
+            val distanceZ = modZ * (sizeZ + 1)
+            
+            val minX = min(location.blockX, location.blockX + distanceX)
+            val minZ = min(location.blockZ, location.blockZ + distanceZ)
+            val maxX = max(location.blockX, location.blockX + distanceX)
+            val maxZ = max(location.blockZ, location.blockZ + distanceZ)
+            
+            return intArrayOf(minX, minZ, maxX, maxZ)
+        }
+        
+    }
+    
     inner class QuarryGUI : TileEntityGUI("menu.nova.quarry") {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
         ) { openWindow(it) }
         
         private val sizeItems = ArrayList<Item>()
@@ -452,19 +519,19 @@ class Quarry(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s u # # # # . |" +
-                "| # # # . . . . |" +
-                "| m n p . . . . |" +
-                "| # # # . . . . |" +
+                "| # # # i i i . |" +
+                "| m n p i i i . |" +
+                "| # # # i i i . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
-            .addIngredient('p', AddNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
-            .addIngredient('m', RemoveNumberItem(MIN_SIZE..MAX_SIZE, { sizeX }, ::setSize).also(sizeItems::add))
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('p', AddNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('m', RemoveNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
-            .also { it.fillRectangle(4, 2, 3, inventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4) { Triple(energy, MAX_ENERGY, if (!done) -energyPerTick else 0) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, energyHolder)
         
         private fun setSize(size: Int) {
             resize(size, size)
@@ -473,11 +540,11 @@ class Quarry(
         
         private inner class NumberDisplayItem(private val getNumber: () -> Int) : BaseItem() {
             
-            override fun getItemBuilder(): ItemBuilder {
+            override fun getItemProvider(): ItemProvider {
                 val number = getNumber()
-                return NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
-                    .setLocalizedName(TranslatableComponent("menu.nova.quarry.size", number, number))
-                    .addLocalizedLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
+                return NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
+                    .setDisplayName(TranslatableComponent("menu.nova.quarry.size", number, number))
+                    .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
             }
             
             override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit

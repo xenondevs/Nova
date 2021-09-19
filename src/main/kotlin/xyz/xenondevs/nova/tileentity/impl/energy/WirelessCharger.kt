@@ -1,73 +1,106 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Item
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.ChargeableItem
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.region.Region
-import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.tileentity.EnergyTileEntity
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.WIRELESS_CHARGER
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.ui.item.AddNumberItem
+import xyz.xenondevs.nova.ui.item.DisplayNumberItem
+import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
-import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.region.Region
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
+import de.studiocode.invui.item.Item as UIItem
 
-private val MAX_ENERGY = NovaConfig.getInt("wireless_charger.capacity")!!
-private val CHARGE_SPEED = NovaConfig.getInt("wireless_charger.charge_speed")!!
-private val RANGE = NovaConfig.getDouble("wireless_charger.range")!!
+private val MAX_ENERGY = NovaConfig[WIRELESS_CHARGER].getInt("capacity")!!
+private val CHARGE_SPEED = NovaConfig[WIRELESS_CHARGER].getInt("charge_speed")!!
+private val MIN_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.default")!!
 
 class WirelessCharger(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME) }
-    override val gui by lazy(::WirelessChargerGUI)
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+    override val gui = lazy(::WirelessChargerGUI)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.SPEED, UpgradeType.ENERGY, UpgradeType.RANGE)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, CHARGE_SPEED, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
     
-    private val region = Region(
-        location.clone().center().subtract(RANGE, RANGE, RANGE),
-        location.clone().center().add(RANGE, RANGE, RANGE)
-    )
+    private var maxRange = 0
+    private var range = retrieveData("range") { DEFAULT_RANGE }
+        set(value) {
+            field = value
+            updateRegion()
+            if (gui.isInitialized()) gui.value.updateRangeItems()
+        }
+    
+    private lateinit var region: Region
+    
+    init {
+        handleUpgradeUpdates()
+        updateRegion()
+    }
+    
+    private fun handleUpgradeUpdates() {
+        maxRange = MAX_RANGE + upgradeHolder.getRangeModifier()
+        if (maxRange < range) range = maxRange
+    }
+    
+    private fun updateRegion() {
+        region = getSurroundingRegion(range)
+        VisualRegion.updateRegion(uuid, region)
+    }
+    
+    override fun saveData() {
+        super.saveData()
+        storeData("range", range)
+    }
+    
+    private var players: List<Player> = emptyList()
+    private var findPlayersCooldown = 0
     
     override fun handleTick() {
-        var energyTransferred = 0
+        var energyTransferred: Int
         
-        if (energy != 0) {
-            chargeLoop@ for (entity in world.entities) {
-                if (entity.location in region) {
-                    if (entity is Player) {
-                        for (itemStack in entity.inventory) {
-                            energyTransferred += chargeItemStack(energyTransferred, itemStack)
-                            if (energyTransferred == CHARGE_SPEED || energy == 0) break@chargeLoop
-                        }
-                    } else if (entity is Item) {
-                        energyTransferred += chargeItemStack(energyTransferred, entity.itemStack)
-                        if (energyTransferred == CHARGE_SPEED || energy == 0) break@chargeLoop
-                    }
-                }
-            }
+        if (--findPlayersCooldown <= 0) {
+            findPlayersCooldown = 100
+            players = world.players.filter { it.location in region }
         }
         
-        if (hasEnergyChanged) {
-            hasEnergyChanged = false
-            gui.energyBar.update()
+        if (energyHolder.energy != 0 && players.isNotEmpty()) {
+            playerLoop@ for (player in players) {
+                energyTransferred = 0
+                if (energyHolder.energy == 0) break
+                for (itemStack in player.inventory) {
+                    energyTransferred += chargeItemStack(energyTransferred, itemStack)
+                    if (energyHolder.energy == 0) break@playerLoop
+                    if (energyTransferred == energyHolder.energyConsumption) break
+                }
+            }
         }
     }
     
@@ -78,8 +111,8 @@ class WirelessCharger(
             val maxEnergy = novaItem.maxEnergy
             val currentEnergy = novaItem.getEnergy(itemStack)
             
-            val energyToTransfer = minOf(CHARGE_SPEED - alreadyTransferred, maxEnergy - currentEnergy, energy)
-            energy -= energyToTransfer
+            val energyToTransfer = minOf(energyHolder.energyConsumption - alreadyTransferred, maxEnergy - currentEnergy, energyHolder.energy)
+            energyHolder.energy -= energyToTransfer
             novaItem.addEnergy(itemStack, energyToTransfer)
             
             return energyToTransfer
@@ -101,19 +134,26 @@ class WirelessCharger(
             null
         ) { openWindow(it) }
         
+        private val rangeItems = ArrayList<UIItem>()
+        
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # . # # # |" +
-                "| v # # . # # # |" +
-                "| u # # . # # # |" +
+                "| s # # . # # p |" +
+                "| v # # . # # n |" +
+                "| u # # . # # m |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('v', VisualizeRegionItem(uuid, region))
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('v', VisualizeRegionItem(uuid) { region })
+            .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
+        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
+        
+        fun updateRangeItems() = rangeItems.forEach(UIItem::notifyWindows)
         
     }
     

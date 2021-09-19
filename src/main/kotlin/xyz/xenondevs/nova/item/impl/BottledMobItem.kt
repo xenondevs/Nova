@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item.impl
 
+import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -18,18 +19,24 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.NovaItemBuilder
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.util.EntityUtils
+import xyz.xenondevs.nova.util.addPrioritized
+import xyz.xenondevs.nova.util.capitalizeAll
+import xyz.xenondevs.nova.util.data.addLoreLines
+import xyz.xenondevs.nova.util.data.coloredText
+import xyz.xenondevs.nova.util.data.getAllStrings
+import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.getTargetLocation
 
 private val DATA_KEY = NamespacedKey(NOVA, "entityData")
 private val TYPE_KEY = NamespacedKey(NOVA, "entityType")
 private val TIME_KEY = NamespacedKey(NOVA, "fillTime")
 
-private val BLACKLISTED_ENTITY_TYPES = NovaConfig
+private val BLACKLISTED_ENTITY_TYPES = DEFAULT_CONFIG
     .getArray("bottled_mob_blacklist")!!
     .getAllStrings()
     .mapTo(HashSet(), EntityType::valueOf)
@@ -49,13 +56,13 @@ object BottledMobItem : NovaItem(), Listener {
             
             if (item.type == Material.GLASS_BOTTLE
                 && !BLACKLISTED_ENTITY_TYPES.contains(clicked.type)
-                && ProtectionUtils.canUse(player, clicked.location)) {
+                && ProtectionManager.canUse(player, clicked.location)) {
                 
                 val fakeDamageEvent = EntityDamageByEntityEvent(player, clicked, DamageCause.ENTITY_ATTACK, Double.MAX_VALUE)
                 Bukkit.getPluginManager().callEvent(fakeDamageEvent)
                 
                 if (!fakeDamageEvent.isCancelled && fakeDamageEvent.damage != 0.0) {
-                    val itemStack = NovaMaterial.BOTTLED_MOB.createItemStack()
+                    val itemStack = NovaMaterialRegistry.BOTTLED_MOB.createItemStack()
                     absorbEntity(itemStack, clicked)
                     
                     player.inventory.getItem(event.hand).amount -= 1
@@ -103,11 +110,11 @@ object BottledMobItem : NovaItem(), Listener {
         val data = EntityUtils.serialize(entity, true)
         setEntityData(itemStack, entity.type, data)
         
-        itemStack.itemMeta = NovaItemBuilder(itemStack).addLocalizedLoreLines(localized(
+        itemStack.itemMeta = ItemBuilder(itemStack).addLoreLines(localized(
             ChatColor.DARK_GRAY,
             "item.nova.bottled_mob.type",
             coloredText(ChatColor.YELLOW, entity.type.name.lowercase().replace('_', ' ').capitalizeAll())
-        )).build().itemMeta
+        )).get().itemMeta
     }
     
 }

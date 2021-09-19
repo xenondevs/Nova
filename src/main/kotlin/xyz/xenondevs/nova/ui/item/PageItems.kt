@@ -1,19 +1,20 @@
 package xyz.xenondevs.nova.ui.item
 
 import de.studiocode.invui.gui.impl.PagedGUI
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.controlitem.PageItem
 import de.studiocode.invui.resourcepack.Icon
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
-import xyz.xenondevs.nova.item.novaItemBuilder
+import xyz.xenondevs.nova.util.data.addLoreLines
+import xyz.xenondevs.nova.util.data.setLocalizedName
 
 class PageBackItem : PageItem(false) {
     
-    override fun getItemBuilder(gui: PagedGUI): ItemBuilder {
-        val itemBuilder = (if (gui.hasPageBefore()) Icon.ARROW_1_LEFT else Icon.LIGHT_ARROW_1_LEFT).novaItemBuilder
+    override fun getItemProvider(gui: PagedGUI): ItemProvider {
+        val itemBuilder = (if (gui.hasPageBefore()) Icon.ARROW_1_LEFT else Icon.LIGHT_ARROW_1_LEFT).itemBuilder
         itemBuilder.setLocalizedName("menu.nova.paged.back")
-        itemBuilder.addLocalizedLoreLines(
+        itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {
                 if (gui.currentPageIndex == 0) TranslatableComponent("menu.nova.paged.limit_min")
                 else TranslatableComponent("menu.nova.paged.go_inf", gui.currentPageIndex)
@@ -30,10 +31,10 @@ class PageBackItem : PageItem(false) {
 
 class PageForwardItem : PageItem(true) {
     
-    override fun getItemBuilder(gui: PagedGUI): ItemBuilder {
-        val itemBuilder = (if (gui.hasNextPage()) Icon.ARROW_1_RIGHT else Icon.LIGHT_ARROW_1_RIGHT).novaItemBuilder
+    override fun getItemProvider(gui: PagedGUI): ItemProvider {
+        val itemBuilder = (if (gui.hasNextPage()) Icon.ARROW_1_RIGHT else Icon.LIGHT_ARROW_1_RIGHT).itemBuilder
         itemBuilder.setLocalizedName("menu.nova.paged.forward")
-        itemBuilder.addLocalizedLoreLines(
+        itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {
                 TranslatableComponent("menu.nova.paged.go_inf", gui.currentPageIndex + 2)
             } else {

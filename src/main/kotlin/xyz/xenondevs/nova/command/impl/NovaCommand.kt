@@ -4,58 +4,61 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
-import org.bukkit.entity.ArmorStand
 import xyz.xenondevs.nova.command.*
-import xyz.xenondevs.nova.debug.NetworkDebugger
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.NetworkType
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.tileentity.getMultiModelParent
-import xyz.xenondevs.nova.tileentity.isMultiModel
-import xyz.xenondevs.nova.ui.menu.CreativeMenu
-import xyz.xenondevs.nova.ui.menu.RecipesMenu
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
+import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
+import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
+import xyz.xenondevs.nova.util.data.coloredText
+import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
+import xyz.xenondevs.nova.world.armorstand.pos
 
-object NovaCommand : PlayerCommand("nova") {
+
+object NovaCommand : Command("nova") {
     
     init {
         builder = builder
             .then(literal("give")
-                .requiresPermission("nova.creative")
+                .requiresPermission("nova.command.give")
                 .apply {
-                    NovaMaterial.values().forEach { material ->
-                        then(literal(material.name)
-                            .executesCatching { context -> handleGive(material, context) }
+                    NovaMaterialRegistry.sortedObtainables.forEach { material ->
+                        then(literal(material.typeName)
+                            .executesCatching { handleGive(material, it) }
                         )
                     }
                 })
             .then(literal("debug")
-                .requiresPermission("nova.debug")
-                .then(literal("listNearby")
-                    .executesCatching { listNearby(it) })
-                .then(literal("getNearestData")
-                    .executesCatching { getNearestData(it) })
-                .then(literal("removeObsoleteModels")
-                    .then(argument("range", IntegerArgumentType.integer(0))
-                        .executesCatching { removeObsoleteModels(it) }))
+                .requiresPermission("nova.command.debug")
                 .then(literal("removeTileEntities")
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching { removeTileEntities(it) }))
+                .then(literal("getTileEntityData")
+                    .executesCatching { showTileEntityData(it) })
                 .then(literal("energyNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
                 .then(literal("itemNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) }))
-            .then(literal("inventory")
-                .requiresPermission("nova.creative")
-                .executesCatching { openCreativeInventory(it) })
-            .then(literal("recipes")
-                .executesCatching { openRecipesMenu(it) })
+            .then(literal("items")
+                .requiresPermission("nova.command.items")
+                .executesCatching { openItemInventory(it) })
+            .then(literal("renderDistance")
+                .requiresPermission("nova.command.renderDistance")
+                .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
+                    .executesCatching { setRenderDistance(it) }))
     }
     
-    private fun handleGive(material: NovaMaterial, context: CommandContext<CommandSourceStack>) {
-        val player = context.player
+    private fun handleGive(material: NovaMaterial, ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
         player.inventory.addItem(material.createItemStack())
-        val itemName = material.itemName.ifBlank { material.name }
+        val itemName = material.localizedName.ifBlank { material.typeName }
         
         player.spigot().sendMessage(localized(
             ChatColor.GRAY,
@@ -64,57 +67,10 @@ object NovaCommand : PlayerCommand("nova") {
         ))
     }
     
-    private fun listNearby(context: CommandContext<CommandSourceStack>) {
-        val player = context.player
-        val chunk = player.location.chunk
-        val armorStands = chunk.entities.filterIsInstance<ArmorStand>()
-        val tileEntityArmorStands = armorStands.filter { it.persistentDataContainer.hasNovaData() }
-        
-        player.spigot().sendMessage(localized(
-            ChatColor.GRAY,
-            "command.nova.list_nearby.success",
-            coloredText(ChatColor.AQUA, armorStands.count()),
-            coloredText(ChatColor.AQUA, tileEntityArmorStands.count())
-        ))
-    }
-    
-    private fun getNearestData(context: CommandContext<CommandSourceStack>) {
-        val player = context.player
-        val chunks = player.location.chunk.getSurroundingChunks(1, true)
-        val armorStands = chunks
-            .flatMap { it.entities.toList() }
-            .filterIsInstance<ArmorStand>()
-            .filter { it.persistentDataContainer.hasNovaData() }
-        val armorStand = armorStands.minByOrNull { it.location.distance(player.location) }
-        if (armorStand != null) player.chat("/data get entity ${armorStand.uniqueId}")
-        else player.spigot().sendMessage(localized(ChatColor.GRAY, "command.nova.get_nearest_data.failed"))
-    }
-    
-    private fun removeObsoleteModels(context: CommandContext<CommandSourceStack>) {
-        val player = context.player
-        val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
-        val obsoleteModels = chunks
-            .flatMap { it.entities.toList() }
-            .filterIsInstance<ArmorStand>()
-            .filter {
-                (it.isMultiModel() && it.getMultiModelParent() == null) ||
-                    (!it.isMultiModel()
-                        && TileEntityManager.getTileEntityAt(it.location.blockLocation) == null
-                        && it.equipment?.helmet?.novaMaterial != null)
-            }
-        obsoleteModels.forEach(ArmorStand::remove)
-        
-        player.spigot().sendMessage(localized(
-            ChatColor.GRAY,
-            "command.nova.remove_obsolete_models.success",
-            coloredText(ChatColor.AQUA, obsoleteModels.count())
-        ))
-    }
-    
-    private fun removeTileEntities(context: CommandContext<CommandSourceStack>) {
-        val player = context.player
-        val chunks = player.location.chunk.getSurroundingChunks(context["range"], true)
-        val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it) }
+    private fun removeTileEntities(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
+        val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it.pos) }
         tileEntities.forEach { TileEntityManager.destroyTileEntity(it, false) }
         
         player.spigot().sendMessage(localized(
@@ -124,8 +80,37 @@ object NovaCommand : PlayerCommand("nova") {
         ))
     }
     
-    private fun toggleNetworkDebugging(type: NetworkType, context: CommandContext<CommandSourceStack>) {
-        val player = context.player
+    private fun showTileEntityData(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        
+        fun sendFailure() = player.spigot().sendMessage(localized(
+            ChatColor.RED,
+            "command.nova.show_tile_entity_data.failure"
+        ))
+        
+        fun sendSuccess(name: String, data: CompoundElement) = player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.show_tile_entity_data.success",
+            localized(ChatColor.AQUA, name),
+            coloredText(ChatColor.WHITE, data.toString())
+        ))
+        
+        val location = player.getTargetBlockExact(8)?.location
+        if (location != null) {
+            val tileEntity = TileEntityManager.getTileEntityAt(location, true)
+            if (tileEntity != null) {
+                sendSuccess(tileEntity.material.localizedName, tileEntity.data)
+            } else {
+                val vanillaTileEntity = VanillaTileEntityManager.getTileEntityAt(location)
+                if (vanillaTileEntity != null) sendSuccess(vanillaTileEntity.type.name, vanillaTileEntity.data)
+                else sendFailure()
+            }
+        } else sendFailure()
+        
+    }
+    
+    private fun toggleNetworkDebugging(type: NetworkType, ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
         NetworkDebugger.toggleDebugger(type, player)
         
         player.spigot().sendMessage(localized(
@@ -134,12 +119,20 @@ object NovaCommand : PlayerCommand("nova") {
         ))
     }
     
-    private fun openCreativeInventory(context: CommandContext<CommandSourceStack>) {
-        CreativeMenu.getWindow(context.player).show()
+    private fun openItemInventory(ctx: CommandContext<CommandSourceStack>) {
+        ItemsWindow(ctx.player).show()
     }
     
-    private fun openRecipesMenu(context: CommandContext<CommandSourceStack>) {
-        RecipesMenu.open(context.player)
+    private fun setRenderDistance(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val distance: Int = ctx["distance"]
+        player.armorStandRenderDistance = distance
+        
+        player.spigot().sendMessage(localized(
+            ChatColor.GRAY,
+            "command.nova.render_distance",
+            coloredText(ChatColor.AQUA, distance)
+        ))
     }
     
 }

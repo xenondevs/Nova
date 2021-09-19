@@ -1,10 +1,9 @@
 package xyz.xenondevs.nova.tileentity
 
-import com.google.gson.JsonObject
+import net.dzikoysk.exposed.upsert.upsert
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.*
 import org.bukkit.block.Block
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -15,110 +14,110 @@ import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
+import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.transactions.transaction
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.database.asyncTransaction
+import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
+import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
+import xyz.xenondevs.nova.world.armorstand.pos
 import java.util.*
 import kotlin.math.roundToInt
 
 val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
 
-fun ItemStack.setTileEntityData(data: JsonObject) {
+fun ItemStack.setTileEntityData(data: CompoundElement) {
     if (hasItemMeta()) {
         val itemMeta = this.itemMeta!!
         val dataContainer = itemMeta.persistentDataContainer
-        dataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, data)
+        dataContainer.set(TILE_ENTITY_KEY, CompoundElementDataType, data)
         this.itemMeta = itemMeta
     }
 }
 
-fun ItemStack.getTileEntityData(): JsonObject? {
+fun ItemStack.getTileEntityData(): CompoundElement? {
     if (hasItemMeta()) {
         val dataContainer = itemMeta!!.persistentDataContainer
-        if (dataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)) {
-            return dataContainer.get(TILE_ENTITY_KEY, JsonElementDataType) as JsonObject
+        if (dataContainer.has(TILE_ENTITY_KEY, CompoundElementDataType)) {
+            return dataContainer.get(TILE_ENTITY_KEY, CompoundElementDataType)
         }
     }
     
     return null
 }
 
-fun ArmorStand.setTileEntityData(data: JsonObject) =
-    persistentDataContainer.set(TILE_ENTITY_KEY, JsonElementDataType, data)
-
-fun ArmorStand.getTileEntityData() =
-    persistentDataContainer.get(TILE_ENTITY_KEY, JsonElementDataType)?.let { it as JsonObject }
-
-fun ArmorStand.hasTileEntityData(): Boolean =
-    persistentDataContainer.has(TILE_ENTITY_KEY, JsonElementDataType)
-
 @Suppress("DEPRECATION")
 val Material?.requiresLight: Boolean
-    get() = this != null && !isTransparent
+    get() = this != null && !isTransparent && isOccluding
 
 object TileEntityManager : Listener {
     
-    private val tileEntityMap = HashMap<Chunk, HashMap<Location, TileEntity>>()
+    private val tileEntityMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
+    private val additionalHitboxMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
     private val locationCache = HashSet<Location>()
-    val tileEntities: List<TileEntity>
-        get() = tileEntityMap.flatMap { (_, chunkMap) -> chunkMap.values }
+    private val tileEntities: Sequence<TileEntity>
+        get() = tileEntityMap.asSequence().flatMap { (_, chunkMap) -> chunkMap.values }
+    val tileEntityChunks: Sequence<Chunk>
+        get() = tileEntityMap.keys.asSequence().map(AsyncChunkPos::chunk)
     
     fun init() {
+        LOGGER.info("Initializing TileEntityManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkLoad)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkUnload) }
-        runTaskTimer(0, 1) { tileEntities.forEach(TileEntity::handleTick) }
+        runTaskTimer(0, 1) { synchronized(this) { tileEntities.forEach(TileEntity::handleTick) } }
         
         runTaskTimer(0, 1200) {
-            // In some special cases no event is called when replacing a block. So we check for air blocks every minute.
-            tileEntities.associateWith(TileEntity::location).forEach { (tileEntity, location) ->
-                if (Material.AIR == location.block.type)
-                    destroyTileEntity(tileEntity, false)
+            synchronized(this) {
+                // In some special cases no event is called when replacing a block. So we check for air blocks every minute.
+                tileEntities.associateWith(TileEntity::location).forEach { (tileEntity, location) ->
+                    if (Material.AIR == location.block.type)
+                        destroyTileEntity(tileEntity, false)
+                }
             }
-            
-            // Async entity loading causes MultiModels to not replace models correctly as the armor stands
-            // haven't been loaded at that time.
-            // This is a temporary workaround until spigot fixes this issue.
-            // https://hub.spigotmc.org/jira/browse/SPIGOT-6547
-            tileEntities.flatMap { it.multiModels.values }.forEach(MultiModel::removeDuplicates)
         }
     }
     
+    @Synchronized
     fun placeTileEntity(
         ownerUUID: UUID,
         location: Location,
         yaw: Float,
         material: NovaMaterial,
-        data: JsonObject?
+        data: CompoundElement?,
+        tileEntityUUID: UUID? = null
     ) {
-        
         val block = location.block
+        val chunk = location.chunk
         
-        // the block type to be used as a hitbox for the tile entity
-        val hitboxType = material.hitbox
-        
-        // spawn ArmorStand there
-        val headItem = material.block!!.getItem("")
+        // create TileEntity with FakeArmorStand
         val spawnLocation = location
             .clone()
             .add(0.5, 0.0, 0.5)
-            .also { it.yaw = ((yaw + 180).mod(360f) / 90f).roundToInt() * 90f }
-        val armorStand = EntityUtils.spawnArmorStandSilently(spawnLocation, headItem, hitboxType.requiresLight)
+            .also { it.yaw = calculateTileEntityYaw(material, yaw) }
         
-        // create TileEntity instance
-        val tileEntity = material.createTileEntity!!(
-            ownerUUID,
+        val uuid = tileEntityUUID ?: UUID.randomUUID()
+        val tileEntity = TileEntity.create(
+            uuid,
+            spawnLocation,
             material,
-            data ?: JsonObject().apply { add("global", JsonObject()) },
-            armorStand
+            data ?: CompoundElement().apply { putElement("global", CompoundElement()) },
+            ownerUUID,
         )
         
         // add to tileEntities map
-        val chunk = block.chunk
-        val chunkMap = tileEntityMap[chunk] ?: HashMap<Location, TileEntity>().also { tileEntityMap[chunk] = it }
+        val chunkMap = tileEntityMap.getOrPut(chunk.pos) { HashMap() }
         chunkMap[location] = tileEntity
         
         // add to location cache
@@ -127,26 +126,39 @@ object TileEntityManager : Listener {
         // count for TileEntity limits
         TileEntityLimits.handleTileEntityCreate(ownerUUID, material)
         
-        // set hitbox block a tick later to prevent interference with the cancellation of the BlockPlaceEvent
+        // call handleInitialized
+        tileEntity.handleInitialized(true)
+        
+        // set the hitbox block (1 tick later to prevent interference with the BlockBreakEvent)
         runTaskLater(1) {
-            if (hitboxType != null) block.type = hitboxType
-            tileEntity.handleInitialized(true)
-            tileEntity.saveData()
+            if (tileEntity.isValid) { // check that the tile entity hasn't been destroyed already
+                material.hitboxType?.run { block.type = this }
+                tileEntity.handleHitboxPlaced()
+            }
         }
     }
     
-    fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
+    private fun calculateTileEntityYaw(material: NovaMaterial, playerYaw: Float): Float =
+        if (material.isDirectional) ((playerYaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f
+    
+    @Synchronized
+    fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean, deleteInDatabase: Boolean = true): List<ItemStack> {
         val location = tileEntity.location
-        val chunk = location.chunk
+        val chunkPos = location.chunkPos
         
         // remove TileEntity and ArmorStand
-        tileEntityMap[chunk]?.remove(location)
+        tileEntityMap[chunkPos]?.remove(location)
         locationCache -= location
         tileEntity.additionalHitboxes.forEach {
-            tileEntityMap[it.chunk]?.remove(it)
+            tileEntityMap[it.chunkPos]?.remove(it)
             locationCache -= it
         }
-        tileEntity.armorStand.remove()
+        
+        if (deleteInDatabase) { // remove it from the database
+            asyncTransaction {
+                TileEntitiesTable.deleteWhere { TileEntitiesTable.id eq tileEntity.uuid }
+            }
+        }
         
         location.block.type = Material.AIR
         tileEntity.additionalHitboxes.forEach { it.block.type = Material.AIR }
@@ -160,6 +172,7 @@ object TileEntityManager : Listener {
         return drops
     }
     
+    @Synchronized
     fun destroyAndDropTileEntity(tileEntity: TileEntity, dropItems: Boolean) {
         val drops = destroyTileEntity(tileEntity, dropItems)
         
@@ -167,59 +180,100 @@ object TileEntityManager : Listener {
         runTaskLater(1) { tileEntity.location.dropItems(drops) }
     }
     
-    fun getTileEntityAt(location: Location) = tileEntityMap[location.chunk]?.get(location)
+    @Synchronized
+    fun getTileEntityAt(location: Location, additionalHitboxes: Boolean = true): TileEntity? {
+        val chunkPos = location.chunkPos
+        return tileEntityMap[chunkPos]?.get(location)
+            ?: if (additionalHitboxes) additionalHitboxMap[chunkPos]?.get(location) else null
+    }
     
-    fun getTileEntitiesInChunk(chunk: Chunk) = tileEntityMap[chunk]?.values?.toList() ?: emptyList()
+    @Synchronized
+    fun getTileEntitiesInChunk(chunkPos: AsyncChunkPos) = tileEntityMap[chunkPos]?.values?.toList() ?: emptyList()
     
-    fun addTileEntityLocations(tileEntity: TileEntity, locations: List<Location>) {
+    @Synchronized
+    fun addTileEntityHitboxLocations(tileEntity: TileEntity, locations: List<Location>) {
         locations.forEach {
-            val chunkMap = tileEntityMap.getOrPut(it.chunk) { HashMap() }
+            val chunkMap = additionalHitboxMap.getOrPut(it.chunkPos) { HashMap() }
             chunkMap[it] = tileEntity
             
             locationCache += it
         }
     }
     
+    @Synchronized
     private fun handleChunkLoad(chunk: Chunk) {
-        // https://hub.spigotmc.org/jira/browse/SPIGOT-6547
-        // workaround because of async entity loading:
-        // check for entities every 10 ticks for the next 15 seconds (300 ticks)
-        for (delay in 0..300 step 10) {
-            runTaskLater(delay.toLong()) {
-                
-                if (chunk.isLoaded) {
-                    val chunkMap = tileEntityMap[chunk] ?: HashMap()
-                    val newChunkMap = HashMap<Location, TileEntity>()
-                    
-                    chunk.entities
-                        .filterIsInstance<ArmorStand>()
-                        .filter(ArmorStand::hasTileEntityData)
-                        .forEach { armorStand ->
-                            val location = armorStand.location.blockLocation
-                            
-                            if (!locationCache.contains(location)) {
-                                if (location.block.type.requiresLight) armorStand.fireTicks = Int.MAX_VALUE
-                                
-                                val tileEntity = TileEntity.newInstance(armorStand)
-                                newChunkMap[location] = tileEntity
-                                locationCache += location
-                            }
-                        }
-                    
-                    chunkMap.putAll(newChunkMap)
-                    tileEntityMap[chunk] = chunkMap
-                    newChunkMap.values.forEach { it.handleInitialized(false) }
+        asyncTransaction {
+            DaoTileEntity.find { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
+                .forEach { tile ->
+                    tile.inventories.forEach { inventory ->
+                        TileInventoryManager.loadInventory(tile.id.value, inventory.id.value, inventory.data)
+                    }
+    
+                    // create the tile entity in the main thread
+                    runTask {
+                        val location = tile.location
+                        val tileEntity = TileEntity.create(tile, location)
+        
+                        val chunkMap = tileEntityMap.getOrPut(chunk.pos) { HashMap() }
+                        chunkMap[location] = tileEntity
+        
+                        locationCache += location
+        
+                        tileEntity.handleInitialized(false)
+                    }
                 }
+        }
+    }
+    
+    @Synchronized
+    private fun handleChunkUnload(chunk: Chunk) {
+        saveChunk(chunk)
+        
+        val chunkPos = chunk.pos
+        val tileEntities = tileEntityMap[chunkPos]
+        tileEntityMap -= chunkPos
+        locationCache.removeAll { it.chunk == chunk }
+        tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
+    }
+    
+    @Synchronized
+    fun saveChunk(chunk: Chunk) {
+        val tileEntities = tileEntityMap[chunk.pos]?.values ?: return
+        
+        transaction {
+            tileEntities.forEach { tileEntity ->
+                tileEntity.saveData()
                 
+                TileEntitiesTable.upsert(
+                    conflictColumn = TileEntitiesTable.id,
+                    
+                    insertBody = {
+                        val location = tileEntity.location
+                        
+                        it[id] = tileEntity.uuid
+                        it[world] = tileEntity.location.world!!.uid
+                        it[owner] = tileEntity.ownerUUID
+                        it[chunkX] = chunk.x
+                        it[chunkZ] = chunk.z
+                        it[x] = location.blockX
+                        it[y] = location.blockY
+                        it[z] = location.blockZ
+                        it[yaw] = tileEntity.armorStand.location.yaw
+                        it[type] = tileEntity.material
+                        it[data] = tileEntity.data
+                    },
+                    
+                    updateBody = {
+                        it[data] = tileEntity.data
+                    }
+                )
             }
         }
     }
     
-    private fun handleChunkUnload(chunk: Chunk) {
-        val tileEntities = tileEntityMap[chunk]
-        tileEntityMap -= chunk
-        locationCache.removeAll { it.chunk == chunk }
-        tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
+    @EventHandler
+    fun handleWorldSave(event: WorldSaveEvent) {
+        runAsyncTask { event.world.loadedChunks.forEach { saveChunk(it) } }
     }
     
     @EventHandler
@@ -234,39 +288,48 @@ object TileEntityManager : Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePlace(event: BlockPlaceEvent) {
-        val player = event.player
-        val placedItem = event.itemInHand
-        val material = placedItem.novaMaterial
+        val location = event.blockPlaced.location
         
-        if (material != null) {
-            event.isCancelled = true
+        if (getTileEntityAt(location) == null) {
+            val player = event.player
+            val placedItem = event.itemInHand
+            val material = placedItem.novaMaterial
             
-            if (material.isBlock) {
-                val location = event.block.location
-                if (getTileEntityAt(location) == null && material.canPlace?.invoke(player, location) != false) {
-                    val uuid = player.uniqueId
-                    val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
-                    if (result == PlaceResult.ALLOW) {
-                        placeTileEntity(
-                            uuid,
-                            event.block.location,
-                            player.location.yaw,
-                            material,
-                            placedItem.getTileEntityData()?.let { JsonObject().apply { add("global", it) } }
-                        )
-                        
-                        if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
-                    } else {
-                        player.spigot().sendMessage(
-                            localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
-                        )
+            if (material != null) {
+                event.isCancelled = true
+                
+                if (material.isBlock) {
+                    val playerLocation = player.location
+                    
+                    if (material.placeCheck?.invoke(
+                            player,
+                            location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
+                        ) != false
+                    ) {
+                        val uuid = player.uniqueId
+                        val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
+                        if (result == PlaceResult.ALLOW) {
+                            placeTileEntity(
+                                uuid,
+                                event.block.location,
+                                playerLocation.yaw,
+                                material,
+                                placedItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
+                            )
+                            
+                            if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
+                        } else {
+                            player.spigot().sendMessage(
+                                localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
+                            )
+                        }
                     }
                 }
             }
-        }
+        } else event.isCancelled = true
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
         val location = event.block.location
         val tileEntity = getTileEntityAt(location)
@@ -283,13 +346,13 @@ object TileEntityManager : Listener {
         if (action == Action.RIGHT_CLICK_BLOCK && !event.player.isSneaking) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
-            if (tileEntity != null && ProtectionUtils.canUse(player, block.location)) tileEntity.handleRightClick(event)
+            if (tileEntity != null && ProtectionManager.canUse(player, block.location)) tileEntity.handleRightClick(event)
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             if ((block.type == Material.BARRIER || block.type == Material.CHAIN)
                 && event.player.gameMode == GameMode.SURVIVAL
                 && getTileEntityAt(block.location) != null
-                && ProtectionUtils.canBreak(player, block.location)) {
+                && ProtectionManager.canBreak(player, block.location)) {
                 
                 event.isCancelled = true
                 Bukkit.getPluginManager().callEvent(BlockBreakEvent(block, player))
@@ -321,7 +384,7 @@ object TileEntityManager : Listener {
         if (event.blocks.any { it.location in locationCache }) event.isCancelled = true
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleBlockPhysics(event: BlockPhysicsEvent) {
         val location = event.block.location
         if (location in locationCache && Material.AIR == event.block.type) {

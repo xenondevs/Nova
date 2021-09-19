@@ -2,8 +2,8 @@
   "result": "nova:harvester",
   "shape": [
     "iai",
-    "snh",
-    "iii"
+    "sfh",
+    "ini"
   ],
   "ingredients": [
     {
@@ -25,6 +25,10 @@
     {
       "char": "h",
       "item": "minecraft:iron_hoe"
+    },
+    {
+      "char": "f",
+      "item": "nova:elite_machine_frame"
     }
   ]
 }

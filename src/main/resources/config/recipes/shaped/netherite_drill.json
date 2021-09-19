@@ -3,7 +3,7 @@
   "shape": [
     "ppp",
     " g ",
-    " b "
+    " i "
   ],
   "ingredients": [
     {
@@ -15,8 +15,8 @@
       "item": "nova:netherite_plate"
     },
     {
-      "char": "b",
-      "item": "minecraft:netherite_block"
+      "char": "i",
+      "item": "minecraft:netherite_ingot"
     }
   ]
 }

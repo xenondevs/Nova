@@ -1,8 +1,8 @@
 {
   "result": "nova:chunk_loader",
   "shape": [
-    "idi",
-    "dgd",
+    "igi",
+    "dfd",
     "idi"
   ],
   "ingredients": [
@@ -17,6 +17,10 @@
     {
       "char": "g",
       "item": "nova:emerald_gear"
+    },
+    {
+      "char": "f",
+      "item": "nova:advanced_machine_frame"
     }
   ]
 }

@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.tileentity.impl.agriculture
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.item.Item
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.minecraft.core.Direction
 import net.minecraft.world.InteractionHand
@@ -14,66 +14,106 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
-import org.bukkit.entity.ArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.FERTILIZER
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
+import xyz.xenondevs.nova.ui.item.AddNumberItem
+import xyz.xenondevs.nova.ui.item.DisplayNumberItem
+import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.ReflectionUtils.blockPos
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsStack
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
+import xyz.xenondevs.nova.util.blockPos
 import xyz.xenondevs.nova.util.item.PlantUtils
 import xyz.xenondevs.nova.util.item.isFullyAged
-import xyz.xenondevs.nova.util.protection.ProtectionUtils
+import xyz.xenondevs.nova.util.nmsStack
+import xyz.xenondevs.nova.util.serverLevel
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.region.Region
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("fertilizer.capacity")!!
-private val ENERGY_PER_FERTILIZE = NovaConfig.getInt("fertilizer.energy_per_fertilize")!!
-private val WAIT_TIME = NovaConfig.getInt("fertilizer.wait_time")!!
+private val MAX_ENERGY = NovaConfig[FERTILIZER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[FERTILIZER].getInt("energy_per_tick")!!
+private val ENERGY_PER_FERTILIZE = NovaConfig[FERTILIZER].getInt("energy_per_fertilize")!!
+private val IDLE_TIME = NovaConfig[FERTILIZER].getInt("idle_time")!!
+private val MIN_RANGE = NovaConfig[FERTILIZER].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[FERTILIZER].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[FERTILIZER].getInt("range.default")!!
 
 class Fertilizer(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+    private val fertilizerInventory = getInventory("fertilizer", 12, ::handleFertilizerUpdate)
+    override val gui = lazy(::FertilizerGUI)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_FERTILIZE, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(this, fertilizerInventory)
     
-    private val fertilizerInventory = getInventory("fertilizer", 12, true, ::handleFertilizerUpdate)
-    override val gui by lazy(::FertilizerGUI)
-    
-    private val fertilizeRegion = getFrontArea(7.0, 7.0, 1.0, 0.0)
-    private var idleTime = WAIT_TIME
+    private var maxIdleTime = 0
+    private var timePassed = 0
+    private var maxRange = 0
+    private var range = retrieveData("range") { DEFAULT_RANGE }
+        set(value) {
+            field = value
+            updateRegion()
+            if (gui.isInitialized()) gui.value.updateRangeItems()
+        }
+    private lateinit var fertilizeRegion: Region
     
     init {
-        setDefaultInventory(fertilizerInventory)
+        handleUpgradeUpdates()
+        updateRegion()
+    }
+    
+    private fun handleUpgradeUpdates() {
+        maxIdleTime = (IDLE_TIME / upgradeHolder.getSpeedModifier()).toInt()
+        if (timePassed > maxIdleTime) timePassed = maxIdleTime
+        
+        maxRange = MAX_RANGE + upgradeHolder.getRangeModifier()
+        if (range > maxRange) range = maxRange
+    }
+    
+    private fun updateRegion() {
+        fertilizeRegion = getBlockFrontRegion(range, range, 1, 0)
+        VisualRegion.updateRegion(uuid, fertilizeRegion)
+    }
+    
+    override fun saveData() {
+        super.saveData()
+        storeData("range", range)
     }
     
     override fun handleTick() {
-        if (energy >= ENERGY_PER_FERTILIZE) {
-            if (--idleTime <= 0) {
-                idleTime = WAIT_TIME
-                if (!fertilizerInventory.isEmpty)
-                    fertilizeNextPlant()
+        if (energyHolder.energy >= energyHolder.energyConsumption) {
+            energyHolder.energy -= energyHolder.energyConsumption
+            if (energyHolder.energy >= energyHolder.specialEnergyConsumption) {
+                if (timePassed++ >= maxIdleTime) {
+                    timePassed = 0
+                    if (!fertilizerInventory.isEmpty)
+                        fertilizeNextPlant()
+                }
             }
-        }
-        
-        if (hasEnergyChanged) {
-            hasEnergyChanged = false
-            gui.energyBar.update()
         }
     }
     
@@ -83,7 +123,7 @@ class Fertilizer(
             val plant = getRandomPlant() ?: return
             
             val context = UseOnContext(
-                plant.world.nmsWorld,
+                plant.world.serverLevel,
                 null,
                 InteractionHand.MAIN_HAND,
                 item.nmsStack,
@@ -91,7 +131,7 @@ class Fertilizer(
             )
             BoneMealItem.applyBonemeal(context)
             
-            energy -= ENERGY_PER_FERTILIZE
+            energyHolder.energy -= energyHolder.specialEnergyConsumption
             fertilizerInventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
             break
         }
@@ -100,7 +140,7 @@ class Fertilizer(
     private fun getRandomPlant(): Block? =
         fertilizeRegion.blocks
             .filter {
-                ProtectionUtils.canUse(ownerUUID, it.location)
+                ProtectionManager.canUse(ownerUUID, it.location)
                     && ((it.blockData is Ageable && !it.isFullyAged()) || (it.blockData !is Ageable && it.type in PlantUtils.PLANTS))
             }
             .randomOrNull()
@@ -121,24 +161,32 @@ class Fertilizer(
             this@Fertilizer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(fertilizerInventory), "inventory.nova.fertilizer", ItemConnectionType.ALL_TYPES)
+                Triple(itemHolder.getNetworkedInventory(fertilizerInventory), "inventory.nova.fertilizer", ItemConnectionType.ALL_TYPES)
             ),
         ) { openWindow(it) }
+        
+        private val rangeItems = ArrayList<Item>()
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s . . . . # . |" +
-                "| v . . . . # . |" +
-                "| u . . . . # . |" +
+                "| s p i i i i . |" +
+                "| v n i i i i . |" +
+                "| u m i i i i . |" +
                 "3 - - - - - - - 4")
-            .addIngredient('v', VisualizeRegionItem(uuid, fertilizeRegion))
+            .addIngredient('i', fertilizerInventory)
+            .addIngredient('v', VisualizeRegionItem(uuid) { fertilizeRegion })
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .build()
-            .also { it.fillRectangle(2, 1, 4, fertilizerInventory, true) }
         
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -1) }
+        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
+        
+        fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
+        
     }
     
 }

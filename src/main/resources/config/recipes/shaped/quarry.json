@@ -2,7 +2,7 @@
   "result": "nova:quarry",
   "shape": [
     "ppp",
-    "sgs",
+    "sfs",
     "pdp"
   ],
   "ingredients": [
@@ -15,8 +15,8 @@
       "item": "nova:scaffolding"
     },
     {
-      "char": "g",
-      "item": "nova:diamond_gear"
+      "char": "f",
+      "item": "nova:ultimate_machine_frame"
     },
     {
       "char": "d",

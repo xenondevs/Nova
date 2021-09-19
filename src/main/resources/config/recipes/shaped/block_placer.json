@@ -1,9 +1,9 @@
 {
   "result": "nova:block_placer",
   "shape": [
-    "iii",
-    "igi",
-    "iii"
+    "ici",
+    "cfc",
+    "ici"
   ],
   "ingredients": [
     {
@@ -11,8 +11,12 @@
       "item": "nova:iron_plate"
     },
     {
-      "char": "g",
-      "item": "nova:redstone_gear"
+      "char": "f",
+      "item": "nova:advanced_machine_frame"
+    },
+    {
+      "char": "c",
+      "item": "minecraft:cobblestone"
     }
   ]
 }

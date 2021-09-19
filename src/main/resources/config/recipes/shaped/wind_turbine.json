@@ -2,7 +2,7 @@
   "result": "nova:wind_turbine",
   "shape": [
     "pgp",
-    " i ",
+    " f ",
     "bbb"
   ],
   "ingredients": [
@@ -15,8 +15,8 @@
       "item": "nova:iron_gear"
     },
     {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
+      "char": "f",
+      "item": "nova:elite_machine_frame"
     },
     {
       "char": "b",

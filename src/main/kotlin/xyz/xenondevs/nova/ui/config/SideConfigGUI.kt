@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.config
 import com.google.common.base.Preconditions
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.resourcepack.Icon
@@ -13,14 +13,16 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.NetworkEndPoint
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.energy.EnergyStorage
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.network.item.ItemStorage
-import xyz.xenondevs.nova.network.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
+import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
+import xyz.xenondevs.nova.util.data.setLocalizedName
 
 class SideConfigGUI(
     endPoint: NetworkEndPoint,
@@ -30,10 +32,10 @@ class SideConfigGUI(
 ) {
     
     private val energyConfigGUI = if (allowedEnergyTypes != null)
-        EnergySideConfigGUI(endPoint as EnergyStorage, allowedEnergyTypes) else null
+        EnergySideConfigGUI(endPoint.holders[NetworkType.ENERGY] as EnergyHolder, allowedEnergyTypes) else null
     
     private val itemConfigGUI = if (inventories != null)
-        ItemSideConfigGUI(endPoint as ItemStorage, inventories) else null
+        ItemSideConfigGUI(endPoint.holders[NetworkType.ITEMS] as ItemHolder, inventories) else null
     
     private val mainGUI: GUI
     
@@ -48,12 +50,12 @@ class SideConfigGUI(
                     "i x x x x x x x x")
                 .addIngredient('b', BackItem(openPrevious))
                 .addIngredient('e', ClickyTabItem(0) {
-                    if (it.currentTab == 0) NovaMaterial.ENERGY_OFF_BUTTON.createBasicItemBuilder()
-                    else NovaMaterial.ENERGY_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.energy")
+                    if (it.currentTab == 0) NovaMaterialRegistry.ENERGY_OFF_BUTTON.createBasicItemBuilder()
+                    else NovaMaterialRegistry.ENERGY_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.energy")
                 })
                 .addIngredient('i', ClickyTabItem(1) {
-                    if (it.currentTab == 1) NovaMaterial.ITEM_OFF_BUTTON.createBasicItemBuilder()
-                    else NovaMaterial.ITEM_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.item")
+                    if (it.currentTab == 1) NovaMaterialRegistry.ITEM_OFF_BUTTON.createBasicItemBuilder()
+                    else NovaMaterialRegistry.ITEM_ON_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.side_config.item")
                 })
                 .addGUI(energyConfigGUI)
                 .addGUI(itemConfigGUI)
@@ -73,7 +75,7 @@ class SideConfigGUI(
     
 }
 
-class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterial.SIDE_CONFIG_BUTTON.item.getItemBuilder("menu.nova.side_config")) {
+class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterialRegistry.SIDE_CONFIG_BUTTON.item.createItemBuilder("menu.nova.side_config")) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

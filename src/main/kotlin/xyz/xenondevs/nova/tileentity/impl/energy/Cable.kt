@@ -1,123 +1,175 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
 import com.google.common.base.Preconditions
-import com.google.gson.JsonObject
-import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
+import de.studiocode.invui.virtualinventory.VirtualInventory
+import de.studiocode.invui.virtualinventory.VirtualInventoryManager
 import org.bukkit.Axis
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Orientable
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.hitbox.Hitbox
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.Network
-import xyz.xenondevs.nova.network.NetworkManager
-import xyz.xenondevs.nova.network.NetworkNode
-import xyz.xenondevs.nova.network.NetworkType
-import xyz.xenondevs.nova.network.NetworkType.ENERGY
-import xyz.xenondevs.nova.network.NetworkType.ITEMS
-import xyz.xenondevs.nova.network.energy.EnergyBridge
-import xyz.xenondevs.nova.network.item.ItemBridge
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.network.item.ItemStorage
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.*
+import xyz.xenondevs.nova.tileentity.network.NetworkType.ENERGY
+import xyz.xenondevs.nova.tileentity.network.NetworkType.ITEMS
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyBridge
+import xyz.xenondevs.nova.tileentity.network.item.ItemBridge
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
+import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.ui.CableItemConfigGUI
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.point.Point3D
+import xyz.xenondevs.nova.util.data.plus
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.hitbox.Hitbox
+import xyz.xenondevs.nova.world.point.Point3D
 import java.util.*
 
-private const val CONNECTOR = 1
-private const val HORIZONTAL = 2
-private const val DOWN = 3
-private const val UP = 4
-private val ATTACHMENTS: IntArray = (5..13).toIntArray()
+private val ATTACHMENTS: IntArray = (64..72).toIntArray()
 
 private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
+
+private val NetworkNode.itemHolder: ItemHolder?
+    get() = if (this is NetworkEndPoint && holders.contains(ITEMS)) holders[ITEMS] as ItemHolder else null
 
 open class Cable(
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : TileEntity(
-    ownerUUID,
-    material,
-    data,
-    armorStand,
-), EnergyBridge, ItemBridge {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : TileEntity(uuid, data, material, ownerUUID, armorStand), EnergyBridge, ItemBridge {
     
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
-    override val bridgeFaces = retrieveData("bridgeFaces") { CUBE_FACES.toMutableSet() }
+    override val bridgeFaces = retrieveEnumCollectionOrNull("bridgeFaces", HashSet()) ?: CUBE_FACES.toMutableSet()
     
-    override val gui: TileEntityGUI? = null
+    override val gui: Lazy<TileEntityGUI>? = null
     
     override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     
-    private var filterInventoriesInitialized = false
-    private val filterInventories by lazy {
-        filterInventoriesInitialized = true
+    private val insertFilters: MutableMap<BlockFace, ItemFilter> = retrieveFilterMap("insertFilters")
+    private val extractFilters: MutableMap<BlockFace, ItemFilter> = retrieveFilterMap("extractFilters")
+    private val configGUIs = emptyEnumMap<BlockFace, CableItemConfigGUI>()
+    
+    private val multiModel = createMultiModel()
+    private val hitboxes = ArrayList<Hitbox>()
+    
+    init {
+        // Convert legacy virtual inventories holding the filter items to ItemFilter configs
+        val manager = VirtualInventoryManager.getInstance()
+        fun VirtualInventory.toFilterConfig(): ItemFilter? = getItemStack(0)?.getFilterConfig()
         
-        mapOf(
-            ItemConnectionType.INSERT to
-                CUBE_FACES.associateWith { getInventory("filter_insert_$it", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate) },
-            ItemConnectionType.EXTRACT to
-                CUBE_FACES.associateWith { getInventory("filter_extract_$it", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate) }
-        )
+        CUBE_FACES.associateWithTo(emptyEnumMap()) {
+            manager.getByUuid(uuid.salt("filter_insert_$it"))
+                ?.also(manager::remove)
+                ?.toFilterConfig()
+        }.forEach { (face, itemFilter) ->
+            if (itemFilter != null) insertFilters[face] = itemFilter
+        }
+        
+        CUBE_FACES.associateWithTo(emptyEnumMap()) {
+            manager.getByUuid(uuid.salt("filter_extract_$it"))
+                ?.also(manager::remove)
+                ?.toFilterConfig()
+        }.forEach { (face, itemFilter) ->
+            if (itemFilter != null) extractFilters[face] = itemFilter
+        }
     }
     
-    private val multiModel = getMultiModel("cableModels")
-    private val hitboxes = ArrayList<Hitbox>()
+    private fun retrieveFilterMap(name: String) =
+        retrieveEnumMapOrNull<BlockFace, CompoundElement>(name)
+            ?.mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
+            ?: emptyEnumMap()
     
     override fun saveData() {
         super.saveData()
-        storeData("bridgeFaces", bridgeFaces)
+        storeList("bridgeFaces", bridgeFaces)
+        storeEnumMap("insertFilters", insertFilters.mapValues { it.value.compound })
+        storeEnumMap("extractFilters", extractFilters.mapValues { it.value.compound })
     }
     
     override fun handleNetworkUpdate() {
-        if (isValid) {
-            if (NOVA.isEnabled) {
-                multiModel.replaceModels(getModelsNeeded())
-                updateHitbox()
+        // assume that we have NetworkManager.LOCK
+        if (isValid && NOVA.isEnabled) {
+            multiModel.replaceModels(getModelsNeeded())
+            updateHeadStack()
+            
+            configGUIs.forEach { (face, gui) ->
+                if (gui != null) {
+                    val neighbor = connectedNodes[ITEMS]?.get(face)
+                    if (neighbor is NetworkEndPoint && neighbor.holders.contains(ITEMS)) {
+                        val itemHolder = neighbor.holders[ITEMS] as ItemHolder
+                        gui.itemHolder = itemHolder
+                        gui.updateButtons()
+                    } else gui.itemHolder = null
+                }
             }
+            
+            // !! Needs to be run in the server thread (updating blocks)
+            // !! Also needs to be synchronized with NetworkManager as connectedNodes are retrieved
+            // This is not using a simple synchronized call as it would (in the worst case) block the main thread
+            // until all other tasks accessing the NetworkManager have run, defeating the purpose of doing this async.
+            runSyncTaskWhenUnlocked(NetworkManager.LOCK, ::updateHitbox)
         }
     }
     
     override fun handleInitialized(first: Boolean) {
-        NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+        runAsyncTask { NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES) }
+    }
+    
+    override fun handleHitboxPlaced() {
+        updateBlockHitbox()
+    }
+    
+    override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
+        val items = super.destroy(dropItems)
+        if (dropItems) {
+            (extractFilters.values.stream() + insertFilters.values.stream())
+                .map { it.createFilterItem() }
+                .forEach(items::add)
+        }
+        
+        return items
     }
     
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
-        NetworkManager.handleBridgeRemove(this, unload)
+        
+        val task = { NetworkManager.handleBridgeRemove(this, unload) }
+        if (NOVA.isEnabled) runAsyncTask(task) else task()
+        
         hitboxes.forEach { it.remove() }
         
-        if (!unload && filterInventoriesInitialized) {
-            filterInventories.values
-                .flatMap { it.values.toList() }
-                .flatMap { it.windows }
-                .mapNotNull { it.currentViewer }
-                .forEach(Player::closeInventory)
-        }
+        if (!unload) configGUIs.values.forEach(CableItemConfigGUI::closeForAllViewers)
     }
     
     override fun getFilter(type: ItemConnectionType, blockFace: BlockFace) =
-        filterInventories[type]?.get(blockFace)?.getItemStack(0)?.getFilterConfig()
+        when (type) {
+            ItemConnectionType.INSERT -> insertFilters[blockFace]
+            ItemConnectionType.EXTRACT -> extractFilters[blockFace]
+            else -> null
+        }
     
-    private fun handleFilterInventoryUpdate(event: ItemUpdateEvent) {
-        if (event.newItemStack != null && event.newItemStack?.novaMaterial != NovaMaterial.ITEM_FILTER)
-            event.isCancelled = true
+    override fun getHeadStack(): ItemStack {
+        val connectedFaces = connectedNodes.values.flatMapTo(HashSet()) { it.keys }
+        
+        val booleans = CUBE_FACES.map { connectedFaces.contains(it) }.reversed().toBooleanArray()
+        val number = MathUtils.convertBooleanArrayToInt(booleans)
+        return material.block!!.createItemStack(number)
     }
     
     private fun getModelsNeeded(): List<Model> {
@@ -125,32 +177,13 @@ open class Cable(
         
         val items = ArrayList<Pair<ItemStack, Float>>()
         
-        val connectedFaces = connectedNodes.values.flatMapTo(HashSet()) { it.keys }
-        
-        // only show connector if connections aren't on two opposite sides
-        if (connectedFaces.size != 2 || connectedFaces.first() != connectedFaces.last().oppositeFace) {
-            items += material.block!!.getItem(CONNECTOR) to 0f
-        }
-        
-        // add all cable connections
-        connectedFaces.forEach { blockFace ->
-            val dataIndex = when (blockFace) {
-                BlockFace.DOWN -> DOWN
-                BlockFace.UP -> UP
-                else -> HORIZONTAL
-            }
-            
-            val itemStack = material.block!!.getItem(dataIndex)
-            items += itemStack to getRotation(blockFace)
-        }
-        
-        // add all item network attachments
         connectedNodes[ITEMS]!!
-            .filter { it.value is ItemStorage }
-            .forEach { (blockFace, itemStorage) ->
-                itemStorage as ItemStorage
+            .filter { val node = it.value; node is NetworkEndPoint && node.holders.contains(ITEMS) }
+            .forEach { (blockFace, node) ->
+                val itemHolder = (node as NetworkEndPoint).holders[ITEMS] as ItemHolder
                 
-                val attachmentIndex = when (itemStorage.itemConfig[blockFace.oppositeFace] ?: ItemConnectionType.NONE) {
+                val attachmentIndex = when (itemHolder.itemConfig[blockFace.oppositeFace]
+                    ?: ItemConnectionType.NONE) {
                     ItemConnectionType.INSERT -> 0
                     ItemConnectionType.EXTRACT -> 1
                     ItemConnectionType.BUFFER -> 2
@@ -161,7 +194,7 @@ open class Cable(
                     else -> 0
                 }
                 
-                val itemStack = material.block!!.getItem(ATTACHMENTS[attachmentIndex])
+                val itemStack = material.block!!.createItemStack(ATTACHMENTS[attachmentIndex])
                 items += itemStack to getRotation(blockFace)
             }
         
@@ -192,15 +225,8 @@ open class Cable(
     
     private fun createCableHitboxes() {
         CUBE_FACES.forEach { blockFace ->
-            val pointA: Point3D
-            val pointB: Point3D
-            if (connectedNodes.values.any { it.containsKey(blockFace) }) {
-                pointA = Point3D(0.3, 0.3, 0.0)
-                pointB = Point3D(0.7, 0.7, 0.5)
-            } else {
-                pointA = Point3D(0.3, 0.3, 0.3)
-                pointB = Point3D(0.7, 0.7, 0.5)
-            }
+            val pointA = Point3D(0.3, 0.3, 0.0)
+            val pointB = Point3D(0.7, 0.7, 0.5)
             
             val origin = Point3D(0.5, 0.5, 0.5)
             
@@ -216,7 +242,7 @@ open class Cable(
             
             hitboxes += Hitbox(
                 from, to,
-                { it.action.isRightClick() && it.hasItem() && it.item!!.novaMaterial == NovaMaterial.WRENCH },
+                { it.action.isRightClick() && it.hasItem() && it.item!!.novaMaterial == NovaMaterialRegistry.WRENCH },
                 { handleCableWrenchHit(it, blockFace) }
             )
         }
@@ -226,8 +252,11 @@ open class Cable(
         val neighborEndPoints = connectedNodes
             .values
             .flatMap { it.entries }
-            .filter { (blockFace, node) -> node is ItemStorage && node.itemConfig[blockFace.oppositeFace] != ItemConnectionType.NONE }
-            .associate { it.key to it.value as ItemStorage }
+            .filter { (blockFace, node) ->
+                val itemHolder = node.itemHolder
+                itemHolder != null && itemHolder.itemConfig[blockFace.oppositeFace] != ItemConnectionType.NONE
+            }
+            .associate { it.key to it.value.itemHolder!! }
         
         neighborEndPoints
             .map { it.key }
@@ -252,39 +281,61 @@ open class Cable(
     }
     
     private fun updateBlockHitbox() {
+        val block = location.block
+        
         val neighborFaces = connectedNodes.flatMapTo(HashSet()) { it.value.keys }
         val axis = when {
             neighborFaces.contains(BlockFace.EAST) && neighborFaces.contains(BlockFace.WEST) -> Axis.X
             neighborFaces.contains(BlockFace.NORTH) && neighborFaces.contains(BlockFace.SOUTH) -> Axis.Z
             neighborFaces.contains(BlockFace.UP) && neighborFaces.contains(BlockFace.DOWN) -> Axis.Y
-            else -> {
-                connectedNodes.values
-                    .mapNotNull { faceMap -> faceMap.keys.firstOrNull() }
-                    .firstOrNull()
-                    ?.axis
-                    ?: Axis.X
-            }
+            else -> null
         }
         
-        // run later because this might be called during an event
-        runTaskLater(1) {
-            if (isValid) {
-                val block = armorStand.location.block
-                val blockData = block.blockData as Orientable
-                blockData.axis = axis
-                block.setBlockData(blockData, false)
-            }
+        if (axis != null) {
+            block.type = Material.CHAIN
+            val blockData = block.blockData as Orientable
+            blockData.axis = axis
+            block.setBlockData(blockData, false)
+        } else {
+            block.type = Material.STRUCTURE_VOID
         }
     }
     
-    private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemStorage: ItemStorage) {
+    private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemHolder: ItemHolder) {
         event.isCancelled = true
+        configGUIs.getOrPut(face) { createAttachmentGUI(face, itemHolder) }.openWindow(event.player)
+    }
+    
+    private fun createAttachmentGUI(face: BlockFace, itemHolder: ItemHolder) =
         CableItemConfigGUI(
-            itemStorage,
+            itemHolder,
             face.oppositeFace,
-            filterInventories[ItemConnectionType.INSERT]!![face]!!,
-            filterInventories[ItemConnectionType.EXTRACT]!![face]!!
-        ).openWindow(event.player)
+            createFilterInventory(face, ItemConnectionType.INSERT),
+            createFilterInventory(face, ItemConnectionType.EXTRACT)
+        )
+    
+    private fun createFilterInventory(face: BlockFace, type: ItemConnectionType): VirtualInventory {
+        val map = when (type) {
+            ItemConnectionType.INSERT -> insertFilters
+            ItemConnectionType.EXTRACT -> extractFilters
+            else -> throw UnsupportedOperationException()
+        }
+        
+        val filterItem = map[face]?.let(ItemFilter::createFilterItem)
+        val inventory = VirtualInventory(null, 1, arrayOf(filterItem), intArrayOf(1))
+        
+        inventory.setItemUpdateHandler {
+            if (it.newItemStack != null && it.newItemStack?.novaMaterial != NovaMaterialRegistry.ITEM_FILTER) {
+                it.isCancelled = true
+                return@setItemUpdateHandler
+            }
+            
+            val filterConfig = it.newItemStack?.getFilterConfig()
+            if (filterConfig != null) map[face] = filterConfig
+            else map.remove(face)
+        }
+        
+        return inventory
     }
     
     private fun handleCableWrenchHit(event: PlayerInteractEvent, face: BlockFace) {
@@ -310,72 +361,94 @@ open class Cable(
     
 }
 
+private val BASIC_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getInt("energy_transfer_rate")!!
+private val BASIC_ITEM_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getInt("energy_transfer_rate")!!
+
+private val ADVANCED_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getInt("energy_transfer_rate")!!
+private val ADVANCED_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getInt("energy_transfer_rate")!!
+
+private val ELITE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getInt("energy_transfer_rate")!!
+private val ELITE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getInt("energy_transfer_rate")!!
+
+private val ULTIMATE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getInt("energy_transfer_rate")!!
+private val ULTIMATE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getInt("energy_transfer_rate")!!
+
 class BasicCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
-    NovaConfig.getInt("cable.basic.energy_transfer_rate")!!,
-    NovaConfig.getInt("cable.basic.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    BASIC_ENERGY_RATE,
+    BASIC_ITEM_RATE,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class AdvancedCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
-    NovaConfig.getInt("cable.advanced.energy_transfer_rate")!!,
-    NovaConfig.getInt("cable.advanced.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    ADVANCED_ENERGY_RATE,
+    ADVANCED_ITEM_RATE,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class EliteCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
-    NovaConfig.getInt("cable.elite.energy_transfer_rate")!!,
-    NovaConfig.getInt("cable.elite.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    ELITE_ENERGY_RATE,
+    ELITE_ITEM_RATE,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class UltimateCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
-    NovaConfig.getInt("cable.ultimate.energy_transfer_rate")!!,
-    NovaConfig.getInt("cable.ultimate.item_transfer_rate")!!,
-    ownerUUID,
-    material,
+    ULTIMATE_ENERGY_RATE,
+    ULTIMATE_ITEM_RATE,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )
 
 class CreativeCable(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
 ) : Cable(
     Int.MAX_VALUE,
     Int.MAX_VALUE,
-    ownerUUID,
-    material,
+    uuid,
     data,
-    armorStand
+    material,
+    ownerUUID,
+    armorStand,
 )

@@ -1,23 +1,24 @@
 package xyz.xenondevs.nova.ui.item
 
 import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 
 open class ChangeNumberItem(
-    private val range: IntRange,
     private val sizeModifier: Int,
+    private val getRange: () -> IntRange,
     private val getNumber: () -> Int,
     private val setNumber: (Int) -> Unit,
     private val onBuilder: ItemBuilder,
     private val offBuilder: ItemBuilder
 ) : BaseItem() {
     
-    override fun getItemBuilder() = if (canModify()) onBuilder else offBuilder
+    override fun getItemProvider(): ItemProvider = if (canModify()) onBuilder else offBuilder
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         if (canModify()) {
@@ -26,40 +27,40 @@ open class ChangeNumberItem(
         }
     }
     
-    private fun canModify() = getNumber() + sizeModifier in range
+    private fun canModify() = getNumber() + sizeModifier in getRange()
     
 }
 
 class DisplayNumberItem(private val getNumber: () -> Int) : BaseItem() {
     
-    override fun getItemBuilder() = NovaMaterial.NUMBER.item.getItemBuilder(getNumber())
+    override fun getItemProvider(): ItemProvider = NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
     
     override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
     
 }
 
 class AddNumberItem(
-    range: IntRange,
+    getRange: () -> IntRange,
     getNumber: () -> Int,
     setNumber: (Int) -> Unit
 ) : ChangeNumberItem(
-    range,
     1,
+    getRange,
     getNumber,
     setNumber,
-    NovaMaterial.PLUS_ON_BUTTON.createBasicItemBuilder(),
-    NovaMaterial.PLUS_OFF_BUTTON.createBasicItemBuilder()
+    NovaMaterialRegistry.PLUS_ON_BUTTON.createBasicItemBuilder(),
+    NovaMaterialRegistry.PLUS_OFF_BUTTON.createBasicItemBuilder()
 )
 
 class RemoveNumberItem(
-    range: IntRange,
+    getRange: () -> IntRange,
     getNumber: () -> Int,
     setNumber: (Int) -> Unit,
 ) : ChangeNumberItem(
-    range,
     -1,
+    getRange,
     getNumber,
     setNumber,
-    NovaMaterial.MINUS_ON_BUTTON.createBasicItemBuilder(),
-    NovaMaterial.MINUS_OFF_BUTTON.createBasicItemBuilder()
+    NovaMaterialRegistry.MINUS_ON_BUTTON.createBasicItemBuilder(),
+    NovaMaterialRegistry.MINUS_OFF_BUTTON.createBasicItemBuilder()
 )

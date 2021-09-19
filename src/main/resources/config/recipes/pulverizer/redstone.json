@@ -4,5 +4,6 @@
     "nova:redstone_gear"
   ],
   "result": "minecraft:redstone",
-  "amount": 1
+  "amount": 1,
+  "time": 200
 }

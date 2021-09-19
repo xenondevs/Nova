@@ -1,0 +1,9 @@
+{
+  "capacity": 1000000,
+  "charge_speed": 300,
+  "range": {
+    "min": 1,
+    "max": 4,
+    "default": 4
+  }
+}

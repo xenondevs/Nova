@@ -1,13 +1,12 @@
 package xyz.xenondevs.nova.tileentity.impl.agriculture
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.chat.TranslatableComponent
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.projectile.FishingHook
 import net.minecraft.world.level.storage.loot.BuiltInLootTables
 import net.minecraft.world.level.storage.loot.LootContext
@@ -20,82 +19,84 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.ArmorStand
-import xyz.xenondevs.nova.config.NovaConfig
-import xyz.xenondevs.nova.item.NovaItemBuilder
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.EnergyItemTileEntity
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.AUTO_FISHER
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
-import xyz.xenondevs.nova.ui.item.UpgradesTeaserItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.ReflectionUtils.nmsWorld
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.salt
+import xyz.xenondevs.nova.util.serverLevel
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig.getInt("auto_fisher.capacity")!!
-private val ENERGY_PER_TICK = NovaConfig.getInt("auto_fisher.energy_per_tick")!!
-private val IDLE_TIME = NovaConfig.getInt("auto_fisher.idle_time")!!
+private val MAX_ENERGY =  NovaConfig[AUTO_FISHER].getInt("capacity")!!
+private val ENERGY_PER_TICK =  NovaConfig[AUTO_FISHER].getInt("energy_per_tick")!!
+private val IDLE_TIME = NovaConfig[AUTO_FISHER].getInt("idle_time")!!
 
 class AutoFisher(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : EnergyItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val defaultEnergyConfig by lazy { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM) }
-    override val gui by lazy(::AutoFisherGUI)
-    override val requestedEnergy: Int
-        get() = MAX_ENERGY - energy
+    private val inventory = getInventory("inventory", 12, ::handleInventoryUpdate)
+    private val fishingRodInventory = getInventory("fishingRod", 1, ::handleFishingRodInventoryUpdate)
+    override val gui = lazy(::AutoFisherGUI)
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
+    override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM) }
+    override val itemHolder = NovaItemHolder(this, inventory, fishingRodInventory)
     
-    private val inventory = getInventory("inventory", 12, true, ::handleInventoryUpdate)
-    private val fishingRodInventory = getInventory("fishingRod", 1, true, ::handleFishingRodInventoryUpdate)
-    private var idleTime = 0
+    private var timePassed = 0
+    private var maxIdleTime = 0
     
     private val waterBlock = location.clone().subtract(0.0, 1.0, 0.0).block
     private val random = Random(uuid.mostSignificantBits xor System.currentTimeMillis())
-    private val level = world.nmsWorld
+    private val level = world.serverLevel
     private val position = Vec3(location.x, location.y, location.z)
     private val itemDropLocation = location.clone().add(0.0, 1.0, 0.0)
-    private lateinit var fakePlayer: ServerPlayer
+    private val fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID.salt(uuid.toString()), "AutoFisher")
     
     init {
-        setDefaultInventory(inventory)
-        addAvailableInventories(fishingRodInventory)
+        handleUpgradeUpdates()
     }
     
-    override fun handleInitialized(first: Boolean) {
-        super.handleInitialized(first)
-        
-        fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID.salt(uuid.toString()), "AutoFisher")
+    private fun handleUpgradeUpdates() {
+        maxIdleTime = (IDLE_TIME / upgradeHolder.getSpeedModifier()).toInt()
+        if (timePassed > maxIdleTime) timePassed = maxIdleTime
     }
     
     override fun handleTick() {
-        if (energy >= ENERGY_PER_TICK && !fishingRodInventory.isEmpty && waterBlock.type == Material.WATER) {
-            energy -= ENERGY_PER_TICK
+        if (energyHolder.energy >= energyHolder.energyConsumption && !fishingRodInventory.isEmpty && waterBlock.type == Material.WATER) {
+            energyHolder.energy -= energyHolder.energyConsumption
             
-            idleTime++
+            timePassed++
             
-            if (idleTime == IDLE_TIME) {
-                idleTime = 0
+            if (timePassed >= maxIdleTime) {
+                timePassed = 0
                 fish()
             }
             
-            gui.idleBar.percentage = idleTime.toDouble() / IDLE_TIME.toDouble()
-        }
-        
-        if (hasEnergyChanged) {
-            hasEnergyChanged = false
-            gui.energyBar.update()
+            if (gui.isInitialized()) gui.value.idleBar.percentage = timePassed.toDouble() / maxIdleTime.toDouble()
         }
     }
     
@@ -154,8 +155,8 @@ class AutoFisher(
             this@AutoFisher,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES),
-                Triple(getNetworkedInventory(fishingRodInventory), "inventory.nova.fishing_rod", ItemConnectionType.ALL_TYPES)
+                Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES),
+                Triple(itemHolder.getNetworkedInventory(fishingRodInventory), "inventory.nova.fishing_rod", ItemConnectionType.ALL_TYPES)
             )
         ) { openWindow(it) }
         
@@ -163,20 +164,20 @@ class AutoFisher(
             .setStructure("" +
                 "1 - - - - - - - 2" +
                 "| s u # # f . . |" +
-                "| . . . . # . . |" +
-                "| . . . . # . . |" +
+                "| i i i i # . . |" +
+                "| i i i i # . . |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('f', VISlotElement(fishingRodInventory, 0, NovaMaterial.FISHING_ROD_PLACEHOLDER.createBasicItemBuilder()))
-            .addIngredient('u', UpgradesTeaserItem)
+            .addIngredient('f', VISlotElement(fishingRodInventory, 0, NovaMaterialRegistry.FISHING_ROD_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
-            .apply { fillRectangle(1, 2, 6, inventory, true) }
         
-        val energyBar = EnergyBar(gui = gui, x = 7, y = 1, height = 3) { Triple(energy, MAX_ENERGY, -ENERGY_PER_TICK) }
+        val energyBar = EnergyBar(gui = gui, x = 7, y = 1, height = 3, energyHolder)
         
-        val idleBar = object : VerticalBar(gui = gui, x = 6, y = 1, height = 3, NovaMaterial.GREEN_BAR) {
-            override fun modifyItemBuilder(itemBuilder: NovaItemBuilder) =
-                itemBuilder.setLocalizedName(TranslatableComponent("menu.nova.auto_fisher.idle", IDLE_TIME - idleTime))
+        val idleBar = object : VerticalBar(gui = gui, x = 6, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
+            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
+                itemBuilder.setDisplayName(TranslatableComponent("menu.nova.auto_fisher.idle", maxIdleTime - timePassed))
         }
         
     }

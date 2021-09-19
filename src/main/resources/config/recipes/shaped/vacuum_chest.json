@@ -1,8 +1,8 @@
 {
   "result": "nova:vacuum_chest",
   "shape": [
-    " p ",
-    "pcp",
+    " c ",
+    "pfp",
     " p "
   ],
   "ingredients": [
@@ -13,6 +13,10 @@
     {
       "char": "p",
       "item": "minecraft:ender_pearl"
+    },
+    {
+      "char": "f",
+      "item": "nova:elite_machine_frame"
     }
   ]
 }

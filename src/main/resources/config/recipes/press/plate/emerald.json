@@ -1,4 +1,5 @@
 {
   "input": "minecraft:emerald",
-  "result": "nova:emerald_plate"
+  "result": "nova:emerald_plate",
+  "time": 200
 }

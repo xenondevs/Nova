@@ -3,172 +3,37 @@
     "enabled": true,
     "url": "https://github.com/xenondevs/NovaRP/releases/download/v0.4/NovaRP.zip"
   },
-  "cable": {
-    "basic": {
-      "energy_transfer_rate": 100,
-      "item_transfer_rate": 1
-    },
-    "advanced": {
-      "energy_transfer_rate": 1000,
-      "item_transfer_rate": 2
-    },
-    "elite": {
-      "energy_transfer_rate": 10000,
-      "item_transfer_rate": 4
-    },
-    "ultimate": {
-      "energy_transfer_rate": 100000,
-      "item_transfer_rate": 8
-    }
+  "mysql": {
+    "enabled": false,
+    "address": "localhost",
+    "port": 3306,
+    "username": "",
+    "password": "",
+    "database": ""
   },
-  "power_cell": {
-    "basic": {
-      "capacity": 100000
-    },
-    "advanced": {
-      "capacity": 1000000
-    },
-    "elite": {
-      "capacity": 10000000
-    },
-    "ultimate": {
-      "capacity": 100000000
-    }
-  },
-  "furnace_generator": {
-    "capacity": 10000,
-    "energy_per_tick": 20,
-    "burn_time_multiplier": 0.1
-  },
-  "solar_panel": {
-    "capacity": 10000,
-    "energy_per_tick": 10
-  },
-  "pulverizer": {
-    "capacity": 10000,
-    "energy_per_tick": 50,
-    "pulverizer_time": 200
-  },
-  "electrical_furnace": {
-    "capacity": 10000,
-    "energy_per_tick": 100,
-    "cook_speed": 2
-  },
-  "mechanical_press": {
-    "capacity": 10000,
-    "energy_per_tick": 100,
-    "press_time": 200
-  },
-  "quarry": {
-    "capacity": 100000,
-    "energy_consumption_base": 100,
-    "energy_inefficiency_exponent": 1.5,
-    "max_size": 30,
-    "min_size": 1,
-    "default_size_x": 10,
-    "default_size_z": 10,
-    "move_speed": 0.15,
-    "drill_speed_multiplier": 0.25,
-    "drill_speed_clamp": 0.5
-  },
-  "chunk_loader": {
-    "capacity": 100000,
-    "energy_per_chunk": 250,
-    "max_range": 3
-  },
-  "block_breaker": {
-    "capacity": 10000,
-    "energy_per_tick": 20,
-    "break_speed_multiplier": 0.1,
-    "break_speed_clamp": 0.5
-  },
-  "block_placer": {
-    "capacity": 10000,
-    "energy_per_place": 500
-  },
-  "item_storage_unit": {
-    "max_items": 2147483647
-  },
-  "jetpack": {
-    "capacity": 100000,
-    "energy_per_tick": 100,
-    "fly_speed": 0.035
-  },
-  "charger": {
-    "capacity": 1000000,
-    "charge_speed": 100
-  },
-  "mob_killer": {
-    "capacity": 10000,
-    "energy_per_tick": 20,
-    "energy_per_damage": 300,
-    "idle_time": 20,
-    "kill_limit": 3,
-    "damage": 10
-  },
-  "vacuum_chest": {
-    "range": 5
-  },
-  "breeder": {
-    "capacity": 10000,
-    "energy_per_tick": 10,
-    "energy_per_breed": 100,
-    "idle_time": 200,
-    "breed_limit": 5
-  },
-  "mob_duplicator": {
-    "capacity": 10000,
-    "energy_per_tick": 500,
-    "energy_per_tick_nbt": 2000,
-    "idle_time": 400,
-    "idle_time_nbt": 1000
-  },
-  "planter": {
-    "capacity": 10000,
-    "energy_per_plant": 20,
-    "wait_time": 40
-  },
-  "wind_turbine": {
-    "capacity": 10000,
-    "energy_per_tick": 80
-  },
-  "harvester": {
-    "capacity": 10000,
-    "energy_per_break": 40,
-    "wait_time": 3
-  },
-  "fertilizer": {
-    "capacity": 10000,
-    "energy_per_fertilize": 30,
-    "wait_time": 10
-  },
-  "wireless_charger": {
-    "capacity": 1000000,
-    "charge_speed": 80,
-    "range": 10
-  },
-  "auto_fisher": {
-    "capacity": 10000,
-    "energy_per_tick": 20,
-    "idle_time": 600
-  },
-  "lightning_exchanger": {
-    "capacity": 1000000,
-    "conversion_rate": 5000,
-    "burst": {
-      "min": 70000,
-      "max": 100000
-    }
+  "armor_stand_render_distance": {
+    "min": 1,
+    "max": 6,
+    "default": 4
   },
   "bottled_mob_blacklist": [
     "WITHER",
     "ENDER_DRAGON",
     "ELDER_GUARDIAN"
   ],
-  "tile_entity_world_blacklist": [
-  ],
-  "tile_entity_type_world_blacklist": {
+  "tile_entity_world_blacklist": [],
+  "tile_entity_type_world_blacklist": {},
+  "tile_entity_limit": {},
+  "upgrade_modifiers": {
+    "speed": [1.0, 1.91, 2.82, 3.73, 4.64, 5.55, 6.46, 7.37, 8.28, 9.19, 10.0],
+    "efficiency": [1.0, 1.25, 1.75, 2.75, 3.75, 4.75, 5.75, 6.75, 7.75, 8.75, 9.75],
+    "energy": [1.0, 1.25, 1.75, 2.75, 3.75, 4.75, 5.75, 6.75, 7.75, 8.75, 9.75],
+    "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   },
-  "tile_entity_limit": {
+  "loot_frequency": {
+    "star_shards": {
+      "min": 0,
+      "max": 5
+    }
   }
 }

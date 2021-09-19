@@ -5,5 +5,6 @@
     "nova:iron_gear"
   ],
   "result": "nova:iron_dust",
-  "amount": 1
+  "amount": 1,
+  "time": 200
 }

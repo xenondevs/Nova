@@ -1,0 +1,11 @@
+{
+  "capacity": 10000,
+  "energy_per_tick": 2,
+  "energy_per_break": 40,
+  "idle_time": 6,
+  "range": {
+    "min": 1,
+    "max": 5,
+    "default": 5
+  }
+}

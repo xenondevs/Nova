@@ -1,54 +1,119 @@
 package xyz.xenondevs.nova.tileentity.impl.storage
 
-import com.google.gson.JsonObject
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.GUIType
+import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Item
-import xyz.xenondevs.nova.config.NovaConfig
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.item.ItemConnectionType
-import xyz.xenondevs.nova.network.item.ItemFilter
-import xyz.xenondevs.nova.region.Region
-import xyz.xenondevs.nova.region.VisualRegion
-import xyz.xenondevs.nova.tileentity.ItemTileEntity
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.VACUUM_CHEST
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
+import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.TileInventoryManager
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
+import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
+import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
+import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.AddNumberItem
+import xyz.xenondevs.nova.ui.item.DisplayNumberItem
+import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
-import xyz.xenondevs.nova.util.center
+import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.util.salt
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.region.Region
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
+import de.studiocode.invui.item.Item as UIItem
 
-private val RANGE = NovaConfig.getDouble("vacuum_chest.range")!!
+private val MIN_RANGE = NovaConfig[VACUUM_CHEST].getInt("range.min")!!
+private val MAX_RANGE = NovaConfig[VACUUM_CHEST].getInt("range.max")!!
+private val DEFAULT_RANGE = NovaConfig[VACUUM_CHEST].getInt("range.default")!!
 
 class VacuumChest(
-    ownerUUID: UUID?,
+    uuid: UUID,
+    data: CompoundElement,
     material: NovaMaterial,
-    data: JsonObject,
-    armorStand: ArmorStand
-) : ItemTileEntity(ownerUUID, material, data, armorStand) {
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand,
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    private val inventory = getInventory("inventory", 12, true) {}
-    private val filterInventory = getInventory("itemFilter", 1, true, intArrayOf(1), ::handleFilterInventoryUpdate)
-    private var filter: ItemFilter? = filterInventory.getItemStack(0)?.getFilterConfig()
-    private var tick = 0
+    private val inventory: VirtualInventory
+    private val filterInventory: VirtualInventory
+    override val itemHolder: NovaItemHolder
     
-    private val region = Region(
-        location.clone().center().subtract(RANGE, RANGE, RANGE),
-        location.clone().center().add(RANGE, RANGE, RANGE)
-    )
-    
+    override val gui = lazy { VacuumChestGUI() }
+    override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)
+    private var filter: ItemFilter? = retrieveOrNull<CompoundElement>("itemFilter")?.let { ItemFilter(it) }
     private val items = ArrayList<Item>()
     
-    override val gui by lazy { VacuumChestGUI() }
+    private lateinit var region: Region
+    private var range = retrieveData("range") { DEFAULT_RANGE }
+        set(value) {
+            field = value
+            updateRegion()
+            if (gui.isInitialized()) gui.value.updateRangeItems()
+        }
+    private val maxRange: Int
+        get() = MAX_RANGE + upgradeHolder.getRangeModifier()
+    
+    private var tick = 0
     
     init {
-        setDefaultInventory(inventory)
+        updateRegion()
+        
+        // region Legacy support
+        // this drops all items of the previously 12 slot inventory and then deletes the inventory
+        val legacyInventory = TileInventoryManager.getByUuid(uuid, uuid.salt("inventory"))
+        if (legacyInventory != null && legacyInventory.size != 9) {
+            location.dropItems(legacyInventory.items.filterNotNull())
+            TileInventoryManager.remove(legacyInventory)
+        }
+        
+        val legacyFilterInventory = TileInventoryManager.getByUuid(uuid, uuid.salt("itemFilter"))
+        if (legacyFilterInventory != null) {
+            if (!legacyFilterInventory.isEmpty)
+                filter = legacyFilterInventory.getItemStack(0).getFilterConfig()
+            TileInventoryManager.remove(legacyFilterInventory)
+        }
+        // endregion
+        
+        inventory = getInventory("inventory", 9) {}
+        itemHolder = NovaItemHolder(this, inventory)
+        
+        filterInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1))
+        filterInventory.setItemUpdateHandler(::handleFilterInventoryUpdate)
+        filter?.also { filterInventory.setItemStack(SELF_UPDATE_REASON, 0, it.createFilterItem()) }
+    }
+    
+    override fun saveData() {
+        storeData("range", range)
+        storeData("itemFilter", filter?.compound)
+        super.saveData()
+    }
+    
+    private fun updateRegion() {
+        region = getSurroundingRegion(range)
+        VisualRegion.updateRegion(uuid, region)
+    }
+    
+    private fun handleUpgradeUpdates() {
+        if (range > maxRange) {
+            range = maxRange // the setter will update everything else
+        } else if (gui.isInitialized()) gui.value.updateRangeItems()
     }
     
     override fun handleRemoved(unload: Boolean) {
@@ -85,7 +150,7 @@ class VacuumChest(
     
     private fun handleFilterInventoryUpdate(event: ItemUpdateEvent) {
         val newStack = event.newItemStack
-        if (newStack?.novaMaterial == NovaMaterial.ITEM_FILTER)
+        if (newStack?.novaMaterial == NovaMaterialRegistry.ITEM_FILTER)
             filter = newStack.getFilterConfig()
         else if (newStack != null) event.isCancelled = true
     }
@@ -96,22 +161,32 @@ class VacuumChest(
             this@VacuumChest,
             null,
             listOf(
-                Triple(getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES)
+                Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES)
             ),
         ) { openWindow(it) }
+        
+        private val rangeItems = ArrayList<UIItem>()
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # . . . . # |" +
-                "| r # . . . . # |" +
-                "| f # . . . . # |" +
+                "| s u # i i i p |" +
+                "| r # # i i i d |" +
+                "| f # # i i i m |" +
                 "3 - - - - - - - 4")
+            .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('r', VisualizeRegionItem(uuid, region))
-            .addIngredient('f', VISlotElement(filterInventory, 0, NovaMaterial.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('r', VisualizeRegionItem(uuid) { region })
+            .addIngredient('f', VISlotElement(filterInventory, 0, NovaMaterialRegistry.ITEM_FILTER_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
+            .addIngredient('d', DisplayNumberItem { range }.also(rangeItems::add))
             .build()
-            .also { it.fillRectangle(3, 1, 4, inventory, true) }
+        
+        fun updateRangeItems() {
+            rangeItems.forEach(UIItem::notifyWindows)
+        }
         
     }
     

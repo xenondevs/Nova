@@ -2,22 +2,23 @@ package xyz.xenondevs.nova.ui.config
 
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.structure.Structure
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.network.NetworkManager
-import xyz.xenondevs.nova.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.network.energy.EnergyStorage
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
+import xyz.xenondevs.nova.util.data.setLocalizedName
 
 class EnergySideConfigGUI(
-    val energyStorage: EnergyStorage,
+    val energyHolder: EnergyHolder,
     private val allowedTypes: List<EnergyConnectionType>,
 ) : SimpleGUI(8, 3) {
     
@@ -37,33 +38,33 @@ class EnergySideConfigGUI(
     }
     
     private fun changeConnectionType(blockFace: BlockFace, forward: Boolean) {
-        NetworkManager.handleEndPointRemove(energyStorage, false)
+        NetworkManager.handleEndPointRemove(energyHolder.endPoint, false)
         
-        val currentType = energyStorage.energyConfig[blockFace]!!
+        val currentType = energyHolder.energyConfig[blockFace]!!
         var index = allowedTypes.indexOf(currentType)
         if (forward) index++ else index--
         if (index < 0) index = allowedTypes.lastIndex
         else if (index == allowedTypes.size) index = 0
-        energyStorage.energyConfig[blockFace] = allowedTypes[index]
+        energyHolder.energyConfig[blockFace] = allowedTypes[index]
         
-        NetworkManager.handleEndPointAdd(energyStorage)
+        NetworkManager.handleEndPointAdd(energyHolder.endPoint)
     }
     
     private inner class SideConfigItem(val blockSide: BlockSide) : BaseItem() {
         
-        private val blockFace = (energyStorage as TileEntity).getFace(blockSide)
+        private val blockFace = energyHolder.endPoint.getFace(blockSide)
         
-        override fun getItemBuilder(): ItemBuilder {
+        override fun getItemProvider(): ItemProvider {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
-            return when (energyStorage.energyConfig[blockFace]!!) {
+            return when (energyHolder.energyConfig[blockFace]!!) {
                 EnergyConnectionType.NONE ->
-                    NovaMaterial.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
+                    NovaMaterialRegistry.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
                 EnergyConnectionType.PROVIDE ->
-                    NovaMaterial.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
+                    NovaMaterialRegistry.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
                 EnergyConnectionType.CONSUME ->
-                    NovaMaterial.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
+                    NovaMaterialRegistry.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
                 EnergyConnectionType.BUFFER ->
-                    NovaMaterial.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
+                    NovaMaterialRegistry.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
             }.setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         

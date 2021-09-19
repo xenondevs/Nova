@@ -1,4 +1,5 @@
 {
   "input": "minecraft:iron_ingot",
-  "result": "nova:iron_gear"
+  "result": "nova:iron_gear",
+  "time": 200
 }

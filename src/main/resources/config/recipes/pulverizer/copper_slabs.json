@@ -10,5 +10,6 @@
     "minecraft:waxed_oxidized_cut_copper_slab"
   ],
   "result": "nova:copper_dust",
-  "amount": 4
+  "amount": 4,
+  "time": 200
 }

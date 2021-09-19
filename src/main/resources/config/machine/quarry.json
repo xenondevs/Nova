@@ -1,0 +1,15 @@
+{
+  "capacity": 100000,
+  "base_energy_consumption": 300,
+  "energy_consumption_per_square_block": 1,
+  "max_size": 30,
+  "min_size": 1,
+  "default_size_x": 10,
+  "default_size_z": 10,
+  "move_speed": 0.15,
+  "drill_speed_multiplier": 0.25,
+  "drill_speed_clamp": 0.5,
+  "upgrade_modifiers": {
+    "range": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+  }
+}

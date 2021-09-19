@@ -1,15 +1,11 @@
 {
   "result": "nova:mechanical_press",
   "shape": [
-    "ccc",
-    "cic",
-    "cac"
+    "ici",
+    "ifi",
+    "iai"
   ],
   "ingredients": [
-    {
-      "char": "c",
-      "item": "minecraft:cobblestone"
-    },
     {
       "char": "i",
       "item": "minecraft:iron_ingot"
@@ -17,6 +13,10 @@
     {
       "char": "a",
       "item": "minecraft:anvil"
+    },
+    {
+      "char": "f",
+      "item": "nova:basic_machine_frame"
     }
   ]
 }

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.gui.structure.Marker
+import de.studiocode.invui.gui.structure.Markers
 import de.studiocode.invui.gui.structure.Structure.addGlobalIngredient
 import de.studiocode.invui.resourcepack.Icon
 import xyz.xenondevs.nova.ui.item.PageBackItem
@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.ui.item.ScrollDownItem
 import xyz.xenondevs.nova.ui.item.ScrollUpItem
 
 fun setGlobalIngredients() {
-    addGlobalIngredient('x', Marker.ITEM_LIST_SLOT)
+    addGlobalIngredient('x', Markers.ITEM_LIST_SLOT)
     addGlobalIngredient('#', Icon.BACKGROUND.item)
     addGlobalIngredient('-', Icon.LIGHT_HORIZONTAL_LINE.item)
     addGlobalIngredient('|', Icon.LIGHT_VERTICAL_LINE.item)
