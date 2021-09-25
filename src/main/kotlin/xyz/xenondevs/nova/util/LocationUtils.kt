@@ -59,7 +59,13 @@ inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitbo
     return tileEntities
 }
 
-inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
+fun Location.getNearbyTileEntity(face: BlockFace, additionalHitboxes: Boolean): Any? {
+    val location = blockLocation.advance(face)
+    return TileEntityManager.getTileEntityAt(location, additionalHitboxes)
+        ?: VanillaTileEntityManager.getTileEntityAt(location)
+}
+
+fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
     val vector = direction.multiply(stepSize)
     val location = clone()
     var distance = 0.0

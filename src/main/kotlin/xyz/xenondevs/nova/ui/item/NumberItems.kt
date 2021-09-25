@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.ui.item
 import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -11,6 +12,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 
 open class ChangeNumberItem(
     private val sizeModifier: Int,
+    private val shiftSizeModifier: Int,
     private val getRange: () -> IntRange,
     private val getNumber: () -> Int,
     private val setNumber: (Int) -> Unit,
@@ -23,7 +25,7 @@ open class ChangeNumberItem(
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         if (canModify()) {
             player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-            setNumber(getNumber() + sizeModifier)
+            setNumber((getNumber() + if (clickType.isShiftClick) shiftSizeModifier else sizeModifier).coerceIn(getRange()))
         }
     }
     
@@ -31,9 +33,18 @@ open class ChangeNumberItem(
     
 }
 
-class DisplayNumberItem(private val getNumber: () -> Int) : BaseItem() {
+class DisplayNumberItem(private val getNumber: () -> Int, private val localizedName: String? = null) : BaseItem() {
     
-    override fun getItemProvider(): ItemProvider = NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
+    constructor(getNumber: () -> Int) : this(getNumber, null)
+    
+    override fun getItemProvider(): ItemProvider {
+        val number = getNumber()
+        val builder = NovaMaterialRegistry.NUMBER.item.createItemBuilder(number)
+        if (localizedName != null)
+            builder.setDisplayName(TranslatableComponent(localizedName, number))
+        
+        return builder
+    }
     
     override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
     
@@ -45,6 +56,7 @@ class AddNumberItem(
     setNumber: (Int) -> Unit
 ) : ChangeNumberItem(
     1,
+    10,
     getRange,
     getNumber,
     setNumber,
@@ -58,6 +70,7 @@ class RemoveNumberItem(
     setNumber: (Int) -> Unit,
 ) : ChangeNumberItem(
     -1,
+    -10,
     getRange,
     getNumber,
     setNumber,

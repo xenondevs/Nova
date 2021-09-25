@@ -74,7 +74,7 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     
     override fun handleRemoved(unload: Boolean) {
         if (unload) {
-            storeEnumMap("itemConfig", itemHolder.itemConfig)
+            itemHolder.saveData()
             updateDataContainer()
         }
         
@@ -99,16 +99,25 @@ class VanillaContainerTileEntity(container: Container) : ItemStorageVanillaTileE
 
 class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest) {
     
-    private var lastInventory = chest.inventory
-    override val itemHolder = DynamicVanillaItemHolder(this, ::getInventories)
+    private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
+    override val itemHolder: ItemHolder
     
-    private fun getInventories(): EnumMap<BlockFace, NetworkedInventory> {
-        val state = block.state
-        return if (state is Chest) {
-            if (state.inventory.size != lastInventory.size) lastInventory = state.inventory
-            val inventory = NetworkedBukkitInventory(lastInventory)
-            CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
-        } else EMPTY_INVENTORIES_MAP
+    init {
+        setInventories()
+        itemHolder = DynamicVanillaItemHolder(this) { inventories }
+    }
+    
+    private fun setInventories() {
+        val inventory = NetworkedBukkitInventory((block.state as Chest).inventory)
+        inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+    }
+    
+    fun handleChestStateChange() {
+        setInventories()
+        runAsyncTask {
+            NetworkManager.handleEndPointRemove(this, false)
+            NetworkManager.handleEndPointAdd(this)
+        }
     }
     
 }

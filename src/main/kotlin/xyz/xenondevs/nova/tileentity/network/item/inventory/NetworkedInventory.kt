@@ -35,6 +35,13 @@ interface NetworkedInventory {
      */
     fun getItem(slot: Int) = items[slot]
     
+    /**
+     * Decrements the amount of an [ItemStack] on a [slot] by one.
+     */
+    fun decrementByOne(slot: Int) {
+        setItem(slot, getItem(slot)?.apply { amount -= 1 })
+    }
+    
 }
 
 /**
@@ -68,7 +75,7 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
 /**
  * A [NetworkedInventory] wrapper for [Inventory]
  */
-class NetworkedBukkitInventory(private val inventory: Inventory) : NetworkedInventory {
+class NetworkedBukkitInventory(val inventory: Inventory) : NetworkedInventory {
     
     override val size = inventory.size
     override val items: Array<ItemStack?>

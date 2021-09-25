@@ -20,7 +20,7 @@ object ItemFilterSerialization : JsonSerializer<ItemFilter>, JsonDeserializer<It
         json as JsonObject
         val whitelist = json.get("whitelist").asBoolean
         val items: Array<ItemStack?> = GSON.fromJson(json.get("items"))!!
-        return ItemFilter(whitelist, items)
+        return ItemFilter(whitelist, true, items)
     }
     
 }

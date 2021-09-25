@@ -2,12 +2,15 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedVirtualInventory
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.associateWithToEnumMap
+import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
 import java.util.*
 
@@ -44,6 +47,23 @@ class NovaItemHolder(
             CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.NONE }
         }
     
+    override val insertFilters: MutableMap<BlockFace, ItemFilter> =
+        endPoint.retrieveEnumMap<BlockFace, CompoundElement>("insertFilters") { emptyEnumMap() }
+            .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
+    
+    override val extractFilters: MutableMap<BlockFace, ItemFilter> =
+        endPoint.retrieveEnumMap<BlockFace, CompoundElement>("extractFilters") { emptyEnumMap() }
+            .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
+    
+    override val insertPriorities: MutableMap<BlockFace, Int> =
+        endPoint.retrieveEnumMap("insertPriorities") { CUBE_FACES.associateWithTo(emptyEnumMap()) { 50 } }
+    
+    override val extractPriorities: MutableMap<BlockFace, Int> =
+        endPoint.retrieveEnumMap("extractPriorities") { CUBE_FACES.associateWithTo(emptyEnumMap()) { 50 } }
+    
+    override val channels: MutableMap<BlockFace, Int> =
+        endPoint.retrieveEnumMap("channels") { CUBE_FACES.associateWithTo(emptyEnumMap()) { 0 } }
+    
     fun getNetworkedInventory(virtualInventory: VirtualInventory) =
         availableInventories[virtualInventory.uuid]!!
     
@@ -55,7 +75,12 @@ class NovaItemHolder(
     
     override fun saveData() {
         endPoint.storeEnumMap("itemConfig", itemConfig)
-        
+        endPoint.storeEnumMap("insertFilters", insertFilters) { it.compound }
+        endPoint.storeEnumMap("extractFilters", extractFilters) { it.compound }
+        endPoint.storeEnumMap("channels", channels)
+        endPoint.storeEnumMap("insertPriorities", insertPriorities)
+        endPoint.storeEnumMap("extractPriorities", extractPriorities)
+
         if (availableInventories.isNotEmpty())
             endPoint.storeEnumMap("inventories", inventories.mapValues { findUUID(it.value) })
     }

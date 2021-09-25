@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.enumMapOf
 
-private val BUTTON_COLORS = listOf(
+val BUTTON_COLORS = listOf(
     NovaMaterialRegistry.RED_BUTTON,
     NovaMaterialRegistry.ORANGE_BUTTON,
     NovaMaterialRegistry.YELLOW_BUTTON,
