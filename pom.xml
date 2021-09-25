@@ -10,7 +10,7 @@
 
     <properties>
         <kotlin.version>1.5.30-RC</kotlin.version>
-        <exposed.version>0.33.1</exposed.version>
+        <exposed.version>0.34.1</exposed.version>
         <spigot.version>1.17.1-R0.1-SNAPSHOT</spigot.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
@@ -239,7 +239,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.0-M1</version>
+            <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
