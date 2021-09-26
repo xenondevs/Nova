@@ -47,8 +47,8 @@ class EnergyNetwork : Network {
         get() = bridges.map { it.energyTransferRate }.minOrNull() ?: Int.MAX_VALUE
     
     override fun addAll(network: Network) {
-        Preconditions.checkArgument(network is EnergyNetwork, "Illegal Network Type")
-        network as EnergyNetwork
+        require(network !== this) { "Can't add to self" }
+        require(network is EnergyNetwork) { "Illegal Network Type" }
         
         _nodes += network._nodes
         providers += network.providers
