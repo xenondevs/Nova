@@ -20,6 +20,7 @@ class ItemNetwork : Network {
     private var nextChannel = 0
     
     override fun addAll(network: Network) {
+        require(network !== this) { "Can't add to self" }
         require(network is ItemNetwork) { "Illegal Network Type" }
         
         _nodes += network._nodes
@@ -28,7 +29,7 @@ class ItemNetwork : Network {
         network.channels.withIndex().forEach { (id, channel) ->
             if (channel == null) return@forEach
             if (channels[id] == null) channels[id] = channel
-            channels[id]!!.addAll(channel)
+            else channels[id]!!.addAll(channel)
         }
     }
     
@@ -52,7 +53,7 @@ class ItemNetwork : Network {
         _nodes -= node
         if (node is NetworkEndPoint) {
             val itemHolder = node.holders[NetworkType.ITEMS] as ItemHolder
-            itemHolder.channels.values.asSequence()
+            itemHolder.channels.values.toSet().asSequence()
                 .mapNotNull { channels[it]?.to(it) }
                 .onEach { it.first.removeItemHolder(itemHolder) }
                 .filter { it.first.isEmpty() }

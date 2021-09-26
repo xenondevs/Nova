@@ -14,7 +14,11 @@ class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, ty
     
     val inventory: NetworkedInventory = itemHolder.inventories[face]!!
     
-    val priority = itemHolder.insertPriorities[face]!!
+    val priority = when (type) {
+        INSERT -> itemHolder.insertPriorities[face]!!
+        EXTRACT -> itemHolder.extractPriorities[face]!!
+        else -> throw IllegalArgumentException()
+    }
     
     val filter = when (type) {
         INSERT -> itemHolder.insertFilters[face]
@@ -79,6 +83,8 @@ class ItemNetworkChannel {
     }
     
     fun addAll(otherChannel: ItemNetworkChannel) {
+        require(this !== otherChannel) { "Can't add to self" }
+        
         consumers += otherChannel.consumers
         providers += otherChannel.providers
         providerConfigurations += otherChannel.providerConfigurations
@@ -106,7 +112,7 @@ class ItemNetworkChannel {
         } else null
     }
     
-    private fun sortAndConvertConfigurations(configurations: List<AttachedInventoryConfiguration>): TreeMap<Int, ArrayList<FilteredNetworkedInventory>> {
+    private fun convertConfigurations(configurations: List<AttachedInventoryConfiguration>): Map<Int, List<FilteredNetworkedInventory>> {
         val tempMap = HashMap<NetworkedInventory, Pair<Int, ItemFilterList>>()
         
         configurations.forEach { (inventory, filter, priority) ->
@@ -121,40 +127,33 @@ class ItemNetworkChannel {
             }
         }
         
-        val treeMap = TreeMap<Int, ArrayList<FilteredNetworkedInventory>>(Comparator.reverseOrder())
+        val result = HashMap<Int, ArrayList<FilteredNetworkedInventory>>()
         tempMap.forEach { (inventory, pair) ->
             val (priority, filterList) = pair
-            treeMap.getOrPut(priority) { ArrayList() } += FilteredNetworkedInventory(inventory, filterList)
+            result.getOrPut(priority) { ArrayList() } += FilteredNetworkedInventory(inventory, filterList)
         }
         
-        return treeMap
+        return result
     }
     
     private fun computeAvailableInventories(): Pair<List<List<FilteredNetworkedInventory>>, List<List<FilteredNetworkedInventory>>> {
-        // TreeMap<Priority, Pair<isProvider, Inventory>>
-        val configurationsByPriority = TreeMap<Int, ArrayList<Pair<Boolean, FilteredNetworkedInventory>>>(Comparator.reverseOrder())
-        
-        sortAndConvertConfigurations(providerConfigurations).forEach { (priority, inventories) ->
-            val priorityList = configurationsByPriority.getOrPut(priority) { ArrayList() }
-            inventories.forEach { priorityList += true to it }
-        }
-        sortAndConvertConfigurations(consumerConfigurations).forEach { (priority, inventories) ->
-            val priorityList = configurationsByPriority.getOrPut(priority) { ArrayList() }
-            inventories.forEach { priorityList += false to it }
-        }
+        val consumers = convertConfigurations(consumerConfigurations)
+        val providers = convertConfigurations(providerConfigurations)
         
         val consumerInventories = ArrayList<ArrayList<FilteredNetworkedInventory>>()
         val providerInventories = ArrayList<ArrayList<FilteredNetworkedInventory>>()
         
-        configurationsByPriority.forEach { (_, list) ->
-            val consumerInventoriesForPriority = ArrayList<FilteredNetworkedInventory>().also(consumerInventories::add)
-            val providerInventoriesForPriority = ArrayList<FilteredNetworkedInventory>().also(providerInventories::add)
-            
-            list.forEach { (isProvider, inventory) ->
-                if (isProvider) providerInventoriesForPriority += inventory
-                else consumerInventoriesForPriority += inventory
+        TreeSet<Int>(Comparator.reverseOrder())
+            .apply {
+                addAll(consumers.keys)
+                addAll(providers.keys)
+            }.forEach {
+                val consumerInventoriesForPriority = ArrayList<FilteredNetworkedInventory>().also(consumerInventories::add)
+                val providerInventoriesForPriority = ArrayList<FilteredNetworkedInventory>().also(providerInventories::add)
+                
+                consumers[it]?.also(consumerInventoriesForPriority::addAll)
+                providers[it]?.also(providerInventoriesForPriority::addAll)
             }
-        }
         
         return consumerInventories to providerInventories
     }
