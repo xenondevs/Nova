@@ -28,6 +28,8 @@ object LootGeneration : Listener {
     
     @EventHandler
     fun handleLootGenerationEvent(event: LootGenerateEvent) {
+        if (event.lootTable.key.toString() == "minecraft:chests/jungle_temple_dispenser") return
+        
         for (material in possibleLoot) {
             val name = material.typeName.lowercase()
             val (min, max) = lootFrequency.getOrPut(name) {
