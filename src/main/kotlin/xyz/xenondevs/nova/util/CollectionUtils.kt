@@ -45,3 +45,12 @@ fun <T> Array<T?>.getOrSet(index: Int, lazyValue: () -> T): T {
     
     return value!!
 }
+
+/**
+ * Puts the [value] in the map if it is not null.
+ * Removes the [key] from the map if the [value] is null.
+ */
+fun <K, V> MutableMap<K, V>.putOrRemove(key: K, value: V?) {
+    if (value == null) remove(key)
+    else put(key, value)
+}

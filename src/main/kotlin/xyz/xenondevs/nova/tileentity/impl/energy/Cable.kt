@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
 import com.google.common.base.Preconditions
-import de.studiocode.invui.virtualinventory.VirtualInventory
+import net.minecraft.commands.arguments.coordinates.RotationArgument.getRotation
 import org.bukkit.Axis
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.item.impl.getFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.Model
@@ -25,9 +24,8 @@ import xyz.xenondevs.nova.tileentity.network.NetworkType.ITEMS
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyBridge
 import xyz.xenondevs.nova.tileentity.network.item.ItemBridge
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
-import xyz.xenondevs.nova.ui.CableItemConfigGUI
+import xyz.xenondevs.nova.ui.CableConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.hitbox.Hitbox
@@ -59,7 +57,7 @@ open class Cable(
     override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
         NetworkType.values().associateWithTo(emptyEnumMap()) { enumMapOf() }
     
-    private val configGUIs = emptyEnumMap<BlockFace, CableItemConfigGUI>()
+    private val configGUIs = emptyEnumMap<BlockFace, CableConfigGUI>()
     
     private val multiModel = createMultiModel()
     private val hitboxes = ArrayList<Hitbox>()
@@ -76,14 +74,19 @@ open class Cable(
             updateHeadStack()
             
             configGUIs.forEach { (face, gui) ->
-                if (gui != null) {
-                    val neighbor = connectedNodes[ITEMS]?.get(face)
-                    if (neighbor is NetworkEndPoint && neighbor.holders.contains(ITEMS)) {
-                        val itemHolder = neighbor.holders[ITEMS] as ItemHolder
-                        gui.itemHolder = itemHolder
-                        gui.updateButtons()
-                    } else gui.itemHolder = null
+                val neighbor = connectedNodes[ITEMS]?.get(face)
+                
+                fun closeAndRemove() {
+                    runTask { gui.closeForAllViewers() }
+                    configGUIs.remove(face)
                 }
+                
+                if (neighbor is NetworkEndPoint) {
+                    val itemHolder = neighbor.holders[ITEMS] as ItemHolder
+                    if (itemHolder == gui.itemHolder) {
+                        gui.updateValues(true)
+                    } else closeAndRemove()
+                } else closeAndRemove()
             }
             
             // !! Needs to be run in the server thread (updating blocks)
@@ -110,7 +113,7 @@ open class Cable(
         
         hitboxes.forEach { it.remove() }
         
-        if (!unload) configGUIs.values.forEach(CableItemConfigGUI::closeForAllViewers)
+        if (!unload) configGUIs.values.forEach(CableConfigGUI::closeForAllViewers)
     }
     
     override fun getHeadStack(): ItemStack {
@@ -252,45 +255,7 @@ open class Cable(
     
     private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemHolder: ItemHolder) {
         event.isCancelled = true
-        configGUIs.getOrPut(face) { createAttachmentGUI(itemHolder, face.oppositeFace) }.openWindow(event.player)
-    }
-    
-    private fun createAttachmentGUI(itemHolder: ItemHolder, holderFace: BlockFace) =
-        CableItemConfigGUI(
-            itemHolder,
-            holderFace,
-            createFilterInventory(holderFace, itemHolder, ItemConnectionType.INSERT),
-            createFilterInventory(holderFace, itemHolder, ItemConnectionType.EXTRACT)
-        )
-    
-    private fun createFilterInventory(face: BlockFace, itemHolder: ItemHolder, type: ItemConnectionType): VirtualInventory {
-        val map = when (type) {
-            ItemConnectionType.INSERT -> itemHolder.insertFilters
-            ItemConnectionType.EXTRACT -> itemHolder.extractFilters
-            else -> throw UnsupportedOperationException()
-        }
-        
-        val filterItem = map[face]?.let(ItemFilter::createFilterItem)
-        val inventory = VirtualInventory(null, 1, arrayOf(filterItem), intArrayOf(1))
-        
-        inventory.setItemUpdateHandler {
-            if (it.newItemStack != null && it.newItemStack?.novaMaterial != NovaMaterialRegistry.ITEM_FILTER) {
-                it.isCancelled = true
-                return@setItemUpdateHandler
-            }
-            
-            val newItemStack = it.newItemStack
-            if (newItemStack != null) {
-                val filterConfig = newItemStack.getFilterConfig() ?: ItemFilter()
-                map[face] = filterConfig
-            } else map.remove(face)
-            
-            val endPoint = itemHolder.endPoint
-            NetworkManager.handleEndPointRemove(endPoint, false)
-            NetworkManager.handleEndPointAdd(endPoint)
-        }
-        
-        return inventory
+        configGUIs.getOrPut(face) { CableConfigGUI(itemHolder, face.oppositeFace) }.openWindow(event.player)
     }
     
     private fun handleCableWrenchHit(event: PlayerInteractEvent, face: BlockFace) {
