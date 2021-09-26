@@ -33,6 +33,20 @@ object RecipesLoader {
                 storeFileHash(recipeFile)
             }
         }
+        
+        // find unedited recipe files that are no longer default and remove them
+        val recipesDirectory = File(NOVA.dataFolder, "recipes/")
+        recipesDirectory.walkTopDown().forEach { file ->
+            if (file.isDirectory) return@forEach
+            
+            val pathInZip = "config/recipes/" + file.absolutePath.substring(recipesDirectory.absolutePath.length + 1).replace(File.separatorChar, '/') // TODO: clean up
+            if (!hasResource(pathInZip)
+                && HashUtils.getFileHash(file, "MD5").contentEquals(getFileHash(file))) {
+                
+                fileHashes.remove(file.absolutePath)
+                file.delete()
+            }
+        }
     }
     
     private fun storeFileHash(originalFile: File) {

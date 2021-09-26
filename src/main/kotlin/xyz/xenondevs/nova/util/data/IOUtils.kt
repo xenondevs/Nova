@@ -28,6 +28,9 @@ fun getResourceAsStream(name: String): InputStream? {
     return ZIP_FILE.getInputStream(entry)
 }
 
+fun hasResource(name: String): Boolean =
+    ZIP_FILE.getEntry(name) != null
+
 fun getResourceData(name: String): ByteArray {
     val stream = getResourceAsStream(name) ?: return byteArrayOf()
     return stream.use(InputStream::readBytes)
