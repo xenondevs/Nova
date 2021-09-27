@@ -76,15 +76,14 @@ object TileEntityManager : Listener {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkLoad)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkUnload) }
-        runTaskTimer(0, 1) { synchronized(this) { tileEntities.forEach(TileEntity::handleTick) } }
+        runTaskTimerSynchronized(this, 0, 1) { tileEntities.forEach(TileEntity::handleTick) }
         
-        runTaskTimer(0, 1200) {
-            synchronized(this) {
-                // In some special cases no event is called when replacing a block. So we check for air blocks every minute.
-                tileEntities.associateWith(TileEntity::location).forEach { (tileEntity, location) ->
-                    if (Material.AIR == location.block.type)
-                        destroyTileEntity(tileEntity, false)
-                }
+        // TODO: Change this to the same behavior as in VanillaTileEntityManager
+        runTaskTimerSynchronized(this, 0, 1200) {
+            // In some special cases no event is called when replacing a block. So we check for air blocks every minute.
+            tileEntities.associateWith(TileEntity::location).forEach { (tileEntity, location) ->
+                if (Material.AIR == location.block.type)
+                    destroyTileEntity(tileEntity, false)
             }
         }
     }
@@ -200,7 +199,6 @@ object TileEntityManager : Listener {
         }
     }
     
-    @Synchronized
     private fun handleChunkLoad(chunk: Chunk) {
         asyncTransaction {
             DaoTileEntity.find { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
@@ -208,17 +206,17 @@ object TileEntityManager : Listener {
                     tile.inventories.forEach { inventory ->
                         TileInventoryManager.loadInventory(tile.id.value, inventory.id.value, inventory.data)
                     }
-    
+                    
                     // create the tile entity in the main thread
-                    runTask {
+                    runTaskSynchronized(TileEntityManager) {
                         val location = tile.location
                         val tileEntity = TileEntity.create(tile, location)
-        
+                        
                         val chunkMap = tileEntityMap.getOrPut(chunk.pos) { HashMap() }
                         chunkMap[location] = tileEntity
-        
+                        
                         locationCache += location
-        
+                        
                         tileEntity.handleInitialized(false)
                     }
                 }
@@ -286,6 +284,8 @@ object TileEntityManager : Listener {
         handleChunkUnload(event.chunk)
     }
     
+    // TODO: clean up
+    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePlace(event: BlockPlaceEvent) {
         val location = event.blockPlaced.location
@@ -329,6 +329,7 @@ object TileEntityManager : Listener {
         } else event.isCancelled = true
     }
     
+    @Synchronized
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
         val location = event.block.location
@@ -339,6 +340,7 @@ object TileEntityManager : Listener {
         }
     }
     
+    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleInteract(event: PlayerInteractEvent) {
         val action = event.action
@@ -361,6 +363,7 @@ object TileEntityManager : Listener {
         }
     }
     
+    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleInventoryCreative(event: InventoryCreativeEvent) {
         val player = event.whoClicked as Player
@@ -374,16 +377,19 @@ object TileEntityManager : Listener {
         }
     }
     
+    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePistonExtend(event: BlockPistonExtendEvent) {
         if (event.blocks.any { it.location in locationCache }) event.isCancelled = true
     }
     
+    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePistonRetract(event: BlockPistonRetractEvent) {
         if (event.blocks.any { it.location in locationCache }) event.isCancelled = true
     }
     
+    @Synchronized
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleBlockPhysics(event: BlockPhysicsEvent) {
         val location = event.block.location
@@ -394,15 +400,18 @@ object TileEntityManager : Listener {
         }
     }
     
+    @Synchronized
     private fun handleExplosion(blockList: MutableList<Block>) {
         val tiles = blockList.filter { it.location in locationCache }
         blockList.removeAll(tiles)
         tiles.forEach { destroyAndDropTileEntity(getTileEntityAt(it.location)!!, true) }
     }
     
+    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleEntityExplosion(event: EntityExplodeEvent) = handleExplosion(event.blockList())
     
+    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleBlockExplosion(event: BlockExplodeEvent) = handleExplosion(event.blockList())
     

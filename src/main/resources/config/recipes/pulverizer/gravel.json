@@ -1,0 +1,6 @@
+{
+  "input": "minecraft:gravel",
+  "result": "minecraft:sand",
+  "amount": 1,
+  "time": 200
+}

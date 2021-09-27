@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world
 
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.LootGenerateEvent
@@ -12,6 +13,8 @@ import kotlin.random.Random
 
 object LootGeneration : Listener {
     
+    @Suppress("DEPRECATION") // We need to specify the minecraft namespace explicitly
+    private val IGNORED_LOOT_TABLES = listOf(NamespacedKey("minecraft", "chests/jungle_temple_dispenser"))
     private val lootFrequency = HashMap<String, Pair<Int, Int>>()
     private val possibleLoot = ArrayList<NovaMaterial>()
     
@@ -28,6 +31,8 @@ object LootGeneration : Listener {
     
     @EventHandler
     fun handleLootGenerationEvent(event: LootGenerateEvent) {
+        if (event.lootTable.key in IGNORED_LOOT_TABLES) return
+        
         for (material in possibleLoot) {
             val name = material.typeName.lowercase()
             val (min, max) = lootFrequency.getOrPut(name) {
