@@ -7,10 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.event.player.PlayerTeleportEvent
+import org.bukkit.event.player.*
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -147,7 +144,7 @@ object FakeArmorStandManager : Listener {
         visibleChunks.remove(player)
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleMove(event: PlayerMoveEvent) {
         val newChunk = event.to!!.chunk
         if (event.from.chunk != newChunk) {
@@ -156,7 +153,7 @@ object FakeArmorStandManager : Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleTeleport(event: PlayerTeleportEvent) {
         val newChunk = event.to!!.chunk
         if (event.from.chunk != newChunk) {
@@ -165,14 +162,23 @@ object FakeArmorStandManager : Listener {
         }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun handleSpawn(event: PlayerRespawnEvent) {
+        val player = event.player
+        val newChunk = event.respawnLocation.chunk
+        if (player.location.chunk != newChunk) {
+            runAsyncTask { handleChunksChange(player, newChunk) }
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
     fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
         val chunk = player.location.chunk
         runAsyncTask { handleChunksChange(player, chunk) }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     fun handleQuit(event: PlayerQuitEvent) {
         val player = event.player
         runAsyncTask { removeViewer(player) }
