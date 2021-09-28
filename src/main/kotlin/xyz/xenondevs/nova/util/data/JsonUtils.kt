@@ -22,7 +22,6 @@ val GSON: Gson =
         .setPrettyPrinting()
         .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
         .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerialization)
-        .registerTypeHierarchyAdapter<ItemFilter>(ItemFilterSerialization)
         .registerTypeHierarchyAdapter<Chunk>(ChunkSerialization)
         .registerTypeHierarchyAdapter<Location>(LocationSerialization)
         .registerTypeHierarchyAdapter<Attachment>(AttachmentSerialization)
