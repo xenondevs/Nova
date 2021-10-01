@@ -31,6 +31,10 @@ fun Location.dropItems(items: Iterable<ItemStack>) {
     items.forEach { world.dropItemNaturally(this, it) }
 }
 
+fun Location.dropItem(item: ItemStack) {
+    world!!.dropItemNaturally(this, item)
+}
+
 fun Location.removeOrientation() {
     yaw = 0f
     pitch = 0f

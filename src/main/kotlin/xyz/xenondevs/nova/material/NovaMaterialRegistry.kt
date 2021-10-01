@@ -6,10 +6,7 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
-import xyz.xenondevs.nova.tileentity.impl.agriculture.AutoFisher
-import xyz.xenondevs.nova.tileentity.impl.agriculture.Fertilizer
-import xyz.xenondevs.nova.tileentity.impl.agriculture.Harvester
-import xyz.xenondevs.nova.tileentity.impl.agriculture.Planter
+import xyz.xenondevs.nova.tileentity.impl.agriculture.*
 import xyz.xenondevs.nova.tileentity.impl.energy.*
 import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
@@ -73,6 +70,7 @@ object NovaMaterialRegistry {
     val WIRELESS_CHARGER = registerEnergyTileEntity("WIRELESS_CHARGER", 24, ::WirelessCharger, COBBLESTONE)
     val AUTO_FISHER = registerEnergyTileEntity("AUTO_FISHER", 25, ::AutoFisher, COBBLESTONE)
     val LIGHTNING_EXCHANGER = registerEnergyTileEntity("LIGHTNING_EXCHANGER", 26, ::LightningExchanger, BARRIER)
+    val TREE_FACTORY = registerEnergyTileEntity("TREE_FACTORY", 27, ::TreeFactory, BARRIER)
     
     // 1000 - 2000: Crafting Items
     // Plates
@@ -193,6 +191,7 @@ object NovaMaterialRegistry {
     val ITEM_FILTER_PLACEHOLDER = registerItem("ITEM_FILTER_PLACEHOLDER", "", 9503)
     val BOTTLED_MOB_PLACEHOLDER = registerItem("BOTTLED_MOB_PLACEHOLDER", "", 9504)
     val FISHING_ROD_PLACEHOLDER = registerItem("FISHING_ROD_PLACEHOLDER", "", 9505)
+    val SAPLING_PLACEHOLDER = registerItem("SAPLING_PLACEHOLDER", "", 9506)
     
     // 10.000 - ? Multi-Texture UI Elements
     val PROGRESS_ARROW = registerItem("PROGRESS_ARROW", "", itemOf((10_000..10_016).toIntArray()))
@@ -205,6 +204,18 @@ object NovaMaterialRegistry {
     
     // 100.000 - ? Numbers
     val NUMBER = registerItem("NUMBER", "", itemOf((100_000..100_999).toIntArray()))
+    
+    // 200.000 - ? Tree Miniatures
+    val OAK_TREE_MINIATURE = registerItem("OAK_TREE_MINIATURE", "", itemOf((200_000 until 200_500).toIntArray()))
+    val SPRUCE_TREE_MINIATURE = registerItem("SPRUCE_TREE_MINIATURE", "", itemOf((200_500 until 201_000).toIntArray()))
+    val BIRCH_TREE_MINIATURE = registerItem("BIRCH_TREE_MINIATURE", "", itemOf((201_000 until 201_500).toIntArray()))
+    val JUNGLE_TREE_MINIATURE = registerItem("JUNGLE_TREE_MINIATURE", "", itemOf((201_500 until 202_000).toIntArray()))
+    val ACACIA_TREE_MINIATURE = registerItem("ACACIA_TREE_MINIATURE", "", itemOf((202_000 until 202_500).toIntArray()))
+    val DARK_OAK_TREE_MINIATURE = registerItem("DARK_OAK_TREE_MINIATURE", "", itemOf((202_500 until 203_000).toIntArray()))
+    val CRIMSON_TREE_MINIATURE = registerItem("CRIMSON_TREE_MINIATURE", "", itemOf((203_000 until 203_500).toIntArray()))
+    val WARPED_TREE_MINIATURE = registerItem("WARPED_TREE_MINIATURE", "", itemOf((203_500 until 204_000).toIntArray()))
+    val GIANT_RED_MUSHROOM_MINIATURE = registerItem("GIANT_RED_MUSHROOM_MINIATURE", "", itemOf((204_000..204_500).toIntArray()))
+    val GIANT_BROWN_MUSHROOM_MINIATURE = registerItem("GIANT_BROWN_MUSHROOM_MINIATURE", "", itemOf((204_500..205_000).toIntArray()))
     
     fun get(typeName: String): NovaMaterial = materialsByTypeName[typeName]!!
     fun get(modelId: Int): NovaMaterial = materialsByModelId[modelId]!!
