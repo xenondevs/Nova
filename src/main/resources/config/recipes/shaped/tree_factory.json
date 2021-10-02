@@ -1,0 +1,34 @@
+{
+  "result": "nova:tree_factory",
+  "shape": [
+    "pop",
+    "cmb",
+    "pgp"
+  ],
+  "ingredients": [
+    {
+      "char": "o",
+      "item": "minecraft:oak_sapling"
+    },
+    {
+      "char": "c",
+      "item": "minecraft:crimson_fungus"
+    },
+    {
+      "char": "b",
+      "item": "minecraft:brown_mushroom"
+    },
+    {
+      "char": "m",
+      "item": "nova:ultimate_machine_frame"
+    },
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "g",
+      "item": "nova:copper_gear"
+    }
+  ]
+}
