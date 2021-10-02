@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.tileentity.impl.processing.ElectricalFurnace
 import xyz.xenondevs.nova.tileentity.impl.processing.MechanicalPress
 import xyz.xenondevs.nova.tileentity.impl.processing.Pulverizer
 import xyz.xenondevs.nova.tileentity.impl.storage.StorageUnit
+import xyz.xenondevs.nova.tileentity.impl.storage.TrashCan
 import xyz.xenondevs.nova.tileentity.impl.storage.VacuumChest
 import xyz.xenondevs.nova.tileentity.impl.world.BlockBreaker
 import xyz.xenondevs.nova.tileentity.impl.world.BlockPlacer
@@ -74,6 +75,7 @@ object NovaMaterialRegistry {
     val AUTO_FISHER = registerEnergyTileEntity("AUTO_FISHER", 25, ::AutoFisher, COBBLESTONE)
     val LIGHTNING_EXCHANGER = registerEnergyTileEntity("LIGHTNING_EXCHANGER", 26, ::LightningExchanger, BARRIER)
     val TREE_FACTORY = registerEnergyTileEntity("TREE_FACTORY", 27, ::TreeFactory, BARRIER)
+    val TRASH_CAN = registerDefaultTileEntity("TRASH_CAN", 28, ::TrashCan, FLOWER_POT)
     
     // 1000 - 2000: Crafting Items
     // Plates
