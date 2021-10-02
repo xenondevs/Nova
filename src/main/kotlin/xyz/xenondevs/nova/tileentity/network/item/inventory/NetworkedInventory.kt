@@ -39,7 +39,7 @@ interface NetworkedInventory {
      * Decrements the amount of an [ItemStack] on a [slot] by one.
      */
     fun decrementByOne(slot: Int) {
-        setItem(slot, getItem(slot)?.apply { amount -= 1 })
+        setItem(slot, getItem(slot)?.apply { amount -= 1 }?.takeUnless { it.amount <= 0 || it.type.isAir })
     }
     
 }

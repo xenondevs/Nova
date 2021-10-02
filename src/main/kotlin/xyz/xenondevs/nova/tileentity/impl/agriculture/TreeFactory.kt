@@ -100,9 +100,8 @@ class TreeFactory(
     }
     
     override fun handleTick() {
-        if (energyHolder.energy >= energyHolder.energyConsumption) {
-            if (plantType != null || idleTimeLeft > 0)
-                energyHolder.energy -= energyHolder.energyConsumption
+        if (energyHolder.energy >= energyHolder.energyConsumption && plantType != null) {
+            energyHolder.energy -= energyHolder.energyConsumption
             
             if (idleTimeLeft == 0) {
                 if (plantType != null) {
@@ -142,9 +141,13 @@ class TreeFactory(
     }
     
     private fun handleInputInventoryUpdate(event: ItemUpdateEvent) {
-        if (event.newItemStack != null && event.newItemStack.type !in PLANTS.keys)
+        if (event.newItemStack != null && event.newItemStack.type !in PLANTS.keys) {
             event.isCancelled = true
-        else plantType = event.newItemStack?.type
+        } else {
+            plantType = event.newItemStack?.type
+            growthProgress = 0.0
+            updatePlantArmorStand()
+        }
     }
     
     private fun handleOutputInventoryUpdate(event: ItemUpdateEvent) {

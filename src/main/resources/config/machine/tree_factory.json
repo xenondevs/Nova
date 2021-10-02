@@ -1,6 +1,6 @@
 {
   "capacity": 10000,
-  "energy_per_tick": 80,
-  "progress_per_tick": 0.002,
+  "energy_per_tick": 70,
+  "progress_per_tick": 0.003,
   "idle_time": 60
 }
