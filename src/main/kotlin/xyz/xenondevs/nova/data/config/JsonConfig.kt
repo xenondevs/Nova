@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.config
 
 import com.google.gson.*
 import org.intellij.lang.annotations.RegExp
-import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
 
