@@ -30,6 +30,10 @@ private fun structureBlockOf(data: Int) = ModelData(STRUCTURE_VOID, intArrayOf(d
 private fun itemOf(data: IntArray) = ModelData(SHULKER_SHELL, data)
 private fun itemOf(data: Int) = ModelData(SHULKER_SHELL, intArrayOf(data))
 
+// Refers to models on the "complete" branch of the resource pack that slow down loading times
+private fun bulkItemOf(data: Int) = ModelData(NAUTILUS_SHELL, intArrayOf(data))
+private fun bulkItemOf(data: IntArray) = ModelData(NAUTILUS_SHELL, data)
+
 @Suppress("unused", "MemberVisibilityCanBePrivate", "UNUSED_PARAMETER")
 object NovaMaterialRegistry {
     
@@ -53,7 +57,6 @@ object NovaMaterialRegistry {
     val PULVERIZER = registerEnergyTileEntity("PULVERIZER", 8, ::Pulverizer, COBBLESTONE)
     val SOLAR_PANEL = registerEnergyTileEntity("SOLAR_PANEL", 9, ::SolarPanel, BARRIER)
     val QUARRY = registerEnergyTileEntity("QUARRY", 10, ::Quarry, COBBLESTONE, Quarry::canPlace)
-    
     // 11: Reserved for legacy electrical furnace
     val CHUNK_LOADER = registerEnergyTileEntity("CHUNK_LOADER", 12, ::ChunkLoader, COBBLESTONE)
     val BLOCK_BREAKER = registerEnergyTileEntity("BLOCK_BREAKER", 13, ::BlockBreaker, COBBLESTONE)
@@ -206,16 +209,16 @@ object NovaMaterialRegistry {
     val NUMBER = registerItem("NUMBER", "", itemOf((100_000..100_999).toIntArray()))
     
     // 200.000 - ? Tree Miniatures
-    val OAK_TREE_MINIATURE = registerItem("OAK_TREE_MINIATURE", "", itemOf((200_000 until 200_500).toIntArray()))
-    val SPRUCE_TREE_MINIATURE = registerItem("SPRUCE_TREE_MINIATURE", "", itemOf((200_500 until 201_000).toIntArray()))
-    val BIRCH_TREE_MINIATURE = registerItem("BIRCH_TREE_MINIATURE", "", itemOf((201_000 until 201_500).toIntArray()))
-    val JUNGLE_TREE_MINIATURE = registerItem("JUNGLE_TREE_MINIATURE", "", itemOf((201_500 until 202_000).toIntArray()))
-    val ACACIA_TREE_MINIATURE = registerItem("ACACIA_TREE_MINIATURE", "", itemOf((202_000 until 202_500).toIntArray()))
-    val DARK_OAK_TREE_MINIATURE = registerItem("DARK_OAK_TREE_MINIATURE", "", itemOf((202_500 until 203_000).toIntArray()))
-    val CRIMSON_TREE_MINIATURE = registerItem("CRIMSON_TREE_MINIATURE", "", itemOf((203_000 until 203_500).toIntArray()))
-    val WARPED_TREE_MINIATURE = registerItem("WARPED_TREE_MINIATURE", "", itemOf((203_500 until 204_000).toIntArray()))
-    val GIANT_RED_MUSHROOM_MINIATURE = registerItem("GIANT_RED_MUSHROOM_MINIATURE", "", itemOf((204_000..204_500).toIntArray()))
-    val GIANT_BROWN_MUSHROOM_MINIATURE = registerItem("GIANT_BROWN_MUSHROOM_MINIATURE", "", itemOf((204_500..205_000).toIntArray()))
+    val OAK_TREE_MINIATURE = registerItem("OAK_TREE_MINIATURE", "", bulkItemOf((200_000 until 200_500).toIntArray()))
+    val SPRUCE_TREE_MINIATURE = registerItem("SPRUCE_TREE_MINIATURE", "", bulkItemOf((200_500 until 201_000).toIntArray()))
+    val BIRCH_TREE_MINIATURE = registerItem("BIRCH_TREE_MINIATURE", "", bulkItemOf((201_000 until 201_500).toIntArray()))
+    val JUNGLE_TREE_MINIATURE = registerItem("JUNGLE_TREE_MINIATURE", "", bulkItemOf((201_500 until 202_000).toIntArray()))
+    val ACACIA_TREE_MINIATURE = registerItem("ACACIA_TREE_MINIATURE", "", bulkItemOf((202_000 until 202_500).toIntArray()))
+    val DARK_OAK_TREE_MINIATURE = registerItem("DARK_OAK_TREE_MINIATURE", "", bulkItemOf((202_500 until 203_000).toIntArray()))
+    val CRIMSON_TREE_MINIATURE = registerItem("CRIMSON_TREE_MINIATURE", "", bulkItemOf((203_000 until 203_500).toIntArray()))
+    val WARPED_TREE_MINIATURE = registerItem("WARPED_TREE_MINIATURE", "", bulkItemOf((203_500 until 204_000).toIntArray()))
+    val GIANT_RED_MUSHROOM_MINIATURE = registerItem("GIANT_RED_MUSHROOM_MINIATURE", "", bulkItemOf((204_000..204_500).toIntArray()))
+    val GIANT_BROWN_MUSHROOM_MINIATURE = registerItem("GIANT_BROWN_MUSHROOM_MINIATURE", "", bulkItemOf((204_500..205_000).toIntArray()))
     
     fun get(typeName: String): NovaMaterial = materialsByTypeName[typeName]!!
     fun get(modelId: Int): NovaMaterial = materialsByModelId[modelId]!!
