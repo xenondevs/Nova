@@ -195,7 +195,7 @@
         <dependency>
             <groupId>com.github.NichtStudioCode.InvUI</groupId>
             <artifactId>InvUI</artifactId>
-            <version>b8ccc1a6ca</version>
+            <version>a09ad3d065</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.NichtStudioCode.InvUI</groupId>
