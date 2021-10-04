@@ -94,3 +94,17 @@ fun Inventory.addPrioritized(prioritizedSlot: Int, itemStack: ItemStack) {
     if (getItem(prioritizedSlot) == null) setItem(prioritizedSlot, itemStack)
     else addItem(itemStack)
 }
+
+class VoidingVirtualInventory(size: Int) : VirtualInventory(null, size) {
+    override fun setItemStackSilently(slot: Int, itemStack: ItemStack?) = Unit
+    override fun forceSetItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
+    override fun setItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
+    override fun putItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack) = 0
+    override fun setItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
+    override fun addItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
+    override fun addItem(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
+    override fun collectToCursor(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
+    override fun simulateAdd(itemStacks: MutableList<ItemStack>) = IntArray(itemStacks.size)
+    override fun simulateAdd(itemStack: ItemStack, vararg itemStacks: ItemStack) = IntArray(1 + itemStacks.size)
+    override fun canHold(itemStacks: MutableList<ItemStack>) = true
+}
