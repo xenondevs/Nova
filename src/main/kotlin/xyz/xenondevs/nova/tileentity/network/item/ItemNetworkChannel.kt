@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import java.util.*
 import kotlin.math.max
+import kotlin.math.min
 
 typealias ItemFilterList = ArrayList<ItemFilter>
 
@@ -33,13 +34,15 @@ class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, ty
 }
 
 class FilteredNetworkedInventory(
-    inventory: NetworkedInventory,
+    private val inventory: NetworkedInventory,
     private val filters: ItemFilterList
 ) : NetworkedInventory by inventory {
     
     fun allowsItem(itemStack: ItemStack) = filters.isEmpty() || filters.all { it.allowsItem(itemStack) }
     
     fun deniesItem(itemStack: ItemStack) = filters.isNotEmpty() && filters.any { !it.allowsItem(itemStack) }
+    
+    fun isSameInventory(other: FilteredNetworkedInventory) = inventory == other.inventory
     
 }
 
@@ -237,6 +240,9 @@ private class ItemDistributor(
         consumerRRCounter: RoundRobinCounter,
         providerRRCounters: HashMap<FilteredNetworkedInventory, RoundRobinCounter>,
     ): Int {
+        if (consumersInScope.size == 1 && providersInScope.size == 1)
+            return distributeDirectlyBetween(transferAmount, consumersInScope[0], providersInScope[0])
+        
         var transfersLeft = transferAmount
         
         val ignoredConsumers = BooleanArray(consumersInScope.size) // represents which consumers should be skipped
@@ -256,18 +262,21 @@ private class ItemDistributor(
                         var didProvide = false
                         val provider = providersInScope[providerRRCounter.get()]
                         
-                        // find the first item that can be extracted into the current consumer and perform the extraction
-                        for ((slot, itemStack) in provider.items.withIndex()) {
-                            if (itemStack == null || provider.deniesItem(itemStack) || consumer.deniesItem(itemStack)) continue
-                            
-                            val singleStack = itemStack.clone().apply { amount = 1 }
-                            if (consumer.addItem(singleStack) == null) {
-                                provider.decrementByOne(slot)
-                                didProvide = true
-                                didConsume = true
-                                transfersLeft -= 1
+                        // prevent providers from providing to themselves
+                        if (!provider.isSameInventory(consumer)) {
+                            // find the first item that can be extracted into the current consumer and perform the extraction
+                            for ((slot, itemStack) in provider.items.withIndex()) {
+                                if (itemStack == null || provider.deniesItem(itemStack) || consumer.deniesItem(itemStack)) continue
                                 
-                                break
+                                val singleStack = itemStack.clone().apply { amount = 1 }
+                                if (consumer.addItem(singleStack) == 0) {
+                                    provider.decrementByOne(slot)
+                                    didProvide = true
+                                    didConsume = true
+                                    transfersLeft -= 1
+                                    
+                                    break
+                                }
                             }
                         }
                         
@@ -283,6 +292,25 @@ private class ItemDistributor(
             }
             
             consumerRRCounter.increment()
+        }
+        
+        return transfersLeft
+    }
+    
+    private fun distributeDirectlyBetween(transferAmount: Int, consumer: FilteredNetworkedInventory, provider: FilteredNetworkedInventory): Int {
+        if (consumer.isSameInventory(provider)) return transferAmount
+        
+        var transfersLeft = transferAmount
+        
+        for ((slot, itemStack) in provider.items.withIndex()) {
+            if (itemStack == null || provider.deniesItem(itemStack) || consumer.deniesItem(itemStack)) continue
+            
+            val transferableStack = itemStack.clone().apply { amount = min(amount, transfersLeft) }
+            val amountTransferred = transferableStack.amount - consumer.addItem(transferableStack)
+            provider.setItem(slot, itemStack.also { it.amount -= amountTransferred }.takeUnless { it.amount <= 0 })
+            
+            transfersLeft -= amountTransferred
+            if (transfersLeft == 0) break
         }
         
         return transfersLeft

@@ -19,10 +19,10 @@ interface NetworkedInventory {
     val items: Array<ItemStack?>
     
     /**
-     * Adds an [ItemStack] to the inventory and returns the
-     * leftover [ItemStack] or null if there is no leftover.
+     * Adds an [ItemStack] to the inventory and returns
+     * how many items have been left over.
      */
-    fun addItem(item: ItemStack): ItemStack?
+    fun addItem(item: ItemStack): Int
     
     /**
      * Changes the [ItemStack] on a specific slot to the
@@ -60,9 +60,8 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
             throw NetworkException("The ItemUpdateEvent was cancelled")
     }
     
-    override fun addItem(item: ItemStack): ItemStack? {
-        val amount = virtualInventory.addItem(CustomUpdateReason("NetworkedVirtualInventory"), item)
-        return if (amount != 0) item.clone().also { it.amount = amount } else null
+    override fun addItem(item: ItemStack): Int {
+        return virtualInventory.addItem(CustomUpdateReason("NetworkedVirtualInventory"), item)
     }
     
     override fun equals(other: Any?) =
@@ -85,9 +84,8 @@ class NetworkedBukkitInventory(val inventory: Inventory) : NetworkedInventory {
         inventory.setItem(slot, item)
     }
     
-    override fun addItem(item: ItemStack): ItemStack? {
-        val amount = inventory.addItemCorrectly(item)
-        return if (amount != 0) item.clone().also { it.amount = amount } else null
+    override fun addItem(item: ItemStack): Int {
+        return inventory.addItemCorrectly(item)
     }
     
     override fun equals(other: Any?) =
@@ -117,7 +115,7 @@ class NetworkedRangedBukkitInventory(
         inventory.setItem(slots[slot], item)
     }
     
-    override fun addItem(item: ItemStack): ItemStack? {
+    override fun addItem(item: ItemStack): Int {
         @Suppress("UNCHECKED_CAST")
         val tempInventory = VirtualInventory(null, size, items as Array<ItemStack>, null) // create a temp virtual inventory
         val amount = tempInventory.addItem(null, item) // add item to the temp inventory
@@ -127,7 +125,7 @@ class NetworkedRangedBukkitInventory(
             inventory.setItem(slots[slot], tempInventory.getItemStack(slot))
         }
         
-        return if (amount != 0) item.clone().also { it.amount = amount } else null
+        return amount
     }
     
     override fun equals(other: Any?) =
