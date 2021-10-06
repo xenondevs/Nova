@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.castRay

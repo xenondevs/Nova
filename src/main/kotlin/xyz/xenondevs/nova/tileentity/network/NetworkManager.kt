@@ -26,7 +26,7 @@ object NetworkManager {
         }
     }
     
-    fun handleEndPointAdd(endPoint: NetworkEndPoint) {
+    fun handleEndPointAdd(endPoint: NetworkEndPoint, updateBridges: Boolean = true) {
         LOCK.lockAndRun {
             val bridgesToUpdate = HashSet<NetworkBridge>()
             NetworkType.values().forEach { networkType ->
@@ -88,7 +88,7 @@ object NetworkManager {
                 }
             }
             
-            bridgesToUpdate.forEach(NetworkBridge::handleNetworkUpdate)
+            if (updateBridges) bridgesToUpdate.forEach(NetworkBridge::handleNetworkUpdate)
         }
     }
     

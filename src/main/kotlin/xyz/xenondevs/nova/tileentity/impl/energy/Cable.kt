@@ -254,8 +254,10 @@ open class Cable(
     }
     
     private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemHolder: ItemHolder) {
-        event.isCancelled = true
-        configGUIs.getOrPut(face) { CableConfigGUI(itemHolder, face.oppositeFace) }.openWindow(event.player)
+        if (!event.player.hasInventoryOpen) {
+            event.isCancelled = true
+            configGUIs.getOrPut(face) { CableConfigGUI(itemHolder, face.oppositeFace) }.openWindow(event.player)
+        }
     }
     
     private fun handleCableWrenchHit(event: PlayerInteractEvent, face: BlockFace) {

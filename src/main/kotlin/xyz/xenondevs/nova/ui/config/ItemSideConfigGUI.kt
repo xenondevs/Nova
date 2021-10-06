@@ -79,7 +79,7 @@ class ItemSideConfigGUI(
         val allowedTypes = allowedTypes[itemHolder.inventories[blockFace]!!]!!
         if (allowedTypes.size < 2) return false
         
-        NetworkManager.handleEndPointRemove(itemHolder.endPoint, false)
+        NetworkManager.handleEndPointRemove(itemHolder.endPoint, true)
         
         val currentType = itemHolder.itemConfig[blockFace]!!
         var index = allowedTypes.indexOf(currentType)
@@ -88,7 +88,8 @@ class ItemSideConfigGUI(
         else if (index == allowedTypes.size) index = 0
         itemHolder.itemConfig[blockFace] = allowedTypes[index]
         
-        NetworkManager.handleEndPointAdd(itemHolder.endPoint)
+        NetworkManager.handleEndPointAdd(itemHolder.endPoint, false)
+        itemHolder.endPoint.updateNearbyBridges()
         
         return true
     }

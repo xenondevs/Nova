@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.util
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -94,6 +96,13 @@ fun Inventory.addPrioritized(prioritizedSlot: Int, itemStack: ItemStack) {
     if (getItem(prioritizedSlot) == null) setItem(prioritizedSlot, itemStack)
     else addItem(itemStack)
 }
+
+/**
+ * If the [Player] has is currently looking into an inventory.
+ * Does not detect the player's inventory itself because that is not sent to the server.
+ */
+val Player.hasInventoryOpen: Boolean
+    get() = openInventory.topInventory.type != InventoryType.CRAFTING
 
 class VoidingVirtualInventory(size: Int) : VirtualInventory(null, size) {
     override fun setItemStackSilently(slot: Int, itemStack: ItemStack?) = Unit

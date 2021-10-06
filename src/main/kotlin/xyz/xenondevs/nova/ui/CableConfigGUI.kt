@@ -111,8 +111,8 @@ class CableConfigGUI(
                     itemHolder.insertFilters.putOrRemove(face, insertFilterInventory.getUnsafeItemStack(0)?.getOrCreateFilterConfig())
                     itemHolder.extractFilters.putOrRemove(face, extractFilterInventory.getUnsafeItemStack(0)?.getOrCreateFilterConfig())
                     
-                    NetworkManager.handleEndPointAdd(itemHolder.endPoint)
-                    itemHolder.endPoint.updateNearbyBridges() // required as bridges are not updated during handleEndPointRemove
+                    NetworkManager.handleEndPointAdd(itemHolder.endPoint, false)
+                    itemHolder.endPoint.updateNearbyBridges()
                 }
             }
         }
