@@ -79,7 +79,7 @@ class CableConfigGUI(
             channel = itemHolder.channels[face]!!
             
             insertFilterInventory.setItemStackSilently(0, itemHolder.insertFilters[face]?.createFilterItem())
-            extractFilterInventory.setItemStackSilently(0, itemHolder.insertFilters[face]?.createFilterItem())
+            extractFilterInventory.setItemStackSilently(0, itemHolder.extractFilters[face]?.createFilterItem())
         }
         
         if (updateButtons) updateButtons()

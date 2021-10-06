@@ -1,11 +1,13 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.block.BlockFace
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.actualDelegate
@@ -50,6 +52,22 @@ abstract class NetworkedTileEntity(
         super.handleRemoved(unload)
         val task = { NetworkManager.handleEndPointRemove(this, unload) }
         if (NOVA.isEnabled) runAsyncTask(task) else task()
+    }
+    
+    override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
+        val items = super.destroy(dropItems)
+        if (dropItems) {
+            val itemHolder = holders[NetworkType.ITEMS]
+            if (itemHolder is ItemHolder) {
+                items += (itemHolder.insertFilters.values.asSequence() + itemHolder.extractFilters.values.asSequence())
+                    .map(ItemFilter::createFilterItem)
+                
+                itemHolder.insertFilters.clear()
+                itemHolder.extractFilters.clear()
+            }
+        }
+        
+        return items
     }
     
 }
