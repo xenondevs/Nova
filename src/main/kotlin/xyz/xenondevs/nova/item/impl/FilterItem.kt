@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.item.impl
 
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.VirtualInventory
@@ -31,7 +32,7 @@ import xyz.xenondevs.nova.util.data.setLocalizedName
 private val LEGACY_ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
 private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilterCBF")
 
-fun ItemStack.getFilterConfig(): ItemFilter? {
+fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
     val container = itemMeta!!.persistentDataContainer
     
     return if (container.has(ITEM_FILTER_KEY, CompoundElementDataType))
@@ -40,6 +41,8 @@ fun ItemStack.getFilterConfig(): ItemFilter? {
         GSON.fromJson(container.get(LEGACY_ITEM_FILTER_KEY, JsonElementDataType))
     else null
 }
+
+fun ItemStack.getOrCreateFilterConfig(): ItemFilter = getFilterConfigOrNull() ?: ItemFilter()
 
 fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     val itemMeta = itemMeta!!
@@ -55,11 +58,18 @@ object FilterItem : NovaItem() {
             ItemFilterWindow(player, itemStack)
         }
     }
+    
+    override fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder =
+        itemBuilder.addModifier {
+            it.saveFilterConfig(ItemFilter())
+            return@addModifier it
+        }
+    
 }
 
 private class ItemFilterWindow(player: Player, private val itemStack: ItemStack) {
     
-    private val itemFilter = itemStack.getFilterConfig() ?: ItemFilter()
+    private val itemFilter = itemStack.getOrCreateFilterConfig()
     private val filterInventory = object : VirtualInventory(null, 7, itemFilter.items, IntArray(7) { 1 }) {
         
         override fun addItem(updateReason: UpdateReason?, itemStack: ItemStack): Int {

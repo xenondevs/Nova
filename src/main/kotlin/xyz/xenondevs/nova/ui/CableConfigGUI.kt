@@ -15,7 +15,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.item.impl.getFilterConfig
+import xyz.xenondevs.nova.item.impl.getOrCreateFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
@@ -108,8 +108,8 @@ class CableConfigGUI(
                     itemHolder.channels[face] = channel
                     itemHolder.setInsert(face, insertState)
                     itemHolder.setExtract(face, extractState)
-                    itemHolder.insertFilters.putOrRemove(face, insertFilterInventory.getUnsafeItemStack(0)?.getFilterConfig())
-                    itemHolder.extractFilters.putOrRemove(face, extractFilterInventory.getUnsafeItemStack(0)?.getFilterConfig())
+                    itemHolder.insertFilters.putOrRemove(face, insertFilterInventory.getUnsafeItemStack(0)?.getOrCreateFilterConfig())
+                    itemHolder.extractFilters.putOrRemove(face, extractFilterInventory.getUnsafeItemStack(0)?.getOrCreateFilterConfig())
                     
                     NetworkManager.handleEndPointAdd(itemHolder.endPoint)
                     itemHolder.endPoint.updateNearbyBridges() // required as bridges are not updated during handleEndPointRemove

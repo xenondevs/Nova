@@ -9,14 +9,13 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.entity.Item
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.item.impl.getFilterConfig
+import xyz.xenondevs.nova.item.impl.getOrCreateFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.VACUUM_CHEST
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
-import xyz.xenondevs.nova.tileentity.TileInventoryManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
@@ -30,9 +29,7 @@ import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
-import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.novaMaterial
-import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
@@ -74,22 +71,6 @@ class VacuumChest(
     
     init {
         updateRegion()
-        
-        // region Legacy support
-        // this drops all items of the previously 12 slot inventory and then deletes the inventory
-        val legacyInventory = TileInventoryManager.getByUuid(uuid, uuid.salt("inventory"))
-        if (legacyInventory != null && legacyInventory.size != 9) {
-            location.dropItems(legacyInventory.items.filterNotNull())
-            TileInventoryManager.remove(legacyInventory)
-        }
-        
-        val legacyFilterInventory = TileInventoryManager.getByUuid(uuid, uuid.salt("itemFilter"))
-        if (legacyFilterInventory != null) {
-            if (!legacyFilterInventory.isEmpty)
-                filter = legacyFilterInventory.getItemStack(0).getFilterConfig()
-            TileInventoryManager.remove(legacyFilterInventory)
-        }
-        // endregion
         
         inventory = getInventory("inventory", 9) {}
         itemHolder = NovaItemHolder(this, inventory)
@@ -151,7 +132,7 @@ class VacuumChest(
     private fun handleFilterInventoryUpdate(event: ItemUpdateEvent) {
         val newStack = event.newItemStack
         if (newStack?.novaMaterial == NovaMaterialRegistry.ITEM_FILTER)
-            filter = newStack.getFilterConfig()
+            filter = newStack.getOrCreateFilterConfig()
         else if (newStack != null) event.isCancelled = true
     }
     

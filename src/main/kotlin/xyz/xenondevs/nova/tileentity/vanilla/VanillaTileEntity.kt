@@ -30,15 +30,6 @@ private fun TileState.getTileEntityData(): CompoundElement {
     return CompoundElement()
 }
 
-private val EMPTY_INVENTORY: NetworkedInventory = object : NetworkedInventory {
-    override val size = 0
-    override val items = emptyArray<ItemStack?>()
-    override fun addItem(item: ItemStack) = item
-    override fun setItem(slot: Int, item: ItemStack?) = Unit
-}
-
-private val EMPTY_INVENTORIES_MAP = CUBE_FACES.associateWithTo(emptyEnumMap()) { EMPTY_INVENTORY }
-
 abstract class VanillaTileEntity(tileState: TileState) : DataHolder(tileState.getTileEntityData(), false) {
     
     val block = tileState.block
