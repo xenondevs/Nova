@@ -22,8 +22,8 @@ internal class JetpackFlyAbility(player: Player) : Ability(player) {
     private val previousFlySpeed = player.flySpeed
     
     private val overlay = JetpackOverlay()
-    private val jetpackItem: ItemStack
-        get() = player.equipment!!.chestplate!!
+    private val jetpackItem: ItemStack?
+        get() = player.equipment?.chestplate
     
     init {
         player.isFlying = false
@@ -41,24 +41,28 @@ internal class JetpackFlyAbility(player: Player) : Ability(player) {
     }
     
     override fun handleTick(tick: Int) {
-        val energyLeft = JetpackItem.getEnergy(jetpackItem)
-        overlay.percentage = energyLeft / JetpackItem.maxEnergy.toDouble()
+        val jetpackItem = jetpackItem
         
-        if (energyLeft > ENERGY_PER_TICK) {
-            if (player.isFlying) {
-                JetpackItem.addEnergy(jetpackItem, -ENERGY_PER_TICK)
-                if (tick % 3 == 0) {
-                    val location = player.location
-                    playSound(location)
-                    spawnParticles(location)
+        if (jetpackItem != null) {
+            val energyLeft = JetpackItem.getEnergy(jetpackItem)
+            overlay.percentage = energyLeft / JetpackItem.maxEnergy.toDouble()
+            
+            if (energyLeft > ENERGY_PER_TICK) {
+                if (player.isFlying) {
+                    JetpackItem.addEnergy(jetpackItem, -ENERGY_PER_TICK)
+                    if (tick % 3 == 0) {
+                        val location = player.location
+                        playSound(location)
+                        spawnParticles(location)
+                    }
+                } else {
+                    player.allowFlight = true
                 }
-            } else {
-                player.allowFlight = true
+            } else if (player.isFlying) {
+                player.isFlying = false
+                player.allowFlight = false
             }
-        } else if (player.isFlying) {
-            player.isFlying = false
-            player.allowFlight = false
-        }
+        } else JetpackItem.setJetpack(player, false)
     }
     
     private fun playSound(location: Location) {
