@@ -131,7 +131,7 @@ class StorageUnit(
             val remaining: Int
             
             if (type == null) { // Storage unit is empty
-                type = item
+                type = item.clone()
                 amount = item.amount
                 remaining = 0
             } else if (type!!.isSimilar(item)) { // The item is the same as the one stored in the unit
