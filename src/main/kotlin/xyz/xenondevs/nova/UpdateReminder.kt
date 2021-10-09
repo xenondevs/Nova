@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.net.URL
 
@@ -30,9 +31,8 @@ object UpdateReminder : Listener {
     
     private fun checkVersion() {
         if (needsUpdate) return
-        val newVersion = URL("https://api.spigotmc.org/legacy/update.php?resource=93648").readText()
-        val currentVersion = NOVA.description.version
-        if (newVersion != currentVersion) {
+        val newVersion = Version(URL("https://api.spigotmc.org/legacy/update.php?resource=93648").readText())
+        if (newVersion > NOVA.version) {
             needsUpdate = true
             if (taskId != -1) {
                 Bukkit.getScheduler().cancelTask(taskId)
