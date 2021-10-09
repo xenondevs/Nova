@@ -32,7 +32,7 @@ object UpdateReminder : Listener {
     private fun checkVersion() {
         if (needsUpdate) return
         val newVersion = Version(URL("https://api.spigotmc.org/legacy/update.php?resource=93648").readText())
-        if (newVersion < NOVA.version) {
+        if (newVersion > NOVA.version) {
             needsUpdate = true
             if (taskId != -1) {
                 Bukkit.getScheduler().cancelTask(taskId)
