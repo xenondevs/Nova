@@ -112,7 +112,7 @@ object VanillaTileEntityManager : Listener {
     
     @Synchronized
     private fun handleTileEntityDestroy(location: Location) {
-        val chunkMap = tileEntityMap[location.chunk.pos]!!
+        val chunkMap = tileEntityMap[location.chunkPos]!!
         val tileEntity = chunkMap[location]!!
         chunkMap -= location
         locationCache -= location
@@ -135,7 +135,7 @@ object VanillaTileEntityManager : Listener {
         val tileEntity = createVanillaTileEntity(state)
         if (tileEntity != null) {
             val location = block.location
-            tileEntityMap[location.chunk.pos]!![location] = tileEntity
+            tileEntityMap[location.chunkPos]!![location] = tileEntity
             locationCache[location] = tileEntity
             tileEntity.handleInitialized()
         }

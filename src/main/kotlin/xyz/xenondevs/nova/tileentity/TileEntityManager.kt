@@ -230,7 +230,7 @@ object TileEntityManager : Listener {
         val chunkPos = chunk.pos
         val tileEntities = tileEntityMap[chunkPos]
         tileEntityMap -= chunkPos
-        locationCache.removeAll { it.chunk == chunk }
+        locationCache.removeAll { it.chunkPos == chunkPos }
         tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
     }
     
