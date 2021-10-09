@@ -19,27 +19,18 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
-import xyz.xenondevs.nova.data.serialization.persistentdata.JsonElementDataType
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLACKLIST_BUTTON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.WHITELIST_BUTTON
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.fromJson
 import xyz.xenondevs.nova.util.data.setLocalizedName
 
-private val LEGACY_ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
 private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilterCBF")
 
 fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
     val container = itemMeta!!.persistentDataContainer
-    
-    return if (container.has(ITEM_FILTER_KEY, CompoundElementDataType))
-        ItemFilter(container.get(ITEM_FILTER_KEY, CompoundElementDataType)!!)
-    else if (container.has(LEGACY_ITEM_FILTER_KEY, JsonElementDataType))
-        GSON.fromJson(container.get(LEGACY_ITEM_FILTER_KEY, JsonElementDataType))
-    else null
+    return container.get(ITEM_FILTER_KEY, CompoundElementDataType)?.let(::ItemFilter)
 }
 
 fun ItemStack.getOrCreateFilterConfig(): ItemFilter = getFilterConfigOrNull() ?: ItemFilter()
