@@ -45,7 +45,7 @@ private val RECIPES: List<FurnaceRecipe> by lazy {
 }
 
 private fun getRecipe(input: ItemStack) =
-    RECIPES.firstOrNull { it.input.isSimilar(input) }
+    RECIPES.firstOrNull { it.input.isSimilar(input) || it.inputChoice.test(input) }
 
 private val MAX_ENERGY = NovaConfig[ELECTRICAL_FURNACE].getInt("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[ELECTRICAL_FURNACE].getInt("energy_per_tick")!!
