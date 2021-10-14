@@ -197,6 +197,7 @@ object NovaMaterialRegistry {
     val BOTTLED_MOB_PLACEHOLDER = registerItem("BOTTLED_MOB_PLACEHOLDER", "", 9504)
     val FISHING_ROD_PLACEHOLDER = registerItem("FISHING_ROD_PLACEHOLDER", "", 9505)
     val SAPLING_PLACEHOLDER = registerItem("SAPLING_PLACEHOLDER", "", 9506)
+    val TRASH_CAN_PLACEHOLDER = registerItem("TRASH_CAN_PLACEHOLDER", "", 9507)
     
     // 10.000 - ? Multi-Texture UI Elements
     val PROGRESS_ARROW = registerItem("PROGRESS_ARROW", "", itemOf((10_000..10_016).toIntArray()))

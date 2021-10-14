@@ -1,10 +1,13 @@
 package xyz.xenondevs.nova.tileentity.impl.storage
 
 import de.studiocode.invui.gui.GUI
+import de.studiocode.invui.gui.SlotElement
+import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
@@ -49,7 +52,7 @@ class TrashCan(
                 "1 - - - - - - - 2" +
                 "| s # # i # # # |" +
                 "3 - - - - - - - 4")
-            .addIngredient('i', inventory)
+            .addIngredient('i', VISlotElement(inventory, 0, NovaMaterialRegistry.TRASH_CAN_PLACEHOLDER.itemProvider))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
