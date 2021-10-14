@@ -63,7 +63,7 @@ object MaterialUtils {
             } else if (name.startsWith("minecraft:")) {
                 val material = Material.valueOf(name.drop(10).uppercase())
                 return MaterialChoice(material)
-            }  else throw IllegalArgumentException("Invalid item name: $name")
+            } else throw IllegalArgumentException("Invalid item name: $name")
         } catch (ex: Exception) {
             throw IllegalArgumentException("Unknown item $name", ex)
         }

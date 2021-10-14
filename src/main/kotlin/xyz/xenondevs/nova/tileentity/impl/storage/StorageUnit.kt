@@ -37,7 +37,7 @@ class StorageUnit(
     
     override val gui = lazy { ItemStorageGUI() }
     private val inventory = StorageUnitInventory(retrieveOrNull("type"), retrieveOrNull("amount") ?: 0)
-    override val itemHolder = NovaItemHolder(this, uuid to inventory)
+    override val itemHolder = NovaItemHolder(this, uuid to (inventory to ItemConnectionType.BUFFER))
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
     private val outputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleOutputInventoryUpdate) }
     
@@ -71,7 +71,7 @@ class StorageUnit(
         val item = inputInventory.getItemStack(0)
         if (item != null) {
             val remaining = inventory.addItem(item)
-            inputInventory.setItemStack(null, 0, remaining)
+            inputInventory.setItemStack(null, 0, item.apply { amount = remaining }.takeUnless { it.amount <= 0 })
         }
     }
     
@@ -86,7 +86,7 @@ class StorageUnit(
         private val sideConfigGUI = SideConfigGUI(
             this@StorageUnit,
             null,
-            listOf(Triple(inventory, "inventory.nova.default", ItemConnectionType.ALL_TYPES)),
+            listOf(inventory to "inventory.nova.default"),
             ::openWindow
         )
         
@@ -127,20 +127,20 @@ class StorageUnit(
                 return arrayOf(type!!.clone().also { it.amount = amount })
             }
         
-        override fun addItem(item: ItemStack): ItemStack? {
-            val remaining: ItemStack?
+        override fun addItem(item: ItemStack): Int {
+            val remaining: Int
             
             if (type == null) { // Storage unit is empty
-                type = item
+                type = item.clone()
                 amount = item.amount
-                remaining = null
+                remaining = 0
             } else if (type!!.isSimilar(item)) { // The item is the same as the one stored in the unit
                 val leeway = MAX_ITEMS - amount
                 if (leeway >= item.amount) { // The whole stack fits into the storage unit
                     amount += item.amount
-                    remaining = null
-                } else remaining = item.clone().also { amount -= leeway }  // Not all items fit so a few will remain
-            } else remaining = item // The item isn't the same as the one stored in the unit
+                    remaining = 0
+                } else remaining = item.amount - leeway  // Not all items fit so a few will remain
+            } else remaining = item.amount // The item isn't the same as the one stored in the unit
             
             if (gui.isInitialized()) gui.value.update()
             return remaining

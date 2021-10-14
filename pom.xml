@@ -6,11 +6,11 @@
 
     <groupId>xyz.xenondevs</groupId>
     <artifactId>Nova</artifactId>
-    <version>0.5.4</version>
+    <version>0.6-SNAPSHOT</version>
 
     <properties>
         <kotlin.version>1.5.30-RC</kotlin.version>
-        <exposed.version>0.33.1</exposed.version>
+        <exposed.version>0.34.1</exposed.version>
         <spigot.version>1.17.1-R0.1-SNAPSHOT</spigot.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
@@ -185,7 +185,7 @@
         <dependency>
             <groupId>xyz.xenondevs</groupId>
             <artifactId>particle</artifactId>
-            <version>1.6.5</version>
+            <version>1.6.6</version>
         </dependency>
         <dependency>
             <groupId>me.xdrop</groupId>
@@ -195,7 +195,7 @@
         <dependency>
             <groupId>com.github.NichtStudioCode.InvUI</groupId>
             <artifactId>InvUI</artifactId>
-            <version>b8ccc1a6ca</version>
+            <version>0b96a820ec</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.NichtStudioCode.InvUI</groupId>
@@ -239,7 +239,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.0-M1</version>
+            <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

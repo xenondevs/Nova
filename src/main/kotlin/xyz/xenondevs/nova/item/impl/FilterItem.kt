@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.item.impl
 
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.item.ItemBuilder
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.VirtualInventory
@@ -19,6 +20,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLACKLIST_BUTTON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.WHITELIST_BUTTON
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
@@ -26,10 +28,12 @@ import xyz.xenondevs.nova.util.data.setLocalizedName
 
 private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilterCBF")
 
-fun ItemStack.getFilterConfig(): ItemFilter? {
+fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
     val container = itemMeta!!.persistentDataContainer
     return container.get(ITEM_FILTER_KEY, CompoundElementDataType)?.let(::ItemFilter)
 }
+
+fun ItemStack.getOrCreateFilterConfig(): ItemFilter = getFilterConfigOrNull() ?: ItemFilter()
 
 fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     val itemMeta = itemMeta!!
@@ -45,11 +49,18 @@ object FilterItem : NovaItem() {
             ItemFilterWindow(player, itemStack)
         }
     }
+    
+    override fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder =
+        itemBuilder.addModifier {
+            it.saveFilterConfig(ItemFilter())
+            return@addModifier it
+        }
+    
 }
 
 private class ItemFilterWindow(player: Player, private val itemStack: ItemStack) {
     
-    private val itemFilter = itemStack.getFilterConfig() ?: ItemFilter(true, arrayOfNulls(7))
+    private val itemFilter = itemStack.getOrCreateFilterConfig()
     private val filterInventory = object : VirtualInventory(null, 7, itemFilter.items, IntArray(7) { 1 }) {
         
         override fun addItem(updateReason: UpdateReason?, itemStack: ItemStack): Int {
@@ -70,10 +81,11 @@ private class ItemFilterWindow(player: Player, private val itemStack: ItemStack)
     private val gui = GUIBuilder(GUIType.NORMAL, 9, 4)
         .setStructure("" +
             "1 - - - - - - - 2" +
-            "| # # # m # # # |" +
+            "| # # m # n # # |" +
             "| i i i i i i i |" +
             "3 - - - - - - - 4")
         .addIngredient('m', SwitchModeItem())
+        .addIngredient('n', SwitchNBTItem())
         .addIngredient('i', filterInventory)
         .build()
     
@@ -105,6 +117,20 @@ private class ItemFilterWindow(player: Player, private val itemStack: ItemStack)
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             itemFilter.whitelist = !itemFilter.whitelist
+            notifyWindows()
+        }
+        
+    }
+    
+    private inner class SwitchNBTItem : BaseItem() {
+        
+        override fun getItemProvider(): ItemProvider {
+            return (if (itemFilter.nbt) NovaMaterialRegistry.NBT_ON_BUTTON else NovaMaterialRegistry.NBT_OFF_BUTTON)
+                .createBasicItemBuilder().setLocalizedName("menu.nova.item_filter.nbt." + if (itemFilter.nbt) "on" else "off")
+        }
+        
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            itemFilter.nbt = !itemFilter.nbt
             notifyWindows()
         }
         

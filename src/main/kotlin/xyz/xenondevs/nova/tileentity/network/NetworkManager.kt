@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.tileentity.network
 import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.*
 
@@ -13,10 +14,19 @@ object NetworkManager {
     
     fun init() {
         LOGGER.info("Initializing NetworkManager")
-        runTaskTimer(0, 1) { LOCK.tryLockAndRun { networks.forEach(Network::handleTick) } }
+        
+        runTaskTimer(0, 1) {
+            LOCK.tryLockAndRun {
+                networks.forEach { network ->
+                    if (network is ItemNetwork) {
+                        if (serverTick % 20 == 0) network.handleTick()
+                    } else network.handleTick()
+                }
+            }
+        }
     }
     
-    fun handleEndPointAdd(endPoint: NetworkEndPoint) {
+    fun handleEndPointAdd(endPoint: NetworkEndPoint, updateBridges: Boolean = true) {
         LOCK.lockAndRun {
             val bridgesToUpdate = HashSet<NetworkBridge>()
             NetworkType.values().forEach { networkType ->
@@ -78,7 +88,7 @@ object NetworkManager {
                 }
             }
             
-            bridgesToUpdate.forEach(NetworkBridge::handleNetworkUpdate)
+            if (updateBridges) bridgesToUpdate.forEach(NetworkBridge::handleNetworkUpdate)
         }
     }
     

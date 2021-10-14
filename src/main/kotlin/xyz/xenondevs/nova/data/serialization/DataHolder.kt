@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.other.EnumMapElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.toElement
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.toEnumMap
 import java.util.*
 
@@ -145,11 +146,20 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
     }
     
     /**
-     * Serializes [EnumMaps][EnumMap] using CBF and stores them in the [data] [CompoundElement]
+     * Serializes [EnumMaps][EnumMap] using CBF and stores them in the [data][CompoundElement]
      */
     inline fun <reified K : Enum<K>, reified V> storeEnumMap(key: String, map: Map<K, V>) {
         val enumMap = if (map is EnumMap) map else map.toEnumMap()
         data.putElement(key, enumMap.toElement(V::class))
+    }
+    
+    /**
+     * Serializes [EnumMaps][EnumMap] using CBF and stores them in the [data][CompoundElement]
+     * while mapping the values using the given [valueMapper].
+     */
+    inline fun <reified K : Enum<K>, reified V, reified R> storeEnumMap(key: String, map: Map<K, V>, valueMapper: (V) -> R) {
+        val enumMap = map.mapValuesTo(emptyEnumMap<K, R>()) { valueMapper(it.value) }
+        data.putElement(key, enumMap.toElement(R::class))
     }
     
     /**

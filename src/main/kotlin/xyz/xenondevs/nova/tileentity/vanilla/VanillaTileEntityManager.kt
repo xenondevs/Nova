@@ -4,23 +4,23 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.block.BlockState
-import org.bukkit.block.Chest
-import org.bukkit.block.Container
-import org.bukkit.block.Furnace
+import org.bukkit.block.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
+import org.bukkit.event.world.WorldSaveEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.chunkPos
-import xyz.xenondevs.nova.util.runAsyncTaskTimer
-import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
 import xyz.xenondevs.nova.world.armorstand.pos
 import java.util.*
@@ -86,6 +86,25 @@ object VanillaTileEntityManager : Listener {
         }
     
     @Synchronized
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun handleInteract(event: PlayerInteractEvent) {
+        val player = event.player
+        val tileEntity = event.clickedBlock?.location?.let(::getTileEntityAt)
+        if (
+            tileEntity is ItemStorageVanillaTileEntity
+            && !player.isSneaking
+            && event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH }
+            && ProtectionManager.canUse(player, tileEntity.location)
+        ) {
+            event.isCancelled = true
+            val face = event.blockFace
+            runAsyncTaskWithLock(NetworkManager.LOCK) {
+                tileEntity.itemHolder.cycleItemConfig(face, true)
+            }
+        }
+    }
+    
+    @Synchronized
     private fun handleChunkLoad(chunk: Chunk) {
         val chunkMap = HashMap<Location, VanillaTileEntity>()
         chunk.tileEntities.forEach { state ->
@@ -117,6 +136,7 @@ object VanillaTileEntityManager : Listener {
         chunkMap -= location
         locationCache -= location
         
+        if (tileEntity is VanillaChestTileEntity) checkForBrokenDoubleChest(tileEntity.block)
         tileEntity.handleRemoved(false)
     }
     
@@ -124,6 +144,15 @@ object VanillaTileEntityManager : Listener {
     private fun handleBlockBreak(location: Location) {
         if (locationCache.containsKey(location))
             handleTileEntityDestroy(location)
+    }
+    
+    @Synchronized
+    @EventHandler
+    fun handleWorldSave(event: WorldSaveEvent) {
+        tileEntityMap.values.asSequence()
+            .flatMap { it.values }
+            .filterIsInstance<ItemStorageVanillaTileEntity>()
+            .forEach { it.itemHolder.saveData() }
     }
     
     @Synchronized
@@ -138,7 +167,42 @@ object VanillaTileEntityManager : Listener {
             tileEntityMap[location.chunkPos]!![location] = tileEntity
             locationCache[location] = tileEntity
             tileEntity.handleInitialized()
+            
+            runTaskLater(1) { checkForPlacedDoubleChest(block) }
         }
+    }
+    
+    @Synchronized
+    private fun checkForPlacedDoubleChest(block: Block) {
+        val state = block.state
+        if (state is Chest) {
+            val holder = state.inventory.holder
+            if (holder is DoubleChest)
+                getOtherChest(block, holder).handleChestStateChange()
+        }
+    }
+    
+    @Synchronized
+    private fun checkForBrokenDoubleChest(block: Block) {
+        // called when the double chest is about to be broken
+        
+        val state = block.state as Chest
+        val holder = state.inventory.holder
+        if (holder is DoubleChest) {
+            val otherChest = getOtherChest(block, holder)
+            runTaskLater(1) { synchronized(this) { otherChest.handleChestStateChange() } }
+        }
+    }
+    
+    @Synchronized
+    private fun getOtherChest(block: Block, holder: DoubleChest): VanillaChestTileEntity {
+        val selfLocation = block.location
+        
+        val left = holder.leftSide as Chest
+        val right = holder.rightSide as Chest
+        
+        val otherLocation = if (left.location == selfLocation) right.location else left.location
+        return getTileEntityAt(otherLocation) as VanillaChestTileEntity
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

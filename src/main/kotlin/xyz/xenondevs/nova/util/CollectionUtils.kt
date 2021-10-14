@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import de.studiocode.invui.item.Item
 import me.xdrop.fuzzywuzzy.FuzzySearch
 
 fun <E> List<E>.contentEquals(other: List<E>) = size == other.size && containsAll(other)
@@ -30,4 +31,26 @@ fun <E> Collection<E>.searchFor(query: String, getString: (E) -> String): List<E
     return FuzzySearch.extractAll(query, elements.keys)
         .apply { sortByDescending { it.score } }
         .map { elements[it.string]!! }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun List<Item>.notifyWindows() = forEach(Item::notifyWindows)
+
+fun <T> Array<T?>.getOrSet(index: Int, lazyValue: () -> T): T {
+    var value = get(index)
+    if (value == null) {
+        value = lazyValue()
+        set(index, value)
+    }
+    
+    return value!!
+}
+
+/**
+ * Puts the [value] in the map if it is not null.
+ * Removes the [key] from the map if the [value] is null.
+ */
+fun <K, V> MutableMap<K, V>.putOrRemove(key: K, value: V?) {
+    if (value == null) remove(key)
+    else put(key, value)
 }

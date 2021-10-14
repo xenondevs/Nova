@@ -31,6 +31,10 @@ fun Location.dropItems(items: Iterable<ItemStack>) {
     items.forEach { world.dropItemNaturally(this, it) }
 }
 
+fun Location.dropItem(item: ItemStack) {
+    world!!.dropItemNaturally(this, item)
+}
+
 fun Location.removeOrientation() {
     yaw = 0f
     pitch = 0f
@@ -59,7 +63,13 @@ inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitbo
     return tileEntities
 }
 
-inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
+fun Location.getNearbyTileEntity(face: BlockFace, additionalHitboxes: Boolean): Any? {
+    val location = blockLocation.advance(face)
+    return TileEntityManager.getTileEntityAt(location, additionalHitboxes)
+        ?: VanillaTileEntityManager.getTileEntityAt(location)
+}
+
+fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
     val vector = direction.multiply(stepSize)
     val location = clone()
     var distance = 0.0

@@ -18,14 +18,16 @@ object JetpackItem : ChargeableItem(MAX_ENERGY) {
     override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {
         if (event.equipMethod == EquipMethod.BREAK) {
             event.isCancelled = true
+        } else setJetpack(player, equipped)
+    }
+    
+    fun setJetpack(player: Player, state: Boolean) {
+        if (state) {
+            Attachment("Jetpack", player.uniqueId, JETPACK.createItemStack(), true)
+            AbilityManager.giveAbility(player, AbilityType.JETPACK)
         } else {
-            if (equipped) {
-                Attachment("Jetpack", player.uniqueId, JETPACK.createItemStack(), true)
-                AbilityManager.giveAbility(player, AbilityType.JETPACK)
-            } else {
-                AttachmentManager.getAttachment(player.uniqueId, "Jetpack")?.remove()
-                AbilityManager.takeAbility(player, AbilityType.JETPACK)
-            }
+            AttachmentManager.getAttachment(player.uniqueId, "Jetpack")?.remove()
+            AbilityManager.takeAbility(player, AbilityType.JETPACK)
         }
     }
     

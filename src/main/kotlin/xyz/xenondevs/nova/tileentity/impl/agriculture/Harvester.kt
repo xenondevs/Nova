@@ -22,7 +22,8 @@ import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType.BUFFER
+import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType.EXTRACT
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
@@ -68,7 +69,7 @@ class Harvester(
     override val gui = lazy(::HarvesterGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_BREAK, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory, shearInventory, axeInventory, hoeInventory)
+    override val itemHolder = NovaItemHolder(this, inventory to EXTRACT, shearInventory to BUFFER, axeInventory to BUFFER, hoeInventory to BUFFER)
     
     private var maxIdleTime = 0
     private var maxRange = 0
@@ -236,10 +237,10 @@ class Harvester(
             this@Harvester,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES),
-                Triple(itemHolder.getNetworkedInventory(shearInventory), "inventory.nova.shears", ItemConnectionType.ALL_TYPES),
-                Triple(itemHolder.getNetworkedInventory(axeInventory), "inventory.nova.axes", ItemConnectionType.ALL_TYPES),
-                Triple(itemHolder.getNetworkedInventory(hoeInventory), "inventory.nova.hoes", ItemConnectionType.ALL_TYPES)
+                itemHolder.getNetworkedInventory(inventory) to "inventory.nova.output",
+                itemHolder.getNetworkedInventory(shearInventory) to "inventory.nova.shears",
+                itemHolder.getNetworkedInventory(axeInventory) to "inventory.nova.axes",
+                itemHolder.getNetworkedInventory(hoeInventory) to "inventory.nova.hoes",
             )
         ) { openWindow(it) }
         

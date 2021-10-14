@@ -42,7 +42,7 @@ class Charger(
     override val gui = lazy { ChargerGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, UpgradeType.ENERGY, UpgradeType.SPEED)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
-    override val itemHolder = NovaItemHolder(this, inventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
         if (event.isAdd && event.newItemStack.novaMaterial?.novaItem !is ChargeableItem) event.isCancelled = true
@@ -68,7 +68,7 @@ class Charger(
         private val sideConfigGUI = SideConfigGUI(
             this@Charger,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default")
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)

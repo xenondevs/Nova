@@ -10,6 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsStack
@@ -43,9 +44,25 @@ class Attachment(
     private lateinit var nmsEntity: Any
     private var hidden = false
     
+    constructor(compound: CompoundElement) : this(
+        compound.getAsserted("key"),
+        compound.getAsserted("uuid"),
+        compound.getAsserted("itemStack"),
+        compound.getAsserted("hideOnDown")
+    )
+    
     init {
         AttachmentManager.registerAttachment(this)
         spawn()
+    }
+    
+    fun toCompoundElement(): CompoundElement {
+        val compound = CompoundElement()
+        compound.put("key", key)
+        compound.put("uuid", playerUUID)
+        compound.put("itemStack", itemStack)
+        compound.put("hideOnDown", hideOnDown)
+        return compound
     }
     
     fun spawn() {

@@ -178,8 +178,7 @@ class FakeArmorStand(
     /**
      * Sets the equipment for a specific [EquipmentSlot].
      */
-    fun setEquipment(slot: EquipmentSlot, bukkitStack: BItemStack) {
-        // TODO: cache?
+    fun setEquipment(slot: EquipmentSlot, bukkitStack: BItemStack?) {
         equipment[slot] = CraftItemStack.asNMSCopy(bukkitStack)
     }
     

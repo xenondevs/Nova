@@ -65,7 +65,7 @@ class Breeder(
     override val gui = lazy { MobCrusherGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_BREED, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
-    override val itemHolder = NovaItemHolder(this, inventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
     
     private lateinit var region: Region
     
@@ -188,7 +188,7 @@ class Breeder(
         private val sideConfigGUI = SideConfigGUI(
             this@Breeder,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default")
         ) { openWindow(it) }
         
         private val rangeItems = ArrayList<Item>()

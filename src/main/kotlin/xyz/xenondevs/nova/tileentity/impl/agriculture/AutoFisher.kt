@@ -47,8 +47,8 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY =  NovaConfig[AUTO_FISHER].getInt("capacity")!!
-private val ENERGY_PER_TICK =  NovaConfig[AUTO_FISHER].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[AUTO_FISHER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[AUTO_FISHER].getInt("energy_per_tick")!!
 private val IDLE_TIME = NovaConfig[AUTO_FISHER].getInt("idle_time")!!
 
 class AutoFisher(
@@ -64,7 +64,7 @@ class AutoFisher(
     override val gui = lazy(::AutoFisherGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM) }
-    override val itemHolder = NovaItemHolder(this, inventory, fishingRodInventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.EXTRACT, fishingRodInventory to ItemConnectionType.BUFFER)
     
     private var timePassed = 0
     private var maxIdleTime = 0
@@ -72,7 +72,7 @@ class AutoFisher(
     private val waterBlock = location.clone().subtract(0.0, 1.0, 0.0).block
     private val random = Random(uuid.mostSignificantBits xor System.currentTimeMillis())
     private val level = world.serverLevel
-    private val position = Vec3(location.x, location.y, location.z)
+    private val position = Vec3(armorStand.location.x, location.y - 0.5, armorStand.location.z)
     private val itemDropLocation = location.clone().add(0.0, 1.0, 0.0)
     private val fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID.salt(uuid.toString()), "AutoFisher")
     
@@ -155,8 +155,8 @@ class AutoFisher(
             this@AutoFisher,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES),
-                Triple(itemHolder.getNetworkedInventory(fishingRodInventory), "inventory.nova.fishing_rod", ItemConnectionType.ALL_TYPES)
+                itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default",
+                itemHolder.getNetworkedInventory(fishingRodInventory) to "inventory.nova.fishing_rod"
             )
         ) { openWindow(it) }
         

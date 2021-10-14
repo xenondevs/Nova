@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -28,6 +29,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
@@ -343,12 +345,20 @@ object TileEntityManager : Listener {
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleInteract(event: PlayerInteractEvent) {
+        if (event.hand != EquipmentSlot.HAND) return // prevent multiple calls for both hands
+        
         val action = event.action
         val player = event.player
-        if (action == Action.RIGHT_CLICK_BLOCK && !event.player.isSneaking) {
+        if (action == Action.RIGHT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
-            if (tileEntity != null && ProtectionManager.canUse(player, block.location)) tileEntity.handleRightClick(event)
+            if (tileEntity != null) {
+                if (!event.player.isSneaking) {
+                    if (ProtectionManager.canUse(player, block.location))
+                        tileEntity.handleRightClick(event)
+                } else if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH } && ProtectionManager.canBreak(player, block.location))
+                    destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
+            }
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             if ((block.type == Material.BARRIER || block.type == Material.CHAIN)

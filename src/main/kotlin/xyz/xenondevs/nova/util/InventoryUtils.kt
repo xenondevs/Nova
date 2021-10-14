@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.util
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -93,4 +95,25 @@ fun PlayerInventory.addPrioritized(prioritizedSlot: EquipmentSlot, itemStack: It
 fun Inventory.addPrioritized(prioritizedSlot: Int, itemStack: ItemStack) {
     if (getItem(prioritizedSlot) == null) setItem(prioritizedSlot, itemStack)
     else addItem(itemStack)
+}
+
+/**
+ * If the [Player] has is currently looking into an inventory.
+ * Does not detect the player's inventory itself because that is not sent to the server.
+ */
+val Player.hasInventoryOpen: Boolean
+    get() = openInventory.topInventory.type != InventoryType.CRAFTING
+
+class VoidingVirtualInventory(size: Int) : VirtualInventory(null, size) {
+    override fun setItemStackSilently(slot: Int, itemStack: ItemStack?) = Unit
+    override fun forceSetItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
+    override fun setItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
+    override fun putItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack) = 0
+    override fun setItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
+    override fun addItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
+    override fun addItem(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
+    override fun collectToCursor(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
+    override fun simulateAdd(itemStacks: MutableList<ItemStack>) = IntArray(itemStacks.size)
+    override fun simulateAdd(itemStack: ItemStack, vararg itemStacks: ItemStack) = IntArray(1 + itemStacks.size)
+    override fun canHold(itemStacks: MutableList<ItemStack>) = true
 }

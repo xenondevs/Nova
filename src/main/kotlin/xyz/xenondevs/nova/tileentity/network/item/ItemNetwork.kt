@@ -1,18 +1,9 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
-import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.network.*
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
-import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.min
-
-private typealias ItemFilterList = List<ItemFilter>
-
-private fun ItemFilterList.allowsItem(itemStack: ItemStack) = isEmpty() || any { it.allowsItem(itemStack) }
+import xyz.xenondevs.nova.util.getOrSet
 
 class ItemNetwork : Network {
     
@@ -21,44 +12,39 @@ class ItemNetwork : Network {
     
     private val _nodes = HashSet<NetworkNode>()
     private val bridges = HashSet<ItemBridge>()
-    private val providers = HashSet<Pair<ItemHolder, BlockFace>>()
-    private val consumers = HashSet<Pair<ItemHolder, BlockFace>>()
+    private val channels: Array<ItemNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     
     private val transferRate: Int
         get() = bridges.map { it.itemTransferRate }.minOrNull() ?: 1
     
+    private var nextChannel = 0
+    
     override fun addAll(network: Network) {
-        Preconditions.checkArgument(network is ItemNetwork, "Illegal Network Type")
-        network as ItemNetwork
+        require(network !== this) { "Can't add to self" }
+        require(network is ItemNetwork) { "Illegal Network Type" }
         
         _nodes += network._nodes
-        providers += network.providers
-        consumers += network.consumers
         bridges += network.bridges
+        
+        network.channels.withIndex().forEach { (id, channel) ->
+            if (channel == null) return@forEach
+            if (channels[id] == null) channels[id] = channel
+            else channels[id]!!.addAll(channel)
+        }
     }
     
     override fun addBridge(bridge: NetworkBridge) {
-        Preconditions.checkArgument(bridge is ItemBridge, "Illegal Bridge Type")
+        require(bridge is ItemBridge) { "Illegal Bridge Type" }
+        
         _nodes += bridge
-        bridges += bridge as ItemBridge
+        bridges += bridge
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
         val itemHolder = endPoint.holders[NetworkType.ITEMS] as ItemHolder
         
-        val pair = itemHolder to face
-        when (val connectionType = itemHolder.itemConfig[face]!!) {
-            
-            EXTRACT -> providers += pair
-            INSERT -> consumers += pair
-            BUFFER -> {
-                providers += pair
-                consumers += pair
-            }
-            
-            else -> throw IllegalArgumentException("Illegal ConnectionType: $connectionType")
-            
-        }
+        val channel = channels.getOrSet(itemHolder.channels[face]!!) { ItemNetworkChannel() }
+        channel.addItemHolder(itemHolder, face)
         
         _nodes += endPoint
     }
@@ -67,11 +53,12 @@ class ItemNetwork : Network {
         _nodes -= node
         if (node is NetworkEndPoint) {
             val itemHolder = node.holders[NetworkType.ITEMS] as ItemHolder
-            providers.removeIf { it.first == itemHolder }
-            consumers.removeIf { it.first == itemHolder }
-        } else if (node is ItemBridge) {
-            bridges -= node
-        }
+            itemHolder.channels.values.toSet().asSequence()
+                .mapNotNull { channels[it]?.to(it) }
+                .onEach { it.first.removeItemHolder(itemHolder) }
+                .filter { it.first.isEmpty() }
+                .forEach { channels[it.second] = null }
+        } else if (node is ItemBridge) bridges -= node
     }
     
     override fun isEmpty() = _nodes.isEmpty()
@@ -79,78 +66,20 @@ class ItemNetwork : Network {
     override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
     
     override fun handleTick() {
-        val transferRate = transferRate
-        
-        val providerInventories = providers.mapNotNullTo(HashSet()) { it.first.inventories[it.second] }
-        val consumerInventories = consumers.mapNotNullTo(HashSet()) { it.first.inventories[it.second] }
-        
-        val providerFilter = getFilterMap(EXTRACT)
-        val consumerFilter = getFilterMap(INSERT)
-        
-        var availableTransfers = transferRate
-        
-        for (providerInventory in providerInventories) {
-            for ((index, itemStack) in providerInventory.items.withIndex()) {
-                if (
-                    itemStack == null
-                    || availableTransfers == 0
-                    || !providerFilter[providerInventory]!!.allowsItem(itemStack)
-                ) continue
-                
-                val transferAmount = min(itemStack.amount, availableTransfers)
-                var amountLeft = transferAmount
-                
-                val availableInventories = ConcurrentHashMap.newKeySet<NetworkedInventory>()
-                    .also {
-                        it += consumerInventories
-                        it -= providerInventory
-                    }
-                
-                while (availableInventories.isNotEmpty() && amountLeft != 0) {
-                    for (consumerInventory in availableInventories) {
-                        if (consumerFilter[consumerInventory]!!.allowsItem(itemStack)) {
-                            val leftover = consumerInventory.addItem(itemStack.clone().also { it.amount = amountLeft })
-                            if (leftover == null) {
-                                amountLeft = 0
-                                break
-                            } else {
-                                availableInventories -= consumerInventory
-                                amountLeft = leftover.amount
-                            }
-                        } else availableInventories -= consumerInventory
-                    }
-                }
-                
-                val transferredAmount = transferAmount - amountLeft
-                itemStack.amount -= transferredAmount
-                availableTransfers -= transferredAmount
-                
-                if (itemStack != providerInventory.getItem(index)) providerInventory.setItem(index, if (itemStack.amount == 0) null else itemStack)
-            }
-        }
+        val startingChannel = nextChannel
+        var transfersLeft = transferRate
+        do {
+            transfersLeft = channels[nextChannel]?.distributeItems(transfersLeft) ?: transfersLeft
+            
+            nextChannel++
+            if (nextChannel >= channels.size) nextChannel = 0
+        } while (transfersLeft != 0 && nextChannel != startingChannel)
     }
     
-    // TODO: optimize
-    private fun getFilterMap(type: ItemConnectionType): Map<NetworkedInventory, ItemFilterList> {
-        val itemStorages = when (type) {
-            INSERT -> consumers
-            EXTRACT -> providers
-            else -> throw UnsupportedOperationException()
-        }
+    companion object {
         
-        val filterMap = HashMap<NetworkedInventory, MutableList<ItemFilter>>()
-        itemStorages.forEach { (itemHolder, face) ->
-            val inventory = itemHolder.inventories[face]!!
-            val filterList = filterMap[inventory] ?: ArrayList()
-            val node = itemHolder.endPoint.getNearbyNodes()[face]
-            if (node is ItemBridge) {
-                val filter = node.getFilter(type, face.oppositeFace) ?: ItemFilter(false, emptyArray())
-                filterList.add(filter)
-            }
-            filterMap[inventory] = filterList
-        }
+        const val CHANNEL_AMOUNT = 4
         
-        return filterMap
     }
     
 }

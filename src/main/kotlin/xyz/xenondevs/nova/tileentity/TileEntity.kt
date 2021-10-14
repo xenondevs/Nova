@@ -140,11 +140,15 @@ abstract class TileEntity(
     
     /**
      * Called when a player right-clicks the TileEntity.
-     * The event has should probably be cancelled if any action
+     *
+     * Only called once and always for the main hand.
+     * Use [PlayerInteractEvent.handItems] to check both items.
+     *
+     * The event has should be cancelled if any action
      * is performed in that method.
      */
     open fun handleRightClick(event: PlayerInteractEvent) {
-        if (gui != null) {
+        if (gui != null && !event.player.hasInventoryOpen) {
             event.isCancelled = true
             gui!!.value.openWindow(event.player)
         }
@@ -236,9 +240,23 @@ abstract class TileEntity(
         vararg blocked: BlockSide
     ): EnumMap<BlockFace, EnergyConnectionType> {
         
-        val blockedFaces = blocked.map { getFace(it) }
+        val blockedFaces = blocked.map(::getFace)
         return CUBE_FACES.associateWithTo(enumMapOf()) {
-            if (blockedFaces.contains(it)) EnergyConnectionType.NONE else default
+            if (it in blockedFaces) EnergyConnectionType.NONE else default
+        }
+    }
+    
+    /**
+     * Creates an energy side config
+     */
+    fun createExclusiveEnergySideConfig(
+        type: EnergyConnectionType,
+        vararg sides: BlockSide
+    ): EnumMap<BlockFace, EnergyConnectionType> {
+        
+        val sideFaces = sides.map(::getFace)
+        return CUBE_FACES.associateWithTo(emptyEnumMap()) {
+            if (it in sideFaces) type else EnergyConnectionType.NONE
         }
     }
     
@@ -331,7 +349,7 @@ abstract class TileEntity(
     
     companion object {
         
-        fun create(tileEntity: DaoTileEntity, location: Location) : TileEntity {
+        fun create(tileEntity: DaoTileEntity, location: Location): TileEntity {
             return create(
                 tileEntity.id.value,
                 location.clone().apply { center(); yaw = tileEntity.yaw },

@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.enumMapOf
 
-private val BUTTON_COLORS = listOf(
+val BUTTON_COLORS = listOf(
     NovaMaterialRegistry.RED_BUTTON,
     NovaMaterialRegistry.ORANGE_BUTTON,
     NovaMaterialRegistry.YELLOW_BUTTON,
@@ -36,11 +36,11 @@ private val BUTTON_COLORS = listOf(
 
 class ItemSideConfigGUI(
     val itemHolder: ItemHolder,
-    inventories: List<Triple<NetworkedInventory, String, List<ItemConnectionType>>>
+    inventories: List<Pair<NetworkedInventory, String>>
 ) : SimpleGUI(8, 3) {
     
     private val inventories = inventories.map { it.first }
-    private val allowedTypes = inventories.associate { it.first to it.third }
+    private val allowedTypes = itemHolder.allowedConnectionTypes.mapValues { (_, type) -> type.included }
     private val buttonBuilders = inventories.withIndex().associate { (index, triple) ->
         triple.first to BUTTON_COLORS[index]
             .createBasicItemBuilder()
@@ -79,7 +79,7 @@ class ItemSideConfigGUI(
         val allowedTypes = allowedTypes[itemHolder.inventories[blockFace]!!]!!
         if (allowedTypes.size < 2) return false
         
-        NetworkManager.handleEndPointRemove(itemHolder.endPoint, false)
+        NetworkManager.handleEndPointRemove(itemHolder.endPoint, true)
         
         val currentType = itemHolder.itemConfig[blockFace]!!
         var index = allowedTypes.indexOf(currentType)
@@ -88,7 +88,8 @@ class ItemSideConfigGUI(
         else if (index == allowedTypes.size) index = 0
         itemHolder.itemConfig[blockFace] = allowedTypes[index]
         
-        NetworkManager.handleEndPointAdd(itemHolder.endPoint)
+        NetworkManager.handleEndPointAdd(itemHolder.endPoint, false)
+        itemHolder.endPoint.updateNearbyBridges()
         
         return true
     }

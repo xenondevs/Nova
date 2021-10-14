@@ -80,7 +80,7 @@ class Quarry(
     private val inventory = getInventory("quarryInventory", 9) {}
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, 0, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.EXTRACT)
     
     private val entityId = uuid.hashCode()
     
@@ -510,7 +510,7 @@ class Quarry(
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default")
         ) { openWindow(it) }
         
         private val sizeItems = ArrayList<Item>()
