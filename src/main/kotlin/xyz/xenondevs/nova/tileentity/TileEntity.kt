@@ -140,10 +140,10 @@ abstract class TileEntity(
     
     /**
      * Called when a player right-clicks the TileEntity.
-     * 
+     *
      * Only called once and always for the main hand.
      * Use [PlayerInteractEvent.handItems] to check both items.
-     * 
+     *
      * The event has should be cancelled if any action
      * is performed in that method.
      */

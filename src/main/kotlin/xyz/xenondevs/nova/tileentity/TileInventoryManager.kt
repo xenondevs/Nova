@@ -26,7 +26,7 @@ object TileInventoryManager {
     }
     
     private fun saveInventories() {
-        if(NOVA.isUninstalled)
+        if (NOVA.isUninstalled)
             return
         transaction {
             inventories.forEach { (inventoryUUID, pair) ->

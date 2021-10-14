@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.player.attachment.Attachment
-import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*

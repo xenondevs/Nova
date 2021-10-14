@@ -47,8 +47,8 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY =  NovaConfig[AUTO_FISHER].getInt("capacity")!!
-private val ENERGY_PER_TICK =  NovaConfig[AUTO_FISHER].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[AUTO_FISHER].getInt("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[AUTO_FISHER].getInt("energy_per_tick")!!
 private val IDLE_TIME = NovaConfig[AUTO_FISHER].getInt("idle_time")!!
 
 class AutoFisher(

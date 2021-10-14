@@ -56,7 +56,7 @@ abstract class NetworkedTileEntity(
             
             runAsyncTaskWithLock(NetworkManager.LOCK) {
                 val itemHolder = holders[NetworkType.ITEMS]
-                if (itemHolder is ItemHolder) 
+                if (itemHolder is ItemHolder)
                     itemHolder.cycleItemConfig(face, true)
             }
         } else handleRightClickNoWrench(event)
