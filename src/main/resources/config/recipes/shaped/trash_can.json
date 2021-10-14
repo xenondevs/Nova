@@ -1,0 +1,18 @@
+{
+  "result": "nova:trash_can",
+  "shape": [
+    "ipi",
+    "i i",
+    "iii"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    }
+  ]
+}
