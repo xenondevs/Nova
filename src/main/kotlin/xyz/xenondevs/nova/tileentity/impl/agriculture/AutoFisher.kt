@@ -72,7 +72,7 @@ class AutoFisher(
     private val waterBlock = location.clone().subtract(0.0, 1.0, 0.0).block
     private val random = Random(uuid.mostSignificantBits xor System.currentTimeMillis())
     private val level = world.serverLevel
-    private val position = Vec3(location.x, location.y, location.z)
+    private val position = Vec3(armorStand.location.x, location.y - 0.5, armorStand.location.z)
     private val itemDropLocation = location.clone().add(0.0, 1.0, 0.0)
     private val fakePlayer = EntityUtils.createFakePlayer(location, ownerUUID.salt(uuid.toString()), "AutoFisher")
     
