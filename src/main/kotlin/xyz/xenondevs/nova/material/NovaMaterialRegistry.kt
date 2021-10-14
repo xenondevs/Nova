@@ -75,7 +75,7 @@ object NovaMaterialRegistry {
     val AUTO_FISHER = registerEnergyTileEntity("AUTO_FISHER", 25, ::AutoFisher, COBBLESTONE)
     val LIGHTNING_EXCHANGER = registerEnergyTileEntity("LIGHTNING_EXCHANGER", 26, ::LightningExchanger, BARRIER)
     val TREE_FACTORY = registerEnergyTileEntity("TREE_FACTORY", 27, ::TreeFactory, BARRIER)
-    val TRASH_CAN = registerDefaultTileEntity("TRASH_CAN", 28, ::TrashCan, FLOWER_POT)
+    val TRASH_CAN = registerDefaultTileEntity("TRASH_CAN", 28, ::TrashCan, BARRIER)
     
     // 1000 - 2000: Crafting Items
     // Plates
