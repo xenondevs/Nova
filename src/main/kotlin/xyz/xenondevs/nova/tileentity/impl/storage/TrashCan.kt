@@ -27,7 +27,11 @@ class TrashCan(
     
     private val inventory = VoidingVirtualInventory(1)
     override val gui: Lazy<TileEntityGUI> = lazy(::TrashCanGUI)
-    override val itemHolder = NovaItemHolder(this, inventory, lazyDefaultTypeConfig = { CUBE_FACES.associateWithToEnumMap { ItemConnectionType.INSERT } })
+    override val itemHolder = NovaItemHolder(
+        this,
+        inventory to ItemConnectionType.INSERT,
+        lazyDefaultTypeConfig = { CUBE_FACES.associateWithToEnumMap { ItemConnectionType.INSERT } }
+    )
     
     override fun handleTick() = Unit
     
@@ -36,7 +40,7 @@ class TrashCan(
         private val sideConfigGUI = SideConfigGUI(
             this@TrashCan,
             null,
-            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.input", ItemConnectionType.INSERT_TYPES)),
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.input"),
             ::openWindow
         )
         

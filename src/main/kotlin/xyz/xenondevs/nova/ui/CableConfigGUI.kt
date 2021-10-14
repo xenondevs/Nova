@@ -40,6 +40,9 @@ class CableConfigGUI(
     private val insertFilterInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1))
     private val extractFilterInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1))
     
+    private var allowsExtract = false
+    private var allowsInsert = false
+    
     private var insertPriority = -1
     private var extractPriority = -1
     private var insertState = false
@@ -72,6 +75,10 @@ class CableConfigGUI(
     
     fun updateValues(updateButtons: Boolean = true) {
         NetworkManager.LOCK.lockAndRun {
+            val allowedConnections = itemHolder.allowedConnectionTypes[itemHolder.inventories[face]]!!
+            allowsExtract = allowedConnections.extract
+            allowsInsert = allowedConnections.insert
+            
             insertPriority = itemHolder.insertPriorities[face]!!
             extractPriority = itemHolder.extractPriorities[face]!!
             insertState = itemHolder.itemConfig[face]!!.insert
@@ -125,6 +132,8 @@ class CableConfigGUI(
                 .createBasicItemBuilder().setLocalizedName("menu.nova.cable_config.insert")
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            if (!allowsInsert) return
+            
             insertState = !insertState
             notifyWindows()
             player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
@@ -139,6 +148,8 @@ class CableConfigGUI(
                 .createBasicItemBuilder().setLocalizedName("menu.nova.cable_config.extract")
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            if (!allowsExtract) return
+            
             extractState = !extractState
             notifyWindows()
             player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

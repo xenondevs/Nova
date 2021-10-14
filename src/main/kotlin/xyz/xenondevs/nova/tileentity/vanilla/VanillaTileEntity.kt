@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
 import org.bukkit.block.*
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement

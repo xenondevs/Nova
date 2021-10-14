@@ -17,6 +17,10 @@ abstract class VanillaItemHolder(
     override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
         endPoint.retrieveDoubleEnumMap("itemConfig") { CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.BUFFER } }
     
+    override val allowedConnectionTypes: Map<NetworkedInventory, ItemConnectionType> by lazy {
+        inventories.entries.associate { (_, inv) -> inv to ItemConnectionType.BUFFER }
+    }
+    
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
         endPoint.retrieveEnumMap<BlockFace, CompoundElement>("insertFilters") { emptyEnumMap() }
             .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }

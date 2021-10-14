@@ -64,7 +64,7 @@ class AutoFisher(
     override val gui = lazy(::AutoFisherGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM) }
-    override val itemHolder = NovaItemHolder(this, inventory, fishingRodInventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.EXTRACT, fishingRodInventory to ItemConnectionType.BUFFER)
     
     private var timePassed = 0
     private var maxIdleTime = 0
@@ -155,8 +155,8 @@ class AutoFisher(
             this@AutoFisher,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES),
-                Triple(itemHolder.getNetworkedInventory(fishingRodInventory), "inventory.nova.fishing_rod", ItemConnectionType.ALL_TYPES)
+                itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default",
+                itemHolder.getNetworkedInventory(fishingRodInventory) to "inventory.nova.fishing_rod"
             )
         ) { openWindow(it) }
         

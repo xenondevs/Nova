@@ -68,7 +68,7 @@ class Fertilizer(
     override val gui = lazy(::FertilizerGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_FERTILIZE, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, fertilizerInventory)
+    override val itemHolder = NovaItemHolder(this, fertilizerInventory to ItemConnectionType.BUFFER)
     
     private var maxIdleTime = 0
     private var timePassed = 0
@@ -160,9 +160,7 @@ class Fertilizer(
         private val sideConfigGUI = SideConfigGUI(
             this@Fertilizer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(
-                Triple(itemHolder.getNetworkedInventory(fertilizerInventory), "inventory.nova.fertilizer", ItemConnectionType.ALL_TYPES)
-            ),
+            listOf(itemHolder.getNetworkedInventory(fertilizerInventory) to "inventory.nova.fertilizer")
         ) { openWindow(it) }
         
         private val rangeItems = ArrayList<Item>()

@@ -19,7 +19,7 @@ object ItemManager : Listener {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     fun handleInteract(event: PlayerInteractEvent) {
         if (event.isCompletelyDenied()) return
         event.item?.novaMaterial?.novaItem?.handleInteract(event.player, event.item!!, event.action, event)

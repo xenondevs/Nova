@@ -71,7 +71,7 @@ class TreeFactory(
     
     override val gui: Lazy<TileEntityGUI> = lazy(::TreeFactoryGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradesUpdate, allowed = UpgradeType.ALL_ENERGY)
-    override val itemHolder = NovaItemHolder(this, outputInventory, inputInventory)
+    override val itemHolder = NovaItemHolder(this, outputInventory to ItemConnectionType.EXTRACT, inputInventory to ItemConnectionType.BUFFER)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) {
         createExclusiveEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM, BlockSide.BACK)
     }
@@ -165,8 +165,8 @@ class TreeFactory(
             this@TreeFactory,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
-                Triple(itemHolder.getNetworkedInventory(inputInventory), "inventory.nova.input", ItemConnectionType.ALL_TYPES),
-                Triple(itemHolder.getNetworkedInventory(outputInventory), "inventory.nova.output", ItemConnectionType.EXTRACT_TYPES)
+                itemHolder.getNetworkedInventory(inputInventory) to "inventory.nova.input",
+                itemHolder.getNetworkedInventory(outputInventory) to "inventory.nova.output"
             )
         ) { openWindow(it) }
         

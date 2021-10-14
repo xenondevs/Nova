@@ -1,17 +1,18 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.block.BlockFace
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
-import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.actualDelegate
-import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
@@ -46,6 +47,23 @@ abstract class NetworkedTileEntity(
     
     override fun handleInitialized(first: Boolean) {
         runAsyncTask { NetworkManager.handleEndPointAdd(this) }
+    }
+    
+    final override fun handleRightClick(event: PlayerInteractEvent) {
+        if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH }) {
+            event.isCancelled = true
+            val face = event.blockFace
+            
+            runAsyncTaskWithLock(NetworkManager.LOCK) {
+                val itemHolder = holders[NetworkType.ITEMS]
+                if (itemHolder is ItemHolder) 
+                    itemHolder.cycleItemConfig(face, true)
+            }
+        } else handleRightClickNoWrench(event)
+    }
+    
+    open fun handleRightClickNoWrench(event: PlayerInteractEvent) {
+        super.handleRightClick(event)
     }
     
     override fun handleRemoved(unload: Boolean) {

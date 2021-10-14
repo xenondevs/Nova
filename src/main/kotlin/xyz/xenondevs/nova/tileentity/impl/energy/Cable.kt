@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
 import com.google.common.base.Preconditions
-import net.minecraft.commands.arguments.coordinates.RotationArgument.getRotation
 import org.bukkit.Axis
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -13,6 +12,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.Model
@@ -194,7 +194,7 @@ open class Cable(
             
             hitboxes += Hitbox(
                 from, to,
-                { it.action.isRightClick() && it.hasItem() && it.item!!.novaMaterial == NovaMaterialRegistry.WRENCH },
+                { it.action.isRightClick() && it.handItems.any { item -> item.novaMaterial == NovaMaterialRegistry.WRENCH } },
                 { handleCableWrenchHit(it, blockFace) }
             )
         }
@@ -228,7 +228,11 @@ open class Cable(
                 val from = location.clone().add(sortedPoints.first.x, sortedPoints.first.y, sortedPoints.first.z)
                 val to = location.clone().add(sortedPoints.second.x, sortedPoints.second.y, sortedPoints.second.z)
                 
-                hitboxes += Hitbox(from, to) { handleAttachmentHit(it, blockFace, neighborEndPoints[blockFace]!!) }
+                hitboxes += Hitbox(
+                    from, to,
+                    { ProtectionManager.canUse(it.player, location) },
+                    { handleAttachmentHit(it, blockFace, neighborEndPoints[blockFace]!!) }
+                )
             }
     }
     
@@ -266,15 +270,17 @@ open class Cable(
         val player = event.player
         if (player.isSneaking) {
             Bukkit.getPluginManager().callEvent(BlockBreakEvent(location.block, player))
-        } else {
-            if (connectedNodes.values.any { it.containsKey(face) }) {
-                NetworkManager.handleBridgeRemove(this, false)
-                bridgeFaces.remove(face)
-                NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
-            } else if (!bridgeFaces.contains(face)) {
-                NetworkManager.handleBridgeRemove(this, false)
-                bridgeFaces.add(face)
-                NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+        } else if (ProtectionManager.canUse(player, location)) {
+            runAsyncTaskWithLock(NetworkManager.LOCK) {
+                if (connectedNodes.values.any { it.containsKey(face) }) {
+                    NetworkManager.handleBridgeRemove(this, false)
+                    bridgeFaces.remove(face)
+                    NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+                } else if (!bridgeFaces.contains(face)) {
+                    NetworkManager.handleBridgeRemove(this, false)
+                    bridgeFaces.add(face)
+                    NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+                }
             }
         }
     }

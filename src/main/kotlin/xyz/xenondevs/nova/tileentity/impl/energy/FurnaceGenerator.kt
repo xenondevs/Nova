@@ -50,7 +50,7 @@ class FurnaceGenerator(
     private val inventory = getInventory("fuel", 1, ::handleInventoryUpdate)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = ACCEPTED_UPGRADE_TYPES)
     override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, upgradeHolder) { createEnergySideConfig(PROVIDE, FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
     
     private var burnTimeMultiplier = BURN_TIME_MULTIPLIER
     private var burnTime: Int = retrieveData("burnTime") { 0 }
@@ -149,7 +149,7 @@ class FurnaceGenerator(
         private val sideConfigGUI = SideConfigGUI(
             this@FurnaceGenerator,
             listOf(NONE, PROVIDE),
-            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.fuel", ItemConnectionType.ALL_TYPES))
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.fuel")
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)

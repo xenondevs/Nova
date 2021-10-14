@@ -63,7 +63,7 @@ class MobDuplicator(
     override val gui = lazy { MobDuplicatorGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_TICK_NBT, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.TOP) }
-    override val itemHolder = NovaItemHolder(this, inventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
     private val energyPerTick: Int
         get() = if (keepNbt) energyHolder.specialEnergyConsumption else energyHolder.energyConsumption
     private val totalIdleTime: Int
@@ -136,7 +136,7 @@ class MobDuplicator(
         private val sideConfigGUI = SideConfigGUI(
             this@MobDuplicator,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default")
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)

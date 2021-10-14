@@ -140,11 +140,15 @@ abstract class TileEntity(
     
     /**
      * Called when a player right-clicks the TileEntity.
-     * The event has should probably be cancelled if any action
+     * 
+     * Only called once and always for the main hand.
+     * Use [PlayerInteractEvent.handItems] to check both items.
+     * 
+     * The event has should be cancelled if any action
      * is performed in that method.
      */
     open fun handleRightClick(event: PlayerInteractEvent) {
-        if (gui != null) {
+        if (gui != null && !event.player.hasInventoryOpen) {
             event.isCancelled = true
             gui!!.value.openWindow(event.player)
         }

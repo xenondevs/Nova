@@ -11,15 +11,16 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.chunkPos
-import xyz.xenondevs.nova.util.runAsyncTaskTimer
-import xyz.xenondevs.nova.util.runTaskLater
-import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
 import xyz.xenondevs.nova.world.armorstand.pos
 import java.util.*
@@ -83,6 +84,25 @@ object VanillaTileEntityManager : Listener {
             is Container -> VanillaContainerTileEntity(state)
             else -> null
         }
+    
+    @Synchronized
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun handleInteract(event: PlayerInteractEvent) {
+        val player = event.player
+        val tileEntity = event.clickedBlock?.location?.let(::getTileEntityAt)
+        if (
+            tileEntity is ItemStorageVanillaTileEntity
+            && !player.isSneaking
+            && event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH }
+            && ProtectionManager.canUse(player, tileEntity.location)
+        ) {
+            event.isCancelled = true
+            val face = event.blockFace
+            runAsyncTaskWithLock(NetworkManager.LOCK) {
+                tileEntity.itemHolder.cycleItemConfig(face, true)
+            }
+        }
+    }
     
     @Synchronized
     private fun handleChunkLoad(chunk: Chunk) {

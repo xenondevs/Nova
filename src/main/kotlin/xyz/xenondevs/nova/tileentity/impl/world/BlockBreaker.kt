@@ -46,7 +46,7 @@ class BlockBreaker(
     override val gui = lazy { BlockBreakerGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.EXTRACT)
     
     private val entityId = uuid.hashCode()
     private val block = location.clone().advance(getFace(BlockSide.FRONT)).block
@@ -106,7 +106,7 @@ class BlockBreaker(
         private val sideConfigGUI = SideConfigGUI(
             this@BlockBreaker,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.EXTRACT_TYPES))
+            listOf(Pair(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default"))
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)

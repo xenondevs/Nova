@@ -36,11 +36,11 @@ val BUTTON_COLORS = listOf(
 
 class ItemSideConfigGUI(
     val itemHolder: ItemHolder,
-    inventories: List<Triple<NetworkedInventory, String, List<ItemConnectionType>>>
+    inventories: List<Pair<NetworkedInventory, String>>
 ) : SimpleGUI(8, 3) {
     
     private val inventories = inventories.map { it.first }
-    private val allowedTypes = inventories.associate { it.first to it.third }
+    private val allowedTypes = itemHolder.allowedConnectionTypes.mapValues { (_, type) -> type.included }
     private val buttonBuilders = inventories.withIndex().associate { (index, triple) ->
         triple.first to BUTTON_COLORS[index]
             .createBasicItemBuilder()

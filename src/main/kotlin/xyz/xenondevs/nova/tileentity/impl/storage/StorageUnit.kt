@@ -37,7 +37,7 @@ class StorageUnit(
     
     override val gui = lazy { ItemStorageGUI() }
     private val inventory = StorageUnitInventory(retrieveOrNull("type"), retrieveOrNull("amount") ?: 0)
-    override val itemHolder = NovaItemHolder(this, uuid to inventory)
+    override val itemHolder = NovaItemHolder(this, uuid to (inventory to ItemConnectionType.BUFFER))
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
     private val outputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleOutputInventoryUpdate) }
     
@@ -86,7 +86,7 @@ class StorageUnit(
         private val sideConfigGUI = SideConfigGUI(
             this@StorageUnit,
             null,
-            listOf(Triple(inventory, "inventory.nova.default", ItemConnectionType.ALL_TYPES)),
+            listOf(inventory to "inventory.nova.default"),
             ::openWindow
         )
         

@@ -14,42 +14,55 @@ import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
 import java.util.*
 
+fun NovaItemHolder(
+    endPoint: NetworkedTileEntity,
+    defaultInventory: Pair<VirtualInventory, ItemConnectionType>,
+    vararg otherInventories: Pair<VirtualInventory, ItemConnectionType>,
+    lazyDefaultInvConfig: (() -> MutableMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first.uuid } },
+    lazyDefaultTypeConfig: (() -> MutableMap<BlockFace, ItemConnectionType>)? = null
+): NovaItemHolder {
+    val virtualInventories = arrayListOf(defaultInventory).apply { addAll(otherInventories) }
+    val networkedInventories: Map<VirtualInventory, NetworkedInventory> = virtualInventories.associate { (vi, _) -> vi to NetworkedVirtualInventory(vi) }
+    val availableInventories: MutableMap<UUID, NetworkedInventory> = virtualInventories.associateTo(HashMap()) { (vi, _) -> vi.uuid to networkedInventories[vi]!! }
+    val allowedConnectionTypes: Map<NetworkedInventory, ItemConnectionType> = virtualInventories.associate { (vi, pc) -> networkedInventories[vi]!! to pc }
+    
+    return NovaItemHolder(
+        endPoint,
+        availableInventories,
+        allowedConnectionTypes,
+        lazyDefaultInvConfig,
+        lazyDefaultTypeConfig
+    )
+}
+
+@JvmName("NovaItemHolder1")
+fun NovaItemHolder(
+    endPoint: NetworkedTileEntity,
+    defaultInventory: Pair<UUID, Pair<NetworkedInventory, ItemConnectionType>>,
+    vararg otherInventories: Pair<UUID, Pair<NetworkedInventory, ItemConnectionType>>,
+    lazyDefaultInvConfig: (() -> MutableMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first } },
+    lazyDefaultTypeConfig: (() -> MutableMap<BlockFace, ItemConnectionType>)? = null
+): NovaItemHolder {
+    val allInventories = hashMapOf(defaultInventory).apply { putAll(otherInventories) }
+    val networkedInventories = allInventories.mapValuesTo(HashMap()) { (_, pair) -> pair.first }
+    val allowedConnectionTypes = allInventories.entries.associate { (_, pair) -> pair }
+    
+    return NovaItemHolder(
+        endPoint,
+        networkedInventories,
+        allowedConnectionTypes,
+        lazyDefaultInvConfig,
+        lazyDefaultTypeConfig
+    )
+}
+
 class NovaItemHolder(
     override val endPoint: NetworkedTileEntity,
     private val availableInventories: MutableMap<UUID, out NetworkedInventory>,
+    override val allowedConnectionTypes: Map<NetworkedInventory, ItemConnectionType>,
     lazyDefaultInvConfig: () -> MutableMap<BlockFace, UUID>,
     lazyDefaultTypeConfig: (() -> MutableMap<BlockFace, ItemConnectionType>)?
 ) : ItemHolder {
-    
-    constructor(
-        endPoint: NetworkedTileEntity,
-        defaultInventory: VirtualInventory,
-        vararg otherInventories: VirtualInventory,
-        lazyDefaultInvConfig: (() -> MutableMap<BlockFace, UUID>)? = null,
-        lazyDefaultTypeConfig: (() -> MutableMap<BlockFace, ItemConnectionType>)? = null
-    ) : this(
-        endPoint,
-        hashMapOf<UUID, NetworkedInventory>(
-            defaultInventory.uuid to NetworkedVirtualInventory(defaultInventory)
-        ).also { otherInventories.forEach { inventory -> it[inventory.uuid] = NetworkedVirtualInventory(inventory) } },
-        lazyDefaultInvConfig ?: { CUBE_FACES.associateWithToEnumMap { defaultInventory.uuid } },
-        lazyDefaultTypeConfig
-    )
-    
-    constructor(
-        endPoint: NetworkedTileEntity,
-        defaultInventory: Pair<UUID, NetworkedInventory>,
-        vararg otherInventories: Pair<UUID, NetworkedInventory>,
-        lazyDefaultInvConfig: (() -> MutableMap<BlockFace, UUID>)? = null,
-        lazyDefaultTypeConfig: (() -> MutableMap<BlockFace, ItemConnectionType>)? = null
-    ) : this(
-        endPoint,
-        hashMapOf<UUID, NetworkedInventory>(
-            defaultInventory.first to defaultInventory.second
-        ).also { otherInventories.forEach { pair -> it[pair.first] = pair.second } },
-        lazyDefaultInvConfig ?: { CUBE_FACES.associateWithToEnumMap { defaultInventory.first } },
-        lazyDefaultTypeConfig
-    )
     
     override val inventories: MutableMap<BlockFace, NetworkedInventory> =
         (endPoint.retrieveEnumMapOrNull("inventories") ?: lazyDefaultInvConfig())

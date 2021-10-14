@@ -48,13 +48,17 @@ class VacuumChest(
     armorStand: FakeArmorStand,
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    private val inventory: VirtualInventory
-    private val filterInventory: VirtualInventory
-    override val itemHolder: NovaItemHolder
+    private val inventory: VirtualInventory = getInventory("inventory", 9) {}
+    private val filterInventory: VirtualInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1)).apply {
+        setItemUpdateHandler(::handleFilterInventoryUpdate)
+    }
+    override val itemHolder: NovaItemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
     
     override val gui = lazy { VacuumChestGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)
-    private var filter: ItemFilter? = retrieveOrNull<CompoundElement>("itemFilter")?.let { ItemFilter(it) }
+    private var filter: ItemFilter? = retrieveOrNull<CompoundElement>("itemFilter")
+        ?.let { ItemFilter(it) }
+        ?.also { filterInventory.setItemStack(SELF_UPDATE_REASON, 0, it.createFilterItem()) }
     private val items = ArrayList<Item>()
     
     private lateinit var region: Region
@@ -71,13 +75,6 @@ class VacuumChest(
     
     init {
         updateRegion()
-        
-        inventory = getInventory("inventory", 9) {}
-        itemHolder = NovaItemHolder(this, inventory)
-        
-        filterInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1))
-        filterInventory.setItemUpdateHandler(::handleFilterInventoryUpdate)
-        filter?.also { filterInventory.setItemStack(SELF_UPDATE_REASON, 0, it.createFilterItem()) }
     }
     
     override fun saveData() {
@@ -141,9 +138,7 @@ class VacuumChest(
         private val sideConfigGUI = SideConfigGUI(
             this@VacuumChest,
             null,
-            listOf(
-                Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES)
-            ),
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default")
         ) { openWindow(it) }
         
         private val rangeItems = ArrayList<UIItem>()

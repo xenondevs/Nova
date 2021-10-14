@@ -41,7 +41,7 @@ class BlockPlacer(
     override val gui = lazy { BlockPlacerGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_PLACE, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory)
+    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.EXTRACT)
     
     private val placeLocation = location.clone().advance(getFace(BlockSide.FRONT))
     private val placeBlock = location.clone().advance(getFace(BlockSide.FRONT)).block
@@ -93,7 +93,7 @@ class BlockPlacer(
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-            listOf(Triple(itemHolder.getNetworkedInventory(inventory), "inventory.nova.default", ItemConnectionType.ALL_TYPES))
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default")
         ) { openWindow(it) }
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
