@@ -198,7 +198,7 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (energyHolder.energy != 0) return
+        if (energyHolder.energy == 0) return
         
         if (!done) {
             if (!drilling) {
