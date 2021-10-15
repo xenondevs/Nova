@@ -152,7 +152,7 @@ object TileEntityManager : Listener {
         tileEntityMap[chunkPos]?.remove(location)
         locationCache -= location
         tileEntity.additionalHitboxes.forEach {
-            tileEntityMap[it.chunkPos]?.remove(it)
+            additionalHitboxMap[it.chunkPos]?.remove(it)
             locationCache -= it
         }
         
