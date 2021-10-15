@@ -1,17 +1,17 @@
 {
   "result": "nova:scaffolding",
   "shape": [
-    "bbb",
-    "iyi",
-    "bbb"
+    "ppp",
+    "byb",
+    "ppp"
   ],
   "ingredients": [
     {
-      "char": "b",
-      "item": "minecraft:iron_block"
+      "char": "p",
+      "item": "nova:iron_plate"
     },
     {
-      "char": "i",
+      "char": "b",
       "item": "minecraft:iron_bars"
     },
     {
