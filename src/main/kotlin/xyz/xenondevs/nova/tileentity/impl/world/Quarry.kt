@@ -198,7 +198,7 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (energyHolder.energy < energyPerTick) return
+        if (energyHolder.energy != 0) return
         
         if (!done) {
             if (!drilling) {
@@ -220,7 +220,7 @@ class Quarry(
     }
     
     override fun handleAsyncTick() {
-        if (!done && energyHolder.energy > energyPerTick)
+        if (!done && energyHolder.energy != 0)
             updatePointer()
     }
     
