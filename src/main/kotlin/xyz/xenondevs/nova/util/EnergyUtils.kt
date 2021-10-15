@@ -26,7 +26,7 @@ object EnergyUtils {
         val resultNumber = closest.first.setScale(2, RoundingMode.HALF_UP)
             .let { if (prefix == MetricPrefix.NONE) it.stripTrailingZeros() else it }
             .toPlainString()
-        return "$resultNumber ${prefix.prefixSymbol}"
+        return "$resultNumber ${prefix.prefixSymbol}J"
     }
     
     fun getEnergyString(energy: Int, maxEnergy: Int): String {
