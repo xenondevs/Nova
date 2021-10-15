@@ -291,45 +291,59 @@ object TileEntityManager : Listener {
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handlePlace(event: BlockPlaceEvent) {
-        val location = event.blockPlaced.location
+        val player = event.player
+        val block = event.blockPlaced
+        val location = block.location
         
-        if (getTileEntityAt(location) == null) {
-            val player = event.player
-            val placedItem = event.itemInHand
-            val material = placedItem.novaMaterial
+        if (getTileEntityAt(location) != null) {
+            event.isCancelled = true
+            val targetLocation = player.eyeLocation.getTargetLocation(0.25, 0.4)
+            val otherBlock = location.advance(BlockFaceUtils.determineBlockFace(block, targetLocation)).block
+            if (otherBlock.type.isAir) {
+                val replacedState = otherBlock.state
+                otherBlock.type = block.type
+                val placeEvent = BlockPlaceEvent(otherBlock, replacedState, block, event.itemInHand, player, event.canBuild(), event.hand)
+                Bukkit.getPluginManager().callEvent(placeEvent)
+                if (placeEvent.isCancelled) otherBlock.type = Material.AIR
+            }
             
-            if (material != null) {
-                event.isCancelled = true
+            return
+        }
+        
+        val placedItem = event.itemInHand
+        val material = placedItem.novaMaterial
+        
+        if (material != null) {
+            event.isCancelled = true
+            
+            if (material.isBlock) {
+                val playerLocation = player.location
                 
-                if (material.isBlock) {
-                    val playerLocation = player.location
-                    
-                    if (material.placeCheck?.invoke(
-                            player,
-                            location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
-                        ) != false
-                    ) {
-                        val uuid = player.uniqueId
-                        val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
-                        if (result == PlaceResult.ALLOW) {
-                            placeTileEntity(
-                                uuid,
-                                event.block.location,
-                                playerLocation.yaw,
-                                material,
-                                placedItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
-                            )
-                            
-                            if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
-                        } else {
-                            player.spigot().sendMessage(
-                                localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
-                            )
-                        }
+                if (material.placeCheck?.invoke(
+                        player,
+                        location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
+                    ) != false
+                ) {
+                    val uuid = player.uniqueId
+                    val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
+                    if (result == PlaceResult.ALLOW) {
+                        placeTileEntity(
+                            uuid,
+                            event.block.location,
+                            playerLocation.yaw,
+                            material,
+                            placedItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
+                        )
+                        
+                        if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
+                    } else {
+                        player.spigot().sendMessage(
+                            localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
+                        )
                     }
                 }
             }
-        } else event.isCancelled = true
+        }
     }
     
     @Synchronized

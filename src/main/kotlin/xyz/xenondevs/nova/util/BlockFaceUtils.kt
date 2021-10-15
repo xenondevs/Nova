@@ -2,8 +2,10 @@ package xyz.xenondevs.nova.util
 
 import org.bukkit.Axis
 import org.bukkit.Location
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 enum class BlockSide(private val rotation: Int, private val blockFace: BlockFace) {
@@ -66,3 +68,27 @@ val Location.facing: BlockFace
             else -> SOUTH
         }
     }
+
+fun Axis.toBlockFace(positive: Boolean): BlockFace =
+    when (this) {
+        Axis.X -> if (positive) EAST else WEST
+        Axis.Y -> if (positive) UP else DOWN
+        Axis.Z -> if (positive) SOUTH else NORTH
+    }
+
+object BlockFaceUtils {
+    
+    fun determineBlockFace(block: Block, location: Location): BlockFace {
+        val blockMiddle = block.location.add(0.5, 0.5, 0.5)
+        val diff = location.clone().subtract(blockMiddle)
+        
+        val result = listOf(
+            Axis.X to diff.x,
+            Axis.Z to diff.z,
+            Axis.Y to diff.y
+        ).sortedByDescending { it.second.absoluteValue }[0]
+        
+        return result.first.toBlockFace(result.second >= 0)
+    }
+    
+}
