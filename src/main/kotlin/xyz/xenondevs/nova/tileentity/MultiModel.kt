@@ -8,8 +8,8 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 
 class MultiModel {
     
-    private val currentModels = HashMap<FakeArmorStand, Model>()
-    private var chunksInvalid = false
+    val currentModels = HashMap<FakeArmorStand, Model>()
+    private var closed = false
     
     @Synchronized
     fun removeDuplicates() {
@@ -37,7 +37,7 @@ class MultiModel {
     
     @Synchronized
     fun addModels(models: Iterable<Model>): List<FakeArmorStand> {
-        chunksInvalid = true
+        if (closed) throw UnsupportedOperationException("MultiModel is closed")
         
         return models.map { model ->
             val location = model.location
@@ -67,6 +67,12 @@ class MultiModel {
     fun removeAllModels() {
         currentModels.forEach { it.key.remove() }
         currentModels.clear()
+    }
+    
+    @Synchronized
+    fun close() {
+        removeAllModels()
+        closed = true
     }
     
     @Synchronized

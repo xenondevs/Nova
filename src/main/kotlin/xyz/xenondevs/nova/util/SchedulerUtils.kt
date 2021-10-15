@@ -18,6 +18,9 @@ fun runAsyncTask(run: () -> Unit) =
 fun runAsyncTaskSynchronized(lock: Any, run: () -> Unit) =
     Bukkit.getScheduler().runTaskAsynchronously(NOVA, Runnable { synchronized(lock, run) })
 
+fun runAsyncTaskTimerSynchronized(lock: Any, delay: Long, period: Long, run: () -> Unit) =
+    Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA, Runnable { synchronized(lock, run) }, delay, period)
+
 fun runAsyncTaskWithLock(lock: ObservableLock, run: () -> Unit) =
     Bukkit.getScheduler().runTaskAsynchronously(NOVA, Runnable { lock.lockAndRun(run) })
 

@@ -128,6 +128,8 @@ class Quarry(
         
         pointerLocation = retrieveOrNull("pointerLocation") ?: Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
         lastPointerLocation = retrieveOrNull("lastPointerLocation") ?: Location(world, 0.0, 0.0, 0.0)
+        
+        createScaffolding()
     }
     
     private fun handleUpgradeUpdates() {
@@ -183,11 +185,6 @@ class Quarry(
             * upgradeHolder.getSpeedModifier() / upgradeHolder.getEfficiencyModifier()).toInt()
     }
     
-    override fun handleInitialized(first: Boolean) {
-        super.handleInitialized(first)
-        createScaffolding()
-    }
-    
     override fun saveData() {
         super.saveData()
         storeData("sizeX", sizeX)
@@ -201,7 +198,7 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (energyHolder.energy == 0) return
+        if (energyHolder.energy < energyPerTick) return
         
         if (!done) {
             if (!drilling) {
@@ -220,6 +217,11 @@ class Quarry(
             energyHolder.energy -= energyPerTick
         }
         
+    }
+    
+    override fun handleAsyncTick() {
+        if (!done && energyHolder.energy > energyPerTick)
+            updatePointer()
     }
     
     private fun moveToPointer(pointerDestination: Location) {
@@ -245,8 +247,6 @@ class Quarry(
         }
         
         pointerLocation.add(moveX, moveY, moveZ)
-        
-        updatePointer()
     }
     
     private fun drill() {
@@ -273,41 +273,39 @@ class Quarry(
             drillProgress = 0.0
             drilling = false
         }
-        
-        updatePointer()
     }
     
     private fun updatePointer(force: Boolean = false) {
-        runAsyncTask {
-            if (force || lastPointerLocation.z != pointerLocation.z)
-                armX.useArmorStands { it.teleport { z = pointerLocation.z } }
-            if (force || lastPointerLocation.x != pointerLocation.x)
-                armZ.useArmorStands { it.teleport { x = pointerLocation.x } }
-            if (force || lastPointerLocation.x != pointerLocation.x || lastPointerLocation.z != pointerLocation.z)
-                armY.useArmorStands { it.teleport { x = pointerLocation.x; z = pointerLocation.z } }
-            if (force || lastPointerLocation.y != pointerLocation.y) updateVerticalArmModels()
-            
-            drill.useArmorStands {
+        val pointerLocation = pointerLocation.clone()
+        
+        if (force || lastPointerLocation.z != pointerLocation.z)
+            armX.useArmorStands { it.teleport { z = pointerLocation.z } }
+        if (force || lastPointerLocation.x != pointerLocation.x)
+            armZ.useArmorStands { it.teleport { x = pointerLocation.x } }
+        if (force || lastPointerLocation.x != pointerLocation.x || lastPointerLocation.z != pointerLocation.z)
+            armY.useArmorStands { it.teleport { x = pointerLocation.x; z = pointerLocation.z } }
+        
+        if (force || lastPointerLocation.y != pointerLocation.y) {
+            for (y in y - 1 downTo pointerLocation.blockY + 1) {
                 val location = pointerLocation.clone()
-                location.yaw = it.location.yaw.mod(360f)
-                if (drilling) location.yaw += 25f * (2 - drillProgress.toFloat())
-                else location.yaw += 10f
-                it.teleport(location)
+                location.y = y.toDouble()
+                if (!armY.hasModelLocation(location)) armY.addModels(Model(FULL_SLIM_VERTICAL, location))
             }
-            
-            lastPointerLocation = pointerLocation.clone()
+            armY.removeIf { armorStand, _ -> armorStand.location.blockY - 1 < pointerLocation.blockY }
         }
-    }
-    
-    private fun updateVerticalArmModels() {
-        for (y in y - 1 downTo pointerLocation.blockY + 1) {
+        
+        drill.useArmorStands {
             val location = pointerLocation.clone()
-            location.y = y.toDouble()
-            if (!armY.hasModelLocation(location)) armY.addModels(Model(FULL_SLIM_VERTICAL, location))
+            location.yaw = it.location.yaw.mod(360f)
+            if (drilling) location.yaw += 25f * (2 - drillProgress.toFloat())
+            else location.yaw += 10f
+            it.teleport(location)
         }
-        armY.removeIf { armorStand, _ -> armorStand.location.blockY - 1 < pointerLocation.blockY }
+        
+        lastPointerLocation = pointerLocation
     }
     
+    // TODO: optimize
     private fun selectNextDestination(): Location? {
         val destination = LocationUtils.getTopBlocksBetween(
             world,
@@ -361,10 +359,8 @@ class Quarry(
             createScaffoldingCorners()
             createScaffoldingPillars()
             createScaffoldingArms()
-            
             drill.addModels(Model(DRILL, pointerLocation))
-            
-            runTaskLater(1) { updatePointer(true) }
+            updatePointer(true)
         }
     }
     

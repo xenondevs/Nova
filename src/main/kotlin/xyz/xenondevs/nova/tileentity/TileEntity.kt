@@ -105,7 +105,12 @@ abstract class TileEntity(
     /**
      * Called every tick for every TileEntity that is in a loaded chunk.
      */
-    abstract fun handleTick()
+    open fun handleTick() = Unit
+    
+    /**
+     * Called asynchronously for every tick that this TileEntity is in a loaded chunk.
+     */
+    open fun handleAsyncTick() = Unit
     
     /**
      * Called after the TileEntity has been initialized and added to the
@@ -134,7 +139,7 @@ abstract class TileEntity(
         if (gui?.isInitialized() == true) gui!!.value.closeWindows()
         
         armorStand.remove()
-        multiModels.forEach { it.removeAllModels() }
+        multiModels.forEach { it.close() }
         particleTasks.forEach { it.stop() }
     }
     
