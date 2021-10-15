@@ -8,9 +8,6 @@ import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.LinkedBlockingDeque
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.TimeUnit
 
 typealias NetworkManagerTask = (NetworkManager) -> Unit
 

@@ -27,7 +27,6 @@ import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.notifyWindows
 import xyz.xenondevs.nova.util.putOrRemove
-import java.lang.Exception
 
 class CableConfigGUI(
     val itemHolder: ItemHolder,

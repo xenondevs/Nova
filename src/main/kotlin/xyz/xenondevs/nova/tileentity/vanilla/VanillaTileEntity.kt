@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedRangedBukki
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
-import xyz.xenondevs.nova.util.runAsyncTask
 import java.util.*
 import kotlin.collections.set
 

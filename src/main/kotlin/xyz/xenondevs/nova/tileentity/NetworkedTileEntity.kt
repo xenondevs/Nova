@@ -11,7 +11,9 @@ import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.handItems
+import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.actualDelegate
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*

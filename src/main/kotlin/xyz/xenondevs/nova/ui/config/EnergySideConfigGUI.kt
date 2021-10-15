@@ -41,14 +41,14 @@ class EnergySideConfigGUI(
         // TODO: runSync / runAsync ?
         NetworkManager.runNow {
             it.handleEndPointRemove(energyHolder.endPoint, true)
-    
+            
             val currentType = energyHolder.energyConfig[blockFace]!!
             var index = allowedTypes.indexOf(currentType)
             if (forward) index++ else index--
             if (index < 0) index = allowedTypes.lastIndex
             else if (index == allowedTypes.size) index = 0
             energyHolder.energyConfig[blockFace] = allowedTypes[index]
-    
+            
             it.handleEndPointAdd(energyHolder.endPoint, false)
             energyHolder.endPoint.updateNearbyBridges()
         }

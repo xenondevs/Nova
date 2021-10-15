@@ -102,21 +102,21 @@ class ItemSideConfigGUI(
         
         NetworkManager.runNow { // TODO: runSync / runAsync ?
             it.handleEndPointRemove(itemHolder.endPoint, false)
-    
+            
             val currentInventory = itemHolder.inventories[blockFace]!!
             var index = inventories.indexOf(currentInventory)
             if (forward) index++ else index--
             if (index < 0) index = inventories.lastIndex
             else if (index == inventories.size) index = 0
-    
+            
             val newInventory = inventories[index]
             itemHolder.inventories[blockFace] = newInventory
-    
+            
             val allowedTypes = allowedTypes[newInventory]!!
             if (!allowedTypes.contains(itemHolder.itemConfig[blockFace]!!)) {
                 itemHolder.itemConfig[blockFace] = allowedTypes[0]
             }
-    
+            
             it.handleEndPointAdd(itemHolder.endPoint)
         }
         

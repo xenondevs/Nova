@@ -43,7 +43,7 @@ interface ItemHolder : EndPointDataHolder {
         else if (index < 0) index = allowedConfigs.lastIndex
         
         itemConfig[face] = allowedConfigs[index]
-    
+        
         manager.handleEndPointAdd(endPoint, false)
         endPoint.updateNearbyBridges()
     }

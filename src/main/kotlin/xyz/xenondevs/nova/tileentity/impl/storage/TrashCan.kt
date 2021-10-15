@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.impl.storage
 
 import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.SlotElement
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
