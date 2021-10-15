@@ -24,7 +24,7 @@ enum class MetricPrefix(exponent: Int, val prefixName: String, val prefixSymbol:
     PETA(15, "peta", "P"),
     EXA(18, "exa", "E"),
     ZETTA(21, "zetta", "Z"),
-    YOTTA(24, "yotta", "y");
+    YOTTA(24, "yotta", "Y");
     
     val number = BigDecimal("1E$exponent")
     
@@ -33,20 +33,13 @@ enum class MetricPrefix(exponent: Int, val prefixName: String, val prefixSymbol:
         // TODO: optimize
         fun findBestPrefix(number: BigDecimal, vararg ignoredPrefixes: MetricPrefix): Pair<BigDecimal, MetricPrefix> {
             val prefix = values()
+                .asSequence()
                 .filterNot { ignoredPrefixes.contains(it) }
                 .filter { number >= it.number }
                 .map { it to (number - it.number) }
                 .minByOrNull { it.second }?.first ?: NONE
             
-            return number.divide(prefix.number).stripTrailingZeros() to prefix
-        }
-        
-        fun getMetricString(number: BigDecimal, unit: String, short: Boolean, vararg ignoredPrefixes: MetricPrefix): String {
-            val closest = findBestPrefix(number, *ignoredPrefixes)
-            val resultNumber = closest.first.toPlainString()
-            val prefix = closest.second
-            val prefixString = if (short) prefix.prefixSymbol else prefix.prefixName
-            return "$resultNumber $prefixString$unit"
+            return number.divide(prefix.number) to prefix
         }
         
     }
