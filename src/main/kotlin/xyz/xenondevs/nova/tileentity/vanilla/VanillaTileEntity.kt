@@ -59,7 +59,7 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
         by lazy { enumMapOf(NetworkType.ITEMS to itemHolder) }
     
     override fun handleInitialized() {
-        runAsyncTask { NetworkManager.handleEndPointAdd(this) }
+        NetworkManager.runAsync { it.handleEndPointAdd(this) }
     }
     
     override fun handleRemoved(unload: Boolean) {
@@ -68,9 +68,8 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
             updateDataContainer()
         }
         
-        val task = { NetworkManager.handleEndPointRemove(this, unload) }
-        if (NOVA.isEnabled) runAsyncTask(task)
-        else task()
+        val task: NetworkManagerTask = { it.handleEndPointRemove(this, unload) }
+        if (NOVA.isEnabled) NetworkManager.runAsync(task) else NetworkManager.runNow(task)
     }
     
 }
@@ -104,9 +103,9 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     
     fun handleChestStateChange() {
         setInventories()
-        runAsyncTask {
-            NetworkManager.handleEndPointRemove(this, false)
-            NetworkManager.handleEndPointAdd(this)
+        NetworkManager.runAsync {
+            it.handleEndPointRemove(this, true)
+            it.handleEndPointAdd(this, false)
         }
     }
     

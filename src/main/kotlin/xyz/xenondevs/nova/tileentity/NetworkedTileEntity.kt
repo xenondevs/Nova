@@ -46,7 +46,7 @@ abstract class NetworkedTileEntity(
     }
     
     override fun handleInitialized(first: Boolean) {
-        runAsyncTask { NetworkManager.handleEndPointAdd(this) }
+        NetworkManager.runAsync { it.handleEndPointAdd(this) }
     }
     
     final override fun handleRightClick(event: PlayerInteractEvent) {
@@ -54,10 +54,10 @@ abstract class NetworkedTileEntity(
             event.isCancelled = true
             val face = event.blockFace
             
-            runAsyncTaskWithLock(NetworkManager.LOCK) {
+            NetworkManager.runAsync {
                 val itemHolder = holders[NetworkType.ITEMS]
                 if (itemHolder is ItemHolder)
-                    itemHolder.cycleItemConfig(face, true)
+                    itemHolder.cycleItemConfig(it, face, true)
             }
         } else handleRightClickNoWrench(event)
     }
@@ -68,8 +68,9 @@ abstract class NetworkedTileEntity(
     
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
-        val task = { NetworkManager.handleEndPointRemove(this, unload) }
-        if (NOVA.isEnabled) runAsyncTask(task) else task()
+        
+        val task: NetworkManagerTask = { it.handleEndPointRemove(this, unload) }
+        if (NOVA.isEnabled) NetworkManager.runAsync(task) else NetworkManager.runNow(task)
     }
     
     override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {

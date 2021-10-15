@@ -98,8 +98,8 @@ object VanillaTileEntityManager : Listener {
         ) {
             event.isCancelled = true
             val face = event.blockFace
-            runAsyncTaskWithLock(NetworkManager.LOCK) {
-                tileEntity.itemHolder.cycleItemConfig(face, true)
+            NetworkManager.runAsync {
+                tileEntity.itemHolder.cycleItemConfig(it, face, true)
             }
         }
     }

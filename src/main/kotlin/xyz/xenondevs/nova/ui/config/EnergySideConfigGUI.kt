@@ -38,17 +38,20 @@ class EnergySideConfigGUI(
     }
     
     private fun changeConnectionType(blockFace: BlockFace, forward: Boolean) {
-        NetworkManager.handleEndPointRemove(energyHolder.endPoint, true)
-        
-        val currentType = energyHolder.energyConfig[blockFace]!!
-        var index = allowedTypes.indexOf(currentType)
-        if (forward) index++ else index--
-        if (index < 0) index = allowedTypes.lastIndex
-        else if (index == allowedTypes.size) index = 0
-        energyHolder.energyConfig[blockFace] = allowedTypes[index]
-        
-        NetworkManager.handleEndPointAdd(energyHolder.endPoint, false)
-        energyHolder.endPoint.updateNearbyBridges()
+        // TODO: runSync / runAsync ?
+        NetworkManager.runNow {
+            it.handleEndPointRemove(energyHolder.endPoint, true)
+    
+            val currentType = energyHolder.energyConfig[blockFace]!!
+            var index = allowedTypes.indexOf(currentType)
+            if (forward) index++ else index--
+            if (index < 0) index = allowedTypes.lastIndex
+            else if (index == allowedTypes.size) index = 0
+            energyHolder.energyConfig[blockFace] = allowedTypes[index]
+    
+            it.handleEndPointAdd(energyHolder.endPoint, false)
+            energyHolder.endPoint.updateNearbyBridges()
+        }
     }
     
     private inner class SideConfigItem(val blockSide: BlockSide) : BaseItem() {

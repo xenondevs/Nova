@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.tileentity.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.util.tryLockAndRun
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
 import java.util.*
@@ -19,7 +18,7 @@ object NetworkDebugger {
     private val itemDebuggers = ArrayList<UUID>()
     
     init {
-        runTaskTimer(0, 1) { NetworkManager.LOCK.tryLockAndRun(::handleTick) }
+        runTaskTimer(0, 1) { NetworkManager.runIfFree(::handleTick) }
     }
     
     fun toggleDebugger(type: NetworkType, player: Player) {
@@ -36,10 +35,10 @@ object NetworkDebugger {
         }
     }
     
-    private fun handleTick() {
+    private fun handleTick(manager: NetworkManager) {
         if (energyDebuggers.isEmpty() && itemDebuggers.isEmpty()) return
         
-        NetworkManager.networks
+        manager.networks
             .forEach { network ->
                 val players = if (network is EnergyNetwork) energyDebuggers.mapNotNull(Bukkit::getPlayer) else itemDebuggers.mapNotNull(Bukkit::getPlayer)
                 if (players.isEmpty()) return@forEach

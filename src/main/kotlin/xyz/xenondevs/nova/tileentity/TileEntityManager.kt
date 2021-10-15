@@ -406,7 +406,7 @@ object TileEntityManager : Listener {
         val location = event.block.location
         if (location in locationCache && Material.AIR == event.block.type) {
             val tileEntity = getTileEntityAt(location)
-            if (tileEntity != null)
+            if (tileEntity != null && tileEntity.hasHitboxBeenPlaced)
                 destroyAndDropTileEntity(tileEntity, true)
         }
     }

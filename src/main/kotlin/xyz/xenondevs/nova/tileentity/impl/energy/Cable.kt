@@ -91,25 +91,24 @@ open class Cable(
             
             // !! Needs to be run in the server thread (updating blocks)
             // !! Also needs to be synchronized with NetworkManager as connectedNodes are retrieved
-            // This is not using a simple synchronized call as it would (in the worst case) block the main thread
-            // until all other tasks accessing the NetworkManager have run, defeating the purpose of doing this async.
-            runSyncTaskWhenUnlocked(NetworkManager.LOCK, ::updateHitbox)
+            NetworkManager.runSync { updateHitbox() }
         }
     }
     
     override fun handleInitialized(first: Boolean) {
-        runAsyncTask { NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES) }
+        NetworkManager.runAsync { it.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES) }
     }
     
     override fun handleHitboxPlaced() {
+        super.handleHitboxPlaced()
         updateBlockHitbox()
     }
     
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
         
-        val task = { NetworkManager.handleBridgeRemove(this, unload) }
-        if (NOVA.isEnabled) runAsyncTask(task) else task()
+        val task: NetworkManagerTask = { it.handleBridgeRemove(this, unload) }
+        if (NOVA.isEnabled) NetworkManager.runAsync(task) else NetworkManager.runNow(task)
         
         hitboxes.forEach { it.remove() }
         
@@ -271,15 +270,15 @@ open class Cable(
         if (player.isSneaking) {
             Bukkit.getPluginManager().callEvent(BlockBreakEvent(location.block, player))
         } else if (ProtectionManager.canUse(player, location)) {
-            runAsyncTaskWithLock(NetworkManager.LOCK) {
-                if (connectedNodes.values.any { it.containsKey(face) }) {
-                    NetworkManager.handleBridgeRemove(this, false)
+            NetworkManager.runAsync {
+                if (connectedNodes.values.any { node -> node.containsKey(face) }) {
+                    it.handleBridgeRemove(this, false)
                     bridgeFaces.remove(face)
-                    NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+                    it.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
                 } else if (!bridgeFaces.contains(face)) {
-                    NetworkManager.handleBridgeRemove(this, false)
+                    it.handleBridgeRemove(this, false)
                     bridgeFaces.add(face)
-                    NetworkManager.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+                    it.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
                 }
             }
         }

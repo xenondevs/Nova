@@ -31,8 +31,8 @@ interface ItemHolder : EndPointDataHolder {
         itemConfig[face] = ItemConnectionType.of(type.insert, state)
     }
     
-    fun cycleItemConfig(face: BlockFace, plus: Boolean) {
-        NetworkManager.handleEndPointRemove(endPoint, true)
+    fun cycleItemConfig(manager: NetworkManager, face: BlockFace, plus: Boolean) {
+        manager.handleEndPointRemove(endPoint, true)
         
         val currentConfig = itemConfig[face]!!
         val inventory = inventories[face]!!
@@ -43,8 +43,8 @@ interface ItemHolder : EndPointDataHolder {
         else if (index < 0) index = allowedConfigs.lastIndex
         
         itemConfig[face] = allowedConfigs[index]
-        
-        NetworkManager.handleEndPointAdd(endPoint, false)
+    
+        manager.handleEndPointAdd(endPoint, false)
         endPoint.updateNearbyBridges()
     }
     

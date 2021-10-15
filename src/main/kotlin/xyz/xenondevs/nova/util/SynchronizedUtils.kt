@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.util
 
 import java.util.concurrent.locks.ReentrantLock
 
-fun ObservableLock.tryLockAndRun(run: () -> Unit): Boolean {
+inline fun ObservableLock.tryLockAndRun(run: () -> Unit): Boolean {
     return if (tryLock()) {
         try {
             run()
@@ -13,7 +13,7 @@ fun ObservableLock.tryLockAndRun(run: () -> Unit): Boolean {
     } else false
 }
 
-fun ObservableLock.lockAndRun(run: () -> Unit) {
+inline fun ObservableLock.lockAndRun(run: () -> Unit) {
     lock()
     try {
         run()

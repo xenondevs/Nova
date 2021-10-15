@@ -54,6 +54,9 @@ abstract class TileEntity(
     
     val additionalHitboxes = HashSet<Location>()
     
+    var hasHitboxBeenPlaced = false
+        private set
+    
     /**
      * Called when the TileEntity is being broken.
      *
@@ -125,7 +128,9 @@ abstract class TileEntity(
      * Called after the hitbox block has been placed.
      * This action happens one tick after [handleInitialized] with first: true.
      */
-    open fun handleHitboxPlaced() = Unit
+    open fun handleHitboxPlaced() {
+        hasHitboxBeenPlaced = true
+    }
     
     /**
      * Called after the TileEntity has been removed from the

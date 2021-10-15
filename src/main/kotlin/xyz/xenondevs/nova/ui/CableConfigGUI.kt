@@ -25,10 +25,9 @@ import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.util.data.setLocalizedName
-import xyz.xenondevs.nova.util.lockAndRun
 import xyz.xenondevs.nova.util.notifyWindows
 import xyz.xenondevs.nova.util.putOrRemove
-import xyz.xenondevs.nova.util.runAsyncTask
+import java.lang.Exception
 
 class CableConfigGUI(
     val itemHolder: ItemHolder,
@@ -74,7 +73,7 @@ class CableConfigGUI(
     }
     
     fun updateValues(updateButtons: Boolean = true) {
-        NetworkManager.LOCK.lockAndRun {
+        NetworkManager.runNow { // TODO: runSync / runAsync ?
             val allowedConnections = itemHolder.allowedConnectionTypes[itemHolder.inventories[face]]!!
             allowsExtract = allowedConnections.extract
             allowsInsert = allowedConnections.insert
@@ -105,22 +104,20 @@ class CableConfigGUI(
     }
     
     private fun writeChanges() {
-        runAsyncTask {
-            NetworkManager.LOCK.lockAndRun {
-                if (itemHolder.endPoint.networks.isNotEmpty()) {
-                    NetworkManager.handleEndPointRemove(itemHolder.endPoint, true)
-                    
-                    itemHolder.insertPriorities[face] = insertPriority
-                    itemHolder.extractPriorities[face] = extractPriority
-                    itemHolder.channels[face] = channel
-                    itemHolder.setInsert(face, insertState)
-                    itemHolder.setExtract(face, extractState)
-                    itemHolder.insertFilters.putOrRemove(face, insertFilterInventory.getUnsafeItemStack(0)?.getOrCreateFilterConfig())
-                    itemHolder.extractFilters.putOrRemove(face, extractFilterInventory.getUnsafeItemStack(0)?.getOrCreateFilterConfig())
-                    
-                    NetworkManager.handleEndPointAdd(itemHolder.endPoint, false)
-                    itemHolder.endPoint.updateNearbyBridges()
-                }
+        NetworkManager.runAsync {
+            if (itemHolder.endPoint.networks.isNotEmpty()) {
+                it.handleEndPointRemove(itemHolder.endPoint, true)
+                
+                itemHolder.insertPriorities[face] = insertPriority
+                itemHolder.extractPriorities[face] = extractPriority
+                itemHolder.channels[face] = channel
+                itemHolder.setInsert(face, insertState)
+                itemHolder.setExtract(face, extractState)
+                itemHolder.insertFilters.putOrRemove(face, insertFilterInventory.getUnsafeItemStack(0)?.getOrCreateFilterConfig())
+                itemHolder.extractFilters.putOrRemove(face, extractFilterInventory.getUnsafeItemStack(0)?.getOrCreateFilterConfig())
+                
+                it.handleEndPointAdd(itemHolder.endPoint, false)
+                itemHolder.endPoint.updateNearbyBridges()
             }
         }
     }

@@ -76,20 +76,23 @@ class ItemSideConfigGUI(
     }
     
     private fun changeConnectionType(blockFace: BlockFace, forward: Boolean): Boolean {
-        val allowedTypes = allowedTypes[itemHolder.inventories[blockFace]!!]!!
-        if (allowedTypes.size < 2) return false
-        
-        NetworkManager.handleEndPointRemove(itemHolder.endPoint, true)
-        
-        val currentType = itemHolder.itemConfig[blockFace]!!
-        var index = allowedTypes.indexOf(currentType)
-        if (forward) index++ else index--
-        if (index < 0) index = allowedTypes.lastIndex
-        else if (index == allowedTypes.size) index = 0
-        itemHolder.itemConfig[blockFace] = allowedTypes[index]
-        
-        NetworkManager.handleEndPointAdd(itemHolder.endPoint, false)
-        itemHolder.endPoint.updateNearbyBridges()
+        NetworkManager.runNow { // TODO: runSync / runAsync ?
+            
+            val allowedTypes = allowedTypes[itemHolder.inventories[blockFace]!!]!!
+            // if (allowedTypes.size < 2) return false
+            
+            it.handleEndPointRemove(itemHolder.endPoint, true)
+            
+            val currentType = itemHolder.itemConfig[blockFace]!!
+            var index = allowedTypes.indexOf(currentType)
+            if (forward) index++ else index--
+            if (index < 0) index = allowedTypes.lastIndex
+            else if (index == allowedTypes.size) index = 0
+            itemHolder.itemConfig[blockFace] = allowedTypes[index]
+            
+            it.handleEndPointAdd(itemHolder.endPoint, false)
+            itemHolder.endPoint.updateNearbyBridges()
+        }
         
         return true
     }
@@ -97,23 +100,25 @@ class ItemSideConfigGUI(
     private fun changeInventory(blockFace: BlockFace, forward: Boolean): Boolean {
         if (inventories.size < 2) return false
         
-        NetworkManager.handleEndPointRemove(itemHolder.endPoint, false)
-        
-        val currentInventory = itemHolder.inventories[blockFace]!!
-        var index = inventories.indexOf(currentInventory)
-        if (forward) index++ else index--
-        if (index < 0) index = inventories.lastIndex
-        else if (index == inventories.size) index = 0
-        
-        val newInventory = inventories[index]
-        itemHolder.inventories[blockFace] = newInventory
-        
-        val allowedTypes = allowedTypes[newInventory]!!
-        if (!allowedTypes.contains(itemHolder.itemConfig[blockFace]!!)) {
-            itemHolder.itemConfig[blockFace] = allowedTypes[0]
+        NetworkManager.runNow { // TODO: runSync / runAsync ?
+            it.handleEndPointRemove(itemHolder.endPoint, false)
+    
+            val currentInventory = itemHolder.inventories[blockFace]!!
+            var index = inventories.indexOf(currentInventory)
+            if (forward) index++ else index--
+            if (index < 0) index = inventories.lastIndex
+            else if (index == inventories.size) index = 0
+    
+            val newInventory = inventories[index]
+            itemHolder.inventories[blockFace] = newInventory
+    
+            val allowedTypes = allowedTypes[newInventory]!!
+            if (!allowedTypes.contains(itemHolder.itemConfig[blockFace]!!)) {
+                itemHolder.itemConfig[blockFace] = allowedTypes[0]
+            }
+    
+            it.handleEndPointAdd(itemHolder.endPoint)
         }
-        
-        NetworkManager.handleEndPointAdd(itemHolder.endPoint)
         
         return true
     }

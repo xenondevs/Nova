@@ -38,7 +38,7 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     constructor(getNumber: () -> Int) : this(getNumber, null)
     
     override fun getItemProvider(): ItemProvider {
-        val number = getNumber()
+        val number = getNumber().coerceIn(0..999)
         val builder = NovaMaterialRegistry.NUMBER.item.createItemBuilder(number)
         if (localizedName != null)
             builder.setDisplayName(TranslatableComponent(localizedName, number))
