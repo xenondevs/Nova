@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.tileentity.network.item.inventory
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.TileInventoryManager
 import xyz.xenondevs.nova.tileentity.network.NetworkException
 import xyz.xenondevs.nova.util.addItemCorrectly
 
@@ -56,8 +58,13 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
         get() = virtualInventory.items
     
     override fun setItem(slot: Int, item: ItemStack?) {
-        if (!virtualInventory.setItemStack(null, slot, item))
-            throw NetworkException("The ItemUpdateEvent was cancelled")
+        if (!virtualInventory.setItemStack(null, slot, item)) {
+            val uuid = virtualInventory.uuid
+            val tileEntity = TileInventoryManager.getByUuid(uuid)?.first?.let { tileUUID ->
+                TileEntityManager.tileEntities.firstOrNull { tileUUID == it.uuid }
+            }
+            throw NetworkException("The ItemUpdateEvent was cancelled. UUID: ${virtualInventory.uuid}, TileEntity: $tileEntity")
+        }
     }
     
     override fun addItem(item: ItemStack): Int {

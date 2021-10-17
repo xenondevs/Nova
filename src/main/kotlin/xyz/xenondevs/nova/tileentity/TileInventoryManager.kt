@@ -73,11 +73,8 @@ object TileInventoryManager {
         { tileEntityUUID to VirtualInventory(inventoryUUID, size, items, stackSizes) }).second
     }
     
-    fun getByUuid(tileEntityUUID: UUID, inventoryUUID: UUID): VirtualInventory? {
-        val pair = getAndAddLegacyInventory(tileEntityUUID, inventoryUUID) ?: inventories[inventoryUUID]
-        if (pair != null) assert(pair.first == tileEntityUUID)
-        return pair?.second
-    }
+    fun getByUuid(inventoryUUID: UUID): Pair<UUID, VirtualInventory>? =
+        inventories[inventoryUUID]
     
     private fun getAndAddLegacyInventory(tileEntityUUID: UUID, inventoryUUID: UUID): Pair<UUID, VirtualInventory>? {
         return manager.getByUuid(inventoryUUID)

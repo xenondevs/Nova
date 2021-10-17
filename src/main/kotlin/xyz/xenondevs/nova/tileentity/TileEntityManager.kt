@@ -68,7 +68,7 @@ object TileEntityManager : Listener {
     private val tileEntityMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
     private val additionalHitboxMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
     private val locationCache = HashSet<Location>()
-    private val tileEntities: Sequence<TileEntity>
+    val tileEntities: Sequence<TileEntity>
         get() = tileEntityMap.asSequence().flatMap { (_, chunkMap) -> chunkMap.values }
     val tileEntityChunks: Sequence<Chunk>
         get() = tileEntityMap.keys.asSequence().map(AsyncChunkPos::chunk)
