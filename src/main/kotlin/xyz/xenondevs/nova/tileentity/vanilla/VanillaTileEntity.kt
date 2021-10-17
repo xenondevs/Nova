@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
+import org.bukkit.Location
 import org.bukkit.block.*
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.DataHolder
@@ -16,6 +17,7 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedRangedBukki
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
+import xyz.xenondevs.nova.util.runTaskLaterSynchronized
 import java.util.*
 import kotlin.collections.set
 
@@ -90,9 +92,20 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
     override val itemHolder: ItemHolder
     
+    private var doubleChestLocation: Location? = null
+    
     init {
         setInventories()
         itemHolder = DynamicVanillaItemHolder(this) { inventories }
+        
+        runTaskLaterSynchronized(VanillaTileEntityManager, 1) {
+            doubleChestLocation = getOtherChestLocation()
+            doubleChestLocation?.let {
+                val tileEntity = VanillaTileEntityManager.getTileEntityAt(it)
+                if (tileEntity is VanillaChestTileEntity) tileEntity.handleChestStateChange()
+                handleChestStateChange()
+            }
+        }
     }
     
     private fun setInventories() {
@@ -100,11 +113,38 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
         inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
     }
     
+    private fun getOtherChestLocation(): Location? {
+        val chest = block.state as Chest
+        val holder = chest.inventory.holder
+        
+        if (holder is DoubleChest) {
+            val left = holder.leftSide as Chest
+            val right = holder.rightSide as Chest
+            
+            return if (left.location == location) right.location else left.location
+        }
+        
+        return null
+    }
+    
     fun handleChestStateChange() {
+        doubleChestLocation = getOtherChestLocation()
         setInventories()
         NetworkManager.runAsync {
             it.handleEndPointRemove(this, true)
             it.handleEndPointAdd(this, false)
+        }
+    }
+    
+    override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
+        
+        val doubleChestLocation = doubleChestLocation
+        if (doubleChestLocation != null) {
+            runTaskLaterSynchronized(VanillaTileEntityManager, 1) {
+                val chest = VanillaTileEntityManager.getTileEntityAt(doubleChestLocation)
+                if (chest is VanillaChestTileEntity) chest.handleChestStateChange()
+            }
         }
     }
     

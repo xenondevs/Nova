@@ -4,7 +4,10 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.block.*
+import org.bukkit.block.BlockState
+import org.bukkit.block.Chest
+import org.bukkit.block.Container
+import org.bukkit.block.Furnace
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -136,7 +139,6 @@ object VanillaTileEntityManager : Listener {
         chunkMap -= location
         locationCache -= location
         
-        if (tileEntity is VanillaChestTileEntity) checkForBrokenDoubleChest(tileEntity.block)
         tileEntity.handleRemoved(false)
     }
     
@@ -167,42 +169,7 @@ object VanillaTileEntityManager : Listener {
             tileEntityMap[location.chunkPos]!![location] = tileEntity
             locationCache[location] = tileEntity
             tileEntity.handleInitialized()
-            
-            runTaskLater(1) { checkForPlacedDoubleChest(block) }
         }
-    }
-    
-    @Synchronized
-    private fun checkForPlacedDoubleChest(block: Block) {
-        val state = block.state
-        if (state is Chest) {
-            val holder = state.inventory.holder
-            if (holder is DoubleChest)
-                getOtherChest(block, holder).handleChestStateChange()
-        }
-    }
-    
-    @Synchronized
-    private fun checkForBrokenDoubleChest(block: Block) {
-        // called when the double chest is about to be broken
-        
-        val state = block.state as Chest
-        val holder = state.inventory.holder
-        if (holder is DoubleChest) {
-            val otherChest = getOtherChest(block, holder)
-            runTaskLater(1) { synchronized(this) { otherChest.handleChestStateChange() } }
-        }
-    }
-    
-    @Synchronized
-    private fun getOtherChest(block: Block, holder: DoubleChest): VanillaChestTileEntity {
-        val selfLocation = block.location
-        
-        val left = holder.leftSide as Chest
-        val right = holder.rightSide as Chest
-        
-        val otherLocation = if (left.location == selfLocation) right.location else left.location
-        return getTileEntityAt(otherLocation) as VanillaChestTileEntity
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
