@@ -139,11 +139,13 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
         
-        val doubleChestLocation = doubleChestLocation
-        if (doubleChestLocation != null) {
-            runTaskLaterSynchronized(VanillaTileEntityManager, 1) {
-                val chest = VanillaTileEntityManager.getTileEntityAt(doubleChestLocation)
-                if (chest is VanillaChestTileEntity) chest.handleChestStateChange()
+        if (NOVA.isEnabled) {
+            val doubleChestLocation = doubleChestLocation
+            if (doubleChestLocation != null) {
+                runTaskLaterSynchronized(VanillaTileEntityManager, 1) {
+                    val chest = VanillaTileEntityManager.getTileEntityAt(doubleChestLocation)
+                    if (chest is VanillaChestTileEntity) chest.handleChestStateChange()
+                }
             }
         }
     }
