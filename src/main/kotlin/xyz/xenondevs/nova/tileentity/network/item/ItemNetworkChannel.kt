@@ -307,9 +307,12 @@ private class ItemDistributor(
             
             val transferableStack = itemStack.clone().apply { amount = min(amount, transfersLeft) }
             val amountTransferred = transferableStack.amount - consumer.addItem(transferableStack)
-            provider.setItem(slot, itemStack.also { it.amount -= amountTransferred }.takeUnless { it.amount <= 0 })
             
-            transfersLeft -= amountTransferred
+            if (amountTransferred != 0) {
+                provider.setItem(slot, itemStack.also { it.amount -= amountTransferred }.takeUnless { it.amount <= 0 })
+                transfersLeft -= amountTransferred
+            }
+            
             if (transfersLeft == 0) break
         }
         
