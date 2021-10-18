@@ -247,12 +247,12 @@ open class Cable(
         }
         
         if (axis != null) {
-            block.type = Material.CHAIN
+            block.setType(Material.CHAIN, false)
             val blockData = block.blockData as Orientable
             blockData.axis = axis
             block.setBlockData(blockData, false)
         } else {
-            block.type = Material.STRUCTURE_VOID
+            block.setType(Material.STRUCTURE_VOID, false)
         }
     }
     
