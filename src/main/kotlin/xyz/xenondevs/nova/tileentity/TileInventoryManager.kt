@@ -21,10 +21,12 @@ object TileInventoryManager {
         NOVA.disableHandlers += ::saveInventories
     }
     
+    @Synchronized
     fun loadInventory(tileEntityUUID: UUID, inventoryUUID: UUID, inventory: VirtualInventory) {
         inventories[inventoryUUID] = tileEntityUUID to inventory
     }
     
+    @Synchronized
     private fun saveInventories() {
         if (NOVA.isUninstalled)
             return
@@ -48,6 +50,7 @@ object TileInventoryManager {
         }
     }
     
+    @Synchronized
     fun remove(tileEntityUUID: UUID, inventories: List<VirtualInventory>) {
         inventories.forEach { this.inventories.remove(it.uuid) }
         
@@ -58,6 +61,7 @@ object TileInventoryManager {
         }
     }
     
+    @Synchronized
     fun remove(inventory: VirtualInventory) {
         inventories.remove(inventory.uuid)
         
@@ -68,14 +72,17 @@ object TileInventoryManager {
         }
     }
     
+    @Synchronized
     fun getOrCreate(tileEntityUUID: UUID, inventoryUUID: UUID, size: Int, items: Array<ItemStack?>, stackSizes: IntArray): VirtualInventory {
         return (getAndAddLegacyInventory(tileEntityUUID, inventoryUUID) ?: inventories.getOrPut(inventoryUUID)
         { tileEntityUUID to VirtualInventory(inventoryUUID, size, items, stackSizes) }).second
     }
     
+    @Synchronized
     fun getByUuid(inventoryUUID: UUID): Pair<UUID, VirtualInventory>? =
         inventories[inventoryUUID]
     
+    @Synchronized
     private fun getAndAddLegacyInventory(tileEntityUUID: UUID, inventoryUUID: UUID): Pair<UUID, VirtualInventory>? {
         return manager.getByUuid(inventoryUUID)
             ?.also { manager.remove(it) }

@@ -22,6 +22,8 @@ data class AsyncChunkPos(val world: UUID, val x: Int, val z: Int) {
         return chunks
     }
     
+    fun isLoaded() = Bukkit.getWorld(world)?.isChunkLoaded(x, z) ?: false
+    
     override fun equals(other: Any?): Boolean {
         return this === other || (other is AsyncChunkPos && other.world == world && other.x == x && other.z == z)
     }

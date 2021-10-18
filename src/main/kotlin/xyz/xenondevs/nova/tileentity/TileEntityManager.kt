@@ -35,6 +35,7 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
 import xyz.xenondevs.nova.world.armorstand.pos
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import kotlin.math.roundToInt
 
 val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
@@ -63,6 +64,14 @@ fun ItemStack.getTileEntityData(): CompoundElement? {
 val Material?.requiresLight: Boolean
     get() = this != null && !isTransparent && isOccluding
 
+private typealias ChunkTask = (CountDownLatch) -> Unit
+
+private fun ChunkTask.runAndAwaitCompletion() {
+    val latch = CountDownLatch(1)
+    invoke(latch)
+    latch.await()
+}
+
 object TileEntityManager : Listener {
     
     private val tileEntityMap = HashMap<AsyncChunkPos, HashMap<Location, TileEntity>>()
@@ -70,14 +79,18 @@ object TileEntityManager : Listener {
     private val locationCache = HashSet<Location>()
     val tileEntities: Sequence<TileEntity>
         get() = tileEntityMap.asSequence().flatMap { (_, chunkMap) -> chunkMap.values }
-    val tileEntityChunks: Sequence<Chunk>
-        get() = tileEntityMap.keys.asSequence().map(AsyncChunkPos::chunk)
+    val tileEntityChunks: Sequence<AsyncChunkPos>
+        get() = tileEntityMap.keys.asSequence()
+    
+    private val chunkTaskQueues = HashMap<AsyncChunkPos, ChunkTaskQueue>()
     
     fun init() {
         LOGGER.info("Initializing TileEntityManager")
+        
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkLoad)
-        NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(this::handleChunkUnload) }
+        Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach { handleChunkLoad(it.pos) }
+        NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach { handleChunkUnload(it.pos) } }
+        
         runTaskTimerSynchronized(this, 0, 1) { tileEntities.forEach(TileEntity::handleTick) }
         runAsyncTaskTimerSynchronized(this, 0, 1) { tileEntities.forEach(TileEntity::handleAsyncTick) }
         
@@ -202,44 +215,58 @@ object TileEntityManager : Listener {
         }
     }
     
-    private fun handleChunkLoad(chunk: Chunk) {
-        asyncTransaction {
-            DaoTileEntity.find { (TileEntitiesTable.world eq chunk.world.uid) and (TileEntitiesTable.chunkX eq chunk.x) and (TileEntitiesTable.chunkZ eq chunk.z) }
-                .forEach { tile ->
-                    tile.inventories.forEach { inventory ->
-                        TileInventoryManager.loadInventory(tile.id.value, inventory.id.value, inventory.data)
-                    }
+    private fun handleChunkLoad(chunkPos: AsyncChunkPos) {
+        addToChunkTaskQueue(chunkPos, true) {
+            if (chunkPos.isLoaded()) {
+                transaction {
+                    val tileEntities = DaoTileEntity.find { (TileEntitiesTable.world eq chunkPos.world) and (TileEntitiesTable.chunkX eq chunkPos.x) and (TileEntitiesTable.chunkZ eq chunkPos.z) }
+                        .onEach { tile -> tile.inventories.forEach { inventory -> TileInventoryManager.loadInventory(tile.id.value, inventory.id.value, inventory.data) } }
+                        .toList()
                     
-                    // create the tile entity in the main thread
+                    // create the tile entities in the main thread
                     runTaskSynchronized(TileEntityManager) {
-                        val location = tile.location
-                        val tileEntity = TileEntity.create(tile, location)
+                        tileEntities.forEach { tile ->
+                            val location = tile.location
+                            val tileEntity = TileEntity.create(tile, location)
+                            
+                            val chunkMap = tileEntityMap.getOrPut(chunkPos) { HashMap() }
+                            chunkMap[location] = tileEntity
+                            
+                            locationCache += location
+                            
+                            tileEntity.handleInitialized(false)
+                        }
                         
-                        val chunkMap = tileEntityMap.getOrPut(chunk.pos) { HashMap() }
-                        chunkMap[location] = tileEntity
-                        
-                        locationCache += location
-                        
-                        tileEntity.handleInitialized(false)
+                        it.countDown() // move on in the queue
                     }
                 }
+            } else it.countDown() // move on in the queue
+        }
+    }
+    
+    private fun handleChunkUnload(chunkPos: AsyncChunkPos) {
+        val async = NOVA.isEnabled
+        addToChunkTaskQueue(chunkPos, async) {
+            saveChunk(chunkPos) // saving can be done from a different thread
+            
+            val task = { // this should be run in the main thread
+                val tileEntities = tileEntityMap[chunkPos]
+                tileEntityMap -= chunkPos
+                locationCache.removeAll { it.chunkPos == chunkPos }
+                tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
+                
+                it.countDown() // move on in the queue
+            }
+            
+            // switch to the main thread if we're not already in it, otherwise just use synchronized
+            if (async) runTaskSynchronized(this, task)
+            else synchronized(this, task)
         }
     }
     
     @Synchronized
-    private fun handleChunkUnload(chunk: Chunk) {
-        saveChunk(chunk)
-        
-        val chunkPos = chunk.pos
-        val tileEntities = tileEntityMap[chunkPos]
-        tileEntityMap -= chunkPos
-        locationCache.removeAll { it.chunkPos == chunkPos }
-        tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
-    }
-    
-    @Synchronized
-    fun saveChunk(chunk: Chunk) {
-        val tileEntities = tileEntityMap[chunk.pos]?.values ?: return
+    fun saveChunk(chunkPos: AsyncChunkPos) {
+        val tileEntities = tileEntityMap[chunkPos]?.values ?: return
         
         transaction {
             tileEntities.forEach { tileEntity ->
@@ -254,8 +281,8 @@ object TileEntityManager : Listener {
                         it[id] = tileEntity.uuid
                         it[world] = tileEntity.location.world!!.uid
                         it[owner] = tileEntity.ownerUUID
-                        it[chunkX] = chunk.x
-                        it[chunkZ] = chunk.z
+                        it[chunkX] = chunkPos.x
+                        it[chunkZ] = chunkPos.z
                         it[x] = location.blockX
                         it[y] = location.blockY
                         it[z] = location.blockZ
@@ -274,17 +301,17 @@ object TileEntityManager : Listener {
     
     @EventHandler
     fun handleWorldSave(event: WorldSaveEvent) {
-        runAsyncTask { event.world.loadedChunks.forEach { saveChunk(it) } }
+        runAsyncTask { event.world.loadedChunks.forEach { saveChunk(it.pos) } }
     }
     
     @EventHandler
     fun handleChunkLoad(event: ChunkLoadEvent) {
-        handleChunkLoad(event.chunk)
+        handleChunkLoad(event.chunk.pos)
     }
     
     @EventHandler
     fun handleChunkUnload(event: ChunkUnloadEvent) {
-        handleChunkUnload(event.chunk)
+        handleChunkUnload(event.chunk.pos)
     }
     
     // TODO: clean up
@@ -439,5 +466,56 @@ object TileEntityManager : Listener {
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleBlockExplosion(event: BlockExplodeEvent) = handleExplosion(event.blockList())
+    
+    private fun addToChunkTaskQueue(chunkPos: AsyncChunkPos, async: Boolean, task: ChunkTask) {
+        synchronized(chunkTaskQueues) {
+            val currentQueue = chunkTaskQueues[chunkPos]
+            if (currentQueue != null) {
+                if (async) {
+                    currentQueue.addTask(task)
+                } else {
+                    currentQueue.awaitCompletion()
+                    task.runAndAwaitCompletion()
+                }
+            } else if (async) {
+                chunkTaskQueues[chunkPos] = ChunkTaskQueue(chunkPos, task)
+            } else task.runAndAwaitCompletion()
+        }
+    }
+    
+    private class ChunkTaskQueue(private val chunkPos: AsyncChunkPos, initialTask: ChunkTask) {
+        
+        private val queue = LinkedList<ChunkTask>()
+        
+        init {
+            queue += initialTask
+            
+            runAsyncTask {
+                while (queue.isNotEmpty()) {
+                    val task = queue.poll()
+                    val latch = CountDownLatch(1)
+                    task(latch)
+                    latch.await()
+                }
+                
+                synchronized(chunkTaskQueues) { chunkTaskQueues.remove(chunkPos) }
+            }
+        }
+        
+        fun awaitCompletion() {
+            while (queue.isNotEmpty()) {
+                Thread.sleep(1)
+            }
+        }
+        
+        fun addTask(task: ChunkTask) {
+            queue += task
+        }
+        
+        operator fun plusAssign(task: ChunkTask) {
+            addTask(task)
+        }
+        
+    }
     
 }
