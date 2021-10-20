@@ -8,6 +8,7 @@ import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
 import org.bukkit.inventory.ItemStack
+import org.bukkit.util.Vector
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
@@ -15,8 +16,7 @@ import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
 
@@ -38,6 +38,36 @@ fun Location.dropItem(item: ItemStack) {
 fun Location.removeOrientation() {
     yaw = 0f
     pitch = 0f
+}
+
+fun Vector.calculateYawPitch(): FloatArray {
+    // Minecraft's coordinate system is weird
+    val x = this.z
+    val y = -this.x
+    val z = this.y
+    
+    val yaw = atan2(y, x)
+    val h = y / sin(yaw)
+    val pitch = atan2(z, h)
+    
+    return floatArrayOf(Math.toDegrees(yaw).toFloat(), -Math.toDegrees(pitch).toFloat())
+}
+
+fun Vector.calculateYaw(): Float {
+    val x = this.z
+    val y = -this.x
+    
+    val yaw = atan2(y, x)
+    return Math.toDegrees(yaw).toFloat()
+}
+
+fun Vector(yaw: Float, pitch: Float): Vector {
+    val pitchRadians = Math.toRadians(-pitch.toDouble())
+    val yawRadians = Math.toRadians(yaw.toDouble())
+    val z = cos(pitchRadians)
+    val x = cos(yawRadians) * z
+    val y = sin(yawRadians) * z
+    return Vector(-y, z, x)
 }
 
 fun Location.advance(blockFace: BlockFace, stepSize: Double = 1.0) =

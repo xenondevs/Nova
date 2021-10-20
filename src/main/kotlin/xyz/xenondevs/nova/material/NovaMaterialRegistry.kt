@@ -17,10 +17,7 @@ import xyz.xenondevs.nova.tileentity.impl.processing.Pulverizer
 import xyz.xenondevs.nova.tileentity.impl.storage.StorageUnit
 import xyz.xenondevs.nova.tileentity.impl.storage.TrashCan
 import xyz.xenondevs.nova.tileentity.impl.storage.VacuumChest
-import xyz.xenondevs.nova.tileentity.impl.world.BlockBreaker
-import xyz.xenondevs.nova.tileentity.impl.world.BlockPlacer
-import xyz.xenondevs.nova.tileentity.impl.world.ChunkLoader
-import xyz.xenondevs.nova.tileentity.impl.world.Quarry
+import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.toIntArray
 
@@ -140,8 +137,9 @@ object NovaMaterialRegistry {
     val CREATIVE_CABLE = registerTileEntity("CREATIVE_CABLE", "block.nova.creative_cable", structureBlockOf(5360), null, structureBlockOf((5361..5424).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024))
     val SCAFFOLDING = register(NovaMaterial("SCAFFOLDING", "item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray())))
     val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", blockOf(5050), EnergyHolder::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace)
-    val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, null, true, intArrayOf(1))
-    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, null, true, intArrayOf(11))
+    val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, legacyItemIds = intArrayOf(1))
+    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, legacyItemIds = intArrayOf(11))
+    val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", blockOf(5080), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5080, 5081, 5082)), BARRIER, ::StarCollector)
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)
