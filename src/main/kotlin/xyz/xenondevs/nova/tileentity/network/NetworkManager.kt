@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.network
 
-import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -19,7 +18,7 @@ interface NetworkManager {
     
     fun handleEndPointAdd(endPoint: NetworkEndPoint, updateBridges: Boolean = true)
     
-    fun handleBridgeAdd(bridge: NetworkBridge, vararg supportedNetworkTypes: NetworkType)
+    fun handleBridgeAdd(bridge: NetworkBridge)
     
     fun handleEndPointRemove(endPoint: NetworkEndPoint, unload: Boolean)
     
@@ -172,19 +171,15 @@ private class NetworkManagerImpl : NetworkManager {
         if (updateBridges) bridgesToUpdate.forEach(NetworkBridge::handleNetworkUpdate)
     }
     
-    override fun handleBridgeAdd(bridge: NetworkBridge, vararg supportedNetworkTypes: NetworkType) {
-        Preconditions.checkArgument(supportedNetworkTypes.isNotEmpty(), "Bridge needs to support at least one network type")
-        
+    override fun handleBridgeAdd(bridge: NetworkBridge) {
         val nearbyNodes: Map<BlockFace, NetworkNode> = bridge.getNearbyNodes()
         val nearbyBridges: Map<BlockFace, NetworkBridge> = nearbyNodes.filterIsInstanceValues()
         val nearbyEndPoints: Map<BlockFace, NetworkEndPoint> = nearbyNodes.filterIsInstanceValues()
         
-        supportedNetworkTypes.forEach { networkType ->
+        bridge.supportedNetworkTypes.forEach { networkType ->
             val previousNetworks = HashSet<Network>()
             nearbyBridges.forEach { (face, otherBridge) ->
-                if (bridge.bridgeFaces.contains(face)
-                    && otherBridge.bridgeFaces.contains(face.oppositeFace)) { // if bridge connects to this bridge
-                    
+                if (bridge.canConnect(otherBridge, networkType, face)) {
                     // bridges won't have a network if they haven't been fully initialized yet
                     if (otherBridge.networks.containsKey(networkType)) {
                         // a possible network to connect to

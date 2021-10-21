@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.network.energy
 
-import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
@@ -43,8 +42,7 @@ class EnergyNetwork : Network {
         get() = buffers.sumOfNoOverflow { it.energy }
     private val requestedConsumerEnergy: Int
         get() = consumers.sumOfNoOverflow { it.requestedEnergy }
-    private val transferRate: Int
-        get() = bridges.map { it.energyTransferRate }.minOrNull() ?: Int.MAX_VALUE
+    private var transferRate = Int.MAX_VALUE
     
     override fun addAll(network: Network) {
         require(network !== this) { "Can't add to self" }
@@ -58,9 +56,10 @@ class EnergyNetwork : Network {
     }
     
     override fun addBridge(bridge: NetworkBridge) {
-        Preconditions.checkArgument(bridge is EnergyBridge, "Illegal Bridge Type")
+        require(bridge is EnergyBridge) { "Illegal Bridge Type" }
         _nodes += bridge
-        bridges += bridge as EnergyBridge
+        bridges += bridge
+        transferRate = bridge.energyTransferRate
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {

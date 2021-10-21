@@ -14,8 +14,7 @@ class ItemNetwork : Network {
     private val bridges = HashSet<ItemBridge>()
     private val channels: Array<ItemNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     
-    private val transferRate: Int
-        get() = bridges.map { it.itemTransferRate }.minOrNull() ?: 1
+    private var transferRate = 1
     
     private var nextChannel = 0
     
@@ -38,6 +37,7 @@ class ItemNetwork : Network {
         
         _nodes += bridge
         bridges += bridge
+        transferRate = bridge.itemTransferRate
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {

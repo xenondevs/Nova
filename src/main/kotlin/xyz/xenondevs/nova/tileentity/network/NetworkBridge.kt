@@ -20,7 +20,17 @@ interface NetworkBridge : NetworkNode {
     val bridgeFaces: Set<BlockFace>
     
     /**
-     * Called when another [NetworkNode] has ben placed
+     * A set of [NetworkTypes][NetworkType] that are supported by this bridge.
+     */
+    val supportedNetworkTypes: Set<NetworkType>
+    
+    /**
+     * An identifier to prevent bridges of different tiers from connecting to each other.
+     */
+    val typeId: Int
+    
+    /**
+     * Called when another [NetworkNode] has been placed
      * or broken right next to this node.
      *
      * Not called when [NetworkNode]s nearby get unloaded.
@@ -74,6 +84,16 @@ interface NetworkBridge : NetworkNode {
         }
         
         return networkedNodes
+    }
+    
+    /**
+     * Checks if this bridge is able to connect to its neighboring bridge.
+     */
+    fun canConnect(other: NetworkBridge, requestedType: NetworkType, face: BlockFace): Boolean {
+        return typeId == other.typeId
+            && bridgeFaces.contains(face)
+            && other.bridgeFaces.contains(face.oppositeFace)
+            && other.supportedNetworkTypes.contains(requestedType)
     }
     
 }

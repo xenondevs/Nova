@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.impl.energy
 
-import com.google.common.base.Preconditions
 import org.bukkit.Axis
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -19,7 +18,6 @@ import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.*
-import xyz.xenondevs.nova.tileentity.network.NetworkType.ENERGY
 import xyz.xenondevs.nova.tileentity.network.NetworkType.ITEMS
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyBridge
 import xyz.xenondevs.nova.tileentity.network.item.ItemBridge
@@ -34,12 +32,11 @@ import java.util.*
 
 private val ATTACHMENTS: IntArray = (64..72).toIntArray()
 
-private val SUPPORTED_NETWORK_TYPES = arrayOf(ENERGY, ITEMS)
-
 private val NetworkNode.itemHolder: ItemHolder?
     get() = if (this is NetworkEndPoint && holders.contains(ITEMS)) holders[ITEMS] as ItemHolder else null
 
 open class Cable(
+    override val typeId: Int,
     override val energyTransferRate: Int,
     override val itemTransferRate: Int,
     uuid: UUID,
@@ -49,6 +46,7 @@ open class Cable(
     armorStand: FakeArmorStand,
 ) : TileEntity(uuid, data, material, ownerUUID, armorStand), EnergyBridge, ItemBridge {
     
+    override val supportedNetworkTypes = NetworkType.values().toHashSet()
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = retrieveEnumCollectionOrNull("bridgeFaces", HashSet()) ?: CUBE_FACES.toMutableSet()
     
@@ -96,7 +94,7 @@ open class Cable(
     }
     
     override fun handleInitialized(first: Boolean) {
-        NetworkManager.runAsync { it.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES) }
+        NetworkManager.runAsync { it.handleBridgeAdd(this) }
     }
     
     override fun handleHitboxPlaced() {
@@ -124,7 +122,7 @@ open class Cable(
     }
     
     private fun getModelsNeeded(): List<Model> {
-        Preconditions.checkState(networks.isNotEmpty(), "No network is initialized")
+        require(networks.isNotEmpty()) { "No network is initialized" }
         
         val items = ArrayList<Pair<ItemStack, Float>>()
         
@@ -274,11 +272,11 @@ open class Cable(
                 if (connectedNodes.values.any { node -> node.containsKey(face) }) {
                     it.handleBridgeRemove(this, false)
                     bridgeFaces.remove(face)
-                    it.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+                    it.handleBridgeAdd(this)
                 } else if (!bridgeFaces.contains(face)) {
                     it.handleBridgeRemove(this, false)
                     bridgeFaces.add(face)
-                    it.handleBridgeAdd(this, *SUPPORTED_NETWORK_TYPES)
+                    it.handleBridgeAdd(this)
                 }
             }
         }
@@ -307,6 +305,7 @@ class BasicCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
+    0,
     BASIC_ENERGY_RATE,
     BASIC_ITEM_RATE,
     uuid,
@@ -323,6 +322,7 @@ class AdvancedCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
+    1,
     ADVANCED_ENERGY_RATE,
     ADVANCED_ITEM_RATE,
     uuid,
@@ -339,6 +339,7 @@ class EliteCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
+    2,
     ELITE_ENERGY_RATE,
     ELITE_ITEM_RATE,
     uuid,
@@ -355,6 +356,7 @@ class UltimateCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
+    3,
     ULTIMATE_ENERGY_RATE,
     ULTIMATE_ITEM_RATE,
     uuid,
@@ -371,6 +373,7 @@ class CreativeCable(
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : Cable(
+    4,
     Int.MAX_VALUE,
     Int.MAX_VALUE,
     uuid,
