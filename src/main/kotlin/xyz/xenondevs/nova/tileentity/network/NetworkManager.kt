@@ -103,6 +103,7 @@ private class NetworkManagerImpl : NetworkManager {
                     val task = asyncQueue.poll()
                     lock.lockAndRun { task.invoke(this) }
                 }
+                Thread.sleep(50)
             }
         }
     }
