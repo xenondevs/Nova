@@ -19,7 +19,7 @@ object Towny : ProtectionIntegration {
         hasPermission(player, location, ActionType.BUILD)
     
     override fun canUse(player: OfflinePlayer, location: Location) =
-        hasPermission(player, location, ActionType.ITEM_USE)
+        hasPermission(player, location, ActionType.SWITCH)
     
     private fun hasPermission(player: OfflinePlayer, location: Location, actionType: ActionType) =
         PlayerCacheUtil.getCachePermission(FakeOnlinePlayer(player, location), location, location.block.type, actionType)
