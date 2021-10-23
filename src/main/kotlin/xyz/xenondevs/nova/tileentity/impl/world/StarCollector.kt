@@ -42,7 +42,7 @@ private val COLLECTING_ENERGY_PER_TICK = NovaConfig[STAR_COLLECTOR].getInt("ener
 private val IDLE_TIME = NovaConfig[STAR_COLLECTOR].getInt("idle_time")!!
 private val COLLECTION_TIME = NovaConfig[STAR_COLLECTOR].getInt("collection_time")!!
 
-private const val STAR_PARTICLE_DISTANCE = 150
+private const val STAR_PARTICLE_DISTANCE_PER_TICK = 0.75
 
 class StarCollector(
     uuid: UUID,
@@ -122,7 +122,7 @@ class StarCollector(
             rod.updateEquipment()
         } else {
             val percentageCollected = (maxCollectionTime - timeSpentCollecting) / maxCollectionTime.toDouble()
-            val particleDistance = percentageCollected * STAR_PARTICLE_DISTANCE
+            val particleDistance = percentageCollected * (STAR_PARTICLE_DISTANCE_PER_TICK * maxCollectionTime)
             val particleLocation = rodLocation.clone().add(particleVector.clone().multiply(particleDistance))
             
             particleBuilder(ParticleEffect.REDSTONE) {
