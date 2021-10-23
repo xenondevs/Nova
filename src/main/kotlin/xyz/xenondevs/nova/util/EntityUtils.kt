@@ -5,6 +5,7 @@ import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -192,7 +193,9 @@ object EntityUtils {
         val server = (Bukkit.getServer() as CraftServer).server
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
-        val serverPlayer = ServerPlayer(server, world, gameProfile)
+        val serverPlayer = object : ServerPlayer(server, world, gameProfile) {
+            override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: NMSEntity?) = Unit
+        }
         serverPlayer.advancements.stopListening()
         return serverPlayer
     }
