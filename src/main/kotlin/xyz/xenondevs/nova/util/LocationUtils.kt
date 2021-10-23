@@ -64,9 +64,10 @@ fun Vector.calculateYaw(): Float {
 fun Vector(yaw: Float, pitch: Float): Vector {
     val pitchRadians = Math.toRadians(-pitch.toDouble())
     val yawRadians = Math.toRadians(yaw.toDouble())
-    val z = cos(pitchRadians)
-    val x = cos(yawRadians) * z
-    val y = sin(yawRadians) * z
+    val xy = cos(pitchRadians)
+    val x = cos(yawRadians) * xy
+    val y = sin(yawRadians) * xy
+    val z = sin(pitchRadians)
     return Vector(-y, z, x)
 }
 
