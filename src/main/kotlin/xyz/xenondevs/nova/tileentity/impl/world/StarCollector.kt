@@ -74,9 +74,9 @@ class StarCollector(
     }
     
     private val particleTask = createParticleTask(listOf(
-        particle(ParticleEffect.REDSTONE) {
+        particle(ParticleEffect.DUST_COLOR_TRANSITION) {
             location(location.clone().center().apply { y += 0.2 })
-            color(Color(132, 0, 245))
+            dustFade(Color(132, 0, 245), Color(196, 128, 217), 1f)
             offset(0.25, 0.1, 0.25)
             amount(3)
         }
