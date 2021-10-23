@@ -16,16 +16,16 @@ object PlotSquared : ProtectionIntegration {
     
     override fun canUse(player: OfflinePlayer, location: Location) = isAllowed(player, location)
     
-    fun isAllowed(offlinePlayer: OfflinePlayer, location: Location): Boolean {
+    private fun isAllowed(offlinePlayer: OfflinePlayer, location: Location): Boolean {
         if (!isInstalled) return true
         val plotLocation = location.toPlotLocation()
         if (plotLocation.isPlotRoad) return false
         return if (plotLocation.isPlotArea) {
-            plotLocation.plotArea.getPlot(plotLocation)?.isAdded(offlinePlayer.uniqueId) ?: false
+            plotLocation.plotArea?.getPlot(plotLocation)?.isAdded(offlinePlayer.uniqueId) ?: false
         } else true
     }
     
-    private fun Location.toPlotLocation() =
-        PlotLocation(world!!.name, blockX, blockY, blockZ, yaw, pitch)
+    private fun Location.toPlotLocation(): PlotLocation =
+        PlotLocation.at(world!!.name, blockX, blockY, blockZ, yaw, pitch)
     
 }
