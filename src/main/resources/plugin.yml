@@ -11,6 +11,7 @@ softdepend:
   - GriefDefender
   - Vault
   - ItemsAdder
+  - Towny
 
 permissions:
   nova.command.*:

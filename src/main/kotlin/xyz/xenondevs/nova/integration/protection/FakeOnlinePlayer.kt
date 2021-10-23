@@ -43,7 +43,7 @@ import java.util.*
  */
 internal class FakeOnlinePlayer(
     private val offlinePlayer: OfflinePlayer,
-    private val world: World
+    private val location: Location
 ) : Player {
     
     override fun hasPermission(name: String): Boolean {
@@ -54,8 +54,28 @@ internal class FakeOnlinePlayer(
         return PermissionUtils.hasPermission(world, uniqueId, perm.name)
     }
     
+    override fun isPermissionSet(name: String): Boolean {
+        return true
+    }
+    
+    override fun isPermissionSet(perm: Permission): Boolean {
+        return true
+    }
+    
+    override fun getWorld(): World {
+        return location.world!!
+    }
+    
+    override fun getLocale(): String {
+        return "en_us"
+    }
+    
+    override fun getLocation(): Location {
+        return location
+    }
+    
     override fun isOnline(): Boolean {
-        return offlinePlayer.isOnline
+        return true
     }
     
     override fun getName(): String {
@@ -640,10 +660,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun getLocale(): String {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
     override fun updateCommands() {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1153,10 +1169,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun getLocation(): Location {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
     @Contract("null -> null; !null -> !null")
     override fun getLocation(loc: Location?): Location? {
         throw UnsupportedOperationException("Player is not online")
@@ -1183,10 +1195,6 @@ internal class FakeOnlinePlayer(
     }
     
     override fun isInWater(): Boolean {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
-    override fun getWorld(): World {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1451,14 +1459,6 @@ internal class FakeOnlinePlayer(
     }
     
     override fun sendMessage(sender: UUID?, messages: Array<String>) {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
-    override fun isPermissionSet(name: String): Boolean {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
-    override fun isPermissionSet(perm: Permission): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
     

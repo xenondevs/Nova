@@ -150,6 +150,12 @@
             <version>2.4.7</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.TownyAdvanced</groupId>
+            <artifactId>Towny</artifactId>
+            <version>0.97.2.0</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Not provided -->
         <dependency>
