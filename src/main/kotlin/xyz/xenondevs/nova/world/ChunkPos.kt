@@ -1,21 +1,21 @@
-package xyz.xenondevs.nova.world.armorstand
+package xyz.xenondevs.nova.world
 
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import java.util.*
 
-data class AsyncChunkPos(val world: UUID, val x: Int, val z: Int) {
+data class ChunkPos(val world: UUID, val x: Int, val z: Int) {
     
     val chunk: Chunk
         get() = Bukkit.getWorld(world)!!.getChunkAt(x, z)
     
-    fun getInRange(range: Int): Set<AsyncChunkPos> {
+    fun getInRange(range: Int): Set<ChunkPos> {
         val length = 2 * range + 1
-        val chunks = HashSet<AsyncChunkPos>(length * length)
+        val chunks = HashSet<ChunkPos>(length * length)
         
         for (newX in (x - range)..(x + range)) {
             for (newZ in (z - range)..(z + range)) {
-                chunks.add(AsyncChunkPos(world, newX, newZ))
+                chunks.add(ChunkPos(world, newX, newZ))
             }
         }
         
@@ -25,7 +25,7 @@ data class AsyncChunkPos(val world: UUID, val x: Int, val z: Int) {
     fun isLoaded() = Bukkit.getWorld(world)?.isChunkLoaded(x, z) ?: false
     
     override fun equals(other: Any?): Boolean {
-        return this === other || (other is AsyncChunkPos && other.world == world && other.x == x && other.z == z)
+        return this === other || (other is ChunkPos && other.world == world && other.x == x && other.z == z)
     }
     
     override fun hashCode(): Int {

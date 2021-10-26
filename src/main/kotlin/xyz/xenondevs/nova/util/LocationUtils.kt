@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
@@ -23,8 +23,8 @@ val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
 
-val Location.chunkPos: AsyncChunkPos
-    get() = AsyncChunkPos(world!!.uid, x.toInt() shr 4, z.toInt() shr 4)
+val Location.chunkPos: ChunkPos
+    get() = ChunkPos(world!!.uid, x.toInt() shr 4, z.toInt() shr 4)
 
 fun Location.dropItems(items: Iterable<ItemStack>) {
     val world = world!!
