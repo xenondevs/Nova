@@ -13,11 +13,12 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.util.runAsyncTask
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
 
-val Chunk.pos: AsyncChunkPos
-    get() = AsyncChunkPos(world.uid, x, z)
+val Chunk.pos: ChunkPos
+    get() = ChunkPos(world.uid, x, z)
 
 var Player.armorStandRenderDistance: Int
     get() = persistentDataContainer
@@ -34,9 +35,9 @@ object FakeArmorStandManager : Listener {
     val MIN_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.min")!!
     val MAX_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.max")!!
     
-    private val visibleChunks = HashMap<Player, Set<AsyncChunkPos>>()
-    private val chunkViewers = HashMap<AsyncChunkPos, MutableList<Player>>()
-    private val chunkArmorStands = HashMap<AsyncChunkPos, MutableList<FakeArmorStand>>()
+    private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
+    private val chunkViewers = HashMap<ChunkPos, MutableList<Player>>()
+    private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
     
     fun init() {
         LOGGER.info("Initializing FakeArmorStandManager")
@@ -57,12 +58,12 @@ object FakeArmorStandManager : Listener {
     }
     
     @Synchronized
-    fun getViewersOf(chunk: AsyncChunkPos): List<Player> {
+    fun getViewersOf(chunk: ChunkPos): List<Player> {
         return chunkViewers[chunk] ?: emptyList()
     }
     
     @Synchronized
-    fun addArmorStand(chunk: AsyncChunkPos, armorStand: FakeArmorStand) {
+    fun addArmorStand(chunk: ChunkPos, armorStand: FakeArmorStand) {
         val armorStands = chunkArmorStands.getOrPut(chunk) { mutableListOf() }
         armorStands.add(armorStand)
         
@@ -71,18 +72,18 @@ object FakeArmorStandManager : Listener {
     }
     
     @Synchronized
-    fun removeArmorStand(chunk: AsyncChunkPos, armorStand: FakeArmorStand) {
+    fun removeArmorStand(chunk: ChunkPos, armorStand: FakeArmorStand) {
         chunkArmorStands[chunk]!!.remove(armorStand)
         chunkViewers[chunk]!!.forEach { armorStand.despawn(it) }
     }
     
     @Synchronized
-    fun getChunkViewers(chunk: AsyncChunkPos): List<Player> {
+    fun getChunkViewers(chunk: ChunkPos): List<Player> {
         return chunkViewers[chunk] ?: emptyList()
     }
     
     @Synchronized
-    fun changeArmorStandChunk(armorStand: FakeArmorStand, previousChunk: AsyncChunkPos, newChunk: AsyncChunkPos) {
+    fun changeArmorStandChunk(armorStand: FakeArmorStand, previousChunk: ChunkPos, newChunk: ChunkPos) {
         // move the armor stand to the new chunk key
         chunkArmorStands[previousChunk]!!.remove(armorStand)
         chunkArmorStands.getOrPut(newChunk) { mutableListOf() }.add(armorStand)

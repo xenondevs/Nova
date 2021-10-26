@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.world.armorstand.AsyncChunkPos
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.pos
 import java.util.*
 
@@ -33,7 +33,7 @@ import java.util.*
  */
 object VanillaTileEntityManager : Listener {
     
-    private val tileEntityMap = HashMap<AsyncChunkPos, HashMap<Location, VanillaTileEntity>>()
+    private val tileEntityMap = HashMap<ChunkPos, HashMap<Location, VanillaTileEntity>>()
     private val locationCache = HashMap<Location, VanillaTileEntity>()
     private val tileEntityQueue = LinkedList<VanillaTileEntity>()
     
