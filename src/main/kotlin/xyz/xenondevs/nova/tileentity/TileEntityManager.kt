@@ -17,6 +17,7 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -270,7 +271,7 @@ object TileEntityManager : Listener {
     }
     
     private fun saveChunk(tileEntities: Iterable<TileEntity>) {
-        asyncTransaction {
+        val statement: (Transaction.() -> Unit) = {
             tileEntities.forEach { tileEntity ->
                 tileEntity.saveData()
                 
@@ -299,6 +300,9 @@ object TileEntityManager : Listener {
                 )
             }
         }
+        
+        if (NOVA.isEnabled) asyncTransaction(statement)
+        else transaction(statement = statement)
     }
     
     @EventHandler
