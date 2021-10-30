@@ -39,7 +39,7 @@ fun ItemBuilder.addLoreLines(vararg lines: BaseComponent): ItemBuilder {
 
 fun Component.toBaseComponentArray(): Array<BaseComponent> {
     try {
-        return ComponentSerializer.parse(CraftChatMessage.fromComponent(this))
+        return ComponentSerializer.parse(CraftChatMessage.toJSON(this))
     } catch (e: Exception) {
         throw IllegalArgumentException("Could not convert to BaseComponent array: $this", e)
     }
