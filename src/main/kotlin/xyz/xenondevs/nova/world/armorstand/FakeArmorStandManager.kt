@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
+import java.util.concurrent.CopyOnWriteArrayList
 
 val Chunk.pos: ChunkPos
     get() = ChunkPos(world.uid, x, z)
@@ -36,7 +37,7 @@ object FakeArmorStandManager : Listener {
     val MAX_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.max")!!
     
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
-    private val chunkViewers = HashMap<ChunkPos, MutableList<Player>>()
+    private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
     private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
     
     fun init() {
@@ -67,7 +68,7 @@ object FakeArmorStandManager : Listener {
         val armorStands = chunkArmorStands.getOrPut(chunk) { mutableListOf() }
         armorStands.add(armorStand)
         
-        val viewers = chunkViewers.getOrPut(chunk) { mutableListOf() }
+        val viewers = chunkViewers.getOrPut(chunk) { CopyOnWriteArrayList() }
         viewers.forEach { armorStand.spawn(it) }
     }
     
@@ -89,14 +90,14 @@ object FakeArmorStandManager : Listener {
         chunkArmorStands.getOrPut(newChunk) { mutableListOf() }.add(armorStand)
         
         // find all players that saw the old chunk but don't see the new one and despawn it for them
-        val newChunkViewers = chunkViewers.getOrPut(newChunk) { mutableListOf() }
-        chunkViewers[previousChunk]!!.stream()
-            .filter { !newChunkViewers.contains(it) }
+        val newChunkViewers = chunkViewers.getOrPut(newChunk) { CopyOnWriteArrayList() }
+        chunkViewers[previousChunk]!!.asSequence()
+            .filterNot { newChunkViewers.contains(it) }
             .forEach { armorStand.despawn(it) }
         
         // find all players that didn't see the old chunk but should see the armor stand now and spawn it for them
-        newChunkViewers.stream()
-            .filter { !(chunkViewers[previousChunk]?.contains(it) ?: false) }
+        newChunkViewers.asSequence()
+            .filterNot { (chunkViewers[previousChunk]?.contains(it) ?: false) }
             .forEach { armorStand.spawn(it) }
     }
     
@@ -106,29 +107,30 @@ object FakeArmorStandManager : Listener {
         val newChunks = newChunk.pos.getInRange(player.armorStandRenderDistance)
         
         // look for all chunks that are no longer visible
-        currentChunks.stream()
-            .filter { !newChunks.contains(it) }
+        currentChunks.asSequence()
+            .filterNot { newChunks.contains(it) }
             .forEach { chunk ->
                 // despawn the armor stands there
                 chunkArmorStands[chunk]?.forEach { armorStand ->
                     armorStand.despawn(player)
                 }
                 
-                // remove the player from the viewer list
+                // copy the chunkViewerList and remove the player there
+                // (The list is copied to prevent other threads from causing issues by iterating over the chunkViewerList concurrently)
                 chunkViewers[chunk]?.remove(player)
             }
         
         // look for all chunks weren't visible previously
-        newChunks.stream()
-            .filter { !currentChunks.contains(it) }
+        newChunks.asSequence()
+            .filterNot { currentChunks.contains(it) }
             .forEach { chunk ->
                 // spawn the armor stands there
                 chunkArmorStands[chunk]?.forEach { armorStand ->
                     armorStand.spawn(player)
                 }
                 
-                // add the player to the viewers list
-                chunkViewers.getOrPut(chunk) { mutableListOf() }.add(player)
+                // copy the chunkViewerList and add the player there
+                chunkViewers.getOrPut(chunk) { CopyOnWriteArrayList() }.add(player)
             }
         
         // update visible chunks map
