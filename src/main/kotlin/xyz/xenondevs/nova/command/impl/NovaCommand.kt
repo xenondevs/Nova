@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
-import xyz.xenondevs.nova.world.armorstand.pos
+import xyz.xenondevs.nova.world.pos
 
 
 object NovaCommand : Command("nova") {

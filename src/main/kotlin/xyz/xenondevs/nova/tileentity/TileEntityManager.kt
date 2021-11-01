@@ -34,7 +34,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.armorstand.pos
+import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.math.roundToInt

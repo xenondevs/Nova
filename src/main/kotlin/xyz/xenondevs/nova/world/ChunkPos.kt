@@ -4,6 +4,9 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import java.util.*
 
+val Chunk.pos: ChunkPos
+    get() = ChunkPos(world.uid, x, z)
+
 data class ChunkPos(val world: UUID, val x: Int, val z: Int) {
     
     val chunk: Chunk
