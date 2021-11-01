@@ -40,9 +40,11 @@ abstract class VanillaTileEntity(tileState: TileState) : DataHolder(tileState.ge
     abstract fun handleInitialized()
     
     fun updateDataContainer() {
-        val tileState = block.state as TileState
-        tileState.persistentDataContainer.set(TILE_ENTITY_KEY, CompoundElementDataType, data)
-        tileState.update()
+        val tileState = block.state
+        if (tileState is TileState) {
+            tileState.persistentDataContainer.set(TILE_ENTITY_KEY, CompoundElementDataType, data)
+            tileState.update()
+        }
     }
     
 }
