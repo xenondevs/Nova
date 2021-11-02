@@ -45,7 +45,7 @@ fun Component.toBaseComponentArray(): Array<BaseComponent> {
     }
 }
 
-fun Array<BaseComponent>.toComponent(): Component? {
+fun Array<out BaseComponent>.toComponent(): Component {
     try {
         return CraftChatMessage.fromJSON(ComponentSerializer.toString(this))
     } catch (e: Exception) {
