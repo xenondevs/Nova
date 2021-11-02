@@ -1,6 +1,9 @@
 package xyz.xenondevs.nova.i18n
 
 import com.google.gson.JsonObject
+import net.minecraft.locale.Language
+import net.minecraft.network.chat.FormattedText
+import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
@@ -32,6 +35,7 @@ object LocaleManager {
             }
             
             this.translationProviders = translationProviders
+            Language.inject(NovaLanguage)
             LOGGER.info("Finished loading translations")
         }
     }
@@ -39,6 +43,16 @@ object LocaleManager {
     fun getTranslation(lang: String, key: String): String {
         if (!::translationProviders.isInitialized) return ""
         return translationProviders[lang]?.get(key) ?: ""
+    }
+    
+    fun getTranslationOrNull(lang: String, key: String): String? {
+        if (!::translationProviders.isInitialized) return null
+        return translationProviders[lang]?.get(key)
+    }
+    
+    fun hasTranslation(lang: String, key: String): Boolean {
+        if (!::translationProviders.isInitialized) return false
+        return translationProviders[lang]?.containsKey(key) ?: false
     }
     
     fun getTranslation(player: Player, key: String): String {
@@ -51,6 +65,28 @@ object LocaleManager {
     
     fun getTranslatedName(player: Player, novaMaterial: NovaMaterial): String {
         return getTranslation(player, novaMaterial.localizedName)
+    }
+    
+    private object NovaLanguage : Language() {
+        
+        private val delegate = getInstance()
+        
+        override fun getOrDefault(key: String): String {
+            return getTranslationOrNull("en_us", key) ?: delegate.getOrDefault(key)
+        }
+        
+        override fun has(key: String): Boolean {
+            return hasTranslation("en_us", key) || delegate.has(key)
+        }
+        
+        override fun isDefaultRightToLeft(): Boolean {
+            return delegate.isDefaultRightToLeft
+        }
+        
+        override fun getVisualOrder(text: FormattedText?): FormattedCharSequence {
+            return delegate.getVisualOrder(text)
+        }
+        
     }
     
 }
