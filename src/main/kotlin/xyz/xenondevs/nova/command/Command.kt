@@ -36,7 +36,7 @@ fun <CommandSourceStack, T : ArgumentBuilder<CommandSourceStack, T>> ArgumentBui
 }
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresPermission(permission: String): LiteralArgumentBuilder<CommandSourceStack> =
-    this.requires { it.player.hasPermission(permission) }
+    this.requires { it.source.isConsole() || it.player.hasPermission(permission) }
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresConsole(): LiteralArgumentBuilder<CommandSourceStack> =
     this.requires { it.source.isConsole() }
