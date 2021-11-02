@@ -338,7 +338,7 @@ object TileEntityManager : Listener {
                 val placeEvent = BlockPlaceEvent(otherBlock, replacedState, block, event.itemInHand, player, event.canBuild(), event.hand)
                 Bukkit.getPluginManager().callEvent(placeEvent)
                 if (placeEvent.isCancelled) otherBlock.type = Material.AIR
-                else player.inventory.setItem(event.hand, event.itemInHand.apply { amount -= 1 })
+                else if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(event.hand, event.itemInHand.apply { amount -= 1 })
             }
             
             return
