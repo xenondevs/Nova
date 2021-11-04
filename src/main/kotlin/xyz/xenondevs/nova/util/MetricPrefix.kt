@@ -30,17 +30,28 @@ enum class MetricPrefix(exponent: Int, val prefixName: String, val prefixSymbol:
     
     companion object {
         
-        // TODO: optimize
-        fun findBestPrefix(number: BigDecimal, vararg ignoredPrefixes: MetricPrefix): Pair<BigDecimal, MetricPrefix> {
-            val prefix = values()
-                .asSequence()
-                .filterNot { ignoredPrefixes.contains(it) }
-                .filter { number >= it.number }
-                .map { it to (number - it.number) }
-                .minByOrNull { it.second }?.first ?: NONE
+        private val VALUES = values()
+        private val VALUES_REVERSED = values().reversedArray()
+        
+        fun findBestPrefix(number: BigDecimal, ignored: BooleanArray): Pair<BigDecimal, MetricPrefix> {
+            if (number == BigDecimal.ZERO)
+                return number to NONE
             
-            return number.divide(prefix.number) to prefix
+            var bestPrefix = NONE
+            var newNumber = number
+            for (prefix in VALUES_REVERSED) {
+                if (!ignored[prefix.ordinal] && number >= prefix.number) {
+                    bestPrefix = prefix
+                    newNumber = number.divide(bestPrefix.number)
+                    if (newNumber >= BigDecimal.ONE)
+                        break
+                }
+            }
+            return newNumber to bestPrefix
         }
+        
+        fun generateIgnoredArray(vararg ignoredPrefixes: MetricPrefix) =
+            BooleanArray(VALUES.size) { VALUES[it] in ignoredPrefixes }
         
     }
     

@@ -5,7 +5,7 @@ import java.math.RoundingMode
 
 object EnergyUtils {
     
-    private val IGNORED_PREFIXES = arrayOf(
+    private val IGNORED_PREFIXES = MetricPrefix.generateIgnoredArray(
         MetricPrefix.YOCTO,
         MetricPrefix.ZEPTO,
         MetricPrefix.ATTO,
@@ -21,7 +21,7 @@ object EnergyUtils {
     )
     
     fun getEnergyString(energy: Int): String {
-        val closest = MetricPrefix.findBestPrefix(BigDecimal(energy), *IGNORED_PREFIXES)
+        val closest = MetricPrefix.findBestPrefix(BigDecimal(energy), IGNORED_PREFIXES)
         val prefix = closest.second
         val resultNumber = closest.first.setScale(2, RoundingMode.HALF_UP)
             .let { if (prefix == MetricPrefix.NONE) it.stripTrailingZeros() else it }
@@ -30,7 +30,7 @@ object EnergyUtils {
     }
     
     fun getEnergyString(energy: Int, maxEnergy: Int): String {
-        val bestMaxEnergy = MetricPrefix.findBestPrefix(BigDecimal(maxEnergy), *IGNORED_PREFIXES)
+        val bestMaxEnergy = MetricPrefix.findBestPrefix(BigDecimal(maxEnergy), IGNORED_PREFIXES)
         val prefix = bestMaxEnergy.second
         
         val prefixedEnergy = if (energy == 0) "0" else
