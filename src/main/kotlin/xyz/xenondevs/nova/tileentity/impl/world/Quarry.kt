@@ -355,12 +355,14 @@ class Quarry(
     
     private fun createScaffolding() {
         runAsyncTask {
-            createScaffoldingOutlines()
-            createScaffoldingCorners()
-            createScaffoldingPillars()
-            createScaffoldingArms()
-            drill.addModels(Model(DRILL, pointerLocation))
-            updatePointer(true)
+            if (isValid) {
+                createScaffoldingOutlines()
+                createScaffoldingCorners()
+                createScaffoldingPillars()
+                createScaffoldingArms()
+                drill.addModels(Model(DRILL, pointerLocation))
+                updatePointer(true)
+            }
         }
     }
     

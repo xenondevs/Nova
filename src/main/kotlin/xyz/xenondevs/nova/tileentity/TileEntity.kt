@@ -39,6 +39,7 @@ abstract class TileEntity(
     
     abstract val gui: Lazy<TileEntityGUI>?
     
+    @Volatile
     var isValid: Boolean = true
         private set
     
