@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.dedicated.DedicatedServer
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.rcon.RconConsoleSource
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.util.data.toComponent
@@ -39,7 +40,7 @@ fun CommandSourceStack.sendFailure(vararg message: BaseComponent) {
 
 fun CommandSource.isConsole() = this is DedicatedServer || this is RconConsoleSource
 
-fun CommandSource.isPlayer() = this is Player
+fun CommandSource.isPlayer() = this is ServerPlayer
 
 inline operator fun <reified V> CommandContext<*>.get(name: String): V =
     getArgument(name, V::class.java)
