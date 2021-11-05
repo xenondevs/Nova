@@ -16,6 +16,9 @@
     "max": 6,
     "default": 4
   },
+  "crafting_cache": {
+    "size": 5000
+  },
   "bottled_mob_blacklist": [
     "WITHER",
     "ENDER_DRAGON",
