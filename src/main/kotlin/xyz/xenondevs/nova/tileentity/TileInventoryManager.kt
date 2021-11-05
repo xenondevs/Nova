@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.database.asyncTransaction
 import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
+import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.util.*
 
 object TileInventoryManager {
@@ -18,6 +19,7 @@ object TileInventoryManager {
     private val inventories = HashMap<UUID, Pair<UUID, VirtualInventory>>()
     
     init {
+        runAsyncTaskTimer(6000L, 6000L) { saveInventories() }
         NOVA.disableHandlers += ::saveInventories
     }
     
