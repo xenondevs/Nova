@@ -1,7 +1,7 @@
 {
   "resource_pack": {
     "enabled": true,
-    "url": "https://github.com/xenondevs/NovaRP/releases/download/0.6/NovaRP.zip"
+    "url": "https://github.com/xenondevs/NovaRP/releases/download/0.6.11/NovaRP.zip"
   },
   "mysql": {
     "enabled": false,
