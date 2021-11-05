@@ -111,19 +111,24 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     }
     
     private fun setInventories() {
-        val inventory = NetworkedBukkitInventory((block.state as Chest).inventory)
-        inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+        val chest = block.state
+        if (chest is Chest) {
+            val inventory = NetworkedBukkitInventory(chest.inventory)
+            inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+        }
     }
     
     private fun getOtherChestLocation(): Location? {
-        val chest = block.state as Chest
-        val holder = chest.inventory.holder
-        
-        if (holder is DoubleChest) {
-            val left = holder.leftSide as Chest
-            val right = holder.rightSide as Chest
+        val chest = block.state
+        if (chest is Chest) {
+            val holder = chest.inventory.holder
             
-            return if (left.location == location) right.location else left.location
+            if (holder is DoubleChest) {
+                val left = holder.leftSide as Chest
+                val right = holder.rightSide as Chest
+                
+                return if (left.location == location) right.location else left.location
+            }
         }
         
         return null
