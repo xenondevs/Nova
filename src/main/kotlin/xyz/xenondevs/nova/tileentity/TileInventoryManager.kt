@@ -23,7 +23,8 @@ object TileInventoryManager {
     
     @Synchronized
     fun loadInventory(tileEntityUUID: UUID, inventoryUUID: UUID, inventory: VirtualInventory) {
-        inventories[inventoryUUID] = tileEntityUUID to inventory
+        if (inventoryUUID !in inventories)
+            inventories[inventoryUUID] = tileEntityUUID to inventory
     }
     
     @Synchronized
