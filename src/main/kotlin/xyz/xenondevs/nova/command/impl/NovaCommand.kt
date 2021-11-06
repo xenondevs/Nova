@@ -4,6 +4,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.arguments.EntityArgument
+import net.minecraft.commands.arguments.selector.EntitySelector
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -19,7 +21,7 @@ import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
-import xyz.xenondevs.nova.world.armorstand.pos
+import xyz.xenondevs.nova.world.pos
 
 
 object NovaCommand : Command("nova") {
@@ -28,15 +30,17 @@ object NovaCommand : Command("nova") {
         builder = builder
             .then(literal("give")
                 .requiresPermission("nova.command.give")
-                .apply {
-                    NovaMaterialRegistry.sortedObtainables.forEach { material ->
-                        then(literal(material.typeName)
-                            .executesCatching { handleGive(material, it) }
-                        )
-                    }
-                })
+                .then(argument("player", EntityArgument.players())
+                    .apply {
+                        NovaMaterialRegistry.sortedObtainables.forEach { material ->
+                            then(literal(material.typeName.lowercase())
+                                .executesCatching { handleGiveTo(it, material, 1) }
+                                .then(argument("amount", IntegerArgumentType.integer())
+                                    .executesCatching { handleGiveTo(it, material) }))
+                        }
+                    }))
             .then(literal("debug")
-                .requiresPermission("nova.command.debug")
+                .requiresPlayerPermission("nova.command.debug")
                 .then(literal("removeTileEntities")
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching { removeTileEntities(it) }))
@@ -47,24 +51,36 @@ object NovaCommand : Command("nova") {
                 .then(literal("itemNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) }))
             .then(literal("items")
-                .requiresPermission("nova.command.items")
+                .requiresPlayerPermission("nova.command.items")
                 .executesCatching { openItemInventory(it) })
             .then(literal("renderDistance")
-                .requiresPermission("nova.command.renderDistance")
+                .requiresPlayerPermission("nova.command.renderDistance")
                 .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
                     .executesCatching { setRenderDistance(it) }))
     }
     
-    private fun handleGive(material: NovaMaterial, ctx: CommandContext<CommandSourceStack>) {
-        val player = ctx.player
-        player.inventory.addItem(material.createItemStack())
+    private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: NovaMaterial) =
+        handleGiveTo(ctx, material, ctx["amount"])
+    
+    private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: NovaMaterial, amount: Int) {
         val itemName = material.localizedName.ifBlank { material.typeName }
         
-        player.spigot().sendMessage(localized(
-            ChatColor.GRAY,
-            "command.nova.give.success",
-            localized(ChatColor.AQUA, itemName)
-        ))
+        val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
+        
+        if (targetPlayers.isNotEmpty()) {
+            targetPlayers.forEach {
+                val player = it.bukkitEntity
+                player.inventory.addItem(material.createItemStack(amount))
+                
+                ctx.source.sendSuccess(localized(
+                    ChatColor.GRAY,
+                    "command.nova.give.success",
+                    amount,
+                    localized(ChatColor.AQUA, itemName),
+                    player.name
+                ))
+            }
+        } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.no-players"))
     }
     
     private fun removeTileEntities(ctx: CommandContext<CommandSourceStack>) {
@@ -73,7 +89,7 @@ object NovaCommand : Command("nova") {
         val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it.pos) }
         tileEntities.forEach { TileEntityManager.destroyTileEntity(it, false) }
         
-        player.spigot().sendMessage(localized(
+        ctx.source.sendSuccess(localized(
             ChatColor.GRAY,
             "command.nova.remove_tile_entities.success",
             coloredText(ChatColor.AQUA, tileEntities.count())
@@ -83,12 +99,12 @@ object NovaCommand : Command("nova") {
     private fun showTileEntityData(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         
-        fun sendFailure() = player.spigot().sendMessage(localized(
+        fun sendFailure() = ctx.source.sendFailure(localized(
             ChatColor.RED,
             "command.nova.show_tile_entity_data.failure"
         ))
         
-        fun sendSuccess(name: String, data: CompoundElement) = player.spigot().sendMessage(localized(
+        fun sendSuccess(name: String, data: CompoundElement) = ctx.source.sendSuccess(localized(
             ChatColor.GRAY,
             "command.nova.show_tile_entity_data.success",
             localized(ChatColor.AQUA, name),
@@ -113,7 +129,7 @@ object NovaCommand : Command("nova") {
         val player = ctx.player
         NetworkDebugger.toggleDebugger(type, player)
         
-        player.spigot().sendMessage(localized(
+        ctx.source.sendSuccess(localized(
             ChatColor.GRAY,
             "command.nova.network_debug." + type.name.lowercase()
         ))
@@ -128,7 +144,7 @@ object NovaCommand : Command("nova") {
         val distance: Int = ctx["distance"]
         player.armorStandRenderDistance = distance
         
-        player.spigot().sendMessage(localized(
+        ctx.source.sendSuccess(localized(
             ChatColor.GRAY,
             "command.nova.render_distance",
             coloredText(ChatColor.AQUA, distance)

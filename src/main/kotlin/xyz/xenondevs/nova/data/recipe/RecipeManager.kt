@@ -1,10 +1,13 @@
 package xyz.xenondevs.nova.data.recipe
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -12,11 +15,13 @@ import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.impl.processing.PressType
 import xyz.xenondevs.nova.util.customModelData
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.removeFirstWhere
+import kotlin.experimental.and
 
 class NovaRecipeChoice(private val material: NovaMaterial) : ExactChoice(material.createItemStack()) {
     
@@ -38,13 +43,16 @@ class NovaRecipeChoice(private val material: NovaMaterial) : ExactChoice(materia
 
 object RecipeManager : Listener {
     
-    internal val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
-    internal val shapelessRecipes = ArrayList<ShapelessRecipe>()
+    val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
+    val shapelessRecipes = ArrayList<ShapelessRecipe>()
     
-    internal val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
+    val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
     val pulverizerRecipes = HashMap<NamespacedKey, PulverizerNovaRecipe>()
     val platePressRecipes = HashMap<NamespacedKey, PlatePressNovaRecipe>()
     val gearPressRecipes = HashMap<NamespacedKey, GearPressNovaRecipe>()
+    
+    private val craftingCache: Cache<CraftingMatrix, ItemStack> =
+        CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(DEFAULT_CONFIG.getLong("crafting_cache.size")!!).build()
     
     fun registerRecipes() {
         LOGGER.info("Loading recipes")
@@ -65,27 +73,35 @@ object RecipeManager : Listener {
         vanillaRegisteredRecipeKeys.forEach(event.player::discoverRecipe)
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
-        val predictedRecipe = event.recipe
-        if (predictedRecipe != null && (predictedRecipe as Keyed).key.namespace != "nova") {
-            // prevent non-nova recipes from using nova items
-            if (event.inventory.contents.any { it.novaMaterial != null })
-                event.inventory.result = ItemStack(Material.AIR)
-        } else {
-            // if the recipe is null or it bukkit thinks it found a nova recipe, we do our own calculations
-            // this does two things:
-            // 1. calls the custom test method of NovaRecipeChoice (-> ignores irrelevant nbt data)
-            // 2. allows for the usage of NovaRecipeChoice / ExactChoice in shapeless crafting recipes
+        event.inventory.result = craftingCache.get(CraftingMatrix(event.inventory.matrix)) {
             
-            val matrix = event.inventory.matrix
-            val recipe = if (matrix.size == 9) {
-                findMatchingShapedRecipe(matrix) ?: findMatchingShapelessRecipe(matrix)
-            } else findMatchingShapelessRecipe(matrix)
-            event.inventory.result = recipe?.result ?: ItemStack(Material.AIR)
+            val predictedRecipe = event.recipe
+            if (predictedRecipe != null && (predictedRecipe as Keyed).key.namespace != "nova") {
+                // prevent non-nova recipes from using nova items
+                if (event.inventory.contents.any { it.novaMaterial != null }) {
+                    return@get ItemStack(Material.AIR)
+                } else {
+                    // Bukkit's calculated result is correct
+                    return@get event.inventory.result
+                }
+            } else {
+                // if the recipe is null or it bukkit thinks it found a nova recipe, we do our own calculations
+                // this does two things:
+                // 1. calls the custom test method of NovaRecipeChoice (-> ignores irrelevant nbt data)
+                // 2. allows for the usage of NovaRecipeChoice / ExactChoice in shapeless crafting recipes
+                
+                val matrix = event.inventory.matrix
+                val recipe = if (matrix.size == 9) {
+                    findMatchingShapedRecipe(matrix) ?: findMatchingShapelessRecipe(matrix)
+                } else findMatchingShapelessRecipe(matrix)
+                
+                return@get recipe?.result ?: ItemStack(Material.AIR)
+            }
+            
         }
     }
-    
     
     private fun findMatchingShapedRecipe(matrix: Array<ItemStack?>): Recipe? {
         // loop over all shaped recipes from nova
@@ -126,6 +142,45 @@ class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
     init {
         val flatShape = recipe.shape.joinToString("")
         choices = Array(9) { recipe.choiceMap[flatShape[it]] }
+    }
+    
+}
+
+class CraftingMatrix(matrix: Array<ItemStack?>) {
+    
+    private val matrix = matrix.map { it?.clone() }
+    private val hashCode: Int
+    
+    init {
+        var hash = 1
+        for (item in matrix)
+            hash = 31 * hash + (item?.hashCodeIgnoredAmount() ?: 0)
+        this.hashCode = hash
+    }
+    
+    override fun hashCode(): Int =
+        hashCode
+    
+    override fun equals(other: Any?): Boolean {
+        if (other !is CraftingMatrix || other.matrix.size != matrix.size) return false
+        
+        for (i in matrix.indices) {
+            val item = matrix[i]
+            val otherItem = other.matrix[i]
+            
+            if (!(item?.isSimilar(otherItem) ?: (otherItem == null))) return false
+        }
+        
+        return true
+    }
+    
+    @Suppress("DEPRECATION")
+    private fun ItemStack.hashCodeIgnoredAmount(): Int {
+        var hash = 1
+        hash = hash * 31 + type.hashCode()
+        hash = hash * 31 + (durability and 0xffff.toShort())
+        hash = hash * 31 + if (hasItemMeta()) itemMeta.hashCode() else 0
+        return hash
     }
     
 }

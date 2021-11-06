@@ -17,6 +17,7 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -33,7 +34,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.armorstand.pos
+import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import kotlin.math.roundToInt
@@ -244,31 +245,33 @@ object TileEntityManager : Listener {
         }
     }
     
+    @Synchronized
     private fun handleChunkUnload(chunkPos: ChunkPos) {
-        val async = NOVA.isEnabled
-        addToChunkTaskQueue(chunkPos, async) {
-            saveChunk(chunkPos) // saving can be done from a different thread
+        if (chunkPos !in tileEntityMap) return
+        
+        val tileEntities = tileEntityMap[chunkPos]!!
+        val tileEntityValues = tileEntities.values
+        
+        addToChunkTaskQueue(chunkPos, false) { latch ->
+            tileEntityMap -= chunkPos
+            additionalHitboxMap -= chunkPos
+            locationCache.removeAll { it.chunkPos == chunkPos }
+            tileEntityValues.forEach { it.handleRemoved(unload = true) }
             
-            val task = { // this should be run in the main thread
-                val tileEntities = tileEntityMap[chunkPos]
-                tileEntityMap -= chunkPos
-                locationCache.removeAll { it.chunkPos == chunkPos }
-                tileEntities?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(unload = true) }
-                
-                it.countDown() // move on in the queue
-            }
-            
-            // switch to the main thread if we're not already in it, otherwise just use synchronized
-            if (async) runTaskSynchronized(this, task)
-            else synchronized(this, task)
+            latch.countDown() // move on in the queue
         }
+        
+        saveChunk(tileEntities.values)
     }
     
     @Synchronized
-    fun saveChunk(chunkPos: ChunkPos) {
-        val tileEntities = tileEntityMap[chunkPos]?.values ?: return
-        
-        transaction {
+    fun saveChunk(chunk: ChunkPos) {
+        if (chunk in tileEntityMap)
+            saveChunk(tileEntityMap[chunk]!!.values)
+    }
+    
+    private fun saveChunk(tileEntities: Iterable<TileEntity>) {
+        val statement: (Transaction.() -> Unit) = {
             tileEntities.forEach { tileEntity ->
                 tileEntity.saveData()
                 
@@ -281,8 +284,8 @@ object TileEntityManager : Listener {
                         it[id] = tileEntity.uuid
                         it[world] = tileEntity.location.world!!.uid
                         it[owner] = tileEntity.ownerUUID
-                        it[chunkX] = chunkPos.x
-                        it[chunkZ] = chunkPos.z
+                        it[chunkX] = tileEntity.chunkPos.x
+                        it[chunkZ] = tileEntity.chunkPos.z
                         it[x] = location.blockX
                         it[y] = location.blockY
                         it[z] = location.blockZ
@@ -297,6 +300,9 @@ object TileEntityManager : Listener {
                 )
             }
         }
+        
+        if (NOVA.isEnabled) asyncTransaction(statement)
+        else transaction(statement = statement)
     }
     
     @EventHandler
@@ -332,6 +338,7 @@ object TileEntityManager : Listener {
                 val placeEvent = BlockPlaceEvent(otherBlock, replacedState, block, event.itemInHand, player, event.canBuild(), event.hand)
                 Bukkit.getPluginManager().callEvent(placeEvent)
                 if (placeEvent.isCancelled) otherBlock.type = Material.AIR
+                else if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(event.hand, event.itemInHand.apply { amount -= 1 })
             }
             
             return

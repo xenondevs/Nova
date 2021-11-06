@@ -14,9 +14,18 @@ body:
           required: true
         - label: I have checked for similar issues.
           required: true
+  - type: dropdown
+    id: plugins
+    attributes:
+      label: Other plugins
+      options:
+        - This bug also occurs when no other plugins are present.
+        - This issue is about a specific plugin incompatibility.
+    validations:
+      required: true
   - type: input
     attributes:
-      label: Plugin Version and Server Software
+      label: Plugin Version, Server Software, Server Version
       description: "The plugin version and server software that were used to cause this bug. Use /version to get your server version."
       placeholder: "Nova: 0.4.1, Spigot: 3241-Spigot-6c1c1b2-1492826 (MC: 1.17.1)"
     validations:
@@ -24,9 +33,9 @@ body:
   - type: textarea
     attributes:
       label: Expected behavior
-      description: A clear and concise description of what you expected to happen.
+      description: A clear and concise description of what you expected to happen. Can be left empty if there is no need for an explanation.
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: Observed/Actual behavior

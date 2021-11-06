@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.armorstand
 
 import org.bukkit.Bukkit
-import org.bukkit.Chunk
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -12,13 +11,12 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.util.chunkPos
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
-
-val Chunk.pos: ChunkPos
-    get() = ChunkPos(world.uid, x, z)
+import java.util.concurrent.CopyOnWriteArrayList
 
 var Player.armorStandRenderDistance: Int
     get() = persistentDataContainer
@@ -26,7 +24,6 @@ var Player.armorStandRenderDistance: Int
         ?: DEFAULT_RENDER_DISTANCE
     set(value) =
         persistentDataContainer.set(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER, value)
-
 
 object FakeArmorStandManager : Listener {
     
@@ -36,7 +33,7 @@ object FakeArmorStandManager : Listener {
     val MAX_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.max")!!
     
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
-    private val chunkViewers = HashMap<ChunkPos, MutableList<Player>>()
+    private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
     private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
     
     fun init() {
@@ -44,7 +41,7 @@ object FakeArmorStandManager : Listener {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         
         Bukkit.getOnlinePlayers().forEach { player ->
-            handleChunksChange(player, player.location.chunk)
+            handleChunksChange(player, player.location.chunkPos)
         }
         
         NOVA.disableHandlers += {
@@ -67,7 +64,7 @@ object FakeArmorStandManager : Listener {
         val armorStands = chunkArmorStands.getOrPut(chunk) { mutableListOf() }
         armorStands.add(armorStand)
         
-        val viewers = chunkViewers.getOrPut(chunk) { mutableListOf() }
+        val viewers = chunkViewers.getOrPut(chunk) { CopyOnWriteArrayList() }
         viewers.forEach { armorStand.spawn(it) }
     }
     
@@ -89,46 +86,47 @@ object FakeArmorStandManager : Listener {
         chunkArmorStands.getOrPut(newChunk) { mutableListOf() }.add(armorStand)
         
         // find all players that saw the old chunk but don't see the new one and despawn it for them
-        val newChunkViewers = chunkViewers.getOrPut(newChunk) { mutableListOf() }
-        chunkViewers[previousChunk]!!.stream()
-            .filter { !newChunkViewers.contains(it) }
+        val newChunkViewers = chunkViewers.getOrPut(newChunk) { CopyOnWriteArrayList() }
+        chunkViewers[previousChunk]!!.asSequence()
+            .filterNot { newChunkViewers.contains(it) }
             .forEach { armorStand.despawn(it) }
         
         // find all players that didn't see the old chunk but should see the armor stand now and spawn it for them
-        newChunkViewers.stream()
-            .filter { !(chunkViewers[previousChunk]?.contains(it) ?: false) }
+        newChunkViewers.asSequence()
+            .filterNot { (chunkViewers[previousChunk]?.contains(it) ?: false) }
             .forEach { armorStand.spawn(it) }
     }
     
     @Synchronized
-    private fun handleChunksChange(player: Player, newChunk: Chunk) {
+    private fun handleChunksChange(player: Player, newChunk: ChunkPos) {
         val currentChunks = visibleChunks[player] ?: emptySet()
-        val newChunks = newChunk.pos.getInRange(player.armorStandRenderDistance)
+        val newChunks = newChunk.getInRange(player.armorStandRenderDistance)
         
         // look for all chunks that are no longer visible
-        currentChunks.stream()
-            .filter { !newChunks.contains(it) }
+        currentChunks.asSequence()
+            .filterNot { newChunks.contains(it) }
             .forEach { chunk ->
                 // despawn the armor stands there
                 chunkArmorStands[chunk]?.forEach { armorStand ->
                     armorStand.despawn(player)
                 }
                 
-                // remove the player from the viewer list
+                // copy the chunkViewerList and remove the player there
+                // (The list is copied to prevent other threads from causing issues by iterating over the chunkViewerList concurrently)
                 chunkViewers[chunk]?.remove(player)
             }
         
         // look for all chunks weren't visible previously
-        newChunks.stream()
-            .filter { !currentChunks.contains(it) }
+        newChunks.asSequence()
+            .filterNot { currentChunks.contains(it) }
             .forEach { chunk ->
                 // spawn the armor stands there
                 chunkArmorStands[chunk]?.forEach { armorStand ->
                     armorStand.spawn(player)
                 }
                 
-                // add the player to the viewers list
-                chunkViewers.getOrPut(chunk) { mutableListOf() }.add(player)
+                // copy the chunkViewerList and add the player there
+                chunkViewers.getOrPut(chunk) { CopyOnWriteArrayList() }.add(player)
             }
         
         // update visible chunks map
@@ -147,8 +145,8 @@ object FakeArmorStandManager : Listener {
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleMove(event: PlayerMoveEvent) {
-        val newChunk = event.to!!.chunk
-        if (event.from.chunk != newChunk) {
+        val newChunk = event.to!!.chunkPos
+        if (event.from.chunkPos != newChunk) {
             val player = event.player
             runAsyncTask { handleChunksChange(player, newChunk) }
         }
@@ -156,8 +154,8 @@ object FakeArmorStandManager : Listener {
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleTeleport(event: PlayerTeleportEvent) {
-        val newChunk = event.to!!.chunk
-        if (event.from.chunk != newChunk) {
+        val newChunk = event.to!!.chunkPos
+        if (event.from.chunkPos != newChunk) {
             val player = event.player
             runAsyncTask { handleChunksChange(player, newChunk) }
         }
@@ -166,8 +164,8 @@ object FakeArmorStandManager : Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleSpawn(event: PlayerRespawnEvent) {
         val player = event.player
-        val newChunk = event.respawnLocation.chunk
-        if (player.location.chunk != newChunk) {
+        val newChunk = event.respawnLocation.chunkPos
+        if (player.location.chunkPos != newChunk) {
             runAsyncTask { handleChunksChange(player, newChunk) }
         }
     }
@@ -175,7 +173,7 @@ object FakeArmorStandManager : Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
-        val chunk = player.location.chunk
+        val chunk = player.location.chunkPos
         runAsyncTask { handleChunksChange(player, chunk) }
     }
     

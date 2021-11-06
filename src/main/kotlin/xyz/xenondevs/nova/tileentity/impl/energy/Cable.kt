@@ -160,6 +160,8 @@ open class Cable(
         }
     
     private fun updateHitbox() {
+        if (!isValid) return
+        
         updateVirtualHitboxes()
         updateBlockHitbox()
     }

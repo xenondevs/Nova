@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
-import xyz.xenondevs.nova.world.armorstand.pos
+import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.region.Region
 import java.util.*
 
@@ -39,6 +39,7 @@ abstract class TileEntity(
     
     abstract val gui: Lazy<TileEntityGUI>?
     
+    @Volatile
     var isValid: Boolean = true
         private set
     

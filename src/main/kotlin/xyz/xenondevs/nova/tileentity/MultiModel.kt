@@ -37,7 +37,10 @@ class MultiModel {
     
     @Synchronized
     fun addModels(models: Iterable<Model>): List<FakeArmorStand> {
-        if (closed) throw UnsupportedOperationException("MultiModel is closed")
+        if (closed) {
+            UnsupportedOperationException("MultiModel is closed").printStackTrace()
+            return emptyList()
+        }
         
         return models.map { model ->
             val location = model.location

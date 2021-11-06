@@ -161,6 +161,8 @@ open class JsonConfig {
     
     fun getInt(path: String) = getNumber(path)?.toInt()
     
+    fun getLong(path: String) = getNumber(path)?.toLong()
+    
     fun getDouble(path: String) = getNumber(path)?.toDouble()
     
     fun getFloat(path: String) = getNumber(path)?.toFloat()

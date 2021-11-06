@@ -9,8 +9,8 @@
     <version>0.7-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>1.5.30-RC</kotlin.version>
-        <exposed.version>0.34.1</exposed.version>
+        <kotlin.version>1.5.31</kotlin.version>
+        <exposed.version>0.35.1</exposed.version>
         <spigot.version>1.17.1-R0.1-SNAPSHOT</spigot.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
@@ -122,15 +122,15 @@
         </dependency>
         <dependency>
             <groupId>com.plotsquared</groupId>
-            <artifactId>PlotSquared-Core</artifactId>
-            <version>5.13.11</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.plotsquared</groupId>
             <artifactId>PlotSquared-Bukkit</artifactId>
-            <version>5.13.11</version>
+            <version>6.1.3</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.kyori</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.griefdefender</groupId>
@@ -201,7 +201,7 @@
         <dependency>
             <groupId>com.github.NichtStudioCode.InvUI</groupId>
             <artifactId>InvUI</artifactId>
-            <version>0b96a820ec</version>
+            <version>4b9486eef7</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.NichtStudioCode.InvUI</groupId>
@@ -245,7 +245,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.0</version>
+            <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
