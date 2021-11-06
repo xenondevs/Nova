@@ -20,7 +20,7 @@ object EnergyUtils {
         MetricPrefix.HECTO,
     )
     
-    fun getEnergyString(energy: Int): String {
+    fun getEnergyString(energy: Long): String {
         val closest = MetricPrefix.findBestPrefix(BigDecimal(energy), IGNORED_PREFIXES)
         val prefix = closest.second
         val resultNumber = closest.first.setScale(2, RoundingMode.HALF_UP)
@@ -29,11 +29,11 @@ object EnergyUtils {
         return "$resultNumber ${prefix.prefixSymbol}J"
     }
     
-    fun getEnergyString(energy: Int, maxEnergy: Int): String {
+    fun getEnergyString(energy: Long, maxEnergy: Long): String {
         val bestMaxEnergy = MetricPrefix.findBestPrefix(BigDecimal(maxEnergy), IGNORED_PREFIXES)
         val prefix = bestMaxEnergy.second
         
-        val prefixedEnergy = if (energy == 0) "0" else
+        val prefixedEnergy = if (energy == 0L) "0" else
             BigDecimal(energy).divide(prefix.number)
                 .setScale(2, RoundingMode.HALF_UP)
                 .let { if (prefix == MetricPrefix.NONE) it.stripTrailingZeros() else it }

@@ -8,19 +8,19 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 
 class ProviderEnergyHolder(
     endPoint: NetworkedTileEntity,
-    defaultMaxEnergy: Int,
-    private val defaultEnergyGeneration: Int,
+    defaultMaxEnergy: Long,
+    private val defaultEnergyGeneration: Long,
     upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> MutableMap<BlockFace, EnergyConnectionType>
 ) : EnergyHolder(endPoint, defaultMaxEnergy, upgradeHolder, lazyDefaultConfig) {
     
     var energyGeneration = calculateEnergyGeneration()
     
-    private fun calculateEnergyGeneration(): Int {
+    private fun calculateEnergyGeneration(): Long {
         upgradeHolder ?: return defaultEnergyGeneration
         
-        return if (UpgradeType.SPEED in upgradeHolder.allowed) (defaultEnergyGeneration * upgradeHolder.getSpeedModifier()).toInt()
-        else (defaultEnergyGeneration * upgradeHolder.getEfficiencyModifier()).toInt()
+        return if (UpgradeType.SPEED in upgradeHolder.allowed) (defaultEnergyGeneration * upgradeHolder.getSpeedModifier()).toLong()
+        else (defaultEnergyGeneration * upgradeHolder.getEfficiencyModifier()).toLong()
     }
     
     override fun handleUpgradesUpdate() {

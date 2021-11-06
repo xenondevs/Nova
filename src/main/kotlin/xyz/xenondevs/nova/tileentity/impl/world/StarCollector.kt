@@ -36,9 +36,9 @@ import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[STAR_COLLECTOR].getInt("capacity")!!
-private val IDLE_ENERGY_PER_TICK = NovaConfig[STAR_COLLECTOR].getInt("energy_per_tick_idle")!!
-private val COLLECTING_ENERGY_PER_TICK = NovaConfig[STAR_COLLECTOR].getInt("energy_per_tick_collecting")!!
+private val MAX_ENERGY = NovaConfig[STAR_COLLECTOR].getLong("capacity")!!
+private val IDLE_ENERGY_PER_TICK = NovaConfig[STAR_COLLECTOR].getLong("energy_per_tick_idle")!!
+private val COLLECTING_ENERGY_PER_TICK = NovaConfig[STAR_COLLECTOR].getLong("energy_per_tick_collecting")!!
 private val IDLE_TIME = NovaConfig[STAR_COLLECTOR].getInt("idle_time")!!
 private val COLLECTION_TIME = NovaConfig[STAR_COLLECTOR].getInt("collection_time")!!
 

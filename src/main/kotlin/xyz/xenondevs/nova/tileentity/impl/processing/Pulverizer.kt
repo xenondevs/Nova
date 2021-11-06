@@ -35,8 +35,8 @@ import xyz.xenondevs.particle.ParticleEffect
 import java.lang.Integer.max
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[PULVERIZER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[PULVERIZER].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[PULVERIZER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[PULVERIZER].getLong("energy_per_tick")!!
 private val PULVERIZE_SPEED = NovaConfig[PULVERIZER].getInt("speed")!!
 
 class Pulverizer(

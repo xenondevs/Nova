@@ -37,7 +37,7 @@ private val NetworkNode.itemHolder: ItemHolder?
 
 open class Cable(
     override val typeId: Int,
-    override val energyTransferRate: Int,
+    override val energyTransferRate: Long,
     override val itemTransferRate: Int,
     uuid: UUID,
     data: CompoundElement,
@@ -288,16 +288,16 @@ open class Cable(
     
 }
 
-private val BASIC_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getInt("energy_transfer_rate")!!
+private val BASIC_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("energy_transfer_rate")!!
 private val BASIC_ITEM_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getInt("item_transfer_rate")!!
 
-private val ADVANCED_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getInt("energy_transfer_rate")!!
+private val ADVANCED_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getLong("energy_transfer_rate")!!
 private val ADVANCED_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getInt("item_transfer_rate")!!
 
-private val ELITE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getInt("energy_transfer_rate")!!
+private val ELITE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getLong("energy_transfer_rate")!!
 private val ELITE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getInt("item_transfer_rate")!!
 
-private val ULTIMATE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getInt("energy_transfer_rate")!!
+private val ULTIMATE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getLong("energy_transfer_rate")!!
 private val ULTIMATE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getInt("item_transfer_rate")!!
 
 class BasicCable(
@@ -376,7 +376,7 @@ class CreativeCable(
     armorStand: FakeArmorStand,
 ) : Cable(
     4,
-    Int.MAX_VALUE,
+    Long.MAX_VALUE,
     Int.MAX_VALUE,
     uuid,
     data,

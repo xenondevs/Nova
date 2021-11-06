@@ -46,9 +46,9 @@ import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[HARVESTER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[HARVESTER].getInt("energy_per_tick")!!
-private val ENERGY_PER_BREAK = NovaConfig[HARVESTER].getInt("energy_per_break")!!
+private val MAX_ENERGY = NovaConfig[HARVESTER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[HARVESTER].getLong("energy_per_tick")!!
+private val ENERGY_PER_BREAK = NovaConfig[HARVESTER].getLong("energy_per_break")!!
 private val IDLE_TIME = NovaConfig[HARVESTER].getInt("idle_time")!!
 private val MIN_RANGE = NovaConfig[HARVESTER].getInt("range.min")!!
 private val MAX_RANGE = NovaConfig[HARVESTER].getInt("range.max")!!

@@ -37,9 +37,9 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.math.min
 
-private val MAX_ENERGY = NovaConfig[MOB_KILLER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[MOB_KILLER].getInt("energy_per_tick")!!
-private val ENERGY_PER_DAMAGE = NovaConfig[MOB_KILLER].getInt("energy_per_damage")!!
+private val MAX_ENERGY = NovaConfig[MOB_KILLER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[MOB_KILLER].getLong("energy_per_tick")!!
+private val ENERGY_PER_DAMAGE = NovaConfig[MOB_KILLER].getLong("energy_per_damage")!!
 private val IDLE_TIME = NovaConfig[MOB_KILLER].getInt("idle_time")!!
 private val KILL_LIMIT = NovaConfig[MOB_KILLER].getInt("kill_limit")!!
 private val DAMAGE = NovaConfig[MOB_KILLER].getDouble("damage")!!
@@ -101,7 +101,7 @@ class MobKiller(
             if (timePassed++ >= maxIdleTime) {
                 timePassed = 0
                 
-                val killLimit = min(energyHolder.energy / energyHolder.specialEnergyConsumption, KILL_LIMIT)
+                val killLimit = min((energyHolder.energy / energyHolder.specialEnergyConsumption).toInt(), KILL_LIMIT)
                 
                 location
                     .chunk

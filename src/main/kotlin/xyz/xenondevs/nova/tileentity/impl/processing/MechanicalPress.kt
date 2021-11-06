@@ -40,8 +40,8 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.max
 
-private val MAX_ENERGY = NovaConfig[MECHANICAL_PRESS].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[MECHANICAL_PRESS].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[MECHANICAL_PRESS].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[MECHANICAL_PRESS].getLong("energy_per_tick")!!
 private val PRESS_SPEED = NovaConfig[MECHANICAL_PRESS].getInt("speed")!!
 
 enum class PressType {

@@ -27,8 +27,8 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-private val MAX_ENERGY = NovaConfig[SOLAR_PANEL].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[SOLAR_PANEL].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[SOLAR_PANEL].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[SOLAR_PANEL].getLong("energy_per_tick")!!
 
 class SolarPanel(
     uuid: UUID,

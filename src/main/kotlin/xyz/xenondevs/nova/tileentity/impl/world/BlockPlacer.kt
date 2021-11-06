@@ -26,8 +26,8 @@ import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[BLOCK_PLACER].getInt("capacity")!!
-private val ENERGY_PER_PLACE = NovaConfig[BLOCK_PLACER].getInt("energy_per_place")!!
+private val MAX_ENERGY = NovaConfig[BLOCK_PLACER].getLong("capacity")!!
+private val ENERGY_PER_PLACE = NovaConfig[BLOCK_PLACER].getLong("energy_per_place")!!
 
 class BlockPlacer(
     uuid: UUID,

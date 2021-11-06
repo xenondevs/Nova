@@ -29,8 +29,8 @@ import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private val MAX_ENERGY = NovaConfig[BLOCK_BREAKER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[BLOCK_BREAKER].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[BLOCK_BREAKER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[BLOCK_BREAKER].getLong("energy_per_tick")!!
 private val BREAK_SPEED_MULTIPLIER = NovaConfig[BLOCK_BREAKER].getDouble("break_speed_multiplier")!!
 private val BREAK_SPEED_CLAMP = NovaConfig[BLOCK_BREAKER].getDouble("break_speed_clamp")!!
 

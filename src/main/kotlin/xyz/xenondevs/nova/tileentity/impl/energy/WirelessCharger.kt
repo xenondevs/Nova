@@ -32,8 +32,8 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import de.studiocode.invui.item.Item as UIItem
 
-private val MAX_ENERGY = NovaConfig[WIRELESS_CHARGER].getInt("capacity")!!
-private val CHARGE_SPEED = NovaConfig[WIRELESS_CHARGER].getInt("charge_speed")!!
+private val MAX_ENERGY = NovaConfig[WIRELESS_CHARGER].getLong("capacity")!!
+private val CHARGE_SPEED = NovaConfig[WIRELESS_CHARGER].getLong("charge_speed")!!
 private val MIN_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.min")!!
 private val MAX_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.max")!!
 private val DEFAULT_RANGE = NovaConfig[WIRELESS_CHARGER].getInt("range.default")!!
@@ -84,27 +84,27 @@ class WirelessCharger(
     private var findPlayersCooldown = 0
     
     override fun handleTick() {
-        var energyTransferred: Int
+        var energyTransferred: Long
         
         if (--findPlayersCooldown <= 0) {
             findPlayersCooldown = 100
             players = world.players.filter { it.location in region }
         }
         
-        if (energyHolder.energy != 0 && players.isNotEmpty()) {
+        if (energyHolder.energy != 0L && players.isNotEmpty()) {
             playerLoop@ for (player in players) {
-                energyTransferred = 0
-                if (energyHolder.energy == 0) break
+                energyTransferred = 0L
+                if (energyHolder.energy == 0L) break
                 for (itemStack in player.inventory) {
                     energyTransferred += chargeItemStack(energyTransferred, itemStack)
-                    if (energyHolder.energy == 0) break@playerLoop
+                    if (energyHolder.energy == 0L) break@playerLoop
                     if (energyTransferred == energyHolder.energyConsumption) break
                 }
             }
         }
     }
     
-    private fun chargeItemStack(alreadyTransferred: Int, itemStack: ItemStack?): Int {
+    private fun chargeItemStack(alreadyTransferred: Long, itemStack: ItemStack?): Long {
         val novaItem = itemStack?.novaMaterial?.novaItem
         
         if (novaItem is ChargeableItem) {

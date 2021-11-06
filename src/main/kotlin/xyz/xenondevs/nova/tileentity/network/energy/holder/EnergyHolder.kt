@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.tileentity.network.energy.holder
 
 import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.config.PermanentStorage.retrieve
+import xyz.xenondevs.nova.data.config.PermanentStorage.retrieveOrNull
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -11,14 +13,14 @@ import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.util.EnergyUtils
 import xyz.xenondevs.nova.util.serverTick
-import java.lang.Integer.max
-import java.lang.Integer.min
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 sealed class EnergyHolder(
     final override val endPoint: NetworkedTileEntity,
-    private val defaultMaxEnergy: Int,
+    private val defaultMaxEnergy: Long,
     protected val upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> MutableMap<BlockFace, EnergyConnectionType>
 ) : EndPointDataHolder {
@@ -31,9 +33,12 @@ sealed class EnergyHolder(
     override val allowedFaces: Set<BlockFace>
         get() = energyConfig.mapNotNullTo(HashSet()) { if (it.value == EnergyConnectionType.NONE) null else it.key }
     
-    var maxEnergy = (defaultMaxEnergy * (upgradeHolder?.getEnergyModifier() ?: 1.0)).toInt()
+    var maxEnergy = (defaultMaxEnergy * (upgradeHolder?.getEnergyModifier() ?: 1.0)).toLong()
     
-    open var energy: Int = endPoint.retrieveData("energy") { 0 }
+    open var energy: Long =
+        endPoint.retrieveOrNull("energy64")
+            ?: retrieveOrNull<Int>("energy")?.toLong()
+            ?: retrieve("energy64") { 0L }
         set(value) {
             val capped = max(min(value, maxEnergy), 0)
             if (field != capped) {
@@ -46,18 +51,18 @@ sealed class EnergyHolder(
             }
         }
     
-    open val requestedEnergy: Int
+    open val requestedEnergy: Long
         get() = maxEnergy - energy
     
-    var energyMinus by TickedInt()
-    var energyPlus by TickedInt()
+    var energyMinus by TickedLong()
+    var energyPlus by TickedLong()
     
     init {
         upgradeHolder?.upgradeUpdateHandlers?.add(::handleUpgradesUpdate)
     }
     
     override fun saveData() {
-        endPoint.storeData("energy", energy, true)
+        endPoint.storeData("energy64", energy, true)
         endPoint.storeEnumMap("energyConfig", energyConfig)
     }
     
@@ -69,8 +74,8 @@ sealed class EnergyHolder(
         } else callUpdateHandlers()
     }
     
-    private fun calculateMaxEnergy(): Int =
-        (defaultMaxEnergy * (upgradeHolder?.getEnergyModifier() ?: 1.0)).toInt()
+    private fun calculateMaxEnergy(): Long =
+        (defaultMaxEnergy * (upgradeHolder?.getEnergyModifier() ?: 1.0)).toLong()
     
     private fun callUpdateHandlers() =
         updateHandlers.forEach { it() }
@@ -89,12 +94,12 @@ sealed class EnergyHolder(
     
 }
 
-private class TickedInt : ReadWriteProperty<Any, Int> {
+private class TickedLong : ReadWriteProperty<Any, Long> {
     
     var lastUpdated: Int = 0
-    var value: Int = 0
+    var value: Long = 0
     
-    override fun getValue(thisRef: Any, property: KProperty<*>): Int {
+    override fun getValue(thisRef: Any, property: KProperty<*>): Long {
         if (lastUpdated != serverTick) {
             value = 0
             lastUpdated = serverTick
@@ -103,7 +108,7 @@ private class TickedInt : ReadWriteProperty<Any, Int> {
         return value
     }
     
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) {
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Long) {
         this.value = value
     }
     

@@ -27,8 +27,8 @@ import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[CHARGER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[CHARGER].getInt("charge_speed")!!
+private val MAX_ENERGY = NovaConfig[CHARGER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[CHARGER].getLong("charge_speed")!!
 
 class Charger(
     uuid: UUID,

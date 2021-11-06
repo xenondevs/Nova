@@ -50,9 +50,9 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.random.Random
 
-private val MAX_ENERGY = NovaConfig[PLANTER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[PLANTER].getInt("energy_per_tick")!!
-private val ENERGY_PER_PLANT = NovaConfig[PLANTER].getInt("energy_per_plant")!!
+private val MAX_ENERGY = NovaConfig[PLANTER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[PLANTER].getLong("energy_per_tick")!!
+private val ENERGY_PER_PLANT = NovaConfig[PLANTER].getLong("energy_per_plant")!!
 private val IDLE_TIME = NovaConfig[PLANTER].getInt("idle_time")!!
 private val MIN_RANGE = NovaConfig[PLANTER].getInt("range.min")!!
 private val MAX_RANGE = NovaConfig[PLANTER].getInt("range.max")!!

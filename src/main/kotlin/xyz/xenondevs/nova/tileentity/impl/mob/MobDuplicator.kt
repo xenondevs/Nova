@@ -45,9 +45,9 @@ import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[MOB_DUPLICATOR].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[MOB_DUPLICATOR].getInt("energy_per_tick")!!
-private val ENERGY_PER_TICK_NBT = NovaConfig[MOB_DUPLICATOR].getInt("energy_per_tick_nbt")!!
+private val MAX_ENERGY = NovaConfig[MOB_DUPLICATOR].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[MOB_DUPLICATOR].getLong("energy_per_tick")!!
+private val ENERGY_PER_TICK_NBT = NovaConfig[MOB_DUPLICATOR].getLong("energy_per_tick_nbt")!!
 private val IDLE_TIME = NovaConfig[MOB_DUPLICATOR].getInt("idle_time")!!
 private val IDLE_TIME_NBT = NovaConfig[MOB_DUPLICATOR].getInt("idle_time_nbt")!!
 
@@ -64,7 +64,7 @@ class MobDuplicator(
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_TICK_NBT, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.TOP) }
     override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
-    private val energyPerTick: Int
+    private val energyPerTick: Long
         get() = if (keepNbt) energyHolder.specialEnergyConsumption else energyHolder.energyConsumption
     private val totalIdleTime: Int
         get() = if (keepNbt) idleTimeNBT else idleTime

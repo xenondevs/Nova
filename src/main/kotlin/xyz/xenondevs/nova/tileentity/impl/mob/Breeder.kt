@@ -44,9 +44,9 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.math.min
 
-private val MAX_ENERGY = NovaConfig[BREEDER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[BREEDER].getInt("energy_per_tick")!!
-private val ENERGY_PER_BREED = NovaConfig[BREEDER].getInt("energy_per_breed")!!
+private val MAX_ENERGY = NovaConfig[BREEDER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[BREEDER].getLong("energy_per_tick")!!
+private val ENERGY_PER_BREED = NovaConfig[BREEDER].getLong("energy_per_breed")!!
 private val IDLE_TIME = NovaConfig[BREEDER].getInt("idle_time")!!
 private val BREED_LIMIT = NovaConfig[BREEDER].getInt("breed_limit")!!
 private val MIN_RANGE = NovaConfig[BREEDER].getInt("range.min")!!
@@ -117,7 +117,7 @@ class Breeder(
                         .filterIsInstance<Animals>()
                         .filter { it.canBredNow && it.location in region }
                 
-                var breedsLeft = min(energyHolder.energy / energyHolder.specialEnergyConsumption, BREED_LIMIT)
+                var breedsLeft = min((energyHolder.energy / energyHolder.specialEnergyConsumption).toInt(), BREED_LIMIT)
                 for (animal in breedableEntities) {
                     val success = if (FoodUtils.requiresHealing(animal)) tryHeal(animal)
                     else tryBreed(animal)

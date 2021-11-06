@@ -27,8 +27,8 @@ import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[CHUNK_LOADER].getInt("capacity")!!
-private val ENERGY_PER_CHUNK = NovaConfig[CHUNK_LOADER].getInt("energy_per_chunk")!!
+private val MAX_ENERGY = NovaConfig[CHUNK_LOADER].getLong("capacity")!!
+private val ENERGY_PER_CHUNK = NovaConfig[CHUNK_LOADER].getLong("energy_per_chunk")!!
 private val MAX_RANGE = NovaConfig[CHUNK_LOADER].getInt("max_range")!!
 
 class ChunkLoader(

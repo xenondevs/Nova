@@ -64,7 +64,7 @@ private val MOVE_SPEED = NovaConfig[QUARRY].getDouble("move_speed")!!
 private val DRILL_SPEED_MULTIPLIER = NovaConfig[QUARRY].getDouble("drill_speed_multiplier")!!
 private val DRILL_SPEED_CLAMP = NovaConfig[QUARRY].getDouble("drill_speed_clamp")!!
 
-private val MAX_ENERGY = NovaConfig[QUARRY].getInt("capacity")!!
+private val MAX_ENERGY = NovaConfig[QUARRY].getLong("capacity")!!
 private val BASE_ENERGY_CONSUMPTION = NovaConfig[QUARRY].getInt("base_energy_consumption")!!
 private val ENERGY_PER_SQUARE_BLOCK = NovaConfig[QUARRY].getInt("energy_consumption_per_square_block")!!
 
@@ -198,7 +198,7 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (energyHolder.energy == 0) return
+        if (energyHolder.energy == 0L) return
         
         if (!done) {
             if (!drilling) {
@@ -220,7 +220,7 @@ class Quarry(
     }
     
     override fun handleAsyncTick() {
-        if (!done && energyHolder.energy != 0)
+        if (!done && energyHolder.energy != 0L)
             updatePointer()
     }
     

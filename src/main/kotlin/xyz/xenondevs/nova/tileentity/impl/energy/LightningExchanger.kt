@@ -33,10 +33,10 @@ import java.util.*
 import kotlin.math.min
 import kotlin.random.Random
 
-private val MAX_ENERGY = NovaConfig[LIGHTNING_EXCHANGER].getInt("capacity")!!
-private val CONVERSION_RATE = NovaConfig[LIGHTNING_EXCHANGER].getInt("conversion_rate")!!
-private val MIN_BURST = NovaConfig[LIGHTNING_EXCHANGER].getInt("burst.min")!!
-private val MAX_BURST = NovaConfig[LIGHTNING_EXCHANGER].getInt("burst.max")!!
+private val MAX_ENERGY = NovaConfig[LIGHTNING_EXCHANGER].getLong("capacity")!!
+private val CONVERSION_RATE = NovaConfig[LIGHTNING_EXCHANGER].getLong("conversion_rate")!!
+private val MIN_BURST = NovaConfig[LIGHTNING_EXCHANGER].getLong("burst.min")!!
+private val MAX_BURST = NovaConfig[LIGHTNING_EXCHANGER].getLong("burst.max")!!
 
 class LightningExchanger(
     uuid: UUID,
@@ -53,17 +53,17 @@ class LightningExchanger(
         { if (it == BlockFace.DOWN) PROVIDE else NONE }
     }
     
-    private var minBurst = 0
-    private var maxBurst = 0
-    private var toCharge = 0
+    private var minBurst = 0L
+    private var maxBurst = 0L
+    private var toCharge = 0L
     
     init {
         handleUpgradeUpdates()
     }
     
     private fun handleUpgradeUpdates() {
-        minBurst = (MIN_BURST * upgradeHolder.getEfficiencyModifier()).toInt()
-        maxBurst = (MAX_BURST * upgradeHolder.getEfficiencyModifier()).toInt()
+        minBurst = (MIN_BURST * upgradeHolder.getEfficiencyModifier()).toLong()
+        maxBurst = (MAX_BURST * upgradeHolder.getEfficiencyModifier()).toLong()
     }
     
     override fun handleTick() {
@@ -74,7 +74,7 @@ class LightningExchanger(
     
     fun addEnergyBurst() {
         val leeway = energyHolder.maxEnergy - energyHolder.energy - toCharge
-        toCharge += (if (leeway <= maxBurst) leeway else Random.nextInt(minBurst, maxBurst))
+        toCharge += (if (leeway <= maxBurst) leeway else Random.nextLong(minBurst, maxBurst))
     }
     
     inner class LightningExchangerGUI : TileEntityGUI("menu.nova.lightning_exchanger") {

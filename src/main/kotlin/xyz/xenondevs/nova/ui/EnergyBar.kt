@@ -16,11 +16,11 @@ class EnergyBar(
     private val energyHolder: EnergyHolder
 ) : VerticalBar(gui, x, y, height, NovaMaterialRegistry.RED_BAR) {
     
-    private var energy: Int = 0
-    private var maxEnergy: Int = 0
-    private val energyPlusPerTick: Int
+    private var energy: Long = 0
+    private var maxEnergy: Long = 0
+    private val energyPlusPerTick: Long
         get() = energyHolder.energyPlus
-    private val energyMinusPerTick: Int
+    private val energyMinusPerTick: Long
         get() = energyHolder.energyMinus
     
     init {

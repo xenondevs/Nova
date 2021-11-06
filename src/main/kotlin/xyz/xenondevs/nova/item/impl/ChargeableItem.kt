@@ -16,12 +16,12 @@ import kotlin.math.roundToInt
 private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy")
 
 abstract class ChargeableItem(
-    val maxEnergy: Int,
+    val maxEnergy: Long,
 ) : NovaItem() {
     
     fun getEnergy(itemStack: ItemStack) = retrieveData(itemStack, ENERGY_KEY) ?: 0
     
-    fun setEnergy(itemStack: ItemStack, energy: Int) {
+    fun setEnergy(itemStack: ItemStack, energy: Long) {
         val coercedEnergy = energy.coerceIn(0, maxEnergy)
         
         storeData(itemStack, ENERGY_KEY, coercedEnergy)
@@ -33,11 +33,11 @@ abstract class ChargeableItem(
         itemStack.itemMeta = itemMeta
     }
     
-    fun addEnergy(itemStack: ItemStack, energy: Int) {
+    fun addEnergy(itemStack: ItemStack, energy: Long) {
         setEnergy(itemStack, getEnergy(itemStack) + energy)
     }
     
-    private fun calculateDamage(material: Material, energy: Int): Int {
+    private fun calculateDamage(material: Material, energy: Long): Int {
         val percentage = energy.toDouble() / maxEnergy.toDouble()
         val maxDurability = material.maxDurability
         return (maxDurability - (maxDurability * percentage)).roundToInt()

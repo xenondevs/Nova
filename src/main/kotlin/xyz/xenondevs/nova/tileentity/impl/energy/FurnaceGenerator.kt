@@ -33,8 +33,8 @@ import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private val MAX_ENERGY = NovaConfig[FURNACE_GENERATOR].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[FURNACE_GENERATOR].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[FURNACE_GENERATOR].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[FURNACE_GENERATOR].getLong("energy_per_tick")!!
 private val BURN_TIME_MULTIPLIER = NovaConfig[FURNACE_GENERATOR].getDouble("burn_time_multiplier")!!
 private val ACCEPTED_UPGRADE_TYPES = arrayOf(UpgradeType.SPEED, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
 

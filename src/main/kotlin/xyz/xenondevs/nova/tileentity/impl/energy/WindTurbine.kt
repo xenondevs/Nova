@@ -27,8 +27,8 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.abs
 
-private val MAX_ENERGY = NovaConfig[WIND_TURBINE].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[WIND_TURBINE].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[WIND_TURBINE].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[WIND_TURBINE].getLong("energy_per_tick")!!
 
 class WindTurbine(
     uuid: UUID,
