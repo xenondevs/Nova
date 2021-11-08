@@ -8,6 +8,7 @@ import net.md_5.bungee.api.chat.TranslatableComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.network.chat.Component
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage
+import net.minecraft.network.chat.TextComponent as NMSTextComponent
 
 fun coloredText(color: ChatColor, text: Any): TextComponent {
     val component = TextComponent(text.toString())
@@ -46,6 +47,8 @@ fun Component.toBaseComponentArray(): Array<BaseComponent> {
 }
 
 fun Array<out BaseComponent>.toComponent(): Component {
+    if (isEmpty()) return NMSTextComponent("")
+    
     try {
         return CraftChatMessage.fromJSON(ComponentSerializer.toString(this))
     } catch (e: Exception) {

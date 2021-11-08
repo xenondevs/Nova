@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.overlay
 
 import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.network.chat.ChatType
-import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.TextComponent
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.util.send
 // TODO: This currently only works with one overlay due to the centering of the text
 object ActionbarOverlayManager : Listener {
     
-    private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(null as Component?)
+    private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(TextComponent(""))
     private val overlays = HashMap<Player, HashSet<ActionbarOverlay>>()
     
     init {
@@ -30,7 +30,13 @@ object ActionbarOverlayManager : Listener {
     }
     
     fun unregisterOverlay(player: Player, overlay: ActionbarOverlay) {
-        overlays[player]?.remove(overlay)
+        val playerOverlays = overlays[player]
+        if (playerOverlays != null) {
+            if (playerOverlays.size <= 1) {
+                overlays.remove(player)
+                player.send(EMPTY_ACTION_BAR_PACKET)
+            } else playerOverlays.remove(overlay)
+        }
     }
     
     /**
