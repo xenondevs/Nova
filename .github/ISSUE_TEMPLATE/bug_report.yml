@@ -10,7 +10,7 @@ body:
       options:
         - label: I am running the latest version of Nova.
           required: true
-        - label: I am running the latest version of Spigot or a Spigot fork.
+        - label: I am running the latest version of my server software.
           required: true
         - label: I have checked for similar issues.
           required: true
