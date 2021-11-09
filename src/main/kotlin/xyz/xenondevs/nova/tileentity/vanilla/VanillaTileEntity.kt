@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.tileentity.network.item.holder.DynamicVanillaItemHolde
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedBukkitInventory
+import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedChestInventory
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedRangedBukkitInventory
 import xyz.xenondevs.nova.util.CUBE_FACES
@@ -94,6 +95,7 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
     override val itemHolder: ItemHolder
     
+    private var initialized = false
     private var doubleChestLocation: Location? = null
     
     init {
@@ -105,15 +107,18 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
             doubleChestLocation?.let {
                 val tileEntity = VanillaTileEntityManager.getTileEntityAt(it)
                 if (tileEntity is VanillaChestTileEntity) tileEntity.handleChestStateChange()
-                handleChestStateChange()
             }
+            handleChestStateChange()
         }
     }
+    
+    // Should not be added to the NetworkManager before checking if it's a double chest
+    override fun handleInitialized() = Unit
     
     private fun setInventories() {
         val chest = block.state
         if (chest is Chest) {
-            val inventory = NetworkedBukkitInventory(chest.inventory)
+            val inventory = NetworkedChestInventory(chest.inventory)
             inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
         }
     }
@@ -135,11 +140,15 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     }
     
     fun handleChestStateChange() {
-        doubleChestLocation = getOtherChestLocation()
         setInventories()
         NetworkManager.runAsync {
             it.handleEndPointRemove(this, true)
             it.handleEndPointAdd(this, false)
+            
+            if (!initialized) {
+                initialized = true
+                updateNearbyBridges()
+            }
         }
     }
     
