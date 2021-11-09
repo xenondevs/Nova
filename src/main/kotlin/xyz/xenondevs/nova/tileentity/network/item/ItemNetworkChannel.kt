@@ -243,6 +243,11 @@ private class ItemDistributor(
         if (consumersInScope.size == 1 && providersInScope.size == 1)
             return distributeDirectlyBetween(transferAmount, consumersInScope[0], providersInScope[0])
         
+        // The content arrays in this map are only updated when items are removed, not when items are added.
+        // This is intended to prevent (endless) loops of giving items back and forth by limiting items to be only
+        // transferred once per "distributeBetween"-call.
+        val providerContentMap = providersInScope.associateWithTo(HashMap()) { it.items }
+        
         var transfersLeft = transferAmount
         
         val ignoredConsumers = BooleanArray(consumersInScope.size) // represents which consumers should be skipped
@@ -264,13 +269,20 @@ private class ItemDistributor(
                         
                         // prevent providers from providing to themselves
                         if (!provider.isSameInventory(consumer)) {
+                            val providerContent = providerContentMap[provider]!!
+                            
                             // find the first item that can be extracted into the current consumer and perform the extraction
-                            for ((slot, itemStack) in provider.items.withIndex()) {
+                            for ((slot, itemStack) in providerContent.withIndex()) {
                                 if (itemStack == null || provider.deniesItem(itemStack) || consumer.deniesItem(itemStack)) continue
                                 
                                 val singleStack = itemStack.clone().apply { amount = 1 }
                                 if (consumer.addItem(singleStack) == 0) {
+                                    // decrease amount by one for the provider
                                     provider.decrementByOne(slot)
+                                    // decrease amount by one for the providerContent array
+                                    if (itemStack.amount == 1) providerContent[slot] = null
+                                    else itemStack.amount -= 1
+                                    
                                     didProvide = true
                                     didConsume = true
                                     transfersLeft -= 1

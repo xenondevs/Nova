@@ -154,6 +154,18 @@ class StorageUnit(
             if (amount == 0) type = null
             if (gui.isInitialized()) gui.value.update()
         }
+        
+        override fun decrementByOne(slot: Int) {
+            if (amount > 1) {
+                amount -= 1
+            } else {
+                amount = 0
+                type = null
+            }
+            
+            if (gui.isInitialized()) gui.value.update()
+        }
+        
     }
     
 }
