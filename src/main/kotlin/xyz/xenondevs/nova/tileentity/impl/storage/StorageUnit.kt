@@ -162,6 +162,8 @@ class StorageUnit(
                 amount = 0
                 type = null
             }
+            
+            if (gui.isInitialized()) gui.value.update()
         }
         
     }
