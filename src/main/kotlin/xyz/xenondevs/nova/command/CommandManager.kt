@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_17_R1.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.command.impl.NovaCommand
+import xyz.xenondevs.nova.command.impl.NovaModelDataCommand
 import xyz.xenondevs.nova.command.impl.UninstallCommand
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
@@ -26,6 +27,7 @@ object CommandManager {
     private fun registerCommands() {
         registerCommand(NovaCommand)
         registerCommand(UninstallCommand)
+        registerCommand(NovaModelDataCommand)
     }
     
     fun registerCommand(command: Command) {

@@ -4,6 +4,7 @@ import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
+import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.RecipeChoice.MaterialChoice
@@ -26,6 +27,9 @@ fun Material.isBreakable() = blastResistance < 3600000.0f
  */
 val Material.breakSpeed: Double
     get() = 1.0 / hardness.absoluteValue
+
+val Material.localizedName: String?
+    get() = CraftMagicNumbers.getItem(this)?.descriptionId
 
 val ItemStack.novaMaterial: NovaMaterial?
     get() {
