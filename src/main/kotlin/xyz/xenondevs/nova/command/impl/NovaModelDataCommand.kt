@@ -5,17 +5,19 @@ import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.executesCatching
+import xyz.xenondevs.nova.command.requiresPermission
 import xyz.xenondevs.nova.command.sendSuccess
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.util.localizedName
 
 object NovaModelDataCommand : Command("nvmodeldata") {
     
     init {
-        builder = builder.apply {
+        builder = builder
+            .requiresPermission("nova.command.modeldata")
+            .apply {
             NovaMaterialRegistry.sortedValues.forEach { material ->
                 then(literal(material.typeName.lowercase())
                     .executesCatching { showModelData(material, it) }
