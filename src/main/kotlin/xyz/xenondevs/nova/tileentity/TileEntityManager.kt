@@ -250,7 +250,7 @@ object TileEntityManager : Listener {
         if (chunkPos !in tileEntityMap) return
         
         val tileEntities = tileEntityMap[chunkPos]!!
-        val tileEntityValues = tileEntities.values
+        val tileEntityValues = HashSet(tileEntities.values)
         
         addToChunkTaskQueue(chunkPos, false) { latch ->
             tileEntityMap -= chunkPos
@@ -261,13 +261,13 @@ object TileEntityManager : Listener {
             latch.countDown() // move on in the queue
         }
         
-        saveChunk(tileEntities.values)
+        saveChunk(tileEntityValues)
     }
     
     @Synchronized
     fun saveChunk(chunk: ChunkPos) {
         if (chunk in tileEntityMap)
-            saveChunk(tileEntityMap[chunk]!!.values)
+            saveChunk(HashSet(tileEntityMap[chunk]!!.values))
     }
     
     private fun saveChunk(tileEntities: Iterable<TileEntity>) {
