@@ -17,7 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.item.impl.BottledMobItem
+import xyz.xenondevs.nova.item.impl.MobCatcherItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MOB_DUPLICATOR
@@ -112,7 +112,7 @@ class MobDuplicator(
     
     private fun updateEntityData(itemStack: ItemStack?): Boolean {
         val novaItem = itemStack?.novaMaterial?.novaItem
-        if (novaItem is BottledMobItem) {
+        if (novaItem is MobCatcherItem) {
             setEntityData(novaItem.getEntityType(itemStack), novaItem.getEntityData(itemStack))
             return true
         }
@@ -147,7 +147,7 @@ class MobDuplicator(
                 "| u # # # # . . |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('i', VISlotElement(inventory, 0, NovaMaterialRegistry.BOTTLED_MOB_PLACEHOLDER.createBasicItemBuilder()))
+            .addIngredient('i', VISlotElement(inventory, 0, NovaMaterialRegistry.MOB_CATCHER_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('n', ToggleNBTModeItem())
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()

@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.player.advancement.cable.AdvancedCableAdvancement
 import xyz.xenondevs.nova.player.advancement.cable.BasicCableAdvancement
 import xyz.xenondevs.nova.player.advancement.cable.EliteCableAdvancement
 import xyz.xenondevs.nova.player.advancement.cable.UltimateCableAdvancement
-import xyz.xenondevs.nova.player.advancement.mob.BottledMobAdvancement
+import xyz.xenondevs.nova.player.advancement.mob.MobCatcherAdvancement
 import xyz.xenondevs.nova.player.advancement.mob.BreederAdvancement
 import xyz.xenondevs.nova.player.advancement.mob.MobDuplicatorAdvancement
 import xyz.xenondevs.nova.player.advancement.mob.MobKillerAdvancement
@@ -91,7 +91,7 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             MechanicalPressAdvancement, GearsAdvancement, PlatesAdvancement, AllPlatesAdvancement, AllGearsAdvancement,
             PulverizerAdvancement, DustAdvancement, AllDustsAdvancement,
             BlockPlacerAdvancement, BlockBreakerAdvancement, QuarryAdvancement,
-            BottledMobAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement,
+            MobCatcherAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement,
             PlanterAdvancement, FertilizerAdvancement, HarvesterAdvancement, TreeFactoryAdvancement,
             AutoFisherAdvancement,
             StarShardsAdvancement, StarCollectorAdvancement

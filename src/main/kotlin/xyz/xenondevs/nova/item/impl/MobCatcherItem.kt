@@ -3,17 +3,11 @@ package xyz.xenondevs.nova.item.impl
 import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.Mob
-import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
+import org.bukkit.entity.*
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -23,14 +17,11 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.addPrioritized
-import xyz.xenondevs.nova.util.capitalizeAll
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.util.getTargetLocation
 
 private val DATA_KEY = NamespacedKey(NOVA, "entityData")
 private val TYPE_KEY = NamespacedKey(NOVA, "entityType")
@@ -41,56 +32,46 @@ private val BLACKLISTED_ENTITY_TYPES = DEFAULT_CONFIG
     .getAllStrings()
     .mapTo(HashSet(), EntityType::valueOf)
 
-object BottledMobItem : NovaItem(), Listener {
+object MobCatcherItem : NovaItem() {
     
-    init {
-        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-    }
+    override fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+        if((clicked is Mob || clicked is EnderDragon)
+            && clicked.type !in BLACKLISTED_ENTITY_TYPES
+            && ProtectionManager.canUse(player, clicked.location)) {
     
-    @EventHandler
-    fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
-        val clicked = event.rightClicked
-        if (clicked is Mob) {
-            val player = event.player
-            val item = player.inventory.getItem(event.hand)
-            
-            if (item.type == Material.GLASS_BOTTLE
-                && !BLACKLISTED_ENTITY_TYPES.contains(clicked.type)
-                && ProtectionManager.canUse(player, clicked.location)) {
-                
-                val fakeDamageEvent = EntityDamageByEntityEvent(player, clicked, DamageCause.ENTITY_ATTACK, Double.MAX_VALUE)
-                Bukkit.getPluginManager().callEvent(fakeDamageEvent)
-                
-                if (!fakeDamageEvent.isCancelled && fakeDamageEvent.damage != 0.0) {
-                    val itemStack = NovaMaterialRegistry.BOTTLED_MOB.createItemStack()
-                    absorbEntity(itemStack, clicked)
-                    
-                    player.inventory.getItem(event.hand).amount -= 1
-                    player.inventory.addPrioritized(event.hand, itemStack)
-                    
-                    if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
-                    
-                    event.isCancelled = true
-                }
+            val fakeDamageEvent = EntityDamageByEntityEvent(player, clicked, EntityDamageEvent.DamageCause.ENTITY_ATTACK, Double.MAX_VALUE)
+            Bukkit.getPluginManager().callEvent(fakeDamageEvent)
+    
+            if (!fakeDamageEvent.isCancelled && fakeDamageEvent.damage != 0.0) {
+                val newCatcher = NovaMaterialRegistry.MOB_CATCHER.createItemStack()
+                absorbEntity(newCatcher, clicked)
+        
+                player.inventory.getItem(event.hand).amount -= 1
+                player.inventory.addPrioritized(event.hand, newCatcher)
+        
+                if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
+        
+                event.isCancelled = true
             }
+            
         }
     }
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
-            // prevents picking up and instantly pacing entity again
+            // Adds a small delay to prevent players from spamming the item
             if (System.currentTimeMillis() - (retrieveData<Long>(itemStack, TIME_KEY) ?: -1) < 50) return
-            
+        
             val data = getEntityData(itemStack)
             if (data != null) {
                 player.inventory.getItem(event.hand!!).amount -= 1
-                player.inventory.addPrioritized(event.hand!!, ItemStack(Material.GLASS_BOTTLE))
-                
+                player.inventory.addPrioritized(event.hand!!, NovaMaterialRegistry.MOB_CATCHER.createItemStack())
+            
                 val location = player.eyeLocation.getTargetLocation(0.25, 8.0)
-                
+            
                 EntityUtils.deserializeAndSpawn(data, location)
                 if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
-                
+            
                 event.isCancelled = true
             }
         }
@@ -112,8 +93,8 @@ object BottledMobItem : NovaItem(), Listener {
         
         itemStack.itemMeta = ItemBuilder(itemStack).addLoreLines(localized(
             ChatColor.DARK_GRAY,
-            "item.nova.bottled_mob.type",
-            coloredText(ChatColor.YELLOW, entity.type.name.lowercase().replace('_', ' ').capitalizeAll())
+            "item.nova.mob_catcher.type",
+            localized(ChatColor.YELLOW, entity)
         )).get().itemMeta
     }
     

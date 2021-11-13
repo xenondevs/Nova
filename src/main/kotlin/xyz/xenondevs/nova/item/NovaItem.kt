@@ -2,8 +2,11 @@ package xyz.xenondevs.nova.item
 
 import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.NamespacedKey
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
@@ -19,6 +22,8 @@ import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 abstract class NovaItem {
     
     open fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {}
+    
+    open fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {}
     
     open fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) {}
     

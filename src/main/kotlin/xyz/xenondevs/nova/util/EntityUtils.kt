@@ -12,6 +12,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -53,6 +54,9 @@ fun ArmorStand.setHeadItemSilently(headStack: ItemStack) {
     val armorItems = ReflectionRegistry.ARMOR_STAND_ARMOR_ITEMS_FIELD.get(nmsEntity) as NonNullList<NMSItemStack>
     armorItems[3] = headStack.nmsStack
 }
+
+val Entity.localizedName: String?
+    get() = (this as CraftEntity).handle.type.descriptionId
 
 object EntityUtils {
     

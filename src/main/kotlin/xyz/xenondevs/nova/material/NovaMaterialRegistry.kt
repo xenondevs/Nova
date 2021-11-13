@@ -3,9 +3,9 @@ package xyz.xenondevs.nova.material
 import org.bukkit.Material
 import org.bukkit.Material.*
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
+import xyz.xenondevs.nova.item.impl.MobCatcherItem
 import xyz.xenondevs.nova.tileentity.impl.agriculture.*
 import xyz.xenondevs.nova.tileentity.impl.energy.*
 import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
@@ -42,7 +42,7 @@ object NovaMaterialRegistry {
         get() = materialsByTypeName.values
     
     val sortedValues: Set<NovaMaterial> by lazy { materialsByTypeName.values.toSortedSet() }
-    val sortedObtainables: Set<NovaMaterial> by lazy { sortedValues.filterTo(LinkedHashSet()) { it.item.data < 9000 && it != BOTTLED_MOB } }
+    val sortedObtainables: Set<NovaMaterial> by lazy { sortedValues.filterTo(LinkedHashSet()) { it.item.data < 9000 } }
     
     // 1 - 1000: Blocks
     // 1: Reserved for legacy furnace generator
@@ -109,7 +109,7 @@ object NovaMaterialRegistry {
     // Other
     val NETHERITE_DRILL = registerDefaultItem("NETHERITE_DRILL", 1030)
     val SOLAR_CELL = registerDefaultItem("SOLAR_CELL", 1031)
-    val BOTTLED_MOB = registerDefaultItem("BOTTLED_MOB", 1032, BottledMobItem)
+    val MOB_CATCHER = registerDefaultItem("MOB_CATCHER", 1032, MobCatcherItem)
     val STAR_SHARDS = registerDefaultItem("STAR_SHARDS", 1033)
     val BASIC_MACHINE_FRAME = registerDefaultItem("BASIC_MACHINE_FRAME", 1034)
     val ADVANCED_MACHINE_FRAME = registerDefaultItem("ADVANCED_MACHINE_FRAME", 1035)
@@ -192,7 +192,7 @@ object NovaMaterialRegistry {
     val AXE_PLACEHOLDER = registerItem("AXE_PLACEHOLDER", "", 9501)
     val SHEARS_PLACEHOLDER = registerItem("SHEARS_PLACEHOLDER", "", 9502)
     val ITEM_FILTER_PLACEHOLDER = registerItem("ITEM_FILTER_PLACEHOLDER", "", 9503)
-    val BOTTLED_MOB_PLACEHOLDER = registerItem("BOTTLED_MOB_PLACEHOLDER", "", 9504)
+    val MOB_CATCHER_PLACEHOLDER = registerItem("MOB_CATCHER_PLACEHOLDER", "", 9504)
     val FISHING_ROD_PLACEHOLDER = registerItem("FISHING_ROD_PLACEHOLDER", "", 9505)
     val SAPLING_PLACEHOLDER = registerItem("SAPLING_PLACEHOLDER", "", 9506)
     val TRASH_CAN_PLACEHOLDER = registerItem("TRASH_CAN_PLACEHOLDER", "", 9507)
