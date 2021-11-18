@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.integration.protection.plugin
 
-import com.sk89q.wepif.PermissionsResolverManager
 import com.sk89q.worldedit.blocks.BaseItemStack
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldedit.entity.BaseEntity
@@ -22,7 +21,9 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.integration.protection.ProtectionIntegration
+import xyz.xenondevs.nova.util.PermissionUtils
 import java.util.*
+import org.bukkit.World as BWorld
 
 object WorldGuard : ProtectionIntegration {
     
@@ -56,11 +57,11 @@ object WorldGuard : ProtectionIntegration {
         return runQuery(player, location, Flags.USE)
     }
     
-    fun runQuery(offlinePlayer: OfflinePlayer, location: Location, vararg flags: StateFlag): Boolean {
+    private fun runQuery(offlinePlayer: OfflinePlayer, location: Location, vararg flags: StateFlag): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true
         
         val world = BukkitAdapter.adapt(location.world)
-        val localPlayer = BetterBukkitOfflinePlayer(world, PLUGIN, offlinePlayer)
+        val localPlayer = BetterBukkitOfflinePlayer(location.world!!, world, PLUGIN, offlinePlayer)
         
         return if (!hasBypass(world, localPlayer)) {
             val vector = BukkitAdapter.asBlockVector(location)
@@ -72,29 +73,24 @@ object WorldGuard : ProtectionIntegration {
         } else true
     }
     
-    fun hasRegion(world: World, vector: BlockVector3): Boolean {
+    private fun hasRegion(world: World, vector: BlockVector3): Boolean {
         if (PLATFORM == null || PLUGIN == null) return false
         val regionManager = PLATFORM.regionContainer.get(world) ?: return true
         return regionManager.getApplicableRegions(vector).size() > 0
     }
     
-    fun hasPermission(world: World, offlinePlayer: OfflinePlayer, perm: String): Boolean {
-        if (PLATFORM == null || PLUGIN == null) return false
-        if (offlinePlayer.isOp) return PLATFORM.globalStateManager[world].opPermissions
-        return PermissionsResolverManager.getInstance().hasPermission(world.name, offlinePlayer, perm)
-    }
-    
-    fun hasBypass(world: World, player: LocalPlayer): Boolean {
+    private fun hasBypass(world: World, player: LocalPlayer): Boolean {
         if (PLATFORM == null || PLUGIN == null) return false
         
         val sessionManager = PLATFORM.sessionManager
         val session = sessionManager.getIfPresent(player)
-        if (session?.hasBypassDisabled() != false) return false
+        if (session?.hasBypassDisabled() == true) return false
         
         return player.hasPermission("worldguard.region.bypass.${world.name}")
     }
     
-    class BetterBukkitOfflinePlayer(
+    private class BetterBukkitOfflinePlayer(
+        private val bukkitWorld: BWorld,
         private val world: World,
         plugin: WorldGuardPlugin,
         private val player: OfflinePlayer
@@ -117,7 +113,9 @@ object WorldGuard : ProtectionIntegration {
         }
         
         override fun hasPermission(perm: String): Boolean {
-            return hasPermission(world, player, perm)
+            if (PLATFORM == null || PLUGIN == null) return false
+            if (player.isOp) return PLATFORM.globalStateManager[world].opPermissions
+            return PermissionUtils.hasPermission(bukkitWorld, player, perm)
         }
         
         override fun getWorld(): World {

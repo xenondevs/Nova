@@ -105,8 +105,8 @@ class Quarry(
     private var maxX = 0
     private var maxZ = 0
     
-    private var lastPointerLocation: Location
-    private var pointerLocation: Location
+    private lateinit var lastPointerLocation: Location
+    private lateinit var pointerLocation: Location
     private var pointerDestination: Location? = retrieveOrNull("pointerDestination")
     
     private var drillProgress = retrieveData("drillProgress") { 0.0 }
@@ -124,11 +124,14 @@ class Quarry(
     
     init {
         handleUpgradeUpdates()
-        updateBounds()
+    }
+    
+    override fun handleInitialized(first: Boolean) {
+        super.handleInitialized(first)
         
+        updateBounds(first)
         pointerLocation = retrieveOrNull("pointerLocation") ?: Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
         lastPointerLocation = retrieveOrNull("lastPointerLocation") ?: Location(world, 0.0, 0.0, 0.0)
-        
         createScaffolding()
     }
     
@@ -140,7 +143,7 @@ class Quarry(
         moveSpeed = MOVE_SPEED * upgradeHolder.getSpeedModifier()
     }
     
-    private fun updateBounds(): Boolean {
+    private fun updateBounds(checkPermission: Boolean): Boolean {
         val positions = getMinMaxPositions(location, sizeX, sizeZ, getFace(BlockSide.BACK), getFace(BlockSide.RIGHT))
         minX = positions[0]
         minZ = positions[1]
@@ -149,9 +152,9 @@ class Quarry(
         
         updateEnergyPerTick()
         
-        if (!canPlace(ownerUUID, location, positions)) {
+        if (checkPermission && !canPlace(ownerUUID, location, positions)) {
             if (sizeX == MIN_SIZE && sizeZ == MIN_SIZE) {
-                runTaskLater(3) { TileEntityManager.destroyAndDropTileEntity(this, true) }
+                TileEntityManager.destroyAndDropTileEntity(this, true)
                 return false
             } else resize(MIN_SIZE, MIN_SIZE)
         }
@@ -163,7 +166,7 @@ class Quarry(
         this.sizeX = sizeX
         this.sizeZ = sizeZ
         
-        if (updateBounds()) {
+        if (updateBounds(true)) {
             drilling = false
             drillProgress = 0.0
             done = false
@@ -189,8 +192,8 @@ class Quarry(
         super.saveData()
         storeData("sizeX", sizeX)
         storeData("sizeZ", sizeZ)
-        storeData("pointerLocation", pointerLocation)
-        storeData("lastPointerLocation", lastPointerLocation)
+        if (::pointerLocation.isInitialized) storeData("pointerLocation", pointerLocation)
+        if (::lastPointerLocation.isInitialized) storeData("lastPointerLocation", lastPointerLocation)
         storeData("pointerDestination", pointerDestination)
         storeData("drillProgress", drillProgress)
         storeData("drilling", drilling)
@@ -200,10 +203,11 @@ class Quarry(
     override fun handleTick() {
         if (energyHolder.energy == 0L) return
         
-        if (!done) {
+        if (!done || serverTick % 300 == 0) {
             if (!drilling) {
                 val pointerDestination = pointerDestination ?: selectNextDestination()
                 if (pointerDestination != null) {
+                    done = false
                     if (pointerLocation.distance(pointerDestination) > 0.2) {
                         moveToPointer(pointerDestination)
                     } else {
