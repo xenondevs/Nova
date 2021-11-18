@@ -18,35 +18,42 @@ import xyz.xenondevs.nova.tileentity.Model
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.*
+import xyz.xenondevs.nova.tileentity.network.NetworkType.FLUID
 import xyz.xenondevs.nova.tileentity.network.NetworkType.ITEMS
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyBridge
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidBridge
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemBridge
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
-import xyz.xenondevs.nova.ui.CableConfigGUI
+import xyz.xenondevs.nova.ui.config.cable.CableConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.hitbox.Hitbox
 import xyz.xenondevs.nova.world.point.Point3D
 import java.util.*
 
-private val ATTACHMENTS: IntArray = (64..72).toIntArray()
+private val SUPPORTED_NETWORK_TYPES = NetworkType.values().toHashSet()
+private val ATTACHMENTS: IntArray = (64..112).toIntArray()
 
 private val NetworkNode.itemHolder: ItemHolder?
-    get() = if (this is NetworkEndPoint && holders.contains(ITEMS)) holders[ITEMS] as ItemHolder else null
+    get() = if (this is NetworkEndPoint) (holders[ITEMS] as ItemHolder?) else null
+
+private val NetworkNode.fluidHolder: FluidHolder?
+    get() = if (this is NetworkEndPoint) holders[FLUID] as FluidHolder? else null
 
 open class Cable(
     override val typeId: Int,
     override val energyTransferRate: Long,
     override val itemTransferRate: Int,
+    override val fluidTransferRate: Long,
     uuid: UUID,
     data: CompoundElement,
     material: NovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
-) : TileEntity(uuid, data, material, ownerUUID, armorStand), EnergyBridge, ItemBridge {
+) : TileEntity(uuid, data, material, ownerUUID, armorStand), EnergyBridge, ItemBridge, FluidBridge {
     
-    override val supportedNetworkTypes = NetworkType.values().toHashSet()
+    override val supportedNetworkTypes = SUPPORTED_NETWORK_TYPES
     override val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
     override val bridgeFaces = retrieveEnumCollectionOrNull("bridgeFaces", HashSet()) ?: CUBE_FACES.toMutableSet()
     
@@ -124,40 +131,38 @@ open class Cable(
     private fun getModelsNeeded(): List<Model> {
         require(networks.isNotEmpty()) { "No network is initialized" }
         
-        val items = ArrayList<Pair<ItemStack, Float>>()
+        val models = ArrayList<Model>()
         
-        connectedNodes[ITEMS]!!
-            .filter { val node = it.value; node is NetworkEndPoint && node.holders.contains(ITEMS) }
-            .forEach { (blockFace, node) ->
-                val itemHolder = (node as NetworkEndPoint).holders[ITEMS] as ItemHolder
-                
-                val attachmentIndex = when (itemHolder.itemConfig[blockFace.oppositeFace]
-                    ?: ItemConnectionType.NONE) {
-                    ItemConnectionType.INSERT -> 0
-                    ItemConnectionType.EXTRACT -> 1
-                    ItemConnectionType.BUFFER -> 2
-                    else -> throw UnsupportedOperationException()
-                } * 3 + when (blockFace) {
-                    BlockFace.DOWN -> 1
-                    BlockFace.UP -> 2
+        CUBE_FACES.forEach { face ->
+            val oppositeFace = face.oppositeFace
+            val itemHolder = connectedNodes[ITEMS]?.get(face)?.itemHolder
+            val fluidHolder = connectedNodes[FLUID]?.get(face)?.fluidHolder
+            
+            if (itemHolder == null && fluidHolder == null) return@forEach
+            
+            val array = booleanArrayOf(
+                itemHolder?.isExtract(oppositeFace) ?: false,
+                itemHolder?.isInsert(oppositeFace) ?: false,
+                fluidHolder?.isExtract(oppositeFace) ?: false,
+                fluidHolder?.isInsert(oppositeFace) ?: false
+            )
+            
+            val id = MathUtils.convertBooleanArrayToInt(array) +
+                when (face) {
+                    BlockFace.UP -> 16
+                    BlockFace.DOWN -> 32
                     else -> 0
                 }
-                
-                val itemStack = material.block!!.createItemStack(ATTACHMENTS[attachmentIndex])
-                items += itemStack to getRotation(blockFace)
-            }
-        
-        return items.map { Model(it.first, location.clone().center().apply { yaw = it.second }) }
-    }
-    
-    private fun getRotation(blockFace: BlockFace) =
-        when (blockFace) {
-            BlockFace.NORTH -> 0f
-            BlockFace.EAST -> 90f
-            BlockFace.SOUTH -> 180f
-            BlockFace.WEST -> 270f
-            else -> 0f
+            
+            val attachmentStack = material.block!!.createItemStack(ATTACHMENTS[id])
+            models += Model(
+                attachmentStack,
+                location.clone().center().apply { yaw = face.rotationValues.second * 90f }
+            )
         }
+        
+        return models
+    }
     
     private fun updateHitbox() {
         if (!isValid) return
@@ -200,24 +205,25 @@ open class Cable(
     }
     
     private fun createAttachmentHitboxes() {
-        val neighborEndPoints = connectedNodes
-            .values
-            .flatMap { it.entries }
-            .filter { (blockFace, node) ->
-                val itemHolder = node.itemHolder
-                itemHolder != null && itemHolder.itemConfig[blockFace.oppositeFace] != ItemConnectionType.NONE
-            }
-            .associate { it.key to it.value.itemHolder!! }
+        val neighbors = CUBE_FACES.associateWithNotNull { face ->
+            val itemHolder = connectedNodes[ITEMS]?.get(face)?.itemHolder
+            val fluidHolder = connectedNodes[FLUID]?.get(face)?.fluidHolder
+            
+            if (itemHolder != null || fluidHolder != null) {
+                itemHolder to fluidHolder
+            } else null
+        }
         
-        neighborEndPoints
-            .map { it.key }
-            .forEach { blockFace ->
+        neighbors
+            .forEach { (face, endPointDataHolders) ->
+                val (itemHolder, fluidHolder) = endPointDataHolders
+                
                 val pointA = Point3D(0.125, 0.125, 0.0)
                 val pointB = Point3D(0.875, 0.875, 0.2)
                 
                 val origin = Point3D(0.5, 0.5, 0.5)
                 
-                val rotationValues = blockFace.rotationValues
+                val rotationValues = face.rotationValues
                 pointA.rotateAroundXAxis(rotationValues.first, origin)
                 pointA.rotateAroundYAxis(rotationValues.second, origin)
                 pointB.rotateAroundXAxis(rotationValues.first, origin)
@@ -230,7 +236,7 @@ open class Cable(
                 hitboxes += Hitbox(
                     from, to,
                     { ProtectionManager.canUse(it.player, location) },
-                    { handleAttachmentHit(it, blockFace, neighborEndPoints[blockFace]!!) }
+                    { handleAttachmentHit(it, itemHolder, fluidHolder, face) }
                 )
             }
     }
@@ -256,10 +262,10 @@ open class Cable(
         }
     }
     
-    private fun handleAttachmentHit(event: PlayerInteractEvent, face: BlockFace, itemHolder: ItemHolder) {
+    private fun handleAttachmentHit(event: PlayerInteractEvent, itemHolder: ItemHolder?, fluidHolder: FluidHolder?, face: BlockFace) {
         if (!event.player.hasInventoryOpen) {
             event.isCancelled = true
-            configGUIs.getOrPut(face) { CableConfigGUI(itemHolder, face.oppositeFace) }.openWindow(event.player)
+            configGUIs.getOrPut(face) { CableConfigGUI(itemHolder, fluidHolder, face.oppositeFace) }.openWindow(event.player)
         }
     }
     
@@ -290,15 +296,19 @@ open class Cable(
 
 private val BASIC_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("energy_transfer_rate")!!
 private val BASIC_ITEM_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getInt("item_transfer_rate")!!
+private val BASIC_FLUID_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("fluid_transfer_rate")!!
 
 private val ADVANCED_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getLong("energy_transfer_rate")!!
 private val ADVANCED_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getInt("item_transfer_rate")!!
+private val ADVANCED_FLUID_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("fluid_transfer_rate")!!
 
 private val ELITE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getLong("energy_transfer_rate")!!
 private val ELITE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getInt("item_transfer_rate")!!
+private val ELITE_FLUID_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("fluid_transfer_rate")!!
 
 private val ULTIMATE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getLong("energy_transfer_rate")!!
 private val ULTIMATE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getInt("item_transfer_rate")!!
+private val ULTIMATE_FLUID_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("fluid_transfer_rate")!!
 
 class BasicCable(
     uuid: UUID,
@@ -310,6 +320,7 @@ class BasicCable(
     0,
     BASIC_ENERGY_RATE,
     BASIC_ITEM_RATE,
+    BASIC_FLUID_RATE,
     uuid,
     data,
     material,
@@ -327,6 +338,7 @@ class AdvancedCable(
     1,
     ADVANCED_ENERGY_RATE,
     ADVANCED_ITEM_RATE,
+    ADVANCED_FLUID_RATE,
     uuid,
     data,
     material,
@@ -344,6 +356,7 @@ class EliteCable(
     2,
     ELITE_ENERGY_RATE,
     ELITE_ITEM_RATE,
+    ELITE_FLUID_RATE,
     uuid,
     data,
     material,
@@ -361,6 +374,7 @@ class UltimateCable(
     3,
     ULTIMATE_ENERGY_RATE,
     ULTIMATE_ITEM_RATE,
+    ULTIMATE_FLUID_RATE,
     uuid,
     data,
     material,
@@ -378,6 +392,7 @@ class CreativeCable(
     4,
     Long.MAX_VALUE,
     Int.MAX_VALUE,
+    Long.MAX_VALUE,
     uuid,
     data,
     material,

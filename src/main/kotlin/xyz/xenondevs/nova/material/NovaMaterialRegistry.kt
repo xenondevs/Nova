@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.item.impl.MobCatcherItem
 import xyz.xenondevs.nova.tileentity.impl.agriculture.*
 import xyz.xenondevs.nova.tileentity.impl.energy.*
+import xyz.xenondevs.nova.tileentity.impl.fluid.FluidTank
 import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
 import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
@@ -55,6 +56,7 @@ object NovaMaterialRegistry {
     val PULVERIZER = registerEnergyTileEntity("PULVERIZER", 8, ::Pulverizer, COBBLESTONE)
     val SOLAR_PANEL = registerEnergyTileEntity("SOLAR_PANEL", 9, ::SolarPanel, BARRIER)
     val QUARRY = registerEnergyTileEntity("QUARRY", 10, ::Quarry, COBBLESTONE, Quarry::canPlace)
+    
     // 11: Reserved for legacy electrical furnace
     val CHUNK_LOADER = registerEnergyTileEntity("CHUNK_LOADER", 12, ::ChunkLoader, COBBLESTONE)
     val BLOCK_BREAKER = registerEnergyTileEntity("BLOCK_BREAKER", 13, ::BlockBreaker, COBBLESTONE)
@@ -130,16 +132,17 @@ object NovaMaterialRegistry {
     
     // 5000 - 9.000 MultiModel Blocks
     // 5000 - 5100: Reserved for legacy cables
-    val BASIC_CABLE = registerTileEntity("BASIC_CABLE", "block.nova.basic_cable", structureBlockOf(5100), null, structureBlockOf((5101..5164).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::BasicCable, isDirectional = false, legacyItemIds = intArrayOf(5004))
-    val ADVANCED_CABLE = registerTileEntity("ADVANCED_CABLE", "block.nova.advanced_cable", structureBlockOf(5165), null, structureBlockOf((5166..5229).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::AdvancedCable, isDirectional = false, legacyItemIds = intArrayOf(5009))
-    val ELITE_CABLE = registerTileEntity("ELITE_CABLE", "block.nova.elite_cable", structureBlockOf(5230), null, structureBlockOf((5231..5294).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::EliteCable, isDirectional = false, legacyItemIds = intArrayOf(5014))
-    val ULTIMATE_CABLE = registerTileEntity("ULTIMATE_CABLE", "block.nova.ultimate_cable", structureBlockOf(5295), null, structureBlockOf((5296..5359).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::UltimateCable, isDirectional = false, legacyItemIds = intArrayOf(5019))
-    val CREATIVE_CABLE = registerTileEntity("CREATIVE_CABLE", "block.nova.creative_cable", structureBlockOf(5360), null, structureBlockOf((5361..5424).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024))
+    val BASIC_CABLE = registerTileEntity("BASIC_CABLE", "block.nova.basic_cable", structureBlockOf(5100), null, structureBlockOf((5101..5164).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::BasicCable, isDirectional = false, legacyItemIds = intArrayOf(5004))
+    val ADVANCED_CABLE = registerTileEntity("ADVANCED_CABLE", "block.nova.advanced_cable", structureBlockOf(5165), null, structureBlockOf((5166..5229).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::AdvancedCable, isDirectional = false, legacyItemIds = intArrayOf(5009))
+    val ELITE_CABLE = registerTileEntity("ELITE_CABLE", "block.nova.elite_cable", structureBlockOf(5230), null, structureBlockOf((5231..5294).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::EliteCable, isDirectional = false, legacyItemIds = intArrayOf(5014))
+    val ULTIMATE_CABLE = registerTileEntity("ULTIMATE_CABLE", "block.nova.ultimate_cable", structureBlockOf(5295), null, structureBlockOf((5296..5359).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::UltimateCable, isDirectional = false, legacyItemIds = intArrayOf(5019))
+    val CREATIVE_CABLE = registerTileEntity("CREATIVE_CABLE", "block.nova.creative_cable", structureBlockOf(5360), null, structureBlockOf((5361..5424).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024))
     val SCAFFOLDING = register(NovaMaterial("SCAFFOLDING", "item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray())))
     val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", blockOf(5050), EnergyHolder::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace)
     val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, legacyItemIds = intArrayOf(1))
     val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, legacyItemIds = intArrayOf(11))
     val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", blockOf(5080), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5080, 5081, 5082)), BARRIER, ::StarCollector)
+    val FLUID_TANK = registerTileEntity("FLUID_TANK", "block.nova.fluid_tank", blockOf(5090), null, ModelData(BLUE_STAINED_GLASS, (5090..5116).toIntArray()), BARRIER, ::FluidTank)
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)
@@ -155,10 +158,6 @@ object NovaMaterialRegistry {
     val PLATE_OFF_BUTTON = registerItem("PLATE_OFF_BUTTON", "", 9102)
     val GEAR_ON_BUTTON = registerItem("GEAR_ON_BUTTON", "", 9103)
     val GEAR_OFF_BUTTON = registerItem("GEAR_OFF_BUTTON", "", 9104)
-    val ENERGY_ON_BUTTON = registerItem("ENERGY_ON_BUTTON", "", 9105)
-    val ENERGY_OFF_BUTTON = registerItem("ENERGY_OFF_BUTTON", "", 9106)
-    val ITEM_ON_BUTTON = registerItem("ITEM_ON_BUTTON", "", 9107)
-    val ITEM_OFF_BUTTON = registerItem("ITEM_OFF_BUTTON", "", 9108)
     val WHITELIST_BUTTON = registerItem("WHITELIST_BUTTON", "", 9109)
     val BLACKLIST_BUTTON = registerItem("BLACKLIST_BUTTON", "", 9110)
     val PLUS_ON_BUTTON = registerItem("PLUS_ON_BUTTON", "", 9111)
@@ -176,6 +175,15 @@ object NovaMaterialRegistry {
     val ARROW_LEFT_OFF_BUTTON = registerItem("ARROW_LEFT_OFF_BUTTON", "", 9123)
     val ARROW_RIGHT_ON_BUTTON = registerItem("ARROW_RIGHT_ON_BUTTON", "", 9124)
     val ARROW_RIGHT_OFF_BUTTON = registerItem("ARROW_RIGHT_OFF_BUTTON", "", 9125)
+    val ENERGY_ON_BUTTON = registerItem("ENERGY_ON_BUTTON", "menu.nova.side_config.energy", 9126)
+    val ENERGY_OFF_BUTTON = registerItem("ENERGY_OFF_BUTTON", "", 9127)
+    val ENERGY_SELECTED_BUTTON = registerItem("ENERGY_SELECTED_BUTTON", "menu.nova.side_config.energy", 9128)
+    val ITEM_ON_BUTTON = registerItem("ITEM_ON_BUTTON", "menu.nova.side_config.items", 9129)
+    val ITEM_OFF_BUTTON = registerItem("ITEM_OFF_BUTTON", "", 9130)
+    val ITEM_SELECTED_BUTTON = registerItem("ITEM_SELECTED_BUTTON", "menu.nova.side_config.items", 9131)
+    val FLUID_ON_BUTTON = registerItem("FLUID_ON_BUTTON", "menu.nova.side_config.fluids", 9132)
+    val FLUID_OFF_BUTTON = registerItem("FLUID_OFF_BUTTON", "", 9133)
+    val FLUID_SELECTED_BUTTON = registerItem("FLUID_SELECTED_BUTTON", "menu.nova.side_config.fluids", 9134)
     val INVISIBLE_ITEM = registerItem("INVISIBLE", "", 9300)
     val STOPWATCH_ICON = registerItem("STOPWATCH_ICON", "", 9301)
     val SEARCH_ICON = registerItem("SEARCH_ICON", "", 9302)
@@ -205,6 +213,7 @@ object NovaMaterialRegistry {
     val BLUE_BAR = registerItem("BLUE_BAR", "", itemOf((10_400..10_416).toIntArray()))
     val PRESS_PROGRESS = registerItem("PRESS_PROGRESS", "", itemOf((10_500..10_508).toIntArray()))
     val PULVERIZER_PROGRESS = registerItem("PULVERIZER_PROGRESS", "", itemOf((10_600..10_614).toIntArray()))
+    val ORANGE_BAR = registerItem("ORANGE_BAR", "", itemOf((10_700..10_716).toIntArray()))
     
     // 100.000 - ? Numbers
     val NUMBER = registerItem("NUMBER", "", itemOf((100_000..100_999).toIntArray()))

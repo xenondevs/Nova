@@ -17,8 +17,11 @@ import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -27,7 +30,7 @@ import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.region.Region
 import java.util.*
 
-internal val SELF_UPDATE_REASON = object : UpdateReason {}
+val SELF_UPDATE_REASON = object : UpdateReason {}
 
 abstract class TileEntity(
     val uuid: UUID,
@@ -61,8 +64,8 @@ abstract class TileEntity(
     /**
      * Called when the TileEntity is being broken.
      *
-     * @param dropItems If items should be dropped. Can be ignored for reasons like
-     * dropping the contents of a chest event when the player is in creative mode.
+     * @param dropItems If items should be dropped. Inventory contents will get
+     * added to the list regardless of this value.
      *
      * @return A list of [ItemStack]s that should be dropped.
      */
@@ -192,6 +195,14 @@ abstract class TileEntity(
     fun getInventory(salt: String, size: Int, itemHandler: (ItemUpdateEvent) -> Unit) =
         getInventory(salt, size, IntArray(size) { 64 }, itemHandler)
     
+    fun getFluidContainer(salt: String, types: Set<FluidType>, capacity: Long, amount: Long, updateHandler: () -> Unit): FluidContainer {
+        // TODO: store somewhere
+        val uuid = uuid.salt(salt)
+        val container = NovaFluidContainer(uuid, types, FluidType.NONE, capacity, amount)
+        container.updateHandlers += updateHandler
+        return container
+    }
+    
     /**
      * Creates a new [MultiModel] for this [TileEntity].
      * When the [TileEntity] is removed, all [Model]s belonging
@@ -275,13 +286,13 @@ abstract class TileEntity(
      * Creates an item side config
      */
     fun createItemSideConfig(
-        default: ItemConnectionType,
+        default: NetworkConnectionType,
         vararg blocked: BlockSide
-    ): EnumMap<BlockFace, ItemConnectionType> {
+    ): EnumMap<BlockFace, NetworkConnectionType> {
         
-        val sideConfig = EnumMap<BlockFace, ItemConnectionType>(BlockFace::class.java)
+        val sideConfig = EnumMap<BlockFace, NetworkConnectionType>(BlockFace::class.java)
         val blockedFaces = blocked.map { getFace(it) }
-        CUBE_FACES.forEach { sideConfig[it] = if (blockedFaces.contains(it)) ItemConnectionType.NONE else default }
+        CUBE_FACES.forEach { sideConfig[it] = if (blockedFaces.contains(it)) NetworkConnectionType.NONE else default }
         
         return sideConfig
     }

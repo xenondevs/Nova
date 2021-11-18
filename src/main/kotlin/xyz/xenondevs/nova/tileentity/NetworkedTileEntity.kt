@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.emptyEnumMap
@@ -36,11 +37,13 @@ abstract class NetworkedTileEntity(
         val map: EnumMap<NetworkType, EndPointDataHolder> = emptyEnumMap()
         if (::energyHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.ENERGY] = energyHolder
         if (::itemHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.ITEMS] = itemHolder
+        if (::fluidHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.FLUID] = fluidHolder
         return@lazy map
     }
     
     open val energyHolder: EnergyHolder by PlaceholderProperty
     open val itemHolder: ItemHolder by PlaceholderProperty
+    open val fluidHolder: FluidHolder by PlaceholderProperty
     
     override fun saveData() {
         super.saveData()

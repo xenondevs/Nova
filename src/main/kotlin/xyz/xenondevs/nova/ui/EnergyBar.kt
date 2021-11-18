@@ -14,7 +14,9 @@ class EnergyBar(
     x: Int, y: Int,
     height: Int,
     private val energyHolder: EnergyHolder
-) : VerticalBar(gui, x, y, height, NovaMaterialRegistry.RED_BAR) {
+) : VerticalBar(gui, x, y, height) {
+    
+    override val barMaterial = NovaMaterialRegistry.RED_BAR
     
     private var energy: Long = 0
     private var maxEnergy: Long = 0

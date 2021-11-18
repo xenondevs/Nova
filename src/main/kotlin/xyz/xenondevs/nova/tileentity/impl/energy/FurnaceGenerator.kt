@@ -11,18 +11,18 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.FURNACE_GENERATOR
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.PROVIDE
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ProviderEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.EnergyProgressItem
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.BlockSide.FRONT
@@ -50,7 +50,7 @@ class FurnaceGenerator(
     private val inventory = getInventory("fuel", 1, ::handleInventoryUpdate)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = ACCEPTED_UPGRADE_TYPES)
     override val energyHolder = ProviderEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, upgradeHolder) { createEnergySideConfig(PROVIDE, FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
     
     private var burnTimeMultiplier = BURN_TIME_MULTIPLIER
     private var burnTime: Int = retrieveData("burnTime") { 0 }

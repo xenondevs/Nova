@@ -27,9 +27,9 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry.AUTO_FISHER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
@@ -37,8 +37,8 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.VerticalBar
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.item.ToolUtils
@@ -64,7 +64,7 @@ class AutoFisher(
     override val gui = lazy(::AutoFisherGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM) }
-    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.EXTRACT, fishingRodInventory to ItemConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT, fishingRodInventory to NetworkConnectionType.BUFFER)
     
     private var timePassed = 0
     private var maxIdleTime = 0
@@ -175,9 +175,13 @@ class AutoFisher(
         
         val energyBar = EnergyBar(gui = gui, x = 7, y = 1, height = 3, energyHolder)
         
-        val idleBar = object : VerticalBar(gui = gui, x = 6, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
+        val idleBar = object : VerticalBar(gui = gui, x = 6, y = 1, height = 3) {
+            
+            override val barMaterial = NovaMaterialRegistry.GREEN_BAR
+            
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(TranslatableComponent("menu.nova.auto_fisher.idle", maxIdleTime - timePassed))
+            
         }
         
     }

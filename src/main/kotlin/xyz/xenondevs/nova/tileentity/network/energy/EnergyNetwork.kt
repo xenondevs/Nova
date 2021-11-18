@@ -27,6 +27,8 @@ private fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Long): Long {
  */
 class EnergyNetwork : Network {
     
+    override val type = NetworkType.ENERGY
+    
     override val nodes: Set<NetworkNode>
         get() = _nodes
     

@@ -2,12 +2,13 @@ package xyz.xenondevs.nova.util
 
 import de.studiocode.invui.item.Item
 import me.xdrop.fuzzywuzzy.FuzzySearch
+import java.util.*
 
 fun <E> List<E>.contentEquals(other: List<E>) = size == other.size && containsAll(other)
 
 fun <E> Set<E>.contentEquals(other: Set<E>) = size == other.size && containsAll(other)
 
-fun <E> MutableList<E>.removeFirstWhere(test: (E) -> Boolean): Boolean {
+fun <E> MutableIterable<E>.removeFirstWhere(test: (E) -> Boolean): Boolean {
     val iterator = iterator()
     while (iterator.hasNext()) {
         if (test(iterator.next())) {
@@ -17,6 +18,24 @@ fun <E> MutableList<E>.removeFirstWhere(test: (E) -> Boolean): Boolean {
     }
     
     return false
+}
+
+fun <E> MutableIterable<E>.pollFirstWhere(test: (E) -> Boolean): E? {
+    val iterator = iterator()
+    while (iterator.hasNext()) {
+        val element = iterator.next()
+        if (test(element)) {
+            iterator.remove()
+            return element
+        }
+    }
+    
+    return null
+}
+
+inline fun <K, V> Iterable<K>.associateWithNotNull(valueSelector: (K) -> V?): Map<K, V> {
+    val destination = LinkedHashMap<K, V>()
+    return associateWithNotNullTo(destination, valueSelector)
 }
 
 fun <E> Collection<E>.searchFor(query: String, getString: (E) -> String): List<E> {
@@ -53,4 +72,49 @@ fun <T> Array<T?>.getOrSet(index: Int, lazyValue: () -> T): T {
 fun <K, V> MutableMap<K, V>.putOrRemove(key: K, value: V?) {
     if (value == null) remove(key)
     else put(key, value)
+}
+
+inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>) = EnumMap<K, V>(K::class.java).apply { putAll(pairs) }
+
+inline fun <reified K : Enum<K>, V> emptyEnumMap() = EnumMap<K, V>(K::class.java)
+
+inline fun <reified K : Enum<K>, V> Map<K, V>.toEnumMap() = this.toMap(EnumMap(K::class.java))
+
+inline fun <reified K : Enum<K>, V> Iterable<K>.associateWithToEnumMap(valueSelector: (K) -> V): EnumMap<K, V> {
+    val destination = EnumMap<K, V>(K::class.java)
+    for (element in this) destination[element] = valueSelector(element)
+    return destination
+}
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified R, K, V> Map<K, V>.filterIsInstanceValues() = filter { it.value is R } as Map<K, R>
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified R, K, V> Map<K, V>.filterIsInstanceKeys() = filter { it.key is R } as Map<R, V>
+
+inline fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean): MutableMap<K, V> {
+    val iterator = iterator()
+    while (iterator.hasNext()) {
+        val entry = iterator.next()
+        if (predicate(entry)) iterator.remove()
+    }
+    
+    return this
+}
+
+inline fun <K, V, M : MutableMap<K, V>> Iterable<K>.associateWithNotNullTo(destination: M, valueSelector: (K) -> V?): M {
+    for (element in this) {
+        val value = valueSelector(element)
+        if (value != null) destination[element] = value
+    }
+    
+    return destination
+}
+
+fun <K, V> Map<K,V>.getValues(keys: Iterable<K>): List<V> {
+    val values = ArrayList<V>()
+    for (key in keys) {
+        values += get(key)!!
+    }
+    return values
 }

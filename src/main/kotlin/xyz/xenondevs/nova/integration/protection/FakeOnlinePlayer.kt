@@ -366,6 +366,10 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun stopAllSounds() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun breakBlock(p0: Block): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }

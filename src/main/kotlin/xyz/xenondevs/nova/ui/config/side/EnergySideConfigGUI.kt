@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui.config
+package xyz.xenondevs.nova.ui.config.side
 
 import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.structure.Structure
@@ -20,12 +20,12 @@ import xyz.xenondevs.nova.util.data.setLocalizedName
 class EnergySideConfigGUI(
     val energyHolder: EnergyHolder,
     private val allowedTypes: List<EnergyConnectionType>,
-) : SimpleGUI(8, 3) {
+) : SimpleGUI(9, 3) {
     
     private val structure = Structure("" +
-        "# # # u # # # #" +
-        "# # l f r # # #" +
-        "# # # d b # # #")
+        "# # # # u # # # #" +
+        "# # # l f r # # #" +
+        "# # # # d b # # #")
         .addIngredient('u', SideConfigItem(BlockSide.TOP))
         .addIngredient('l', SideConfigItem(BlockSide.LEFT))
         .addIngredient('f', SideConfigItem(BlockSide.FRONT))

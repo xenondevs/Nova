@@ -16,15 +16,15 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry.VACUUM_CHEST
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
@@ -52,7 +52,7 @@ class VacuumChest(
     private val filterInventory: VirtualInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1)).apply {
         setItemUpdateHandler(::handleFilterInventoryUpdate)
     }
-    override val itemHolder: NovaItemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
+    override val itemHolder: NovaItemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
     
     override val gui = lazy { VacuumChestGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)

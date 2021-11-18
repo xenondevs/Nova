@@ -22,8 +22,8 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.VerticalBar
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
@@ -153,9 +153,14 @@ class MobKiller(
         
         val energyBar = EnergyBar(gui, x = 3, y = 1, height = 3, energyHolder)
         
-        val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
+        val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3) {
+    
+            override val barMaterial = NovaMaterialRegistry.GREEN_BAR
+            
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_killer.idle", maxIdleTime - timePassed))
+            
+            
         }
         
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)

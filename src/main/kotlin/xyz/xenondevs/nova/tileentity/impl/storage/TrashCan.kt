@@ -9,10 +9,10 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.VoidingVirtualInventory
 import xyz.xenondevs.nova.util.associateWithToEnumMap
@@ -31,8 +31,8 @@ class TrashCan(
     override val gui: Lazy<TileEntityGUI> = lazy(::TrashCanGUI)
     override val itemHolder = NovaItemHolder(
         this,
-        inventory to ItemConnectionType.INSERT,
-        lazyDefaultTypeConfig = { CUBE_FACES.associateWithToEnumMap { ItemConnectionType.INSERT } }
+        inventory to NetworkConnectionType.INSERT,
+        lazyDefaultTypeConfig = { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.INSERT } }
     )
     
     override fun handleTick() = Unit

@@ -1,4 +1,5 @@
 {
   "energy_transfer_rate": 2000,
-  "item_transfer_rate": 16
+  "item_transfer_rate": 16,
+  "fluid_transfer_rate": 400
 }

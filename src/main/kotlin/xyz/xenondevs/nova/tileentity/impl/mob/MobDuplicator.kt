@@ -23,9 +23,9 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MOB_DUPLICATOR
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
@@ -33,8 +33,8 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.VerticalBar
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.center
@@ -63,7 +63,7 @@ class MobDuplicator(
     override val gui = lazy { MobDuplicatorGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_TICK_NBT, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.TOP) }
-    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
     private val energyPerTick: Long
         get() = if (keepNbt) energyHolder.specialEnergyConsumption else energyHolder.energyConsumption
     private val totalIdleTime: Int
@@ -154,7 +154,9 @@ class MobDuplicator(
         
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
-        private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
+        private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3) {
+    
+            override val barMaterial = NovaMaterialRegistry.GREEN_BAR
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - timePassed))

@@ -12,8 +12,8 @@ import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.BufferEnergyHolder
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 

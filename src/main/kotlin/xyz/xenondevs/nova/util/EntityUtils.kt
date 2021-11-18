@@ -18,6 +18,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.CreatureSpawnEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import xyz.xenondevs.nova.NOVA
@@ -36,6 +37,14 @@ fun Player.awardAdvancement(key: NamespacedKey) {
     val advancement = Bukkit.getAdvancement(key)!!
     val progress = getAdvancementProgress(advancement)
     advancement.criteria.forEach { progress.awardCriteria(it) }
+}
+
+fun Player.swingHand(hand: EquipmentSlot) {
+    when (hand) {
+        EquipmentSlot.HAND -> swingMainHand()
+        EquipmentSlot.OFF_HAND -> swingOffHand()
+        else -> throw IllegalArgumentException("EquipmentSlot is not a hand")
+    }
 }
 
 fun Entity.teleport(modifyLocation: Location.() -> Unit) {

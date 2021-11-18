@@ -13,12 +13,13 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
 
-open class VerticalBar(
+abstract class VerticalBar(
     gui: GUI,
     x: Int, y: Int,
-    height: Int,
-    private val barMaterial: NovaMaterial
+    height: Int
 ) {
+    
+    abstract val barMaterial: NovaMaterial
     
     private val barItems = Array(height) { VerticalBarItem(it, height) }
     var percentage: Double = 0.0

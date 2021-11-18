@@ -18,7 +18,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.ui.config.BackItem
+import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.localized
 import kotlin.random.Random

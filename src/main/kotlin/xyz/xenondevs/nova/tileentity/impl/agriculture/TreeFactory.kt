@@ -16,17 +16,17 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry.TREE_FACTORY
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.dropItem
@@ -71,7 +71,7 @@ class TreeFactory(
     
     override val gui: Lazy<TileEntityGUI> = lazy(::TreeFactoryGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradesUpdate, allowed = UpgradeType.ALL_ENERGY)
-    override val itemHolder = NovaItemHolder(this, outputInventory to ItemConnectionType.EXTRACT, inputInventory to ItemConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, outputInventory to NetworkConnectionType.EXTRACT, inputInventory to NetworkConnectionType.BUFFER)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) {
         createExclusiveEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM, BlockSide.BACK)
     }

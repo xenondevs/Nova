@@ -4,7 +4,6 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.tileentity.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -16,31 +15,31 @@ object NetworkDebugger {
     
     private val energyDebuggers = ArrayList<UUID>()
     private val itemDebuggers = ArrayList<UUID>()
+    private val fluidDebuggers = ArrayList<UUID>()
     
     init {
         runTaskTimer(0, 1) { NetworkManager.runIfFree(::handleTick) }
     }
     
     fun toggleDebugger(type: NetworkType, player: Player) {
-        when (type) {
-            NetworkType.ENERGY -> {
-                if (energyDebuggers.contains(player.uniqueId)) energyDebuggers -= player.uniqueId
-                else energyDebuggers += player.uniqueId
-            }
-            
-            NetworkType.ITEMS -> {
-                if (itemDebuggers.contains(player.uniqueId)) itemDebuggers -= player.uniqueId
-                else itemDebuggers += player.uniqueId
-            }
-        }
+        val list = getViewerList(type)
+        if (player.uniqueId in list) list -= player.uniqueId
+        else list += player.uniqueId
     }
+    
+    private fun getViewerList(type: NetworkType): ArrayList<UUID> =
+        when (type) {
+            NetworkType.ENERGY -> energyDebuggers
+            NetworkType.ITEMS -> itemDebuggers
+            NetworkType.FLUID -> fluidDebuggers
+        }
     
     private fun handleTick(manager: NetworkManager) {
         if (energyDebuggers.isEmpty() && itemDebuggers.isEmpty()) return
         
         manager.networks
             .forEach { network ->
-                val players = if (network is EnergyNetwork) energyDebuggers.mapNotNull(Bukkit::getPlayer) else itemDebuggers.mapNotNull(Bukkit::getPlayer)
+                val players = getViewerList(network.type).mapNotNull(Bukkit::getPlayer)
                 if (players.isEmpty()) return@forEach
                 
                 val color = Color(network.hashCode())
