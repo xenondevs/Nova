@@ -61,13 +61,8 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
         get() = virtualInventory.items
     
     override fun setItem(slot: Int, item: ItemStack?) {
-        if (!virtualInventory.setItemStack(null, slot, item)) {
-            val uuid = virtualInventory.uuid
-            val tileEntity = TileInventoryManager.getByUuid(uuid)?.first?.let { tileUUID ->
-                TileEntityManager.tileEntities.firstOrNull { tileUUID == it.uuid }
-            }
-            throw NetworkException("The ItemUpdateEvent was cancelled. UUID: ${virtualInventory.uuid}, TileEntity: $tileEntity")
-        }
+        if (!virtualInventory.setItemStack(null, slot, item))
+            throwNetworkException()
     }
     
     override fun addItem(item: ItemStack): Int {
@@ -75,13 +70,22 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
     }
     
     override fun decrementByOne(slot: Int) {
-        virtualInventory.addItemAmount(UPDATE_REASON, slot, -1)
+        if (virtualInventory.addItemAmount(UPDATE_REASON, slot, -1) != -1)
+            throwNetworkException()
     }
     
     override fun equals(other: Any?) =
         if (other is NetworkedVirtualInventory) other.virtualInventory.uuid == virtualInventory.uuid else false
     
     override fun hashCode() = virtualInventory.uuid.hashCode()
+    
+    private fun throwNetworkException() {
+        val uuid = virtualInventory.uuid
+        val tileEntity = TileInventoryManager.getByUuid(uuid)?.first?.let { tileUUID ->
+            TileEntityManager.tileEntities.firstOrNull { tileUUID == it.uuid }
+        }
+        throw NetworkException("The ItemUpdateEvent was cancelled. UUID: ${virtualInventory.uuid}, TileEntity: $tileEntity")
+    }
     
 }
 
