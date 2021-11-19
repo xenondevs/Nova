@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.LIGHTNING_EXCHANGER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.PROVIDE
@@ -77,7 +76,7 @@ class LightningExchanger(
         toCharge += (if (leeway <= maxBurst) leeway else Random.nextLong(minBurst, maxBurst))
     }
     
-    inner class LightningExchangerGUI : TileEntityGUI("menu.nova.lightning_exchanger") {
+    inner class LightningExchangerGUI : TileEntityGUI() {
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +

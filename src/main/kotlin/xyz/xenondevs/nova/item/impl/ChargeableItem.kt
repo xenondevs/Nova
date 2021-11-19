@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.EquipMethod
-import xyz.xenondevs.nova.util.EnergyUtils
+import xyz.xenondevs.nova.util.PrefixUtils
 import kotlin.math.roundToInt
 
 private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy")
@@ -27,7 +27,7 @@ abstract class ChargeableItem(
         storeData(itemStack, ENERGY_KEY, coercedEnergy)
         
         val itemMeta = itemStack.itemMeta!!
-        itemMeta.lore = listOf(EnergyUtils.getEnergyString(coercedEnergy, maxEnergy))
+        itemMeta.lore = listOf(PrefixUtils.getEnergyString(coercedEnergy, maxEnergy))
         if (itemMeta is Damageable)
             itemMeta.damage = calculateDamage(itemStack.type, coercedEnergy)
         itemStack.itemMeta = itemMeta
@@ -51,7 +51,7 @@ abstract class ChargeableItem(
     
     override fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
         itemBuilder.damage = calculateDamage(itemBuilder.material, 0)
-        itemBuilder.addLoreLines(EnergyUtils.getEnergyString(0, maxEnergy))
+        itemBuilder.addLoreLines(PrefixUtils.getEnergyString(0, maxEnergy))
         return itemBuilder
     }
     

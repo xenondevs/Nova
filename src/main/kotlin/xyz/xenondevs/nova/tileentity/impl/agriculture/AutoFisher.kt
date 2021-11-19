@@ -26,7 +26,6 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.AUTO_FISHER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -149,7 +148,7 @@ class AutoFisher(
         event.isCancelled = event.isAdd && event.newItemStack.type != Material.FISHING_ROD
     }
     
-    inner class AutoFisherGUI : TileEntityGUI("menu.nova.auto_fisher") {
+    inner class AutoFisherGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@AutoFisher,

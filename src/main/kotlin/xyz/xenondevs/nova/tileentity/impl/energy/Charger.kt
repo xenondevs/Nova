@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.item.impl.ChargeableItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.CHARGER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -63,7 +62,7 @@ class Charger(
         }
     }
     
-    inner class ChargerGUI : TileEntityGUI("menu.nova.charger") {
+    inner class ChargerGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Charger,

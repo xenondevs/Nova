@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLOCK_BREAKER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -101,7 +100,7 @@ class BlockBreaker(
         }
     }
     
-    inner class BlockBreakerGUI : TileEntityGUI("menu.nova.block_breaker") {
+    inner class BlockBreakerGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@BlockBreaker,

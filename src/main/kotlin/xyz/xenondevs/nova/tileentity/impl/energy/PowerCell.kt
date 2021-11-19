@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.BufferEnergyHolder
 import xyz.xenondevs.nova.ui.EnergyBar
@@ -33,7 +32,7 @@ open class PowerCell(
     
     override fun handleTick() = Unit
     
-    inner class PowerCellGUI : TileEntityGUI("menu.nova.power_cell") {
+    inner class PowerCellGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@PowerCell,

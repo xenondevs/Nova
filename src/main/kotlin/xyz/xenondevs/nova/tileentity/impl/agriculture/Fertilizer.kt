@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.FERTILIZER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -155,7 +154,7 @@ class Fertilizer(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class FertilizerGUI : TileEntityGUI("menu.nova.fertilizer") {
+    inner class FertilizerGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Fertilizer,

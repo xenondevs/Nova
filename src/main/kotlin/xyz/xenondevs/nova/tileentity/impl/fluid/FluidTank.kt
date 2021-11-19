@@ -10,10 +10,11 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
@@ -24,10 +25,13 @@ import xyz.xenondevs.nova.util.hands
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
+import kotlin.math.roundToInt
+import net.minecraft.world.entity.EquipmentSlot as NMSEquipmentSlot
 
-private const val STATES = 13
+private const val MAX_STATE = 99
 
-class FluidTank(
+open class FluidTank(
+    capacity: Long,
     uuid: UUID,
     data: CompoundElement,
     material: NovaMaterial,
@@ -37,28 +41,40 @@ class FluidTank(
     
     override val gui = lazy(::FluidTankGUI)
     
-    private val fluidContainer = getFluidContainer("tank", hashSetOf(FluidType.WATER, FluidType.LAVA), 13000, 0, ::handleFluidUpdate)
-    override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.BUFFER)
-    
-    private fun handleFluidUpdate() {
-        updateHeadStack()
+    private val fluidContainer = getFluidContainer("tank", hashSetOf(FluidType.WATER, FluidType.LAVA), capacity, 0, ::handleFluidUpdate)
+    override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.BUFFER, defaultConnectionConfig = { createSideConfig(NetworkConnectionType.BUFFER) })
+    private val fluidLevel = FakeArmorStand(armorStand.location, true) {
+        it.isInvisible = true
+        it.isMarker = true
     }
     
-    override fun getHeadStack(): ItemStack {
-        val model = material.block!!
+    private fun handleFluidUpdate() {
+        updateFluidLevel()
+    }
+    
+    private fun updateFluidLevel() {
+        val stack = if (fluidContainer.hasFluid()) {
+            val state = (fluidContainer.amount.toDouble() / fluidContainer.capacity.toDouble() * MAX_STATE.toDouble()).roundToInt()
+            when (fluidContainer.type) {
+                FluidType.LAVA -> NovaMaterialRegistry.LAVA_LEVELS
+                FluidType.WATER -> NovaMaterialRegistry.WATER_LEVELS
+                else -> throw IllegalStateException()
+            }.item.createItemStack(state)
+        } else null
         
-        val data = (fluidContainer.amount.toDouble() / fluidContainer.capacity.toDouble() * STATES.toDouble()).toInt()
-            .takeUnless { it == 0 }
-            ?.let {
-                when (fluidContainer.type) {
-                    FluidType.LAVA -> it
-                    FluidType.WATER -> STATES + it
-                    else -> null
-                }
-            }
-            ?: 0
+        val shouldGlow = fluidContainer.type == FluidType.LAVA
+        if (fluidLevel.hasVisualFire != shouldGlow) {
+            fluidLevel.hasVisualFire = shouldGlow
+            fluidLevel.updateEntityData()
+        }
         
-        return model.createItemStack(data)
+        fluidLevel.setEquipment(NMSEquipmentSlot.HEAD, stack)
+        fluidLevel.updateEquipment()
+    }
+    
+    override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
+        fluidLevel.remove()
     }
     
     override fun handleRightClickNoWrench(event: PlayerInteractEvent) {
@@ -69,7 +85,6 @@ class FluidTank(
         } else super.handleRightClickNoWrench(event)
     }
     
-    // TODO: Fix issues with filling when the bucket is in the off-hand
     // TODO: clean up
     private fun handleBucketClick(player: Player, hand: EquipmentSlot): Boolean {
         val gameMode = player.gameMode
@@ -117,7 +132,7 @@ class FluidTank(
         return false
     }
     
-    inner class FluidTankGUI : TileEntityGUI("menu.nova.fluid_tank") {
+    inner class FluidTankGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@FluidTank,
@@ -140,3 +155,48 @@ class FluidTank(
     }
     
 }
+
+private val BASIC_CAPACITY = NovaConfig[NovaMaterialRegistry.BASIC_FLUID_TANK].getLong("capacity")!!
+private val ADVANCED_CAPACITY = NovaConfig[NovaMaterialRegistry.ADVANCED_FLUID_TANK].getLong("capacity")!!
+private val ELITE_CAPACITY = NovaConfig[NovaMaterialRegistry.ELITE_FLUID_TANK].getLong("capacity")!!
+private val ULTIMATE_CAPACITY = NovaConfig[NovaMaterialRegistry.ULTIMATE_FLUID_TANK].getLong("capacity")!!
+
+class BasicFluidTank(
+    uuid: UUID,
+    data: CompoundElement,
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand
+) : FluidTank(BASIC_CAPACITY, uuid, data, material, ownerUUID, armorStand)
+
+class AdvancedFluidTank(
+    uuid: UUID,
+    data: CompoundElement,
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand
+) : FluidTank(ADVANCED_CAPACITY, uuid, data, material, ownerUUID, armorStand)
+
+class EliteFluidTank(
+    uuid: UUID,
+    data: CompoundElement,
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand
+) : FluidTank(ELITE_CAPACITY, uuid, data, material, ownerUUID, armorStand)
+
+class UltimateFluidTank(
+    uuid: UUID,
+    data: CompoundElement,
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand
+) : FluidTank(ULTIMATE_CAPACITY, uuid, data, material, ownerUUID, armorStand)
+
+class CreativeFluidTank(
+    uuid: UUID,
+    data: CompoundElement,
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand
+) : FluidTank(Long.MAX_VALUE, uuid, data, material, ownerUUID, armorStand)

@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
-import xyz.xenondevs.nova.util.EnergyUtils
+import xyz.xenondevs.nova.util.PrefixUtils
 import xyz.xenondevs.nova.util.serverTick
 import kotlin.math.max
 import kotlin.math.min
@@ -86,7 +86,7 @@ sealed class EnergyHolder(
             val builder = material.createBasicItemBuilder()
             val energy = tileEntity?.let { ((tileEntity as NetworkedTileEntity).holders[NetworkType.ENERGY] as EnergyHolder).energy }
                 ?: 0
-            builder.addLoreLines("§7" + EnergyUtils.getEnergyString(energy))
+            builder.addLoreLines("§7" + PrefixUtils.getEnergyString(energy))
             return builder
         }
         

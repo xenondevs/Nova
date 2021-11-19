@@ -19,7 +19,6 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.HARVESTER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType.BUFFER
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType.EXTRACT
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -231,7 +230,7 @@ class Harvester(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class HarvesterGUI : TileEntityGUI("menu.nova.harvester") {
+    inner class HarvesterGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Harvester,

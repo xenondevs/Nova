@@ -22,7 +22,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MOB_DUPLICATOR
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -131,7 +130,7 @@ class MobDuplicator(
         else spawnLocation.world!!.spawnEntity(spawnLocation, entityType!!)
     }
     
-    inner class MobDuplicatorGUI : TileEntityGUI("menu.nova.mob_duplicator") {
+    inner class MobDuplicatorGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@MobDuplicator,

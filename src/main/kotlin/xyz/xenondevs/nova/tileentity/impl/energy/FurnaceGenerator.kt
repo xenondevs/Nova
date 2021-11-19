@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.FURNACE_GENERATOR
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.PROVIDE
@@ -142,7 +141,7 @@ class FurnaceGenerator(
         storeData("totalBurnTime", totalBurnTime)
     }
     
-    inner class FurnaceGeneratorGUI : TileEntityGUI("menu.nova.furnace_generator") {
+    inner class FurnaceGeneratorGUI : TileEntityGUI() {
         
         val progressItem = EnergyProgressItem()
         

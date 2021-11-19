@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.BREEDER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -183,7 +182,7 @@ class Breeder(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class MobCrusherGUI : TileEntityGUI("menu.nova.breeder") {
+    inner class MobCrusherGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Breeder,

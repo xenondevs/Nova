@@ -35,7 +35,7 @@ class FluidBar(
     }
     
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
-        // TODO: metric prefix?
+        val capacity = if (capacity == Long.MAX_VALUE) "∞" else capacity.toString()
         itemBuilder.setDisplayName("$amount mB / $capacity mB")
         return itemBuilder
     }

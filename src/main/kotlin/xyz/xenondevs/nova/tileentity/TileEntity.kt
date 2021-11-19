@@ -283,9 +283,9 @@ abstract class TileEntity(
     }
     
     /**
-     * Creates an item side config
+     * Creates a side config
      */
-    fun createItemSideConfig(
+    fun createSideConfig(
         default: NetworkConnectionType,
         vararg blocked: BlockSide
     ): EnumMap<BlockFace, NetworkConnectionType> {
@@ -407,35 +407,33 @@ abstract class TileEntity(
         
     }
     
-}
-
-
-abstract class TileEntityGUI(private val title: String) {
-    
-    /**
-     * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
-     * the owning [TileEntity] is destroyed.
-     */
-    abstract val gui: GUI
-    
-    /**
-     * A list of [GUIs][GUI] that are not a part of [gui] but should still be closed
-     * when the [TileEntity] is destroyed.
-     */
-    val subGUIs = ArrayList<GUI>()
-    
-    /**
-     * Opens a Window of the [gui] to the specified [player].
-     */
-    fun openWindow(player: Player) = SimpleWindow(player, arrayOf(TranslatableComponent(title)), gui).show()
-    
-    /**
-     * Closes all Windows connected to this [TileEntityGUI].
-     */
-    fun closeWindows() {
-        gui.closeForAllViewers()
-        subGUIs.forEach(GUI::closeForAllViewers)
+    abstract inner class TileEntityGUI {
+        
+        /**
+         * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
+         * the owning [TileEntity] is destroyed.
+         */
+        abstract val gui: GUI
+        
+        /**
+         * A list of [GUIs][GUI] that are not a part of [gui] but should still be closed
+         * when the [TileEntity] is destroyed.
+         */
+        val subGUIs = ArrayList<GUI>()
+        
+        /**
+         * Opens a Window of the [gui] to the specified [player].
+         */
+        fun openWindow(player: Player) = SimpleWindow(player, arrayOf(TranslatableComponent(material.localizedName)), gui).show()
+        
+        /**
+         * Closes all Windows connected to this [TileEntityGUI].
+         */
+        fun closeWindows() {
+            gui.closeForAllViewers()
+            subGUIs.forEach(GUI::closeForAllViewers)
+        }
+        
     }
     
 }
-

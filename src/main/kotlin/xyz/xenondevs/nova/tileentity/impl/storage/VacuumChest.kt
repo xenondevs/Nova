@@ -15,7 +15,6 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.VACUUM_CHEST
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
@@ -133,7 +132,7 @@ class VacuumChest(
         else if (newStack != null) event.isCancelled = true
     }
     
-    inner class VacuumChestGUI : TileEntityGUI("menu.nova.vacuum_chest") {
+    inner class VacuumChestGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@VacuumChest,

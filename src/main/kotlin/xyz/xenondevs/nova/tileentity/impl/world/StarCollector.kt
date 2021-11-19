@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.STAR_COLLECTOR
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -180,7 +179,7 @@ class StarCollector(
         rod.remove()
     }
     
-    inner class StarCollectorGUI : TileEntityGUI("menu.nova.star_collector") {
+    inner class StarCollectorGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@StarCollector,

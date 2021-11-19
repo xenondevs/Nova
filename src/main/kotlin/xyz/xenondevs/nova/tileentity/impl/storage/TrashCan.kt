@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
@@ -37,7 +36,7 @@ class TrashCan(
     
     override fun handleTick() = Unit
     
-    private inner class TrashCanGUI : TileEntityGUI("menu.nova.trash_can") {
+    private inner class TrashCanGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@TrashCan,

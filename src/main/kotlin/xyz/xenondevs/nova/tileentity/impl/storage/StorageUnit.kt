@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.STORAGE_UNIT
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
@@ -81,7 +80,7 @@ class StorageUnit(
         storeData("amount", inventory.amount, true)
     }
     
-    inner class ItemStorageGUI : TileEntityGUI("menu.nova.storage_unit") {
+    inner class ItemStorageGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@StorageUnit,

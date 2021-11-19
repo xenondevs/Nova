@@ -88,7 +88,7 @@ class BlockPlacer(
         }
     }
     
-    inner class BlockPlacerGUI : TileEntityGUI("menu.nova.block_placer") {
+    inner class BlockPlacerGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,

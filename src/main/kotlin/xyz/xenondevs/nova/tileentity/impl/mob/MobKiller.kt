@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MOB_KILLER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
@@ -126,7 +125,7 @@ class MobKiller(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class MobCrusherGUI : TileEntityGUI("menu.nova.mob_killer") {
+    inner class MobCrusherGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@MobKiller,

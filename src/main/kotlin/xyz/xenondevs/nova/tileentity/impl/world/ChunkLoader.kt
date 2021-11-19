@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.CHUNK_LOADER
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
@@ -96,7 +95,7 @@ class ChunkLoader(
         if (!unload) setChunksForceLoaded(false)
     }
     
-    inner class ChunkLoaderGUI : TileEntityGUI("menu.nova.chunk_loader") {
+    inner class ChunkLoaderGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@ChunkLoader,

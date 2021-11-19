@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MECHANICAL_PRESS
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.NONE
@@ -137,7 +136,7 @@ class MechanicalPress(
     }
     
     
-    inner class MechanicalPressGUI : TileEntityGUI("menu.nova.mechanical_press") {
+    inner class MechanicalPressGUI : TileEntityGUI() {
         
         private val pressProgress = PressProgressItem()
         private val pressTypeItems = ArrayList<PressTypeItem>()

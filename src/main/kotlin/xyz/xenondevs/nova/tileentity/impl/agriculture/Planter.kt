@@ -23,7 +23,6 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.PLANTER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -214,7 +213,7 @@ class Planter(
         storeData("range", range)
     }
     
-    inner class PlanterGUI : TileEntityGUI("menu.nova.planter") {
+    inner class PlanterGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Planter,

@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.item.impl.MobCatcherItem
 import xyz.xenondevs.nova.tileentity.impl.agriculture.*
 import xyz.xenondevs.nova.tileentity.impl.energy.*
-import xyz.xenondevs.nova.tileentity.impl.fluid.FluidTank
+import xyz.xenondevs.nova.tileentity.impl.fluid.*
 import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
 import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
@@ -56,7 +56,6 @@ object NovaMaterialRegistry {
     val PULVERIZER = registerEnergyTileEntity("PULVERIZER", 8, ::Pulverizer, COBBLESTONE)
     val SOLAR_PANEL = registerEnergyTileEntity("SOLAR_PANEL", 9, ::SolarPanel, BARRIER)
     val QUARRY = registerEnergyTileEntity("QUARRY", 10, ::Quarry, COBBLESTONE, Quarry::canPlace)
-    
     // 11: Reserved for legacy electrical furnace
     val CHUNK_LOADER = registerEnergyTileEntity("CHUNK_LOADER", 12, ::ChunkLoader, COBBLESTONE)
     val BLOCK_BREAKER = registerEnergyTileEntity("BLOCK_BREAKER", 13, ::BlockBreaker, COBBLESTONE)
@@ -75,6 +74,11 @@ object NovaMaterialRegistry {
     val LIGHTNING_EXCHANGER = registerEnergyTileEntity("LIGHTNING_EXCHANGER", 26, ::LightningExchanger, BARRIER)
     val TREE_FACTORY = registerEnergyTileEntity("TREE_FACTORY", 27, ::TreeFactory, BARRIER)
     val TRASH_CAN = registerDefaultTileEntity("TRASH_CAN", 28, ::TrashCan, BARRIER)
+    val BASIC_FLUID_TANK = registerDefaultTileEntity("BASIC_FLUID_TANK", 29, ::BasicFluidTank, BARRIER)
+    val ADVANCED_FLUID_TANK = registerDefaultTileEntity("ADVANCED_FLUID_TANK", 30, ::AdvancedFluidTank, BARRIER)
+    val ELITE_FLUID_TANK = registerDefaultTileEntity("ELITE_FLUID_TANK", 31, ::EliteFluidTank, BARRIER)
+    val ULTIMATE_FLUID_TANK = registerDefaultTileEntity("ULTIMATE_FLUID_TANK", 32, ::UltimateFluidTank, BARRIER)
+    val CREATIVE_FLUID_TANK = registerDefaultTileEntity("CREATIVE_FLUID_TANK", 33, ::CreativeFluidTank, BARRIER)
     
     // 1000 - 2000: Crafting Items
     // Plates
@@ -142,7 +146,6 @@ object NovaMaterialRegistry {
     val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, legacyItemIds = intArrayOf(1))
     val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, legacyItemIds = intArrayOf(11))
     val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", blockOf(5080), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5080, 5081, 5082)), BARRIER, ::StarCollector)
-    val FLUID_TANK = registerTileEntity("FLUID_TANK", "block.nova.fluid_tank", blockOf(5090), null, ModelData(BLUE_STAINED_GLASS, (5090..5116).toIntArray()), BARRIER, ::FluidTank)
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)
@@ -217,6 +220,10 @@ object NovaMaterialRegistry {
     
     // 100.000 - ? Numbers
     val NUMBER = registerItem("NUMBER", "", itemOf((100_000..100_999).toIntArray()))
+    
+    // 190.000 Fluid Levels
+    val LAVA_LEVELS = registerItem("LAVA_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (190_000 until 190_100).toIntArray()))
+    val WATER_LEVELS = registerItem("WATER_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (191_000 until 191_100).toIntArray()))
     
     // 200.000 - ? Tree Miniatures
     val OAK_TREE_MINIATURE = registerItem("OAK_TREE_MINIATURE", "", bulkItemOf((200_000 until 200_500).toIntArray()))

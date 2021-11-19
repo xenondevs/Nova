@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.item.impl.ChargeableItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.WIRELESS_CHARGER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
@@ -126,7 +125,7 @@ class WirelessCharger(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class WirelessChargerGUI : TileEntityGUI("menu.nova.wireless_charger") {
+    inner class WirelessChargerGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@WirelessCharger,

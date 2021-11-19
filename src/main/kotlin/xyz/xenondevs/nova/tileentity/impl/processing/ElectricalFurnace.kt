@@ -20,7 +20,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.ELECTRICAL_FURNACE
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -173,7 +172,7 @@ class ElectricalFurnace(
         cookSpeed = (COOK_SPEED * upgradeHolder.getSpeedModifier()).toInt()
     }
     
-    inner class ElectricalFurnaceGUI : TileEntityGUI("menu.nova.electrical_furnace") {
+    inner class ElectricalFurnaceGUI : TileEntityGUI() {
         
         private val progressItem = ProgressArrowItem()
         
