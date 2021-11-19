@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.PULVERIZER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
+import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -92,7 +93,7 @@ class Pulverizer(
                 if (!particleTask.isRunning()) particleTask.start()
                 
                 if (timeLeft == 0) {
-                    outputInv.addItem(null, currentRecipe!!.resultStack)
+                    outputInv.addItem(SELF_UPDATE_REASON, currentRecipe!!.resultStack)
                     currentRecipe = null
                 }
                 
@@ -108,7 +109,7 @@ class Pulverizer(
             val recipe = RecipeManager.getPulverizerRecipeFor(inputItem)!!
             val result = recipe.resultStack
             if (outputInv.canHold(result)) {
-                inputInv.addItemAmount(null, 0, -1)
+                inputInv.addItemAmount(SELF_UPDATE_REASON, 0, -1)
                 timeLeft = recipe.time
                 currentRecipe = recipe
             }
@@ -116,16 +117,11 @@ class Pulverizer(
     }
     
     private fun handleInputUpdate(event: ItemUpdateEvent) {
-        if (event.updateReason != null
-            && event.newItemStack != null
-            && RecipeManager.getPulverizerRecipeFor(event.newItemStack) == null) {
-            
-            event.isCancelled = true
-        }
+        event.isCancelled = event.newItemStack != null && RecipeManager.getPulverizerRecipeFor(event.newItemStack) == null
     }
     
     private fun handleOutputUpdate(event: ItemUpdateEvent) {
-        if (event.updateReason != null && event.newItemStack != null) event.isCancelled = true
+        event.isCancelled = !event.isRemove && event.updateReason != SELF_UPDATE_REASON
     }
     
     override fun saveData() {
