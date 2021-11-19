@@ -3,14 +3,12 @@ package xyz.xenondevs.nova.command.impl
 import com.mojang.brigadier.context.CommandContext
 import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
-import xyz.xenondevs.nova.command.Command
-import xyz.xenondevs.nova.command.executesCatching
-import xyz.xenondevs.nova.command.requiresPermission
-import xyz.xenondevs.nova.command.sendSuccess
+import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.novaMaterial
 
 object NovaModelDataCommand : Command("nvmodeldata") {
     
@@ -18,12 +16,21 @@ object NovaModelDataCommand : Command("nvmodeldata") {
         builder = builder
             .requiresPermission("nova.command.modeldata")
             .apply {
-            NovaMaterialRegistry.sortedValues.forEach { material ->
-                then(literal(material.typeName.lowercase())
-                    .executesCatching { showModelData(material, it) }
-                )
+                NovaMaterialRegistry.sortedValues.forEach { material ->
+                    then(literal(material.typeName.lowercase())
+                        .executesCatching { showModelData(material, it) }
+                    )
+                }
             }
-        }
+            .executesCatching { showCurrentModelData(it) }
+    }
+    
+    private fun showCurrentModelData(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val material = player.inventory.itemInMainHand.novaMaterial
+        if (material != null) {
+            showModelData(material, ctx)
+        } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.modeldata.no-nova-item"))
     }
     
     private fun showModelData(material: NovaMaterial, ctx: CommandContext<CommandSourceStack>) {
@@ -48,7 +55,8 @@ object NovaModelDataCommand : Command("nvmodeldata") {
             val block = material.block.material
             val blockLocalized = localized(ChatColor.AQUA, block)
             
-            ctx.source.sendSuccess(localized(ChatColor.GRAY,
+            ctx.source.sendSuccess(localized(
+                ChatColor.GRAY,
                 "command.nova.modeldata.block",
                 localizedName,
                 blockLocalized,
