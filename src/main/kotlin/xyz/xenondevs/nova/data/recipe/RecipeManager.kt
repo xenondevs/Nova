@@ -84,7 +84,7 @@ object RecipeManager : Listener {
                     return@get ItemStack(Material.AIR)
                 } else {
                     // Bukkit's calculated result is correct
-                    return@get event.inventory.result
+                    return@get event.inventory.result ?: ItemStack(Material.AIR)
                 }
             } else {
                 // if the recipe is null or it bukkit thinks it found a nova recipe, we do our own calculations
