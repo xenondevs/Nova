@@ -57,7 +57,7 @@ object UninstallCommand : Command("nvuninstall") {
             LOGGER.warning(world.name.capitalize() + " doesn't exist anymore.")
             return
         }
-        TileEntityManager.tileEntityChunks.filter { it.world == world.uid }.forEach(TileEntityManager::saveChunk)
+        TileEntityManager.tileEntityChunks.filter { it.worldUUID == world.uid }.forEach(TileEntityManager::saveChunk)
         transaction {
             DaoTileEntity
                 .find { TileEntitiesTable.world eq world.uid }

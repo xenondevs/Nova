@@ -220,7 +220,7 @@ object TileEntityManager : Listener {
         addToChunkTaskQueue(chunkPos, true) {
             if (chunkPos.isLoaded()) {
                 transaction {
-                    val tileEntities = DaoTileEntity.find { (TileEntitiesTable.world eq chunkPos.world) and (TileEntitiesTable.chunkX eq chunkPos.x) and (TileEntitiesTable.chunkZ eq chunkPos.z) }
+                    val tileEntities = DaoTileEntity.find { (TileEntitiesTable.world eq chunkPos.worldUUID) and (TileEntitiesTable.chunkX eq chunkPos.x) and (TileEntitiesTable.chunkZ eq chunkPos.z) }
                         .onEach { tile -> tile.inventories.forEach { inventory -> TileInventoryManager.loadInventory(tile.id.value, inventory.id.value, inventory.data) } }
                         .toList()
                     

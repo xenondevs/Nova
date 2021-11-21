@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.pos
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig[CHUNK_LOADER].getLong("capacity")!!
@@ -77,8 +78,8 @@ class ChunkLoader(
     
     private fun setChunksForceLoaded(state: Boolean) {
         chunks.forEach {
-            if (state) ChunkLoadManager.submitChunkLoadRequest(it, uuid)
-            else ChunkLoadManager.revokeChunkLoadRequest(it, uuid)
+            if (state) ChunkLoadManager.submitChunkLoadRequest(it.pos, uuid)
+            else ChunkLoadManager.revokeChunkLoadRequest(it.pos, uuid)
         }
     }
     
