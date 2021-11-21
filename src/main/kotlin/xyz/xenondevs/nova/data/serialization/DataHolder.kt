@@ -71,7 +71,7 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
      * Retrieves an [EnumMap]. If it can't find anything under the
      * given key, the result of the [getAlternative] lambda is returned.
      */
-    inline fun <reified K : Enum<K>, V> retrieveEnumMap(key: String, getAlternative: () -> MutableMap<K, V>) =
+    inline fun <reified K : Enum<K>, V> retrieveEnumMap(key: String, getAlternative: () -> MutableMap<K, V>): MutableMap<K, V> =
         retrieveEnumMapOrNull(key) ?: getAlternative()
     
     /**
@@ -88,7 +88,7 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
      * can't find anything under the given key, the result of the
      * [getAlternative] lambda is returned.
      */
-    inline fun <reified K : Enum<K>, reified V : Enum<V>> retrieveDoubleEnumMap(key: String, getAlternative: () -> MutableMap<K, V>) =
+    inline fun <reified K : Enum<K>, reified V : Enum<V>> retrieveDoubleEnumMap(key: String, getAlternative: () -> MutableMap<K, V>): MutableMap<K, V> =
         retrieveDoubleEnumMapOrNull(key) ?: getAlternative()
     
     /**

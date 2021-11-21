@@ -9,8 +9,8 @@
     <version>0.7-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>1.5.31</kotlin.version>
-        <exposed.version>0.35.1</exposed.version>
+        <kotlin.version>1.6.0</kotlin.version>
+        <exposed.version>0.36.1</exposed.version>
         <spigot.version>1.17.1-R0.1-SNAPSHOT</spigot.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
