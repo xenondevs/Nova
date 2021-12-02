@@ -92,7 +92,7 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
     val tileEntityTag = itemTag.getCompound("BlockEntityTag")?.let { if (it.isEmpty) itemTag else it }
     if (tileEntityTag != null) {
         val world = this.world.serverLevel
-        world.getTileEntity(BlockPos(x, y, z), true)?.load(tileEntityTag)
+        world.getBlockEntity(BlockPos(x, y, z), true)?.load(tileEntityTag)
     }
 }
 

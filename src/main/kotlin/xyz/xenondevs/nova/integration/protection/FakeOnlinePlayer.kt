@@ -394,7 +394,7 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun sendChunkChange(loc: Location, sx: Int, sy: Int, sz: Int, data: ByteArray): Boolean {
+    override fun sendEquipmentChange(p0: LivingEntity, p1: EquipmentSlot, p2: ItemStack) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -517,6 +517,18 @@ internal class FakeOnlinePlayer(
     }
     
     override fun canSee(player: Player): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun canSee(entity: Entity): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun hideEntity(plugin: Plugin, entity: Entity) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showEntity(plugin: Plugin, entity: Entity) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -670,6 +682,14 @@ internal class FakeOnlinePlayer(
     
     override fun openBook(book: ItemStack) {
         throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showDemoScreen() {
+        TODO("Not yet implemented")
+    }
+    
+    override fun isAllowingServerListings(): Boolean {
+        TODO("Not yet implemented")
     }
     
     override fun spigot(): Player.Spigot {

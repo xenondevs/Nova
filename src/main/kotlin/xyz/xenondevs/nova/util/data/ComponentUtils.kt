@@ -8,7 +8,7 @@ import net.md_5.bungee.api.chat.TranslatableComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.network.chat.Component
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage
+import org.bukkit.craftbukkit.v1_18_R1.util.CraftChatMessage
 import org.bukkit.entity.Entity
 import xyz.xenondevs.nova.util.localizedName
 import net.minecraft.network.chat.TextComponent as NMSTextComponent
