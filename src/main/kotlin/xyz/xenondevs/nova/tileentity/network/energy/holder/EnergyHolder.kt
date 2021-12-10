@@ -4,11 +4,9 @@ import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.PermanentStorage.retrieve
 import xyz.xenondevs.nova.data.config.PermanentStorage.retrieveOrNull
-import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
-import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.util.PrefixUtils
@@ -82,9 +80,9 @@ sealed class EnergyHolder(
     
     companion object {
         
-        fun createItemBuilder(material: NovaMaterial, tileEntity: TileEntity?): ItemBuilder {
-            val builder = material.createBasicItemBuilder()
-            val energy = tileEntity?.let { ((tileEntity as NetworkedTileEntity).holders[NetworkType.ENERGY] as EnergyHolder).energy }
+        fun modifyItemBuilder(builder: ItemBuilder, tileEntity: TileEntity?): ItemBuilder {
+            val energy = tileEntity
+                ?.let { (tileEntity as NetworkedTileEntity).energyHolder.energy }
                 ?: 0
             builder.addLoreLines("§7" + PrefixUtils.getEnergyString(energy))
             return builder

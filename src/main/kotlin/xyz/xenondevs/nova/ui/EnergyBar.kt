@@ -37,7 +37,7 @@ class EnergyBar(
     }
     
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
-        if (energy == Long.MAX_VALUE) itemBuilder.setDisplayName("∞ / ∞ J")
+        if (energy == Long.MAX_VALUE) itemBuilder.setDisplayName("∞ J / ∞ J")
         else itemBuilder.setDisplayName(PrefixUtils.getEnergyString(energy, maxEnergy))
         
         if (energyPlusPerTick > 0) {

@@ -53,6 +53,7 @@ abstract class TileEntity(
     val facing = armorStand.location.facing
     
     private val inventories = ArrayList<VirtualInventory>()
+    private val fluidContainers = HashMap<FluidContainer, Boolean>()
     private val multiModels = ArrayList<MultiModel>()
     private val particleTasks = ArrayList<TileEntityParticleTask>()
     
@@ -92,6 +93,13 @@ abstract class TileEntity(
     open fun saveData() {
         if (this is Upgradable)
             upgradeHolder.save(data)
+        
+        fluidContainers.forEach { (container, global) ->
+            val data = CompoundElement()
+            data.put("amount", container.amount)
+            data.put("type", container.type)
+            storeData("fluidContainer.${container.uuid}", data, global)
+        }
     }
     
     /**
@@ -195,11 +203,19 @@ abstract class TileEntity(
     fun getInventory(salt: String, size: Int, itemHandler: (ItemUpdateEvent) -> Unit) =
         getInventory(salt, size, IntArray(size) { 64 }, itemHandler)
     
-    fun getFluidContainer(salt: String, types: Set<FluidType>, capacity: Long, amount: Long, updateHandler: () -> Unit): FluidContainer {
-        // TODO: store somewhere
-        val uuid = uuid.salt(salt)
-        val container = NovaFluidContainer(uuid, types, FluidType.NONE, capacity, amount)
+    /**
+     * Gets a [FluidContainer] for this [TileEntity].
+     */
+    fun getFluidContainer(name: String, types: Set<FluidType>, capacity: Long, defaultAmount: Long, updateHandler: () -> Unit, global: Boolean = true): FluidContainer {
+        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        
+        val fluidData = retrieveOrNull<CompoundElement>("fluidContainer.$uuid")
+        val storedAmount = fluidData?.getAsserted<Long>("amount")
+        val storedType = fluidData?.getEnumConstant<FluidType>("type")
+        
+        val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, capacity, storedAmount ?: defaultAmount)
         container.updateHandlers += updateHandler
+        fluidContainers[container] = global
         return container
     }
     

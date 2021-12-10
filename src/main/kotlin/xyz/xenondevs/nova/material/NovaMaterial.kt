@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-typealias ItemBuilderCreatorFun = ((NovaMaterial, TileEntity?) -> ItemBuilder)
+typealias ItemBuilderModifierFun = (ItemBuilder, TileEntity?) -> ItemBuilder
 typealias TileEntityConstructor = ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)
 typealias PlaceCheckFun = ((Player, Location) -> Boolean)
 
@@ -22,7 +22,7 @@ class NovaMaterial(
     val localizedName: String,
     val item: ModelData,
     val novaItem: NovaItem? = null,
-    itemBuilderCreatorFun: ItemBuilderCreatorFun? = null,
+    private val itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
     val block: ModelData? = null,
     val hitboxType: Material? = null,
     val tileEntityConstructor: TileEntityConstructor? = null,
@@ -32,9 +32,6 @@ class NovaMaterial(
 ) : Comparable<NovaMaterial> {
     
     val isBlock = block != null && tileEntityConstructor != null
-    private val itemBuilderCreatorFun: ((TileEntity?) -> ItemBuilder)? = if (itemBuilderCreatorFun != null) {
-        { itemBuilderCreatorFun(this, it) }
-    } else null
     
     val basicItemProvider: ItemProvider = ItemWrapper(createBasicItemBuilder().get())
     val itemProvider: ItemProvider = ItemWrapper(createItemStack())
@@ -60,12 +57,12 @@ class NovaMaterial(
      * The [TileEntity] provided must be of the same type as the [TileEntity]
      * returned by the [tileEntityConstructor] function.
      *
-     * If there is no custom [itemBuilderCreatorFun] for this [NovaMaterial],
-     * it will return the result of [createBasicItemBuilder].
      */
-    fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder =
-        itemBuilderCreatorFun?.invoke(tileEntity) ?: novaItem?.getDefaultItemBuilder(createBasicItemBuilder())
-        ?: createBasicItemBuilder()
+    fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder {
+        var builder = createBasicItemBuilder()
+        itemBuilderModifiers?.forEach { builder = it.invoke(builder, tileEntity) }
+        return builder
+    }
     
     /**
      * Creates an [ItemStack] for this [NovaMaterial].

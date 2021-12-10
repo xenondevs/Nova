@@ -48,6 +48,10 @@ open class FluidTank(
         it.isMarker = true
     }
     
+    init {
+        updateFluidLevel()
+    }
+    
     private fun handleFluidUpdate() {
         updateFluidLevel()
     }
@@ -101,6 +105,7 @@ open class FluidTank(
                     when (fluidContainer.type) {
                         FluidType.LAVA -> player.playSound(player.location, Sound.ITEM_BUCKET_FILL_LAVA, 1f, 1f)
                         FluidType.WATER -> player.playSound(player.location, Sound.ITEM_BUCKET_FILL, 1f, 1f)
+                        else -> throw IllegalStateException()
                     }
                     
                     player.swingHand(hand)
@@ -126,6 +131,8 @@ open class FluidTank(
                     return true
                 }
             }
+            
+            else -> Unit
             
         }
         
