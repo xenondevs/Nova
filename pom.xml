@@ -9,28 +9,24 @@
     <version>0.7-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>1.6.0</kotlin.version>
+        <kotlin.version>1.6.10-RC</kotlin.version>
         <exposed.version>0.36.1</exposed.version>
         <spigot.version>1.18-R0.1-SNAPSHOT</spigot.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <repositories>
-        <repository>
-            <id>nms-repo</id>
-            <url>https://repo.codemc.org/repository/nms/</url>
-        </repository>
+        <!--        <repository>-->
+        <!--            <id>nms-repo</id>-->
+        <!--            <url>https://repo.codemc.org/repository/nms/</url>-->
+        <!--        </repository>-->
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
-            <id>minecraft-repo</id>
-            <url>https://libraries.minecraft.net/</url>
         </repository>
         <repository>
             <id>jitpack</id>
@@ -222,7 +218,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.1</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
