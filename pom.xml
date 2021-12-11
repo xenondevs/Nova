@@ -11,7 +11,7 @@
     <properties>
         <kotlin.version>1.6.10-RC</kotlin.version>
         <exposed.version>0.36.1</exposed.version>
-        <spigot.version>1.18-R0.1-SNAPSHOT</spigot.version>
+        <spigot.version>1.18.1-R0.1-SNAPSHOT</spigot.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
