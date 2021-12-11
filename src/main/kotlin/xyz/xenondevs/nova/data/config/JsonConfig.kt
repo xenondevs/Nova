@@ -8,7 +8,7 @@ import java.io.File
 private fun File.readConfig(): JsonObject {
     check()
     val text = readText(Charsets.UTF_8)
-    return if (text.isBlank()) JsonObject() else JSON_PARSER.parse(text).asJsonObject
+    return if (text.isBlank()) JsonObject() else JsonParser.parseString(text).asJsonObject
 }
 
 private fun File.check() {

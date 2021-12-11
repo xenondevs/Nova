@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.i18n
 
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
@@ -8,7 +9,6 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.util.data.JSON_PARSER
 import xyz.xenondevs.nova.util.runAsyncTask
 import java.net.URL
 import java.util.zip.ZipInputStream
@@ -28,7 +28,7 @@ object LocaleManager {
                     .forEach { entry ->
                         val fileContent = zis.readNBytes(entry.size.toInt())
                         val langName = entry.name.substringAfterLast('/').substringBeforeLast('.')
-                        val langObject = JSON_PARSER.parse(String(fileContent)) as JsonObject
+                        val langObject = JsonParser.parseString(String(fileContent)) as JsonObject
                         
                         translationProviders[langName] = langObject.entrySet().associateTo(HashMap()) { it.key to it.value.asString }
                     }

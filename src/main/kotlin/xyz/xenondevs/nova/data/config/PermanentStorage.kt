@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.data.config
 
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.JSON_PARSER
 import xyz.xenondevs.nova.util.data.fromJson
 import java.io.File
 
@@ -18,7 +18,7 @@ object PermanentStorage {
             legacyFile.renameTo(file)
         
         mainObj = if (file.exists())
-            JSON_PARSER.parse(file.reader()).asJsonObject
+            JsonParser.parseReader(file.reader()).asJsonObject
         else JsonObject()
     }
     

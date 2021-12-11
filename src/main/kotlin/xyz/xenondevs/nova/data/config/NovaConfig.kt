@@ -1,11 +1,15 @@
 package xyz.xenondevs.nova.data.config
 
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.data.getResourceAsStream
+import xyz.xenondevs.nova.util.data.getResourceData
+import xyz.xenondevs.nova.util.data.getResources
+import xyz.xenondevs.nova.util.data.set
 import java.io.File
 
 val DEFAULT_CONFIG = NovaConfig["config"]
@@ -13,14 +17,14 @@ val DEFAULT_CONFIG = NovaConfig["config"]
 class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataFolder}/$configPath"), false) {
     
     private val defaults: JsonConfig
-    private val internalConfig = JsonConfig(JSON_PARSER.parse(getResourceAsStream(configPath)!!.reader()).asJsonObject)
+    private val internalConfig = JsonConfig(JsonParser.parseReader(getResourceAsStream(configPath)!!.reader()).asJsonObject)
     
     init {
         extractConfigFiles()
         reload()
         
         val defaultsElement = configDefaults.get(configPath)
-            ?: JSON_PARSER.parse(file!!.reader()).also { configDefaults.add(configPath, it) }
+            ?: JsonParser.parseReader(file!!.reader()).also { configDefaults.add(configPath, it) }
         defaults = JsonConfig(defaultsElement as JsonObject)
         
         updateUnchangedConfigValues()
