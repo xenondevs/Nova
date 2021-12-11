@@ -20,7 +20,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Run BuildTools
-        run: . scripts/buildtools.sh
+        run: . .github/scripts/buildtools.sh
 
       - name: Build With Maven
         run: mvn -B clean test package "-Ddir=artifacts/" --file pom.xml
