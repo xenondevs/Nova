@@ -8,18 +8,16 @@ import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.item.impl.MobCatcherItem
 import xyz.xenondevs.nova.tileentity.impl.agriculture.*
 import xyz.xenondevs.nova.tileentity.impl.energy.*
-import xyz.xenondevs.nova.tileentity.impl.fluid.*
 import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
 import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
 import xyz.xenondevs.nova.tileentity.impl.processing.ElectricalFurnace
 import xyz.xenondevs.nova.tileentity.impl.processing.MechanicalPress
 import xyz.xenondevs.nova.tileentity.impl.processing.Pulverizer
-import xyz.xenondevs.nova.tileentity.impl.storage.StorageUnit
-import xyz.xenondevs.nova.tileentity.impl.storage.TrashCan
-import xyz.xenondevs.nova.tileentity.impl.storage.VacuumChest
+import xyz.xenondevs.nova.tileentity.impl.storage.*
 import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.util.toIntArray
 
@@ -131,6 +129,7 @@ object NovaMaterialRegistry {
     val EFFICIENCY_UPGRADE = registerDefaultItem("EFFICIENCY_UPGRADE", 2003)
     val ENERGY_UPGRADE = registerDefaultItem("ENERGY_UPGRADE", 2004)
     val RANGE_UPGRADE = registerDefaultItem("RANGE_UPGRADE", 2005)
+    val FLUID_UPGRADE = registerDefaultItem("FLUID_UPGRADE", 2006)
     
     // 3000 - 4000: Equipment, Attachments
     val JETPACK = registerItem("JETPACK", "item.nova.jetpack", ModelData(IRON_CHESTPLATE, intArrayOf(3000)), JetpackItem)
@@ -200,6 +199,8 @@ object NovaMaterialRegistry {
     val TRANSLUCENT_ENERGY_UPGRADE_ICON = registerItem("TRANSLUCENT_ENERGY_UPGRADE_ICON", "", 9407)
     val RANGE_UPGRADE_ICON = registerItem("RANGE_UPGRADE_ICON", "", 9408)
     val TRANSLUCENT_RANGE_UPGRADE_ICON = registerItem("TRANSLUCENT_RANGE_UPGRADE_ICON", "", 9409)
+    val FLUID_UPGRADE_ICON = registerItem("FLUID_UPGRADE_ICON", "", 9410)
+    val TRANSLUCENT_FLUID_UPGRADE_ICON = registerItem("TRANSLUCENT_FLUID_UPGRADE_ICON", "", 9411)
     val HOE_PLACEHOLDER = registerItem("HOE_PLACEHOLDER", "", 9500)
     val AXE_PLACEHOLDER = registerItem("AXE_PLACEHOLDER", "", 9501)
     val SHEARS_PLACEHOLDER = registerItem("SHEARS_PLACEHOLDER", "", 9502)

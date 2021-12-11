@@ -49,8 +49,8 @@ class CauldronFluidContainer(
     uuid,
     ALLOWED_FLUID_TYPES,
     cauldron.fluidType,
-    1000,
-    cauldron.fluidAmount
+    cauldron.fluidAmount,
+    1000
 ) {
     
     override var type: FluidType?

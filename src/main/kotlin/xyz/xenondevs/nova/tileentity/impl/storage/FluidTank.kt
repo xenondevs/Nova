@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.tileentity.impl.fluid
+package xyz.xenondevs.nova.tileentity.impl.storage
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
@@ -157,7 +157,9 @@ open class FluidTank(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .build()
         
-        val energyBar = FluidBar(gui, x = 4, y = 1, height = 3, fluidContainer)
+        init {
+            FluidBar(gui, x = 4, y = 1, height = 3, fluidContainer)
+        }
         
     }
     

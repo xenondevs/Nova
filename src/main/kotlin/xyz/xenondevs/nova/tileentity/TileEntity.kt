@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
@@ -206,15 +207,24 @@ abstract class TileEntity(
     /**
      * Gets a [FluidContainer] for this [TileEntity].
      */
-    fun getFluidContainer(name: String, types: Set<FluidType>, capacity: Long, defaultAmount: Long, updateHandler: () -> Unit, global: Boolean = true): FluidContainer {
+    fun getFluidContainer(
+        name: String,
+        types: Set<FluidType>,
+        capacity: Long,
+        defaultAmount: Long = 0,
+        updateHandler: (() -> Unit)? = null,
+        upgradeHolder: UpgradeHolder? = null,
+        global: Boolean = true
+    ): FluidContainer {
         val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
         
         val fluidData = retrieveOrNull<CompoundElement>("fluidContainer.$uuid")
         val storedAmount = fluidData?.getAsserted<Long>("amount")
         val storedType = fluidData?.getEnumConstant<FluidType>("type")
         
-        val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, capacity, storedAmount ?: defaultAmount)
-        container.updateHandlers += updateHandler
+        val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, storedAmount
+            ?: defaultAmount, capacity, upgradeHolder)
+        updateHandler?.apply(container.updateHandlers::add)
         fluidContainers[container] = global
         return container
     }

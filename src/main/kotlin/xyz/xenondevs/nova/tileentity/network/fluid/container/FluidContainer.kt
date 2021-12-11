@@ -8,8 +8,8 @@ abstract class FluidContainer(
     val uuid: UUID,
     allowedTypes: Set<FluidType>,
     type: FluidType?,
-    capacity: Long,
-    amount: Long
+    amount: Long,
+    capacity: Long
 ) {
     
     /**
@@ -27,16 +27,20 @@ abstract class FluidContainer(
     /**
      * How many mB this container can hold.
      */
-    val capacity: Long = capacity
+    var capacity: Long = capacity
+        set(value) {
+            field = value
+            if (amount > value)
+                amount = value
+            
+            callUpdateHandlers()
+        }
     
     /**
      * The amount of mB in this container.
      */
     open var amount: Long = amount
         protected set
-    
-    val requestedAmount: Long
-        get() = capacity - amount
     
     val updateHandlers = ArrayList<() -> Unit>()
     
