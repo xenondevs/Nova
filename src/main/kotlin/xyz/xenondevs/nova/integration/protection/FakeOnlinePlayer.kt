@@ -8,6 +8,7 @@ import org.bukkit.attribute.AttributeInstance
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.PistonMoveReaction
+import org.bukkit.block.Sign
 import org.bukkit.block.data.BlockData
 import org.bukkit.conversations.Conversation
 import org.bukkit.conversations.ConversationAbandonedEvent
@@ -684,12 +685,16 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun openSign(sign: Sign) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun showDemoScreen() {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("Player is not online")
     }
     
     override fun isAllowingServerListings(): Boolean {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("Player is not online")
     }
     
     override fun spigot(): Player.Spigot {
