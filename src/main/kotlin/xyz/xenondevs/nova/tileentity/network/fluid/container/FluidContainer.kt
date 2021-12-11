@@ -104,19 +104,42 @@ abstract class FluidContainer(
         return toTake
     }
     
+    /**
+     * Removes all fluids from this [FluidContainer].
+     */
+    fun clear() {
+        amount = 0
+        type = FluidType.NONE
+        
+        callUpdateHandlers()
+    }
+    
+    /**
+     * Checks if this [FluidContainer] would accept [amount] of [type].
+     */
     fun accepts(type: FluidType, amount: Long): Boolean {
         return (this.type == type || (this.type == FluidType.NONE && type in allowedTypes)) && (this.amount + amount <= capacity)
     }
     
+    /**
+     * Checks if the [FluidContainer] is full.
+     */
     fun isFull(): Boolean {
         return this.amount >= this.capacity
     }
     
     /**
-     * Checks that the [type] is not null and not [FluidType.NONE]
+     * Checks if the [FluidContainer] has any fluid.
      */
     fun hasFluid(): Boolean {
         return type != null && type != FluidType.NONE
+    }
+    
+    /**
+     * Checks if the [FluidContainer] is empty.
+     */
+    fun isEmpty(): Boolean {
+        return type == null || type == FluidType.NONE
     }
     
     protected fun callUpdateHandlers() =

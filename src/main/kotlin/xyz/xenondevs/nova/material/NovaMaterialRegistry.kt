@@ -146,6 +146,7 @@ object NovaMaterialRegistry {
     val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, legacyItemIds = intArrayOf(1))
     val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, legacyItemIds = intArrayOf(11))
     val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", blockOf(5080), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5080, 5081, 5082)), BARRIER, ::StarCollector)
+    val LAVA_GENERATOR = registerTileEntity("LAVA_GENERATOR", "block.nova.lava_generator", blockOf(5090), listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder), blockOf(intArrayOf(5090, 5091)), COBBLESTONE, ::LavaGenerator)
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)

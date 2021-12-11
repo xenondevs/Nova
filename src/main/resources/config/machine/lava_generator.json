@@ -1,0 +1,6 @@
+{
+  "energy_capacity": 10000,
+  "fluid_capacity": 10000,
+  "energy_per_mb": 40.0,
+  "burn_rate": 0.5
+}
