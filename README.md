@@ -18,3 +18,9 @@ Visit our [spigot page](https://www.spigotmc.org/resources/93648/) for a more de
 
 # Translating
 If you would like to help translate Nova, you can do so via [Crowdin](https://crowdin.com/project/novaplugin/)
+
+# Patreons
+
+[SgtLegoTown](https://www.youtube.com/channel/UCq8IXcNv_vWPcSB7C2A3hfQ) - €10
+
+Want to donate as well? Check out our [Patreon](https://www.patreon.com/xenondevs) page.
