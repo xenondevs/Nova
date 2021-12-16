@@ -1,0 +1,22 @@
+{
+  "result": "nova:mob_catcher",
+  "shape": [
+    "sds",
+    "dnd",
+    "sds"
+  ],
+  "ingredients": [
+    {
+      "char": "s",
+      "item": "nova:star_shards"
+    },
+    {
+      "char": "d",
+      "item": "minecraft:diamond"
+    },
+    {
+      "char": "n",
+      "item": "minecraft:netherite_ingot"
+    }
+  ]
+}
