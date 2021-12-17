@@ -35,8 +35,12 @@ class FluidBar(
     }
     
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
-        val capacity = if (capacity == Long.MAX_VALUE) "∞" else capacity.toString()
-        itemBuilder.setDisplayName("$amount mB / $capacity mB")
+        if (amount == Long.MAX_VALUE) {
+            itemBuilder.setDisplayName("∞ mB / ∞ mB")
+        } else {
+            val capacity = if (capacity == Long.MAX_VALUE) "∞" else capacity.toString()
+            itemBuilder.setDisplayName("$amount mB / $capacity mB")
+        }
         return itemBuilder
     }
     

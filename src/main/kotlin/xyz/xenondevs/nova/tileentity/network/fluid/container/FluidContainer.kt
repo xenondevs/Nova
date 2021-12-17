@@ -49,7 +49,7 @@ abstract class FluidContainer(
      * @throws IllegalArgumentException If the specified [type] is invalid
      * @throws IllegalArgumentException If the [amount] would exceed this [container's][FluidContainer] capacity.
      */
-    fun addFluid(type: FluidType, amount: Long) {
+    open fun addFluid(type: FluidType, amount: Long) {
         if (amount == 0L) return
         require(this.type == type || (this.type == FluidType.NONE && type in allowedTypes)) { "Illegal fluid type: $type" }
         require(this.capacity >= this.amount + amount) { "The provided amount $amount would exceed this container's capacity $capacity (current amount: ${this.amount})" }
@@ -65,7 +65,7 @@ abstract class FluidContainer(
      * @throws IllegalArgumentException If the specified [type] is invalid
      * @return The amount of fluid that was actually added.
      */
-    fun tryAddFluid(type: FluidType, amount: Long): Long {
+    open fun tryAddFluid(type: FluidType, amount: Long): Long {
         if (amount == 0L) return 0L
         require(this.type == type || (this.type == FluidType.NONE && type in allowedTypes)) { "Illegal fluid type: $type" }
         
@@ -82,7 +82,7 @@ abstract class FluidContainer(
      * Takes fluid from this [FluidContainer].
      * @throws IllegalArgumentException If there are not at least [amount] mB in this container.
      */
-    fun takeFluid(amount: Long) {
+    open fun takeFluid(amount: Long) {
         require(this.amount >= amount) { "FluidContainer does not contain ${amount}mB" }
         
         this.amount -= amount
@@ -95,7 +95,7 @@ abstract class FluidContainer(
      * Tries to take fluid from this [FluidContainer].
      * @return The amount of fluid that was actually taken.
      */
-    fun tryTakeFluid(amount: Long): Long {
+    open fun tryTakeFluid(amount: Long): Long {
         val toTake = min(this.amount, amount)
         this.amount -= toTake
         if (this.amount == 0L) type = FluidType.NONE
@@ -107,7 +107,7 @@ abstract class FluidContainer(
     /**
      * Removes all fluids from this [FluidContainer].
      */
-    fun clear() {
+    open fun clear() {
         amount = 0
         type = FluidType.NONE
         
@@ -117,28 +117,28 @@ abstract class FluidContainer(
     /**
      * Checks if this [FluidContainer] would accept [amount] of [type].
      */
-    fun accepts(type: FluidType, amount: Long): Boolean {
+    open fun accepts(type: FluidType, amount: Long): Boolean {
         return (this.type == type || (this.type == FluidType.NONE && type in allowedTypes)) && (this.amount + amount <= capacity)
     }
     
     /**
      * Checks if the [FluidContainer] is full.
      */
-    fun isFull(): Boolean {
+    open fun isFull(): Boolean {
         return this.amount >= this.capacity
     }
     
     /**
      * Checks if the [FluidContainer] has any fluid.
      */
-    fun hasFluid(): Boolean {
+    open fun hasFluid(): Boolean {
         return type != null && type != FluidType.NONE
     }
     
     /**
      * Checks if the [FluidContainer] is empty.
      */
-    fun isEmpty(): Boolean {
+    open fun isEmpty(): Boolean {
         return type == null || type == FluidType.NONE
     }
     

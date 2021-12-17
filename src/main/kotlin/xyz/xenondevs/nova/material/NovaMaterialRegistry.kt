@@ -78,6 +78,7 @@ object NovaMaterialRegistry {
     val ELITE_FLUID_TANK = registerDefaultTileEntity("ELITE_FLUID_TANK", 31, ::EliteFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val ULTIMATE_FLUID_TANK = registerDefaultTileEntity("ULTIMATE_FLUID_TANK", 32, ::UltimateFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val CREATIVE_FLUID_TANK = registerDefaultTileEntity("CREATIVE_FLUID_TANK", 33, ::CreativeFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
+    val INFINITE_WATER_SOURCE = registerDefaultTileEntity("INFINITE_WATER_SOURCE", 34, ::InfiniteWaterSource, COBBLESTONE)
     
     // 1000 - 2000: Crafting Items
     // Plates
