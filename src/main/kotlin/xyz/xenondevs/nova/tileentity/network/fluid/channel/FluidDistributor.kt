@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.tileentity.network.fluid.channel
 import xyz.xenondevs.nova.tileentity.network.NetworkException
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.util.sumOfNoOverflow
 import kotlin.math.min
 
 class FluidDistributor(
@@ -91,7 +92,7 @@ class FluidDistributor(
         consumers: MutableList<FluidContainer>,
         providers: MutableList<FluidContainer>
     ): Long {
-        val availableFluid = min(maxTransfers, providers.sumOf { it.amount })
+        val availableFluid = min(maxTransfers, providers.sumOfNoOverflow { it.amount })
         if (availableFluid == 0L) return 0L
         
         val distributed = giveEqually(availableFluid, type, consumers)

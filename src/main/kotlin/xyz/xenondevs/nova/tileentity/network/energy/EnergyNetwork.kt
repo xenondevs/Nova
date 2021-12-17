@@ -4,21 +4,9 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.util.sumOfNoOverflow
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
-
-private fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Long): Long {
-    return try {
-        var sum = 0L
-        for (element in this) {
-            sum = Math.addExact(sum, selector(element))
-        }
-        
-        sum
-    } catch (e: ArithmeticException) {
-        Long.MAX_VALUE
-    }
-}
 
 /**
  * An EnergyNetwork consists of [NetworkBridge] that connect [NetworkEndPoint]
