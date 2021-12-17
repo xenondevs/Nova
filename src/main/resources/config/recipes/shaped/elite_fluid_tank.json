@@ -1,0 +1,22 @@
+{
+  "result": "nova:elite_fluid_tank",
+  "shape": [
+    "gdg",
+    "dtd",
+    "gdg"
+  ],
+  "ingredients": [
+    {
+      "char": "t",
+      "item": "nova:advanced_fluid_tank"
+    },
+    {
+      "char": "d",
+      "item": "nova:star_dust"
+    },
+    {
+      "char": "g",
+      "item": "minecraft:gold_ingot"
+    }
+  ]
+}
