@@ -107,6 +107,7 @@ class Quarry(
     private var minZ = 0
     private var maxX = 0
     private var maxZ = 0
+    private val minY = world.minHeight
     
     private lateinit var lastPointerLocation: Location
     private lateinit var pointerLocation: Location
@@ -316,7 +317,7 @@ class Quarry(
     private fun selectNextDestination(): Location? {
         val destination = LocationUtils.getTopBlocksBetween(
             world,
-            minX + 1, 0, minZ + 1,
+            minX + 1, minY, minZ + 1,
             maxX - 1, y - 2, maxZ - 1
         ).asSequence()
             .sortedBy { prioritizedDistance(pointerLocation, it) }
