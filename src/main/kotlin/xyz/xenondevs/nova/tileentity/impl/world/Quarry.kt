@@ -60,8 +60,11 @@ private val DRILL = NovaMaterialRegistry.NETHERITE_DRILL.createItemStack()
 
 private val MIN_SIZE = NovaConfig[QUARRY].getInt("min_size")!!
 private val MAX_SIZE = NovaConfig[QUARRY].getInt("max_size")!!
+private val MIN_DEPTH = NovaConfig[QUARRY].getInt("min_depth")!!
+private val MAX_DEPTH = NovaConfig[QUARRY].getInt("max_depth")!!
 private val DEFAULT_SIZE_X = NovaConfig[QUARRY].getInt("default_size_x")!!
 private val DEFAULT_SIZE_Z = NovaConfig[QUARRY].getInt("default_size_z")!!
+private val DEFAULT_SIZE_Y = NovaConfig[QUARRY].getInt("default_size_y")!!
 
 private val MOVE_SPEED = NovaConfig[QUARRY].getDouble("move_speed")!!
 private val DRILL_SPEED_MULTIPLIER = NovaConfig[QUARRY].getDouble("drill_speed_multiplier")!!
@@ -89,6 +92,7 @@ class Quarry(
     
     private var sizeX = retrieveData("sizeX") { DEFAULT_SIZE_X }
     private var sizeZ = retrieveData("sizeZ") { DEFAULT_SIZE_Z }
+    private var sizeY = retrieveData("sizeY") { DEFAULT_SIZE_Y }
     
     private var energyPerTick by Delegates.notNull<Int>()
     
@@ -107,7 +111,8 @@ class Quarry(
     private var minZ = 0
     private var maxX = 0
     private var maxZ = 0
-    private val minY = world.minHeight
+    private val minY: Int
+        get() = max(world.minHeight, y - 1 - sizeY)
     
     private lateinit var lastPointerLocation: Location
     private lateinit var pointerLocation: Location
@@ -196,6 +201,7 @@ class Quarry(
         super.saveData()
         storeData("sizeX", sizeX)
         storeData("sizeZ", sizeZ)
+        storeData("sizeY", sizeY)
         if (::pointerLocation.isInitialized) storeData("pointerLocation", pointerLocation)
         if (::lastPointerLocation.isInitialized) storeData("lastPointerLocation", lastPointerLocation)
         storeData("pointerDestination", pointerDestination)
@@ -520,6 +526,7 @@ class Quarry(
         ) { openWindow(it) }
         
         private val sizeItems = ArrayList<Item>()
+        private val depthItems = ArrayList<Item>()
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
@@ -527,13 +534,16 @@ class Quarry(
                 "| s u # # # # . |" +
                 "| # # # i i i . |" +
                 "| m n p i i i . |" +
-                "| # # # i i i . |" +
+                "| M N P i i i . |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
-            .addIngredient('p', AddNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
             .addIngredient('m', RemoveNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('n', SizeDisplayItem { sizeX }.also(sizeItems::add))
+            .addIngredient('p', AddNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('M', RemoveNumberItem({ MIN_DEPTH..MAX_DEPTH }, { sizeY }, ::setDepth).also(depthItems::add))
+            .addIngredient('N', DepthDisplayItem { sizeY }.also(depthItems::add))
+            .addIngredient('P', AddNumberItem({ MIN_DEPTH..MAX_DEPTH }, { sizeY }, ::setDepth).also(depthItems::add))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
@@ -544,13 +554,31 @@ class Quarry(
             sizeItems.forEach(Item::notifyWindows)
         }
         
-        private inner class NumberDisplayItem(private val getNumber: () -> Int) : BaseItem() {
+        private fun setDepth(depth: Int) {
+            sizeY = depth
+            depthItems.forEach(Item::notifyWindows)
+        }
+        
+        private inner class SizeDisplayItem(private val getNumber: () -> Int) : BaseItem() {
             
             override fun getItemProvider(): ItemProvider {
                 val number = getNumber()
                 return NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
                     .setDisplayName(TranslatableComponent("menu.nova.quarry.size", number, number))
                     .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
+            }
+            
+            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+            
+        }
+        
+        private inner class DepthDisplayItem(private val getNumber: () -> Int) : BaseItem() {
+            
+            override fun getItemProvider(): ItemProvider {
+                val number = getNumber()
+                return NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
+                    .setDisplayName(TranslatableComponent("menu.nova.quarry.depth", number))
+                    .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.depth_tip"))
             }
             
             override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
