@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.tileentity.impl.processing.Pulverizer
 import xyz.xenondevs.nova.tileentity.impl.storage.*
 import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
-import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.util.toIntArray
 
@@ -79,7 +78,7 @@ object NovaMaterialRegistry {
     val ELITE_FLUID_TANK = registerDefaultTileEntity("ELITE_FLUID_TANK", 31, ::EliteFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val ULTIMATE_FLUID_TANK = registerDefaultTileEntity("ULTIMATE_FLUID_TANK", 32, ::UltimateFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val CREATIVE_FLUID_TANK = registerDefaultTileEntity("CREATIVE_FLUID_TANK", 33, ::CreativeFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val INFINITE_WATER_SOURCE = registerDefaultTileEntity("INFINITE_WATER_SOURCE", 34, ::InfiniteWaterSource, COBBLESTONE)
+    val INFINITE_WATER_SOURCE = registerDefaultTileEntity("INFINITE_WATER_SOURCE", 34, ::InfiniteWaterSource, SANDSTONE)
     
     // 1000 - 2000: Crafting Items
     // Plates

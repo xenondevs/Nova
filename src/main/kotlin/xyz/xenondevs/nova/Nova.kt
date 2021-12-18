@@ -24,8 +24,8 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.nova.world.LootGeneration
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import xyz.xenondevs.nova.world.loot.LootGeneration
 import java.util.logging.Logger
 
 lateinit var NOVA: Nova

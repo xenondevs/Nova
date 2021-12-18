@@ -1,0 +1,21 @@
+{
+  "loot": [
+    {
+      "item": "nova:star_shards",
+      "frequency": 75.0,
+      "min": 1,
+      "max": 5,
+      "blacklist": [
+        "minecraft:chests/jungle_temple_dispenser"
+      ]
+    },
+    {
+      "item": "nova:infinite_water_source",
+      "frequency": 12.5,
+      "amount": 1,
+      "whitelist": [
+        "minecraft:chests/desert_pyramid"
+      ]
+    }
+  ]
+}
