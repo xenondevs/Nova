@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova
 
 import de.studiocode.invui.resourcepack.ForceResourcePack
+import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.command.CommandManager
@@ -82,8 +83,12 @@ class Nova : JavaPlugin() {
     }
     
     private fun forceResourcePack() {
-        if (DEFAULT_CONFIG.getBoolean("resource_pack.enabled"))
-            ForceResourcePack.getInstance().resourcePackUrl = DEFAULT_CONFIG.getString("resource_pack.url")
+        if (DEFAULT_CONFIG.getBoolean("resource_pack.enabled")) {
+            ForceResourcePack.getInstance().setResourcePack(
+                DEFAULT_CONFIG.getString("resource_pack.url"),
+                ComponentBuilder("Nova Resource Pack").create()
+            )
+        }
     }
     
 }
