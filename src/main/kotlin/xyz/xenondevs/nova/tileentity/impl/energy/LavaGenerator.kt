@@ -44,8 +44,8 @@ class LavaGenerator(
     
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.EFFICIENCY, UpgradeType.SPEED, UpgradeType.ENERGY, UpgradeType.FLUID)
     private val fluidContainer = getFluidContainer("tank", hashSetOf(FluidType.LAVA), FLUID_CAPACITY, upgradeHolder = upgradeHolder)
-    override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.BUFFER, defaultConnectionConfig = { createSideConfig(NetworkConnectionType.INSERT) })
-    override val energyHolder = ProviderEnergyHolder(this, ENERGY_CAPACITY, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.PROVIDE) }
+    override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.BUFFER, defaultConnectionConfig = { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) })
+    override val energyHolder = ProviderEnergyHolder(this, ENERGY_CAPACITY, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.PROVIDE, BlockSide.FRONT) }
     
     private var on = false
     private var burnRate = 0.0

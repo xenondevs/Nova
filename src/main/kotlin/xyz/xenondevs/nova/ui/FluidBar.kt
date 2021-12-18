@@ -2,10 +2,17 @@ package xyz.xenondevs.nova.ui
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.util.InventoryUtils
+import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.util.addItemCorrectly
 
 class FluidBar(
     gui: GUI,
@@ -42,6 +49,34 @@ class FluidBar(
             itemBuilder.setDisplayName("$amount mB / $capacity mB")
         }
         return itemBuilder
+    }
+    
+    override fun createBarItem(section: Int, totalSections: Int) = FluidBarItem(section, totalSections) as VerticalBarItem
+    
+    private inner class FluidBarItem(section: Int, totalSections: Int) : VerticalBarItem(section, totalSections) {
+        
+        @Suppress("DEPRECATION")
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            val cursor = event.cursor?.takeUnless { it.type.isAir }
+            if (cursor != null) {
+                if (cursor.type == Material.BUCKET && fluidContainer.amount >= 1000) {
+                    val bucket = fluidContainer.type!!.bucket!!
+                    if (cursor.amount > 1) {
+                        event.cursor!!.amount -= 1
+                        if (player.inventory.addItemCorrectly(bucket) != 0)
+                            InventoryUtils.dropItemLikePlayer(player, bucket)
+                    } else event.cursor = bucket
+                    fluidContainer.takeFluid(1000)
+                } else if (cursor.type == Material.LAVA_BUCKET && fluidContainer.accepts(FluidType.LAVA, 1000)) {
+                    event.cursor = ItemStack(Material.BUCKET)
+                    fluidContainer.addFluid(FluidType.LAVA, 1000)
+                } else if (cursor.type == Material.WATER_BUCKET && fluidContainer.accepts(FluidType.WATER, 1000)) {
+                    event.cursor = ItemStack(Material.BUCKET)
+                    fluidContainer.addFluid(FluidType.WATER, 1000)
+                }
+            }
+        }
+        
     }
     
 }

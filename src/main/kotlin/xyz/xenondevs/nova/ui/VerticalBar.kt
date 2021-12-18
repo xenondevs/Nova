@@ -21,7 +21,7 @@ abstract class VerticalBar(
     
     abstract val barMaterial: NovaMaterial
     
-    private val barItems = Array(height) { VerticalBarItem(it, height) }
+    private val barItems = Array(height) { createBarItem(it, height) }
     var percentage: Double = 0.0
         set(value) {
             field = value
@@ -34,7 +34,9 @@ abstract class VerticalBar(
     
     protected open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     
-    private inner class VerticalBarItem(
+    protected open fun createBarItem(section: Int, totalSections: Int) = VerticalBarItem(section, totalSections)
+    
+    protected open inner class VerticalBarItem(
         private val section: Int,
         private val totalSections: Int,
     ) : BaseItem() {
@@ -47,7 +49,7 @@ abstract class VerticalBar(
             return modifyItemBuilder(barMaterial.item.createItemBuilder(state))
         }
         
-        override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
         
     }
     

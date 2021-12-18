@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.tileentity.impl.energy.*
 import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
 import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
+import xyz.xenondevs.nova.tileentity.impl.processing.CobblestoneGenerator
 import xyz.xenondevs.nova.tileentity.impl.processing.ElectricalFurnace
 import xyz.xenondevs.nova.tileentity.impl.processing.MechanicalPress
 import xyz.xenondevs.nova.tileentity.impl.processing.Pulverizer
@@ -148,6 +149,7 @@ object NovaMaterialRegistry {
     val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, legacyItemIds = intArrayOf(11))
     val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", blockOf(5080), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5080, 5081, 5082)), BARRIER, ::StarCollector)
     val LAVA_GENERATOR = registerTileEntity("LAVA_GENERATOR", "block.nova.lava_generator", blockOf(5090), listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder), blockOf(intArrayOf(5090, 5091)), COBBLESTONE, ::LavaGenerator)
+    val COBBLESTONE_GENERATOR = registerTileEntity("COBBLESTONE_GENERATOR", "block.nova.cobblestone_generator", blockOf(5400), listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder), ModelData(BLUE_STAINED_GLASS, intArrayOf(5400, 5401, 5402, 5403)), BARRIER, ::CobblestoneGenerator)
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)
@@ -189,6 +191,9 @@ object NovaMaterialRegistry {
     val FLUID_ON_BUTTON = registerItem("FLUID_ON_BUTTON", "menu.nova.side_config.fluids", 9132)
     val FLUID_OFF_BUTTON = registerItem("FLUID_OFF_BUTTON", "", 9133)
     val FLUID_SELECTED_BUTTON = registerItem("FLUID_SELECTED_BUTTON", "menu.nova.side_config.fluids", 9134)
+    val COBBLESTONE_MODE_BUTTON = registerItem("COBBLESTONE_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.cobblestone", 9135)
+    val STONE_MODE_BUTTON = registerItem("STONE_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.stone", 9136)
+    val OBSIDIAN_MODE_BUTTON = registerItem("OBSIDIAN_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.obsidian", 9137)
     val INVISIBLE_ITEM = registerItem("INVISIBLE", "", 9300)
     val STOPWATCH_ICON = registerItem("STOPWATCH_ICON", "", 9301)
     val SEARCH_ICON = registerItem("SEARCH_ICON", "", 9302)

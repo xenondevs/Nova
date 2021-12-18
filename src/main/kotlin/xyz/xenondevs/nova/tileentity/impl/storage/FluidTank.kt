@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.ui.FluidBar
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
+import xyz.xenondevs.nova.util.addPrioritized
 import xyz.xenondevs.nova.util.hands
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -99,8 +100,15 @@ open class FluidTank(
             
             Material.BUCKET -> {
                 if (fluidContainer.amount >= 1000) {
-                    if (gameMode != GameMode.CREATIVE) inventory.setItem(hand, fluidContainer.type!!.bucket)
-                    fluidContainer.takeFluid(1000)
+                    if (gameMode != GameMode.CREATIVE) {
+                        val bucket = fluidContainer.type!!.bucket!!
+                        if (inventory.getItem(hand).amount == 1) {
+                            inventory.setItem(hand, bucket)
+                        } else {
+                            inventory.getItem(hand).amount -= 1
+                            inventory.addItem(bucket)
+                        }
+                    }
                     
                     when (fluidContainer.type) {
                         FluidType.LAVA -> player.playSound(player.location, Sound.ITEM_BUCKET_FILL_LAVA, 1f, 1f)
@@ -108,8 +116,8 @@ open class FluidTank(
                         else -> throw IllegalStateException()
                     }
                     
+                    fluidContainer.takeFluid(1000)
                     player.swingHand(hand)
-                    
                     return true
                 }
             }
