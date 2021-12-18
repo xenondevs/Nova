@@ -567,7 +567,19 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun setResourcePack(url: String, hash: ByteArray) {
+    override fun setResourcePack(url: String, hash: ByteArray?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: ByteArray?, prompt: String?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: ByteArray?, force: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: ByteArray?, prompt: String?, force: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
     
