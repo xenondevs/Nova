@@ -299,15 +299,15 @@ private val BASIC_FLUID_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getL
 
 private val ADVANCED_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getLong("energy_transfer_rate")!!
 private val ADVANCED_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getInt("item_transfer_rate")!!
-private val ADVANCED_FLUID_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("fluid_transfer_rate")!!
+private val ADVANCED_FLUID_RATE = NovaConfig[NovaMaterialRegistry.ADVANCED_CABLE].getLong("fluid_transfer_rate")!!
 
 private val ELITE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getLong("energy_transfer_rate")!!
 private val ELITE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getInt("item_transfer_rate")!!
-private val ELITE_FLUID_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("fluid_transfer_rate")!!
+private val ELITE_FLUID_RATE = NovaConfig[NovaMaterialRegistry.ELITE_CABLE].getLong("fluid_transfer_rate")!!
 
 private val ULTIMATE_ENERGY_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getLong("energy_transfer_rate")!!
 private val ULTIMATE_ITEM_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getInt("item_transfer_rate")!!
-private val ULTIMATE_FLUID_RATE = NovaConfig[NovaMaterialRegistry.BASIC_CABLE].getLong("fluid_transfer_rate")!!
+private val ULTIMATE_FLUID_RATE = NovaConfig[NovaMaterialRegistry.ULTIMATE_CABLE].getLong("fluid_transfer_rate")!!
 
 class BasicCable(
     uuid: UUID,
