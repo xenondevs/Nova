@@ -19,15 +19,26 @@ import xyz.xenondevs.nova.player.advancement.cable.AdvancedCableAdvancement
 import xyz.xenondevs.nova.player.advancement.cable.BasicCableAdvancement
 import xyz.xenondevs.nova.player.advancement.cable.EliteCableAdvancement
 import xyz.xenondevs.nova.player.advancement.cable.UltimateCableAdvancement
-import xyz.xenondevs.nova.player.advancement.mob.MobCatcherAdvancement
+import xyz.xenondevs.nova.player.advancement.fluid.CobblestoneGeneratorAdvancement
+import xyz.xenondevs.nova.player.advancement.fluid.InfiniteWaterSourceAdvancement
+import xyz.xenondevs.nova.player.advancement.fluid.LavaGeneratorAdvancement
+import xyz.xenondevs.nova.player.advancement.fluid.PumpAdvancement
+import xyz.xenondevs.nova.player.advancement.fluid.tank.AdvancedFluidTankAdvancement
+import xyz.xenondevs.nova.player.advancement.fluid.tank.BasicFluidTankAdvancement
+import xyz.xenondevs.nova.player.advancement.fluid.tank.EliteFluidTankAdvancement
+import xyz.xenondevs.nova.player.advancement.fluid.tank.UltimateFluidTankAdvancement
 import xyz.xenondevs.nova.player.advancement.mob.BreederAdvancement
+import xyz.xenondevs.nova.player.advancement.mob.MobCatcherAdvancement
 import xyz.xenondevs.nova.player.advancement.mob.MobDuplicatorAdvancement
 import xyz.xenondevs.nova.player.advancement.mob.MobKillerAdvancement
 import xyz.xenondevs.nova.player.advancement.power.FurnaceGeneratorAdvancement
 import xyz.xenondevs.nova.player.advancement.power.LightningExchangerAdvancement
 import xyz.xenondevs.nova.player.advancement.power.SolarPanelAdvancement
 import xyz.xenondevs.nova.player.advancement.power.WindTurbineAdvancement
-import xyz.xenondevs.nova.player.advancement.powercell.*
+import xyz.xenondevs.nova.player.advancement.powercell.AdvancedPowerCellAdvancement
+import xyz.xenondevs.nova.player.advancement.powercell.BasicPowerCellAdvancement
+import xyz.xenondevs.nova.player.advancement.powercell.ElitePowerCellAdvancement
+import xyz.xenondevs.nova.player.advancement.powercell.UltimatePowerCellAdvancement
 import xyz.xenondevs.nova.player.advancement.press.*
 import xyz.xenondevs.nova.player.advancement.pulverizer.AllDustsAdvancement
 import xyz.xenondevs.nova.player.advancement.pulverizer.DustAdvancement
@@ -94,7 +105,9 @@ object AdvancementManager : RoxeezAdvancementManager(NOVA), Listener {
             MobCatcherAdvancement, BreederAdvancement, MobKillerAdvancement, MobDuplicatorAdvancement,
             PlanterAdvancement, FertilizerAdvancement, HarvesterAdvancement, TreeFactoryAdvancement,
             AutoFisherAdvancement,
-            StarShardsAdvancement, StarCollectorAdvancement
+            StarShardsAdvancement, StarCollectorAdvancement,
+            BasicFluidTankAdvancement, AdvancedFluidTankAdvancement, EliteFluidTankAdvancement, UltimateFluidTankAdvancement,
+            InfiniteWaterSourceAdvancement, PumpAdvancement, CobblestoneGeneratorAdvancement, LavaGeneratorAdvancement
         )
         
         createAll(IS_VERSION_CHANGE)
