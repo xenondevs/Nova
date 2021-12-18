@@ -40,7 +40,7 @@ fun NovaFluidHolder(
 
 class NovaFluidHolder(
     override val endPoint: NetworkedTileEntity,
-    private val availableContainers: Map<UUID, FluidContainer>,
+    val availableContainers: Map<UUID, FluidContainer>,
     override val allowedConnectionTypes: Map<FluidContainer, NetworkConnectionType>,
     defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer>,
     defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)?
