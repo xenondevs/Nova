@@ -556,6 +556,7 @@ class Quarry(
         
         private fun setDepth(depth: Int) {
             sizeY = depth
+            done = false
             depthItems.forEach(Item::notifyWindows)
         }
         
