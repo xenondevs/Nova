@@ -19,6 +19,8 @@ import java.awt.Color
 import kotlin.math.*
 
 val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
+val HORIZONTAL_FACES = listOf(NORTH, EAST, SOUTH, WEST)
+val VERTICAL_FACES = listOf(UP, DOWN)
 
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())

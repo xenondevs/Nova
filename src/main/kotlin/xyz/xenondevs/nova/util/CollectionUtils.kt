@@ -118,3 +118,13 @@ fun <K, V> Map<K,V>.getValues(keys: Iterable<K>): List<V> {
     }
     return values
 }
+
+fun <T> MutableList<T>.rotateRight() {
+    val last = removeAt(size - 1)
+    add(0, last)
+}
+
+fun <T> MutableList<T>.rotateLeft() {
+    val first = removeAt(0)
+    add(first)
+}

@@ -1,0 +1,11 @@
+{
+  "energy_capacity": 10000,
+  "energy_per_tick": 250,
+  "fluid_capacity": 20000,
+  "replacement_block": "DIRT",
+  "range": {
+    "min": 1,
+    "max": 10,
+    "default": 5
+  }
+}

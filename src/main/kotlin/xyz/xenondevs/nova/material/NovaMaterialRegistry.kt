@@ -79,7 +79,7 @@ object NovaMaterialRegistry {
     val ULTIMATE_FLUID_TANK = registerDefaultTileEntity("ULTIMATE_FLUID_TANK", 32, ::UltimateFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val CREATIVE_FLUID_TANK = registerDefaultTileEntity("CREATIVE_FLUID_TANK", 33, ::CreativeFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val INFINITE_WATER_SOURCE = registerDefaultTileEntity("INFINITE_WATER_SOURCE", 34, ::InfiniteWaterSource, SANDSTONE)
-    val PUMP = registerDefaultTileEntity("PUMP", 35, ::InfiniteWaterSource, BARRIER)
+    val PUMP = registerDefaultTileEntity("PUMP", 35, ::Pump, BARRIER)
     val COBBLESTONE_GENERATOR = registerDefaultTileEntity("COBBLESTONE_GENERATOR", 36, ::CobblestoneGenerator, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     
     // 1000 - 2000: Crafting Items
@@ -198,6 +198,8 @@ object NovaMaterialRegistry {
     val STOPWATCH_ICON = registerItem("STOPWATCH_ICON", "", 9301)
     val SEARCH_ICON = registerItem("SEARCH_ICON", "", 9302)
     val NO_NUMBER = registerItem("NO_NUMBER", "", 9303)
+    val PUMP_PUMP_ICON = registerItem("PUMP_PUMP_ICON", "", 9304)
+    val PUMP_REPLACE_ICON = registerItem("PUMP_REPLACE_ICON", "", 9305)
     val SPEED_UPGRADE_ICON = registerItem("SPEED_UPGRADE_ICON", "", 9402)
     val TRANSLUCENT_SPEED_UPGRADE_ICON = registerItem("TRANSLUCENT_SPEED_UPGRADE_ICON", "", 9403)
     val EFFICIENCY_UPGRADE_ICON = registerItem("EFFICIENCY_UPGRADE_ICON", "", 9404)

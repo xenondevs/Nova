@@ -11,6 +11,7 @@ import org.bukkit.inventory.RecipeChoice.MaterialChoice
 import xyz.xenondevs.nova.data.recipe.NovaRecipeChoice
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 
@@ -21,6 +22,18 @@ fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmou
 fun Material.isTraversable() = isAir || this == Material.WATER || this == Material.BUBBLE_COLUMN || this == Material.LAVA
 
 fun Material.isBreakable() = blastResistance < 3600000.0f
+
+fun Material.isFluid() = this == Material.WATER || this == Material.BUBBLE_COLUMN || this == Material.LAVA
+
+val Material.fluidType: FluidType?
+    get() {
+        val fluidType = when (this) {
+            Material.WATER, Material.BUBBLE_COLUMN -> FluidType.WATER
+            Material.LAVA -> FluidType.LAVA
+            else -> null
+        }
+        return fluidType
+    }
 
 /**
  * The break speed for a specific material, always positive.

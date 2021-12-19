@@ -5,7 +5,6 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.LIGHTNING_EXCHANGER
 import xyz.xenondevs.nova.player.advancement.addObtainCriteria
-import xyz.xenondevs.nova.player.advancement.power.SolarPanelAdvancement
 import xyz.xenondevs.nova.player.advancement.setDisplayLocalized
 import xyz.xenondevs.nova.player.advancement.toIcon
 

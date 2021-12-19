@@ -7,6 +7,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.*
+import org.bukkit.block.data.Levelled
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.other.ItemsAdder
@@ -100,4 +101,8 @@ fun Location.getBlockName(): String {
     val tileEntity = TileEntityManager.getTileEntityAt(this)
     return if (tileEntity != null) "nova:" + tileEntity.material.typeName.lowercase()
     else "minecraft:" + block.type.name.lowercase()
+}
+
+fun Block.isSourceFluid(): Boolean {
+    return blockData is Levelled && (blockData as Levelled).level == 0
 }
