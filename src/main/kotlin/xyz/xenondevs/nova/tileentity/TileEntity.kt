@@ -324,6 +324,20 @@ abstract class TileEntity(
     }
     
     /**
+     * Creates a side config
+     */
+    fun createExclusiveSideConfig(
+        type: NetworkConnectionType,
+        vararg sides: BlockSide
+    ): EnumMap<BlockFace, NetworkConnectionType> {
+        
+        val sideFaces = sides.map(::getFace)
+        return CUBE_FACES.associateWithTo(emptyEnumMap()) {
+            if (it in sideFaces) type else NetworkConnectionType.NONE
+        }
+    }
+    
+    /**
      * Creates a [Region] of a specified [size] that surrounds this [TileEntity].
      */
     fun getSurroundingRegion(size: Int): Region {
