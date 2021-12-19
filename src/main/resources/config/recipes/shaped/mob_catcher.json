@@ -2,7 +2,7 @@
   "result": "nova:mob_catcher",
   "shape": [
     "sds",
-    "dnd",
+    "dgd",
     "sds"
   ],
   "ingredients": [
@@ -15,8 +15,8 @@
       "item": "minecraft:diamond"
     },
     {
-      "char": "n",
-      "item": "minecraft:netherite_ingot"
+      "char": "g",
+      "item": "minecraft:ghast_tear"
     }
   ]
 }
