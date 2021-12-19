@@ -78,8 +78,8 @@ class NovaFluidHolder(
         
         fun modifyItemBuilder(builder: ItemBuilder, tileEntity: TileEntity?): ItemBuilder {
             if (tileEntity is NetworkedTileEntity) {
-                val fluidHolder = tileEntity.fluidHolder
-                fluidHolder.containerConfig.values.toSet().forEach { container ->
+                val fluidHolder = tileEntity.fluidHolder as NovaFluidHolder
+                fluidHolder.availableContainers.values.forEach { container ->
                     if (container.hasFluid()) builder.addLoreLines(localized(
                         ChatColor.GRAY,
                         "tooltip.nova.fluid",
