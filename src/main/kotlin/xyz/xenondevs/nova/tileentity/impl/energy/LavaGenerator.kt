@@ -122,6 +122,7 @@ class LavaGenerator(
         private val sideConfigGUI = SideConfigGUI(
             this@LavaGenerator,
             fluidContainers = listOf(fluidContainer to "container.nova.lava_tank"),
+            allowedEnergyTypes = listOf(EnergyConnectionType.NONE, EnergyConnectionType.PROVIDE),
             openPrevious = ::openWindow
         )
         
