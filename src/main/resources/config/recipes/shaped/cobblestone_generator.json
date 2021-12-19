@@ -1,0 +1,34 @@
+{
+  "result": "nova:cobblestone_generator",
+  "shape": [
+    "iei",
+    "wfl",
+    "igi"
+  ],
+  "ingredients": [
+    {
+      "char": "w",
+      "item": "minecraft:water_bucket"
+    },
+    {
+      "char": "l",
+      "item": "minecraft:lava_bucket"
+    },
+    {
+      "char": "e",
+      "item": "minecraft:bucket"
+    },
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "f",
+      "item": "nova:elite_machine_frame"
+    },
+    {
+      "char": "g",
+      "item": "nova:diamond_gear"
+    }
+  ]
+}
