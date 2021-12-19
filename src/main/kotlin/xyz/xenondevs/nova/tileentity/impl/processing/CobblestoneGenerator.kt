@@ -6,6 +6,7 @@ import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
+import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -23,6 +24,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
@@ -35,15 +37,24 @@ import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.MathUtils
+import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.axis
+import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
+import kotlin.math.min
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
+import kotlin.random.Random
+
+private const val MAX_STATE = 99
 
 private val ENERGY_CAPACITY = NovaConfig[COBBLESTONE_GENERATOR].getLong("energy_capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[COBBLESTONE_GENERATOR].getLong("energy_per_tick")!!
 private val WATER_CAPACITY = NovaConfig[COBBLESTONE_GENERATOR].getLong("water_capacity")!!
 private val LAVA_CAPACITY = NovaConfig[COBBLESTONE_GENERATOR].getLong("lava_capacity")!!
-private val PROGRESS_PER_TICK = NovaConfig[COBBLESTONE_GENERATOR].getDouble("progress_per_tick")!!
+private val MB_PER_TICK = NovaConfig[COBBLESTONE_GENERATOR].getLong("mb_per_tick")!!
 
 class CobblestoneGenerator(
     uuid: UUID,
@@ -57,55 +68,98 @@ class CobblestoneGenerator(
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.SPEED, UpgradeType.EFFICIENCY, UpgradeType.ENERGY, UpgradeType.FLUID)
     
     private val inventory = getInventory("inventory", 3, ::handleInventoryUpdate)
-    private val waterTank = getFluidContainer("water", setOf(FluidType.WATER), WATER_CAPACITY, 0, ::updateHeadStack, upgradeHolder)
-    private val lavaTank = getFluidContainer("lava", setOf(FluidType.LAVA), LAVA_CAPACITY, 0, ::updateHeadStack, upgradeHolder)
+    private val waterTank = getFluidContainer("water", setOf(FluidType.WATER), WATER_CAPACITY, 0, ::updateWaterLevel, upgradeHolder)
+    private val lavaTank = getFluidContainer("lava", setOf(FluidType.LAVA), LAVA_CAPACITY, 0, ::updateLavaLevel, upgradeHolder)
     
     override val energyHolder = ConsumerEnergyHolder(this, ENERGY_CAPACITY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT) { createSideConfig(NetworkConnectionType.EXTRACT, BlockSide.FRONT) }
     override val fluidHolder = NovaFluidHolder(this, waterTank to NetworkConnectionType.BUFFER, lavaTank to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     
     private var mode = retrieveEnum("mode") { GenerationMode.COBBLESTONE }
+    private var mbPerTick = 0L
     
-    private var progress = 0.0
-    private var progressPerTick = 0.0
+    private var currentMode = mode
+    private var mbUsed = 0L
+    
+    private val waterLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true;it.isMarker = true }
+    private val lavaLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true; it.isMarker = true }
+    
+    private val particleEffect = particleBuilder(ParticleEffect.SMOKE_LARGE) {
+        location(armorStand.location.advance(getFace(BlockSide.FRONT), 0.6).apply { y += 0.6 })
+        offset(getFace(BlockSide.RIGHT).axis, 0.15f)
+        amount(5)
+        speed(0.03f)
+    }
     
     init {
         handleUpgradeUpdates()
+        updateWaterLevel()
+        updateLavaLevel()
     }
-    
-    override fun getHeadStack() =
-        material.block!!.createItemStack(
-            MathUtils.convertBooleanArrayToInt(booleanArrayOf(!lavaTank.isEmpty(), !waterTank.isEmpty()))
-        )
     
     private fun handleUpgradeUpdates() {
-        progressPerTick = PROGRESS_PER_TICK * upgradeHolder.getSpeedModifier()
+        mbPerTick = (MB_PER_TICK * upgradeHolder.getSpeedModifier()).roundToLong()
     }
     
+    private fun updateWaterLevel() {
+        val item = if (!waterTank.isEmpty()) {
+            val state = getFluidState(waterTank)
+            NovaMaterialRegistry.COBBLESTONE_GENERATOR_WATER_LEVELS.item.createItemStack(state)
+        } else null
+        waterLevel.setEquipment(EquipmentSlot.HEAD, item)
+        waterLevel.updateEquipment()
+    }
+    
+    private fun updateLavaLevel() {
+        val item = if (!lavaTank.isEmpty()) {
+            val state = getFluidState(lavaTank)
+            NovaMaterialRegistry.COBBLESTONE_GENERATOR_LAVA_LEVELS.item.createItemStack(state)
+        } else null
+        lavaLevel.setEquipment(EquipmentSlot.HEAD, item)
+        lavaLevel.updateEquipment()
+    }
+    
+    private fun getFluidState(container: FluidContainer) =
+        (container.amount.toDouble() / container.capacity.toDouble() * MAX_STATE.toDouble()).roundToInt()
+    
     override fun handleTick() {
-        if (waterTank.amount >= 1000
-            && lavaTank.amount >= 1000
+        val mbToTake = min(mbPerTick, 1000 - mbUsed)
+        
+        if (waterTank.amount >= mbToTake
+            && lavaTank.amount >= mbToTake
             && energyHolder.energy >= energyHolder.energyConsumption
-            && inventory.canHold(mode.product)
+            && inventory.canHold(currentMode.product)
         ) {
             energyHolder.energy -= energyHolder.energyConsumption
+            mbUsed += mbToTake
             
-            progress += progressPerTick
-            if (progress >= 1.0) {
-                progress = 0.0
+            when {
+                currentMode.takeLava -> lavaTank
+                currentMode.takeWater -> waterTank
+                else -> null
+            }?.takeFluid(mbToTake)
+            
+            if (mbUsed >= 1000) {
+                mbUsed = 0
+                inventory.addItem(SELF_UPDATE_REASON, currentMode.product)
+                currentMode = mode
                 
-                waterTank.takeFluid(mode.waterTake)
-                lavaTank.takeFluid(mode.lavaTake)
-                
-                inventory.addItem(SELF_UPDATE_REASON, mode.product)
+                playSoundEffect(Sound.BLOCK_LAVA_EXTINGUISH, 0.1f, Random.nextDouble(0.5, 1.95).toFloat())
+                particleEffect.display(getViewers())
             }
             
-            if (gui.isInitialized()) gui.value.progressItem.percentage = progress
+            if (gui.isInitialized()) gui.value.progressItem.percentage = mbUsed / 1000.0
         }
     }
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
         event.isCancelled == !event.isRemove && event.updateReason != SELF_UPDATE_REASON
+    }
+    
+    override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
+        waterLevel.remove()
+        lavaLevel.remove()
     }
     
     override fun saveData() {
@@ -166,10 +220,10 @@ class CobblestoneGenerator(
     
 }
 
-private enum class GenerationMode(val waterTake: Long, val lavaTake: Long, val product: ItemStack, val uiItem: NovaMaterial) {
+private enum class GenerationMode(val takeWater: Boolean, val takeLava: Boolean, val product: ItemStack, val uiItem: NovaMaterial) {
     
-    COBBLESTONE(0L, 0L, ItemStack(Material.COBBLESTONE), NovaMaterialRegistry.COBBLESTONE_MODE_BUTTON),
-    STONE(1000L, 0L, ItemStack(Material.STONE), NovaMaterialRegistry.STONE_MODE_BUTTON),
-    OBSIDIAN(0L, 1000L, ItemStack(Material.OBSIDIAN), NovaMaterialRegistry.OBSIDIAN_MODE_BUTTON)
+    COBBLESTONE(false, false, ItemStack(Material.COBBLESTONE), NovaMaterialRegistry.COBBLESTONE_MODE_BUTTON),
+    STONE(true, false, ItemStack(Material.STONE), NovaMaterialRegistry.STONE_MODE_BUTTON),
+    OBSIDIAN(false, true, ItemStack(Material.OBSIDIAN), NovaMaterialRegistry.OBSIDIAN_MODE_BUTTON)
     
 }

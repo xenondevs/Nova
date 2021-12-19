@@ -80,6 +80,7 @@ object NovaMaterialRegistry {
     val CREATIVE_FLUID_TANK = registerDefaultTileEntity("CREATIVE_FLUID_TANK", 33, ::CreativeFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val INFINITE_WATER_SOURCE = registerDefaultTileEntity("INFINITE_WATER_SOURCE", 34, ::InfiniteWaterSource, SANDSTONE)
     val PUMP = registerDefaultTileEntity("PUMP", 35, ::InfiniteWaterSource, BARRIER)
+    val COBBLESTONE_GENERATOR = registerDefaultTileEntity("COBBLESTONE_GENERATOR", 36, ::CobblestoneGenerator, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     
     // 1000 - 2000: Crafting Items
     // Plates
@@ -149,7 +150,6 @@ object NovaMaterialRegistry {
     val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, legacyItemIds = intArrayOf(11))
     val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", blockOf(5080), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5080, 5081, 5082)), BARRIER, ::StarCollector)
     val LAVA_GENERATOR = registerTileEntity("LAVA_GENERATOR", "block.nova.lava_generator", blockOf(5090), listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder), blockOf(intArrayOf(5090, 5091)), COBBLESTONE, ::LavaGenerator)
-    val COBBLESTONE_GENERATOR = registerTileEntity("COBBLESTONE_GENERATOR", "block.nova.cobblestone_generator", blockOf(5400), listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder), ModelData(BLUE_STAINED_GLASS, intArrayOf(5400, 5401, 5402, 5403)), BARRIER, ::CobblestoneGenerator)
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)
@@ -231,8 +231,10 @@ object NovaMaterialRegistry {
     val NUMBER = registerItem("NUMBER", "", itemOf((100_000..100_999).toIntArray()))
     
     // 190.000 Fluid Levels
-    val LAVA_LEVELS = registerItem("LAVA_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (190_000 until 190_100).toIntArray()))
-    val WATER_LEVELS = registerItem("WATER_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (191_000 until 191_100).toIntArray()))
+    val TANK_LAVA_LEVELS = registerItem("TANK_LAVA_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (190_000 until 190_100).toIntArray()))
+    val TANK_WATER_LEVELS = registerItem("TANK_WATER_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (191_000 until 191_100).toIntArray()))
+    val COBBLESTONE_GENERATOR_LAVA_LEVELS = registerItem("COBBLESTONE_GENERATOR_LAVA_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (192_000 until 192_100).toIntArray()))
+    val COBBLESTONE_GENERATOR_WATER_LEVELS = registerItem("COBBLESTONE_GENERATOR_WATER_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (193_000 until 193_100).toIntArray()))
     
     // 200.000 - ? Tree Miniatures
     val OAK_TREE_MINIATURE = registerItem("OAK_TREE_MINIATURE", "", bulkItemOf((200_000 until 200_500).toIntArray()))

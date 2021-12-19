@@ -34,10 +34,7 @@ open class FluidTank(
     
     private val fluidContainer = getFluidContainer("tank", hashSetOf(FluidType.WATER, FluidType.LAVA), capacity, 0, ::handleFluidUpdate)
     override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.BUFFER, defaultConnectionConfig = { createSideConfig(NetworkConnectionType.BUFFER) })
-    private val fluidLevel = FakeArmorStand(armorStand.location, true) {
-        it.isInvisible = true
-        it.isMarker = true
-    }
+    private val fluidLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true;it.isMarker = true }
     
     init {
         updateFluidLevel()
@@ -51,8 +48,8 @@ open class FluidTank(
         val stack = if (fluidContainer.hasFluid()) {
             val state = (fluidContainer.amount.toDouble() / fluidContainer.capacity.toDouble() * MAX_STATE.toDouble()).roundToInt()
             when (fluidContainer.type) {
-                FluidType.LAVA -> NovaMaterialRegistry.LAVA_LEVELS
-                FluidType.WATER -> NovaMaterialRegistry.WATER_LEVELS
+                FluidType.LAVA -> NovaMaterialRegistry.TANK_LAVA_LEVELS
+                FluidType.WATER -> NovaMaterialRegistry.TANK_WATER_LEVELS
                 else -> throw IllegalStateException()
             }.item.createItemStack(state)
         } else null
