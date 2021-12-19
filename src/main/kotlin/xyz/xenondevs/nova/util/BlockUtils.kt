@@ -12,6 +12,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.other.ItemsAdder
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
@@ -106,3 +107,17 @@ fun Location.getBlockName(): String {
 fun Block.isSourceFluid(): Boolean {
     return blockData is Levelled && (blockData as Levelled).level == 0
 }
+
+val Block.sourceFluidType: FluidType?
+    get() {
+        val blockData = blockData
+        if (blockData is Levelled && blockData.level == 0) {
+            return when (type) {
+                Material.WATER, Material.BUBBLE_COLUMN -> FluidType.WATER
+                Material.LAVA -> FluidType.LAVA
+                else -> null
+            }
+        }
+        
+        return null
+    }

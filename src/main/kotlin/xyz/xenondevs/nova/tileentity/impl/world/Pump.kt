@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.PUMP
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -103,6 +104,7 @@ class Pump(
         val max = location.clone().add(rangeDouble, 0.0, rangeDouble)
         region = Region(min, max)
         VisualRegion.updateRegion(uuid, region)
+        idleTime = maxIdleTime
     }
     
     override fun handleTick() {
@@ -117,7 +119,7 @@ class Pump(
         if (block != null && type != null) {
             if (mode == PumpMode.REPLACE) {
                 block.type = REPLACEMENT_BLOCK
-                
+                REPLACEMENT_BLOCK.playPlaceSoundEffect(block.location)
             } else if (!block.isInfiniteWaterSource()) {
                 block.type = Material.AIR
             }
@@ -155,9 +157,9 @@ class Pump(
         for (face in faces) {
             val newLocation = location.clone().advance(face, 1.0)
             val newBlock = newLocation.block
-            val blockType = newBlock.type
-            val fluidType = blockType.fluidType ?: continue
-            if (blockType.isFluid() && newBlock.isSourceFluid() && fluidTank.accepts(fluidType) && newLocation.center() in region) {
+            
+            val fluidType = newBlock.sourceFluidType ?: continue
+            if (fluidTank.accepts(fluidType) && newLocation.center() in region) {
                 if (face !in VERTICAL_FACES)
                     sortedFaces.rotateRight()
                 block = newBlock
@@ -172,9 +174,8 @@ class Pump(
         repeat(range) { r ->
             if (r == 0) {
                 val block = location.clone().advance(BlockFace.DOWN).block
-                val blockType = block.type
-                val fluidType = blockType.fluidType ?: return@repeat
-                if (blockType.isFluid() && block.isSourceFluid() && fluidTank.accepts(fluidType))
+                val fluidType = block.sourceFluidType ?: return@repeat
+                if (fluidTank.accepts(fluidType))
                     return block to fluidType
                 return@repeat
             }
@@ -184,9 +185,8 @@ class Pump(
                         if ((x != -r && x != r) && (y != -r - 1 && y != r) && (z != -r && z != r))
                             continue
                         val block = location.clone().add(x.toDouble(), y.toDouble(), z.toDouble()).block
-                        val blockType = block.type
-                        val fluidType = blockType.fluidType ?: continue
-                        if (blockType.isFluid() && block.isSourceFluid() && fluidTank.accepts(fluidType))
+                        val fluidType = block.sourceFluidType ?: continue
+                        if (fluidTank.accepts(fluidType))
                             return block to fluidType
                     }
                 }
@@ -217,7 +217,7 @@ class Pump(
         storeData("mode", mode)
     }
     
-    inner class PumpGUI : TileEntityGUI() {
+    inner class PumpGUI : TileEntity.TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Pump,
