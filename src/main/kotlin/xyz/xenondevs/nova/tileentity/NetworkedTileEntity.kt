@@ -95,7 +95,7 @@ abstract class NetworkedTileEntity(
         val bucket = player.inventory.getItem(hand)
         val type = FluidType.values().first { bucket.isSimilar(it.bucket) }
         
-        val container = holder.availableContainers.values.firstOrNull { it.accepts(type, 1000) }
+        val container = holder.availableContainers.values.firstOrNull { it.accepts(type, 1000) && holder.allowedConnectionTypes[it]!!.insert }
         if (container != null) {
             container.addFluid(type, 1000)
             if (player.gameMode != GameMode.CREATIVE)
@@ -113,8 +113,8 @@ abstract class NetworkedTileEntity(
         val face = BlockFaceUtils.determineBlockFace(location.block, targetLocation)
         
         val container = holder.containerConfig[face]
-            ?.takeUnless { holder.connectionConfig[face] != NetworkConnectionType.NONE || it.amount < 1000 }
-            ?: holder.availableContainers.values.firstOrNull { it.amount >= 1000 }
+            ?.takeUnless { holder.connectionConfig[face] != NetworkConnectionType.NONE || it.amount < 1000 || !holder.allowedConnectionTypes[it]!!.extract }
+            ?: holder.availableContainers.values.firstOrNull { it.amount >= 1000 && holder.allowedConnectionTypes[it]!!.extract }
         
         if (container != null) {
             if (player.gameMode != GameMode.CREATIVE) {

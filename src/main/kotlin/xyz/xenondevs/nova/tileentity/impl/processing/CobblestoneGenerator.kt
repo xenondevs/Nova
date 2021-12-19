@@ -194,8 +194,8 @@ class CobblestoneGenerator(
             .build()
         
         init {
-            FluidBar(gui, x = 1, y = 1, height = 3, waterTank)
-            FluidBar(gui, x = 2, y = 1, height = 3, lavaTank)
+            FluidBar(gui, x = 1, y = 1, height = 3, fluidHolder, waterTank)
+            FluidBar(gui, x = 2, y = 1, height = 3, fluidHolder, lavaTank)
             EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         }
         

@@ -12,14 +12,18 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.util.addItemCorrectly
 
 class FluidBar(
     gui: GUI,
     x: Int, y: Int,
     height: Int,
+    fluidHolder: NovaFluidHolder,
     private val fluidContainer: FluidContainer
 ) : VerticalBar(gui, x, y, height) {
+    
+    private val allowedConnectionType = fluidHolder.allowedConnectionTypes[fluidContainer]!!
     
     override val barMaterial: NovaMaterial
         get() = when (fluidContainer.type) {
@@ -58,8 +62,8 @@ class FluidBar(
         @Suppress("DEPRECATION")
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             val cursor = event.cursor?.takeUnless { it.type.isAir }
-            if (cursor != null) {
-                if (cursor.type == Material.BUCKET && fluidContainer.amount >= 1000) {
+            when (cursor?.type) {
+                Material.BUCKET -> if (allowedConnectionType.extract && fluidContainer.amount >= 1000) {
                     val bucket = fluidContainer.type!!.bucket!!
                     if (cursor.amount > 1) {
                         event.cursor!!.amount -= 1
@@ -67,13 +71,19 @@ class FluidBar(
                             InventoryUtils.dropItemLikePlayer(player, bucket)
                     } else event.cursor = bucket
                     fluidContainer.takeFluid(1000)
-                } else if (cursor.type == Material.LAVA_BUCKET && fluidContainer.accepts(FluidType.LAVA, 1000)) {
-                    event.cursor = ItemStack(Material.BUCKET)
-                    fluidContainer.addFluid(FluidType.LAVA, 1000)
-                } else if (cursor.type == Material.WATER_BUCKET && fluidContainer.accepts(FluidType.WATER, 1000)) {
+                }
+                
+                Material.WATER_BUCKET -> if (allowedConnectionType.insert && fluidContainer.accepts(FluidType.WATER, 1000)) {
                     event.cursor = ItemStack(Material.BUCKET)
                     fluidContainer.addFluid(FluidType.WATER, 1000)
                 }
+                
+                Material.LAVA_BUCKET -> if (allowedConnectionType.insert && fluidContainer.accepts(FluidType.LAVA, 1000)) {
+                    event.cursor = ItemStack(Material.BUCKET)
+                    fluidContainer.addFluid(FluidType.LAVA, 1000)
+                }
+                
+                else -> Unit
             }
         }
         

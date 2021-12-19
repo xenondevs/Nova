@@ -138,7 +138,7 @@ class LavaGenerator(
             .build()
         
         init {
-            FluidBar(gui, x = 6, y = 1, height = 3, fluidContainer)
+            FluidBar(gui, x = 6, y = 1, height = 3, fluidHolder, fluidContainer)
             EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         }
         

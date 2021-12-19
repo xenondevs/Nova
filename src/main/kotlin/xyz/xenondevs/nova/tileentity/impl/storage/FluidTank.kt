@@ -88,7 +88,7 @@ open class FluidTank(
             .build()
         
         init {
-            FluidBar(gui, x = 4, y = 1, height = 3, fluidContainer)
+            FluidBar(gui, x = 4, y = 1, height = 3, fluidHolder, fluidContainer)
         }
         
     }
