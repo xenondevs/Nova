@@ -56,7 +56,7 @@ class FluidDistributor(
             }
         }
         
-        return fluidType
+        return fluidType?.takeUnless { fluidContainers.any { fluidType !in it.allowedTypes } }
     }
     
     private fun distributeInScope(
