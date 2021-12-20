@@ -138,7 +138,7 @@ class MobDuplicator(
     private fun spawnEntity() {
         val entity = if (keepNbt) EntityUtils.deserializeAndSpawn(entityData!!, spawnLocation, NBTUtils::removeItemData).bukkitEntity
         else spawnLocation.world!!.spawnEntity(spawnLocation, entityType!!)
-        if (entity is LivingEntity && Random.nextInt(1..1000) == 1) {
+        if (PATRON_SKULLS.isNotEmpty() && entity is LivingEntity && Random.nextInt(1..1000) == 1) {
             entity.equipment?.setHelmet(PATRON_SKULLS.random().get(), true)
         }
     }
