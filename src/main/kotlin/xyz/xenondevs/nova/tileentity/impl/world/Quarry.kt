@@ -21,7 +21,10 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.QUARRY
-import xyz.xenondevs.nova.tileentity.*
+import xyz.xenondevs.nova.tileentity.Model
+import xyz.xenondevs.nova.tileentity.MultiModel
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -550,7 +553,7 @@ class Quarry(
         
     }
     
-    inner class QuarryGUI : TileEntity.TileEntityGUI() {
+    inner class QuarryGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
