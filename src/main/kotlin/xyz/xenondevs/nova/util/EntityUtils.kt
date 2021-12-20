@@ -166,7 +166,7 @@ object EntityUtils {
         data: ByteArray,
         location: Location,
         nbtModifier: ((CompoundTag) -> CompoundTag)? = null
-    ) {
+    ): net.minecraft.world.entity.Entity {
         // get world
         val world = location.world!!
         val level = world.serverLevel
@@ -184,14 +184,14 @@ object EntityUtils {
         if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)
         
         // deserialize compound tag to entity
-        NMSEntityType.loadEntityRecursive(compoundTag, level) { entity ->
+        return NMSEntityType.loadEntityRecursive(compoundTag, level) { entity ->
             // assign new uuid
             entity.uuid = UUID.randomUUID()
             
             // add entity to world
             level.addWithUUID(entity)
             entity
-        }
+        }!!
     }
     
     fun createNMSEntity(world: World, location: Location, entityType: EntityType): Any {

@@ -1,16 +1,21 @@
 package xyz.xenondevs.nova.tileentity.impl.mob
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.ItemBuilder.HeadTexture
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Sound
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -38,11 +43,16 @@ import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.data.isString
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import java.io.IOException
+import java.net.URL
 import java.util.*
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 private val MAX_ENERGY = NovaConfig[MOB_DUPLICATOR].getLong("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[MOB_DUPLICATOR].getLong("energy_per_tick")!!
@@ -126,8 +136,11 @@ class MobDuplicator(
     }
     
     private fun spawnEntity() {
-        if (keepNbt) EntityUtils.deserializeAndSpawn(entityData!!, spawnLocation, NBTUtils::removeItemData)
+        val entity = if (keepNbt) EntityUtils.deserializeAndSpawn(entityData!!, spawnLocation, NBTUtils::removeItemData).bukkitEntity
         else spawnLocation.world!!.spawnEntity(spawnLocation, entityType!!)
+        if (entity is LivingEntity && Random.nextInt(1..1000) == 1) {
+            entity.equipment?.setHelmet(PATRON_SKULLS.random().get(), true)
+        }
     }
     
     inner class MobDuplicatorGUI : TileEntityGUI() {
@@ -154,7 +167,7 @@ class MobDuplicator(
         val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3) {
-    
+            
             override val barMaterial = NovaMaterialRegistry.GREEN_BAR
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
@@ -183,6 +196,27 @@ class MobDuplicator(
                 player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
             }
             
+        }
+        
+    }
+    
+    private companion object PatronSkulls {
+        private const val PATRON_SKULLS_URL = "https://xenondevs.xyz/nova/patron_skulls.json"
+        
+        val PATRON_SKULLS = loadPatreonSkulls()
+        
+        private fun loadPatreonSkulls(): List<ItemBuilder> {
+            val url = URL(PATRON_SKULLS_URL)
+            try {
+                val array = url.openConnection().getInputStream().bufferedReader().use(JsonParser::parseReader)
+                if (array !is JsonArray)
+                    return emptyList()
+                return array.filter(JsonElement::isString).map {
+                    return@map ItemBuilder(HeadTexture(it.asString))
+                }
+            } catch (ex: IOException) {
+                return emptyList()
+            }
         }
         
     }
