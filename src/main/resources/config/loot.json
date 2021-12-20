@@ -11,7 +11,7 @@
     },
     {
       "item": "nova:infinite_water_source",
-      "frequency": 12.5,
+      "frequency": 5,
       "amount": 1,
       "whitelist": [
         "minecraft:chests/desert_pyramid"
