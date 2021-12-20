@@ -11,23 +11,23 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLOCK_PLACER
 import xyz.xenondevs.nova.tileentity.*
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[BLOCK_PLACER].getInt("capacity")!!
-private val ENERGY_PER_PLACE = NovaConfig[BLOCK_PLACER].getInt("energy_per_place")!!
+private val MAX_ENERGY = NovaConfig[BLOCK_PLACER].getLong("capacity")!!
+private val ENERGY_PER_PLACE = NovaConfig[BLOCK_PLACER].getLong("energy_per_place")!!
 
 class BlockPlacer(
     uuid: UUID,
@@ -41,7 +41,7 @@ class BlockPlacer(
     override val gui = lazy { BlockPlacerGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_PLACE, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
     
     private val placeLocation = location.clone().advance(getFace(BlockSide.FRONT))
     private val placeBlock = location.clone().advance(getFace(BlockSide.FRONT)).block
@@ -88,7 +88,7 @@ class BlockPlacer(
         }
     }
     
-    inner class BlockPlacerGUI : TileEntityGUI("menu.nova.block_placer") {
+    inner class BlockPlacerGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,

@@ -9,7 +9,8 @@ class TileEntityParticleTask(tileEntity: TileEntity, particles: List<Any>, tickD
     private var taskId = -1
     
     fun start() {
-        taskId = TaskManager.getTaskManager().startTask(task)
+        if (taskId == -1)
+            taskId = TaskManager.getTaskManager().startTask(task)
     }
     
     fun stop() {

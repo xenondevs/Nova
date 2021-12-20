@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.recipe
 
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.json.*
@@ -76,7 +77,7 @@ object RecipesLoader {
             .filter { it.isFile && it.name.endsWith(".json") }
             .forEach { file ->
                 try {
-                    val element = file.reader().use { JSON_PARSER.parse(it) }
+                    val element = file.reader().use { JsonParser.parseReader(it) }
                     if (element !is JsonObject)
                         throw IllegalStateException("Invalid recipe in file ${file.name}.")
                     

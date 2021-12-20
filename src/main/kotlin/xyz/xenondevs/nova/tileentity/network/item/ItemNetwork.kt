@@ -2,10 +2,13 @@ package xyz.xenondevs.nova.tileentity.network.item
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.*
+import xyz.xenondevs.nova.tileentity.network.item.channel.ItemNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.getOrSet
 
 class ItemNetwork : Network {
+    
+    override val type = NetworkType.ITEMS
     
     override val nodes: Set<NetworkNode>
         get() = _nodes
@@ -14,8 +17,7 @@ class ItemNetwork : Network {
     private val bridges = HashSet<ItemBridge>()
     private val channels: Array<ItemNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     
-    private val transferRate: Int
-        get() = bridges.map { it.itemTransferRate }.minOrNull() ?: 1
+    private var transferRate = 1
     
     private var nextChannel = 0
     
@@ -34,17 +36,21 @@ class ItemNetwork : Network {
     }
     
     override fun addBridge(bridge: NetworkBridge) {
+        if (bridge in _nodes) return
         require(bridge is ItemBridge) { "Illegal Bridge Type" }
         
         _nodes += bridge
         bridges += bridge
+        transferRate = bridge.itemTransferRate
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
-        val itemHolder = endPoint.holders[NetworkType.ITEMS] as ItemHolder
+        if (endPoint in _nodes) return
+        val itemHolder = endPoint.holders[NetworkType.ITEMS]
+        require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
         
         val channel = channels.getOrSet(itemHolder.channels[face]!!) { ItemNetworkChannel() }
-        channel.addItemHolder(itemHolder, face)
+        channel.addHolder(itemHolder, face)
         
         _nodes += endPoint
     }
@@ -55,7 +61,7 @@ class ItemNetwork : Network {
             val itemHolder = node.holders[NetworkType.ITEMS] as ItemHolder
             itemHolder.channels.values.toSet().asSequence()
                 .mapNotNull { channels[it]?.to(it) }
-                .onEach { it.first.removeItemHolder(itemHolder) }
+                .onEach { it.first.removeHolder(itemHolder) }
                 .filter { it.first.isEmpty() }
                 .forEach { channels[it.second] = null }
         } else if (node is ItemBridge) bridges -= node

@@ -394,19 +394,22 @@ object TileEntityManager : Listener {
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleInteract(event: PlayerInteractEvent) {
-        if (event.hand != EquipmentSlot.HAND) return // prevent multiple calls for both hands
-        
         val action = event.action
         val player = event.player
         if (action == Action.RIGHT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
             if (tileEntity != null) {
-                if (!event.player.isSneaking) {
-                    if (ProtectionManager.canUse(player, block.location))
-                        tileEntity.handleRightClick(event)
-                } else if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH } && ProtectionManager.canBreak(player, block.location))
-                    destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
+                if (event.hand == EquipmentSlot.HAND) {
+                    if (!event.player.isSneaking) {
+                        if (ProtectionManager.canUse(player, block.location)) {
+                            event.isCancelled = true
+                            tileEntity.handleRightClick(event)
+                        }
+                    } else if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH } && ProtectionManager.canBreak(player, block.location)) {
+                        destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
+                    }
+                } else event.isCancelled = true
             }
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!

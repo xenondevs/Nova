@@ -4,12 +4,14 @@ import de.studiocode.invui.item.ItemBuilder
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
+import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.RecipeChoice.MaterialChoice
 import xyz.xenondevs.nova.data.recipe.NovaRecipeChoice
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 
@@ -17,15 +19,30 @@ fun Material.isGlass() = name.endsWith("GLASS") || name.endsWith("GLASS_PANE")
 
 fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmount(amount).get()
 
-fun Material.isTraversable() = isAir || name == "WATER" || name == "LAVA"
+fun Material.isTraversable() = isAir || this == Material.WATER || this == Material.BUBBLE_COLUMN || this == Material.LAVA
 
 fun Material.isBreakable() = blastResistance < 3600000.0f
+
+fun Material.isFluid() = this == Material.WATER || this == Material.BUBBLE_COLUMN || this == Material.LAVA
+
+val Material.fluidType: FluidType?
+    get() {
+        val fluidType = when (this) {
+            Material.WATER, Material.BUBBLE_COLUMN -> FluidType.WATER
+            Material.LAVA -> FluidType.LAVA
+            else -> null
+        }
+        return fluidType
+    }
 
 /**
  * The break speed for a specific material, always positive.
  */
 val Material.breakSpeed: Double
     get() = 1.0 / hardness.absoluteValue
+
+val Material.localizedName: String?
+    get() = CraftMagicNumbers.getItem(this)?.descriptionId
 
 val ItemStack.novaMaterial: NovaMaterial?
     get() {

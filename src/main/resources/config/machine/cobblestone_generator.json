@@ -1,0 +1,7 @@
+{
+  "energy_capacity": 10000,
+  "water_capacity": 1000,
+  "lava_capacity": 1000,
+  "energy_per_tick": 10,
+  "mb_per_tick": 10
+}

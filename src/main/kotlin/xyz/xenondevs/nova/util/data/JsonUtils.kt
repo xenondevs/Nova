@@ -8,12 +8,11 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.player.attachment.Attachment
+import xyz.xenondevs.nova.world.loot.LootInfo
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.reflect.KProperty
-
-val JSON_PARSER = JsonParser()
 
 val GSON: Gson =
     GsonBuilder()
@@ -24,6 +23,7 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter<Attachment>(AttachmentSerialization)
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
         .registerTypeHierarchyAdapter<NovaMaterial>(NovaMaterialSerialization)
+        .registerTypeHierarchyAdapter<LootInfo>(LootInfoDeserializer)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()
         .create()

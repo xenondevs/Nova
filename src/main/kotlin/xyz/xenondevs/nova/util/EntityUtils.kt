@@ -10,13 +10,15 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_18_R1.CraftServer
+import org.bukkit.craftbukkit.v1_18_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.CreatureSpawnEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import xyz.xenondevs.nova.NOVA
@@ -37,6 +39,14 @@ fun Player.awardAdvancement(key: NamespacedKey) {
     advancement.criteria.forEach { progress.awardCriteria(it) }
 }
 
+fun Player.swingHand(hand: EquipmentSlot) {
+    when (hand) {
+        EquipmentSlot.HAND -> swingMainHand()
+        EquipmentSlot.OFF_HAND -> swingOffHand()
+        else -> throw IllegalArgumentException("EquipmentSlot is not a hand")
+    }
+}
+
 fun Entity.teleport(modifyLocation: Location.() -> Unit) {
     val location = location
     location.modifyLocation()
@@ -53,6 +63,9 @@ fun ArmorStand.setHeadItemSilently(headStack: ItemStack) {
     val armorItems = ReflectionRegistry.ARMOR_STAND_ARMOR_ITEMS_FIELD.get(nmsEntity) as NonNullList<NMSItemStack>
     armorItems[3] = headStack.nmsStack
 }
+
+val Entity.localizedName: String?
+    get() = (this as CraftEntity).handle.type.descriptionId
 
 object EntityUtils {
     
@@ -153,7 +166,7 @@ object EntityUtils {
         data: ByteArray,
         location: Location,
         nbtModifier: ((CompoundTag) -> CompoundTag)? = null
-    ) {
+    ): net.minecraft.world.entity.Entity {
         // get world
         val world = location.world!!
         val level = world.serverLevel
@@ -171,14 +184,14 @@ object EntityUtils {
         if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)
         
         // deserialize compound tag to entity
-        NMSEntityType.loadEntityRecursive(compoundTag, level) { entity ->
+        return NMSEntityType.loadEntityRecursive(compoundTag, level) { entity ->
             // assign new uuid
             entity.uuid = UUID.randomUUID()
             
             // add entity to world
             level.addWithUUID(entity)
             entity
-        }
+        }!!
     }
     
     fun createNMSEntity(world: World, location: Location, entityType: EntityType): Any {

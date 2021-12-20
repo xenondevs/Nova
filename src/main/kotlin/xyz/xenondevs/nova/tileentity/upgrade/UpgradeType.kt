@@ -7,12 +7,15 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry.EFFICIENCY_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.EFFICIENCY_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.ENERGY_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.ENERGY_UPGRADE_ICON
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.FLUID_UPGRADE
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.FLUID_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_EFFICIENCY_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_ENERGY_UPGRADE_ICON
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_FLUID_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_RANGE_UPGRADE_ICON
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_SPEED_UPGRADE_ICON
 import xyz.xenondevs.nova.util.data.getAllDoubles
@@ -22,6 +25,7 @@ enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial, val g
     SPEED(SPEED_UPGRADE, SPEED_UPGRADE_ICON, TRANSLUCENT_SPEED_UPGRADE_ICON),
     EFFICIENCY(EFFICIENCY_UPGRADE, EFFICIENCY_UPGRADE_ICON, TRANSLUCENT_EFFICIENCY_UPGRADE_ICON),
     ENERGY(ENERGY_UPGRADE, ENERGY_UPGRADE_ICON, TRANSLUCENT_ENERGY_UPGRADE_ICON),
+    FLUID(FLUID_UPGRADE, FLUID_UPGRADE_ICON, TRANSLUCENT_FLUID_UPGRADE_ICON),
     RANGE(RANGE_UPGRADE, RANGE_UPGRADE_ICON, TRANSLUCENT_RANGE_UPGRADE_ICON);
     
     private val modifierCache = HashMap<NovaMaterial, DoubleArray>()

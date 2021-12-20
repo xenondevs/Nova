@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.player.attachment.AttachmentManager
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.EquipMethod
 
-private val MAX_ENERGY = NovaConfig["machine/jetpack"].getInt("capacity")!!
+private val MAX_ENERGY = NovaConfig["machine/jetpack"].getLong("capacity")!!
 
 object JetpackItem : ChargeableItem(MAX_ENERGY) {
     

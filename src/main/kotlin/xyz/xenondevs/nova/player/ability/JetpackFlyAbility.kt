@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.ui.overlay.impl.JetpackOverlay
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 
-private val ENERGY_PER_TICK = NovaConfig[JETPACK].getInt("energy_per_tick")!!
+private val ENERGY_PER_TICK = NovaConfig[JETPACK].getLong("energy_per_tick")!!
 private val FLY_SPEED = NovaConfig[JETPACK].getFloat("fly_speed")!!
 
 internal class JetpackFlyAbility(player: Player) : Ability(player) {

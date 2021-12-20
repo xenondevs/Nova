@@ -8,6 +8,7 @@ import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
 import org.bukkit.inventory.ItemStack
+import org.bukkit.util.Vector
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
@@ -15,10 +16,14 @@ import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
+val HORIZONTAL_FACES = listOf(NORTH, EAST, SOUTH, WEST)
+val VERTICAL_FACES = listOf(UP, DOWN)
+
+fun Location(world: World?, x: Int, y: Int, z: Int): Location =
+    Location(world, x.toDouble(), y.toDouble(), z.toDouble())
 
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
@@ -38,6 +43,37 @@ fun Location.dropItem(item: ItemStack) {
 fun Location.removeOrientation() {
     yaw = 0f
     pitch = 0f
+}
+
+fun Vector.calculateYawPitch(): FloatArray {
+    // Minecraft's coordinate system is weird
+    val x = this.z
+    val y = -this.x
+    val z = this.y
+    
+    val yaw = atan2(y, x)
+    val h = y / sin(yaw)
+    val pitch = atan2(z, h)
+    
+    return floatArrayOf(Math.toDegrees(yaw).toFloat(), -Math.toDegrees(pitch).toFloat())
+}
+
+fun Vector.calculateYaw(): Float {
+    val x = this.z
+    val y = -this.x
+    
+    val yaw = atan2(y, x)
+    return Math.toDegrees(yaw).toFloat()
+}
+
+fun Vector(yaw: Float, pitch: Float): Vector {
+    val pitchRadians = Math.toRadians(-pitch.toDouble())
+    val yawRadians = Math.toRadians(yaw.toDouble())
+    val xy = cos(pitchRadians)
+    val x = cos(yawRadians) * xy
+    val y = sin(yawRadians) * xy
+    val z = sin(pitchRadians)
+    return Vector(-y, z, x)
 }
 
 fun Location.advance(blockFace: BlockFace, stepSize: Double = 1.0) =
@@ -269,26 +305,19 @@ fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Loca
 
 object LocationUtils {
     
-    fun getTopBlocksBetween(
+    fun getTopBlockBetween(
         world: World,
-        minX: Int, minY: Int, minZ: Int,
-        maxX: Int, maxY: Int, maxZ: Int
-    ): List<Location> {
-        val locations = ArrayList<Location>()
-        
-        for (x in minX..maxX) {
-            for (z in minZ..maxZ) {
-                for (y in maxY downTo minY) {
-                    val location = Location(world, x.toDouble(), y.toDouble(), z.toDouble())
-                    if (!location.block.type.isTraversable()) {
-                        locations += location
-                        break
-                    }
-                }
-            }
+        x: Int, z: Int,
+        maxY: Int, minY: Int
+    ): Location? {
+        val location = Location(world, x, 0, z)
+        for (y in maxY downTo minY) {
+            location.y = y.toDouble()
+            if (!location.block.type.isTraversable())
+                return location
         }
         
-        return locations
+        return null
     }
     
     fun getStraightLine(base: Location, axis: Axis, range: IntRange) =

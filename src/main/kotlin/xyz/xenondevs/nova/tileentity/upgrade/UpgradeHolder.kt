@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.UpgradesElement
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.TileEntity.TileEntityGUI
 import xyz.xenondevs.nova.ui.UpgradesGUI
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.runTaskLater
@@ -90,16 +90,15 @@ class UpgradeHolder(
     
     fun getLimit(type: UpgradeType): Int = min(type[material].size - 1, 999)
     
-    fun calculateEnergyUsage(baseUsage: Int) =
-        (baseUsage * getSpeedModifier() / getEfficiencyModifier()).toInt()
+    fun getSpeedModifier(): Double = getModifier(UpgradeType.SPEED)
     
-    fun getSpeedModifier() = getModifier(UpgradeType.SPEED)
+    fun getEfficiencyModifier(): Double = getModifier(UpgradeType.EFFICIENCY)
     
-    fun getEfficiencyModifier() = getModifier(UpgradeType.EFFICIENCY)
+    fun getEnergyModifier(): Double = getModifier(UpgradeType.ENERGY)
     
-    fun getEnergyModifier() = getModifier(UpgradeType.ENERGY)
+    fun getFluidModifier(): Double = getModifier(UpgradeType.FLUID)
     
-    fun getRangeModifier() = getModifier(UpgradeType.RANGE).toInt()
+    fun getRangeModifier(): Int = getModifier(UpgradeType.RANGE).toInt()
     
     private fun handleNewInput(event: ItemUpdateEvent) {
         if (event.updateReason == SELF_UPDATE_REASON || event.isRemove || event.newItemStack == null)

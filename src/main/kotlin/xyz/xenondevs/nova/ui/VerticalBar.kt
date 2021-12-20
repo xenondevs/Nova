@@ -13,14 +13,15 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
 
-open class VerticalBar(
+abstract class VerticalBar(
     gui: GUI,
     x: Int, y: Int,
-    height: Int,
-    private val barMaterial: NovaMaterial
+    height: Int
 ) {
     
-    private val barItems = Array(height) { VerticalBarItem(it, height) }
+    abstract val barMaterial: NovaMaterial
+    
+    private val barItems = Array(height) { createBarItem(it, height) }
     var percentage: Double = 0.0
         set(value) {
             field = value
@@ -33,7 +34,9 @@ open class VerticalBar(
     
     protected open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     
-    private inner class VerticalBarItem(
+    protected open fun createBarItem(section: Int, totalSections: Int) = VerticalBarItem(section, totalSections)
+    
+    protected open inner class VerticalBarItem(
         private val section: Int,
         private val totalSections: Int,
     ) : BaseItem() {
@@ -46,7 +49,7 @@ open class VerticalBar(
             return modifyItemBuilder(barMaterial.item.createItemBuilder(state))
         }
         
-        override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
         
     }
     

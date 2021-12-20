@@ -21,27 +21,26 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MECHANICAL_PRESS
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.NONE
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.PressProgressItem
 import xyz.xenondevs.nova.util.BlockSide.FRONT
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.max
 
-private val MAX_ENERGY = NovaConfig[MECHANICAL_PRESS].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[MECHANICAL_PRESS].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[MECHANICAL_PRESS].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[MECHANICAL_PRESS].getLong("energy_per_tick")!!
 private val PRESS_SPEED = NovaConfig[MECHANICAL_PRESS].getInt("speed")!!
 
 enum class PressType {
@@ -64,7 +63,7 @@ class MechanicalPress(
     
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(CONSUME, FRONT) }
-    override val itemHolder = NovaItemHolder(this, inputInv to ItemConnectionType.BUFFER, outputInv to ItemConnectionType.EXTRACT)
+    override val itemHolder = NovaItemHolder(this, inputInv to NetworkConnectionType.BUFFER, outputInv to NetworkConnectionType.EXTRACT)
     
     private var type: PressType = retrieveEnum("pressType") { PressType.PLATE }
     private var timeLeft: Int = retrieveData("pressTime") { 0 }
@@ -137,7 +136,7 @@ class MechanicalPress(
     }
     
     
-    inner class MechanicalPressGUI : TileEntityGUI("menu.nova.mechanical_press") {
+    inner class MechanicalPressGUI : TileEntityGUI() {
         
         private val pressProgress = PressProgressItem()
         private val pressTypeItems = ArrayList<PressTypeItem>()

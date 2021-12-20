@@ -15,18 +15,17 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.TREE_FACTORY
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.dropItem
@@ -51,8 +50,8 @@ private val PLANTS = mapOf(
     Material.BROWN_MUSHROOM to PlantConfiguration(NovaMaterialRegistry.GIANT_BROWN_MUSHROOM_MINIATURE, ItemStack(Material.BROWN_MUSHROOM, 3), Color(149, 112, 80))
 )
 
-private val MAX_ENERGY = NovaConfig[TREE_FACTORY].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[TREE_FACTORY].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[TREE_FACTORY].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[TREE_FACTORY].getLong("energy_per_tick")!!
 private val PROGRESS_PER_TICK = NovaConfig[TREE_FACTORY].getDouble("progress_per_tick")!!
 private val IDLE_TIME = NovaConfig[TREE_FACTORY].getInt("idle_time")!!
 
@@ -71,7 +70,7 @@ class TreeFactory(
     
     override val gui: Lazy<TileEntityGUI> = lazy(::TreeFactoryGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradesUpdate, allowed = UpgradeType.ALL_ENERGY)
-    override val itemHolder = NovaItemHolder(this, outputInventory to ItemConnectionType.EXTRACT, inputInventory to ItemConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, outputInventory to NetworkConnectionType.EXTRACT, inputInventory to NetworkConnectionType.BUFFER)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) {
         createExclusiveEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM, BlockSide.BACK)
     }
@@ -159,7 +158,7 @@ class TreeFactory(
         plant.remove()
     }
     
-    private inner class TreeFactoryGUI : TileEntityGUI("menu.nova.tree_factory") {
+    private inner class TreeFactoryGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@TreeFactory,

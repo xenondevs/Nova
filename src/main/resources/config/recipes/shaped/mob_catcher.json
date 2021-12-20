@@ -1,0 +1,22 @@
+{
+  "result": "nova:mob_catcher",
+  "shape": [
+    "sds",
+    "dgd",
+    "sds"
+  ],
+  "ingredients": [
+    {
+      "char": "s",
+      "item": "nova:star_shards"
+    },
+    {
+      "char": "d",
+      "item": "minecraft:diamond"
+    },
+    {
+      "char": "g",
+      "item": "minecraft:ghast_tear"
+    }
+  ]
+}

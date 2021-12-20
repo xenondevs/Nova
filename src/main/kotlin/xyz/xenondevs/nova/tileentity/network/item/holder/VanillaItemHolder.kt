@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.vanilla.ItemStorageVanillaTileEntity
@@ -14,11 +14,11 @@ abstract class VanillaItemHolder(
     final override val endPoint: ItemStorageVanillaTileEntity
 ) : ItemHolder {
     
-    override val itemConfig: MutableMap<BlockFace, ItemConnectionType> =
-        endPoint.retrieveDoubleEnumMap("itemConfig") { CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { ItemConnectionType.BUFFER } }
+    override val itemConfig: MutableMap<BlockFace, NetworkConnectionType> =
+        endPoint.retrieveDoubleEnumMap("itemConfig") { CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { NetworkConnectionType.BUFFER } }
     
-    override val allowedConnectionTypes: Map<NetworkedInventory, ItemConnectionType> by lazy {
-        inventories.entries.associate { (_, inv) -> inv to ItemConnectionType.BUFFER }
+    override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType> by lazy {
+        inventories.entries.associate { (_, inv) -> inv to NetworkConnectionType.BUFFER }
     }
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =

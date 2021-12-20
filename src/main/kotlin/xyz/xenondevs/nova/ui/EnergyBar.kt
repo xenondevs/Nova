@@ -5,7 +5,7 @@ import de.studiocode.invui.item.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
-import xyz.xenondevs.nova.util.EnergyUtils
+import xyz.xenondevs.nova.util.PrefixUtils
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
 
@@ -14,13 +14,15 @@ class EnergyBar(
     x: Int, y: Int,
     height: Int,
     private val energyHolder: EnergyHolder
-) : VerticalBar(gui, x, y, height, NovaMaterialRegistry.RED_BAR) {
+) : VerticalBar(gui, x, y, height) {
     
-    private var energy: Int = 0
-    private var maxEnergy: Int = 0
-    private val energyPlusPerTick: Int
+    override val barMaterial = NovaMaterialRegistry.RED_BAR
+    
+    private var energy: Long = 0
+    private var maxEnergy: Long = 0
+    private val energyPlusPerTick: Long
         get() = energyHolder.energyPlus
-    private val energyMinusPerTick: Int
+    private val energyMinusPerTick: Long
         get() = energyHolder.energyMinus
     
     init {
@@ -35,19 +37,21 @@ class EnergyBar(
     }
     
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
-        itemBuilder.setDisplayName(EnergyUtils.getEnergyString(energy, maxEnergy))
+        if (energy == Long.MAX_VALUE) itemBuilder.setDisplayName("∞ J / ∞ J")
+        else itemBuilder.setDisplayName(PrefixUtils.getEnergyString(energy, maxEnergy))
+        
         if (energyPlusPerTick > 0) {
             itemBuilder.addLoreLines(localized(
                 ChatColor.GRAY,
                 "menu.nova.energy_per_tick",
-                "+" + EnergyUtils.getEnergyString(energyPlusPerTick)
+                "+" + PrefixUtils.getEnergyString(energyPlusPerTick)
             ))
         }
         if (energyMinusPerTick > 0) {
             itemBuilder.addLoreLines(localized(
                 ChatColor.GRAY,
                 "menu.nova.energy_per_tick",
-                "-" + EnergyUtils.getEnergyString(energyMinusPerTick)
+                "-" + PrefixUtils.getEnergyString(energyMinusPerTick)
             ))
         }
         return itemBuilder

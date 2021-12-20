@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.CHUNK_LOADER
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
@@ -18,8 +17,8 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
@@ -28,8 +27,8 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[CHUNK_LOADER].getInt("capacity")!!
-private val ENERGY_PER_CHUNK = NovaConfig[CHUNK_LOADER].getInt("energy_per_chunk")!!
+private val MAX_ENERGY = NovaConfig[CHUNK_LOADER].getLong("capacity")!!
+private val ENERGY_PER_CHUNK = NovaConfig[CHUNK_LOADER].getLong("energy_per_chunk")!!
 private val MAX_RANGE = NovaConfig[CHUNK_LOADER].getInt("max_range")!!
 
 class ChunkLoader(
@@ -97,7 +96,7 @@ class ChunkLoader(
         if (!unload) setChunksForceLoaded(false)
     }
     
-    inner class ChunkLoaderGUI : TileEntityGUI("menu.nova.chunk_loader") {
+    inner class ChunkLoaderGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@ChunkLoader,

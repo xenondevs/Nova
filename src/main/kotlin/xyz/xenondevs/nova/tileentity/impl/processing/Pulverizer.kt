@@ -14,18 +14,17 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.PULVERIZER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.ui.item.PulverizerProgress
 import xyz.xenondevs.nova.util.BlockSide
@@ -36,8 +35,8 @@ import xyz.xenondevs.particle.ParticleEffect
 import java.lang.Integer.max
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[PULVERIZER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[PULVERIZER].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[PULVERIZER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[PULVERIZER].getLong("energy_per_tick")!!
 private val PULVERIZE_SPEED = NovaConfig[PULVERIZER].getInt("speed")!!
 
 class Pulverizer(
@@ -55,7 +54,7 @@ class Pulverizer(
     
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inputInv to ItemConnectionType.BUFFER, outputInv to ItemConnectionType.EXTRACT)
+    override val itemHolder = NovaItemHolder(this, inputInv to NetworkConnectionType.BUFFER, outputInv to NetworkConnectionType.EXTRACT)
     
     private var timeLeft = retrieveData("pulverizerTime") { 0 }
     private var pulverizeSpeed = 0
@@ -130,7 +129,7 @@ class Pulverizer(
         storeData("currentRecipe", currentRecipe?.key)
     }
     
-    inner class PulverizerGUI : TileEntityGUI("menu.nova.pulverizer") {
+    inner class PulverizerGUI : TileEntityGUI() {
         
         private val mainProgress = ProgressArrowItem()
         private val pulverizerProgress = PulverizerProgress()

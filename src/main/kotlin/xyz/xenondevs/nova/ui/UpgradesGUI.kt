@@ -18,7 +18,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.ui.config.BackItem
+import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.localized
 import kotlin.random.Random
@@ -30,19 +30,21 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 4)
         .setStructure("" +
             "< - - - - - - - 2" +
-            "| i # # s f e r |" +
-            "| # # # a b c d |" +
+            "| i # s c e r f |" +
+            "| # # S C E R F |" +
             "3 - - - - - - - 4")
         .addIngredient('<', BackItem(openPrevious))
         .addIngredient('i', VISlotElement(upgradeHolder.input, 0))
         .addIngredient('s', UpgradeDisplay(UpgradeType.SPEED))
-        .addIngredient('f', UpgradeDisplay(UpgradeType.EFFICIENCY))
+        .addIngredient('c', UpgradeDisplay(UpgradeType.EFFICIENCY))
         .addIngredient('e', UpgradeDisplay(UpgradeType.ENERGY))
         .addIngredient('r', UpgradeDisplay(UpgradeType.RANGE))
-        .addIngredient('a', UpgradeCounter(UpgradeType.SPEED))
-        .addIngredient('b', UpgradeCounter(UpgradeType.EFFICIENCY))
-        .addIngredient('c', UpgradeCounter(UpgradeType.ENERGY))
-        .addIngredient('d', UpgradeCounter(UpgradeType.RANGE))
+        .addIngredient('f', UpgradeDisplay(UpgradeType.FLUID))
+        .addIngredient('S', UpgradeCounter(UpgradeType.SPEED))
+        .addIngredient('C', UpgradeCounter(UpgradeType.EFFICIENCY))
+        .addIngredient('E', UpgradeCounter(UpgradeType.ENERGY))
+        .addIngredient('R', UpgradeCounter(UpgradeType.RANGE))
+        .addIngredient('F', UpgradeCounter(UpgradeType.FLUID))
         .build()
     
     init {

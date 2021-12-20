@@ -8,6 +8,7 @@ import org.bukkit.attribute.AttributeInstance
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.PistonMoveReaction
+import org.bukkit.block.Sign
 import org.bukkit.block.data.BlockData
 import org.bukkit.conversations.Conversation
 import org.bukkit.conversations.ConversationAbandonedEvent
@@ -43,7 +44,7 @@ import java.util.*
  */
 internal class FakeOnlinePlayer(
     private val offlinePlayer: OfflinePlayer,
-    private val world: World
+    private val location: Location
 ) : Player {
     
     override fun hasPermission(name: String): Boolean {
@@ -54,8 +55,28 @@ internal class FakeOnlinePlayer(
         return PermissionUtils.hasPermission(world, uniqueId, perm.name)
     }
     
+    override fun isPermissionSet(name: String): Boolean {
+        return true
+    }
+    
+    override fun isPermissionSet(perm: Permission): Boolean {
+        return true
+    }
+    
+    override fun getWorld(): World {
+        return location.world!!
+    }
+    
+    override fun getLocale(): String {
+        return "en_us"
+    }
+    
+    override fun getLocation(): Location {
+        return location
+    }
+    
     override fun isOnline(): Boolean {
-        return offlinePlayer.isOnline
+        return true
     }
     
     override fun getName(): String {
@@ -374,7 +395,7 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun sendChunkChange(loc: Location, sx: Int, sy: Int, sz: Int, data: ByteArray): Boolean {
+    override fun sendEquipmentChange(p0: LivingEntity, p1: EquipmentSlot, p2: ItemStack) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -500,6 +521,18 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun canSee(entity: Entity): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun hideEntity(plugin: Plugin, entity: Entity) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showEntity(plugin: Plugin, entity: Entity) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun isFlying(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -534,7 +567,19 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun setResourcePack(url: String, hash: ByteArray) {
+    override fun setResourcePack(url: String, hash: ByteArray?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: ByteArray?, prompt: String?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: ByteArray?, force: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: ByteArray?, prompt: String?, force: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -644,15 +689,23 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun getLocale(): String {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
     override fun updateCommands() {
         throw UnsupportedOperationException("Player is not online")
     }
     
     override fun openBook(book: ItemStack) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun openSign(sign: Sign) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showDemoScreen() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isAllowingServerListings(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1157,10 +1210,6 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun getLocation(): Location {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
     @Contract("null -> null; !null -> !null")
     override fun getLocation(loc: Location?): Location? {
         throw UnsupportedOperationException("Player is not online")
@@ -1187,10 +1236,6 @@ internal class FakeOnlinePlayer(
     }
     
     override fun isInWater(): Boolean {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
-    override fun getWorld(): World {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1455,14 +1500,6 @@ internal class FakeOnlinePlayer(
     }
     
     override fun sendMessage(sender: UUID?, messages: Array<String>) {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
-    override fun isPermissionSet(name: String): Boolean {
-        throw UnsupportedOperationException("Player is not online")
-    }
-    
-    override fun isPermissionSet(perm: Permission): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
     

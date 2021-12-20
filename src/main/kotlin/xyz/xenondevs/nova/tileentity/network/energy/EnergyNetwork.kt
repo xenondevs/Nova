@@ -1,25 +1,12 @@
 package xyz.xenondevs.nova.tileentity.network.energy
 
-import com.google.common.base.Preconditions
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.util.sumOfNoOverflow
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
-
-private fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Int): Int {
-    return try {
-        var sum = 0
-        for (element in this) {
-            sum = Math.addExact(sum, selector(element))
-        }
-        
-        sum
-    } catch (e: ArithmeticException) {
-        Int.MAX_VALUE
-    }
-}
 
 /**
  * An EnergyNetwork consists of [NetworkBridge] that connect [NetworkEndPoint]
@@ -27,6 +14,8 @@ private fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Int): Int {
  * [EnergyHolders][EnergyHolder] can provide, consume or buffer energy.
  */
 class EnergyNetwork : Network {
+    
+    override val type = NetworkType.ENERGY
     
     override val nodes: Set<NetworkNode>
         get() = _nodes
@@ -37,14 +26,13 @@ class EnergyNetwork : Network {
     private val consumers = HashSet<EnergyHolder>()
     private val buffers = HashSet<EnergyHolder>()
     
-    private val availableProviderEnergy: Int
+    private val availableProviderEnergy: Long
         get() = providers.sumOfNoOverflow { it.energy }
-    private val availableBufferEnergy: Int
+    private val availableBufferEnergy: Long
         get() = buffers.sumOfNoOverflow { it.energy }
-    private val requestedConsumerEnergy: Int
+    private val requestedConsumerEnergy: Long
         get() = consumers.sumOfNoOverflow { it.requestedEnergy }
-    private val transferRate: Int
-        get() = bridges.map { it.energyTransferRate }.minOrNull() ?: Int.MAX_VALUE
+    private var transferRate = Long.MAX_VALUE
     
     override fun addAll(network: Network) {
         require(network !== this) { "Can't add to self" }
@@ -58,9 +46,10 @@ class EnergyNetwork : Network {
     }
     
     override fun addBridge(bridge: NetworkBridge) {
-        Preconditions.checkArgument(bridge is EnergyBridge, "Illegal Bridge Type")
+        require(bridge is EnergyBridge) { "Illegal Bridge Type" }
         _nodes += bridge
-        bridges += bridge as EnergyBridge
+        bridges += bridge
+        transferRate = bridge.energyTransferRate
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
@@ -136,23 +125,23 @@ class EnergyNetwork : Network {
         
         var energyDeficit = availableEnergy - energy
         energyDeficit = takeEqually(energyDeficit, providers)
-        if (energyDeficit != 0 && useBuffers) energyDeficit = takeEqually(energyDeficit, buffers)
+        if (energyDeficit != 0L && useBuffers) energyDeficit = takeEqually(energyDeficit, buffers)
         
-        if (energyDeficit != 0) throw NetworkException("Not enough energy: $energyDeficit") // should never happen
+        if (energyDeficit != 0L) throw NetworkException("Not enough energy: $energyDeficit") // should never happen
     }
     
-    private fun distributeEqually(energy: Int, consumers: Iterable<EnergyHolder>): Int {
+    private fun distributeEqually(energy: Long, consumers: Iterable<EnergyHolder>): Long {
         var availableEnergy = energy
         
-        val consumerMap = ConcurrentHashMap<EnergyHolder, Int>()
+        val consumerMap = ConcurrentHashMap<EnergyHolder, Long>()
         consumerMap += consumers
-            .filterNot { it.requestedEnergy == 0 }
+            .filterNot { it.requestedEnergy == 0L }
             .map { it to it.requestedEnergy }
         
-        while (availableEnergy != 0 && consumerMap.isNotEmpty()) {
+        while (availableEnergy != 0L && consumerMap.isNotEmpty()) {
             val distribution = availableEnergy / consumerMap.size
-            if (distribution == 0) break
-            if (distribution != 0) {
+            if (distribution == 0L) break
+            if (distribution != 0L) {
                 for ((consumer, requestedAmount) in consumerMap) {
                     val energyToGive = min(distribution, requestedAmount)
                     consumer.energy += energyToGive
@@ -169,30 +158,30 @@ class EnergyNetwork : Network {
         return availableEnergy
     }
     
-    private fun giveFirst(energy: Int, consumers: Iterable<EnergyHolder>): Int {
+    private fun giveFirst(energy: Long, consumers: Iterable<EnergyHolder>): Long {
         var availableEnergy = energy
         for (consumer in consumers) {
             val energyToGive = min(availableEnergy, consumer.requestedEnergy)
             availableEnergy -= energyToGive
             consumer.energy += energyToGive
             
-            if (availableEnergy == 0) break
+            if (availableEnergy == 0L) break
         }
         
         return availableEnergy
     }
     
-    private fun takeEqually(energy: Int, providers: Iterable<EnergyHolder>): Int {
+    private fun takeEqually(energy: Long, providers: Iterable<EnergyHolder>): Long {
         var energyDeficit = energy
         
-        val providerMap = ConcurrentHashMap<EnergyHolder, Int>()
+        val providerMap = ConcurrentHashMap<EnergyHolder, Long>()
         providerMap += providers
-            .filterNot { it.energy == 0 }
+            .filterNot { it.energy == 0L }
             .map { it to it.energy }
         
-        while (energyDeficit != 0 && providerMap.isNotEmpty()) {
+        while (energyDeficit != 0L && providerMap.isNotEmpty()) {
             val distribution = energyDeficit / providerMap.size
-            if (distribution != 0) {
+            if (distribution != 0L) {
                 for ((provider, providedAmount) in providerMap) {
                     val take = min(distribution, providedAmount)
                     energyDeficit -= take
@@ -209,14 +198,14 @@ class EnergyNetwork : Network {
         return energyDeficit
     }
     
-    private fun takeFirst(energy: Int, providers: Iterable<EnergyHolder>): Int {
+    private fun takeFirst(energy: Long, providers: Iterable<EnergyHolder>): Long {
         var energyDeficit = energy
         for (provider in providers) {
             val take = min(energyDeficit, provider.energy)
             energyDeficit -= take
             provider.energy -= take
             
-            if (energyDeficit == 0) break
+            if (energyDeficit == 0L) break
         }
         
         return energyDeficit

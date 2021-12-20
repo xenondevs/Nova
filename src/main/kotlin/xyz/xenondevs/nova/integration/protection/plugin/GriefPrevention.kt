@@ -13,10 +13,10 @@ object GriefPrevention : ProtectionIntegration {
     override val isInstalled = GRIEF_PREVENTION != null
     
     override fun canBreak(player: OfflinePlayer, location: Location) =
-        GRIEF_PREVENTION?.allowBreak(FakeOnlinePlayer(player, location.world!!), location.block, location) == null
+        GRIEF_PREVENTION?.allowBreak(FakeOnlinePlayer(player, location), location.block, location) == null
     
     override fun canPlace(player: OfflinePlayer, location: Location) =
-        GRIEF_PREVENTION?.allowBuild(FakeOnlinePlayer(player, location.world!!), location) == null
+        GRIEF_PREVENTION?.allowBuild(FakeOnlinePlayer(player, location), location) == null
     
     override fun canUse(player: OfflinePlayer, location: Location) = canBreak(player, location)
     

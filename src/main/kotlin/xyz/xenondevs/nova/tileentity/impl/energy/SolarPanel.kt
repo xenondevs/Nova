@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.SOLAR_PANEL
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ProviderEnergyHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
@@ -27,8 +26,8 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-private val MAX_ENERGY = NovaConfig[SOLAR_PANEL].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[SOLAR_PANEL].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[SOLAR_PANEL].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[SOLAR_PANEL].getLong("energy_per_tick")!!
 
 class SolarPanel(
     uuid: UUID,
@@ -79,7 +78,7 @@ class SolarPanel(
         obstructionTask.cancel()
     }
     
-    inner class SolarPanelGUI : TileEntityGUI("menu.nova.solar_panel") {
+    inner class SolarPanelGUI : TileEntityGUI() {
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +

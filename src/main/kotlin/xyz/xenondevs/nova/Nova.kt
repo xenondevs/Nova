@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova
 
 import de.studiocode.invui.resourcepack.ForceResourcePack
+import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.command.CommandManager
@@ -23,8 +24,8 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.nova.world.LootGeneration
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import xyz.xenondevs.nova.world.loot.LootGeneration
 import java.util.logging.Logger
 
 lateinit var NOVA: Nova
@@ -82,8 +83,12 @@ class Nova : JavaPlugin() {
     }
     
     private fun forceResourcePack() {
-        if (DEFAULT_CONFIG.getBoolean("resource_pack.enabled"))
-            ForceResourcePack.getInstance().resourcePackUrl = DEFAULT_CONFIG.getString("resource_pack.url")
+        if (DEFAULT_CONFIG.getBoolean("resource_pack.enabled")) {
+            ForceResourcePack.getInstance().setResourcePack(
+                DEFAULT_CONFIG.getString("resource_pack.url"),
+                ComponentBuilder("Nova Resource Pack").create()
+            )
+        }
     }
     
 }

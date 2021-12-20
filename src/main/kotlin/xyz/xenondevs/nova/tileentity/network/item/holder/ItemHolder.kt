@@ -2,33 +2,31 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 
 interface ItemHolder : EndPointDataHolder {
     
     val inventories: MutableMap<BlockFace, NetworkedInventory>
-    val itemConfig: MutableMap<BlockFace, ItemConnectionType>
+    val itemConfig: MutableMap<BlockFace, NetworkConnectionType>
     val insertFilters: MutableMap<BlockFace, ItemFilter>
     val extractFilters: MutableMap<BlockFace, ItemFilter>
     val insertPriorities: MutableMap<BlockFace, Int>
     val extractPriorities: MutableMap<BlockFace, Int>
     val channels: MutableMap<BlockFace, Int>
-    val allowedConnectionTypes: Map<NetworkedInventory, ItemConnectionType>
+    val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType>
     
     override val allowedFaces: Set<BlockFace>
-        get() = itemConfig.mapNotNullTo(HashSet()) { if (it.value == ItemConnectionType.NONE) null else it.key }
+        get() = itemConfig.mapNotNullTo(HashSet()) { if (it.value == NetworkConnectionType.NONE) null else it.key }
     
-    fun setInsert(face: BlockFace, state: Boolean) {
-        val type = itemConfig[face]!!
-        itemConfig[face] = ItemConnectionType.of(state, type.extract)
+    fun isExtract(face: BlockFace): Boolean {
+        return NetworkConnectionType.EXTRACT in itemConfig[face]!!.included
     }
     
-    fun setExtract(face: BlockFace, state: Boolean) {
-        val type = itemConfig[face]!!
-        itemConfig[face] = ItemConnectionType.of(type.insert, state)
+    fun isInsert(face: BlockFace): Boolean {
+        return NetworkConnectionType.INSERT in itemConfig[face]!!.included
     }
     
     fun cycleItemConfig(manager: NetworkManager, face: BlockFace, plus: Boolean) {

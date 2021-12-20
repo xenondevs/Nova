@@ -8,18 +8,17 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.BufferEnergyHolder
 import xyz.xenondevs.nova.ui.EnergyBar
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
 open class PowerCell(
     creative: Boolean,
-    val maxEnergy: Int,
+    val maxEnergy: Long,
     uuid: UUID,
     data: CompoundElement,
     material: NovaMaterial,
@@ -33,7 +32,7 @@ open class PowerCell(
     
     override fun handleTick() = Unit
     
-    inner class PowerCellGUI : TileEntityGUI("menu.nova.power_cell") {
+    inner class PowerCellGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@PowerCell,
@@ -57,10 +56,10 @@ open class PowerCell(
     
 }
 
-private val BASIC_CAPACITY = NovaConfig[NovaMaterialRegistry.BASIC_POWER_CELL].getInt("capacity")!!
-private val ADVANCED_CAPACITY = NovaConfig[NovaMaterialRegistry.ADVANCED_POWER_CELL].getInt("capacity")!!
-private val ELITE_CAPACITY = NovaConfig[NovaMaterialRegistry.ELITE_POWER_CELL].getInt("capacity")!!
-private val ULTIMATE_CAPACITY = NovaConfig[NovaMaterialRegistry.ULTIMATE_POWER_CELL].getInt("capacity")!!
+private val BASIC_CAPACITY = NovaConfig[NovaMaterialRegistry.BASIC_POWER_CELL].getLong("capacity")!!
+private val ADVANCED_CAPACITY = NovaConfig[NovaMaterialRegistry.ADVANCED_POWER_CELL].getLong("capacity")!!
+private val ELITE_CAPACITY = NovaConfig[NovaMaterialRegistry.ELITE_POWER_CELL].getLong("capacity")!!
+private val ULTIMATE_CAPACITY = NovaConfig[NovaMaterialRegistry.ULTIMATE_POWER_CELL].getLong("capacity")!!
 
 class BasicPowerCell(
     uuid: UUID,
@@ -134,7 +133,7 @@ class CreativePowerCell(
     armorStand: FakeArmorStand,
 ) : PowerCell(
     true,
-    Int.MAX_VALUE,
+    Long.MAX_VALUE,
     uuid,
     data,
     material,

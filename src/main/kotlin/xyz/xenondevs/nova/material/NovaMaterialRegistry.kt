@@ -3,25 +3,22 @@ package xyz.xenondevs.nova.material
 import org.bukkit.Material
 import org.bukkit.Material.*
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.impl.BottledMobItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
+import xyz.xenondevs.nova.item.impl.MobCatcherItem
 import xyz.xenondevs.nova.tileentity.impl.agriculture.*
 import xyz.xenondevs.nova.tileentity.impl.energy.*
 import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
 import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
+import xyz.xenondevs.nova.tileentity.impl.processing.CobblestoneGenerator
 import xyz.xenondevs.nova.tileentity.impl.processing.ElectricalFurnace
 import xyz.xenondevs.nova.tileentity.impl.processing.MechanicalPress
 import xyz.xenondevs.nova.tileentity.impl.processing.Pulverizer
-import xyz.xenondevs.nova.tileentity.impl.storage.StorageUnit
-import xyz.xenondevs.nova.tileentity.impl.storage.TrashCan
-import xyz.xenondevs.nova.tileentity.impl.storage.VacuumChest
-import xyz.xenondevs.nova.tileentity.impl.world.BlockBreaker
-import xyz.xenondevs.nova.tileentity.impl.world.BlockPlacer
-import xyz.xenondevs.nova.tileentity.impl.world.ChunkLoader
-import xyz.xenondevs.nova.tileentity.impl.world.Quarry
+import xyz.xenondevs.nova.tileentity.impl.storage.*
+import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.util.toIntArray
 
 private fun blockOf(data: IntArray) = ModelData(BARRIER, data)
@@ -45,7 +42,7 @@ object NovaMaterialRegistry {
         get() = materialsByTypeName.values
     
     val sortedValues: Set<NovaMaterial> by lazy { materialsByTypeName.values.toSortedSet() }
-    val sortedObtainables: Set<NovaMaterial> by lazy { sortedValues.filterTo(LinkedHashSet()) { it.item.data < 9000 && it != BOTTLED_MOB } }
+    val sortedObtainables: Set<NovaMaterial> by lazy { sortedValues.filterTo(LinkedHashSet()) { it.item.data < 9000 } }
     
     // 1 - 1000: Blocks
     // 1: Reserved for legacy furnace generator
@@ -76,6 +73,14 @@ object NovaMaterialRegistry {
     val LIGHTNING_EXCHANGER = registerEnergyTileEntity("LIGHTNING_EXCHANGER", 26, ::LightningExchanger, BARRIER)
     val TREE_FACTORY = registerEnergyTileEntity("TREE_FACTORY", 27, ::TreeFactory, BARRIER)
     val TRASH_CAN = registerDefaultTileEntity("TRASH_CAN", 28, ::TrashCan, BARRIER)
+    val BASIC_FLUID_TANK = registerDefaultTileEntity("BASIC_FLUID_TANK", 29, ::BasicFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
+    val ADVANCED_FLUID_TANK = registerDefaultTileEntity("ADVANCED_FLUID_TANK", 30, ::AdvancedFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
+    val ELITE_FLUID_TANK = registerDefaultTileEntity("ELITE_FLUID_TANK", 31, ::EliteFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
+    val ULTIMATE_FLUID_TANK = registerDefaultTileEntity("ULTIMATE_FLUID_TANK", 32, ::UltimateFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
+    val CREATIVE_FLUID_TANK = registerDefaultTileEntity("CREATIVE_FLUID_TANK", 33, ::CreativeFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
+    val INFINITE_WATER_SOURCE = registerDefaultTileEntity("INFINITE_WATER_SOURCE", 34, ::InfiniteWaterSource, SANDSTONE)
+    val PUMP = registerDefaultTileEntity("PUMP", 35, ::Pump, BARRIER)
+    val COBBLESTONE_GENERATOR = registerDefaultTileEntity("COBBLESTONE_GENERATOR", 36, ::CobblestoneGenerator, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     
     // 1000 - 2000: Crafting Items
     // Plates
@@ -112,7 +117,7 @@ object NovaMaterialRegistry {
     // Other
     val NETHERITE_DRILL = registerDefaultItem("NETHERITE_DRILL", 1030)
     val SOLAR_CELL = registerDefaultItem("SOLAR_CELL", 1031)
-    val BOTTLED_MOB = registerDefaultItem("BOTTLED_MOB", 1032, BottledMobItem)
+    val MOB_CATCHER = registerDefaultItem("MOB_CATCHER", 1032, MobCatcherItem)
     val STAR_SHARDS = registerDefaultItem("STAR_SHARDS", 1033)
     val BASIC_MACHINE_FRAME = registerDefaultItem("BASIC_MACHINE_FRAME", 1034)
     val ADVANCED_MACHINE_FRAME = registerDefaultItem("ADVANCED_MACHINE_FRAME", 1035)
@@ -127,21 +132,24 @@ object NovaMaterialRegistry {
     val EFFICIENCY_UPGRADE = registerDefaultItem("EFFICIENCY_UPGRADE", 2003)
     val ENERGY_UPGRADE = registerDefaultItem("ENERGY_UPGRADE", 2004)
     val RANGE_UPGRADE = registerDefaultItem("RANGE_UPGRADE", 2005)
+    val FLUID_UPGRADE = registerDefaultItem("FLUID_UPGRADE", 2006)
     
     // 3000 - 4000: Equipment, Attachments
     val JETPACK = registerItem("JETPACK", "item.nova.jetpack", ModelData(IRON_CHESTPLATE, intArrayOf(3000)), JetpackItem)
     
     // 5000 - 9.000 MultiModel Blocks
     // 5000 - 5100: Reserved for legacy cables
-    val BASIC_CABLE = registerTileEntity("BASIC_CABLE", "block.nova.basic_cable", structureBlockOf(5100), null, structureBlockOf((5101..5164).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::BasicCable, isDirectional = false, legacyItemIds = intArrayOf(5004))
-    val ADVANCED_CABLE = registerTileEntity("ADVANCED_CABLE", "block.nova.advanced_cable", structureBlockOf(5165), null, structureBlockOf((5166..5229).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::AdvancedCable, isDirectional = false, legacyItemIds = intArrayOf(5009))
-    val ELITE_CABLE = registerTileEntity("ELITE_CABLE", "block.nova.elite_cable", structureBlockOf(5230), null, structureBlockOf((5231..5294).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::EliteCable, isDirectional = false, legacyItemIds = intArrayOf(5014))
-    val ULTIMATE_CABLE = registerTileEntity("ULTIMATE_CABLE", "block.nova.ultimate_cable", structureBlockOf(5295), null, structureBlockOf((5296..5359).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::UltimateCable, isDirectional = false, legacyItemIds = intArrayOf(5019))
-    val CREATIVE_CABLE = registerTileEntity("CREATIVE_CABLE", "block.nova.creative_cable", structureBlockOf(5360), null, structureBlockOf((5361..5424).toIntArray() + (5025..5033).toIntArray()), STRUCTURE_VOID, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024))
+    val BASIC_CABLE = registerTileEntity("BASIC_CABLE", "block.nova.basic_cable", structureBlockOf(5100), null, structureBlockOf((5101..5164).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::BasicCable, isDirectional = false, legacyItemIds = intArrayOf(5004))
+    val ADVANCED_CABLE = registerTileEntity("ADVANCED_CABLE", "block.nova.advanced_cable", structureBlockOf(5165), null, structureBlockOf((5166..5229).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::AdvancedCable, isDirectional = false, legacyItemIds = intArrayOf(5009))
+    val ELITE_CABLE = registerTileEntity("ELITE_CABLE", "block.nova.elite_cable", structureBlockOf(5230), null, structureBlockOf((5231..5294).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::EliteCable, isDirectional = false, legacyItemIds = intArrayOf(5014))
+    val ULTIMATE_CABLE = registerTileEntity("ULTIMATE_CABLE", "block.nova.ultimate_cable", structureBlockOf(5295), null, structureBlockOf((5296..5359).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::UltimateCable, isDirectional = false, legacyItemIds = intArrayOf(5019))
+    val CREATIVE_CABLE = registerTileEntity("CREATIVE_CABLE", "block.nova.creative_cable", structureBlockOf(5360), null, structureBlockOf((5361..5424).toIntArray() + (5000..5047).toIntArray()), STRUCTURE_VOID, ::CreativeCable, isDirectional = false, legacyItemIds = intArrayOf(5024))
     val SCAFFOLDING = register(NovaMaterial("SCAFFOLDING", "item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray())))
-    val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", blockOf(5050), EnergyHolder::createItemBuilder, blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace)
-    val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, null, true, intArrayOf(1))
-    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), EnergyHolder::createItemBuilder, blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, null, true, intArrayOf(11))
+    val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", blockOf(5050), listOf(EnergyHolder::modifyItemBuilder), blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace)
+    val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, legacyItemIds = intArrayOf(1))
+    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, legacyItemIds = intArrayOf(11))
+    val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", blockOf(5080), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5080, 5081, 5082)), BARRIER, ::StarCollector)
+    val LAVA_GENERATOR = registerTileEntity("LAVA_GENERATOR", "block.nova.lava_generator", blockOf(5090), listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder), blockOf(intArrayOf(5090, 5091)), COBBLESTONE, ::LavaGenerator)
     
     // 9.000 - 10.000 UI Elements
     val GRAY_BUTTON = registerItem("GRAY_BUTTON", "", 9001)
@@ -157,10 +165,6 @@ object NovaMaterialRegistry {
     val PLATE_OFF_BUTTON = registerItem("PLATE_OFF_BUTTON", "", 9102)
     val GEAR_ON_BUTTON = registerItem("GEAR_ON_BUTTON", "", 9103)
     val GEAR_OFF_BUTTON = registerItem("GEAR_OFF_BUTTON", "", 9104)
-    val ENERGY_ON_BUTTON = registerItem("ENERGY_ON_BUTTON", "", 9105)
-    val ENERGY_OFF_BUTTON = registerItem("ENERGY_OFF_BUTTON", "", 9106)
-    val ITEM_ON_BUTTON = registerItem("ITEM_ON_BUTTON", "", 9107)
-    val ITEM_OFF_BUTTON = registerItem("ITEM_OFF_BUTTON", "", 9108)
     val WHITELIST_BUTTON = registerItem("WHITELIST_BUTTON", "", 9109)
     val BLACKLIST_BUTTON = registerItem("BLACKLIST_BUTTON", "", 9110)
     val PLUS_ON_BUTTON = registerItem("PLUS_ON_BUTTON", "", 9111)
@@ -178,10 +182,24 @@ object NovaMaterialRegistry {
     val ARROW_LEFT_OFF_BUTTON = registerItem("ARROW_LEFT_OFF_BUTTON", "", 9123)
     val ARROW_RIGHT_ON_BUTTON = registerItem("ARROW_RIGHT_ON_BUTTON", "", 9124)
     val ARROW_RIGHT_OFF_BUTTON = registerItem("ARROW_RIGHT_OFF_BUTTON", "", 9125)
+    val ENERGY_ON_BUTTON = registerItem("ENERGY_ON_BUTTON", "menu.nova.side_config.energy", 9126)
+    val ENERGY_OFF_BUTTON = registerItem("ENERGY_OFF_BUTTON", "", 9127)
+    val ENERGY_SELECTED_BUTTON = registerItem("ENERGY_SELECTED_BUTTON", "menu.nova.side_config.energy", 9128)
+    val ITEM_ON_BUTTON = registerItem("ITEM_ON_BUTTON", "menu.nova.side_config.items", 9129)
+    val ITEM_OFF_BUTTON = registerItem("ITEM_OFF_BUTTON", "", 9130)
+    val ITEM_SELECTED_BUTTON = registerItem("ITEM_SELECTED_BUTTON", "menu.nova.side_config.items", 9131)
+    val FLUID_ON_BUTTON = registerItem("FLUID_ON_BUTTON", "menu.nova.side_config.fluids", 9132)
+    val FLUID_OFF_BUTTON = registerItem("FLUID_OFF_BUTTON", "", 9133)
+    val FLUID_SELECTED_BUTTON = registerItem("FLUID_SELECTED_BUTTON", "menu.nova.side_config.fluids", 9134)
+    val COBBLESTONE_MODE_BUTTON = registerItem("COBBLESTONE_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.cobblestone", 9135)
+    val STONE_MODE_BUTTON = registerItem("STONE_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.stone", 9136)
+    val OBSIDIAN_MODE_BUTTON = registerItem("OBSIDIAN_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.obsidian", 9137)
     val INVISIBLE_ITEM = registerItem("INVISIBLE", "", 9300)
     val STOPWATCH_ICON = registerItem("STOPWATCH_ICON", "", 9301)
     val SEARCH_ICON = registerItem("SEARCH_ICON", "", 9302)
     val NO_NUMBER = registerItem("NO_NUMBER", "", 9303)
+    val PUMP_PUMP_ICON = registerItem("PUMP_PUMP_ICON", "", 9304)
+    val PUMP_REPLACE_ICON = registerItem("PUMP_REPLACE_ICON", "", 9305)
     val SPEED_UPGRADE_ICON = registerItem("SPEED_UPGRADE_ICON", "", 9402)
     val TRANSLUCENT_SPEED_UPGRADE_ICON = registerItem("TRANSLUCENT_SPEED_UPGRADE_ICON", "", 9403)
     val EFFICIENCY_UPGRADE_ICON = registerItem("EFFICIENCY_UPGRADE_ICON", "", 9404)
@@ -190,11 +208,13 @@ object NovaMaterialRegistry {
     val TRANSLUCENT_ENERGY_UPGRADE_ICON = registerItem("TRANSLUCENT_ENERGY_UPGRADE_ICON", "", 9407)
     val RANGE_UPGRADE_ICON = registerItem("RANGE_UPGRADE_ICON", "", 9408)
     val TRANSLUCENT_RANGE_UPGRADE_ICON = registerItem("TRANSLUCENT_RANGE_UPGRADE_ICON", "", 9409)
+    val FLUID_UPGRADE_ICON = registerItem("FLUID_UPGRADE_ICON", "", 9410)
+    val TRANSLUCENT_FLUID_UPGRADE_ICON = registerItem("TRANSLUCENT_FLUID_UPGRADE_ICON", "", 9411)
     val HOE_PLACEHOLDER = registerItem("HOE_PLACEHOLDER", "", 9500)
     val AXE_PLACEHOLDER = registerItem("AXE_PLACEHOLDER", "", 9501)
     val SHEARS_PLACEHOLDER = registerItem("SHEARS_PLACEHOLDER", "", 9502)
     val ITEM_FILTER_PLACEHOLDER = registerItem("ITEM_FILTER_PLACEHOLDER", "", 9503)
-    val BOTTLED_MOB_PLACEHOLDER = registerItem("BOTTLED_MOB_PLACEHOLDER", "", 9504)
+    val MOB_CATCHER_PLACEHOLDER = registerItem("MOB_CATCHER_PLACEHOLDER", "", 9504)
     val FISHING_ROD_PLACEHOLDER = registerItem("FISHING_ROD_PLACEHOLDER", "", 9505)
     val SAPLING_PLACEHOLDER = registerItem("SAPLING_PLACEHOLDER", "", 9506)
     val TRASH_CAN_PLACEHOLDER = registerItem("TRASH_CAN_PLACEHOLDER", "", 9507)
@@ -207,9 +227,16 @@ object NovaMaterialRegistry {
     val BLUE_BAR = registerItem("BLUE_BAR", "", itemOf((10_400..10_416).toIntArray()))
     val PRESS_PROGRESS = registerItem("PRESS_PROGRESS", "", itemOf((10_500..10_508).toIntArray()))
     val PULVERIZER_PROGRESS = registerItem("PULVERIZER_PROGRESS", "", itemOf((10_600..10_614).toIntArray()))
+    val ORANGE_BAR = registerItem("ORANGE_BAR", "", itemOf((10_700..10_716).toIntArray()))
     
     // 100.000 - ? Numbers
     val NUMBER = registerItem("NUMBER", "", itemOf((100_000..100_999).toIntArray()))
+    
+    // 190.000 Fluid Levels
+    val TANK_LAVA_LEVELS = registerItem("TANK_LAVA_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (190_000 until 190_100).toIntArray()))
+    val TANK_WATER_LEVELS = registerItem("TANK_WATER_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (191_000 until 191_100).toIntArray()))
+    val COBBLESTONE_GENERATOR_LAVA_LEVELS = registerItem("COBBLESTONE_GENERATOR_LAVA_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (192_000 until 192_100).toIntArray()))
+    val COBBLESTONE_GENERATOR_WATER_LEVELS = registerItem("COBBLESTONE_GENERATOR_WATER_LEVELS", "", ModelData(BLUE_STAINED_GLASS, (193_000 until 193_100).toIntArray()))
     
     // 200.000 - ? Tree Miniatures
     val OAK_TREE_MINIATURE = registerItem("OAK_TREE_MINIATURE", "", bulkItemOf((200_000 until 200_500).toIntArray()))
@@ -233,13 +260,13 @@ object NovaMaterialRegistry {
         id: Int,
         tileEntityConstructor: TileEntityConstructor?,
         hitboxType: Material,
-        itemBuilderCreator: ItemBuilderCreatorFun? = null,
+        itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
         placeCheck: PlaceCheckFun? = null,
         isDirectional: Boolean = true,
         legacyItemIds: IntArray? = null,
     ): NovaMaterial {
         val modelData = blockOf(id)
-        return registerTileEntity(typeName, "block.nova.${typeName.lowercase()}", modelData, itemBuilderCreator, modelData,
+        return registerTileEntity(typeName, "block.nova.${typeName.lowercase()}", modelData, itemBuilderModifiers, modelData,
             hitboxType, tileEntityConstructor, placeCheck, isDirectional, legacyItemIds)
     }
     
@@ -256,7 +283,7 @@ object NovaMaterialRegistry {
             id,
             tileEntityConstructor,
             hitboxType,
-            EnergyHolder::createItemBuilder,
+            listOf(EnergyHolder::modifyItemBuilder),
             placeCheck,
             isDirectional,
             legacyItemIds)
@@ -266,7 +293,7 @@ object NovaMaterialRegistry {
         typeName: String,
         name: String,
         item: ModelData,
-        itemBuilderCreator: ItemBuilderCreatorFun?,
+        itemBuilderModifiers: List<ItemBuilderModifierFun>?,
         block: ModelData,
         hitboxType: Material,
         tileEntityConstructor: TileEntityConstructor?,
@@ -276,7 +303,7 @@ object NovaMaterialRegistry {
     ): NovaMaterial {
         require(item.dataArray.size == 1) { "Item ModelData of $typeName cannot be bigger than 1 (is ${item.dataArray.size})" }
         
-        val material = NovaMaterial(typeName, name, item, null, itemBuilderCreator, block,
+        val material = NovaMaterial(typeName, name, item, null, itemBuilderModifiers, block,
             hitboxType, tileEntityConstructor, placeCheck, isDirectional, legacyItemIds)
         
         return register(material)

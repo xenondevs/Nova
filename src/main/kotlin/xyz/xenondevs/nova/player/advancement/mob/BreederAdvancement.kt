@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.player.advancement.toIcon
 object BreederAdvancement : Advancement(NamespacedKey(NOVA, "breeder")) {
     
     init {
-        setParent(BottledMobAdvancement.key)
+        setParent(MobCatcherAdvancement.key)
         addObtainCriteria(BREEDER)
         setDisplayLocalized {
             it.setIcon(BREEDER.toIcon())

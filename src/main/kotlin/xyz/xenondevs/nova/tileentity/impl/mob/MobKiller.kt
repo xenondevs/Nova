@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MOB_KILLER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
@@ -22,8 +21,8 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.VerticalBar
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
@@ -37,9 +36,9 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.math.min
 
-private val MAX_ENERGY = NovaConfig[MOB_KILLER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[MOB_KILLER].getInt("energy_per_tick")!!
-private val ENERGY_PER_DAMAGE = NovaConfig[MOB_KILLER].getInt("energy_per_damage")!!
+private val MAX_ENERGY = NovaConfig[MOB_KILLER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[MOB_KILLER].getLong("energy_per_tick")!!
+private val ENERGY_PER_DAMAGE = NovaConfig[MOB_KILLER].getLong("energy_per_damage")!!
 private val IDLE_TIME = NovaConfig[MOB_KILLER].getInt("idle_time")!!
 private val KILL_LIMIT = NovaConfig[MOB_KILLER].getInt("kill_limit")!!
 private val DAMAGE = NovaConfig[MOB_KILLER].getDouble("damage")!!
@@ -101,7 +100,7 @@ class MobKiller(
             if (timePassed++ >= maxIdleTime) {
                 timePassed = 0
                 
-                val killLimit = min(energyHolder.energy / energyHolder.specialEnergyConsumption, KILL_LIMIT)
+                val killLimit = min((energyHolder.energy / energyHolder.specialEnergyConsumption).toInt(), KILL_LIMIT)
                 
                 location
                     .chunk
@@ -126,7 +125,7 @@ class MobKiller(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class MobCrusherGUI : TileEntityGUI("menu.nova.mob_killer") {
+    inner class MobCrusherGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@MobKiller,
@@ -153,9 +152,14 @@ class MobKiller(
         
         val energyBar = EnergyBar(gui, x = 3, y = 1, height = 3, energyHolder)
         
-        val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3, NovaMaterialRegistry.GREEN_BAR) {
+        val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3) {
+    
+            override val barMaterial = NovaMaterialRegistry.GREEN_BAR
+            
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_killer.idle", maxIdleTime - timePassed))
+            
+            
         }
         
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)

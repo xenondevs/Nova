@@ -21,18 +21,17 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.FERTILIZER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
@@ -48,9 +47,9 @@ import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[FERTILIZER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[FERTILIZER].getInt("energy_per_tick")!!
-private val ENERGY_PER_FERTILIZE = NovaConfig[FERTILIZER].getInt("energy_per_fertilize")!!
+private val MAX_ENERGY = NovaConfig[FERTILIZER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[FERTILIZER].getLong("energy_per_tick")!!
+private val ENERGY_PER_FERTILIZE = NovaConfig[FERTILIZER].getLong("energy_per_fertilize")!!
 private val IDLE_TIME = NovaConfig[FERTILIZER].getInt("idle_time")!!
 private val MIN_RANGE = NovaConfig[FERTILIZER].getInt("range.min")!!
 private val MAX_RANGE = NovaConfig[FERTILIZER].getInt("range.max")!!
@@ -68,7 +67,7 @@ class Fertilizer(
     override val gui = lazy(::FertilizerGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_FERTILIZE, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, fertilizerInventory to ItemConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, fertilizerInventory to NetworkConnectionType.BUFFER)
     
     private var maxIdleTime = 0
     private var timePassed = 0
@@ -155,7 +154,7 @@ class Fertilizer(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class FertilizerGUI : TileEntityGUI("menu.nova.fertilizer") {
+    inner class FertilizerGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Fertilizer,

@@ -27,9 +27,9 @@ class Region(val min: Location, val max: Location) : Iterable<Block> {
     
     operator fun contains(loc: Location): Boolean {
         return loc.world == min.world
-            && loc.x >= min.x && loc.x <= max.x
-            && loc.y >= min.y && loc.y <= max.y
-            && loc.z >= min.z && loc.z <= max.z
+            && loc.x > min.x && loc.x < max.x
+            && loc.y > min.y && loc.y < max.y
+            && loc.z > min.z && loc.z < max.z
     }
     
     operator fun get(index: Int) = blocks[index]

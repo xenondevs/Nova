@@ -13,12 +13,11 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.STORAGE_UNIT
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.StorageUnitDisplay
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -37,7 +36,7 @@ class StorageUnit(
     
     override val gui = lazy { ItemStorageGUI() }
     private val inventory = StorageUnitInventory(retrieveOrNull("type"), retrieveOrNull("amount") ?: 0)
-    override val itemHolder = NovaItemHolder(this, uuid to (inventory to ItemConnectionType.BUFFER))
+    override val itemHolder = NovaItemHolder(this, uuid to (inventory to NetworkConnectionType.BUFFER))
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
     private val outputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleOutputInventoryUpdate) }
     
@@ -81,7 +80,7 @@ class StorageUnit(
         storeData("amount", inventory.amount, true)
     }
     
-    inner class ItemStorageGUI : TileEntityGUI("menu.nova.storage_unit") {
+    inner class ItemStorageGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@StorageUnit,

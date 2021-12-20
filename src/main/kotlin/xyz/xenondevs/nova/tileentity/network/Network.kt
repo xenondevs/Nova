@@ -2,9 +2,15 @@ package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyNetwork
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidNetwork
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 
 interface Network {
+    
+    /**
+     * The [NetworkType] this network implements.
+     */
+    val type: NetworkType
     
     /**
      * A set of [NetworkNode]s that are connected to this [Network].
@@ -64,7 +70,30 @@ enum class NetworkType(val networkConstructor: () -> Network) {
     /**
      * Transfers Items
      */
-    ITEMS(::ItemNetwork)
+    ITEMS(::ItemNetwork),
+    
+    /**
+     * Transfers Fluids
+     */
+    FLUID(::FluidNetwork)
+    
+}
+
+enum class NetworkConnectionType(val insert: Boolean, val extract: Boolean, included: ArrayList<NetworkConnectionType>) {
+    
+    NONE(false, false, arrayListOf()),
+    INSERT(true, false, arrayListOf(NONE)),
+    EXTRACT(false, true, arrayListOf(NONE)),
+    BUFFER(true, true, arrayListOf(NONE, INSERT, EXTRACT));
+    
+    val included: List<NetworkConnectionType> = included.also { it.add(this) }
+    val insertExtract = insert to extract
+    
+    companion object {
+        
+        fun of(insert: Boolean, extract: Boolean) = values().first { it.insert == insert && it.extract == extract }
+        
+    }
     
 }
 

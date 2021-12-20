@@ -3,7 +3,7 @@ version: ${project.version}
 authors: [ "StudioCode", "ByteZ1337", "flimosch" ]
 website: "https://github.com/xenondevs/Nova/"
 main: xyz.xenondevs.nova.Nova
-api-version: 1.17
+api-version: 1.18
 softdepend:
   - WorldGuard
   - GriefPrevention
@@ -11,6 +11,7 @@ softdepend:
   - GriefDefender
   - Vault
   - ItemsAdder
+  - Towny
 
 permissions:
   nova.command.*:
@@ -22,6 +23,7 @@ permissions:
       - nova.command.render_distance
       - nova.command.nvrecipe
       - nova.command.nvusage
+      - nova.command.modeldata
   nova.command.give:
     description: Allows players to cheat nova items using /nova give.
   nova.command.debug:
@@ -42,3 +44,5 @@ permissions:
     description: Players with this permission will be reminded if a new version is available
   nova.misc.bypassTileEntityLimits:
     description: Players with this permission will be able to bypass the tile entity limits set in the config.
+  nova.command.modeldata:
+    description: Allows players to use the /nvmodeldata command.

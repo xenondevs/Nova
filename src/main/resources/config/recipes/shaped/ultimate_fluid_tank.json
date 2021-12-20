@@ -1,0 +1,22 @@
+{
+  "result": "nova:ultimate_fluid_tank",
+  "shape": [
+    "gdg",
+    "dtd",
+    "gdg"
+  ],
+  "ingredients": [
+    {
+      "char": "t",
+      "item": "nova:elite_fluid_tank"
+    },
+    {
+      "char": "d",
+      "item": "nova:star_dust"
+    },
+    {
+      "char": "g",
+      "item": "minecraft:diamond"
+    }
+  ]
+}

@@ -20,18 +20,17 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.ELECTRICAL_FURNACE
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.intValue
@@ -47,8 +46,8 @@ private val RECIPES: List<FurnaceRecipe> by lazy {
 private fun getRecipe(input: ItemStack) =
     RECIPES.firstOrNull { it.input.isSimilar(input) || it.inputChoice.test(input) }
 
-private val MAX_ENERGY = NovaConfig[ELECTRICAL_FURNACE].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[ELECTRICAL_FURNACE].getInt("energy_per_tick")!!
+private val MAX_ENERGY = NovaConfig[ELECTRICAL_FURNACE].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[ELECTRICAL_FURNACE].getLong("energy_per_tick")!!
 private val COOK_SPEED = NovaConfig[ELECTRICAL_FURNACE].getInt("cook_speed")!!
 
 class ElectricalFurnace(
@@ -66,7 +65,7 @@ class ElectricalFurnace(
     
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inputInventory to ItemConnectionType.BUFFER, outputInventory to ItemConnectionType.EXTRACT)
+    override val itemHolder = NovaItemHolder(this, inputInventory to NetworkConnectionType.BUFFER, outputInventory to NetworkConnectionType.EXTRACT)
     
     private var currentRecipe: FurnaceRecipe? = retrieveOrNull<NamespacedKey>("currentRecipe")?.let { Bukkit.getRecipe(it) as FurnaceRecipe? }
     private var timeCooked = retrieveData("timeCooked") { 0 }
@@ -173,7 +172,7 @@ class ElectricalFurnace(
         cookSpeed = (COOK_SPEED * upgradeHolder.getSpeedModifier()).toInt()
     }
     
-    inner class ElectricalFurnaceGUI : TileEntityGUI("menu.nova.electrical_furnace") {
+    inner class ElectricalFurnaceGUI : TileEntityGUI() {
         
         private val progressItem = ProgressArrowItem()
         

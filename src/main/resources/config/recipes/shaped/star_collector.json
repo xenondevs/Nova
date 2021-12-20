@@ -1,0 +1,30 @@
+{
+  "result": "nova:star_collector",
+  "shape": [
+    "tat",
+    "sfs",
+    "isi"
+  ],
+  "ingredients": [
+    {
+      "char": "t",
+      "item": "minecraft:tinted_glass"
+    },
+    {
+      "char": "a",
+      "item": "minecraft:amethyst_shard"
+    },
+    {
+      "char": "s",
+      "item": "nova:star_shards"
+    },
+    {
+      "char": "f",
+      "item": "nova:ultimate_machine_frame"
+    },
+    {
+      "char": "i",
+      "item": "nova:iron_plate"
+    }
+  ]
+}

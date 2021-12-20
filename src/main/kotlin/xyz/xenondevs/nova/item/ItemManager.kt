@@ -1,9 +1,11 @@
 package xyz.xenondevs.nova.item
 
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import xyz.xenondevs.nova.LOGGER
@@ -23,6 +25,14 @@ object ItemManager : Listener {
     fun handleInteract(event: PlayerInteractEvent) {
         if (event.isCompletelyDenied()) return
         event.item?.novaMaterial?.novaItem?.handleInteract(event.player, event.item!!, event.action, event)
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
+        if(event.isCancelled) return
+        val item = event.player.inventory.getItem(event.hand)
+        if(item.type == Material.AIR) return
+        item.novaMaterial?.novaItem?.handleEntityInteract(event.player, item, event.rightClicked, event)
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

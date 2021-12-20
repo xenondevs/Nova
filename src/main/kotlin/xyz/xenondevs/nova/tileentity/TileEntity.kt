@@ -17,9 +17,13 @@ import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
@@ -27,7 +31,7 @@ import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.region.Region
 import java.util.*
 
-internal val SELF_UPDATE_REASON = object : UpdateReason {}
+val SELF_UPDATE_REASON = object : UpdateReason {}
 
 abstract class TileEntity(
     val uuid: UUID,
@@ -50,6 +54,7 @@ abstract class TileEntity(
     val facing = armorStand.location.facing
     
     private val inventories = ArrayList<VirtualInventory>()
+    private val fluidContainers = HashMap<FluidContainer, Boolean>()
     private val multiModels = ArrayList<MultiModel>()
     private val particleTasks = ArrayList<TileEntityParticleTask>()
     
@@ -61,8 +66,8 @@ abstract class TileEntity(
     /**
      * Called when the TileEntity is being broken.
      *
-     * @param dropItems If items should be dropped. Can be ignored for reasons like
-     * dropping the contents of a chest event when the player is in creative mode.
+     * @param dropItems If items should be dropped. Inventory contents will get
+     * added to the list regardless of this value.
      *
      * @return A list of [ItemStack]s that should be dropped.
      */
@@ -89,6 +94,13 @@ abstract class TileEntity(
     open fun saveData() {
         if (this is Upgradable)
             upgradeHolder.save(data)
+        
+        fluidContainers.forEach { (container, global) ->
+            val data = CompoundElement()
+            data.put("amount", container.amount)
+            data.put("type", container.type)
+            storeData("fluidContainer.${container.uuid}", data, global)
+        }
     }
     
     /**
@@ -193,6 +205,31 @@ abstract class TileEntity(
         getInventory(salt, size, IntArray(size) { 64 }, itemHandler)
     
     /**
+     * Gets a [FluidContainer] for this [TileEntity].
+     */
+    fun getFluidContainer(
+        name: String,
+        types: Set<FluidType>,
+        capacity: Long,
+        defaultAmount: Long = 0,
+        updateHandler: (() -> Unit)? = null,
+        upgradeHolder: UpgradeHolder? = null,
+        global: Boolean = true
+    ): FluidContainer {
+        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        
+        val fluidData = retrieveOrNull<CompoundElement>("fluidContainer.$uuid")
+        val storedAmount = fluidData?.getAsserted<Long>("amount")
+        val storedType = fluidData?.getEnumConstant<FluidType>("type")
+        
+        val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, storedAmount
+            ?: defaultAmount, capacity, upgradeHolder)
+        updateHandler?.apply(container.updateHandlers::add)
+        fluidContainers[container] = global
+        return container
+    }
+    
+    /**
      * Creates a new [MultiModel] for this [TileEntity].
      * When the [TileEntity] is removed, all [Model]s belonging
      * to this [MultiModel] will be removed.
@@ -272,18 +309,32 @@ abstract class TileEntity(
     }
     
     /**
-     * Creates an item side config
+     * Creates a side config
      */
-    fun createItemSideConfig(
-        default: ItemConnectionType,
+    fun createSideConfig(
+        default: NetworkConnectionType,
         vararg blocked: BlockSide
-    ): EnumMap<BlockFace, ItemConnectionType> {
+    ): EnumMap<BlockFace, NetworkConnectionType> {
         
-        val sideConfig = EnumMap<BlockFace, ItemConnectionType>(BlockFace::class.java)
+        val sideConfig = EnumMap<BlockFace, NetworkConnectionType>(BlockFace::class.java)
         val blockedFaces = blocked.map { getFace(it) }
-        CUBE_FACES.forEach { sideConfig[it] = if (blockedFaces.contains(it)) ItemConnectionType.NONE else default }
+        CUBE_FACES.forEach { sideConfig[it] = if (blockedFaces.contains(it)) NetworkConnectionType.NONE else default }
         
         return sideConfig
+    }
+    
+    /**
+     * Creates a side config
+     */
+    fun createExclusiveSideConfig(
+        type: NetworkConnectionType,
+        vararg sides: BlockSide
+    ): EnumMap<BlockFace, NetworkConnectionType> {
+        
+        val sideFaces = sides.map(::getFace)
+        return CUBE_FACES.associateWithTo(emptyEnumMap()) {
+            if (it in sideFaces) type else NetworkConnectionType.NONE
+        }
     }
     
     /**
@@ -396,35 +447,33 @@ abstract class TileEntity(
         
     }
     
-}
-
-
-abstract class TileEntityGUI(private val title: String) {
-    
-    /**
-     * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
-     * the owning [TileEntity] is destroyed.
-     */
-    abstract val gui: GUI
-    
-    /**
-     * A list of [GUIs][GUI] that are not a part of [gui] but should still be closed
-     * when the [TileEntity] is destroyed.
-     */
-    val subGUIs = ArrayList<GUI>()
-    
-    /**
-     * Opens a Window of the [gui] to the specified [player].
-     */
-    fun openWindow(player: Player) = SimpleWindow(player, arrayOf(TranslatableComponent(title)), gui).show()
-    
-    /**
-     * Closes all Windows connected to this [TileEntityGUI].
-     */
-    fun closeWindows() {
-        gui.closeForAllViewers()
-        subGUIs.forEach(GUI::closeForAllViewers)
+    abstract inner class TileEntityGUI {
+        
+        /**
+         * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
+         * the owning [TileEntity] is destroyed.
+         */
+        abstract val gui: GUI
+        
+        /**
+         * A list of [GUIs][GUI] that are not a part of [gui] but should still be closed
+         * when the [TileEntity] is destroyed.
+         */
+        val subGUIs = ArrayList<GUI>()
+        
+        /**
+         * Opens a Window of the [gui] to the specified [player].
+         */
+        fun openWindow(player: Player) = SimpleWindow(player, arrayOf(TranslatableComponent(material.localizedName)), gui).show()
+        
+        /**
+         * Closes all Windows connected to this [TileEntityGUI].
+         */
+        fun closeWindows() {
+            gui.closeForAllViewers()
+            subGUIs.forEach(GUI::closeForAllViewers)
+        }
+        
     }
     
 }
-

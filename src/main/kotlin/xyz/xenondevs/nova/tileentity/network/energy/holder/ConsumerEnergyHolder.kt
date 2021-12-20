@@ -7,9 +7,9 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 
 class ConsumerEnergyHolder(
     endPoint: NetworkedTileEntity,
-    defaultMaxEnergy: Int,
-    private val defaultEnergyConsumption: Int,
-    private val defaultSpecialEnergyConsumption: Int,
+    defaultMaxEnergy: Long,
+    private val defaultEnergyConsumption: Long,
+    private val defaultSpecialEnergyConsumption: Long,
     upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> MutableMap<BlockFace, EnergyConnectionType>
 ) : EnergyHolder(endPoint, defaultMaxEnergy, upgradeHolder, lazyDefaultConfig) {
@@ -17,9 +17,9 @@ class ConsumerEnergyHolder(
     var energyConsumption = calculateEnergyConsumption(defaultEnergyConsumption)
     var specialEnergyConsumption = calculateEnergyConsumption(defaultSpecialEnergyConsumption)
     
-    private fun calculateEnergyConsumption(default: Int): Int =
+    private fun calculateEnergyConsumption(default: Long): Long =
         (default * ((upgradeHolder?.getSpeedModifier() ?: 1.0)
-            / (upgradeHolder?.getEfficiencyModifier() ?: 1.0))).toInt()
+            / (upgradeHolder?.getEfficiencyModifier() ?: 1.0))).toLong()
     
     override fun handleUpgradesUpdate() {
         energyConsumption = calculateEnergyConsumption(defaultEnergyConsumption)

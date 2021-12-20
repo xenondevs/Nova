@@ -1,0 +1,22 @@
+{
+  "result": "nova:basic_fluid_tank",
+  "shape": [
+    "ipi",
+    "igi",
+    "ipi"
+  ],
+  "ingredients": [
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "g",
+      "item": "minecraft:glass_pane"
+    }
+  ]
+}

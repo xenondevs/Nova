@@ -19,19 +19,18 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.HARVESTER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType.BUFFER
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType.EXTRACT
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType.BUFFER
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType.EXTRACT
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
@@ -46,9 +45,9 @@ import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[HARVESTER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[HARVESTER].getInt("energy_per_tick")!!
-private val ENERGY_PER_BREAK = NovaConfig[HARVESTER].getInt("energy_per_break")!!
+private val MAX_ENERGY = NovaConfig[HARVESTER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[HARVESTER].getLong("energy_per_tick")!!
+private val ENERGY_PER_BREAK = NovaConfig[HARVESTER].getLong("energy_per_break")!!
 private val IDLE_TIME = NovaConfig[HARVESTER].getInt("idle_time")!!
 private val MIN_RANGE = NovaConfig[HARVESTER].getInt("range.min")!!
 private val MAX_RANGE = NovaConfig[HARVESTER].getInt("range.max")!!
@@ -231,7 +230,7 @@ class Harvester(
         VisualRegion.removeRegion(uuid)
     }
     
-    inner class HarvesterGUI : TileEntityGUI("menu.nova.harvester") {
+    inner class HarvesterGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Harvester,

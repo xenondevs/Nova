@@ -11,24 +11,23 @@ import xyz.xenondevs.nova.item.impl.ChargeableItem
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.CHARGER
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityGUI
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
-private val MAX_ENERGY = NovaConfig[CHARGER].getInt("capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[CHARGER].getInt("charge_speed")!!
+private val MAX_ENERGY = NovaConfig[CHARGER].getLong("capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[CHARGER].getLong("charge_speed")!!
 
 class Charger(
     uuid: UUID,
@@ -42,7 +41,7 @@ class Charger(
     override val gui = lazy { ChargerGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, UpgradeType.ENERGY, UpgradeType.SPEED)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME) }
-    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
         if (event.isAdd && event.newItemStack.novaMaterial?.novaItem !is ChargeableItem) event.isCancelled = true
@@ -63,7 +62,7 @@ class Charger(
         }
     }
     
-    inner class ChargerGUI : TileEntityGUI("menu.nova.charger") {
+    inner class ChargerGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Charger,

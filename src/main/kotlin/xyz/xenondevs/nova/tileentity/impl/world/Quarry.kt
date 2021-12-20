@@ -21,18 +21,21 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.QUARRY
-import xyz.xenondevs.nova.tileentity.*
+import xyz.xenondevs.nova.tileentity.Model
+import xyz.xenondevs.nova.tileentity.MultiModel
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
+import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
-import xyz.xenondevs.nova.tileentity.network.item.ItemConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.ui.config.OpenSideConfigItem
-import xyz.xenondevs.nova.ui.config.SideConfigGUI
+import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
+import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.util.*
@@ -57,14 +60,17 @@ private val DRILL = NovaMaterialRegistry.NETHERITE_DRILL.createItemStack()
 
 private val MIN_SIZE = NovaConfig[QUARRY].getInt("min_size")!!
 private val MAX_SIZE = NovaConfig[QUARRY].getInt("max_size")!!
+private val MIN_DEPTH = NovaConfig[QUARRY].getInt("min_depth")!!
+private val MAX_DEPTH = NovaConfig[QUARRY].getInt("max_depth")!!
 private val DEFAULT_SIZE_X = NovaConfig[QUARRY].getInt("default_size_x")!!
 private val DEFAULT_SIZE_Z = NovaConfig[QUARRY].getInt("default_size_z")!!
+private val DEFAULT_SIZE_Y = NovaConfig[QUARRY].getInt("default_size_y")!!
 
 private val MOVE_SPEED = NovaConfig[QUARRY].getDouble("move_speed")!!
 private val DRILL_SPEED_MULTIPLIER = NovaConfig[QUARRY].getDouble("drill_speed_multiplier")!!
 private val DRILL_SPEED_CLAMP = NovaConfig[QUARRY].getDouble("drill_speed_clamp")!!
 
-private val MAX_ENERGY = NovaConfig[QUARRY].getInt("capacity")!!
+private val MAX_ENERGY = NovaConfig[QUARRY].getLong("capacity")!!
 private val BASE_ENERGY_CONSUMPTION = NovaConfig[QUARRY].getInt("base_energy_consumption")!!
 private val ENERGY_PER_SQUARE_BLOCK = NovaConfig[QUARRY].getInt("energy_consumption_per_square_block")!!
 
@@ -80,12 +86,13 @@ class Quarry(
     private val inventory = getInventory("quarryInventory", 9) {}
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, 0, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory to ItemConnectionType.EXTRACT)
+    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT)
     
     private val entityId = uuid.hashCode()
     
     private var sizeX = retrieveData("sizeX") { DEFAULT_SIZE_X }
     private var sizeZ = retrieveData("sizeZ") { DEFAULT_SIZE_Z }
+    private var sizeY = retrieveData("sizeY") { DEFAULT_SIZE_Y }
     
     private var energyPerTick by Delegates.notNull<Int>()
     
@@ -104,9 +111,24 @@ class Quarry(
     private var minZ = 0
     private var maxX = 0
     private var maxZ = 0
+    private val minY: Int
+        get() = max(world.minHeight, y - 1 - sizeY)
     
-    private var lastPointerLocation: Location
-    private var pointerLocation: Location
+    private val minBreakX: Int
+        get() = minX + 1
+    private val minBreakY: Int
+        get() = minY + 1
+    private val minBreakZ: Int
+        get() = minZ + 1
+    private val maxBreakX: Int
+        get() = maxX - 1
+    private val maxBreakY: Int
+        get() = y - 2
+    private val maxBreakZ: Int
+        get() = maxZ - 1
+    
+    private lateinit var lastPointerLocation: Location
+    private lateinit var pointerLocation: Location
     private var pointerDestination: Location? = retrieveOrNull("pointerDestination")
     
     private var drillProgress = retrieveData("drillProgress") { 0.0 }
@@ -124,11 +146,14 @@ class Quarry(
     
     init {
         handleUpgradeUpdates()
-        updateBounds()
+    }
+    
+    override fun handleInitialized(first: Boolean) {
+        super.handleInitialized(first)
         
+        updateBounds(first)
         pointerLocation = retrieveOrNull("pointerLocation") ?: Location(world, minX + 1.5, y - 2.0, minZ + 1.5)
         lastPointerLocation = retrieveOrNull("lastPointerLocation") ?: Location(world, 0.0, 0.0, 0.0)
-        
         createScaffolding()
     }
     
@@ -140,7 +165,7 @@ class Quarry(
         moveSpeed = MOVE_SPEED * upgradeHolder.getSpeedModifier()
     }
     
-    private fun updateBounds(): Boolean {
+    private fun updateBounds(checkPermission: Boolean): Boolean {
         val positions = getMinMaxPositions(location, sizeX, sizeZ, getFace(BlockSide.BACK), getFace(BlockSide.RIGHT))
         minX = positions[0]
         minZ = positions[1]
@@ -149,9 +174,9 @@ class Quarry(
         
         updateEnergyPerTick()
         
-        if (!canPlace(ownerUUID, location, positions)) {
+        if (checkPermission && !canPlace(ownerUUID, location, positions)) {
             if (sizeX == MIN_SIZE && sizeZ == MIN_SIZE) {
-                runTaskLater(3) { TileEntityManager.destroyAndDropTileEntity(this, true) }
+                TileEntityManager.destroyAndDropTileEntity(this, true)
                 return false
             } else resize(MIN_SIZE, MIN_SIZE)
         }
@@ -163,7 +188,7 @@ class Quarry(
         this.sizeX = sizeX
         this.sizeZ = sizeZ
         
-        if (updateBounds()) {
+        if (updateBounds(true)) {
             drilling = false
             drillProgress = 0.0
             done = false
@@ -189,8 +214,9 @@ class Quarry(
         super.saveData()
         storeData("sizeX", sizeX)
         storeData("sizeZ", sizeZ)
-        storeData("pointerLocation", pointerLocation)
-        storeData("lastPointerLocation", lastPointerLocation)
+        storeData("sizeY", sizeY)
+        if (::pointerLocation.isInitialized) storeData("pointerLocation", pointerLocation)
+        if (::lastPointerLocation.isInitialized) storeData("lastPointerLocation", lastPointerLocation)
         storeData("pointerDestination", pointerDestination)
         storeData("drillProgress", drillProgress)
         storeData("drilling", drilling)
@@ -198,12 +224,13 @@ class Quarry(
     }
     
     override fun handleTick() {
-        if (energyHolder.energy == 0) return
+        if (energyHolder.energy == 0L) return
         
-        if (!done) {
+        if (!done || serverTick % 300 == 0) {
             if (!drilling) {
                 val pointerDestination = pointerDestination ?: selectNextDestination()
                 if (pointerDestination != null) {
+                    done = false
                     if (pointerLocation.distance(pointerDestination) > 0.2) {
                         moveToPointer(pointerDestination)
                     } else {
@@ -220,7 +247,7 @@ class Quarry(
     }
     
     override fun handleAsyncTick() {
-        if (!done && energyHolder.energy != 0)
+        if (!done && energyHolder.energy != 0L)
             updatePointer()
     }
     
@@ -305,19 +332,42 @@ class Quarry(
         lastPointerLocation = pointerLocation
     }
     
-    // TODO: optimize
     private fun selectNextDestination(): Location? {
-        val destination = LocationUtils.getTopBlocksBetween(
-            world,
-            minX + 1, 0, minZ + 1,
-            maxX - 1, y - 2, maxZ - 1
-        ).asSequence()
-            .sortedBy { prioritizedDistance(pointerLocation, it) }
-            .firstOrNull { ProtectionManager.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
-            ?.center()
-            ?.apply { y += 1 }
+        var radius = -1
+        val results = ArrayList<Location>()
         
+        do {
+            radius++
+            
+            val minX = Integer.max(pointerLocation.blockX - radius, minBreakX)
+            val minZ = Integer.max(pointerLocation.blockZ - radius, minBreakZ)
+            val maxX = Integer.min(pointerLocation.blockX + radius, maxBreakX)
+            val maxZ = Integer.min(pointerLocation.blockZ + radius, maxBreakZ)
+            
+            for (x in minX..maxX) {
+                for (z in minZ..maxZ) {
+                    if (x != minX && x != maxX && z != minZ && z != maxZ) continue
+                    
+                    val topLoc = LocationUtils.getTopBlockBetween(world, x, z, maxBreakY, minBreakY)
+                    if (topLoc != null
+                        && (topLoc.block.type.isBreakable() || TileEntityManager.getTileEntityAt(topLoc) != null)
+                        && ProtectionManager.canBreak(ownerUUID, topLoc)) {
+                        
+                        results += topLoc
+                    }
+                }
+            }
+            
+        } while (
+            (results.isEmpty() || radius <= 0) // only take results (if available) when radius > 0
+            && !(minX == minBreakX && minZ == minBreakZ && maxX == maxBreakX && maxZ == maxBreakZ) // break loop when the region cannot expand
+        )
+        
+        val destination = results
+            .minByOrNull { prioritizedDistance(pointerLocation, it) }
+            ?.add(0.5, 1.0, 0.5)
         pointerDestination = destination
+        
         return destination
     }
     
@@ -503,7 +553,7 @@ class Quarry(
         
     }
     
-    inner class QuarryGUI : TileEntityGUI("menu.nova.quarry") {
+    inner class QuarryGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
@@ -512,6 +562,7 @@ class Quarry(
         ) { openWindow(it) }
         
         private val sizeItems = ArrayList<Item>()
+        private val depthItems = ArrayList<Item>()
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
@@ -519,13 +570,16 @@ class Quarry(
                 "| s u # # # # . |" +
                 "| # # # i i i . |" +
                 "| m n p i i i . |" +
-                "| # # # i i i . |" +
+                "| M N P i i i . |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('n', NumberDisplayItem { sizeX }.also(sizeItems::add))
-            .addIngredient('p', AddNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
             .addIngredient('m', RemoveNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('n', SizeDisplayItem { sizeX }.also(sizeItems::add))
+            .addIngredient('p', AddNumberItem({ MIN_SIZE..maxSize }, { sizeX }, ::setSize).also(sizeItems::add))
+            .addIngredient('M', RemoveNumberItem({ MIN_DEPTH..MAX_DEPTH }, { sizeY }, ::setDepth).also(depthItems::add))
+            .addIngredient('N', DepthDisplayItem { sizeY }.also(depthItems::add))
+            .addIngredient('P', AddNumberItem({ MIN_DEPTH..MAX_DEPTH }, { sizeY }, ::setDepth).also(depthItems::add))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .build()
         
@@ -536,13 +590,32 @@ class Quarry(
             sizeItems.forEach(Item::notifyWindows)
         }
         
-        private inner class NumberDisplayItem(private val getNumber: () -> Int) : BaseItem() {
+        private fun setDepth(depth: Int) {
+            sizeY = depth
+            done = false
+            depthItems.forEach(Item::notifyWindows)
+        }
+        
+        private inner class SizeDisplayItem(private val getNumber: () -> Int) : BaseItem() {
             
             override fun getItemProvider(): ItemProvider {
                 val number = getNumber()
                 return NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
                     .setDisplayName(TranslatableComponent("menu.nova.quarry.size", number, number))
                     .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
+            }
+            
+            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+            
+        }
+        
+        private inner class DepthDisplayItem(private val getNumber: () -> Int) : BaseItem() {
+            
+            override fun getItemProvider(): ItemProvider {
+                val number = getNumber()
+                return NovaMaterialRegistry.NUMBER.item.createItemBuilder(getNumber())
+                    .setDisplayName(TranslatableComponent("menu.nova.quarry.depth", number))
+                    .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.depth_tip"))
             }
             
             override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit

@@ -1,0 +1,30 @@
+{
+  "result": "nova:fluid_upgrade",
+  "shape": [
+    "did",
+    "ipi",
+    "bgb"
+  ],
+  "ingredients": [
+    {
+      "char": "d",
+      "item": "nova:lapis_dust"
+    },
+    {
+      "char": "i",
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "char": "p",
+      "item": "nova:iron_plate"
+    },
+    {
+      "char": "b",
+      "item": "minecraft:bucket"
+    },
+    {
+      "char": "g",
+      "item": "nova:lapis_gear"
+    }
+  ]
+}

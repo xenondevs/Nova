@@ -1,15 +1,14 @@
 package xyz.xenondevs.nova.command.impl
 
 import com.mojang.brigadier.context.CommandContext
+import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
-import xyz.xenondevs.nova.command.Command
-import xyz.xenondevs.nova.command.executesCatching
-import xyz.xenondevs.nova.command.player
-import xyz.xenondevs.nova.command.requiresPlayerPermission
+import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.RecipesWindow
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeType
+import xyz.xenondevs.nova.util.data.localized
 
 object NovaRecipeCommand : Command("nvrecipe") {
     
@@ -23,10 +22,21 @@ object NovaRecipeCommand : Command("nvrecipe") {
                     )
                 }
             }
+            .executesCatching { showCurrentRecipe(it) }
     }
     
-    private fun showRecipe(recipes: Map<RecipeType, List<RecipeContainer>>, context: CommandContext<CommandSourceStack>) {
-        RecipesWindow(context.player, recipes).show()
+    private fun showCurrentRecipe(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val item = player.inventory.itemInMainHand
+        if (!item.type.isAir) {
+            val recipes = RecipeRegistry.CREATION_RECIPES[RecipeRegistry.getNameKey(item)]
+            if (recipes != null) RecipesWindow(player, recipes).show()
+            else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.recipe.no-recipe"))
+        } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.no-item-in-hand"))
+    }
+    
+    private fun showRecipe(recipes: Map<RecipeType, List<RecipeContainer>>, ctx: CommandContext<CommandSourceStack>) {
+        RecipesWindow(ctx.player, recipes).show()
     }
     
 }
