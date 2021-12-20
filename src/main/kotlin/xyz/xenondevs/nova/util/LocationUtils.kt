@@ -22,6 +22,9 @@ val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
 val HORIZONTAL_FACES = listOf(NORTH, EAST, SOUTH, WEST)
 val VERTICAL_FACES = listOf(UP, DOWN)
 
+fun Location(world: World?, x: Int, y: Int, z: Int): Location =
+    Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
 
@@ -302,26 +305,19 @@ fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Loca
 
 object LocationUtils {
     
-    fun getTopBlocksBetween(
+    fun getTopBlockBetween(
         world: World,
-        minX: Int, minY: Int, minZ: Int,
-        maxX: Int, maxY: Int, maxZ: Int
-    ): List<Location> {
-        val locations = ArrayList<Location>()
-        
-        for (x in minX..maxX) {
-            for (z in minZ..maxZ) {
-                for (y in maxY downTo minY) {
-                    val location = Location(world, x.toDouble(), y.toDouble(), z.toDouble())
-                    if (!location.block.type.isTraversable()) {
-                        locations += location
-                        break
-                    }
-                }
-            }
+        x: Int, z: Int,
+        maxY: Int, minY: Int
+    ): Location? {
+        val location = Location(world, x, 0, z)
+        for (y in maxY downTo minY) {
+            location.y = y.toDouble()
+            if (!location.block.type.isTraversable())
+                return location
         }
         
-        return locations
+        return null
     }
     
     fun getStraightLine(base: Location, axis: Axis, range: IntRange) =

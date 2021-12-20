@@ -21,10 +21,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.QUARRY
-import xyz.xenondevs.nova.tileentity.Model
-import xyz.xenondevs.nova.tileentity.MultiModel
-import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.*
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
@@ -113,6 +110,19 @@ class Quarry(
     private var maxZ = 0
     private val minY: Int
         get() = max(world.minHeight, y - 1 - sizeY)
+    
+    private val minBreakX: Int
+        get() = minX + 1
+    private val minBreakY: Int
+        get() = minY + 1
+    private val minBreakZ: Int
+        get() = minZ + 1
+    private val maxBreakX: Int
+        get() = maxX - 1
+    private val maxBreakY: Int
+        get() = y - 2
+    private val maxBreakZ: Int
+        get() = maxZ - 1
     
     private lateinit var lastPointerLocation: Location
     private lateinit var pointerLocation: Location
@@ -319,19 +329,42 @@ class Quarry(
         lastPointerLocation = pointerLocation
     }
     
-    // TODO: optimize
     private fun selectNextDestination(): Location? {
-        val destination = LocationUtils.getTopBlocksBetween(
-            world,
-            minX + 1, minY, minZ + 1,
-            maxX - 1, y - 2, maxZ - 1
-        ).asSequence()
-            .sortedBy { prioritizedDistance(pointerLocation, it) }
-            .firstOrNull { ProtectionManager.canBreak(ownerUUID, it) && (it.block.type.isBreakable() || TileEntityManager.getTileEntityAt(it) != null) }
-            ?.center()
-            ?.apply { y += 1 }
+        var radius = -1
+        val results = ArrayList<Location>()
         
+        do {
+            radius++
+            
+            val minX = Integer.max(pointerLocation.blockX - radius, minBreakX)
+            val minZ = Integer.max(pointerLocation.blockZ - radius, minBreakZ)
+            val maxX = Integer.min(pointerLocation.blockX + radius, maxBreakX)
+            val maxZ = Integer.min(pointerLocation.blockZ + radius, maxBreakZ)
+            
+            for (x in minX..maxX) {
+                for (z in minZ..maxZ) {
+                    if (x != minX && x != maxX && z != minZ && z != maxZ) continue
+                    
+                    val topLoc = LocationUtils.getTopBlockBetween(world, x, z, maxBreakY, minBreakY)
+                    if (topLoc != null
+                        && (topLoc.block.type.isBreakable() || TileEntityManager.getTileEntityAt(topLoc) != null)
+                        && ProtectionManager.canBreak(ownerUUID, topLoc)) {
+                        
+                        results += topLoc
+                    }
+                }
+            }
+            
+        } while (
+            (results.isEmpty() || radius <= 0) // only take results (if available) when radius > 0
+            && !(minX == minBreakX && minZ == minBreakZ && maxX == maxBreakX && maxZ == maxBreakZ) // break loop when the region cannot expand
+        )
+        
+        val destination = results
+            .minByOrNull { prioritizedDistance(pointerLocation, it) }
+            ?.add(0.5, 1.0, 0.5)
         pointerDestination = destination
+        
         return destination
     }
     
@@ -517,7 +550,7 @@ class Quarry(
         
     }
     
-    inner class QuarryGUI : TileEntityGUI() {
+    inner class QuarryGUI : TileEntity.TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@Quarry,
