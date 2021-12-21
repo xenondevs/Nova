@@ -81,16 +81,13 @@ object EntityUtils {
         // create EntityArmorStand
         val nmsArmorStand = createNMSEntity(world, location, EntityType.ARMOR_STAND) as NMSArmorStand
         
-        // set head item silently
-        val armorItems = ReflectionRegistry.ARMOR_STAND_ARMOR_ITEMS_FIELD.get(nmsArmorStand) as NonNullList<NMSItemStack>
-        armorItems[3] = headStack.nmsStack
-        
         // get CraftArmorStand
         val armorStand = nmsArmorStand.bukkitEntity as ArmorStand
         
         // set other properties
         armorStand.isMarker = true
         armorStand.isVisible = false
+        armorStand.equipment?.setHelmet(headStack, true)
         if (light) armorStand.fireTicks = Int.MAX_VALUE
         
         // set data
