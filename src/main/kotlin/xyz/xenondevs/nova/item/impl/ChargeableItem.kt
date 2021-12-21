@@ -13,13 +13,13 @@ import xyz.xenondevs.nova.player.equipment.EquipMethod
 import xyz.xenondevs.nova.util.PrefixUtils
 import kotlin.math.roundToInt
 
-private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy")
+private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy64")
 
 abstract class ChargeableItem(
     val maxEnergy: Long,
 ) : NovaItem() {
     
-    fun getEnergy(itemStack: ItemStack) = retrieveData(itemStack, ENERGY_KEY) ?: 0
+    fun getEnergy(itemStack: ItemStack) = retrieveData(itemStack, ENERGY_KEY) ?: 0L
     
     fun setEnergy(itemStack: ItemStack, energy: Long) {
         val coercedEnergy = energy.coerceIn(0, maxEnergy)
