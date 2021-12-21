@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.PUMP
@@ -159,7 +160,7 @@ class Pump(
             val newBlock = newLocation.block
             
             val fluidType = newBlock.sourceFluidType ?: continue
-            if (fluidTank.accepts(fluidType) && newLocation.center() in region) {
+            if (fluidTank.accepts(fluidType) && newLocation.center() in region && ProtectionManager.canBreak(ownerUUID, newBlock.location)) {
                 if (face !in VERTICAL_FACES)
                     sortedFaces.rotateRight()
                 block = newBlock
@@ -175,7 +176,7 @@ class Pump(
             if (r == 0) {
                 val block = location.clone().advance(BlockFace.DOWN).block
                 val fluidType = block.sourceFluidType ?: return@repeat
-                if (fluidTank.accepts(fluidType))
+                if (fluidTank.accepts(fluidType) && ProtectionManager.canBreak(ownerUUID, block.location))
                     return block to fluidType
                 return@repeat
             }
@@ -186,7 +187,7 @@ class Pump(
                             continue
                         val block = location.clone().add(x.toDouble(), y.toDouble(), z.toDouble()).block
                         val fluidType = block.sourceFluidType ?: continue
-                        if (fluidTank.accepts(fluidType))
+                        if (fluidTank.accepts(fluidType) && ProtectionManager.canBreak(ownerUUID, block.location))
                             return block to fluidType
                     }
                 }
