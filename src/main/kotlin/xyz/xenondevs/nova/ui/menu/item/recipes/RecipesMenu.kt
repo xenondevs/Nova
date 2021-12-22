@@ -8,7 +8,7 @@ import de.studiocode.invui.gui.impl.SimplePagedNestedGUI
 import de.studiocode.invui.gui.impl.SimpleTabGUI
 import de.studiocode.invui.gui.impl.TabGUI
 import de.studiocode.invui.gui.structure.Structure
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.controlitem.ControlItem
 import de.studiocode.invui.item.impl.controlitem.TabItem

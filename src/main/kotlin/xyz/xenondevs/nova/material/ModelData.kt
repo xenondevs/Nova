@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.data.setLocalizedName

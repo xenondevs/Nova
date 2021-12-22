@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.energy.holder
 
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.PermanentStorage.retrieve
 import xyz.xenondevs.nova.data.config.PermanentStorage.retrieveOrNull

@@ -7,9 +7,10 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.item.ItemBuilder
-import de.studiocode.invui.item.ItemBuilder.HeadTexture
 import de.studiocode.invui.item.ItemProvider
+import de.studiocode.invui.item.builder.ItemBuilder
+import de.studiocode.invui.item.builder.SkullBuilder
+import de.studiocode.invui.item.builder.SkullBuilder.HeadTexture
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.ChatColor
@@ -205,14 +206,14 @@ class MobDuplicator(
         
         val PATRON_SKULLS = loadPatreonSkulls()
         
-        private fun loadPatreonSkulls(): List<ItemBuilder> {
+        private fun loadPatreonSkulls(): List<SkullBuilder> {
             val url = URL(PATRON_SKULLS_URL)
             try {
                 val array = url.openConnection().getInputStream().bufferedReader().use(JsonParser::parseReader)
                 if (array !is JsonArray)
                     return emptyList()
                 return array.filter(JsonElement::isString).map {
-                    return@map ItemBuilder(HeadTexture(it.asString))
+                    return@map SkullBuilder(HeadTexture(it.asString))
                 }
             } catch (ex: IOException) {
                 return emptyList()

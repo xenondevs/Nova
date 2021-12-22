@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.util
 
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup

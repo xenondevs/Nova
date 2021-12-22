@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.serialization.json
 
 import com.google.gson.JsonObject
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.RecipeChoice

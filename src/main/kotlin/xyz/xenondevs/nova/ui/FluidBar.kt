@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui
 
 import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.util.InventoryUtils
 import org.bukkit.Material
 import org.bukkit.entity.Player

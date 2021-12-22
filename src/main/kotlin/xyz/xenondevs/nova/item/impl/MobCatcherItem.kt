@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.item.impl
 
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey

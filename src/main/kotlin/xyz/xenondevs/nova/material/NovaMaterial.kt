@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import org.bukkit.Location

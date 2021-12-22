@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui
 
 import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder

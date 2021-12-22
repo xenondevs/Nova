@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.fluid.holder
 
-import de.studiocode.invui.item.ItemBuilder
+import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.block.BlockFace
