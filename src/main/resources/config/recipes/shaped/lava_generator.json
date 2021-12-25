@@ -5,26 +5,11 @@
     "bfb",
     "pgp"
   ],
-  "ingredients": [
-    {
-      "char": "f",
-      "item": "nova:advanced_machine_frame"
-    },
-    {
-      "char": "t",
-      "item": "nova:basic_fluid_tank"
-    },
-    {
-      "char": "g",
-      "item": "nova:copper_gear"
-    },
-    {
-      "char": "b",
-      "item": "minecraft:lava_bucket"
-    },
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    }
-  ]
+  "ingredients": {
+    "f": "nova:advanced_machine_frame",
+    "t": "nova:basic_fluid_tank",
+    "g": "nova:copper_gear",
+    "b": "minecraft:lava_bucket",
+    "p": "nova:iron_plate"
+  }
 }

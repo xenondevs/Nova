@@ -5,18 +5,9 @@
     "dmd",
     "gdg"
   ],
-  "ingredients": [
-    {
-      "char": "g",
-      "item": "minecraft:gold_ingot"
-    },
-    {
-      "char": "d",
-      "item": "minecraft:glowstone_dust"
-    },
-    {
-      "char": "m",
-      "item": "nova:basic_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "g": "minecraft:gold_ingot",
+    "d": "minecraft:glowstone_dust",
+    "m": "nova:basic_machine_frame"
+  }
 }

@@ -5,18 +5,9 @@
     " g ",
     " d "
   ],
-  "ingredients": [
-    {
-      "char": "g",
-      "item": "nova:netherite_gear"
-    },
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "d",
-      "item": "minecraft:diamond"
-    }
-  ]
+  "ingredients": {
+    "g": "nova:netherite_gear",
+    "p": "nova:iron_plate",
+    "d": "minecraft:diamond"
+  }
 }

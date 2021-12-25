@@ -5,30 +5,12 @@
     "wfl",
     "igi"
   ],
-  "ingredients": [
-    {
-      "char": "w",
-      "item": "minecraft:water_bucket"
-    },
-    {
-      "char": "l",
-      "item": "minecraft:lava_bucket"
-    },
-    {
-      "char": "e",
-      "item": "minecraft:bucket"
-    },
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "f",
-      "item": "nova:elite_machine_frame"
-    },
-    {
-      "char": "g",
-      "item": "nova:diamond_gear"
-    }
-  ]
+  "ingredients": {
+    "w": "minecraft:water_bucket",
+    "l": "minecraft:lava_bucket",
+    "e": "minecraft:bucket",
+    "i": "nova:iron_plate",
+    "f": "nova:elite_machine_frame",
+    "g": "nova:diamond_gear"
+  }
 }

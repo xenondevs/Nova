@@ -5,30 +5,12 @@
     "sfh",
     "ini"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "n",
-      "item": "nova:netherite_gear"
-    },
-    {
-      "char": "a",
-      "item": "minecraft:iron_axe"
-    },
-    {
-      "char": "s",
-      "item": "minecraft:shears"
-    },
-    {
-      "char": "h",
-      "item": "minecraft:iron_hoe"
-    },
-    {
-      "char": "f",
-      "item": "nova:elite_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "i": "nova:iron_plate",
+    "n": "nova:netherite_gear",
+    "a": "minecraft:iron_axe",
+    "s": "minecraft:shears",
+    "h": "minecraft:iron_hoe",
+    "f": "nova:elite_machine_frame"
+  }
 }

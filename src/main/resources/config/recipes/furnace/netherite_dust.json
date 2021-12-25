@@ -2,5 +2,5 @@
   "result": "minecraft:netherite_ingot",
   "input": "nova:netherite_dust",
   "experience": 1.0,
-  "cookingTime": 100
+  "time": 100
 }

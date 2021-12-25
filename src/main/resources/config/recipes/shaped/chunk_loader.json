@@ -5,22 +5,10 @@
     "dfd",
     "idi"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "d",
-      "item": "nova:diamond_plate"
-    },
-    {
-      "char": "g",
-      "item": "nova:emerald_gear"
-    },
-    {
-      "char": "f",
-      "item": "nova:advanced_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "i": "nova:iron_plate",
+    "d": "nova:diamond_plate",
+    "g": "nova:emerald_gear",
+    "f": "nova:advanced_machine_frame"
+  }
 }

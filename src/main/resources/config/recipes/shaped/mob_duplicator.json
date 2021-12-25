@@ -5,30 +5,12 @@
     "dfe",
     "nsn"
   ],
-  "ingredients": [
-    {
-      "char": "n",
-      "item": "nova:netherite_plate"
-    },
-    {
-      "char": "g",
-      "item": "nova:gold_gear"
-    },
-    {
-      "char": "d",
-      "item": "nova:diamond_gear"
-    },
-    {
-      "char": "e",
-      "item": "nova:emerald_gear"
-    },
-    {
-      "char": "s",
-      "item": "minecraft:nether_star"
-    },
-    {
-      "char": "f",
-      "item": "nova:ultimate_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "n": "nova:netherite_plate",
+    "g": "nova:gold_gear",
+    "d": "nova:diamond_gear",
+    "e": "nova:emerald_gear",
+    "s": "minecraft:nether_star",
+    "f": "nova:ultimate_machine_frame"
+  }
 }

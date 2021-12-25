@@ -5,18 +5,9 @@
     "pfp",
     " p "
   ],
-  "ingredients": [
-    {
-      "char": "c",
-      "item": "minecraft:chest"
-    },
-    {
-      "char": "p",
-      "item": "minecraft:ender_pearl"
-    },
-    {
-      "char": "f",
-      "item": "nova:elite_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "c": "minecraft:chest",
+    "p": "minecraft:ender_pearl",
+    "f": "nova:elite_machine_frame"
+  }
 }

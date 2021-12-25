@@ -5,22 +5,10 @@
     "gmg",
     "iii"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "g",
-      "item": "nova:gold_gear"
-    },
-    {
-      "char": "f",
-      "item": "minecraft:furnace"
-    },
-    {
-      "char": "m",
-      "item": "nova:basic_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "i": "nova:iron_plate",
+    "g": "nova:gold_gear",
+    "f": "minecraft:furnace",
+    "m": "nova:basic_machine_frame"
+  }
 }

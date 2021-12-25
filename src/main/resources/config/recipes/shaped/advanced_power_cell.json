@@ -5,22 +5,10 @@
     "cbc",
     "pfp"
   ],
-  "ingredients": [
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "c",
-      "item": "nova:advanced_cable"
-    },
-    {
-      "char": "b",
-      "item": "nova:basic_power_cell"
-    },
-    {
-      "char": "f",
-      "item": "nova:advanced_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "p": "nova:iron_plate",
+    "c": "nova:advanced_cable",
+    "b": "nova:basic_power_cell",
+    "f": "nova:advanced_machine_frame"
+  }
 }

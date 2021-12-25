@@ -6,14 +6,8 @@
     "ccc",
     "ggg"
   ],
-  "ingredients": [
-    {
-      "char": "g",
-      "item": "minecraft:glowstone_dust"
-    },
-    {
-      "char": "c",
-      "item": "nova:basic_cable"
-    }
-  ]
+  "ingredients": {
+    "g": "minecraft:glowstone_dust",
+    "c": "nova:basic_cable"
+  }
 }

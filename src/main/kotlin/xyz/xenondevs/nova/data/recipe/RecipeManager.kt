@@ -16,40 +16,35 @@ import org.bukkit.inventory.RecipeChoice.ExactChoice
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.impl.processing.PressType
 import xyz.xenondevs.nova.util.customModelData
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.removeFirstWhere
 import kotlin.experimental.and
 
-class NovaRecipeChoice(private val material: NovaMaterial) : ExactChoice(material.createItemStack()) {
-    
-    private val requiredType: Material
-    private val requiredModelData: Int
-    
-    init {
-        val itemStack = material.createItemStack()
-        requiredType = itemStack.type
-        requiredModelData = itemStack.customModelData
-    }
+class CustomRecipeChoice(private val customChoices: List<Pair<Material, IntArray>>, examples: List<ItemStack>) : ExactChoice(examples) {
     
     override fun test(item: ItemStack): Boolean {
-        val customModelData = item.customModelData
-        return item.type == requiredType && (customModelData == requiredModelData || material.legacyItemIds?.contains(customModelData) == true)
+        return customChoices.any { (material, requiredModelDataArray) ->
+            item.type == material && requiredModelDataArray.contains(item.customModelData)
+        }
+    }
+    
+}
+
+class SingleCustomRecipeChoice(private val material: Material, private val customModelData: Int, example: ItemStack) : ExactChoice(example) {
+    
+    override fun test(item: ItemStack): Boolean {
+        return item.type == material && item.customModelData == customModelData
     }
     
 }
 
 object RecipeManager : Listener {
     
-    val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
-    val shapelessRecipes = ArrayList<ShapelessRecipe>()
-    
-    val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
-    val pulverizerRecipes = HashMap<NamespacedKey, PulverizerNovaRecipe>()
-    val platePressRecipes = HashMap<NamespacedKey, PlatePressNovaRecipe>()
-    val gearPressRecipes = HashMap<NamespacedKey, GearPressNovaRecipe>()
+    private val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
+    private val shapelessRecipes = ArrayList<ShapelessRecipe>()
+    private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
+    val conversionNovaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, ConversionNovaRecipe>>()
     
     private val craftingCache: Cache<CraftingMatrix, ItemStack> =
         CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(DEFAULT_CONFIG.getLong("crafting_cache.size")!!).build()
@@ -57,15 +52,35 @@ object RecipeManager : Listener {
     fun registerRecipes() {
         LOGGER.info("Loading recipes")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        RecipesLoader.loadRecipes().forEach(NovaRecipe::register)
+        
+        RecipesLoader.loadRecipes().forEach { recipe ->
+            when (recipe) {
+                is Recipe -> {
+                    vanillaRegisteredRecipeKeys += (recipe as Keyed).key
+                    when (recipe) {
+                        is ShapedRecipe -> shapedRecipes += OptimizedShapedRecipe(recipe)
+                        is ShapelessRecipe -> shapelessRecipes += recipe
+                    }
+                    Bukkit.addRecipe(recipe)
+                }
+                
+                is ConversionNovaRecipe -> {
+                    conversionNovaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
+                }
+                
+                else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
+            }
+        }
     }
     
-    fun getPulverizerRecipeFor(itemStack: ItemStack): PulverizerNovaRecipe? =
-        pulverizerRecipes.values.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }
+    @Suppress("UNCHECKED_CAST")
+    fun <T : ConversionNovaRecipe> getRecipeFor(type: RecipeType<T>, input: ItemStack): T? {
+        return conversionNovaRecipes[type]?.values?.firstOrNull { it.input.test(input) } as T?
+    }
     
-    fun getPressRecipeFor(itemStack: ItemStack, type: PressType): CustomNovaRecipe? {
-        return if (type == PressType.PLATE) platePressRecipes.values.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }
-        else gearPressRecipes.values.firstOrNull { recipe -> recipe.inputStacks.any { it.isSimilar(itemStack) } }
+    @Suppress("UNCHECKED_CAST")
+    fun <T : ConversionNovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? {
+        return conversionNovaRecipes[type]?.get(key) as T?
     }
     
     @EventHandler

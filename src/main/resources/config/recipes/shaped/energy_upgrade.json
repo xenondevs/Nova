@@ -5,30 +5,11 @@
     "cic",
     "pgp"
   ],
-  "ingredients": [
-    {
-      "char": "r",
-      "item": "minecraft:redstone"
-    },
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "p",
-      "item": "nova:basic_power_cell"
-    },
-    {
-      "char": "c",
-      "item": "minecraft:copper_ingot"
-    },
-    {
-      "char": "g",
-      "item": "nova:copper_gear"
-    },
-    {
-      "char": "p",
-      "item": "nova:basic_cable"
-    }
-  ]
+  "ingredients": {
+    "r": "minecraft:redstone",
+    "i": "nova:iron_plate",
+    "p": "nova:basic_cable",
+    "c": "minecraft:copper_ingot",
+    "g": "nova:copper_gear"
+  }
 }

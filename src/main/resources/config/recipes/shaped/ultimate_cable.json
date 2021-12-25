@@ -6,18 +6,9 @@
     "ccc",
     "ggg"
   ],
-  "ingredients": [
-    {
-      "char": "g",
-      "item": "minecraft:gold_nugget"
-    },
-    {
-      "char": "d",
-      "item": "nova:diamond_plate"
-    },
-    {
-      "char": "c",
-      "item": "nova:elite_cable"
-    }
-  ]
+  "ingredients": {
+    "g": "minecraft:gold_nugget",
+    "d": "nova:diamond_plate",
+    "c": "nova:elite_cable"
+  }
 }

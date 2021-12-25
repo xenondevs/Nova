@@ -6,14 +6,8 @@
     "rrr",
     "iii"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "r",
-      "item": "minecraft:redstone"
-    }
-  ]
+  "ingredients": {
+    "i": "minecraft:iron_ingot",
+    "r": "minecraft:redstone"
+  }
 }

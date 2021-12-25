@@ -2,5 +2,5 @@
   "result": "minecraft:diamond",
   "input": "nova:diamond_dust",
   "experience": 1.0,
-  "cookingTime": 100
+  "time": 100
 }

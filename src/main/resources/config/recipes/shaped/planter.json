@@ -5,30 +5,12 @@
     "wmf",
     "ihi"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "s",
-      "item": "minecraft:oak_sapling"
-    },
-    {
-      "char": "w",
-      "item": "minecraft:wheat_seeds"
-    },
-    {
-      "char": "m",
-      "item": "nova:elite_machine_frame"
-    },
-    {
-      "char": "f",
-      "item": "minecraft:crimson_fungus"
-    },
-    {
-      "char": "h",
-      "item": "minecraft:iron_hoe"
-    }
-  ]
+  "ingredients": {
+    "i": "nova:iron_plate",
+    "s": "minecraft:oak_sapling",
+    "w": "minecraft:wheat_seeds",
+    "m": "nova:elite_machine_frame",
+    "f": "minecraft:crimson_fungus",
+    "h": "minecraft:iron_hoe"
+  }
 }

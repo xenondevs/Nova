@@ -4,7 +4,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.serialization.json.*
+import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
 
@@ -57,20 +57,12 @@ object RecipesLoader {
     private fun getFileHash(originalFile: File): ByteArray? =
         fileHashes[originalFile.absolutePath]?.decodeWithBase64()
     
-    fun loadRecipes(): List<NovaRecipe> {
-        val recipes = ArrayList<NovaRecipe>()
-        
-        recipes += loadRecipes("shaped", ShapedNovaRecipeDeserializer)
-        recipes += loadRecipes("shapeless", ShapelessNovaRecipeDeserializer)
-        recipes += loadRecipes("furnace", FurnaceNovaRecipeDeserializer)
-        recipes += loadRecipes("pulverizer", PulverizerNovaRecipeDeserializer)
-        recipes += loadRecipes("press/plate", PlatePressNovaRecipeDeserializer)
-        recipes += loadRecipes("press/gear", GearPressNovaRecipeDeserializer)
-        return recipes
+    fun loadRecipes(): List<Any> {
+        return RecipeType.values.flatMap { loadRecipes(it.dirName, it.deserializer) }
     }
     
-    private fun loadRecipes(folder: String, deserializer: NovaRecipeDeserializer<out NovaRecipe>): List<NovaRecipe> {
-        val recipes = ArrayList<NovaRecipe>()
+    private fun loadRecipes(folder: String, deserializer: RecipeDeserializer<out Any>): List<Any> {
+        val recipes = ArrayList<Any>()
         
         val recipesDirectory = File("plugins/Nova/recipes/$folder")
         recipesDirectory.walkTopDown()

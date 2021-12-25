@@ -5,26 +5,11 @@
     "nin",
     "aga"
   ],
-  "ingredients": [
-    {
-      "char": "d",
-      "item": "nova:lapis_dust"
-    },
-    {
-      "char": "n",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "g",
-      "item": "nova:emerald_gear"
-    },
-    {
-      "char": "a",
-      "item": "minecraft:amethyst_shard"
-    }
-  ]
+  "ingredients": {
+    "d": "nova:lapis_dust",
+    "n": "minecraft:iron_ingot",
+    "i": "nova:iron_plate",
+    "g": "nova:emerald_gear",
+    "a": "minecraft:amethyst_shard"
+  }
 }

@@ -5,30 +5,12 @@
     "dfd",
     "ibi"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "m",
-      "item": "minecraft:bone_meal"
-    },
-    {
-      "char": "g",
-      "item": "nova:gold_plate"
-    },
-    {
-      "char": "b",
-      "item": "minecraft:bone_block"
-    },
-    {
-      "char": "d",
-      "item": "nova:diamond_gear"
-    },
-    {
-      "char": "f",
-      "item": "nova:elite_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "i": "nova:iron_plate",
+    "m": "minecraft:bone_meal",
+    "g": "nova:gold_plate",
+    "b": "minecraft:bone_block",
+    "d": "nova:diamond_gear",
+    "f": "nova:elite_machine_frame"
+  }
 }

@@ -5,18 +5,9 @@
     "gmg",
     "iii"
   ],
-  "ingredients": [
-    {
-      "char": "m",
-      "item": "nova:basic_machine_frame"
-    },
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "g",
-      "item": "nova:iron_gear"
-    }
-  ]
+  "ingredients": {
+    "m": "nova:basic_machine_frame",
+    "i": "minecraft:iron_ingot",
+    "g": "nova:iron_gear"
+  }
 }

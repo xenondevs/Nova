@@ -5,26 +5,11 @@
     "gfg",
     " i "
   ],
-  "ingredients": [
-    {
-      "char": "t",
-      "item": "nova:basic_fluid_tank"
-    },
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "f",
-      "item": "nova:advanced_machine_frame"
-    },
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "g",
-      "item": "nova:copper_gear"
-    }
-  ]
+  "ingredients": {
+    "t": "nova:basic_fluid_tank",
+    "p": "nova:iron_plate",
+    "f": "nova:advanced_machine_frame",
+    "i": "minecraft:iron_ingot",
+    "g": "nova:copper_gear"
+  }
 }

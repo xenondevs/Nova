@@ -5,18 +5,9 @@
     "ece",
     "geg"
   ],
-  "ingredients": [
-    {
-      "char": "c",
-      "item": "nova:charger"
-    },
-    {
-      "char": "e",
-      "item": "minecraft:ender_pearl"
-    },
-    {
-      "char": "g",
-      "item": "nova:gold_plate"
-    }
-  ]
+  "ingredients": {
+    "c": "nova:charger",
+    "e": "minecraft:ender_pearl",
+    "g": "nova:gold_plate"
+  }
 }

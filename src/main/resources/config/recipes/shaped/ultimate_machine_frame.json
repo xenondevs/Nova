@@ -5,18 +5,9 @@
     "dmd",
     "gdg"
   ],
-  "ingredients": [
-    {
-      "char": "g",
-      "item": "minecraft:diamond"
-    },
-    {
-      "char": "d",
-      "item": "nova:star_dust"
-    },
-    {
-      "char": "m",
-      "item": "nova:elite_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "g": "minecraft:diamond",
+    "d": "nova:star_dust",
+    "m": "nova:elite_machine_frame"
+  }
 }

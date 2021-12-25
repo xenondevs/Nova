@@ -5,18 +5,9 @@
     "lll",
     "sss"
   ],
-  "ingredients": [
-    {
-      "char": "g",
-      "item": "minecraft:glass_pane"
-    },
-    {
-      "char": "l",
-      "item": "nova:lapis_dust"
-    },
-    {
-      "char": "s",
-      "item": "minecraft:smooth_stone_slab"
-    }
-  ]
+  "ingredients": {
+    "g": "minecraft:glass_pane",
+    "l": "nova:lapis_dust",
+    "s": "minecraft:smooth_stone_slab"
+  }
 }

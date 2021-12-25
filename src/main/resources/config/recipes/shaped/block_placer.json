@@ -5,18 +5,9 @@
     "cfc",
     "ici"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "f",
-      "item": "nova:advanced_machine_frame"
-    },
-    {
-      "char": "c",
-      "item": "minecraft:cobblestone"
-    }
-  ]
+  "ingredients": {
+    "i": "nova:iron_plate",
+    "f": "nova:advanced_machine_frame",
+    "c": "minecraft:cobblestone"
+  }
 }

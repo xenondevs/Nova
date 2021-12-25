@@ -5,30 +5,12 @@
     "sfc",
     "iti"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "f",
-      "item": "nova:elite_machine_frame"
-    },
-    {
-      "char": "s",
-      "item": "minecraft:salmon_bucket"
-    },
-    {
-      "char": "r",
-      "item": "minecraft:fishing_rod"
-    },
-    {
-      "char": "c",
-      "item": "minecraft:cod_bucket"
-    },
-    {
-      "char": "t",
-      "item": "minecraft:string"
-    }
-  ]
+  "ingredients": {
+    "i": "nova:iron_plate",
+    "f": "nova:elite_machine_frame",
+    "s": "minecraft:salmon_bucket",
+    "r": "minecraft:fishing_rod",
+    "c": "minecraft:cod_bucket",
+    "t": "minecraft:string"
+  }
 }

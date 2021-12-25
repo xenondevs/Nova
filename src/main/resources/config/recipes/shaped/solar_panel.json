@@ -5,18 +5,9 @@
     " i ",
     "ppp"
   ],
-  "ingredients": [
-    {
-      "char": "c",
-      "item": "nova:solar_cell"
-    },
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    }
-  ]
+  "ingredients": {
+    "c": "nova:solar_cell",
+    "i": "minecraft:iron_ingot",
+    "p": "nova:iron_plate"
+  }
 }

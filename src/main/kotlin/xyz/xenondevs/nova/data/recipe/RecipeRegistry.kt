@@ -7,22 +7,21 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
-import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeType
-import xyz.xenondevs.nova.util.data.plus
+import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
+import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
-import java.util.stream.Stream
 
 object RecipeRegistry {
     
     private var BUKKIT_RECIPES: List<Recipe> = ArrayList()
     
-    var CREATION_RECIPES: Map<String, Map<RecipeType, List<RecipeContainer>>> = HashMap()
+    var CREATION_RECIPES: Map<String, Map<RecipeGroup, List<RecipeContainer>>> = HashMap()
         private set
-    var USAGE_RECIPES: Map<String, Map<RecipeType, Set<RecipeContainer>>> = HashMap()
+    var USAGE_RECIPES: Map<String, Map<RecipeGroup, Set<RecipeContainer>>> = HashMap()
         private set
-    var RECIPES_BY_TYPE: Map<RecipeType, List<RecipeContainer>> = HashMap()
+    var RECIPES_BY_TYPE: Map<RecipeGroup, List<RecipeContainer>> = HashMap()
     
     fun init() {
         runAsyncTask {
@@ -30,7 +29,7 @@ object RecipeRegistry {
             BUKKIT_RECIPES = loadBukkitRecipes()
             CREATION_RECIPES = loadCreationRecipes()
             USAGE_RECIPES = loadUsageRecipes()
-            RECIPES_BY_TYPE = loadRecipesByType()
+            RECIPES_BY_TYPE = loadRecipesByGroup()
             LOGGER.info("Finished initializing recipe registry")
             
             runTask {
@@ -46,47 +45,49 @@ object RecipeRegistry {
         return list
     }
     
-    private fun loadCreationRecipes(): Map<String, Map<RecipeType, List<RecipeContainer>>> {
-        val map = HashMap<String, HashMap<RecipeType, MutableList<RecipeContainer>>>()
+    private fun loadCreationRecipes(): Map<String, Map<RecipeGroup, List<RecipeContainer>>> {
+        val map = HashMap<String, HashMap<RecipeGroup, MutableList<RecipeContainer>>>()
         
         // add all with bukkit registered recipes
-        getBukkitRecipeStream().forEach {
+        getBukkitRecipeSequence().forEach {
             val itemKey = getNameKey(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
-                .getOrPut(RecipeType.of(it)) { mutableListOf() }
+                .getOrPut(RecipeType.of(it).group) { mutableListOf() }
                 .add(RecipeContainer(it))
         }
         
         // add all nova machine recipes
-        getNovaRecipeStream().forEach {
-            val itemKey = getNameKey(it.resultStack)
+        getNovaRecipeSequence().forEach {
+            val itemKey = getNameKey(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
-                .getOrPut(RecipeType.of(it)) { mutableListOf() }
+                .getOrPut(RecipeType.of(it).group) { mutableListOf() }
                 .add(RecipeContainer(it))
         }
         
         return map
     }
     
-    private fun loadUsageRecipes(): Map<String, Map<RecipeType, Set<RecipeContainer>>> {
-        val map = HashMap<String, HashMap<RecipeType, HashSet<RecipeContainer>>>()
+    private fun loadUsageRecipes(): Map<String, Map<RecipeGroup, Set<RecipeContainer>>> {
+        val map = HashMap<String, HashMap<RecipeGroup, HashSet<RecipeContainer>>>()
         
         // add all with bukkit registered recipes
-        getBukkitRecipeStream().forEach { recipe ->
+        getBukkitRecipeSequence().forEach { recipe ->
+            val group = RecipeType.of(recipe).group
             recipe.getInputStacks().forEach { inputStack ->
                 val itemKey = getNameKey(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
-                    .getOrPut(RecipeType.of(recipe)) { LinkedHashSet() }
+                    .getOrPut(group) { LinkedHashSet() }
                     .add(RecipeContainer(recipe))
             }
         }
         
         // add all nova machine recipes
-        getNovaRecipeStream().forEach { recipe ->
-            recipe.inputStacks.forEach { inputStack ->
+        getNovaRecipeSequence().forEach { recipe ->
+            val group = RecipeType.of(recipe).group
+            recipe.input.getInputStacks().forEach { inputStack ->
                 val itemKey = getNameKey(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
-                    .getOrPut(RecipeType.of(recipe)) { LinkedHashSet() }
+                    .getOrPut(group) { LinkedHashSet() }
                     .add(RecipeContainer(recipe))
             }
         }
@@ -94,16 +95,16 @@ object RecipeRegistry {
         return map
     }
     
-    private fun loadRecipesByType(): Map<RecipeType, List<RecipeContainer>> {
-        val map = HashMap<RecipeType, MutableList<RecipeContainer>>()
-        (getBukkitRecipeStream() + getNovaRecipeStream()).forEach {
-            map.getOrPut(RecipeType.of(it)) { ArrayList() } += RecipeContainer(it)
+    private fun loadRecipesByGroup(): Map<RecipeGroup, List<RecipeContainer>> {
+        val map = HashMap<RecipeGroup, MutableList<RecipeContainer>>()
+        (getBukkitRecipeSequence() + getNovaRecipeSequence()).forEach {
+            map.getOrPut(RecipeType.of(it).group) { ArrayList() } += RecipeContainer(it)
         }
         return map
     }
     
-    private fun getBukkitRecipeStream(): Stream<Recipe> {
-        return BUKKIT_RECIPES.stream()
+    private fun getBukkitRecipeSequence(): Sequence<Recipe> {
+        return BUKKIT_RECIPES.asSequence()
             .filter {
                 val namespace = (it as Keyed).key.namespace
                 (namespace == "minecraft" || namespace == "nova") // do not allow recipes from different plugins to show up
@@ -111,30 +112,11 @@ object RecipeRegistry {
             }
     }
     
-    private fun getNovaRecipeStream(): Stream<out CustomNovaRecipe> {
-        return (RecipeManager.pulverizerRecipes.values.stream()
-            + RecipeManager.platePressRecipes.values.stream()
-            + RecipeManager.gearPressRecipes.values.stream())
+    private fun getNovaRecipeSequence(): Sequence<ConversionNovaRecipe> {
+        return RecipeManager.conversionNovaRecipes
+            .values.asSequence()
+            .flatMap { it.values }
     }
-    
-    private fun Recipe.getInputStacks(): List<ItemStack> =
-        when (this) {
-            
-            is ShapedRecipe -> choiceMap.values.mapNotNull { choice -> choice?.getInputStacks() }.flatten()
-            is ShapelessRecipe -> choiceList.map { it.getInputStacks() }.flatten()
-            is FurnaceRecipe -> inputChoice.getInputStacks()
-            
-            else -> throw UnsupportedOperationException("Unsupported Recipe type: ${this.javaClass.name}")
-        }
-    
-    
-    private fun RecipeChoice.getInputStacks(): List<ItemStack> =
-        when (this) {
-            is RecipeChoice.MaterialChoice -> choices.map(::ItemStack)
-            is RecipeChoice.ExactChoice -> choices
-            else -> throw UnsupportedOperationException("Unknown RecipeChoice type: ${this.javaClass.name}")
-        }
-    
     
     fun getNameKey(itemStack: ItemStack): String {
         val novaMaterial = itemStack.novaMaterial
@@ -145,28 +127,3 @@ object RecipeRegistry {
     
 }
 
-class RecipeContainer(val recipe: Any) {
-    
-    val result = if (recipe is Recipe) recipe.result else (recipe as CustomNovaRecipe).resultStack
-    val isCraftingRecipe = recipe is ShapedRecipe || recipe is ShapelessRecipe
-    val isSmeltingRecipe = recipe is FurnaceRecipe
-    val isPulverizingRecipe = recipe is PulverizerNovaRecipe
-    val isPressingRecipe = recipe is GearPressNovaRecipe || recipe is PlatePressNovaRecipe
-    
-    override fun equals(other: Any?): Boolean {
-        if (other is RecipeContainer) {
-            val otherRecipe = other.recipe
-            return if (recipe is Recipe && otherRecipe is Recipe) {
-                (recipe as Keyed).key.toString() == (otherRecipe as Keyed).key.toString()
-            } else recipe == otherRecipe
-        }
-        
-        return this === other
-    }
-    
-    override fun hashCode(): Int {
-        return if (recipe is Recipe) (recipe as Keyed).key.hashCode()
-        else recipe.hashCode()
-    }
-    
-}

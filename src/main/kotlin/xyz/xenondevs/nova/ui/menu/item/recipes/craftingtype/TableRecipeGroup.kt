@@ -15,15 +15,14 @@ import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 import xyz.xenondevs.nova.util.intValue
 
-object TableRecipeType : RecipeType() {
+object TableRecipeGroup : RecipeGroup() {
     
     override val priority = 0
     override val overlay = CustomCharacters.CRAFTING_RECIPE
     override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
-    override fun createGUI(holder: RecipeContainer): GUI {
-        require(holder.isCraftingRecipe)
-        val recipe = holder.recipe as Recipe
+    override fun createGUI(container: RecipeContainer): GUI {
+        val recipe = container.recipe as Recipe
         
         val gui = GUIBuilder(GUIType.NORMAL, 9, 3)
             .setStructure("" +

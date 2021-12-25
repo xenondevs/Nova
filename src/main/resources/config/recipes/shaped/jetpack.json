@@ -5,22 +5,10 @@
     "pgp",
     "b b"
   ],
-  "ingredients": [
-    {
-      "char": "p",
-      "item": "nova:basic_power_cell"
-    },
-    {
-      "char": "g",
-      "item": "nova:copper_gear"
-    },
-    {
-      "char": "b",
-      "item": "minecraft:blaze_powder"
-    },
-    {
-      "char": "n",
-      "item": "nova:netherite_plate"
-    }
-  ]
+  "ingredients": {
+    "p": "nova:basic_power_cell",
+    "g": "nova:copper_gear",
+    "b": "minecraft:blaze_powder",
+    "n": "nova:netherite_plate"
+  }
 }

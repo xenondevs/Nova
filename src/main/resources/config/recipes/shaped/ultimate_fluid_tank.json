@@ -5,18 +5,9 @@
     "dtd",
     "gdg"
   ],
-  "ingredients": [
-    {
-      "char": "t",
-      "item": "nova:elite_fluid_tank"
-    },
-    {
-      "char": "d",
-      "item": "nova:star_dust"
-    },
-    {
-      "char": "g",
-      "item": "minecraft:diamond"
-    }
-  ]
+  "ingredients": {
+    "t": "nova:elite_fluid_tank",
+    "d": "nova:star_dust",
+    "g": "minecraft:diamond"
+  }
 }

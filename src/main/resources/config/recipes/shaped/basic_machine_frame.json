@@ -5,18 +5,9 @@
     "drd",
     "idi"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "r",
-      "item": "minecraft:redstone_block"
-    },
-    {
-      "char": "d",
-      "item": "minecraft:redstone"
-    }
-  ]
+  "ingredients": {
+    "i": "minecraft:iron_ingot",
+    "r": "minecraft:redstone_block",
+    "d": "minecraft:redstone"
+  }
 }

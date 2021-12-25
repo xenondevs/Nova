@@ -5,18 +5,9 @@
     "sfs",
     "iii"
   ],
-  "ingredients": [
-    {
-      "char": "s",
-      "item": "minecraft:diamond_sword"
-    },
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "f",
-      "item": "nova:elite_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "s": "minecraft:diamond_sword",
+    "i": "nova:iron_plate",
+    "f": "nova:elite_machine_frame"
+  }
 }

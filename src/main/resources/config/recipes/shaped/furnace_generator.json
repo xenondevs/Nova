@@ -5,22 +5,10 @@
     "cfc",
     "iri"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "f",
-      "item": "minecraft:furnace"
-    },
-    {
-      "char": "r",
-      "item": "minecraft:redstone"
-    },
-    {
-      "char": "c",
-      "item": "nova:basic_cable"
-    }
-  ]
+  "ingredients": {
+    "i": "minecraft:iron_ingot",
+    "f": "minecraft:furnace",
+    "r": "minecraft:redstone",
+    "c": "nova:basic_cable"
+  }
 }

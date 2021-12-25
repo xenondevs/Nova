@@ -5,22 +5,10 @@
     " f ",
     "bbb"
   ],
-  "ingredients": [
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "g",
-      "item": "nova:iron_gear"
-    },
-    {
-      "char": "f",
-      "item": "nova:elite_machine_frame"
-    },
-    {
-      "char": "b",
-      "item": "minecraft:iron_block"
-    }
-  ]
+  "ingredients": {
+    "p": "nova:iron_plate",
+    "g": "nova:iron_gear",
+    "f": "nova:elite_machine_frame",
+    "b": "minecraft:iron_block"
+  }
 }

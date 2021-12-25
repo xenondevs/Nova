@@ -5,18 +5,9 @@
     "ifi",
     "iai"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "a",
-      "item": "minecraft:anvil"
-    },
-    {
-      "char": "f",
-      "item": "nova:basic_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "i": "minecraft:iron_ingot",
+    "a": "minecraft:anvil",
+    "f": "nova:basic_machine_frame"
+  }
 }

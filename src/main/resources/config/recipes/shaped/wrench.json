@@ -5,10 +5,7 @@
     " ii",
     "i  "
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    }
-  ]
+  "ingredients": {
+    "i": "minecraft:iron_ingot"
+  }
 }

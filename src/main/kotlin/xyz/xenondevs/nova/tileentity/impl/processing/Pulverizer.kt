@@ -9,6 +9,7 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.PulverizerNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeManager
+import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.PULVERIZER
@@ -60,7 +61,7 @@ class Pulverizer(
     private var pulverizeSpeed = 0
     
     private var currentRecipe: PulverizerNovaRecipe? =
-        retrieveOrNull<NamespacedKey>("currentRecipe")?.let(RecipeManager.pulverizerRecipes::get)
+        retrieveOrNull<NamespacedKey>("currentRecipe")?.let { RecipeManager.getRecipe(RecipeType.PULVERIZER, it) }
     
     private val particleTask = createParticleTask(listOf(
         particle(ParticleEffect.SMOKE_NORMAL) {
@@ -92,7 +93,7 @@ class Pulverizer(
                 if (!particleTask.isRunning()) particleTask.start()
                 
                 if (timeLeft == 0) {
-                    outputInv.addItem(SELF_UPDATE_REASON, currentRecipe!!.resultStack)
+                    outputInv.addItem(SELF_UPDATE_REASON, currentRecipe!!.result)
                     currentRecipe = null
                 }
                 
@@ -105,8 +106,8 @@ class Pulverizer(
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val recipe = RecipeManager.getPulverizerRecipeFor(inputItem)!!
-            val result = recipe.resultStack
+            val recipe = RecipeManager.getRecipeFor(RecipeType.PULVERIZER, inputItem)!!
+            val result = recipe.result
             if (outputInv.canHold(result)) {
                 inputInv.addItemAmount(SELF_UPDATE_REASON, 0, -1)
                 timeLeft = recipe.time
@@ -116,7 +117,7 @@ class Pulverizer(
     }
     
     private fun handleInputUpdate(event: ItemUpdateEvent) {
-        event.isCancelled = event.newItemStack != null && RecipeManager.getPulverizerRecipeFor(event.newItemStack) == null
+        event.isCancelled = event.newItemStack != null && RecipeManager.getRecipeFor(RecipeType.PULVERIZER, event.newItemStack) == null
     }
     
     private fun handleOutputUpdate(event: ItemUpdateEvent) {

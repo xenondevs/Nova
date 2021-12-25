@@ -5,18 +5,9 @@
     "gpg",
     "lgl"
   ],
-  "ingredients": [
-    {
-      "char": "l",
-      "item": "minecraft:lightning_rod"
-    },
-    {
-      "char": "g",
-      "item": "nova:copper_gear"
-    },
-    {
-      "char": "p",
-      "item": "nova:elite_power_cell"
-    }
-  ]
+  "ingredients": {
+    "l": "minecraft:lightning_rod",
+    "g": "nova:copper_gear",
+    "p": "nova:elite_power_cell"
+  }
 }

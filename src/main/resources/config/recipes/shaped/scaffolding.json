@@ -5,18 +5,9 @@
     "byb",
     "ppp"
   ],
-  "ingredients": [
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "b",
-      "item": "minecraft:iron_bars"
-    },
-    {
-      "char": "y",
-      "item": "minecraft:yellow_dye"
-    }
-  ]
+  "ingredients": {
+    "p": "nova:iron_plate",
+    "b": "minecraft:iron_bars",
+    "y": "minecraft:yellow_dye"
+  }
 }

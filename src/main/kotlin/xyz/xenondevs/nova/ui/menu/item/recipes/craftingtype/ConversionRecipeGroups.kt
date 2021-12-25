@@ -10,21 +10,23 @@ import org.bukkit.Material
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.data.recipe.CustomNovaRecipe
+import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
+import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.util.data.getInputStacks
 
-abstract class ConversionRecipeType : RecipeType() {
+abstract class ConversionRecipeGroup : RecipeGroup() {
     
-    override fun createGUI(holder: RecipeContainer): GUI {
-        return if (holder.isSmeltingRecipe) {
-            val recipe = holder.recipe as FurnaceRecipe
+    override fun createGUI(container: RecipeContainer): GUI {
+        return if (container.type == RecipeType.FURNACE) {
+            val recipe = container.recipe as FurnaceRecipe
             createConversionRecipeGUI(recipe.inputChoice, recipe.result, recipe.cookingTime)
         } else {
-            val recipe = holder.recipe as CustomNovaRecipe
-            createConversionRecipeGUI(recipe.inputStacks, recipe.resultStack, recipe.time)
+            val recipe = container.recipe as ConversionNovaRecipe
+            createConversionRecipeGUI(recipe.input.getInputStacks(), recipe.result, recipe.time)
         }
     }
     
@@ -54,19 +56,19 @@ abstract class ConversionRecipeType : RecipeType() {
     
 }
 
-object SmeltingRecipeType : ConversionRecipeType() {
+object SmeltingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.FURNACE))
     override val overlay = CustomCharacters.FURNACE_RECIPE
 }
 
-object PulverizingRecipeType : ConversionRecipeType() {
+object PulverizingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 2
     override val icon = NovaMaterialRegistry.PULVERIZER.basicItemProvider
     override val overlay = CustomCharacters.PULVERIZER_RECIPE
 }
 
-object PressingRecipeType : ConversionRecipeType() {
+object PressingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 3
     override val icon = NovaMaterialRegistry.MECHANICAL_PRESS.basicItemProvider
     override val overlay = CustomCharacters.PRESS_RECIPE

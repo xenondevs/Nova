@@ -5,30 +5,12 @@
     "cmb",
     "pgp"
   ],
-  "ingredients": [
-    {
-      "char": "o",
-      "item": "minecraft:oak_sapling"
-    },
-    {
-      "char": "c",
-      "item": "minecraft:crimson_fungus"
-    },
-    {
-      "char": "b",
-      "item": "minecraft:brown_mushroom"
-    },
-    {
-      "char": "m",
-      "item": "nova:ultimate_machine_frame"
-    },
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "g",
-      "item": "nova:copper_gear"
-    }
-  ]
+  "ingredients": {
+    "o": "minecraft:oak_sapling",
+    "c": "minecraft:crimson_fungus",
+    "b": "minecraft:brown_mushroom",
+    "m": "nova:ultimate_machine_frame",
+    "p": "nova:iron_plate",
+    "g": "nova:copper_gear"
+  }
 }

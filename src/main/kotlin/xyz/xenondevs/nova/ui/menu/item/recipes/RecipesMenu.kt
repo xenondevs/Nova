@@ -27,14 +27,14 @@ import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
-import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeType
+import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 import java.util.*
 
 /**
  * A menu that displays the given list of recipes.
  */
-class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeContainer>>) : ItemMenu {
+class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeContainer>>) : ItemMenu {
     
     private val RECIPES_GUI_STRUCTURE = Structure("" +
         "< . . . . . . . >" +
@@ -46,13 +46,13 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
     
     private val viewerUUID = player.uniqueId
     
-    private lateinit var currentType: RecipeType
+    private lateinit var currentType: RecipeGroup
     
     private val mainGUI: SimpleTabGUI
     private lateinit var window: Window
     
     init {
-        val craftingGUIs: List<Pair<RecipeType, GUI>> = recipes
+        val craftingGUIs: List<Pair<RecipeGroup, GUI>> = recipes
             .mapValues { (type, holderList) -> PagedRecipesGUI(holderList.map { holder -> type.getGUI(holder) }).gui }
             .map { it.key to it.value }
             .sortedBy { it.first }
@@ -110,18 +110,18 @@ class RecipesWindow(player: Player, recipes: Map<RecipeType, Iterable<RecipeCont
         window.changeTitle(getCurrentTitle())
     }
     
-    inner class CraftingTabItem(private val recipeType: RecipeType, tab: Int) : TabItem(tab) {
+    inner class CraftingTabItem(private val recipeGroup: RecipeGroup, tab: Int) : TabItem(tab) {
         
-        override fun getItemProvider(gui: TabGUI) = recipeType.icon
+        override fun getItemProvider(gui: TabGUI) = recipeGroup.icon
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             super.handleClick(clickType, player, event)
             if (clickType == ClickType.LEFT) {
-                currentType = recipeType
+                currentType = recipeGroup
                 updateTitle()
             } else if (clickType == ClickType.RIGHT) {
-                val recipes = RecipeRegistry.RECIPES_BY_TYPE[recipeType]
-                if (recipes != null) RecipesWindow(player, mapOf(recipeType to recipes)).show()
+                val recipes = RecipeRegistry.RECIPES_BY_TYPE[recipeGroup]
+                if (recipes != null) RecipesWindow(player, mapOf(recipeGroup to recipes)).show()
             }
         }
         

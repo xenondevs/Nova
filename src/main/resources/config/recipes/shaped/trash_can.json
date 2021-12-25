@@ -5,14 +5,8 @@
     "i i",
     "iii"
   ],
-  "ingredients": [
-    {
-      "char": "i",
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    }
-  ]
+  "ingredients": {
+    "i": "minecraft:iron_ingot",
+    "p": "nova:iron_plate"
+  }
 }

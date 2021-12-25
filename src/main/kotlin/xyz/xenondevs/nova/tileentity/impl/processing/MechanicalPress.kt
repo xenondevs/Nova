@@ -14,8 +14,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.recipe.CustomNovaRecipe
+import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeManager
+import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -43,9 +44,9 @@ private val MAX_ENERGY = NovaConfig[MECHANICAL_PRESS].getLong("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[MECHANICAL_PRESS].getLong("energy_per_tick")!!
 private val PRESS_SPEED = NovaConfig[MECHANICAL_PRESS].getInt("speed")!!
 
-enum class PressType {
-    PLATE,
-    GEAR
+private enum class PressType(val recipeType: RecipeType<out ConversionNovaRecipe>) {
+    PLATE(RecipeType.PLATE_PRESS),
+    GEAR(RecipeType.GEAR_PRESS)
 }
 
 class MechanicalPress(
@@ -69,13 +70,8 @@ class MechanicalPress(
     private var timeLeft: Int = retrieveData("pressTime") { 0 }
     private var pressSpeed = 0
     
-    private var currentRecipe: CustomNovaRecipe? =
-        retrieveOrNull<NamespacedKey>("currentRecipe")?.let {
-            when (type) {
-                PressType.PLATE -> RecipeManager.platePressRecipes[it]
-                PressType.GEAR -> RecipeManager.gearPressRecipes[it]
-            }
-        }
+    private var currentRecipe: ConversionNovaRecipe? =
+        retrieveOrNull<NamespacedKey>("currentRecipe")?.let { RecipeManager.getRecipe(type.recipeType, it) }
     
     init {
         handleUpgradeUpdates()
@@ -94,7 +90,7 @@ class MechanicalPress(
                 energyHolder.energy -= energyHolder.energyConsumption
                 
                 if (timeLeft == 0) {
-                    outputInv.putItemStack(null, 0, currentRecipe!!.resultStack)
+                    outputInv.putItemStack(null, 0, currentRecipe!!.result)
                     currentRecipe = null
                 }
                 
@@ -106,8 +102,8 @@ class MechanicalPress(
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val recipe = RecipeManager.getPressRecipeFor(inputItem, type)
-            if (recipe != null && outputInv.canHold(recipe.resultStack)) {
+            val recipe = RecipeManager.getRecipeFor(type.recipeType, inputItem)
+            if (recipe != null && outputInv.canHold(recipe.result)) {
                 inputInv.addItemAmount(null, 0, -1)
                 timeLeft = recipe.time
                 currentRecipe = recipe
@@ -118,7 +114,7 @@ class MechanicalPress(
     private fun handleInputUpdate(event: ItemUpdateEvent) {
         if (event.updateReason != null
             && event.newItemStack != null
-            && RecipeManager.getPressRecipeFor(event.newItemStack, type) == null) {
+            && RecipeManager.getRecipeFor(type.recipeType, event.newItemStack) == null) {
             
             event.isCancelled = true
         }

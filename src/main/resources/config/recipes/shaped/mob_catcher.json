@@ -5,18 +5,9 @@
     "dgd",
     "sds"
   ],
-  "ingredients": [
-    {
-      "char": "s",
-      "item": "nova:star_shards"
-    },
-    {
-      "char": "d",
-      "item": "minecraft:diamond"
-    },
-    {
-      "char": "g",
-      "item": "minecraft:ghast_tear"
-    }
-  ]
+  "ingredients": {
+    "s": "nova:star_shards",
+    "d": "minecraft:diamond",
+    "g": "minecraft:ghast_tear"
+  }
 }

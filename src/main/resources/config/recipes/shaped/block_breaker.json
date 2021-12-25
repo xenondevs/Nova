@@ -5,18 +5,9 @@
     "ifi",
     "iii"
   ],
-  "ingredients": [
-    {
-      "char": "p",
-      "item": "minecraft:diamond_pickaxe"
-    },
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "f",
-      "item": "nova:advanced_machine_frame"
-    }
-  ]
+  "ingredients": {
+    "p": "minecraft:diamond_pickaxe",
+    "i": "nova:iron_plate",
+    "f": "nova:advanced_machine_frame"
+  }
 }

@@ -5,22 +5,10 @@
     "sfs",
     "pdp"
   ],
-  "ingredients": [
-    {
-      "char": "p",
-      "item": "nova:iron_plate"
-    },
-    {
-      "char": "s",
-      "item": "nova:scaffolding"
-    },
-    {
-      "char": "f",
-      "item": "nova:elite_machine_frame"
-    },
-    {
-      "char": "d",
-      "item": "nova:netherite_drill"
-    }
-  ]
+  "ingredients": {
+    "p": "nova:iron_plate",
+    "s": "nova:scaffolding",
+    "f": "nova:elite_machine_frame",
+    "d": "nova:netherite_drill"
+  }
 }

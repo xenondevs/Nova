@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.RecipesWindow
-import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeType
+import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
 import xyz.xenondevs.nova.util.data.localized
 
 object NovaUsageCommand : Command("nvusage") {
@@ -35,7 +35,7 @@ object NovaUsageCommand : Command("nvusage") {
         } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.no-item-in-hand"))
     }
     
-    private fun showRecipe(recipes: Map<RecipeType, Iterable<RecipeContainer>>, context: CommandContext<CommandSourceStack>) {
+    private fun showRecipe(recipes: Map<RecipeGroup, Iterable<RecipeContainer>>, context: CommandContext<CommandSourceStack>) {
         RecipesWindow(context.player, recipes).show()
     }
     

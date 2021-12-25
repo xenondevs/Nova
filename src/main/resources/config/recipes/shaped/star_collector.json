@@ -5,26 +5,11 @@
     "sfs",
     "isi"
   ],
-  "ingredients": [
-    {
-      "char": "t",
-      "item": "minecraft:tinted_glass"
-    },
-    {
-      "char": "a",
-      "item": "minecraft:amethyst_shard"
-    },
-    {
-      "char": "s",
-      "item": "nova:star_shards"
-    },
-    {
-      "char": "f",
-      "item": "nova:ultimate_machine_frame"
-    },
-    {
-      "char": "i",
-      "item": "nova:iron_plate"
-    }
-  ]
+  "ingredients": {
+    "t": "minecraft:tinted_glass",
+    "a": "minecraft:amethyst_shard",
+    "s": "nova:star_shards",
+    "f": "nova:ultimate_machine_frame",
+    "i": "nova:iron_plate"
+  }
 }

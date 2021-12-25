@@ -7,8 +7,8 @@ import org.bukkit.SoundGroup
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import org.bukkit.inventory.RecipeChoice.MaterialChoice
-import xyz.xenondevs.nova.data.recipe.NovaRecipeChoice
+import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
+import xyz.xenondevs.nova.data.recipe.SingleCustomRecipeChoice
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -72,18 +72,29 @@ fun Material.playPlaceSoundEffect(location: Location) {
 @Suppress("LiftReturnOrAssignment", "CascadeIf")
 object MaterialUtils {
     
-    fun getRecipeChoice(name: String): RecipeChoice {
-        try {
-            if (name.startsWith("nova:")) {
-                val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
-                return NovaRecipeChoice(material)
-            } else if (name.startsWith("minecraft:")) {
-                val material = Material.valueOf(name.drop(10).uppercase())
-                return MaterialChoice(material)
-            } else throw IllegalArgumentException("Invalid item name: $name")
-        } catch (ex: Exception) {
-            throw IllegalArgumentException("Unknown item $name", ex)
+    fun getRecipeChoice(nameList: List<String>): RecipeChoice {
+        val choices = ArrayList<Pair<Material, IntArray>>()
+        val examples = ArrayList<ItemStack>()
+        
+        nameList.forEach { name ->
+            try {
+                if (name.startsWith("nova:")) {
+                    val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
+                    choices += material.item.material to intArrayOf(material.item.data).let { if (material.legacyItemIds != null) it + material.legacyItemIds else it }
+                    examples += material.createItemStack()
+                } else if (name.startsWith("minecraft:")) {
+                    val material = Material.valueOf(name.drop(10).uppercase())
+                    choices += material to intArrayOf(0)
+                    examples += ItemStack(material)
+                } else throw IllegalArgumentException("Invalid item name: $name (Unknown or missing prefix)")
+            } catch (ex: Exception) {
+                throw IllegalArgumentException("Unknown item $name", ex)
+            }
         }
+        
+        return if (choices.size == 1 && choices[0].second.size == 1)
+            SingleCustomRecipeChoice(choices[0].first, choices[0].second[0], examples[0])
+        else CustomRecipeChoice(choices, examples)
     }
     
 }

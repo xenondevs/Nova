@@ -5,18 +5,9 @@
     "dtd",
     "gdg"
   ],
-  "ingredients": [
-    {
-      "char": "t",
-      "item": "nova:basic_fluid_tank"
-    },
-    {
-      "char": "d",
-      "item": "minecraft:glowstone_dust"
-    },
-    {
-      "char": "g",
-      "item": "minecraft:gold_ingot"
-    }
-  ]
+  "ingredients": {
+    "t": "nova:basic_fluid_tank",
+    "d": "minecraft:glowstone_dust",
+    "g": "minecraft:gold_ingot"
+  }
 }
