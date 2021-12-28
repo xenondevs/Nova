@@ -7,8 +7,13 @@ import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.vanilla.ItemStorageVanillaTileEntity
 import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.data.WatchedMap
 import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.runTask
 import java.util.*
+
+private val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(emptyEnumMap()) { 50 } }
+private val DEFAULT_CHANNELS = { CUBE_FACES.associateWithTo(emptyEnumMap()) { 0 } }
 
 abstract class VanillaItemHolder(
     final override val endPoint: ItemStorageVanillaTileEntity
@@ -22,29 +27,39 @@ abstract class VanillaItemHolder(
     }
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveEnumMap<BlockFace, CompoundElement>("insertFilters") { emptyEnumMap() }
-            .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
+        WatchedMap(
+            endPoint.retrieveEnumMap<BlockFace, CompoundElement>("insertFilters", ::emptyEnumMap)
+                .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) },
+            ::saveData
+        )
     
     override val extractFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveEnumMap<BlockFace, CompoundElement>("extractFilters") { emptyEnumMap() }
-            .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
+        WatchedMap(
+            endPoint.retrieveEnumMap<BlockFace, CompoundElement>("extractFilters", ::emptyEnumMap)
+                .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) },
+            ::saveData
+        )
     
     override val insertPriorities: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("insertPriorities") { CUBE_FACES.associateWithTo(emptyEnumMap()) { 50 } }
+        WatchedMap(endPoint.retrieveEnumMap("insertPriorities", DEFAULT_PRIORITIES), ::saveData)
     
     override val extractPriorities: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("extractPriorities") { CUBE_FACES.associateWithTo(emptyEnumMap()) { 50 } }
+        WatchedMap(endPoint.retrieveEnumMap("extractPriorities", DEFAULT_PRIORITIES), ::saveData)
     
     override val channels: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("channels") { CUBE_FACES.associateWithTo(emptyEnumMap()) { 0 } }
+        WatchedMap(endPoint.retrieveEnumMap("channels", DEFAULT_CHANNELS), ::saveData)
     
     override fun saveData() {
-        endPoint.storeEnumMap("itemConfig", itemConfig)
-        endPoint.storeEnumMap("insertFilters", insertFilters) { it.compound }
-        endPoint.storeEnumMap("extractFilters", extractFilters) { it.compound }
-        endPoint.storeEnumMap("insertPriorities", insertPriorities)
-        endPoint.storeEnumMap("extractPriorities", extractPriorities)
-        endPoint.storeEnumMap("channels", channels)
+        runTask {
+            endPoint.storeEnumMap("itemConfig", itemConfig)
+            endPoint.storeEnumMap("insertFilters", insertFilters) { it.compound }
+            endPoint.storeEnumMap("extractFilters", extractFilters) { it.compound }
+            endPoint.storeEnumMap("insertPriorities", insertPriorities)
+            endPoint.storeEnumMap("extractPriorities", extractPriorities)
+            endPoint.storeEnumMap("channels", channels)
+            
+            endPoint.updateDataContainer()
+        }
     }
     
 }

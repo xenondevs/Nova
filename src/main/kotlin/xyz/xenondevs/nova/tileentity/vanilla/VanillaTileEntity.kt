@@ -67,11 +67,6 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     }
     
     override fun handleRemoved(unload: Boolean) {
-        if (unload) {
-            itemHolder.saveData()
-            updateDataContainer()
-        }
-        
         val task: NetworkManagerTask = { it.handleEndPointRemove(this, unload) }
         if (NOVA.isEnabled) NetworkManager.runAsync(task) else NetworkManager.runNow(task)
     }
