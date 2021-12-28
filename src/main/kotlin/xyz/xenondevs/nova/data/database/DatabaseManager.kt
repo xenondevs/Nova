@@ -57,6 +57,7 @@ object DatabaseManager {
         val config = HikariConfig()
         config.jdbcUrl = "jdbc:sqlite:" + File("plugins/Nova/database.db").absolutePath
         config.driverClassName = "org.sqlite.JDBC"
+        config.maximumPoolSize = 1
         
         connect(config)
     }
