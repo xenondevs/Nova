@@ -404,16 +404,12 @@ class Quarry(
     }
     
     private fun createScaffolding() {
-        runAsyncTask {
-            if (isValid) {
-                createScaffoldingOutlines()
-                createScaffoldingCorners()
-                createScaffoldingPillars()
-                createScaffoldingArms()
-                drill.addModels(Model(DRILL, pointerLocation))
-                updatePointer(true)
-            }
-        }
+        createScaffoldingOutlines()
+        createScaffoldingCorners()
+        createScaffoldingPillars()
+        createScaffoldingArms()
+        drill.addModels(Model(DRILL, pointerLocation))
+        updatePointer(true)
     }
     
     private fun createScaffoldingOutlines() {
