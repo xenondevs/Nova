@@ -7,6 +7,7 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
 import xyz.xenondevs.nova.command.*
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -16,6 +17,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.util.data.coloredText
+import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
@@ -26,13 +28,18 @@ import xyz.xenondevs.nova.world.pos
 
 object NovaCommand : Command("nova") {
     
+    private val OBTAINABLE_NOVA_ITEMS: List<NovaMaterial> = NovaConfig["creative_items"]
+        .getArray("categories")!!
+        .flatMap { it.asJsonObject.get("items").asJsonArray.getAllStrings() }
+        .mapNotNull { NovaMaterialRegistry.getOrNull(it.removePrefix("nova:").uppercase()) }
+    
     init {
         builder = builder
             .then(literal("give")
                 .requiresPermission("nova.command.give")
                 .then(argument("player", EntityArgument.players())
                     .apply {
-                        NovaMaterialRegistry.sortedObtainables.forEach { material ->
+                        OBTAINABLE_NOVA_ITEMS.forEach { material ->
                             then(literal(material.typeName.lowercase())
                                 .executesCatching { handleGiveTo(it, material, 1) }
                                 .then(argument("amount", IntegerArgumentType.integer())

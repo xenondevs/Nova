@@ -97,4 +97,38 @@ object MaterialUtils {
         else CustomRecipeChoice(choices, examples)
     }
     
+    fun getItemBuilder(name: String, basic: Boolean = false): ItemBuilder {
+        try {
+            if (name.startsWith("nova:")) {
+                val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
+                return if (basic) novaMaterial.createBasicItemBuilder() else novaMaterial.createItemBuilder()
+            } else if (name.startsWith("minecraft:")) {
+                return ItemBuilder(Material.valueOf(name.substringAfter(':').uppercase()))
+            } else throw IllegalArgumentException("Unknown prefix")
+        } catch (ex: Exception) {
+            throw IllegalArgumentException("Invalid item name: $name", ex)
+        }
+    }
+    
+    fun getItemAndLocalizedName(name: String, basic: Boolean = false): Pair<ItemStack, String> {
+        val itemStack: ItemStack
+        val localizedName: String
+        
+        try {
+            if (name.startsWith("nova:")) {
+                val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
+                localizedName = novaMaterial.localizedName
+                itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
+            } else if (name.startsWith("minecraft:")) {
+                val material = Material.valueOf(name.substringAfter(':').uppercase())
+                localizedName = material.localizedName!!
+                itemStack = ItemStack(material)
+            } else throw IllegalArgumentException("Unknown prefix")
+        } catch (ex: Exception) {
+            throw IllegalArgumentException("Invalid item name: $name", ex)
+        }
+        
+        return itemStack to localizedName
+    }
+    
 }

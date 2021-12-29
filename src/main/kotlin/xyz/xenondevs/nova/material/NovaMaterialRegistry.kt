@@ -42,7 +42,6 @@ object NovaMaterialRegistry {
         get() = materialsByTypeName.values
     
     val sortedValues: Set<NovaMaterial> by lazy { materialsByTypeName.values.toSortedSet() }
-    val sortedObtainables: Set<NovaMaterial> by lazy { sortedValues.filterTo(LinkedHashSet()) { it.item.data < 9000 } }
     
     // 1 - 1000: Blocks
     // 1: Reserved for legacy furnace generator

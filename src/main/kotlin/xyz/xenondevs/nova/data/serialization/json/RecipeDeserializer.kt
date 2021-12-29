@@ -3,31 +3,16 @@ package xyz.xenondevs.nova.data.serialization.json
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import de.studiocode.invui.item.builder.ItemBuilder
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.recipe.GearPressNovaRecipe
 import xyz.xenondevs.nova.data.recipe.PlatePressNovaRecipe
 import xyz.xenondevs.nova.data.recipe.PulverizerNovaRecipe
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.MaterialUtils
+import xyz.xenondevs.nova.util.MaterialUtils.getItemBuilder
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
-
-@Suppress("LiftReturnOrAssignment", "CascadeIf")
-private fun getItemBuilder(name: String): ItemBuilder {
-    try {
-        if (name.startsWith("nova:")) {
-            return NovaMaterialRegistry.get(name.substringAfter(':').uppercase()).createItemBuilder()
-        } else if (name.startsWith("minecraft:")) {
-            return ItemBuilder(Material.valueOf(name.substringAfter(':').uppercase()))
-        } else throw IllegalArgumentException("Invalid item name: $name")
-    } catch (ex: Exception) {
-        throw IllegalArgumentException("Unknown item $name", ex)
-    }
-}
 
 private fun getRecipeKey(file: File): NamespacedKey =
     NamespacedKey(NOVA, "nova.${file.parentFile.name}.${file.nameWithoutExtension}")

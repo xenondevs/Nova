@@ -1,0 +1,121 @@
+{
+  "categories": [
+    {
+      "icon": "nova:quarry",
+      "name": "menu.nova.creative.category.machines",
+      "items": [
+        "nova:mechanical_press",
+        "nova:pulverizer",
+        "nova:electrical_furnace",
+        "nova:block_placer",
+        "nova:block_breaker",
+        "nova:quarry",
+        "nova:charger",
+        "nova:wireless_charger",
+        "nova:auto_fisher",
+        "nova:breeder",
+        "nova:mob_killer",
+        "nova:mob_duplicator",
+        "nova:planter",
+        "nova:fertilizer",
+        "nova:harvester",
+        "nova:chunk_loader",
+        "nova:cobblestone_generator",
+        "nova:pump",
+        "nova:star_collector",
+        "nova:tree_factory",
+        "nova:infinite_water_source"
+      ]
+    },
+    {
+      "icon": "nova:wind_turbine",
+      "name": "menu.nova.creative.category.power",
+      "items": [
+        "nova:solar_panel",
+        "nova:furnace_generator",
+        "nova:lava_generator",
+        "nova:wind_turbine",
+        "nova:lightning_exchanger"
+      ]
+    },
+    {
+      "icon": "nova:ultimate_power_cell",
+      "name": "menu.nova.creative.category.storage",
+      "items": [
+        "nova:basic_cable",
+        "nova:advanced_cable",
+        "nova:elite_cable",
+        "nova:ultimate_cable",
+        "nova:creative_cable",
+        "nova:storage_unit",
+        "nova:vacuum_chest",
+        "nova:trash_can",
+        "nova:basic_power_cell",
+        "nova:advanced_power_cell",
+        "nova:elite_power_cell",
+        "nova:ultimate_power_cell",
+        "nova:creative_power_cell",
+        "nova:basic_fluid_tank",
+        "nova:advanced_fluid_tank",
+        "nova:elite_fluid_tank",
+        "nova:ultimate_fluid_tank",
+        "nova:creative_fluid_tank"
+      ]
+    },
+    {
+      "icon": "nova:copper_gear",
+      "name": "menu.nova.creative.category.crafting",
+      "items": [
+        "nova:star_shards",
+        "nova:star_dust",
+        "nova:coal_dust",
+        "nova:lapis_dust",
+        "nova:iron_dust",
+        "nova:copper_dust",
+        "nova:gold_dust",
+        "nova:diamond_dust",
+        "nova:emerald_dust",
+        "nova:netherite_dust",
+        "nova:redstone_plate",
+        "nova:lapis_plate",
+        "nova:iron_plate",
+        "nova:copper_plate",
+        "nova:gold_plate",
+        "nova:diamond_plate",
+        "nova:emerald_plate",
+        "nova:netherite_plate",
+        "nova:redstone_gear",
+        "nova:lapis_gear",
+        "nova:iron_gear",
+        "nova:copper_gear",
+        "nova:gold_gear",
+        "nova:diamond_gear",
+        "nova:emerald_gear",
+        "nova:netherite_gear",
+        "nova:basic_machine_frame",
+        "nova:advanced_machine_frame",
+        "nova:elite_machine_frame",
+        "nova:ultimate_machine_frame",
+        "nova:creative_machine_frame",
+        "nova:scaffolding",
+        "nova:netherite_drill",
+        "nova:solar_cell"
+      ]
+    },
+    {
+      "icon": "nova:wrench",
+      "name": "menu.nova.creative.category.misc",
+      "items": [
+        "nova:speed_upgrade",
+        "nova:efficiency_upgrade",
+        "nova:energy_upgrade",
+        "nova:range_upgrade",
+        "nova:fluid_upgrade",
+        "nova:item_filter",
+        "nova:wrench",
+        "nova:mob_catcher",
+        "nova:jetpack"
+      ]
+    }
+  ]
+}
