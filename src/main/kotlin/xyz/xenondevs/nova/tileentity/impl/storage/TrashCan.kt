@@ -9,6 +9,9 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
@@ -17,6 +20,8 @@ import xyz.xenondevs.nova.util.VoidingVirtualInventory
 import xyz.xenondevs.nova.util.associateWithToEnumMap
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
+
+private val ALL_INSERT_CONFIG = { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.INSERT } }
 
 class TrashCan(
     uuid: UUID,
@@ -31,7 +36,11 @@ class TrashCan(
     override val itemHolder = NovaItemHolder(
         this,
         inventory to NetworkConnectionType.INSERT,
-        lazyDefaultTypeConfig = { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.INSERT } }
+        lazyDefaultTypeConfig = ALL_INSERT_CONFIG
+    )
+    override val fluidHolder = NovaFluidHolder(this,
+        VoidingFluidContainer to NetworkConnectionType.INSERT,
+        defaultConnectionConfig = ALL_INSERT_CONFIG
     )
     
     override fun handleTick() = Unit
@@ -41,7 +50,8 @@ class TrashCan(
         private val sideConfigGUI = SideConfigGUI(
             this@TrashCan,
             null,
-            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.input"),
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.trash_can"),
+            listOf(VoidingFluidContainer to "container.nova.trash_can"),
             ::openWindow
         )
         
@@ -56,4 +66,16 @@ class TrashCan(
         
     }
     
+}
+
+object VoidingFluidContainer : FluidContainer(UUID(0, 1L), hashSetOf(FluidType.WATER, FluidType.LAVA), FluidType.NONE, 0, Long.MAX_VALUE) {
+    override fun addFluid(type: FluidType, amount: Long) = Unit
+    override fun tryAddFluid(type: FluidType, amount: Long) = amount
+    override fun takeFluid(amount: Long) = Unit
+    override fun tryTakeFluid(amount: Long) = 0L
+    override fun accepts(type: FluidType, amount: Long) = true
+    override fun clear() = Unit
+    override fun isFull() = false
+    override fun hasFluid() = false
+    override fun isEmpty() = true
 }
