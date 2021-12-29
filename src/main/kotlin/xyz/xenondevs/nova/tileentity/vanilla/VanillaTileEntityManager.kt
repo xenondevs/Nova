@@ -17,7 +17,6 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
-import org.bukkit.event.world.WorldSaveEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -146,15 +145,6 @@ object VanillaTileEntityManager : Listener {
     private fun handleBlockBreak(location: Location) {
         if (locationCache.containsKey(location))
             handleTileEntityDestroy(location)
-    }
-    
-    @Synchronized
-    @EventHandler
-    fun handleWorldSave(event: WorldSaveEvent) {
-        tileEntityMap.values.asSequence()
-            .flatMap { it.values }
-            .filterIsInstance<ItemStorageVanillaTileEntity>()
-            .forEach { it.itemHolder.saveData() }
     }
     
     @Synchronized
