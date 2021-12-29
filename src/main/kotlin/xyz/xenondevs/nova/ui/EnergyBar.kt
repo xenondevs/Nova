@@ -5,7 +5,7 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
-import xyz.xenondevs.nova.util.PrefixUtils
+import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
 
@@ -38,20 +38,20 @@ class EnergyBar(
     
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
         if (energy == Long.MAX_VALUE) itemBuilder.setDisplayName("∞ J / ∞ J")
-        else itemBuilder.setDisplayName(PrefixUtils.getEnergyString(energy, maxEnergy))
+        else itemBuilder.setDisplayName(NumberFormatUtils.getEnergyString(energy, maxEnergy))
         
         if (energyPlusPerTick > 0) {
             itemBuilder.addLoreLines(localized(
                 ChatColor.GRAY,
                 "menu.nova.energy_per_tick",
-                "+" + PrefixUtils.getEnergyString(energyPlusPerTick)
+                "+" + NumberFormatUtils.getEnergyString(energyPlusPerTick)
             ))
         }
         if (energyMinusPerTick > 0) {
             itemBuilder.addLoreLines(localized(
                 ChatColor.GRAY,
                 "menu.nova.energy_per_tick",
-                "-" + PrefixUtils.getEnergyString(energyMinusPerTick)
+                "-" + NumberFormatUtils.getEnergyString(energyMinusPerTick)
             ))
         }
         return itemBuilder

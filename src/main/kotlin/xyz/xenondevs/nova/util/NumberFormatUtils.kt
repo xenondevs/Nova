@@ -1,9 +1,14 @@
 package xyz.xenondevs.nova.util
 
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.NumberFormat
+import java.util.*
 
-object PrefixUtils {
+object NumberFormatUtils {
+    
+    private val PREFIXED = DEFAULT_CONFIG.getBoolean("use_metric_prefixes")
     
     private val IGNORED_ENERGY_PREFIXES = MetricPrefix.generateIgnoredArray(
         MetricPrefix.YOCTO,
@@ -34,17 +39,27 @@ object PrefixUtils {
         MetricPrefix.HECTO,
     )
     
-    fun getEnergyString(energy: Long) =
-        getSoleString(IGNORED_ENERGY_PREFIXES, BigDecimal(energy), "J")
+    private val NUMBER_FORMAT = NumberFormat.getInstance(Locale.US).apply { isGroupingUsed = true }
     
-    fun getEnergyString(energy: Long, maxEnergy: Long) =
-        getOutOfString(IGNORED_ENERGY_PREFIXES, BigDecimal(energy), BigDecimal(maxEnergy), "J")
+    fun getEnergyString(energy: Long): String =
+        if (PREFIXED)
+            getSoleString(IGNORED_ENERGY_PREFIXES, BigDecimal(energy), "J")
+        else "${NUMBER_FORMAT.format(energy)} J"
     
-    fun getFluidString(fluid: Long) =
-        getSoleString(IGNORED_FLUID_PREFIXES, BigDecimal(fluid).divide(1000.toBigDecimal()), "B")
+    fun getEnergyString(energy: Long, maxEnergy: Long): String =
+        if (PREFIXED)
+            getOutOfString(IGNORED_ENERGY_PREFIXES, BigDecimal(energy), BigDecimal(maxEnergy), "J")
+        else "${NUMBER_FORMAT.format(energy)} J / ${NUMBER_FORMAT.format(maxEnergy)} J"
     
-    fun getFluidString(fluid: Long, maxFluid: Long) =
-        getOutOfString(IGNORED_FLUID_PREFIXES, BigDecimal(fluid).divide(1000.toBigDecimal()), BigDecimal(maxFluid).divide(1000.toBigDecimal()), "B")
+    fun getFluidString(fluid: Long): String =
+        if (PREFIXED)
+            getSoleString(IGNORED_FLUID_PREFIXES, BigDecimal(fluid).divide(1000.toBigDecimal()), "B")
+        else "${NUMBER_FORMAT.format(fluid)} mB"
+    
+    fun getFluidString(fluid: Long, maxFluid: Long): String =
+        if (PREFIXED)
+            getOutOfString(IGNORED_FLUID_PREFIXES, BigDecimal(fluid).divide(1000.toBigDecimal()), BigDecimal(maxFluid).divide(1000.toBigDecimal()), "B")
+        else "${NUMBER_FORMAT.format(fluid)} mB / ${NUMBER_FORMAT.format(maxFluid)} mB"
     
     private fun getSoleString(ignoredPrefixes: BooleanArray, number: BigDecimal, unit: String): String {
         val closest = MetricPrefix.findBestPrefix(number, ignoredPrefixes)

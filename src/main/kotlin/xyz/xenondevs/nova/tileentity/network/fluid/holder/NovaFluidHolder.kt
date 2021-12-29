@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.fluid.holder
 
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
@@ -9,9 +10,8 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.associateWithToEnumMap
-import xyz.xenondevs.nova.util.data.addLoreLines
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
 
@@ -80,13 +80,23 @@ class NovaFluidHolder(
             if (tileEntity is NetworkedTileEntity) {
                 val fluidHolder = tileEntity.fluidHolder as NovaFluidHolder
                 fluidHolder.availableContainers.values.forEach { container ->
-                    if (container.hasFluid()) builder.addLoreLines(localized(
-                        ChatColor.GRAY,
-                        "tooltip.nova.fluid",
-                        TranslatableComponent(container.type!!.localizedName),
-                        container.amount,
-                        container.capacity
-                    ))
+                    if (container.hasFluid()) {
+                        val amount = container.amount
+                        val capacity = container.capacity
+                        
+                        val amountStr = if (amount != Long.MAX_VALUE) {
+                            if (capacity == Long.MAX_VALUE) NumberFormatUtils.getFluidString(amount) + " / ∞ mB"
+                            else NumberFormatUtils.getFluidString(amount, capacity)
+                        } else "∞ mB / ∞ mB"
+                        
+                        builder.addLoreLines(
+                            ComponentBuilder()
+                                .color(ChatColor.GRAY)
+                                .append(TranslatableComponent(container.type!!.localizedName))
+                                .append(": $amountStr")
+                                .create()
+                        )
+                    }
                 }
             }
             
