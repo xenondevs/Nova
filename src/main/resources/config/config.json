@@ -19,6 +19,12 @@
   "crafting_cache": {
     "size": 5000
   },
+  "nova_executor": {
+    "enabled": true,
+    "min_threads": 100,
+    "max_threads": 100,
+    "thread_timeout": 0
+  },
   "bottled_mob_blacklist": [
     "WITHER",
     "ENDER_DRAGON",
