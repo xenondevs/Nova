@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.recipe
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 
 interface NovaRecipe {
     val key: NamespacedKey
@@ -16,26 +17,46 @@ abstract class ConversionNovaRecipe(
     val time: Int
 ) : NovaRecipe
 
-class PulverizerNovaRecipe(
+class PulverizerRecipe(
     key: NamespacedKey,
     input: RecipeChoice,
     result: ItemStack,
     time: Int,
-    override val type: RecipeType<PulverizerNovaRecipe> = RecipeType.PULVERIZER
-) : ConversionNovaRecipe(key, input, result, time)
+) : ConversionNovaRecipe(key, input, result, time) {
+    override val type = RecipeType.PULVERIZER
+}
 
-class PlatePressNovaRecipe(
+class PlatePressRecipe(
     key: NamespacedKey,
     input: RecipeChoice,
     result: ItemStack,
-    time: Int,
-    override val type: RecipeType<PlatePressNovaRecipe> = RecipeType.PLATE_PRESS
-) : ConversionNovaRecipe(key, input, result, time)
+    time: Int
+) : ConversionNovaRecipe(key, input, result, time) {
+    override val type = RecipeType.PLATE_PRESS
+}
 
-class GearPressNovaRecipe(
+class GearPressRecipe(
     key: NamespacedKey,
     input: RecipeChoice,
     result: ItemStack,
-    time: Int,
-    override val type: RecipeType<GearPressNovaRecipe> = RecipeType.GEAR_PRESS
-) : ConversionNovaRecipe(key, input, result, time)
+    time: Int
+) : ConversionNovaRecipe(key, input, result, time) {
+    override val type = RecipeType.GEAR_PRESS
+}
+
+class FluidInfuserRecipe(
+    override val key: NamespacedKey,
+    val mode: InfuserMode,
+    val fluidType: FluidType,
+    val fluidAmount: Long,
+    input: RecipeChoice,
+    result: ItemStack,
+    time: Int
+) : ConversionNovaRecipe(key, input, result, time) {
+    override val type = RecipeType.FLUID_INFUSER
+    
+    enum class InfuserMode {
+        INSERT,
+        EXTRACT
+    }
+}

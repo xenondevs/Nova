@@ -1,0 +1,8 @@
+{
+  "mode": "INSERT",
+  "fluid_type": "LAVA",
+  "fluid_amount": 1000,
+  "input": "minecraft:bucket",
+  "result": "minecraft:lava_bucket",
+  "time": 100
+}

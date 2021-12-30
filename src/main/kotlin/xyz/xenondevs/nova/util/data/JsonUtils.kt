@@ -49,6 +49,8 @@ fun JsonObject.getNumber(property: String) = if (hasNumber(property)) get(proper
 
 fun JsonObject.getInt(property: String) = if (hasNumber(property)) get(property).asInt else null
 
+fun JsonObject.getLong(property: String) = if (hasNumber(property)) get(property).asLong else null
+
 fun JsonObject.getDouble(property: String) = if (hasNumber(property)) get(property).asDouble else null
 
 fun JsonObject.getFloat(property: String) = if (hasNumber(property)) get(property).asFloat else null
@@ -64,6 +66,10 @@ fun JsonObject.getDouble(property: String, default: Double) = if (hasNumber(prop
 fun JsonObject.getFloat(property: String, default: Float) = if (hasNumber(property)) get(property).asFloat else default
 
 fun JsonObject.getBoolean(property: String, default: Boolean = false) = if (hasBoolean(property)) get(property).asBoolean else default
+
+inline fun <reified T> JsonObject.getDeserialized(property: String) = GSON.fromJson<T>(get(property))
+
+inline fun <reified T> JsonObject.getDeserialized(property: String, default: () -> T) = getDeserialized(property) ?: default()
 
 operator fun JsonObject.set(property: String, value: JsonElement) = add(property, value)
 

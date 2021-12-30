@@ -7,7 +7,7 @@ import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.recipe.PulverizerNovaRecipe
+import xyz.xenondevs.nova.data.recipe.PulverizerRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
-import xyz.xenondevs.nova.ui.item.PulverizerProgress
+import xyz.xenondevs.nova.ui.item.PulverizerProgressItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.particle
@@ -60,7 +60,7 @@ class Pulverizer(
     private var timeLeft = retrieveData("pulverizerTime") { 0 }
     private var pulverizeSpeed = 0
     
-    private var currentRecipe: PulverizerNovaRecipe? =
+    private var currentRecipe: PulverizerRecipe? =
         retrieveOrNull<NamespacedKey>("currentRecipe")?.let { RecipeManager.getRecipe(RecipeType.PULVERIZER, it) }
     
     private val particleTask = createParticleTask(listOf(
@@ -106,7 +106,7 @@ class Pulverizer(
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val recipe = RecipeManager.getRecipeFor(RecipeType.PULVERIZER, inputItem)!!
+            val recipe = RecipeManager.getConversionRecipeFor(RecipeType.PULVERIZER, inputItem)!!
             val result = recipe.result
             if (outputInv.canHold(result)) {
                 inputInv.addItemAmount(SELF_UPDATE_REASON, 0, -1)
@@ -117,7 +117,7 @@ class Pulverizer(
     }
     
     private fun handleInputUpdate(event: ItemUpdateEvent) {
-        event.isCancelled = event.newItemStack != null && RecipeManager.getRecipeFor(RecipeType.PULVERIZER, event.newItemStack) == null
+        event.isCancelled = event.newItemStack != null && RecipeManager.getConversionRecipeFor(RecipeType.PULVERIZER, event.newItemStack) == null
     }
     
     private fun handleOutputUpdate(event: ItemUpdateEvent) {
@@ -133,7 +133,7 @@ class Pulverizer(
     inner class PulverizerGUI : TileEntityGUI() {
         
         private val mainProgress = ProgressArrowItem()
-        private val pulverizerProgress = PulverizerProgress()
+        private val pulverizerProgress = PulverizerProgressItem()
         
         private val sideConfigGUI = SideConfigGUI(
             this@Pulverizer,

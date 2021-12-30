@@ -29,9 +29,10 @@ class RecipeType<T : Any> private constructor(
         val SHAPED = RecipeType("shaped", ShapedRecipe::class, TableRecipeGroup, ShapedRecipeDeserializer)
         val SHAPELESS = RecipeType("shapeless", ShapelessRecipe::class, TableRecipeGroup, ShapelessRecipeDeserializer)
         val FURNACE = RecipeType("furnace", FurnaceRecipe::class, SmeltingRecipeGroup, FurnaceRecipeDeserializer)
-        val PULVERIZER = RecipeType("pulverizer", PulverizerNovaRecipe::class, PulverizingRecipeGroup, PulverizerRecipeDeserializer)
-        val GEAR_PRESS = RecipeType("press/gear", GearPressNovaRecipe::class, PressingRecipeGroup, GearPressRecipeDeserializer)
-        val PLATE_PRESS = RecipeType("press/plate", PlatePressNovaRecipe::class, PressingRecipeGroup, PlatePressRecipeDeserializer)
+        val PULVERIZER = RecipeType("pulverizer", PulverizerRecipe::class, PulverizingRecipeGroup, PulverizerRecipeDeserializer)
+        val GEAR_PRESS = RecipeType("press/gear", GearPressRecipe::class, PressingRecipeGroup, GearPressRecipeDeserializer)
+        val PLATE_PRESS = RecipeType("press/plate", PlatePressRecipe::class, PressingRecipeGroup, PlatePressRecipeDeserializer)
+        val FLUID_INFUSER = RecipeType("fluid_infuser", FluidInfuserRecipe::class, FluidInfuserRecipeGroup, FluidInfuserRecipeDeserializer)
         
         @Suppress("UNCHECKED_CAST")
         fun <T : Any> of(recipe: T): RecipeType<out T> {

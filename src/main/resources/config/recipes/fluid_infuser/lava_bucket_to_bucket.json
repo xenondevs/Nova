@@ -1,0 +1,8 @@
+{
+  "mode": "EXTRACT",
+  "fluid_type": "LAVA",
+  "fluid_amount": 1000,
+  "input": "minecraft:lava_bucket",
+  "result": "minecraft:bucket",
+  "time": 100
+}

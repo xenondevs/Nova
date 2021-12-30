@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import kotlin.math.roundToInt
 
-open class ProgressItem(val material: NovaMaterial, private val states: Int) : BaseItem() {
+open class ProgressItem(val material: NovaMaterial, private val maxState: Int) : BaseItem() {
     
     var percentage: Double = 0.0
         set(value) {
@@ -18,10 +18,10 @@ open class ProgressItem(val material: NovaMaterial, private val states: Int) : B
         }
     
     override fun getItemProvider(): ItemProvider {
-        return material.item.createItemBuilder("", (percentage * states).roundToInt())
+        return material.item.createItemBuilder("", (percentage * maxState).roundToInt())
     }
     
-    override fun handleClick(p0: ClickType?, p1: Player?, p2: InventoryClickEvent?) = Unit
+    override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
 }
 
 class ProgressArrowItem : ProgressItem(NovaMaterialRegistry.PROGRESS_ARROW, 16)
@@ -30,4 +30,8 @@ class EnergyProgressItem : ProgressItem(NovaMaterialRegistry.ENERGY_PROGRESS, 16
 
 class PressProgressItem : ProgressItem(NovaMaterialRegistry.PRESS_PROGRESS, 8)
 
-class PulverizerProgress : ProgressItem(NovaMaterialRegistry.PULVERIZER_PROGRESS, 14)
+class PulverizerProgressItem : ProgressItem(NovaMaterialRegistry.PULVERIZER_PROGRESS, 14)
+
+class LeftRightFluidProgressItem : ProgressItem(NovaMaterialRegistry.FLUID_PROGRESS_LEFT_RIGHT, 16)
+
+class RightLeftFluidProgressItem : ProgressItem(NovaMaterialRegistry.FLUID_PROGRESS_RIGHT_LEFT, 16)

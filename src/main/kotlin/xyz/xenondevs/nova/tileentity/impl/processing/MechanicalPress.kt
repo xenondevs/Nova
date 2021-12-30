@@ -102,7 +102,7 @@ class MechanicalPress(
     private fun takeItem() {
         val inputItem = inputInv.getItemStack(0)
         if (inputItem != null) {
-            val recipe = RecipeManager.getRecipeFor(type.recipeType, inputItem)
+            val recipe = RecipeManager.getConversionRecipeFor(type.recipeType, inputItem)
             if (recipe != null && outputInv.canHold(recipe.result)) {
                 inputInv.addItemAmount(null, 0, -1)
                 timeLeft = recipe.time
@@ -114,7 +114,7 @@ class MechanicalPress(
     private fun handleInputUpdate(event: ItemUpdateEvent) {
         if (event.updateReason != null
             && event.newItemStack != null
-            && RecipeManager.getRecipeFor(type.recipeType, event.newItemStack) == null) {
+            && RecipeManager.getConversionRecipeFor(type.recipeType, event.newItemStack) == null) {
             
             event.isCancelled = true
         }

@@ -35,7 +35,7 @@ import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.openCorrespondingRecipesWindow
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
-import xyz.xenondevs.nova.util.MaterialUtils
+import xyz.xenondevs.nova.util.ItemUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getString
@@ -48,7 +48,7 @@ private data class Category(val name: String, val icon: ItemProvider, val items:
 private val CATEGORIES: List<Category> = NovaConfig["creative_items"].getArray("categories")!!.map { obj ->
     obj as JsonObject
     val name = obj.getString("name")!!
-    val icon = MaterialUtils.getItemBuilder(obj.getString("icon")!!, true)
+    val icon = ItemUtils.getItemBuilder(obj.getString("icon")!!, true)
         .setDisplayName(TranslatableComponent(name))
         .get()
     val items = obj.getAsJsonArray("items").map { ObtainableItem(it.asString) }
@@ -73,7 +73,7 @@ class ObtainableItem(name: String) : BaseItem() {
     private val itemWrapper: ItemWrapper
     
     init {
-        val pair = MaterialUtils.getItemAndLocalizedName(name)
+        val pair = ItemUtils.getItemAndLocalizedName(name)
         itemStack = pair.first
         localizedName = pair.second
         itemWrapper = ItemWrapper(itemStack)

@@ -57,7 +57,7 @@ object RecipeRegistry {
         }
         
         // add all nova machine recipes
-        getNovaRecipeSequence().forEach {
+        getConversionNovaRecipeSequence().forEach {
             val itemKey = getNameKey(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(RecipeType.of(it).group) { mutableListOf() }
@@ -82,7 +82,7 @@ object RecipeRegistry {
         }
         
         // add all nova machine recipes
-        getNovaRecipeSequence().forEach { recipe ->
+        getConversionNovaRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe).group
             recipe.input.getInputStacks().forEach { inputStack ->
                 val itemKey = getNameKey(inputStack)
@@ -97,7 +97,7 @@ object RecipeRegistry {
     
     private fun loadRecipesByGroup(): Map<RecipeGroup, List<RecipeContainer>> {
         val map = HashMap<RecipeGroup, MutableList<RecipeContainer>>()
-        (getBukkitRecipeSequence() + getNovaRecipeSequence()).forEach {
+        (getBukkitRecipeSequence() + getConversionNovaRecipeSequence()).forEach {
             map.getOrPut(RecipeType.of(it).group) { ArrayList() } += RecipeContainer(it)
         }
         return map
@@ -112,10 +112,11 @@ object RecipeRegistry {
             }
     }
     
-    private fun getNovaRecipeSequence(): Sequence<ConversionNovaRecipe> {
-        return RecipeManager.conversionNovaRecipes
+    private fun getConversionNovaRecipeSequence(): Sequence<ConversionNovaRecipe> {
+        return RecipeManager.novaRecipes
             .values.asSequence()
             .flatMap { it.values }
+            .filterIsInstance<ConversionNovaRecipe>()
     }
     
     fun getNameKey(itemStack: ItemStack): String {

@@ -14,6 +14,7 @@ enum class CustomCharacters(fontName: String, char: Char) {
     CONVERSION_RECIPE("gui", '4'),
     EMPTY_GUI("gui", '5'),
     SEARCH("gui", '6'),
+    FLUID_INFUSER("gui", '7'),
     CREATIVE_0("gui", 'a'),
     CREATIVE_1("gui", 'b'),
     CREATIVE_2("gui", 'c'),

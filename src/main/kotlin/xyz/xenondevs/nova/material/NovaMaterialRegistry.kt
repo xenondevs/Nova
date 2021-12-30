@@ -11,10 +11,7 @@ import xyz.xenondevs.nova.tileentity.impl.energy.*
 import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
 import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
-import xyz.xenondevs.nova.tileentity.impl.processing.CobblestoneGenerator
-import xyz.xenondevs.nova.tileentity.impl.processing.ElectricalFurnace
-import xyz.xenondevs.nova.tileentity.impl.processing.MechanicalPress
-import xyz.xenondevs.nova.tileentity.impl.processing.Pulverizer
+import xyz.xenondevs.nova.tileentity.impl.processing.*
 import xyz.xenondevs.nova.tileentity.impl.storage.*
 import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
@@ -80,6 +77,7 @@ object NovaMaterialRegistry {
     val INFINITE_WATER_SOURCE = registerDefaultTileEntity("INFINITE_WATER_SOURCE", 34, ::InfiniteWaterSource, SANDSTONE)
     val PUMP = registerDefaultTileEntity("PUMP", 35, ::Pump, BARRIER)
     val COBBLESTONE_GENERATOR = registerDefaultTileEntity("COBBLESTONE_GENERATOR", 36, ::CobblestoneGenerator, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
+    val FLUID_INFUSER = registerDefaultTileEntity("FLUID_INFUSER", 37, ::FluidInfuser, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     
     // 1000 - 2000: Crafting Items
     // Plates
@@ -193,6 +191,8 @@ object NovaMaterialRegistry {
     val COBBLESTONE_MODE_BUTTON = registerItem("COBBLESTONE_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.cobblestone", 9135)
     val STONE_MODE_BUTTON = registerItem("STONE_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.stone", 9136)
     val OBSIDIAN_MODE_BUTTON = registerItem("OBSIDIAN_MODE_BUTTON", "menu.nova.cobblestone_generator.mode.obsidian", 9137)
+    val FLUID_LEFT_RIGHT_BUTTON = registerItem("FLUID_LEFT_RIGHT_BUTTON", "menu.nova.fluid_infuser.mode.insert", 9138)
+    val FLUID_RIGHT_LEFT_BUTTON = registerItem("FLUID_RIGHT_LEFT_BUTTON", "menu.nova.fluid_infuser.mode.extract", 9139)
     val INVISIBLE_ITEM = registerItem("INVISIBLE", "", 9300)
     val STOPWATCH_ICON = registerItem("STOPWATCH_ICON", "", 9301)
     val SEARCH_ICON = registerItem("SEARCH_ICON", "", 9302)
@@ -227,6 +227,12 @@ object NovaMaterialRegistry {
     val PRESS_PROGRESS = registerItem("PRESS_PROGRESS", "", itemOf((10_500..10_508).toIntArray()))
     val PULVERIZER_PROGRESS = registerItem("PULVERIZER_PROGRESS", "", itemOf((10_600..10_614).toIntArray()))
     val ORANGE_BAR = registerItem("ORANGE_BAR", "", itemOf((10_700..10_716).toIntArray()))
+    val FLUID_PROGRESS_LEFT_RIGHT = registerItem("FLUID_PROGRESS_LEFT_RIGHT", "", itemOf((10_800..10_816).toIntArray()))
+    val FLUID_PROGRESS_RIGHT_LEFT = registerItem("FLUID_PROGRESS_RIGHT_LEFT", "", itemOf((10_900..10_916).toIntArray()))
+    val FLUID_PROGRESS_LEFT_RIGHT_TRANSPARENT = registerItem("FLUID_PROGRESS_LEFT_RIGHT_TRANSPARENT", "", itemOf((11_000..11_016).toIntArray()))
+    val FLUID_PROGRESS_RIGHT_LEFT_TRANSPARENT = registerItem("FLUID_PROGRESS_RIGHT_LEFT_TRANSPARENT", "", itemOf((11_100..11_116).toIntArray()))
+    val BLUE_BAR_TRANSPARENT = registerItem("BLUE_BAR_TRANSPARENT", "", itemOf((11_200..11_216).toIntArray()))
+    val ORANGE_BAR_TRANSPARENT = registerItem("ORANGE_BAR_TRANSPARENT", "", itemOf((11_300..11_316).toIntArray()))
     
     // 100.000 - ? Numbers
     val NUMBER = registerItem("NUMBER", "", itemOf((100_000..100_999).toIntArray()))

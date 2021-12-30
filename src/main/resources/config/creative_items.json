@@ -21,6 +21,7 @@
         "nova:harvester",
         "nova:chunk_loader",
         "nova:cobblestone_generator",
+        "nova:fluid_infuser",
         "nova:pump",
         "nova:star_collector",
         "nova:tree_factory",

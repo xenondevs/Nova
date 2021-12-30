@@ -16,7 +16,9 @@ import org.bukkit.inventory.RecipeChoice.ExactChoice
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.customModelData
+import xyz.xenondevs.nova.util.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.removeFirstWhere
 import kotlin.experimental.and
@@ -39,12 +41,21 @@ class SingleCustomRecipeChoice(private val material: Material, private val custo
     
 }
 
+class ComplexChoice(choices: List<ItemStack>) : ExactChoice(choices) {
+    
+    override fun test(item: ItemStack): Boolean {
+        val testStack = item.namelessCopyOrSelf
+        return choices.any { it.isSimilar(testStack) }
+    }
+    
+}
+
 object RecipeManager : Listener {
     
     private val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
     private val shapelessRecipes = ArrayList<ShapelessRecipe>()
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
-    val conversionNovaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, ConversionNovaRecipe>>()
+    val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
     
     private val craftingCache: Cache<CraftingMatrix, ItemStack> =
         CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(DEFAULT_CONFIG.getLong("crafting_cache.size")!!).build()
@@ -65,7 +76,7 @@ object RecipeManager : Listener {
                 }
                 
                 is ConversionNovaRecipe -> {
-                    conversionNovaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
+                    novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
                 }
                 
                 else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
@@ -74,13 +85,32 @@ object RecipeManager : Listener {
     }
     
     @Suppress("UNCHECKED_CAST")
-    fun <T : ConversionNovaRecipe> getRecipeFor(type: RecipeType<T>, input: ItemStack): T? {
-        return conversionNovaRecipes[type]?.values?.firstOrNull { it.input.test(input) } as T?
+    fun <T : ConversionNovaRecipe> getConversionRecipeFor(type: RecipeType<T>, input: ItemStack): T? {
+        return novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
+    }
+    
+    fun getFluidInfuserInsertRecipeFor(fluidType: FluidType, input: ItemStack): FluidInfuserRecipe? {
+        return novaRecipes[RecipeType.FLUID_INFUSER]?.values?.asSequence()
+            ?.map { it as FluidInfuserRecipe }
+            ?.firstOrNull { recipe ->
+                recipe.mode == FluidInfuserRecipe.InfuserMode.INSERT
+                    && recipe.fluidType == fluidType
+                    && recipe.input.test(input)
+            }
+    }
+    
+    fun getFluidInfuserExtractRecipeFor(input: ItemStack): FluidInfuserRecipe? {
+        return novaRecipes[RecipeType.FLUID_INFUSER]?.values?.asSequence()
+            ?.map { it as FluidInfuserRecipe }
+            ?.firstOrNull { recipe ->
+                recipe.mode == FluidInfuserRecipe.InfuserMode.EXTRACT
+                    && recipe.input.test(input)
+            }
     }
     
     @Suppress("UNCHECKED_CAST")
-    fun <T : ConversionNovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? {
-        return conversionNovaRecipes[type]?.get(key) as T?
+    fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? {
+        return novaRecipes[type]?.get(key) as T?
     }
     
     @EventHandler

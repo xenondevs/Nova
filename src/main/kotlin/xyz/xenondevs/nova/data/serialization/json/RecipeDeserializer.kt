@@ -6,21 +6,32 @@ import com.google.gson.JsonObject
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.recipe.GearPressNovaRecipe
-import xyz.xenondevs.nova.data.recipe.PlatePressNovaRecipe
-import xyz.xenondevs.nova.data.recipe.PulverizerNovaRecipe
-import xyz.xenondevs.nova.util.MaterialUtils
-import xyz.xenondevs.nova.util.MaterialUtils.getItemBuilder
+import xyz.xenondevs.nova.data.recipe.FluidInfuserRecipe
+import xyz.xenondevs.nova.data.recipe.GearPressRecipe
+import xyz.xenondevs.nova.data.recipe.PlatePressRecipe
+import xyz.xenondevs.nova.data.recipe.PulverizerRecipe
+import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.util.ItemUtils
+import xyz.xenondevs.nova.util.ItemUtils.getItemBuilder
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
 
 private fun getRecipeKey(file: File): NamespacedKey =
-    NamespacedKey(NOVA, "nova.${file.parentFile.name}.${file.nameWithoutExtension}")
+    NamespacedKey(NOVA, "${file.parentFile.name}.${file.nameWithoutExtension}")
 
 interface RecipeDeserializer<T> {
     
     fun deserialize(json: JsonObject, file: File): T
     
+}
+
+private fun parseRecipeChoice(element: JsonElement): RecipeChoice {
+    val nameList = when {
+        element is JsonArray -> element.getAllStrings()
+        element.isString() -> listOf(element.asString)
+        else -> throw IllegalArgumentException()
+    }
+    return ItemUtils.getRecipeChoice(nameList)
 }
 
 object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
@@ -37,21 +48,14 @@ object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
         
         val ingredients = json.get("ingredients")
         if (ingredients is JsonObject) {
-            ingredients.entrySet().forEach { (char, value) ->
-                val nameList = when {
-                    value is JsonArray -> value.asJsonArray.map(JsonElement::getAsString)
-                    value.isString() -> listOf(value.asString)
-                    else -> throw IllegalArgumentException()
-                }
-                ingredientMap[char[0]] = MaterialUtils.getRecipeChoice(nameList)
-            }
+            ingredients.entrySet().forEach { (char, value) -> ingredientMap[char[0]] = parseRecipeChoice(value) }
         } else if (ingredients is JsonArray) {
             // legacy support
             ingredients.forEach {
                 it as JsonObject
                 val char = it.getString("char")!![0]
                 val item = it.getString("item")!!
-                ingredientMap[char] = MaterialUtils.getRecipeChoice(listOf(item))
+                ingredientMap[char] = ItemUtils.getRecipeChoice(listOf(item))
             }
         }
         
@@ -77,7 +81,7 @@ object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
         val ingredients = json.get("ingredients")
         if (ingredients is JsonObject) {
             ingredients.entrySet().forEach { (key, value) ->
-                val choice = MaterialUtils.getRecipeChoice(listOf(key))
+                val choice = ItemUtils.getRecipeChoice(listOf(key))
                 ingredientsMap[choice] = value.asInt
             }
         } else if (ingredients is JsonArray) {
@@ -85,14 +89,7 @@ object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
                 it as JsonObject
                 
                 val items = it.get("item") ?: it.get("items")
-                val choice = MaterialUtils.getRecipeChoice(
-                    when {
-                        items is JsonArray -> items.getAllStrings()
-                        items.isString() -> listOf(items.asString)
-                        else -> throw IllegalArgumentException("Item name(s) expected")
-                    }
-                )
-                
+                val choice = parseRecipeChoice(items)
                 ingredientsMap[choice] = it.getInt("amount")!!
             }
         }
@@ -113,13 +110,7 @@ object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
 abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
     
     override fun deserialize(json: JsonObject, file: File): T {
-        val input = json.get("input")
-        val nameList = when {
-            input is JsonArray -> input.getAllStrings()
-            input.isString() -> listOf(input.asString)
-            else -> throw IllegalArgumentException()
-        }
-        val inputChoice = MaterialUtils.getRecipeChoice(nameList)
+        val inputChoice = parseRecipeChoice(json.get("input"))
         
         val result = getItemBuilder(json.getString("result")!!)
         result.amount = json.getInt("amount", default = 1)
@@ -142,17 +133,32 @@ object FurnaceRecipeDeserializer : ConversionRecipeDeserializer<FurnaceRecipe>()
     
 }
 
-object PulverizerRecipeDeserializer : ConversionRecipeDeserializer<PulverizerNovaRecipe>() {
+object PulverizerRecipeDeserializer : ConversionRecipeDeserializer<PulverizerRecipe>() {
     override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int) =
-        PulverizerNovaRecipe(key, input, result, time)
+        PulverizerRecipe(key, input, result, time)
 }
 
-object PlatePressRecipeDeserializer : ConversionRecipeDeserializer<PlatePressNovaRecipe>() {
+object PlatePressRecipeDeserializer : ConversionRecipeDeserializer<PlatePressRecipe>() {
     override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int) =
-        PlatePressNovaRecipe(key, input, result, time)
+        PlatePressRecipe(key, input, result, time)
 }
 
-object GearPressRecipeDeserializer : ConversionRecipeDeserializer<GearPressNovaRecipe>() {
+object GearPressRecipeDeserializer : ConversionRecipeDeserializer<GearPressRecipe>() {
     override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int) =
-        GearPressNovaRecipe(key, input, result, time)
+        GearPressRecipe(key, input, result, time)
+}
+
+object FluidInfuserRecipeDeserializer : RecipeDeserializer<FluidInfuserRecipe> {
+    
+    override fun deserialize(json: JsonObject, file: File): FluidInfuserRecipe {
+        val mode = json.getDeserialized<FluidInfuserRecipe.InfuserMode>("mode")!!
+        val fluidType = json.getDeserialized<FluidType>("fluid_type")!!
+        val fluidAmount = json.getLong("fluid_amount")!!
+        val input = parseRecipeChoice(json.get("input"))
+        val time = json.getInt("time")!!
+        val result = getItemBuilder(json.getString("result")!!).get()
+        
+        return FluidInfuserRecipe(getRecipeKey(file), mode, fluidType, fluidAmount, input, result, time)
+    }
+    
 }
