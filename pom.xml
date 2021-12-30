@@ -9,7 +9,7 @@
     <version>0.7.3</version>
 
     <properties>
-        <kotlin.version>1.6.10-RC</kotlin.version>
+        <kotlin.version>1.6.10</kotlin.version>
         <exposed.version>0.36.1</exposed.version>
         <spigot.version>1.18.1-R0.1-SNAPSHOT</spigot.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
@@ -43,6 +43,10 @@
         <repository>
             <id>glaremasters</id>
             <url>https://repo.glaremasters.me/repository/bloodshot</url>
+        </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
     </repositories>
 
@@ -84,7 +88,7 @@
         <dependency>
             <groupId>com.plotsquared</groupId>
             <artifactId>PlotSquared-Bukkit</artifactId>
-            <version>6.1.4</version>
+            <version>6.2.0</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
