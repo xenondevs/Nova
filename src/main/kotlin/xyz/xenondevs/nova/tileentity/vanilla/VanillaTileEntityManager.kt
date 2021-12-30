@@ -121,14 +121,13 @@ object VanillaTileEntityManager : Listener {
         chunkMap.values.forEach(VanillaTileEntity::handleInitialized)
     }
     
-    @Synchronized
     private fun handleChunkUnload(chunk: Chunk) {
-        val tileEntities = tileEntityMap[chunk.pos]
-        tileEntityMap.remove(chunk.pos)
-        tileEntities?.forEach { (location, tileEntity) ->
-            locationCache -= location
-            tileEntity.handleRemoved(unload = true)
-        }
+        // The VanillaTileEntityManager lock should not be hold for VanillaTileEntity#handleRemoved
+        synchronized(this) {
+            val tileEntities = tileEntityMap.remove(chunk.pos)
+            tileEntities?.forEach { (location, _) -> locationCache -= location }
+            return@synchronized tileEntities
+        }?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(true) }
     }
     
     @Synchronized
