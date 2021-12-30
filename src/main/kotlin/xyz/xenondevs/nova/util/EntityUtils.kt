@@ -34,9 +34,11 @@ import net.minecraft.world.entity.decoration.ArmorStand as NMSArmorStand
 import net.minecraft.world.item.ItemStack as NMSItemStack
 
 fun Player.awardAdvancement(key: NamespacedKey) {
-    val advancement = Bukkit.getAdvancement(key)!!
-    val progress = getAdvancementProgress(advancement)
-    advancement.criteria.forEach { progress.awardCriteria(it) }
+    val advancement = Bukkit.getAdvancement(key)
+    if (advancement != null) {
+        val progress = getAdvancementProgress(advancement)
+        advancement.criteria.forEach { progress.awardCriteria(it) }
+    }
 }
 
 fun Player.swingHand(hand: EquipmentSlot) {
