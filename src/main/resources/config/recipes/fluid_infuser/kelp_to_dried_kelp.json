@@ -1,0 +1,8 @@
+{
+  "mode": "EXTRACT",
+  "fluid_type": "WATER",
+  "fluid_amount": 100,
+  "input": "minecraft:kelp",
+  "result": "minecraft:dried_kelp",
+  "time": 10
+}

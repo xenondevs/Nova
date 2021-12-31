@@ -1,0 +1,8 @@
+{
+  "mode": "INSERT",
+  "fluid_type": "WATER",
+  "fluid_amount": 1000,
+  "input": "minecraft:dead_bubble_coral_block",
+  "result": "minecraft:bubble_coral_block",
+  "time": 100
+}

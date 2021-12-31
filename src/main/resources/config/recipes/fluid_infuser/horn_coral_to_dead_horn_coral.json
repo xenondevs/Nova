@@ -1,0 +1,8 @@
+{
+  "mode": "EXTRACT",
+  "fluid_type": "WATER",
+  "fluid_amount": 100,
+  "input": "minecraft:horn_coral",
+  "result": "minecraft:dead_horn_coral",
+  "time": 10
+}

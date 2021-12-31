@@ -1,0 +1,8 @@
+{
+  "mode": "INSERT",
+  "fluid_type": "WATER",
+  "fluid_amount": 1000,
+  "input": "minecraft:sponge",
+  "result": "minecraft:wet_sponge",
+  "time": 100
+}

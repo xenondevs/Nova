@@ -1,0 +1,8 @@
+{
+  "mode": "INSERT",
+  "fluid_type": "WATER",
+  "fluid_amount": 1000,
+  "input": "minecraft:dead_horn_coral_block",
+  "result": "minecraft:horn_coral_block",
+  "time": 100
+}
