@@ -34,6 +34,7 @@ import xyz.xenondevs.nova.ui.FluidBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.LeftRightFluidProgressItem
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -112,7 +113,7 @@ class Freezer(
     
     inner class FreezerGUI : TileEntityGUI() {
         
-        private val progressItem = FreezerProgressItem()
+        private val progressItem = LeftRightFluidProgressItem()
         private val sideConfigGUI = SideConfigGUI(this@Freezer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.output"),
@@ -158,20 +159,6 @@ class Freezer(
                     notifyWindows()
                 }
             }
-        }
-        private inner class FreezerProgressItem : BaseItem() {
-        
-            var percentage: Double = 0.0
-                set(value) {
-                    field = value.coerceIn(0.0, 1.0)
-                    notifyWindows()
-                }
-        
-            override fun getItemProvider(): ItemProvider {
-                return NovaMaterialRegistry.FLUID_PROGRESS_LEFT_RIGHT.item.createItemBuilder("", (percentage * 16).roundToInt())
-            }
-        
-            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
         }
     }
 }
