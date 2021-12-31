@@ -107,6 +107,29 @@ object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
     
 }
 
+object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingRecipe> {
+    
+    override fun deserialize(json: JsonObject, file: File): StonecuttingRecipe {
+        val input = parseRecipeChoice(json.get("input"))
+        val result = getItemBuilder(json.get("result").asString)
+        result.amount = json.getInt("amount", 1)
+        return StonecuttingRecipe(getRecipeKey(file), result.get(), input)
+    }
+    
+}
+
+object SmithingRecipeDeserializer : RecipeDeserializer<SmithingRecipe> {
+    
+    override fun deserialize(json: JsonObject, file: File): SmithingRecipe {
+        val base = parseRecipeChoice(json.get("base"))
+        val addition = parseRecipeChoice(json.get("addition"))
+        val result = getItemBuilder(json.get("result").asString)
+        result.amount = json.getInt("amount", 1)
+        return SmithingRecipe(getRecipeKey(file), result.get(), base, addition)
+    }
+    
+}
+
 abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
     
     override fun deserialize(json: JsonObject, file: File): T {

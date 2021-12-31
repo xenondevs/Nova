@@ -8,6 +8,8 @@ fun Recipe.getInputStacks(): List<ItemStack> =
         is ShapedRecipe -> choiceMap.values.mapNotNull { choice -> choice?.getInputStacks() }.flatten()
         is ShapelessRecipe -> choiceList.map { it.getInputStacks() }.flatten()
         is FurnaceRecipe -> inputChoice.getInputStacks()
+        is StonecuttingRecipe -> inputChoice.getInputStacks()
+        is SmithingRecipe -> base.getInputStacks() + addition.getInputStacks()
         
         else -> throw UnsupportedOperationException("Unsupported Recipe type: ${javaClass.name}")
     }

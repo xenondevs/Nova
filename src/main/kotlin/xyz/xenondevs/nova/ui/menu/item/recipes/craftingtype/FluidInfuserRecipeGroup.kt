@@ -22,7 +22,7 @@ object FluidInfuserRecipeGroup : RecipeGroup() {
     
     override val overlay = CustomCharacters.FLUID_INFUSER
     override val icon = NovaMaterialRegistry.FLUID_INFUSER.basicItemProvider
-    override val priority = 4
+    override val priority = 6
     
     override fun createGUI(container: RecipeContainer): GUI {
         val recipe = container.recipe as FluidInfuserRecipe

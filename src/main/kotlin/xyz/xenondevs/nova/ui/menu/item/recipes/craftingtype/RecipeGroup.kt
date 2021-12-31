@@ -9,9 +9,9 @@ abstract class RecipeGroup : Comparable<RecipeGroup> {
     
     private val guiCache = HashMap<RecipeContainer, GUI>()
     
+    abstract val priority: Int
     abstract val overlay: CustomCharacters
     abstract val icon: ItemProvider
-    abstract val priority: Int
     
     protected abstract fun createGUI(container: RecipeContainer): GUI
     

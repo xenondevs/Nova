@@ -108,7 +108,7 @@ object RecipeRegistry {
             .filter {
                 val namespace = (it as Keyed).key.namespace
                 (namespace == "minecraft" || namespace == "nova") // do not allow recipes from different plugins to show up
-                    && (it is ShapedRecipe || it is ShapelessRecipe || it is FurnaceRecipe) // TODO: allow more recipe types
+                    && (it is ShapedRecipe || it is ShapelessRecipe || it is FurnaceRecipe || it is StonecuttingRecipe || it is SmithingRecipe)
             }
     }
     

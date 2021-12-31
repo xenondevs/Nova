@@ -1,8 +1,7 @@
 package xyz.xenondevs.nova.data.recipe
 
-import org.bukkit.inventory.FurnaceRecipe
-import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.inventory.ShapelessRecipe
+import net.minecraft.world.item.crafting.StonecutterRecipe
+import org.bukkit.inventory.*
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.*
 import kotlin.reflect.KClass
@@ -29,6 +28,8 @@ class RecipeType<T : Any> private constructor(
         val SHAPED = RecipeType("shaped", ShapedRecipe::class, TableRecipeGroup, ShapedRecipeDeserializer)
         val SHAPELESS = RecipeType("shapeless", ShapelessRecipe::class, TableRecipeGroup, ShapelessRecipeDeserializer)
         val FURNACE = RecipeType("furnace", FurnaceRecipe::class, SmeltingRecipeGroup, FurnaceRecipeDeserializer)
+        val SMITHING = RecipeType("smithing", SmithingRecipe::class, SmithingRecipeGroup, SmithingRecipeDeserializer)
+        val STONECUTTER = RecipeType("stonecutter", StonecuttingRecipe::class, StonecutterRecipeGroup, StonecutterRecipeDeserializer)
         val PULVERIZER = RecipeType("pulverizer", PulverizerRecipe::class, PulverizingRecipeGroup, PulverizerRecipeDeserializer)
         val GEAR_PRESS = RecipeType("press/gear", GearPressRecipe::class, PressingRecipeGroup, GearPressRecipeDeserializer)
         val PLATE_PRESS = RecipeType("press/plate", PlatePressRecipe::class, PressingRecipeGroup, PlatePressRecipeDeserializer)

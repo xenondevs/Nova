@@ -7,19 +7,20 @@ import kotlin.math.abs
 
 enum class CustomCharacters(fontName: String, char: Char) {
     
-    CRAFTING_RECIPE("gui", '0'),
-    FURNACE_RECIPE("gui", '1'),
-    PULVERIZER_RECIPE("gui", '2'),
-    PRESS_RECIPE("gui", '3'),
-    CONVERSION_RECIPE("gui", '4'),
-    EMPTY_GUI("gui", '5'),
-    SEARCH("gui", '6'),
-    FLUID_INFUSER("gui", '7'),
-    CREATIVE_0("gui", 'a'),
-    CREATIVE_1("gui", 'b'),
-    CREATIVE_2("gui", 'c'),
-    CREATIVE_3("gui", 'd'),
-    CREATIVE_4("gui", 'e');
+    EMPTY_GUI("gui", '\uF000'),
+    CRAFTING_RECIPE("gui", '\uF001'),
+    FURNACE_RECIPE("gui", '\uF002'),
+    CONVERSION_RECIPE("gui", '\uF003'),
+    SMITHING_TABLE("gui", '\uF004'),
+    PULVERIZER_RECIPE("gui", '\uF005'),
+    PRESS_RECIPE("gui", '\uF006'),
+    FLUID_INFUSER("gui", '\uF007'),
+    SEARCH("gui", '\uF008'),
+    CREATIVE_0("gui", '\uF100'),
+    CREATIVE_1("gui", '\uF101'),
+    CREATIVE_2("gui", '\uF102'),
+    CREATIVE_3("gui", '\uF103'),
+    CREATIVE_4("gui", '\uF104');
     
     val component: BaseComponent = ComponentBuilder(char.toString())
         .font("nova:$fontName")

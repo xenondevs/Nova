@@ -35,6 +35,7 @@ import xyz.xenondevs.nova.ui.FluidBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
+import xyz.xenondevs.nova.ui.item.LeftRightFluidProgressItem
 import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
@@ -177,7 +178,7 @@ class CobblestoneGenerator(
             openPrevious = ::openWindow
         )
         
-        val progressItem = ProgressArrowItem()
+        val progressItem = LeftRightFluidProgressItem()
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
