@@ -65,8 +65,6 @@ class Freezer(
     override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT) { createSideConfig(NetworkConnectionType.EXTRACT, BlockSide.FRONT) }
     override val energyHolder = ConsumerEnergyHolder(this, ENERGY_CAPACITY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     
-    private val waterLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true; it.isMarker = true }
-    
     private var mbPerTick = 0L
     private var mbUsed = 0L
     
@@ -105,11 +103,6 @@ class Freezer(
             }
             if (gui.isInitialized()) gui.value.progressItem.percentage = mbUsed / mbMaxPerOperation.toDouble()
         }
-    }
-    
-    override fun handleRemoved(unload: Boolean) {
-        super.handleRemoved(unload)
-        waterLevel.remove()
     }
     
     override fun saveData() {
