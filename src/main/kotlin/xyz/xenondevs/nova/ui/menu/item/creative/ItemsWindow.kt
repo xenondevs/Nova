@@ -21,22 +21,19 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
-import xyz.xenondevs.nova.ui.menu.item.recipes.openCorrespondingRecipesWindow
+import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 import xyz.xenondevs.nova.util.ItemUtils
-import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.data.setLocalizedName
@@ -82,15 +79,7 @@ class ObtainableItem(name: String) : BaseItem() {
     override fun getItemProvider(): ItemProvider = itemWrapper
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) {
-            openCorrespondingRecipesWindow(player, clickType, itemWrapper)
-        } else if (event.clickedInventory?.type != InventoryType.PLAYER && player.gameMode == GameMode.CREATIVE) {
-            if (clickType == ClickType.MIDDLE) {
-                player.setItemOnCursor(itemStack.clone().apply { amount = type.maxStackSize })
-            } else if (clickType.isShiftClick) {
-                player.inventory.addItemCorrectly(itemStack.clone().apply { amount = type.maxStackSize })
-            }
-        }
+        handleRecipeChoiceItemClick(player, clickType, event, itemWrapper)
     }
     
 }

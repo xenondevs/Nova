@@ -5,12 +5,14 @@ import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.impl.AutoCycleItem
 import de.studiocode.invui.item.impl.SimpleItem
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.util.addItemCorrectly
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
     val itemProviders = if (recipeChoice is RecipeChoice.MaterialChoice) recipeChoice.choices.map { ItemWrapper(ItemStack(it)) }
@@ -31,7 +33,7 @@ fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item {
     else StaticRecipeChoiceItem(itemProviders[0])
 }
 
-fun openCorrespondingRecipesWindow(player: Player, clickType: ClickType, itemProvider: ItemProvider) {
+fun handleRecipeChoiceItemClick(player: Player, clickType: ClickType, event: InventoryClickEvent, itemProvider: ItemProvider) {
     val name = RecipeRegistry.getNameKey(itemProvider.get())
     if (clickType == ClickType.LEFT) {
         val recipes = RecipeRegistry.CREATION_RECIPES[name]
@@ -39,13 +41,22 @@ fun openCorrespondingRecipesWindow(player: Player, clickType: ClickType, itemPro
     } else if (clickType == ClickType.RIGHT) {
         val recipes = RecipeRegistry.USAGE_RECIPES[name]
         if (recipes?.isNotEmpty() == true) RecipesWindow(player, recipes).show()
+    } else if (player.gameMode == GameMode.CREATIVE) {
+        val itemStack = itemProvider.get().clone().apply { amount = type.maxStackSize }
+        if (clickType == ClickType.MIDDLE) {
+            player.setItemOnCursor(itemStack)
+        } else if (clickType.isShiftClick) {
+            player.inventory.addItemCorrectly(itemStack)
+        } else if (clickType == ClickType.NUMBER_KEY) {
+            player.inventory.setItem(event.hotbarButton, itemStack)
+        }
     }
 }
 
 class CyclingRecipeChoiceItem(itemProviders: Array<ItemProvider>) : AutoCycleItem(20, *itemProviders) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) openCorrespondingRecipesWindow(player, clickType, itemProvider)
+        handleRecipeChoiceItemClick(player, clickType, event, itemProvider)
     }
     
 }
@@ -53,7 +64,7 @@ class CyclingRecipeChoiceItem(itemProviders: Array<ItemProvider>) : AutoCycleIte
 class StaticRecipeChoiceItem(itemProvider: ItemProvider) : SimpleItem(itemProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) openCorrespondingRecipesWindow(player, clickType, itemProvider)
+        handleRecipeChoiceItemClick(player, clickType, event, itemProvider)
     }
     
 }
