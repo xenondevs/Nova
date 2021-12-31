@@ -1,0 +1,6 @@
+{
+  "energy_capacity": 100000,
+  "water_capacity": 10000,
+  "energy_per_tick": 100,
+  "mb_per_tick": 100
+}

@@ -1,0 +1,6 @@
+{
+  "input": "minecraft:ice",
+  "result": "minecraft:snowball",
+  "amount": 4,
+  "time": 200
+}

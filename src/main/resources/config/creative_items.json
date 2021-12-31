@@ -25,7 +25,8 @@
         "nova:pump",
         "nova:star_collector",
         "nova:tree_factory",
-        "nova:infinite_water_source"
+        "nova:infinite_water_source",
+        "nova:freezer"
       ]
     },
     {
