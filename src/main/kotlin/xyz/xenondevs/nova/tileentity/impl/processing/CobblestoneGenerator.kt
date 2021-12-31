@@ -154,7 +154,7 @@ class CobblestoneGenerator(
     }
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
-        event.isCancelled == !event.isRemove && event.updateReason != SELF_UPDATE_REASON
+        event.isCancelled = !event.isRemove && event.updateReason != SELF_UPDATE_REASON
     }
     
     override fun handleRemoved(unload: Boolean) {

@@ -59,7 +59,7 @@ class Freezer(
     
     override val gui = lazy(::FreezerGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.SPEED, UpgradeType.EFFICIENCY, UpgradeType.ENERGY, UpgradeType.FLUID)
-    private val inventory = getInventory("inventory", 1, ::handleInventoryUpdate)
+    private val inventory = getInventory("inventory", 6, ::handleInventoryUpdate)
     private val waterTank = getFluidContainer("water", setOf(FluidType.WATER), WATER_CAPACITY, 0, upgradeHolder = upgradeHolder)
     
     override val fluidHolder = NovaFluidHolder(this, waterTank to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
@@ -76,7 +76,7 @@ class Freezer(
     }
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
-        event.isCancelled == !event.isRemove && event.updateReason != SELF_UPDATE_REASON
+        event.isCancelled = !event.isRemove && event.updateReason != SELF_UPDATE_REASON
     }
     
     private fun handleUpgradeUpdates() {
@@ -124,9 +124,9 @@ class Freezer(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| w # # # # s e |" +
-                "| w # > i # u e |" +
-                "| w # # # # m e |" +
+                "| w # i i # s e |" +
+                "| w > i i # u e |" +
+                "| w # i i # m e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inventory)
             .addIngredient('>', progressItem)
