@@ -1,0 +1,16 @@
+{
+  "result": "nova:freezer",
+  "shape": [
+    "sts",
+    "bfp",
+    "iii"
+  ],
+  "ingredients": {
+    "t": "nova:basic_fluid_tank",
+    "s": "minecraft:snowball",
+    "i": "nova:iron_plate",
+    "f": "nova:advanced_machine_frame",
+    "b": "minecraft:bucket",
+    "p": "minecraft:powder_snow_bucket"
+  }
+}
