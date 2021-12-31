@@ -22,11 +22,12 @@
         "nova:chunk_loader",
         "nova:cobblestone_generator",
         "nova:fluid_infuser",
+        "nova:freezer",
+        "nova:sprinkler",
         "nova:pump",
         "nova:star_collector",
         "nova:tree_factory",
-        "nova:infinite_water_source",
-        "nova:freezer"
+        "nova:infinite_water_source"
       ]
     },
     {
