@@ -1,0 +1,15 @@
+{
+  "result": "nova:fluid_infuser",
+  "shape": [
+    "ptp",
+    "bfb",
+    "iii"
+  ],
+  "ingredients": {
+    "t": "nova:basic_fluid_tank",
+    "p": "minecraft:piston",
+    "i": "nova:iron_plate",
+    "f": "nova:advanced_machine_frame",
+    "b": "minecraft:bucket"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "mode": "INSERT",
+  "fluid_type": "WATER",
+  "fluid_amount": 100,
+  "input": "minecraft:dead_tube_coral",
+  "result": "minecraft:tube_coral",
+  "time": 10
+}

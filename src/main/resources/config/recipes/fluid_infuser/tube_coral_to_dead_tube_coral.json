@@ -1,0 +1,8 @@
+{
+  "mode": "EXTRACT",
+  "fluid_type": "WATER",
+  "fluid_amount": 100,
+  "input": "minecraft:tube_coral",
+  "result": "minecraft:dead_tube_coral",
+  "time": 10
+}

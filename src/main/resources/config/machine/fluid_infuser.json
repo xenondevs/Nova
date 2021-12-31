@@ -1,5 +1,5 @@
 {
   "energy_per_tick": 20,
   "energy_capacity": 10000,
-  "fluid_capacity": 10000
+  "fluid_capacity": 5000
 }

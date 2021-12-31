@@ -1,0 +1,8 @@
+{
+  "mode": "EXTRACT",
+  "fluid_type": "WATER",
+  "fluid_amount": 1000,
+  "input": "minecraft:brain_coral_block",
+  "result": "minecraft:dead_brain_coral_block",
+  "time": 100
+}
