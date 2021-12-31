@@ -7,7 +7,6 @@ import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -25,7 +24,6 @@ import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.ConsumerEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
-import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
@@ -50,22 +48,22 @@ private val ENERGY_CAPACITY = NovaConfig[FREEZER].getLong("energy_capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[FREEZER].getLong("energy_per_tick")!!
 private val MB_PER_TICK = NovaConfig[FREEZER].getLong("mb_per_tick")!!
 
-class Freezer(uuid: UUID, data: CompoundElement, material: NovaMaterial, ownerUUID: UUID, armorStand: FakeArmorStand) :
-    NetworkedTileEntity(
-        uuid, data, material,
-        ownerUUID, armorStand
-    ), Upgradable {
+class Freezer(
+    uuid: UUID,
+    data: CompoundElement,
+    material: NovaMaterial,
+    ownerUUID: UUID,
+    armorStand: FakeArmorStand
+) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
     override val gui = lazy(::FreezerGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.SPEED, UpgradeType.EFFICIENCY, UpgradeType.ENERGY, UpgradeType.FLUID)
     private val inventory = getInventory("inventory", 1, ::handleInventoryUpdate)
-    
     private val waterTank = getFluidContainer("water", setOf(FluidType.WATER), WATER_CAPACITY, 0)
     
-    override val fluidHolder = NovaFluidHolder(this, waterTank to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT)}
+    override val fluidHolder = NovaFluidHolder(this, waterTank to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT) { createSideConfig(NetworkConnectionType.EXTRACT, BlockSide.FRONT) }
-    override val energyHolder = ConsumerEnergyHolder(this,
-        ENERGY_CAPACITY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    override val energyHolder = ConsumerEnergyHolder(this, ENERGY_CAPACITY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     
     private val waterLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true; it.isMarker = true }
     
@@ -78,7 +76,6 @@ class Freezer(uuid: UUID, data: CompoundElement, material: NovaMaterial, ownerUU
         handleUpgradeUpdates()
     }
     
-    
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {
         event.isCancelled == !event.isRemove && event.updateReason != SELF_UPDATE_REASON
     }
@@ -89,17 +86,16 @@ class Freezer(uuid: UUID, data: CompoundElement, material: NovaMaterial, ownerUU
     
     override fun handleTick() {
         val mbMaxPerOperation = 1000 * mode.maxCostMultiplier
-
+        
         if (mbUsed > mbMaxPerOperation && inventory.canHold(mode.product)) {
             val compensationItems = ItemStack(Material.ICE, (mbUsed / 1000.0).roundToInt())
             if (inventory.canHold(compensationItems)) {
-                inventory.addItem(SELF_UPDATE_REASON, compensationItems) //Add ice from overflowing water to the inventory
-                mbUsed = (mbUsed / 1000) - floor(mbUsed / 1000.0).toLong() //Add rest to the used millibuckets
+                inventory.addItem(SELF_UPDATE_REASON, compensationItems) // Add ice from overflowing water to the inventory
+                mbUsed = (mbUsed / 1000) - floor(mbUsed / 1000.0).toLong() // Add rest to the used millibuckets
             }
         }
         val mbToTake = min(mbPerTick, mbMaxPerOperation - mbUsed)
         if (waterTank.amount >= mbToTake && energyHolder.energy >= energyHolder.energyConsumption && inventory.canHold(mode.product)) {
-            
             energyHolder.energy -= energyHolder.energyConsumption
             mbUsed += mbToTake
             waterTank.takeFluid(mbToTake)
@@ -125,19 +121,19 @@ class Freezer(uuid: UUID, data: CompoundElement, material: NovaMaterial, ownerUU
         
         val progressItem = ProgressArrowItem()
         private val sideConfigGUI = SideConfigGUI(this@Freezer,
-        listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
-        listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.output"),
+            listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
+            listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.output"),
             listOf(waterTank to "container.nova.water_tank"),
             openPrevious = ::openWindow
         )
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
-                    "1 - - - - - - - 2" +
-                    "| w # # # # s e |" +
-                    "| w # > i # u e |" +
-                    "| w # # # # m e |" +
-                    "3 - - - - - - - 4")
+                "1 - - - - - - - 2" +
+                "| w # # # # s e |" +
+                "| w # > i # u e |" +
+                "| w # # # # m e |" +
+                "3 - - - - - - - 4")
             .addIngredient('i', inventory)
             .addIngredient('>', SimpleItem(NovaMaterialRegistry.PROGRESS_ARROW.itemProvider))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
@@ -149,13 +145,13 @@ class Freezer(uuid: UUID, data: CompoundElement, material: NovaMaterial, ownerUU
             FluidBar(gui, 1, 1, 3, fluidHolder, waterTank)
             EnergyBar(gui, 7, 1, 3, energyHolder)
         }
-    
-        private inner class ChangeModeItem : BaseItem() {
         
+        private inner class ChangeModeItem : BaseItem() {
+            
             override fun getItemProvider(): ItemProvider {
                 return mode.uiItem.itemProvider
             }
-        
+            
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
                 if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) {
                     val direction = if (clickType == ClickType.LEFT) 1 else -1
@@ -165,7 +161,7 @@ class Freezer(uuid: UUID, data: CompoundElement, material: NovaMaterial, ownerUU
                     notifyWindows()
                 }
             }
-        
+            
         }
     }
 }
