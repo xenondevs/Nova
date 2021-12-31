@@ -101,7 +101,7 @@ class Freezer(
                 mbUsed = 0
                 inventory.addItem(SELF_UPDATE_REASON, ItemStack(mode.product))
             }
-            if (gui.isInitialized()) gui.value.progressItem.percentage = mbUsed / mbMaxPerOperation.toDouble()
+            if (gui.isInitialized()) gui.value.updateProgress()
         }
     }
     
@@ -112,7 +112,7 @@ class Freezer(
     
     inner class FreezerGUI : TileEntityGUI() {
         
-        val progressItem = ProgressArrowItem()
+        private val progressItem = FreezerProgressItem()
         private val sideConfigGUI = SideConfigGUI(this@Freezer,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.output"),
@@ -128,7 +128,7 @@ class Freezer(
                 "| w # # # # m e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inventory)
-            .addIngredient('>', SimpleItem(NovaMaterialRegistry.PROGRESS_ARROW.itemProvider))
+            .addIngredient('>', progressItem)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .addIngredient('m', ChangeModeItem())
@@ -137,6 +137,10 @@ class Freezer(
         init {
             FluidBar(gui, 1, 1, 3, fluidHolder, waterTank)
             EnergyBar(gui, 7, 1, 3, energyHolder)
+        }
+        
+        fun updateProgress() {
+            progressItem.percentage = mbUsed / (1000 * mode.maxCostMultiplier).toDouble()
         }
         
         private inner class ChangeModeItem : BaseItem() {
@@ -154,13 +158,26 @@ class Freezer(
                     notifyWindows()
                 }
             }
-            
+        }
+        private inner class FreezerProgressItem : BaseItem() {
+        
+            var percentage: Double = 0.0
+                set(value) {
+                    field = value.coerceIn(0.0, 1.0)
+                    notifyWindows()
+                }
+        
+            override fun getItemProvider(): ItemProvider {
+                return NovaMaterialRegistry.FLUID_PROGRESS_LEFT_RIGHT.item.createItemBuilder("", (percentage * 16).roundToInt())
+            }
+        
+            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
         }
     }
 }
 
 private enum class FreezerMode(val product: ItemStack, val uiItem: NovaMaterial, val maxCostMultiplier: Int) {
-    ICE(ItemStack(Material.ICE), NovaMaterialRegistry.PINK_BUTTON, 1),
-    PACKED_ICE(ItemStack(Material.PACKED_ICE), NovaMaterialRegistry.GREEN_BUTTON, 1),
-    BLUE_ICE(ItemStack(Material.BLUE_ICE), NovaMaterialRegistry.BLUE_BUTTON, 5)
+    ICE(ItemStack(Material.ICE), NovaMaterialRegistry.ICE_MODE_BUTTON, 1),
+    PACKED_ICE(ItemStack(Material.PACKED_ICE), NovaMaterialRegistry.PACKED_ICE_MODE_BUTTON, 1),
+    BLUE_ICE(ItemStack(Material.BLUE_ICE), NovaMaterialRegistry.BLUE_ICE_MODE_BUTTON, 5)
 }
