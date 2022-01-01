@@ -1,0 +1,13 @@
+{
+  "result": "nova:sprinkler",
+  "shape": [
+    " i ",
+    " t ",
+    "ppp"
+  ],
+  "ingredients": {
+    "i": "minecraft:iron_ingot",
+    "t": "nova:basic_fluid_tank",
+    "p": "nova:iron_plate"
+  }
+}
