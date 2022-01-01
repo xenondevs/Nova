@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.RecipesWindow
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
+import xyz.xenondevs.nova.util.ItemUtils
 import xyz.xenondevs.nova.util.data.localized
 
 object NovaUsageCommand : Command("nvusage") {
@@ -29,7 +30,7 @@ object NovaUsageCommand : Command("nvusage") {
         val player = ctx.player
         val item = player.inventory.itemInMainHand
         if (!item.type.isAir) {
-            val recipes = RecipeRegistry.USAGE_RECIPES[RecipeRegistry.getNameKey(item)]
+            val recipes = RecipeRegistry.USAGE_RECIPES[ItemUtils.getNameKey(item)]
             if (recipes != null) RecipesWindow(player, recipes).show()
             else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.usage.no-usage"))
         } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.no-item-in-hand"))

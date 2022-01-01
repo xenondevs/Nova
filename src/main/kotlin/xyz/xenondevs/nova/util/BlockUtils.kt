@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.util
 
-import dev.lone.itemsadder.api.CustomBlock
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
@@ -10,7 +9,7 @@ import org.bukkit.block.*
 import org.bukkit.block.data.Levelled
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.integration.other.ItemsAdder
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -32,13 +31,10 @@ fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true
         return TileEntityManager.destroyTileEntity(tileEntity, true)
     }
     
-    if (ItemsAdder.isInstalled) {
-        val customBlock = CustomBlock.byAlreadyPlaced(this)
-        if (customBlock != null)
-            return ItemsAdder.breakCustomBlock(customBlock)
-    }
+    var drops = CustomItemServiceManager.breakBlock(this, tool)?.toMutableList()
+    if (drops != null) return drops
     
-    val drops = this.getDrops(tool).toMutableList()
+    drops = this.getDrops(tool).toMutableList()
     val state = state
     if (state is Chest) {
         drops += state.blockInventory.contents.filterNotNull()

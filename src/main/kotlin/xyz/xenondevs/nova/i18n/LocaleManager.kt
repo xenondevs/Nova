@@ -41,8 +41,8 @@ object LocaleManager {
     }
     
     fun getTranslation(lang: String, key: String): String {
-        if (!::translationProviders.isInitialized) return ""
-        return translationProviders[lang]?.get(key) ?: ""
+        if (!::translationProviders.isInitialized) return key
+        return translationProviders[lang]?.get(key) ?: key
     }
     
     fun getTranslationOrNull(lang: String, key: String): String? {

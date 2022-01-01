@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.i18n.LocaleManager
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.PacketListener
 import xyz.xenondevs.nova.player.ability.AbilityManager
@@ -46,36 +47,38 @@ class Nova : JavaPlugin() {
     override fun onEnable() {
         NOVA = this
         LOGGER = logger
-        
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
         PermanentStorage.store("last_version", description.version)
-        UpdateReminder.init()
         
+        UpdateReminder.init()
         setGlobalIngredients()
         NovaConfig.init()
         DatabaseManager.connect()
-        LocaleManager.init()
-        ChunkReloadWatcher.init()
-        FakeArmorStandManager.init()
-        AdvancementManager.loadAdvancements()
-        RecipeManager.registerRecipes()
-        RecipeRegistry.init()
-        ChunkLoadManager.init()
-        VanillaTileEntityManager.init()
-        TileEntityManager.init()
-        NetworkManager.init()
-        ItemManager.init()
-        AttachmentManager.init()
-        CommandManager.init()
-        ArmorEquipListener.init()
-        AbilityManager.init()
-        PacketListener.init()
-        LootGeneration.init()
-        forceResourcePack()
         
-        Metrics(this, 11927)
-        
-        LOGGER.info("Done loading")
+        CustomItemServiceManager.runAfterDataLoad {
+            LocaleManager.init()
+            ChunkReloadWatcher.init()
+            FakeArmorStandManager.init()
+            AdvancementManager.loadAdvancements()
+            RecipeManager.registerRecipes()
+            RecipeRegistry.init()
+            ChunkLoadManager.init()
+            VanillaTileEntityManager.init()
+            TileEntityManager.init()
+            NetworkManager.init()
+            ItemManager.init()
+            AttachmentManager.init()
+            CommandManager.init()
+            ArmorEquipListener.init()
+            AbilityManager.init()
+            PacketListener.init()
+            LootGeneration.init()
+            forceResourcePack()
+            
+            Metrics(this, 11927)
+            
+            LOGGER.info("Done loading")
+        }
     }
     
     override fun onDisable() {

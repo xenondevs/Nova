@@ -7,9 +7,10 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
+import xyz.xenondevs.nova.util.ItemUtils.getNameKey
 import xyz.xenondevs.nova.util.data.getInputStacks
-import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
 
@@ -107,7 +108,7 @@ object RecipeRegistry {
         return BUKKIT_RECIPES.asSequence()
             .filter {
                 val namespace = (it as Keyed).key.namespace
-                (namespace == "minecraft" || namespace == "nova") // do not allow recipes from different plugins to show up
+                (namespace == "minecraft" || namespace == "nova" || CustomItemServiceManager.hasNamespace(namespace)) // do not allow recipes from unsupported plugins to show up
                     && (it is ShapedRecipe || it is ShapelessRecipe || it is FurnaceRecipe || it is StonecuttingRecipe || it is SmithingRecipe)
             }
     }
@@ -117,13 +118,6 @@ object RecipeRegistry {
             .values.asSequence()
             .flatMap { it.values }
             .filterIsInstance<ConversionNovaRecipe>()
-    }
-    
-    fun getNameKey(itemStack: ItemStack): String {
-        val novaMaterial = itemStack.novaMaterial
-        
-        return if (novaMaterial != null) "nova:${novaMaterial.typeName.lowercase()}"
-        else "minecraft:${itemStack.type.name.lowercase()}"
     }
     
 }

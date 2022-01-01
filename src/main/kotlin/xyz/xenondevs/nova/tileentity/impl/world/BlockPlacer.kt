@@ -6,7 +6,7 @@ import de.studiocode.invui.gui.builder.guitype.GUIType
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.integration.other.ItemsAdder
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.BLOCK_PLACER
@@ -44,33 +44,27 @@ class BlockPlacer(
     override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
     
     private val placeLocation = location.clone().advance(getFace(BlockSide.FRONT))
-    private val placeBlock = location.clone().advance(getFace(BlockSide.FRONT)).block
+    private val placeBlock = placeLocation.block
     
     private fun placeBlock(): Boolean {
         for ((index, item) in inventory.items.withIndex()) {
             if (item == null) continue
             
             val material = item.type
-            if (material.isBlock) {
-                val novaMaterial = item.novaMaterial
-                if (novaMaterial != null && novaMaterial.isBlock) {
-                    if (TileEntityLimits.canPlaceTileEntity(ownerUUID, world, novaMaterial) == PlaceResult.ALLOW) {
-                        TileEntityManager.placeTileEntity(ownerUUID, placeBlock.location, armorStand.location.yaw, novaMaterial, null)
-                        novaMaterial.hitboxType?.playPlaceSoundEffect(placeBlock.location)
-                    } else continue
-                } else {
+            val novaMaterial = item.novaMaterial
+            if (novaMaterial != null && novaMaterial.isBlock) {
+                if (TileEntityLimits.canPlaceTileEntity(ownerUUID, world, novaMaterial) == PlaceResult.ALLOW) {
+                    runTask { TileEntityManager.placeTileEntity(ownerUUID, placeLocation, armorStand.location.yaw, novaMaterial, null) }
+                    novaMaterial.hitboxType?.playPlaceSoundEffect(placeLocation)
+                } else continue
+            } else if (!CustomItemServiceManager.placeItem(item, placeLocation)) {
+                if (material.isBlock) {
                     placeBlock.place(item)
-                    material.playPlaceSoundEffect(placeBlock.location)
-                }
-                
-                inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
-                return true
-            } else if (ItemsAdder.isInstalled) {
-                if (ItemsAdder.placeItem(item, placeBlock.location)) {
-                    inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
-                    return true
-                }
+                    material.playPlaceSoundEffect(placeLocation)
+                } else continue
             }
+            
+            inventory.addItemAmount(SELF_UPDATE_REASON, index, -1)
         }
         
         return false
@@ -88,7 +82,7 @@ class BlockPlacer(
         }
     }
     
-    inner class BlockPlacerGUI : TileEntityGUI() {
+    inner class BlockPlacerGUI : TileEntity.TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@BlockPlacer,

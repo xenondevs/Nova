@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.util.ItemUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
@@ -34,7 +35,7 @@ fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item {
 }
 
 fun handleRecipeChoiceItemClick(player: Player, clickType: ClickType, event: InventoryClickEvent, itemProvider: ItemProvider) {
-    val name = RecipeRegistry.getNameKey(itemProvider.get())
+    val name = ItemUtils.getNameKey(itemProvider.get())
     if (clickType == ClickType.LEFT) {
         val recipes = RecipeRegistry.CREATION_RECIPES[name]
         if (recipes?.isNotEmpty() == true) RecipesWindow(player, recipes).show()

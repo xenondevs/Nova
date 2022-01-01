@@ -13,6 +13,7 @@ import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.data.recipe.ComplexChoice
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
 import xyz.xenondevs.nova.data.recipe.SingleCustomRecipeChoice
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -67,6 +68,16 @@ val ItemStack.customModelData: Int
         return 0
     }
 
+val ItemStack.displayName: String?
+    get() {
+        if (hasItemMeta()) {
+            val itemMeta = itemMeta!!
+            return itemMeta.displayName
+        }
+        
+        return null
+    }
+
 val Material.soundGroup: SoundGroup
     get() = createBlockData().soundGroup
 
@@ -105,14 +116,20 @@ object ItemUtils {
         
         nameList.forEach { name ->
             try {
-                if (name.startsWith("nova:")) {
+                val namespace = name.substringBefore(':')
+                
+                if (namespace == "nova") {
                     val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
                     choices += material.item.material to intArrayOf(material.item.data).let { if (material.legacyItemIds != null) it + material.legacyItemIds else it }
                     examples += material.createItemStack()
-                } else if (name.startsWith("minecraft:")) {
+                } else if (namespace == "minecraft") {
                     val material = Material.valueOf(name.drop(10).uppercase())
                     choices += material to intArrayOf(0)
                     examples += ItemStack(material)
+                } else if (CustomItemServiceManager.hasNamespace(namespace)) {
+                    val stack = CustomItemServiceManager.getItemByName(name)!!
+                    choices += stack.type to intArrayOf(stack.customModelData)
+                    examples += stack
                 } else throw IllegalArgumentException("Invalid item name: $name (Unknown or missing prefix)")
             } catch (ex: Exception) {
                 throw IllegalArgumentException("Unknown item $name", ex)
@@ -127,11 +144,16 @@ object ItemUtils {
     @Suppress("LiftReturnOrAssignment")
     fun getItemBuilder(name: String, basic: Boolean = false): ItemBuilder {
         try {
-            if (name.startsWith("nova:")) {
+            val namespace = name.substringBefore(':')
+            
+            if (namespace == "nova") {
                 val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
                 return if (basic) novaMaterial.createBasicItemBuilder() else novaMaterial.createItemBuilder()
-            } else if (name.startsWith("minecraft:")) {
+            } else if (namespace == "minecraft") {
                 return ItemBuilder(toItemStack(name))
+            } else if (CustomItemServiceManager.hasNamespace(namespace)) {
+                val stack = CustomItemServiceManager.getItemByName(name)!!
+                return ItemBuilder(stack)
             } else throw IllegalArgumentException("Unknown prefix")
         } catch (ex: Exception) {
             throw IllegalArgumentException("Invalid item name: $name", ex)
@@ -143,13 +165,18 @@ object ItemUtils {
         val localizedName: String
         
         try {
-            if (name.startsWith("nova:")) {
+            val namespace = name.substringBefore(':')
+            
+            if (namespace == "nova") {
                 val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
                 localizedName = novaMaterial.localizedName
                 itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
-            } else if (name.startsWith("minecraft:")) {
+            } else if (namespace == "minecraft") {
                 itemStack = toItemStack(name)
                 localizedName = itemStack.type.localizedName!!
+            } else if (CustomItemServiceManager.hasNamespace(namespace)) {
+                itemStack = CustomItemServiceManager.getItemByName(name)!!
+                localizedName = itemStack.displayName ?: ""
             } else throw IllegalArgumentException("Unknown prefix")
         } catch (ex: Exception) {
             throw IllegalArgumentException("Invalid item name: $name", ex)
@@ -162,6 +189,16 @@ object ItemUtils {
         val parser = ItemParser(StringReader(s), false).parse()
         val nmsStack = NMSItemStack(parser.item, 1).apply { tag = parser.nbt }
         return CraftItemStack.asBukkitCopy(nmsStack)
+    }
+    
+    fun getNameKey(itemStack: ItemStack): String {
+        val novaMaterial = itemStack.novaMaterial
+        if (novaMaterial != null) return "nova:${novaMaterial.typeName.lowercase()}"
+        
+        val customNameKey = CustomItemServiceManager.getNameKey(itemStack)
+        if (customNameKey != null) return customNameKey
+        
+        return "minecraft:${itemStack.type.name.lowercase()}"
     }
     
 }
