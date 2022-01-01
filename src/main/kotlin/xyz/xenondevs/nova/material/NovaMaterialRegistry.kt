@@ -78,7 +78,7 @@ object NovaMaterialRegistry {
     val PUMP = registerDefaultTileEntity("PUMP", 35, ::Pump, BARRIER)
     val COBBLESTONE_GENERATOR = registerDefaultTileEntity("COBBLESTONE_GENERATOR", 36, ::CobblestoneGenerator, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     val FLUID_INFUSER = registerDefaultTileEntity("FLUID_INFUSER", 37, ::FluidInfuser, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
-    val FREEZER = registerDefaultTileEntity("FREEZER", 38, ::Freezer, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
+    val FREEZER = registerDefaultTileEntity("FREEZER", 38, ::Freezer, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     val SPRINKLER = registerDefaultTileEntity("SPRINKLER", 39, ::Sprinkler, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     
     // 1000 - 2000: Crafting Items
