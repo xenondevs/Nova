@@ -87,10 +87,11 @@ class Freezer(
         val mbMaxPerOperation = 1000 * mode.maxCostMultiplier
         
         if (mbUsed > mbMaxPerOperation && inventory.canHold(mode.product)) {
-            val compensationItems = ItemStack(Material.ICE, (mbUsed / 1000.0).roundToInt())
+            val compensationCount = (mbUsed / mbMaxPerOperation.toDouble()).roundToInt()
+            val compensationItems = ItemStack(Material.ICE, compensationCount)
             if (inventory.canHold(compensationItems)) {
                 inventory.addItem(SELF_UPDATE_REASON, compensationItems) // Add ice from overflowing water to the inventory
-                mbUsed = (mbUsed / 1000) - floor(mbUsed / 1000.0).toLong() // Add rest to the used millibuckets
+                mbUsed -= compensationCount * mbMaxPerOperation // Take used up mb for the compensatory product
             }
         }
         val mbToTake = min(mbPerTick, mbMaxPerOperation - mbUsed)
@@ -100,7 +101,7 @@ class Freezer(
             waterTank.takeFluid(mbToTake)
             if (mbUsed >= mbMaxPerOperation) {
                 mbUsed = 0
-                inventory.addItem(SELF_UPDATE_REASON, ItemStack(mode.product))
+                inventory.addItem(SELF_UPDATE_REASON, mode.product)
             }
             if (gui.isInitialized()) gui.value.updateProgress()
         }
