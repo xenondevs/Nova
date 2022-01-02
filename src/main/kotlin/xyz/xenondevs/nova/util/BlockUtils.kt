@@ -1,12 +1,26 @@
 package xyz.xenondevs.nova.util
 
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.block.*
+import org.bukkit.block.Block
+import org.bukkit.block.Chest
+import org.bukkit.block.Container
+import org.bukkit.block.ShulkerBox
+import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.Levelled
+import org.bukkit.block.data.type.Bed
+import org.bukkit.block.data.type.PistonHead
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -33,7 +47,7 @@ fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true
         return TileEntityManager.destroyTileEntity(tileEntity, true)
     }
     
-    val drops = this.getDrops(tool).toMutableList()
+    val drops = ArrayList<ItemStack>()
     val state = state
     if (state is Chest) {
         drops += state.blockInventory.contents.filterNotNull()
@@ -41,11 +55,33 @@ fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true
     } else if (state is Container && state !is ShulkerBox) {
         drops += state.inventory.contents.filterNotNull()
         state.inventory.clear()
+    } else if (state is Bisected && state.half == Bisected.Half.TOP) {
+        return location.subtract(0.0, 1.0, 0.0).block.breakAndTakeDrops(tool, playEffects)
     }
     
-    type = Material.AIR
+    val block = getMainHalf()
+    drops += block.getDrops(tool)
+    
+    block.type = Material.AIR
     
     return drops.filterNot { it.type.isAir }
+}
+
+private fun Block.getMainHalf(): Block {
+    val data = blockData
+    if (data is Bisected) {
+        if (data.half == Bisected.Half.TOP) {
+            return location.subtract(0.0, 1.0, 0.0).block
+        }
+    } else if (data is Bed) {
+        if (data.part == Bed.Part.FOOT) {
+            return location.advance(data.facing).block
+        }
+    } else if (data is PistonHead) {
+        return location.advance(data.facing.oppositeFace).block
+    }
+    
+    return this
 }
 
 fun Block.playBreakEffects() {
@@ -75,11 +111,28 @@ fun Block.setBreakState(entityId: Int, state: Int) {
         .forEach { it.send(packet) }
 }
 
-fun Block.place(itemStack: ItemStack) {
-    type = itemStack.type
+fun Block.place(player: ServerPlayer, itemStack: ItemStack): Boolean {
+    val location = location
+    val nmsStack = itemStack.nmsStack
+    val blockItem = nmsStack.item as BlockItem
+    val result = blockItem.place(BlockPlaceContext(UseOnContext(
+        world.serverLevel,
+        player,
+        InteractionHand.MAIN_HAND,
+        nmsStack,
+        BlockHitResult(
+            Vec3(location.x, location.y, location.z),
+            Direction.UP,
+            BlockPos(location.blockX, location.blockY, location.blockZ),
+            false
+        )
+    )))
     
-    if (state is TileState || type == Material.PLAYER_HEAD || type == Material.PLAYER_WALL_HEAD)
+    if (result.consumesAction()) {
         setBlockEntityDataFromItemStack(itemStack)
+        return true
+    }
+    return false
 }
 
 fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {

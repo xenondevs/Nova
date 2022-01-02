@@ -43,6 +43,7 @@ class BlockPlacer(
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_PLACE, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
     override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
     
+    private val fakePlayer = EntityUtils.createFakePlayer(location.clone(), UUID.randomUUID(), "Block Placer $uuid")
     private val placeLocation = location.clone().advance(getFace(BlockSide.FRONT))
     private val placeBlock = placeLocation.block
     
@@ -58,8 +59,7 @@ class BlockPlacer(
                     novaMaterial.hitboxType?.playPlaceSoundEffect(placeLocation)
                 } else continue
             } else if (!CustomItemServiceManager.placeItem(item, placeLocation, true)) {
-                if (material.isBlock) {
-                    placeBlock.place(item)
+                if (material.isBlock && placeBlock.place(fakePlayer, item)) {
                     material.playPlaceSoundEffect(placeLocation)
                 } else continue
             }
