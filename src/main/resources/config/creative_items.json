@@ -62,7 +62,8 @@
         "nova:advanced_fluid_tank",
         "nova:elite_fluid_tank",
         "nova:ultimate_fluid_tank",
-        "nova:creative_fluid_tank"
+        "nova:creative_fluid_tank",
+        "nova:fluid_storage_unit"
       ]
     },
     {
