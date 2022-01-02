@@ -11,10 +11,7 @@ import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.item.holder.DynamicVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.StaticVanillaItemHolder
-import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedBukkitInventory
-import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedChestInventory
-import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedRangedBukkitInventory
+import xyz.xenondevs.nova.tileentity.network.item.inventory.*
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
@@ -78,7 +75,7 @@ class VanillaContainerTileEntity(container: Container) : ItemStorageVanillaTileE
     override val itemHolder: StaticVanillaItemHolder
     
     init {
-        val inventory = NetworkedBukkitInventory(container.inventory)
+        val inventory = if (container is ShulkerBox) NetworkedShulkerBoxInventory(container.inventory) else NetworkedBukkitInventory(container.inventory)
         val inventories = CUBE_FACES.associateWithTo(emptyEnumMap<BlockFace, NetworkedInventory>()) { inventory }
         itemHolder = StaticVanillaItemHolder(this, inventories)
     }

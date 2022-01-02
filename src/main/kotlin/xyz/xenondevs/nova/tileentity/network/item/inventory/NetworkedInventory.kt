@@ -134,6 +134,19 @@ class NetworkedChestInventory(inventory: Inventory) : NetworkedBukkitInventory(i
 }
 
 /**
+ * A [NetworkedInventory] specifically for shulker boxes. This implementation prevents the insertion
+ * of other shulker boxes into the shulker box inventory.
+ */
+class NetworkedShulkerBoxInventory(inventory: Inventory) : NetworkedBukkitInventory(inventory) {
+    
+    override fun addItem(item: ItemStack): Int {
+        return if (item.type.name.contains("SHULKER_BOX")) item.amount
+        else super.addItem(item)
+    }
+    
+}
+
+/**
  * A [NetworkedInventory] wrapper for specific slots of a [Inventory].
  *
  * Useful for splitting different slots inside vanilla TileEntities into multiple [NetworkedInventory]s

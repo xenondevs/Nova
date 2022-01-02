@@ -2,6 +2,8 @@ name: Build Artifacts
 
 on:
   push:
+    branches:
+      - '**'
   release:
     types: [ created ]
 
