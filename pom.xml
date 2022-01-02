@@ -6,7 +6,7 @@
 
     <groupId>xyz.xenondevs</groupId>
     <artifactId>Nova</artifactId>
-    <version>0.7.3</version>
+    <version>0.7.4</version>
 
     <properties>
         <kotlin.version>1.6.10</kotlin.version>
@@ -201,7 +201,7 @@
         <dependency>
             <groupId>com.github.NichtStudioCode</groupId>
             <artifactId>AdvancementAPI</artifactId>
-            <version>4a8d5e64ad</version>
+            <version>f928e46930</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
