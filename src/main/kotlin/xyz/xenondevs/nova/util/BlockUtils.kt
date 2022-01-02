@@ -55,8 +55,6 @@ fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true
     } else if (state is Container && state !is ShulkerBox) {
         drops += state.inventory.contents.filterNotNull()
         state.inventory.clear()
-    } else if (state is Bisected && state.half == Bisected.Half.TOP) {
-        return location.subtract(0.0, 1.0, 0.0).block.breakAndTakeDrops(tool, playEffects)
     }
     
     val block = getMainHalf()
