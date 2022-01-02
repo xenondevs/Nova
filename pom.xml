@@ -121,6 +121,12 @@
             <version>0.97.2.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.Th0rgal</groupId>
+            <artifactId>Oraxen</artifactId>
+            <version>2ddf3c68b7</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Not provided -->
         <dependency>
