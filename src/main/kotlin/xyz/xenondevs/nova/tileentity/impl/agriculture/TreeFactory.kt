@@ -55,7 +55,7 @@ private val ENERGY_PER_TICK = NovaConfig[TREE_FACTORY].getLong("energy_per_tick"
 private val PROGRESS_PER_TICK = NovaConfig[TREE_FACTORY].getDouble("progress_per_tick")!!
 private val IDLE_TIME = NovaConfig[TREE_FACTORY].getInt("idle_time")!!
 
-private const val MAX_GROWTH_STAGE = 450
+private const val MAX_GROWTH_STAGE = 199
 
 class TreeFactory(
     uuid: UUID,
