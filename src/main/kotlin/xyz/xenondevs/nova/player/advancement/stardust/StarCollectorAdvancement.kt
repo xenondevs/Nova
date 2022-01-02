@@ -13,7 +13,7 @@ object StarCollectorAdvancement : Advancement(NamespacedKey(NOVA, "star_collecto
     init {
         setParent(StarShardsAdvancement.key)
         addObtainCriteria(NovaMaterialRegistry.STAR_COLLECTOR)
-        setDisplayLocalized { 
+        setDisplayLocalized {
             it.setIcon(NovaMaterialRegistry.STAR_COLLECTOR.toIcon())
         }
     }

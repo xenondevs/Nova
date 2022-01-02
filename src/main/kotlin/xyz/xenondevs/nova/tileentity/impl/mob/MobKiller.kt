@@ -153,7 +153,7 @@ class MobKiller(
         val energyBar = EnergyBar(gui, x = 3, y = 1, height = 3, energyHolder)
         
         val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3) {
-    
+            
             override val barMaterial = NovaMaterialRegistry.GREEN_BAR
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =

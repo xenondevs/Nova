@@ -14,7 +14,7 @@ object StarShardsAdvancement : Advancement(NamespacedKey(NOVA, "star_shards")) {
     init {
         setParent(RootAdvancement.key)
         addObtainCriteria(NovaMaterialRegistry.STAR_SHARDS)
-        setDisplayLocalized { 
+        setDisplayLocalized {
             it.setIcon(NovaMaterialRegistry.STAR_SHARDS.toIcon())
         }
     }

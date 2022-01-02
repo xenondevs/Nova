@@ -69,7 +69,8 @@ fun JsonObject.getBoolean(property: String, default: Boolean = false) = if (hasB
 
 inline fun <reified T> JsonObject.getDeserialized(property: String) = GSON.fromJson<T>(get(property))
 
-inline fun <reified T> JsonObject.getDeserialized(property: String, default: () -> T) = getDeserialized(property) ?: default()
+inline fun <reified T> JsonObject.getDeserialized(property: String, default: () -> T) = getDeserialized(property)
+    ?: default()
 
 operator fun JsonObject.set(property: String, value: JsonElement) = add(property, value)
 

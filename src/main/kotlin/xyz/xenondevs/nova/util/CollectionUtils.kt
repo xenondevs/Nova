@@ -111,7 +111,7 @@ inline fun <K, V, M : MutableMap<K, V>> Iterable<K>.associateWithNotNullTo(desti
     return destination
 }
 
-fun <K, V> Map<K,V>.getValues(keys: Iterable<K>): List<V> {
+fun <K, V> Map<K, V>.getValues(keys: Iterable<K>): List<V> {
     val values = ArrayList<V>()
     for (key in keys) {
         values += get(key)!!

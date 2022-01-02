@@ -216,7 +216,7 @@ class Breeder(
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.breeder.idle", maxIdleTime - timePassed))
-        
+            
         }
         
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)

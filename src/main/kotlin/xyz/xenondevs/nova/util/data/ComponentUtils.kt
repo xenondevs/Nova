@@ -25,7 +25,7 @@ fun localized(color: ChatColor, translate: String, vararg with: Any): Translatab
     return component
 }
 
-fun localized(color: ChatColor, material: Material) : BaseComponent {
+fun localized(color: ChatColor, material: Material): BaseComponent {
     val component = material.localizedName?.let {
         TranslatableComponent(it)
     } ?: TextComponent(material.name)
@@ -33,7 +33,7 @@ fun localized(color: ChatColor, material: Material) : BaseComponent {
     return component
 }
 
-fun localized(color: ChatColor, entity: Entity) : BaseComponent {
+fun localized(color: ChatColor, entity: Entity): BaseComponent {
     val component = entity.localizedName?.let {
         TranslatableComponent(it)
     } ?: TextComponent(entity.name)

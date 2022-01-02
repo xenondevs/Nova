@@ -36,7 +36,6 @@ import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.LeftRightFluidProgressItem
-import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.axis

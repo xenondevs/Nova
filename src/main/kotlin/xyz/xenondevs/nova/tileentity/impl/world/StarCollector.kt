@@ -130,7 +130,7 @@ class StarCollector(
             }.display(getViewers())
         }
         
-        if (gui.isInitialized()) 
+        if (gui.isInitialized())
             gui.value.collectionBar.percentage = timeSpentCollecting / maxCollectionTime.toDouble()
     }
     
@@ -148,7 +148,7 @@ class StarCollector(
             particleVector = Vector(rod.location.yaw, -65F)
         } else rod.teleport { this.yaw += 2F }
         
-        if (gui.isInitialized()) 
+        if (gui.isInitialized())
             gui.value.idleBar.percentage = timeSpentIdle / maxIdleTime.toDouble()
     }
     
@@ -213,7 +213,7 @@ class StarCollector(
         }
         
         val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3) {
-    
+            
             override val barMaterial = NovaMaterialRegistry.GREEN_BAR
             
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =

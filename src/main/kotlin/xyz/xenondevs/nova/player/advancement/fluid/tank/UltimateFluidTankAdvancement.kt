@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.player.advancement.addObtainCriteria
 import xyz.xenondevs.nova.player.advancement.setDisplayLocalized
 import xyz.xenondevs.nova.player.advancement.toIcon
 
-object UltimateFluidTankAdvancement: Advancement(NOVA, "ultimate_fluid_tank") {
+object UltimateFluidTankAdvancement : Advancement(NOVA, "ultimate_fluid_tank") {
     
     init {
         setParent(EliteFluidTankAdvancement.key)

@@ -45,7 +45,7 @@ class FluidStorageUnit(
     override val gui = lazy(::FluidStorageUnitGUI)
     val fluidTank = getFluidContainer("fluid", setOf(FluidType.LAVA, FluidType.WATER), MAX_CAPACITY, 0, ::handleFluidUpdate)
     val inventory = getInventory("inventory", 1, ::handleInventoryUpdate)
-    private val fluidLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true; it.isMarker = true}
+    private val fluidLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true; it.isMarker = true }
     
     override val fluidHolder = NovaFluidHolder(this, fluidTank to NetworkConnectionType.BUFFER)
     
@@ -97,11 +97,11 @@ class FluidStorageUnit(
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
-                    "1 - - - - - - - 2" +
-                    "| # # # # # f # |" +
-                    "| # i # c # f s |" +
-                    "| # # # # # f # |" +
-                    "3 - - - - - - - 4")
+                "1 - - - - - - - 2" +
+                "| # # # # # f # |" +
+                "| # i # c # f s |" +
+                "| # # # # # f # |" +
+                "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('i', inventory)
             .addIngredient('c', fluidStorageDisplay)
@@ -115,11 +115,12 @@ class FluidStorageUnit(
             FluidBar(gui, 6, 1, 3, fluidHolder, fluidTank)
         }
         
-        private inner class FluidStorageUnitDisplay(val fluidStorageUnit: FluidStorageUnit): BaseItem() {
-        
-            override fun getItemProvider(): ItemProvider {
+        private inner class FluidStorageUnitDisplay(val fluidStorageUnit: FluidStorageUnit) : BaseItem() {
             
-                val type = fluidStorageUnit.fluidTank.type?.bucket ?: return ItemBuilder(Material.BARRIER).setDisplayName("§r")
+            override fun getItemProvider(): ItemProvider {
+                
+                val type = fluidStorageUnit.fluidTank.type?.bucket
+                    ?: return ItemBuilder(Material.BARRIER).setDisplayName("§r")
                 val amount = fluidStorageUnit.fluidTank.amount
                 val component = TranslatableComponent(
                     "menu.nova.fluid_storage_unit.item_display_" + if (amount > 1) "plural" else "singular",
@@ -127,7 +128,7 @@ class FluidStorageUnit(
                 )
                 return ItemBuilder(type).setDisplayName(component).setAmount(1)
             }
-        
+            
             override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
         }
     }

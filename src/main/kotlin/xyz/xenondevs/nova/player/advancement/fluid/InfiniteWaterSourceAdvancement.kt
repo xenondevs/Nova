@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.player.advancement.fluid.tank.UltimateFluidTankAdvance
 import xyz.xenondevs.nova.player.advancement.setDisplayLocalized
 import xyz.xenondevs.nova.player.advancement.toIcon
 
-object InfiniteWaterSourceAdvancement : Advancement(NOVA, "infinite_water_source"){
+object InfiniteWaterSourceAdvancement : Advancement(NOVA, "infinite_water_source") {
     
     init {
         setParent(UltimateFluidTankAdvancement.key)

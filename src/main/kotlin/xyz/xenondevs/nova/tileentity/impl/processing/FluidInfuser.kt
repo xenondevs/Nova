@@ -107,7 +107,7 @@ class FluidInfuser(
                 if (((mode == InfuserMode.INSERT && tank.amount >= recipe.fluidAmount)
                         || (mode == InfuserMode.EXTRACT && tank.accepts(recipe.fluidType, recipe.fluidAmount)))
                     && output.canHold(recipe.result)) {
-    
+                    
                     energyHolder.energy -= energyHolder.energyConsumption
                     if (++timePassed >= recipeTime) {
                         input.addItemAmount(SELF_UPDATE_REASON, 0, -1)
@@ -129,7 +129,7 @@ class FluidInfuser(
         private val changeModeItem = CycleItem.withStateChangeHandler(
             ::changeMode,
             mode.ordinal,
-            NovaMaterialRegistry.FLUID_LEFT_RIGHT_BUTTON.itemProvider, 
+            NovaMaterialRegistry.FLUID_LEFT_RIGHT_BUTTON.itemProvider,
             NovaMaterialRegistry.FLUID_RIGHT_LEFT_BUTTON.itemProvider
         )
         

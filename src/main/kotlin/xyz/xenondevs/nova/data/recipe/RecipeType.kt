@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.data.recipe
 
-import net.minecraft.world.item.crafting.StonecutterRecipe
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.*
