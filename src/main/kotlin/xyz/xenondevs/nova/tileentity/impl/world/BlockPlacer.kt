@@ -57,7 +57,7 @@ class BlockPlacer(
                     runTask { TileEntityManager.placeTileEntity(ownerUUID, placeLocation, armorStand.location.yaw, novaMaterial, null) }
                     novaMaterial.hitboxType?.playPlaceSoundEffect(placeLocation)
                 } else continue
-            } else if (!CustomItemServiceManager.placeItem(item, placeLocation)) {
+            } else if (!CustomItemServiceManager.placeItem(item, placeLocation, true)) {
                 if (material.isBlock) {
                     placeBlock.place(item)
                     material.playPlaceSoundEffect(placeLocation)

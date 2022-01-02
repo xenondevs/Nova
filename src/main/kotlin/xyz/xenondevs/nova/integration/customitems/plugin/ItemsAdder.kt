@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 object ItemsAdder : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null
+    override val requiresLoadDelay = true
     
     init {
         if (isInstalled) {
@@ -32,7 +33,7 @@ object ItemsAdder : CustomItemService {
         }
     }
     
-    override fun breakBlock(block: Block, tool: ItemStack?): List<ItemStack>? {
+    override fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
         if (customBlock != null) {
             val loot = customBlock.getLoot(true)
@@ -43,7 +44,7 @@ object ItemsAdder : CustomItemService {
         return null
     }
     
-    override fun placeItem(item: ItemStack, location: Location): Boolean {
+    override fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
         // Note: CustomBlock.byItemStack(item) can't be used because of an illegal cast in the ItemsAdder API
         val customItem = CustomStack.byItemStack(item)
         if (customItem == null || !customItem.isBlock)

@@ -24,6 +24,8 @@ fun Block.hasSameTypeBelow(): Boolean {
 }
 
 fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true): List<ItemStack> {
+    CustomItemServiceManager.breakBlock(this, tool, playEffects)?.let { return it }
+    
     if (playEffects) playBreakEffects()
     
     val tileEntity = TileEntityManager.getTileEntityAt(location)
@@ -31,10 +33,7 @@ fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true
         return TileEntityManager.destroyTileEntity(tileEntity, true)
     }
     
-    var drops = CustomItemServiceManager.breakBlock(this, tool)?.toMutableList()
-    if (drops != null) return drops
-    
-    drops = this.getDrops(tool).toMutableList()
+    val drops = this.getDrops(tool).toMutableList()
     val state = state
     if (state is Chest) {
         drops += state.blockInventory.contents.filterNotNull()

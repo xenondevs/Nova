@@ -71,8 +71,15 @@ object AsyncExecutor {
         }
     }
     
-    fun runAsync(task: () -> Unit): Future<*> =
-        executorService.submit(task)
+    fun runAsync(task: () -> Unit): Future<*> {
+        return executorService.submit {
+            try {
+                task()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
+        }
+    }
     
     fun shutdown() {
         if (USE_NOVA_SCHEDULER) {
