@@ -207,7 +207,7 @@
         <dependency>
             <groupId>com.github.NichtStudioCode</groupId>
             <artifactId>AdvancementAPI</artifactId>
-            <version>4a8d5e64ad</version>
+            <version>f928e46930</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
