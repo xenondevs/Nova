@@ -1,0 +1,9 @@
+{
+  "creation": {
+    "nova:star_shards": "item_info.nova.star_shards",
+    "nova:infinite_water_source": "item_info.nova.infinite_water_source",
+    "nova:star_dust": "abc"
+  },
+  "usage": {
+  }
+}

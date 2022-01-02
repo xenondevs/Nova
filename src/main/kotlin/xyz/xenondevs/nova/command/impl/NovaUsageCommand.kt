@@ -4,11 +4,8 @@ import com.mojang.brigadier.context.CommandContext
 import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import xyz.xenondevs.nova.command.*
-import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.ui.menu.item.recipes.RecipesWindow
-import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
-import xyz.xenondevs.nova.util.ItemUtils
+import xyz.xenondevs.nova.ui.menu.item.recipes.showUsages
 import xyz.xenondevs.nova.util.data.localized
 
 object NovaUsageCommand : Command("nvusage") {
@@ -17,9 +14,9 @@ object NovaUsageCommand : Command("nvusage") {
         builder = builder
             .requiresPlayerPermission("nova.command.nvusage")
             .apply {
-                RecipeRegistry.USAGE_RECIPES.forEach { (key, recipes) ->
-                    then(literal(key)
-                        .executesCatching { showRecipe(recipes, it) }
+                (RecipeRegistry.USAGE_RECIPES.keys + RecipeRegistry.USAGE_INFO.keys).forEach { id ->
+                    then(literal(id)
+                        .executesCatching { it.player.showUsages(id) }
                     )
                 }
             }
@@ -30,14 +27,9 @@ object NovaUsageCommand : Command("nvusage") {
         val player = ctx.player
         val item = player.inventory.itemInMainHand
         if (!item.type.isAir) {
-            val recipes = RecipeRegistry.USAGE_RECIPES[ItemUtils.getNameKey(item)]
-            if (recipes != null) RecipesWindow(player, recipes).show()
-            else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.usage.no-usage"))
+            if (!player.showUsages(item))
+                ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.usage.no-usage"))
         } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.no-item-in-hand"))
-    }
-    
-    private fun showRecipe(recipes: Map<RecipeGroup, Iterable<RecipeContainer>>, context: CommandContext<CommandSourceStack>) {
-        RecipesWindow(context.player, recipes).show()
     }
     
 }

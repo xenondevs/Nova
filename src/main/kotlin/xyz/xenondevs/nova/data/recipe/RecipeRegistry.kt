@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.recipe
 
+import com.google.gson.JsonParser
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.inventory.*
@@ -9,12 +10,17 @@ import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
-import xyz.xenondevs.nova.util.ItemUtils.getNameKey
+import xyz.xenondevs.nova.util.ItemUtils.getId
 import xyz.xenondevs.nova.util.data.getInputStacks
+import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
 
 object RecipeRegistry {
+    
+    private val ITEM_INFO = JsonParser.parseReader(getResourceAsStream("item_info.json")!!.reader()).asJsonObject
+    val CREATION_INFO = ITEM_INFO.get("creation").asJsonObject.entrySet().associate { it.key to it.value.asString }
+    val USAGE_INFO = ITEM_INFO.get("usage").asJsonObject.entrySet().associate { it.key to it.value.asString }
     
     private var BUKKIT_RECIPES: List<Recipe> = ArrayList()
     
@@ -51,7 +57,7 @@ object RecipeRegistry {
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach {
-            val itemKey = getNameKey(it.result)
+            val itemKey = getId(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(RecipeType.of(it).group) { mutableListOf() }
                 .add(RecipeContainer(it))
@@ -59,7 +65,7 @@ object RecipeRegistry {
         
         // add all nova machine recipes
         getConversionNovaRecipeSequence().forEach {
-            val itemKey = getNameKey(it.result)
+            val itemKey = getId(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(RecipeType.of(it).group) { mutableListOf() }
                 .add(RecipeContainer(it))
@@ -75,7 +81,7 @@ object RecipeRegistry {
         getBukkitRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe).group
             recipe.getInputStacks().forEach { inputStack ->
-                val itemKey = getNameKey(inputStack)
+                val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { LinkedHashSet() }
                     .add(RecipeContainer(recipe))
@@ -86,7 +92,7 @@ object RecipeRegistry {
         getConversionNovaRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe).group
             recipe.input.getInputStacks().forEach { inputStack ->
-                val itemKey = getNameKey(inputStack)
+                val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { LinkedHashSet() }
                     .add(RecipeContainer(recipe))

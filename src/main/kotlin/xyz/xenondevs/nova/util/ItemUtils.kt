@@ -191,7 +191,7 @@ object ItemUtils {
         return CraftItemStack.asBukkitCopy(nmsStack)
     }
     
-    fun getNameKey(itemStack: ItemStack): String {
+    fun getId(itemStack: ItemStack): String {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) return "nova:${novaMaterial.typeName.lowercase()}"
         

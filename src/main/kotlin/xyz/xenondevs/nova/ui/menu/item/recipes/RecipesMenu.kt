@@ -18,25 +18,61 @@ import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.BookMeta
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.util.ItemUtils
 import java.util.*
+
+fun Player.showRecipes(item: ItemStack) = showRecipes(ItemUtils.getId(item))
+
+fun Player.showRecipes(id: String): Boolean {
+    val recipes = RecipeRegistry.CREATION_RECIPES[id]
+    val info = RecipeRegistry.CREATION_INFO[id]
+    if (recipes != null) {
+        RecipesWindow(this, recipes, info).show()
+        return true
+    } else if (info != null) {
+        closeInventory()
+        spigot().sendMessage(TranslatableComponent(info))
+        return true
+    }
+    return false
+}
+
+fun Player.showUsages(item: ItemStack) = showUsages(ItemUtils.getId(item))
+
+fun Player.showUsages(id: String): Boolean {
+    val recipes = RecipeRegistry.USAGE_RECIPES[id]
+    val info = RecipeRegistry.USAGE_INFO[id]
+    if (recipes != null) {
+        RecipesWindow(this, recipes, info).show()
+        return true
+    } else if (info != null) {
+        closeInventory()
+        spigot().sendMessage(TranslatableComponent(info))
+        return true
+    }
+    return false
+}
 
 /**
  * A menu that displays the given list of recipes.
  */
-class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeContainer>>) : ItemMenu {
+private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeContainer>>, info: String? = null) : ItemMenu {
     
-    private val RECIPES_GUI_STRUCTURE = Structure("" +
+    private val recipesGuiStructure = Structure("" +
         "< . . . . . . . >" +
         "x x x x x x x x x" +
         "x x x x x x x x x" +
@@ -52,12 +88,12 @@ class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeCon
     private lateinit var window: Window
     
     init {
-        val craftingGUIs: List<Pair<RecipeGroup, GUI>> = recipes
+        val craftingTabs: List<Pair<RecipeGroup, GUI>> = recipes
             .mapValues { (type, holderList) -> PagedRecipesGUI(holderList.map { holder -> type.getGUI(holder) }).gui }
             .map { it.key to it.value }
             .sortedBy { it.first }
         
-        val guiBuilder = GUIBuilder(GUIType.TAB, 9, 6)
+        mainGUI = GUIBuilder(GUIType.TAB, 9, 6)
             .setStructure("" +
                 "b . . . . . . . ." +
                 "x x x x x x x x x" +
@@ -65,20 +101,20 @@ class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeCon
                 "x x x x x x x x x" +
                 "x x x x x x x x x" +
                 ". . . . . . . . .")
-            .setGUIs(craftingGUIs.map { it.second })
+            .setGUIs(craftingTabs.map { it.second })
+            .addIngredient('b', LastRecipeItem(viewerUUID))
+            .build()
         
-        guiBuilder.addIngredient('b', LastRecipeItem(viewerUUID))
-        
-        mainGUI = guiBuilder.build() as SimpleTabGUI
-        
-        craftingGUIs
+        // Add tab buttons
+        var lastTab = -1
+        craftingTabs
             .map { it.first }
-            .withIndex()
-            .forEach { (index, craftingType) ->
+            .forEach { craftingType ->
                 if (!::currentType.isInitialized) currentType = craftingType
-                mainGUI.setItem(2 + index, CraftingTabItem(craftingType, index))
+                mainGUI.setItem(2 + ++lastTab, CraftingTabItem(craftingType, lastTab))
             }
         
+        if (info != null) mainGUI.setItem(2 + ++lastTab, InfoItem(info))
     }
     
     override fun show() {
@@ -110,7 +146,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeCon
         window.changeTitle(getCurrentTitle())
     }
     
-    inner class CraftingTabItem(private val recipeGroup: RecipeGroup, tab: Int) : TabItem(tab) {
+    private inner class CraftingTabItem(private val recipeGroup: RecipeGroup, tab: Int) : TabItem(tab) {
         
         override fun getItemProvider(gui: TabGUI) = recipeGroup.icon
         
@@ -127,7 +163,20 @@ class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeCon
         
     }
     
-    inner class PageBackItem : ControlItem<PagedGUI>() {
+    private class InfoItem(private val info: String) : BaseItem() {
+        
+        override fun getItemProvider(): ItemBuilder =
+            ItemBuilder(Material.KNOWLEDGE_BOOK)
+                .setDisplayName(TranslatableComponent("menu.nova.recipe.item_info"))
+        
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            player.closeInventory()
+            player.spigot().sendMessage(TranslatableComponent(info))
+        }
+        
+    }
+    
+    private inner class PageBackItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
             (if (gui.hasPageBefore()) NovaMaterialRegistry.ARROW_LEFT_ON_BUTTON else NovaMaterialRegistry.ARROW_LEFT_OFF_BUTTON)
@@ -143,7 +192,7 @@ class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeCon
         
     }
     
-    inner class PageForwardItem : ControlItem<PagedGUI>() {
+    private inner class PageForwardItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
             (if (gui.hasNextPage()) NovaMaterialRegistry.ARROW_RIGHT_ON_BUTTON else NovaMaterialRegistry.ARROW_RIGHT_OFF_BUTTON)
@@ -159,11 +208,10 @@ class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeCon
         
     }
     
-    inner class PagedRecipesGUI(recipes: List<GUI>) {
+    private inner class PagedRecipesGUI(recipes: List<GUI>) {
         
-        val isEmpty = recipes.isEmpty()
         val gui: GUI = GUIBuilder(GUIType.PAGED_GUIs, 9, 4)
-            .setStructure(RECIPES_GUI_STRUCTURE)
+            .setStructure(recipesGuiStructure)
             .setGUIs(recipes)
             .build()
         
