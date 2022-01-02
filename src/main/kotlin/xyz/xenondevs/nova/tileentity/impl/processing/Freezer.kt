@@ -5,7 +5,6 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -35,12 +34,10 @@ import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.LeftRightFluidProgressItem
-import xyz.xenondevs.nova.ui.item.ProgressArrowItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.lang.Long.min
 import java.util.*
-import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -65,6 +62,8 @@ class Freezer(
     override val fluidHolder = NovaFluidHolder(this, waterTank to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT) { createSideConfig(NetworkConnectionType.EXTRACT, BlockSide.FRONT) }
     override val energyHolder = ConsumerEnergyHolder(this, ENERGY_CAPACITY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
+    
+    private val snowSpawnBlock = location.clone().apply { y += 1 }.block
     
     private var mbPerTick = 0L
     private var mbUsed = 0L
@@ -96,6 +95,8 @@ class Freezer(
         }
         val mbToTake = min(mbPerTick, mbMaxPerOperation - mbUsed)
         if (waterTank.amount >= mbToTake && energyHolder.energy >= energyHolder.energyConsumption && inventory.canHold(mode.product)) {
+            if (snowSpawnBlock.type.isAir) snowSpawnBlock.type = Material.SNOW
+            
             energyHolder.energy -= energyHolder.energyConsumption
             mbUsed += mbToTake
             waterTank.takeFluid(mbToTake)
