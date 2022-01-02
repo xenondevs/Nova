@@ -4,8 +4,18 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.item.ItemProvider
+import de.studiocode.invui.item.builder.ItemBuilder
+import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TextComponent
+import net.md_5.bungee.api.chat.TranslatableComponent
+import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
@@ -18,7 +28,6 @@ import xyz.xenondevs.nova.tileentity.network.item.holder.NovaItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
-import xyz.xenondevs.nova.ui.item.StorageUnitDisplay
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
@@ -34,7 +43,7 @@ class StorageUnit(
     armorStand: FakeArmorStand,
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand) {
     
-    override val gui = lazy { ItemStorageGUI() }
+    override val gui = lazy { StorageUnitGUI() }
     private val inventory = StorageUnitInventory(retrieveOrNull("type"), retrieveOrNull("amount") ?: 0)
     override val itemHolder = NovaItemHolder(this, uuid to (inventory to NetworkConnectionType.BUFFER))
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
@@ -80,7 +89,7 @@ class StorageUnit(
         storeData("amount", inventory.amount, true)
     }
     
-    inner class ItemStorageGUI : TileEntityGUI() {
+    inner class StorageUnitGUI : TileEntityGUI() {
         
         private val sideConfigGUI = SideConfigGUI(
             this@StorageUnit,
@@ -89,7 +98,7 @@ class StorageUnit(
             ::openWindow
         )
         
-        private val storageUnitDisplay = StorageUnitDisplay(inventory)
+        private val storageUnitDisplay = StorageUnitDisplay()
         
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 3)
             .setStructure("" +
@@ -109,6 +118,22 @@ class StorageUnit(
         fun update() {
             storageUnitDisplay.notifyWindows()
             updateOutputSlot()
+        }
+        
+        private inner class StorageUnitDisplay : BaseItem() {
+            
+            override fun getItemProvider(): ItemProvider {
+                val type = inventory.type ?: return ItemBuilder(Material.BARRIER).setDisplayName("§r")
+                val amount = inventory.amount
+                val component = TranslatableComponent(
+                    "menu.nova.storage_unit.item_display_" + if (amount > 1) "plural" else "singular",
+                    TextComponent(amount.toString()).apply { color = ChatColor.GREEN }
+                )
+                return ItemBuilder(type).setDisplayName(component).setAmount(1)
+            }
+            
+            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+            
         }
         
     }
