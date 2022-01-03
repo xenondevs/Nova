@@ -1,6 +1,11 @@
 package xyz.xenondevs.nova.util.data
 
+import org.bukkit.Keyed
+import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
+
+val Recipe?.key: NamespacedKey?
+    get() = (this as Keyed?)?.key
 
 fun Recipe.getInputStacks(): List<ItemStack> =
     when (this) {

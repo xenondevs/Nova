@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.reflection
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.decoration.ArmorStand
+import org.bukkit.event.inventory.PrepareItemCraftEvent
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCBClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
@@ -26,5 +27,7 @@ object ReflectionRegistry {
     
     val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class.java, false, "getDelegate", Any::class.java)
     val CALLABLE_REFERENCE_RECEIVER_FIELD = getField(CallableReference::class.java, true, "receiver")
+    
+    val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = getField(PrepareItemCraftEvent::class.java, true, "matrix")
     
 }

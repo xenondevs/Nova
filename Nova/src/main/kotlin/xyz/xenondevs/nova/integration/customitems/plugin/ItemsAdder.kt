@@ -11,6 +11,7 @@ import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -80,7 +81,7 @@ class ItemsAdderLoadListener(private val run: () -> Unit) : Listener {
                 run()
             }
         } else {
-            NOVA.logger.warning("Reloading ItemsAdder might cause issues when items from ItemsAdder are used in Nova recipes.")
+            LOGGER.warning("Reloading ItemsAdder might cause issues when items from ItemsAdder are used in Nova recipes.")
         }
     }
     

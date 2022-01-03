@@ -18,9 +18,12 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.customModelData
+import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.removeFirstWhere
+import java.util.*
 import kotlin.experimental.and
 
 class CustomRecipeChoice(private val customChoices: List<Pair<Material, IntArray>>, examples: List<ItemStack>) : ExactChoice(examples) {
@@ -50,6 +53,9 @@ class ComplexChoice(choices: List<ItemStack>) : ExactChoice(choices) {
     
 }
 
+private val CRAFTING_CACHE_SIZE = DEFAULT_CONFIG.getLong("crafting.cache_size")!!
+private val ALLOW_RESULT_OVERWRITE = DEFAULT_CONFIG.getBoolean("crafting.allow_result_overwrite")
+
 object RecipeManager : Listener {
     
     private val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
@@ -57,8 +63,8 @@ object RecipeManager : Listener {
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
     val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
     
-    private val craftingCache: Cache<CraftingMatrix, ItemStack> =
-        CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(DEFAULT_CONFIG.getLong("crafting_cache.size")!!).build()
+    private val craftingCache: Cache<CraftingMatrix, Optional<Recipe>> =
+        CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(CRAFTING_CACHE_SIZE).build()
     
     fun registerRecipes() {
         LOGGER.info("Loading recipes")
@@ -118,18 +124,17 @@ object RecipeManager : Listener {
         vanillaRegisteredRecipeKeys.forEach(event.player::discoverRecipe)
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
-        event.inventory.result = craftingCache.get(CraftingMatrix(event.inventory.matrix)) {
-            
-            val predictedRecipe = event.recipe
+        val predictedRecipe = event.recipe
+        val recipe = craftingCache.get(CraftingMatrix(event.inventory.matrix)) {
             if (predictedRecipe != null && (predictedRecipe as Keyed).key.namespace != "nova") {
                 // prevent non-nova recipes from using nova items
                 if (event.inventory.contents.any { it.novaMaterial != null }) {
-                    return@get ItemStack(Material.AIR)
+                    return@get Optional.empty()
                 } else {
                     // Bukkit's calculated result is correct
-                    return@get event.inventory.result ?: ItemStack(Material.AIR)
+                    return@get Optional.of(predictedRecipe)
                 }
             } else {
                 // if the recipe is null or it bukkit thinks it found a nova recipe, we do our own calculations
@@ -142,9 +147,17 @@ object RecipeManager : Listener {
                     findMatchingShapedRecipe(matrix) ?: findMatchingShapelessRecipe(matrix)
                 } else findMatchingShapelessRecipe(matrix)
                 
-                return@get recipe?.result ?: ItemStack(Material.AIR)
+                return@get Optional.ofNullable(recipe)
             }
             
+        }.orElse(null)
+        
+        // Set the resulting item stack
+        event.inventory.result = recipe?.result ?: ItemStack(Material.AIR)
+        
+        // If this is a Nova-calculated result, replace it with a NovaCraftingInventory
+        if (recipe?.key?.namespace == "nova" || predictedRecipe?.key?.namespace == "nova") {
+            ReflectionRegistry.PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD.set(event, NovaCraftingInventory(recipe, event.inventory))
         }
     }
     
@@ -226,6 +239,26 @@ class CraftingMatrix(matrix: Array<ItemStack?>) {
         hash = hash * 31 + (durability and 0xffff.toShort())
         hash = hash * 31 + if (hasItemMeta()) itemMeta.hashCode() else 0
         return hash
+    }
+    
+}
+
+/**
+ * A crafting inventory that is set to display the new recipe and prevent subsequent
+ * changes to the resulting item.
+ */
+class NovaCraftingInventory(
+    val result: Recipe?,
+    val inventory: CraftingInventory
+) : CraftingInventory by inventory {
+    
+    override fun getRecipe(): Recipe? {
+        return result
+    }
+    
+    override fun setResult(newResult: ItemStack?) {
+        if (ALLOW_RESULT_OVERWRITE)
+            inventory.result = newResult
     }
     
 }
