@@ -24,7 +24,7 @@ jobs:
         run: . .github/scripts/buildtools.sh
 
       - name: Build With Maven
-        run: mvn -B clean test package "-Ddir=artifacts/" --file pom.xml
+        run: mvn -B clean test package "-Ddir=./artifacts/" --file pom.xml
 
       - name: Upload Artifacts
         id: upload
