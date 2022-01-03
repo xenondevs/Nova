@@ -1,0 +1,23 @@
+{
+  "display": {
+    "title": {
+      "translate": "advancement.nova.root.title"
+    },
+    "description": {
+      "translate": "advancement.nova.root.description"
+    },
+    "icon": {
+      "item": "nova:copper_gear"
+    },
+    "background": "minecraft:textures/block/tube_coral_block.png",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "none": {
+      "trigger": "minecraft:impossible",
+      "conditions": {}
+    }
+  }
+}

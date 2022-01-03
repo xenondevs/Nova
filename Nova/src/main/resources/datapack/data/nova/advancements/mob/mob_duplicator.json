@@ -1,0 +1,29 @@
+{
+  "parent": "nova:mob/mob_killer",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.mob_duplicator.title"
+    },
+    "description": {
+      "translate": "advancement.nova.mob_duplicator.description"
+    },
+    "icon": {
+      "item": "nova:mob_duplicator"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_mob_duplicator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:mob_duplicator"]
+          }
+        ]
+      }
+    }
+  }
+}

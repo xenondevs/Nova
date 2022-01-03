@@ -1,0 +1,29 @@
+{
+  "parent": "nova:agriculture/harvester",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.tree_factory.title"
+    },
+    "description": {
+      "translate": "advancement.nova.tree_factory.description"
+    },
+    "icon": {
+      "item": "nova:tree_factory"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_tree_factory": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:tree_factory"]
+          }
+        ]
+      }
+    }
+  }
+}

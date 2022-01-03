@@ -1,0 +1,29 @@
+{
+  "parent": "nova:root",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.star_shards.title"
+    },
+    "description": {
+      "translate": "advancement.nova.star_shards.description"
+    },
+    "icon": {
+      "item": "nova:star_shards"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_star_shards": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:star_shards"]
+          }
+        ]
+      }
+    }
+  }
+}

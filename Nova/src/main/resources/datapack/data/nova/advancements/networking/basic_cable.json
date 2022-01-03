@@ -1,0 +1,29 @@
+{
+  "parent": "nova:root",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.basic_cable.title"
+    },
+    "description": {
+      "translate": "advancement.nova.basic_cable.description"
+    },
+    "icon": {
+      "item": "nova:basic_cable"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_basic_cable": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:basic_cable"]
+          }
+        ]
+      }
+    }
+  }
+}

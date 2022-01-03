@@ -1,0 +1,29 @@
+{
+  "parent": "nova:fluid/ultimate_fluid_tank",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.infinite_water_source.title"
+    },
+    "description": {
+      "translate": "advancement.nova.infinite_water_source.description"
+    },
+    "icon": {
+      "item": "nova:infinite_water_source"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_infinite_water_source": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:infinite_water_source"]
+          }
+        ]
+      }
+    }
+  }
+}

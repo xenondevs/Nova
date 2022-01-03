@@ -1,0 +1,29 @@
+{
+  "parent": "nova:fluid/basic_fluid_tank",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.pump.title"
+    },
+    "description": {
+      "translate": "advancement.nova.pump.description"
+    },
+    "icon": {
+      "item": "nova:pump"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_pump": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:pump"]
+          }
+        ]
+      }
+    }
+  }
+}

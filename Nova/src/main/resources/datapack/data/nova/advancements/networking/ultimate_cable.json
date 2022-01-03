@@ -1,0 +1,29 @@
+{
+  "parent": "nova:networking/elite_cable",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.ultimate_cable.title"
+    },
+    "description": {
+      "translate": "advancement.nova.ultimate_cable.description"
+    },
+    "icon": {
+      "item": "nova:ultimate_cable"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_ultimate_cable": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:ultimate_cable"]
+          }
+        ]
+      }
+    }
+  }
+}

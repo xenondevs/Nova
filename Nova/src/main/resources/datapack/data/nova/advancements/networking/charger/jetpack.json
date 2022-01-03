@@ -1,0 +1,29 @@
+{
+  "parent": "nova:networking/charger/charger",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.jetpack.title"
+    },
+    "description": {
+      "translate": "advancement.nova.jetpack.description"
+    },
+    "icon": {
+      "item": "nova:jetpack"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_jetpack": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:jetpack"]
+          }
+        ]
+      }
+    }
+  }
+}

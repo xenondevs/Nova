@@ -1,0 +1,29 @@
+{
+  "parent": "nova:power/furnace_generator",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.solar_panel.title"
+    },
+    "description": {
+      "translate": "advancement.nova.solar_panel.description"
+    },
+    "icon": {
+      "item": "nova:solar_panel"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_solar_panel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:solar_panel"]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "parent": "nova:fluid/pump",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.lava_generator.title"
+    },
+    "description": {
+      "translate": "advancement.nova.lava_generator.description"
+    },
+    "icon": {
+      "item": "nova:lava_generator"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_lava_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:lava_generator"]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "parent": "nova:root",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.mechanical_press.title"
+    },
+    "description": {
+      "translate": "advancement.nova.mechanical_press.description"
+    },
+    "icon": {
+      "item": "nova:mechanical_press"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_mechanical_press": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:mechanical_press"]
+          }
+        ]
+      }
+    }
+  }
+}

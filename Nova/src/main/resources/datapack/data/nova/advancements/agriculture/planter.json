@@ -1,0 +1,29 @@
+{
+  "parent": "nova:root",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.planter.title"
+    },
+    "description": {
+      "translate": "advancement.nova.planter.description"
+    },
+    "icon": {
+      "item": "nova:planter"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_planter": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:planter"]
+          }
+        ]
+      }
+    }
+  }
+}

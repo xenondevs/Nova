@@ -1,0 +1,29 @@
+{
+  "parent": "nova:networking/item/item_filter",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.vacuum_chest.title"
+    },
+    "description": {
+      "translate": "advancement.nova.vacuum_chest.description"
+    },
+    "icon": {
+      "item": "nova:vacuum_chest"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_vacuum_chest": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:vacuum_chest"]
+          }
+        ]
+      }
+    }
+  }
+}

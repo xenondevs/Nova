@@ -1,0 +1,29 @@
+{
+  "parent": "nova:fluid/basic_fluid_tank",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.advanced_fluid_tank.title"
+    },
+    "description": {
+      "translate": "advancement.nova.advanced_fluid_tank.description"
+    },
+    "icon": {
+      "item": "nova:advanced_fluid_tank"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_advanced_fluid_tank": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:advanced_fluid_tank"]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.util
 fun String.capitalize() = replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 
 fun String.capitalizeAll(): String {
-    if (length == 0) return this
+    if (isEmpty()) return this
     
     val chars = toCharArray()
     chars[0] = chars[0].uppercaseChar()
@@ -18,3 +18,5 @@ fun String.capitalizeAll(): String {
     
     return String(chars)
 }
+
+fun String.insert(offset: Int, charSequence: CharSequence) = StringBuilder(this).insert(offset, charSequence).toString()

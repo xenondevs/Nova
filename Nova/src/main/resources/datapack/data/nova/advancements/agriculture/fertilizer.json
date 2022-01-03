@@ -1,0 +1,29 @@
+{
+  "parent": "nova:agriculture/planter",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.fertilizer.title"
+    },
+    "description": {
+      "translate": "advancement.nova.fertilizer.description"
+    },
+    "icon": {
+      "item": "nova:fertilizer"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_fertilizer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:fertilizer"]
+          }
+        ]
+      }
+    }
+  }
+}

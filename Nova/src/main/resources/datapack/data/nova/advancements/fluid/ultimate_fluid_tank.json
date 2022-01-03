@@ -1,0 +1,29 @@
+{
+  "parent": "nova:fluid/elite_fluid_tank",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.ultimate_fluid_tank.title"
+    },
+    "description": {
+      "translate": "advancement.nova.ultimate_fluid_tank.description"
+    },
+    "icon": {
+      "item": "nova:ultimate_fluid_tank"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_ultimate_fluid_tank": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:ultimate_fluid_tank"]
+          }
+        ]
+      }
+    }
+  }
+}

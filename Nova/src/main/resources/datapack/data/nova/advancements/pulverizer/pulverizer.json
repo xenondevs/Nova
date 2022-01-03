@@ -1,0 +1,29 @@
+{
+  "parent": "nova:root",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.pulverizer.title"
+    },
+    "description": {
+      "translate": "advancement.nova.pulverizer.description"
+    },
+    "icon": {
+      "item": "nova:pulverizer"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_pulverizer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:pulverizer"]
+          }
+        ]
+      }
+    }
+  }
+}

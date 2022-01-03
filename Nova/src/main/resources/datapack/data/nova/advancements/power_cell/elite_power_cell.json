@@ -1,0 +1,29 @@
+{
+  "parent": "nova:power_cell/advanced_power_cell",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.elite_power_cell.title"
+    },
+    "description": {
+      "translate": "advancement.nova.elite_power_cell.description"
+    },
+    "icon": {
+      "item": "nova:elite_power_cell"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_elite_power_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:elite_power_cell"]
+          }
+        ]
+      }
+    }
+  }
+}

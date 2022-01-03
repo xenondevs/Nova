@@ -1,0 +1,29 @@
+{
+  "parent": "nova:mob/breeder",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.mob_killer.title"
+    },
+    "description": {
+      "translate": "advancement.nova.mob_killer.description"
+    },
+    "icon": {
+      "item": "nova:breeder"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_mob_killer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:breeder"]
+          }
+        ]
+      }
+    }
+  }
+}

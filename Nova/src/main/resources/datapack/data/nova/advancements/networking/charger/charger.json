@@ -1,0 +1,29 @@
+{
+  "parent": "nova:networking/basic_cable",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.charger.title"
+    },
+    "description": {
+      "translate": "advancement.nova.charger.description"
+    },
+    "icon": {
+      "item": "nova:charger"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_charger": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:charger"]
+          }
+        ]
+      }
+    }
+  }
+}

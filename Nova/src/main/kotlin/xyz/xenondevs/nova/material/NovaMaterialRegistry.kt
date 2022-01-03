@@ -261,9 +261,9 @@ object NovaMaterialRegistry {
     val GIANT_RED_MUSHROOM_MINIATURE = registerItem("GIANT_RED_MUSHROOM_MINIATURE", "", bulkItemOf((204_000..204_500).toIntArray()))
     val GIANT_BROWN_MUSHROOM_MINIATURE = registerItem("GIANT_BROWN_MUSHROOM_MINIATURE", "", bulkItemOf((204_500..205_000).toIntArray()))
     
-    fun get(typeName: String): NovaMaterial = materialsByTypeName[typeName]!!
+    fun get(typeName: String): NovaMaterial = materialsByTypeName[typeName.uppercase()]!!
     fun get(modelId: Int): NovaMaterial = materialsByModelId[modelId]!!
-    fun getOrNull(typeName: String): NovaMaterial? = materialsByTypeName[typeName]
+    fun getOrNull(typeName: String): NovaMaterial? = materialsByTypeName[typeName.uppercase()]
     fun getOrNull(modelId: Int): NovaMaterial? = materialsByModelId[modelId]
     
     fun registerDefaultTileEntity(

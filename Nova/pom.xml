@@ -204,11 +204,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.github.NichtStudioCode</groupId>
-            <artifactId>AdvancementAPI</artifactId>
-            <version>f928e46930</version>
-        </dependency>
-        <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>2.2.1</version>

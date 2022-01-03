@@ -1,0 +1,29 @@
+{
+  "parent": "nova:stardust/star_shards",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.star_collector.title"
+    },
+    "description": {
+      "translate": "advancement.nova.star_collector.description"
+    },
+    "icon": {
+      "item": "nova:star_collector"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_star_collector": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:star_collector"]
+          }
+        ]
+      }
+    }
+  }
+}

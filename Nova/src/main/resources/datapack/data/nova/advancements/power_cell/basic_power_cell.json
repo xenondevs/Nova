@@ -1,0 +1,29 @@
+{
+  "parent": "nova:root",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.basic_power_cell.title"
+    },
+    "description": {
+      "translate": "advancement.nova.basic_power_cell.description"
+    },
+    "icon": {
+      "item": "nova:basic_power_cell"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_basic_power_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:basic_power_cell"]
+          }
+        ]
+      }
+    }
+  }
+}

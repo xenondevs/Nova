@@ -1,0 +1,99 @@
+{
+  "parent": "nova:press/plates",
+  "display": {
+    "title": {
+      "translate": "advancement.nova.all_plates.title"
+    },
+    "description": {
+      "translate": "advancement.nova.all_plates.description"
+    },
+    "icon": {
+      "item": "nova:diamond_plate"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_netherite_plate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:netherite_plate"]
+          }
+        ]
+      }
+    },
+    "obtain_diamond_plate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:diamond_plate"]
+          }
+        ]
+      }
+    },
+    "obtain_redstone_plate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:redstone_plate"]
+          }
+        ]
+      }
+    },
+    "obtain_gold_plate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:gold_plate"]
+          }
+        ]
+      }
+    },
+    "obtain_lapis_plate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:lapis_plate"]
+          }
+        ]
+      }
+    },
+    "obtain_copper_plate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:copper_plate"]
+          }
+        ]
+      }
+    },
+    "obtain_emerald_plate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:emerald_plate"]
+          }
+        ]
+      }
+    },
+    "obtain_iron_plate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["nova:iron_plate"]
+          }
+        ]
+      }
+    }
+  }
+}
