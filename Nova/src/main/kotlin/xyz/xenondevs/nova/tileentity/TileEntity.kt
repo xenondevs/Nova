@@ -88,6 +88,7 @@ abstract class TileEntity(
         if (this is Upgradable)
             upgradeHolder.save(data)
         
+        inventories.forEach { storeData("inventory.${it.uuid}", it) }
         fluidContainers.forEach { (container, global) ->
             val data = CompoundElement()
             data.put("amount", container.amount)
@@ -183,9 +184,12 @@ abstract class TileEntity(
         stackSizes: IntArray,
         itemHandler: (ItemUpdateEvent) -> Unit
     ): VirtualInventory {
-        val inventory = TileInventoryManager.getOrCreate(
-            uuid, uuid.salt(salt), size, arrayOfNulls(size), stackSizes
-        )
+        val invUUID = uuid.salt(salt)
+        val inventory = TileInventoryManager.getOrNull(uuid, invUUID)
+            ?: retrieveData("inventory.$invUUID") {
+                VirtualInventory(invUUID, size, arrayOfNulls(size), stackSizes)
+            }
+        
         inventory.setItemUpdateHandler(itemHandler)
         inventories += inventory
         return inventory

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.serialization.cbf
 
+import de.studiocode.invui.virtualinventory.VirtualInventory
 import io.netty.buffer.ByteBuf
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -56,6 +57,7 @@ abstract class BackedElement<T> : Element {
             Location::class to ::LocationElement,
             NamespacedKey::class to ::NamespacedKeyElement,
             CompoundElement::class to ::returnSelf,
+            VirtualInventory::class to ::VirtualInventoryElement,
         )
         
         @Suppress("UNCHECKED_CAST")

@@ -82,6 +82,11 @@ object TileInventoryManager {
     }
     
     @Synchronized
+    fun getOrNull(tileEntityUUID: UUID, inventoryUUID: UUID): VirtualInventory? {
+        return (getAndAddLegacyInventory(tileEntityUUID, inventoryUUID) ?: inventories[inventoryUUID])?.second
+    }
+    
+    @Synchronized
     fun getByUuid(inventoryUUID: UUID): Pair<UUID, VirtualInventory>? =
         inventories[inventoryUUID]
     
