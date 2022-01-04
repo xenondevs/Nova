@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.loot.LootGeneration
+import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.logging.Logger
 
 lateinit var NOVA: Nova
@@ -46,6 +47,7 @@ class Nova : JavaPlugin() {
     
     override fun onEnable() {
         NOVA = this
+        ReflectionUtils.setPlugin(this)
         LOGGER = logger
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
         PermanentStorage.store("last_version", description.version)

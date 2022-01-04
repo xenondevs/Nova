@@ -15,6 +15,10 @@
 
     <properties>
         <exposed.version>0.36.1</exposed.version>
+        <hikaricp.version>5.0.0</hikaricp.version>
+        <particlelib.version>1.7</particlelib.version>
+        <fuzzywuzzy.version>1.3.1</fuzzywuzzy.version>
+        <annotations.version>23.0.0</annotations.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>
 
@@ -57,11 +61,14 @@
     </pluginRepositories>
 
     <dependencies>
+        <!-- Nova API -->
         <dependency>
             <groupId>xyz.xenondevs.nova</groupId>
             <artifactId>Nova-API</artifactId>
             <version>0.8-SNAPSHOT</version>
         </dependency>
+        
+        <!-- Spigot -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
@@ -70,6 +77,56 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Provided through library loader -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-core</artifactId>
+            <version>${exposed.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-dao</artifactId>
+            <version>${exposed.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-jdbc</artifactId>
+            <version>${exposed.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${annotations.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs</groupId>
+            <artifactId>particle</artifactId>
+            <version>${particlelib.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.xdrop</groupId>
+            <artifactId>fuzzywuzzy</artifactId>
+            <version>${fuzzywuzzy.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
         <!-- Provided through plugins -->
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
@@ -133,41 +190,6 @@
         </dependency>
 
         <!-- Not provided -->
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-core</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-dao</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-jdbc</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>xyz.xenondevs</groupId>
-            <artifactId>particle</artifactId>
-            <version>1.7</version>
-        </dependency>
-        <dependency>
-            <groupId>me.xdrop</groupId>
-            <artifactId>fuzzywuzzy</artifactId>
-            <version>1.3.1</version>
-        </dependency>
         <dependency>
             <groupId>de.studiocode.invui</groupId>
             <artifactId>InvUI</artifactId>
@@ -327,36 +349,9 @@
                                 </includes>
                             </artifactSet>
                             <relocations>
-                                <!-- Kotlin cannot be relocated as kotlin-reflect cannot find Kotlin built-ins -->
-                                <!-- Jetbrains Exposed can also not be relocated -->
-                                <!-- Relocating dependencies of non-relocated dependencies does not make sense (coroutines, annotations...) -->
-                                <relocation>
-                                    <pattern>com.zaxxer.hikari</pattern>
-                                    <shadedPattern>${shadePath}.com.zaxxer.hikari</shadedPattern>
-                                </relocation>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
                                     <shadedPattern>${shadePath}.org.bstats</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>de.studiocode</pattern>
-                                    <shadedPattern>${shadePath}.de.studiocode</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>net.roxeez</pattern>
-                                    <shadedPattern>${shadePath}.net.roxeez</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>xyz.xenondevs.particle</pattern>
-                                    <shadedPattern>${shadePath}.xyz.xenondevs.particle</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>me.xdrop</pattern>
-                                    <shadedPattern>${shadePath}.me.xdrop</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>net.dzikoysk</pattern>
-                                    <shadedPattern>${shadePath}.net.dzikoysk</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
