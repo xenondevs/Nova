@@ -68,17 +68,16 @@ class FluidStorageUnit(
                 return
             }
             val fluidType = FluidType.values().first { it.bucket?.type == event.newItemStack.type }
-            if (!fluidTank.accepts(fluidType)) {
+            if (!fluidTank.accepts(fluidType, 1000)) {
                 event.isCancelled = true
                 return
             }
-            if (!fluidTank.isFull() && (MAX_CAPACITY - fluidTank.amount) >= 1000) {
-                fluidTank.addFluid(fluidType, 1000)
-                event.newItemStack.type = Material.BUCKET
-                runTaskLater(1) {
-                    gui.value.update()
-                }
+            fluidTank.addFluid(fluidType, 1000)
+            event.newItemStack.type = Material.BUCKET
+            runTaskLater(1) {
+                gui.value.update()
             }
+            
         }
     }
     
