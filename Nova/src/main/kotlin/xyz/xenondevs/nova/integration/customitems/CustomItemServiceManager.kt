@@ -21,8 +21,16 @@ object CustomItemServiceManager {
         return PLUGINS.any { it.placeBlock(item, location, playEffects) }
     }
     
+    fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean {
+        return PLUGINS.any { it.removeBlock(block, tool, playEffects) }
+    }
+    
     fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
         return PLUGINS.firstNotNullOfOrNull { it.breakBlock(block, tool, playEffects) }
+    }
+    
+    fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
+        return PLUGINS.firstNotNullOfOrNull { it.getDrops(block, tool) }
     }
     
     fun getItemByName(name: String): ItemStack? {

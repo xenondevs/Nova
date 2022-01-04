@@ -13,6 +13,11 @@ interface CustomItemService : Integration {
     val requiresLoadDelay: Boolean
     
     /**
+     * Remove a block from the world without handling drops
+     */
+    fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean
+    
+    /**
      * Breaks a block from this [CustomItemService]
      * @return the drops or null if the block isn't from this [CustomItemService]
      */
@@ -25,6 +30,11 @@ interface CustomItemService : Integration {
      * successfully
      */
     fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean
+    
+    /**
+     * Gets all drops of a block from this [CustomItemService]
+     */
+    fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>?
     
     /**
      * Gets an [ItemStack] from a namespaced name

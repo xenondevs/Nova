@@ -34,6 +34,12 @@ object ItemsAdder : CustomItemService {
         }
     }
     
+    override fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean {
+        val customBlock = CustomBlock.byAlreadyPlaced(block) ?: return false
+        customBlock.remove()
+        return true
+    }
+    
     override fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
         if (customBlock != null) {
@@ -42,6 +48,13 @@ object ItemsAdder : CustomItemService {
             return loot
         }
         
+        return null
+    }
+    
+    override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
+        val customBlock = CustomBlock.byAlreadyPlaced(block)
+        if (customBlock != null)
+            return customBlock.getLoot(true)
         return null
     }
     
