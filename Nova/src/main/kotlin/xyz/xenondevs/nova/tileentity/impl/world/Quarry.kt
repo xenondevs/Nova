@@ -15,6 +15,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -287,7 +288,12 @@ class Quarry(
         block.setBreakState(entityId, (drillProgress * 9).roundToInt())
         
         if (drillProgress >= 1f) { // is done drilling
-            val drops = block.breakAndTakeDrops()
+            var drops = block.getAllDrops().toMutableList()
+            val event = TileEntityBreakBlockEvent(this, block, drops)
+            callEvent(event)
+            drops = event.drops
+            
+            block.remove()
             drops.forEach { drop ->
                 val leftover = inventory.addItem(null, drop)
                 if (leftover != 0) {
@@ -351,7 +357,7 @@ class Quarry(
                     val topLoc = LocationUtils.getTopBlockBetween(world, x, z, maxBreakY, minBreakY)
                     if (topLoc != null
                         && (topLoc.block.type.isBreakable() || TileEntityManager.getTileEntityAt(topLoc) != null)
-                        && ProtectionManager.canBreak(ownerUUID, topLoc)) {
+                        && ProtectionManager.canBreak(this, topLoc)) {
                         
                         results += topLoc
                     }

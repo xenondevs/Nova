@@ -73,4 +73,6 @@ class NovaMaterial(
         return item.data.compareTo(other.item.data)
     }
     
+    override fun toString() = typeName
+    
 }

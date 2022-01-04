@@ -4,6 +4,7 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import org.bukkit.Material
+import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -62,7 +63,7 @@ class BlockBreaker(
         if (energyHolder.energy >= ENERGY_PER_TICK
             && !type.isTraversable()
             && type.isBreakable()
-            && ProtectionManager.canBreak(ownerUUID, block.location)
+            && ProtectionManager.canBreak(this, block.location)
         ) {
             // consume energy
             energyHolder.energy -= energyHolder.energyConsumption
@@ -78,8 +79,13 @@ class BlockBreaker(
             breakProgress += additionalProgress
             
             if (breakProgress >= 1.0) {
+                var drops = block.getAllDrops().toMutableList()
+                val event = TileEntityBreakBlockEvent(this, block, drops)
+                callEvent(event)
+                drops = event.drops
+                
                 // break block, add items to inventory / drop them if full
-                val drops = block.breakAndTakeDrops()
+                block.breakAndTakeDrops()
                 drops.forEach { drop ->
                     val amountLeft = inventory.addItem(SELF_UPDATE_REASON, drop)
                     if (amountLeft != 0) {

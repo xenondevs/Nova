@@ -11,6 +11,7 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -35,10 +36,7 @@ import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.addAll
-import xyz.xenondevs.nova.util.breakAndTakeDrops
-import xyz.xenondevs.nova.util.dropItemsNaturally
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.item.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.region.Region
@@ -145,7 +143,7 @@ class Harvester(
                 val (block, expectedType) = queuedBlocks.first
                 queuedBlocks.removeFirst()
                 
-                if (!ProtectionManager.canBreak(ownerUUID, block.location)) {
+                if (!ProtectionManager.canBreak(this, block.location)) {
                     // skip block if it is protected
                     tryAgain = true
                     continue
@@ -178,13 +176,18 @@ class Harvester(
                         }
                     }
                     
-                    val drops = if (PlantUtils.COMPLEX_HARVESTABLE_BLOCKS.contains(expectedType)) {
+                    var drops = (if (PlantUtils.COMPLEX_HARVESTABLE_BLOCKS.contains(expectedType)) {
                         // use complex harvesting method to harvest this block
                         listOf(PlantUtils.COMPLEX_HARVESTABLE_BLOCKS[expectedType]!!.second(block))
                     } else {
                         // break the drops with the provided tool
-                        block.breakAndTakeDrops(tool)
-                    }
+                        block.getAllDrops(tool)
+                    }).toMutableList()
+                    
+                    val event = TileEntityBreakBlockEvent(this, block, drops)
+                    callEvent(event)
+                    drops = event.drops
+                    block.remove(tool)
                     
                     // add the drops to the inventory or drop them in the world if they don't fit
                     if (inventory.canHold(drops))
