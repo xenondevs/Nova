@@ -84,7 +84,7 @@ class BlockBreaker(
                     val amountLeft = inventory.addItem(SELF_UPDATE_REASON, drop)
                     if (amountLeft != 0) {
                         drop.amount = amountLeft
-                        world.dropItemNaturally(location, drop)
+                        world.dropItemNaturally(block.location.center(), drop)
                     }
                 }
                 
