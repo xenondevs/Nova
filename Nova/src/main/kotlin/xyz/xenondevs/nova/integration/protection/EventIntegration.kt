@@ -4,13 +4,15 @@ import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.api.event.protection.ProtectionCheckEvent
 import xyz.xenondevs.nova.api.event.protection.ProtectionCheckEvent.*
+import xyz.xenondevs.nova.api.event.protection.Source
+import xyz.xenondevs.nova.api.event.protection.TileEntitySource
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.callEvent
 
 object EventIntegration: ProtectionIntegration {
     
     override fun canBreak(player: OfflinePlayer, location: Location): Boolean {
-        val event = ProtectionCheckEvent(PlayerSource(player), ProtectionType.BREAK, location)
+        val event = ProtectionCheckEvent(Source(player), ProtectionType.BREAK, location)
         callEvent(event)
         return event.allowed
     }
@@ -22,7 +24,7 @@ object EventIntegration: ProtectionIntegration {
     }
     
     override fun canPlace(player: OfflinePlayer, location: Location): Boolean {
-        val event = ProtectionCheckEvent(PlayerSource(player), ProtectionType.PLACE, location)
+        val event = ProtectionCheckEvent(Source(player), ProtectionType.PLACE, location)
         callEvent(event)
         return event.allowed
     }
@@ -34,7 +36,7 @@ object EventIntegration: ProtectionIntegration {
     }
     
     override fun canUse(player: OfflinePlayer, location: Location): Boolean {
-        val event = ProtectionCheckEvent(PlayerSource(player), ProtectionType.USE, location)
+        val event = ProtectionCheckEvent(Source(player), ProtectionType.USE, location)
         callEvent(event)
         return event.allowed
     }
