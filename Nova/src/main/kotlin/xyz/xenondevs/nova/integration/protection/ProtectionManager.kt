@@ -5,30 +5,40 @@ import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.integration.Integration
 import xyz.xenondevs.nova.integration.protection.plugin.*
+import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.isBetweenXZ
 import java.util.*
 
 object ProtectionManager {
     
-    private val PROTECTION_PLUGINS = listOf(GriefPrevention, PlotSquared, WorldGuard, GriefDefender, Towny)
+    private val PROTECTION_PLUGINS = listOf(GriefPrevention, PlotSquared, WorldGuard, GriefDefender, Towny, EventIntegration)
         .filter(Integration::isInstalled)
     
     fun canPlace(uuid: UUID, location: Location) =
         canPlace(Bukkit.getOfflinePlayer(uuid), location)
     
-    fun canBreak(uuid: UUID, location: Location) =
-        canBreak(Bukkit.getOfflinePlayer(uuid), location)
-    
-    fun canUse(uuid: UUID, location: Location) =
-        canUse(Bukkit.getOfflinePlayer(uuid), location)
+    fun canPlace(tileEntity: TileEntity, location: Location) =
+        canPlace(tileEntity.owner, location)
     
     fun canPlace(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
             && PROTECTION_PLUGINS.all { it.canPlace(offlinePlayer, location) }
     
+    fun canBreak(uuid: UUID, location: Location) =
+        canBreak(Bukkit.getOfflinePlayer(uuid), location)
+    
+    fun canBreak(tileEntity: TileEntity, location: Location) =
+        canBreak(tileEntity.owner, location)
+    
     fun canBreak(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
             && PROTECTION_PLUGINS.all { it.canBreak(offlinePlayer, location) }
+    
+    fun canUse(uuid: UUID, location: Location) =
+        canUse(Bukkit.getOfflinePlayer(uuid), location)
+    
+    fun canUse(tileEntity: TileEntity, location: Location) =
+        canUse(tileEntity.owner, location)
     
     fun canUse(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
