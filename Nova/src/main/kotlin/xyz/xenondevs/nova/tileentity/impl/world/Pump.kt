@@ -109,7 +109,7 @@ class Pump(
     }
     
     override fun handleTick() {
-        if (energyHolder.energy >= energyHolder.energyConsumption && !fluidTank.isFull()) {
+        if (energyHolder.energy >= energyHolder.energyConsumption && fluidTank.accepts(FluidType.WATER, 1000)) {
             if (--idleTime <= 0)
                 pumpNextBlock()
         }
