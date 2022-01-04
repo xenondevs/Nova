@@ -159,10 +159,10 @@ object TileEntityManager : Listener {
         if (material.isDirectional) ((playerYaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f
     
     @Synchronized
-    fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean, deleteInDatabase: Boolean = true): List<ItemStack> {
+    fun removeTileEntity(tileEntity: TileEntity) {
         val location = tileEntity.location
         val chunkPos = location.chunkPos
-        
+    
         // remove TileEntity and ArmorStand
         tileEntityMap[chunkPos]?.remove(location)
         locationCache -= location
@@ -170,23 +170,25 @@ object TileEntityManager : Listener {
             additionalHitboxMap[it.chunkPos]?.remove(it)
             locationCache -= it
         }
-        
-        if (deleteInDatabase) { // remove it from the database
-            asyncTransaction {
-                TileEntitiesTable.deleteWhere { TileEntitiesTable.id eq tileEntity.uuid }
-            }
+    
+        asyncTransaction {
+            TileEntitiesTable.deleteWhere { TileEntitiesTable.id eq tileEntity.uuid }
         }
-        
+    
         location.block.type = Material.AIR
         tileEntity.additionalHitboxes.forEach { it.block.type = Material.AIR }
-        val drops = tileEntity.destroy(dropItems) // destroy tileEntity and save drops for later
-        
+    
         tileEntity.handleRemoved(unload = false)
-        
+    
         // count for TileEntity limits
         TileEntityLimits.handleTileEntityRemove(tileEntity.ownerUUID, tileEntity.material)
-        
-        return drops
+    }
+    
+    @Synchronized
+    fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
+        removeTileEntity(tileEntity)
+    
+        return tileEntity.getDrops(dropItems)
     }
     
     @Synchronized

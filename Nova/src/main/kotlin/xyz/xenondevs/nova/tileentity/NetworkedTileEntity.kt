@@ -151,22 +151,20 @@ abstract class NetworkedTileEntity(
         
         val task: NetworkManagerTask = { it.handleEndPointRemove(this, unload) }
         if (NOVA.isEnabled) NetworkManager.runAsync(task) else NetworkManager.runNow(task)
+        val itemHolder = holders[NetworkType.ITEMS]
+        if (!unload && itemHolder is ItemHolder) {
+            itemHolder.insertFilters.clear()
+            itemHolder.extractFilters.clear()
+        }
     }
     
-    override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
-        val items = super.destroy(dropItems)
-        if (dropItems) {
-            val itemHolder = holders[NetworkType.ITEMS]
-            if (itemHolder is ItemHolder) {
-                items += (itemHolder.insertFilters.values.asSequence() + itemHolder.extractFilters.values.asSequence())
-                    .map(ItemFilter::createFilterItem)
-                
-                itemHolder.insertFilters.clear()
-                itemHolder.extractFilters.clear()
-            }
-        }
-        
-        return items
+    override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
+        val drops = super.getDrops(includeSelf)
+        val itemHolder = holders[NetworkType.ITEMS]
+        if (itemHolder is ItemHolder)
+            drops += (itemHolder.insertFilters.values.asSequence() + itemHolder.extractFilters.values.asSequence())
+                .map(ItemFilter::createFilterItem)
+        return drops
     }
     
 }

@@ -7,6 +7,7 @@ import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.world.entity.EquipmentSlot
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
@@ -30,6 +31,7 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.region.Region
 import java.util.*
+import xyz.xenondevs.nova.api.TileEntity as ITileEntity
 
 val SELF_UPDATE_REASON = object : UpdateReason {}
 
@@ -39,7 +41,9 @@ abstract class TileEntity(
     val material: NovaMaterial,
     val ownerUUID: UUID,
     val armorStand: FakeArmorStand,
-) : DataHolder(data, true) {
+) : DataHolder(data, true), ITileEntity {
+    
+    override val owner = Bukkit.getOfflinePlayer(ownerUUID)
     
     abstract val gui: Lazy<TileEntityGUI>?
     
@@ -63,28 +67,17 @@ abstract class TileEntity(
     var hasHitboxBeenPlaced = false
         private set
     
-    /**
-     * Called when the TileEntity is being broken.
-     *
-     * @param dropItems If items should be dropped. Inventory contents will get
-     * added to the list regardless of this value.
-     *
-     * @return A list of [ItemStack]s that should be dropped.
-     */
-    open fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
+    override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
         val drops = ArrayList<ItemStack>()
-        if (dropItems) {
+        if (includeSelf) {
             saveData()
             val item = material.createItemBuilder(this).get()
             if (globalData.isNotEmpty()) item.setTileEntityData(globalData)
-            if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
             drops += item
         }
         
-        // inventory drops ignore the dropItems parameter
+        if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
         inventories.forEach { drops += it.items.filterNotNull() }
-        TileInventoryManager.remove(uuid, inventories)
-        
         return drops
     }
     
@@ -159,6 +152,8 @@ abstract class TileEntity(
         armorStand.remove()
         multiModels.forEach { it.close() }
         particleTasks.forEach { it.stop() }
+        if (!unload)
+            TileInventoryManager.remove(uuid, inventories)
     }
     
     /**

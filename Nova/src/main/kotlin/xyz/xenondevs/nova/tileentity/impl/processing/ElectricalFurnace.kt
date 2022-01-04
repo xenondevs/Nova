@@ -131,11 +131,6 @@ class ElectricalFurnace(
         orb.experience += experience.toInt()
     }
     
-    override fun destroy(dropItems: Boolean): ArrayList<ItemStack> {
-        spawnExperienceOrb(armorStand.location, experience)
-        return super.destroy(dropItems)
-    }
-    
     override fun handleTick() {
         if (energyHolder.energy >= energyHolder.energyConsumption) {
             if (currentRecipe == null) {
@@ -170,6 +165,12 @@ class ElectricalFurnace(
     
     private fun handleUpgradeUpdates() {
         cookSpeed = (COOK_SPEED * upgradeHolder.getSpeedModifier()).toInt()
+    }
+    
+    override fun handleRemoved(unload: Boolean) {
+        super.handleRemoved(unload)
+        if (!unload)
+            spawnExperienceOrb(armorStand.location, experience)
     }
     
     inner class ElectricalFurnaceGUI : TileEntityGUI() {
