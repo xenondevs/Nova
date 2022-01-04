@@ -49,7 +49,7 @@ class StorageUnit(
         if (event.updateReason == SELF_UPDATE_REASON)
             return
         
-        if (event.isAdd) {
+        if (event.isAdd || event.isSwap) {
             event.isCancelled = true
         } else if (event.isRemove && inventory.type != null) {
             inventory.amount -= event.removedAmount
