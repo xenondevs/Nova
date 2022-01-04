@@ -3,6 +3,7 @@ package xyz.xenondevs.nova
 import de.studiocode.invui.resourcepack.ForceResourcePack
 import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bstats.bukkit.Metrics
+import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
@@ -34,6 +35,7 @@ import java.util.logging.Logger
 
 lateinit var NOVA: Nova
 lateinit var LOGGER: Logger
+lateinit var PLUGIN_MANAGER: PluginManager
 var IS_VERSION_CHANGE: Boolean = false
 
 class Nova : JavaPlugin() {
@@ -49,6 +51,8 @@ class Nova : JavaPlugin() {
         NOVA = this
         ReflectionUtils.setPlugin(this)
         LOGGER = logger
+        PLUGIN_MANAGER = server.pluginManager
+        
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
         PermanentStorage.store("last_version", description.version)
         
