@@ -21,9 +21,7 @@
   },
   "nova_executor": {
     "enabled": true,
-    "min_threads": 100,
-    "max_threads": 100,
-    "thread_timeout": 0
+    "threads": 200
   },
   "bottled_mob_blacklist": [
     "WITHER",

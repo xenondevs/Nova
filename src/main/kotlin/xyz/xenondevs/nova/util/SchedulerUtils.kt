@@ -33,19 +33,24 @@ fun runSyncTaskWhenUnlocked(lock: ObservableLock, run: () -> Unit) {
 }
 
 inline fun runAsyncTask(noinline run: () -> Unit) {
-    if (USE_NOVA_SCHEDULER) AsyncExecutor.runAsync(run)
+    if (USE_NOVA_SCHEDULER) AsyncExecutor.run(run)
     else Bukkit.getScheduler().runTaskAsynchronously(NOVA, run)
+}
+
+inline fun runAsyncTaskLater(delay: Long, noinline run: () -> Unit) {
+    if (USE_NOVA_SCHEDULER) AsyncExecutor.runLater(delay * 50, run)
+    else Bukkit.getScheduler().runTaskLaterAsynchronously(NOVA, run, delay)
 }
 
 inline fun runAsyncTaskSynchronized(lock: Any, noinline run: () -> Unit) {
     val task = { synchronized(lock, run) }
-    if (USE_NOVA_SCHEDULER) AsyncExecutor.runAsync(task)
+    if (USE_NOVA_SCHEDULER) AsyncExecutor.run(task)
     else Bukkit.getScheduler().runTaskAsynchronously(NOVA, task)
 }
 
 inline fun runAsyncTaskWithLock(lock: ObservableLock, noinline run: () -> Unit) {
     val task = { lock.lockAndRun(run) }
-    if (USE_NOVA_SCHEDULER) AsyncExecutor.runAsync(task)
+    if (USE_NOVA_SCHEDULER) AsyncExecutor.run(task)
     else Bukkit.getScheduler().runTaskAsynchronously(NOVA, task)
 }
 
@@ -57,22 +62,35 @@ inline fun runAsyncTaskTimer(delay: Long, period: Long, noinline run: () -> Unit
 
 object AsyncExecutor {
     
-    private val MIN_THREADS = DEFAULT_CONFIG.getInt("nova_executor.min_threads")!!
-    private val MAX_THREADS = DEFAULT_CONFIG.getInt("nova_executor.max_threads")!!
-    private val THREAD_TIMEOUT = DEFAULT_CONFIG.getLong("nova_executor.thread_timeout")!!
+    private val THREADS = DEFAULT_CONFIG.getInt("nova_executor.threads")!!
     
     private lateinit var threadFactory: ThreadFactory
-    private lateinit var executorService: ExecutorService
+    private lateinit var executorService: ScheduledExecutorService
     
     init {
         if (USE_NOVA_SCHEDULER) {
             threadFactory = ThreadFactoryBuilder().setNameFormat("Async Nova Worker - %d").build()
-            executorService = ThreadPoolExecutor(MIN_THREADS, MAX_THREADS, THREAD_TIMEOUT, TimeUnit.MILLISECONDS, LinkedBlockingQueue(), threadFactory)
+            executorService = ScheduledThreadPoolExecutor(THREADS)
         }
     }
     
-    fun runAsync(task: () -> Unit): Future<*> =
-        executorService.submit(task)
+    fun run(task: () -> Unit): Future<*> =
+        executorService.submit {
+            try {
+                task()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
+        }
+    
+    fun runLater(delay: Long, task: () -> Unit): Future<*> =
+        executorService.schedule({
+            try {
+                task()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
+        }, delay, TimeUnit.MILLISECONDS)
     
     fun shutdown() {
         if (USE_NOVA_SCHEDULER) {
