@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.util.chunkPos
 import xyz.xenondevs.nova.util.runAsyncTask
+import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
@@ -157,7 +158,7 @@ object FakeArmorStandManager : Listener {
         val newChunk = event.to!!.chunkPos
         if (event.from.chunkPos != newChunk) {
             val player = event.player
-            runAsyncTask { handleChunksChange(player, newChunk) }
+            runAsyncTaskLater(1) { handleChunksChange(player, newChunk) }
         }
     }
     
