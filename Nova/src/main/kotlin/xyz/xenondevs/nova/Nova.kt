@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
+import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -13,6 +14,7 @@ import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.i18n.LocaleManager
+import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.network.PacketListener
@@ -26,11 +28,14 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.AsyncExecutor
+import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.Version
+import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.loot.LootGeneration
 import xyz.xenondevs.particle.utils.ReflectionUtils
+import java.util.concurrent.CountDownLatch
 import java.util.logging.Logger
 
 lateinit var NOVA: Nova
@@ -39,7 +44,7 @@ lateinit var PLUGIN_MANAGER: PluginManager
 var IS_VERSION_CHANGE: Boolean = false
 
 class Nova : JavaPlugin() {
-    
+
     val version = Version(description.version.removeSuffix("-SNAPSHOT"))
     val devBuild = description.version.contains("SNAPSHOT")
     val disableHandlers = ArrayList<() -> Unit>()
@@ -56,35 +61,10 @@ class Nova : JavaPlugin() {
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
         PermanentStorage.store("last_version", description.version)
         
-        UpdateReminder.init()
         setGlobalIngredients()
+        Metrics(this, 11927)
         NovaConfig.init()
-        DatabaseManager.connect()
-        
-        CustomItemServiceManager.runAfterDataLoad {
-            LocaleManager.init()
-            ChunkReloadWatcher.init()
-            FakeArmorStandManager.init()
-            AdvancementManager.loadAdvancements()
-            RecipeManager.registerRecipes()
-            RecipeRegistry.init()
-            ChunkLoadManager.init()
-            VanillaTileEntityManager.init()
-            TileEntityManager.init()
-            NetworkManager.init()
-            ItemManager.init()
-            AttachmentManager.init()
-            CommandManager.init()
-            ArmorEquipListener.init()
-            AbilityManager.init()
-            PacketListener.init()
-            LootGeneration.init()
-            forceResourcePack()
-            
-            Metrics(this, 11927)
-            
-            LOGGER.info("Done loading")
-        }
+        Initializer.init()
     }
     
     override fun onDisable() {
@@ -93,15 +73,6 @@ class Nova : JavaPlugin() {
         }
         DatabaseManager.disconnect()
         AsyncExecutor.shutdown()
-    }
-    
-    private fun forceResourcePack() {
-        if (DEFAULT_CONFIG.getBoolean("resource_pack.enabled")) {
-            ForceResourcePack.getInstance().setResourcePack(
-                DEFAULT_CONFIG.getString("resource_pack.url"),
-                ComponentBuilder("Nova Resource Pack").create()
-            )
-        }
     }
     
 }

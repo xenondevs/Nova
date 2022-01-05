@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.config
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -65,8 +66,8 @@ class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataF
     companion object {
         
         private val configs = HashMap<String, NovaConfig>()
-        private val configDefaults = PermanentStorage.retrieve("configDefaults") { JsonObject() }
-        
+        private var configDefaults = PermanentStorage.retrieve("configDefaults") { JsonObject() }
+    
         fun init() {
             LOGGER.info("Loading configs")
             

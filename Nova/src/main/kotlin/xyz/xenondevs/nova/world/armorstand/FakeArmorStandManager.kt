@@ -8,9 +8,11 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.*
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.chunkPos
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
@@ -26,7 +28,7 @@ var Player.armorStandRenderDistance: Int
     set(value) =
         persistentDataContainer.set(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER, value)
 
-object FakeArmorStandManager : Listener {
+object FakeArmorStandManager : Initializable(), Listener {
     
     val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "armor_stand_render_distance")
     val DEFAULT_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.default")!!
@@ -37,7 +39,10 @@ object FakeArmorStandManager : Listener {
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
     private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
     
-    fun init() {
+    override val inMainThread = false
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         LOGGER.info("Initializing FakeArmorStandManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         

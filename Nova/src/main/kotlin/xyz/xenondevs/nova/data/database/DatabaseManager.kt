@@ -6,8 +6,10 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import xyz.xenondevs.nova.util.runAsyncTask
@@ -19,14 +21,17 @@ fun asyncTransaction(statement: Transaction.() -> Unit) {
     }
 }
 
-object DatabaseManager {
+object DatabaseManager: Initializable() {
+    
+    val MYSQL = DEFAULT_CONFIG.getBoolean("mysql.enabled")
     
     private lateinit var database: Database
     private lateinit var dataSource: HikariDataSource
     
-    val MYSQL = DEFAULT_CONFIG.getBoolean("mysql.enabled")
+    override val inMainThread = false
+    override val dependsOn: Initializable? = null
     
-    fun connect() {
+    override fun init() {
         LOGGER.info("Connecting to database")
         if (MYSQL) {
             val address = DEFAULT_CONFIG.getString("mysql.address")!!

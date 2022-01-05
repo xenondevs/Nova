@@ -1,18 +1,23 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.Bukkit
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.*
 
-object ChunkLoadManager {
+object ChunkLoadManager : Initializable() {
     
     private val forceLoadedChunks = PermanentStorage.retrieve("forceLoadedChunks") { HashMap<ChunkPos, HashSet<UUID>>() }
     
-    fun init() {
+    override val inMainThread = true
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         LOGGER.info("Initializing ChunkLoadManager")
         
         Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false }

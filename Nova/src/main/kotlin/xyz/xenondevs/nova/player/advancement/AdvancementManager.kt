@@ -5,8 +5,10 @@ import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.awardAdvancement
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -20,13 +22,13 @@ private val ITEM_REGEXPS = listOf(
     Regex("""("items":\s*\[\s*")(nova:[a-z0-9._-]+)("\s*])""")
 )
 
-object AdvancementManager : Listener {
+object AdvancementManager : Initializable(), Listener {
     
-    init {
+    override val inMainThread = true
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-    }
-    
-    fun loadAdvancements() {
         LOGGER.info("Loading advancements")
         
         val novaDataPack = File("world/datapacks/nova")

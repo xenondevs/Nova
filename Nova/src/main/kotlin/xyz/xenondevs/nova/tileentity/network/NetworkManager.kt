@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.*
@@ -24,7 +26,7 @@ interface NetworkManager {
     
     fun handleBridgeRemove(bridge: NetworkBridge, unload: Boolean)
     
-    companion object {
+    companion object : Initializable(){
         
         /**
          * Schedules the execution of this [NetworkManagerTask].
@@ -61,8 +63,11 @@ interface NetworkManager {
                 task.invoke(NETWORK_MANAGER)
             }
         }
-        
-        fun init() {
+    
+        override val inMainThread = true
+        override val dependsOn = TileEntityManager
+    
+        override fun init() {
             NETWORK_MANAGER.init()
         }
         

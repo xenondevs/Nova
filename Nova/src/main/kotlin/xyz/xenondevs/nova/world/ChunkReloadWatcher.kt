@@ -4,17 +4,22 @@ import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 
-object ChunkReloadWatcher : Listener {
+object ChunkReloadWatcher : Initializable(), Listener {
     
     private const val RELOAD_TIME_LIMIT = 500
     private const val RELOAD_LIMIT = 2
     
     private val CHUNK_LOADS = HashMap<ChunkPos, Pair<Long, Int>>()
     
-    fun init() {
+    override val inMainThread = false
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         if (DEFAULT_CONFIG.getBoolean("chunk_reload_watcher"))
             Bukkit.getPluginManager().registerEvents(this, NOVA)
     }

@@ -5,13 +5,18 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.serverPlayer
 
-object PacketListener : Listener {
+object PacketListener : Initializable(), Listener {
     
-    fun init() {
+    override val inMainThread = true
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         LOGGER.info("Initializing PacketListener")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getOnlinePlayers().forEach { unregisterHandler(it); registerHandler(it) }

@@ -8,15 +8,19 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.novaMaterial
 
-object ItemManager : Listener {
+object ItemManager : Initializable(), Listener {
+    override val inMainThread = false
+    override val dependsOn = CustomItemServiceManager
     
-    fun init() {
+    override fun init() {
         LOGGER.info("Initializing ItemManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }

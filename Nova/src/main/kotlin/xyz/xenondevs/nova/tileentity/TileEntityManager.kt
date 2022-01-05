@@ -21,6 +21,7 @@ import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.asyncTransaction
@@ -34,6 +35,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -74,7 +76,7 @@ private fun ChunkTask.runAndAwaitCompletion() {
     latch.await()
 }
 
-object TileEntityManager : Listener {
+object TileEntityManager : Initializable(), Listener {
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<Location, TileEntity>>()
     private val additionalHitboxMap = HashMap<ChunkPos, HashMap<Location, TileEntity>>()
@@ -86,7 +88,10 @@ object TileEntityManager : Listener {
     
     private val chunkProcessors = HashMap<ChunkPos, ChunkProcessor>()
     
-    fun init() {
+    override val inMainThread = true
+    override val dependsOn = FakeArmorStandManager
+    
+    override fun init() {
         LOGGER.info("Initializing TileEntityManager")
         
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
@@ -162,7 +167,7 @@ object TileEntityManager : Listener {
     fun removeTileEntity(tileEntity: TileEntity) {
         val location = tileEntity.location
         val chunkPos = location.chunkPos
-    
+        
         // remove TileEntity and ArmorStand
         tileEntityMap[chunkPos]?.remove(location)
         locationCache -= location
@@ -170,16 +175,16 @@ object TileEntityManager : Listener {
             additionalHitboxMap[it.chunkPos]?.remove(it)
             locationCache -= it
         }
-    
+        
         asyncTransaction {
             TileEntitiesTable.deleteWhere { TileEntitiesTable.id eq tileEntity.uuid }
         }
-    
+        
         location.block.type = Material.AIR
         tileEntity.additionalHitboxes.forEach { it.block.type = Material.AIR }
-    
+        
         tileEntity.handleRemoved(unload = false)
-    
+        
         // count for TileEntity limits
         TileEntityLimits.handleTileEntityRemove(tileEntity.ownerUUID, tileEntity.material)
     }
@@ -187,7 +192,7 @@ object TileEntityManager : Listener {
     @Synchronized
     fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
         removeTileEntity(tileEntity)
-    
+        
         return tileEntity.getDrops(dropItems)
     }
     

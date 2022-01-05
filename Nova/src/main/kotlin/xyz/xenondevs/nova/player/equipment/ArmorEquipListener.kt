@@ -18,8 +18,10 @@ import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.runTask
@@ -30,9 +32,12 @@ private fun ItemStack?.getNullIfAir(): ItemStack? {
 
 private fun InventoryView.isPlayerView() = topInventory is CraftingInventory && topInventory.size == 5
 
-object ArmorEquipListener : Listener {
+object ArmorEquipListener : Initializable(), Listener {
     
-    fun init() {
+    override val inMainThread = false
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         LOGGER.info("Initializing ArmorEquipListener")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
     }

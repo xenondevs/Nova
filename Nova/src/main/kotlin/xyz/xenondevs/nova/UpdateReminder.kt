@@ -6,17 +6,21 @@ import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.net.URL
 
-object UpdateReminder : Listener {
+object UpdateReminder : Initializable(), Listener {
+
+    override val inMainThread = false
+    override val dependsOn: Initializable? = null
     
     @Volatile
     private var needsUpdate = false
     private var taskId: Int = -1
     
-    fun init() {
+    override fun init() {
         if (NOVA.devBuild) return
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         taskId = runAsyncTaskTimer(0, 12000) {

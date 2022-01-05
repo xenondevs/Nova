@@ -17,8 +17,10 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -30,13 +32,16 @@ import java.util.*
 /**
  * Manages wrappers for vanilla TileEntities
  */
-object VanillaTileEntityManager : Listener {
+object VanillaTileEntityManager : Initializable(), Listener {
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<Location, VanillaTileEntity>>()
     private val locationCache = HashMap<Location, VanillaTileEntity>()
     private val tileEntityQueue = LinkedList<VanillaTileEntity>()
     
-    fun init() {
+    override val inMainThread = true
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         LOGGER.info("Initializing VanillaTileEntityManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach(::handleChunkLoad)

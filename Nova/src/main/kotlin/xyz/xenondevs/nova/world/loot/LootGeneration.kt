@@ -4,8 +4,10 @@ import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.LootGenerateEvent
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
 import kotlin.random.Random
@@ -13,11 +15,14 @@ import kotlin.random.nextInt
 
 private val LOOT_CONFIG = NovaConfig["loot"]
 
-object LootGeneration : Listener {
+object LootGeneration : Initializable(), Listener {
     
     private val lootTable = ArrayList<LootInfo>()
     
-    fun init() {
+    override val inMainThread = false
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         lootTable.addAll(GSON.fromJson<ArrayList<LootInfo>>(LOOT_CONFIG.getArray("loot")) ?: emptyList())
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }

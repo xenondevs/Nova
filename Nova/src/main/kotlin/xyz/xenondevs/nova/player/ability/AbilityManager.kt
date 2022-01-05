@@ -8,10 +8,12 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
 import xyz.xenondevs.nova.util.emptyEnumMap
@@ -20,12 +22,15 @@ import java.util.*
 
 private val ABILITIES_KEY = NamespacedKey(NOVA, "abilities")
 
-object AbilityManager : Listener {
+object AbilityManager : Initializable(), Listener {
     
     private val activeAbilities = HashMap<Player, EnumMap<AbilityType, Ability>>()
     private var tick = 0
     
-    fun init() {
+    override val inMainThread = true
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         LOGGER.info("Initializing AbilityManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerJoin)

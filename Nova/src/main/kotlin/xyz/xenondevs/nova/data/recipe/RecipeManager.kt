@@ -13,9 +13,11 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.customModelData
 import xyz.xenondevs.nova.util.data.key
@@ -56,7 +58,7 @@ class ComplexChoice(choices: List<ItemStack>) : ExactChoice(choices) {
 private val CRAFTING_CACHE_SIZE = DEFAULT_CONFIG.getLong("crafting.cache_size")!!
 private val ALLOW_RESULT_OVERWRITE = DEFAULT_CONFIG.getBoolean("crafting.allow_result_overwrite")
 
-object RecipeManager : Listener {
+object RecipeManager : Initializable(), Listener {
     
     private val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
     private val shapelessRecipes = ArrayList<ShapelessRecipe>()
@@ -66,7 +68,10 @@ object RecipeManager : Listener {
     private val craftingCache: Cache<CraftingMatrix, Optional<Recipe>> =
         CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(CRAFTING_CACHE_SIZE).build()
     
-    fun registerRecipes() {
+    override val inMainThread = true
+    override val dependsOn = CustomItemServiceManager
+    
+    override fun init() {
         LOGGER.info("Loading recipes")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         

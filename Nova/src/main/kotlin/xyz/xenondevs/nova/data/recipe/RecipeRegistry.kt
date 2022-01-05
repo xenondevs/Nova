@@ -4,6 +4,7 @@ import com.google.gson.JsonParser
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.inventory.*
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
@@ -13,10 +14,9 @@ import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
 import xyz.xenondevs.nova.util.ItemUtils.getId
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.data.getResourceAsStream
-import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
 
-object RecipeRegistry {
+object RecipeRegistry : Initializable() {
     
     private val ITEM_INFO = JsonParser.parseReader(getResourceAsStream("item_info.json")!!.reader()).asJsonObject
     val CREATION_INFO = ITEM_INFO.get("creation").asJsonObject.entrySet().associate { it.key to it.value.asString }
@@ -30,19 +30,20 @@ object RecipeRegistry {
         private set
     var RECIPES_BY_TYPE: Map<RecipeGroup, List<RecipeContainer>> = HashMap()
     
-    fun init() {
-        runAsyncTask {
-            LOGGER.info("Initializing recipe registry")
-            BUKKIT_RECIPES = loadBukkitRecipes()
-            CREATION_RECIPES = loadCreationRecipes()
-            USAGE_RECIPES = loadUsageRecipes()
-            RECIPES_BY_TYPE = loadRecipesByGroup()
-            LOGGER.info("Finished initializing recipe registry")
-            
-            runTask {
-                CommandManager.registerCommand(NovaRecipeCommand)
-                CommandManager.registerCommand(NovaUsageCommand)
-            }
+    override val inMainThread = false
+    override val dependsOn = RecipeManager
+    
+    override fun init() {
+        LOGGER.info("Initializing recipe registry")
+        BUKKIT_RECIPES = loadBukkitRecipes()
+        CREATION_RECIPES = loadCreationRecipes()
+        USAGE_RECIPES = loadUsageRecipes()
+        RECIPES_BY_TYPE = loadRecipesByGroup()
+        LOGGER.info("Finished initializing recipe registry")
+        
+        runTask {
+            CommandManager.registerCommand(NovaRecipeCommand)
+            CommandManager.registerCommand(NovaUsageCommand)
         }
     }
     
