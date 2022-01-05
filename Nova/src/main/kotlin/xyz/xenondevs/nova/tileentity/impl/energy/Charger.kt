@@ -73,16 +73,15 @@ class Charger(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # # # # . |" +
-                "| u # # i # # . |" +
-                "| # # # # # # . |" +
+                "| s # # # # # e |" +
+                "| u # # i # # e |" +
+                "| # # # # # # e |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('i', VISlotElement(inventory, 0))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
     }
     

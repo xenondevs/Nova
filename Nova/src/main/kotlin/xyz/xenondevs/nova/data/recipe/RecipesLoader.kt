@@ -58,7 +58,13 @@ object RecipesLoader {
         fileHashes[originalFile.absolutePath]?.decodeWithBase64()
     
     fun loadRecipes(): List<Any> {
-        return RecipeType.values.flatMap { loadRecipes(it.dirName, it.deserializer) }
+        return RecipeType.values.flatMap {
+            val dirName = it.dirName
+            val deserializer = it.deserializer
+            if (dirName != null && deserializer != null) {
+                loadRecipes(it.dirName, it.deserializer)
+            } else emptyList()
+        }
     }
     
     private fun loadRecipes(folder: String, deserializer: RecipeDeserializer<out Any>): List<Any> {

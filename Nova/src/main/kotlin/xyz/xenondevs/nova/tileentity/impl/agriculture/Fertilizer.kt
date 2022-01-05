@@ -167,9 +167,9 @@ class Fertilizer(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s p i i i i . |" +
-                "| v n i i i i . |" +
-                "| u m i i i i . |" +
+                "| s p i i i i e |" +
+                "| v n i i i i e |" +
+                "| u m i i i i e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', fertilizerInventory)
             .addIngredient('v', VisualizeRegionItem(uuid) { fertilizeRegion })
@@ -178,9 +178,8 @@ class Fertilizer(
             .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
         

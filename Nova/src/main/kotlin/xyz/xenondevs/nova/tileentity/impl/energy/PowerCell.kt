@@ -43,14 +43,13 @@ open class PowerCell(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # . # # # |" +
-                "| # # # . # # # |" +
-                "| # # # . # # # |" +
+                "| s # # e # # # |" +
+                "| # # # e # # # |" +
+                "| # # # e # # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
         
     }
     

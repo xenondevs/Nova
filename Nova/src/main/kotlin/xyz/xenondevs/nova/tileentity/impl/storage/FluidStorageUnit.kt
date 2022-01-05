@@ -104,14 +104,11 @@ class FluidStorageUnit(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('i', inventory)
             .addIngredient('c', fluidStorageDisplay)
+            .addIngredient('f', FluidBar(3, fluidHolder, fluidTank))
             .build()
         
         fun update() {
             fluidStorageDisplay.notifyWindows()
-        }
-        
-        init {
-            FluidBar(gui, 6, 1, 3, fluidHolder, fluidTank)
         }
         
         private inner class FluidStorageUnitDisplay(val fluidStorageUnit: FluidStorageUnit) : BaseItem() {

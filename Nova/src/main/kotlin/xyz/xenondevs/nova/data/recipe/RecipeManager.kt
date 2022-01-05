@@ -63,7 +63,7 @@ object RecipeManager : Initializable(), Listener {
     private val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
     private val shapelessRecipes = ArrayList<ShapelessRecipe>()
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
-    val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
+    val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, SerializableNovaRecipe>>()
     
     private val craftingCache: Cache<CraftingMatrix, Optional<Recipe>> =
         CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(CRAFTING_CACHE_SIZE).build()
@@ -120,7 +120,7 @@ object RecipeManager : Initializable(), Listener {
     }
     
     @Suppress("UNCHECKED_CAST")
-    fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? {
+    fun <T : SerializableNovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? {
         return novaRecipes[type]?.get(key) as T?
     }
     

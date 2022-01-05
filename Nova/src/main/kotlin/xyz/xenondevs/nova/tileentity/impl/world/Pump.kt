@@ -243,15 +243,11 @@ class Pump(
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('M', PumpModeItem())
+            .addIngredient('e', EnergyBar(3, energyHolder))
+            .addIngredient('f', FluidBar(3, fluidHolder, fluidTank))
             .build()
         
-        val energyBar = EnergyBar(gui, x = 6, y = 1, height = 3, energyHolder)
-        
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
-        
-        init {
-            FluidBar(gui, x = 4, y = 1, height = 3, fluidHolder, fluidTank)
-        }
         
         private inner class PumpModeItem : BaseItem() {
             

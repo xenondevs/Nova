@@ -117,16 +117,15 @@ class BlockBreaker(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # i i i # . |" +
-                "| u # i i i # . |" +
-                "| # # i i i # . |" +
+                "| s # i i i # e |" +
+                "| u # i i i # e |" +
+                "| # # i i i # e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
     }
     

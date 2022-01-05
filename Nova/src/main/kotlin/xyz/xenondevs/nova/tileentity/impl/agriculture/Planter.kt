@@ -229,9 +229,9 @@ class Planter(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s u v # # p . |" +
-                "| i i i # h n . |" +
-                "| i i i # f m . |" +
+                "| s u v # # p e |" +
+                "| i i i # h n e |" +
+                "| i i i # f m e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inputInventory)
             .addIngredient('h', VISlotElement(hoesInventory, 0, NovaMaterialRegistry.HOE_PLACEHOLDER.createBasicItemBuilder()))
@@ -242,9 +242,8 @@ class Planter(
             .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
         

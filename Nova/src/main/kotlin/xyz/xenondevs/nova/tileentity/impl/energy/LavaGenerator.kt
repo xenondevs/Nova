@@ -135,12 +135,9 @@ class LavaGenerator(
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(3, energyHolder))
+            .addIngredient('f', FluidBar(3, fluidHolder, fluidContainer))
             .build()
-        
-        init {
-            FluidBar(gui, x = 6, y = 1, height = 3, fluidHolder, fluidContainer)
-            EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
-        }
         
     }
     

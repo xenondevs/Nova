@@ -135,12 +135,18 @@ class MobKiller(
         
         private val rangeItems = ArrayList<Item>()
         
+        val idleBar = object : VerticalBar(3) {
+            override val barMaterial = NovaMaterialRegistry.GREEN_BAR
+            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
+                itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_killer.idle", maxIdleTime - timePassed))
+        }
+        
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # . # . # p |" +
-                "| r # . # . # n |" +
-                "| u # . # . # m |" +
+                "| s # i # e # p |" +
+                "| r # i # e # n |" +
+                "| u # i # e # m |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('r', VisualizeRegionItem(uuid) { region })
@@ -148,19 +154,9 @@ class MobKiller(
             .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
+            .addIngredient('e', EnergyBar(3, energyHolder))
+            .addIngredient('i', idleBar)
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 3, y = 1, height = 3, energyHolder)
-        
-        val idleBar = object : VerticalBar(gui, x = 5, y = 1, height = 3) {
-            
-            override val barMaterial = NovaMaterialRegistry.GREEN_BAR
-            
-            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
-                itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_killer.idle", maxIdleTime - timePassed))
-            
-            
-        }
         
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
         

@@ -172,20 +172,17 @@ class TreeFactory(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s u # # # # . |" +
-                "| # # # o o o . |" +
-                "| # i # o o o . |" +
-                "| # # # o o o . |" +
+                "| s u # # # # e |" +
+                "| # # # o o o e |" +
+                "| # i # o o o e |" +
+                "| # # # o o o e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', VISlotElement(inputInventory, 0, NovaMaterialRegistry.SAPLING_PLACEHOLDER.itemProvider))
             .addIngredient('o', outputInventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(4, energyHolder))
             .build()
-        
-        init {
-            EnergyBar(gui = gui, x = 7, y = 1, height = 4, energyHolder)
-        }
         
     }
     

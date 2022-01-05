@@ -147,9 +147,9 @@ class FluidInfuser(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| . # m u s # . |" +
-                "| . p i > o # . |" +
-                "| . # # # # # . |" +
+                "| f # m u s # e |" +
+                "| f p i > o # e |" +
+                "| f # # # # # e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', input)
             .addIngredient('o', output)
@@ -158,12 +158,9 @@ class FluidInfuser(
             .addIngredient('>', SimpleItem(NovaMaterialRegistry.PROGRESS_ARROW.itemProvider))
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('f', FluidBar(3, fluidHolder, tank))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        init {
-            EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
-            FluidBar(gui, 1, 1, 3, fluidHolder, tank)
-        }
         
         fun updateProgress() {
             progressItem.percentage = if (recipe != null) timePassed.toDouble() / recipeTime.toDouble() else 0.0

@@ -29,7 +29,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
-import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
 import xyz.xenondevs.nova.util.ItemUtils
 import java.util.*

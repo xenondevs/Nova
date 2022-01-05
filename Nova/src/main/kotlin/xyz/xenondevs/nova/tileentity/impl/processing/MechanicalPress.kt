@@ -149,9 +149,9 @@ class MechanicalPress(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| p g # i # # . |" +
-                "| # # # , # # . |" +
-                "| s u # o # # . |" +
+                "| p g # i # # e |" +
+                "| # # # , # # e |" +
+                "| s u # o # # e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', VISlotElement(inputInv, 0))
             .addIngredient('o', VISlotElement(outputInv, 0))
@@ -160,9 +160,8 @@ class MechanicalPress(
             .addIngredient('p', PressTypeItem(PressType.PLATE).apply(pressTypeItems::add))
             .addIngredient('g', PressTypeItem(PressType.GEAR).apply(pressTypeItems::add))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         init {
             updateProgress()

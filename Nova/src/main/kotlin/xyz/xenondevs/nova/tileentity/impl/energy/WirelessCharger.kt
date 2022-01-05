@@ -138,9 +138,9 @@ class WirelessCharger(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # . # # p |" +
-                "| v # # . # # n |" +
-                "| u # # . # # m |" +
+                "| s # # e # # p |" +
+                "| v # # e # # n |" +
+                "| u # # e # # m |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('v', VisualizeRegionItem(uuid) { region })
@@ -148,9 +148,8 @@ class WirelessCharger(
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
         
         fun updateRangeItems() = rangeItems.forEach(UIItem::notifyWindows)
         

@@ -188,42 +188,35 @@ class StarCollector(
             ::openWindow
         )
         
-        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
-            .setStructure("" +
-                "1 - - - - - - - 2" +
-                "| s # # # . . . |" +
-                "| u # i # . . . |" +
-                "| # # # # . . . |" +
-                "3 - - - - - - - 4")
-            .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
-            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
-            .addIngredient('i', inventory)
-            .build()
-        
-        val collectionBar = object : VerticalBar(gui, x = 5, y = 1, height = 3) {
-            
+        val collectionBar = object : VerticalBar(3) {
             override val barMaterial = NovaMaterialRegistry.GREEN_BAR
-            
             override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
                 if (timeSpentCollecting != -1)
                     itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.star_collector.collection"))
                 return itemBuilder
             }
-            
         }
         
-        val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3) {
-            
+        val idleBar = object : VerticalBar(3) {
             override val barMaterial = NovaMaterialRegistry.GREEN_BAR
-            
             override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
                 itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.star_collector.idle"))
-            
         }
         
-        init {
-            EnergyBar(gui, 7, 1, 3, energyHolder)
-        }
+        override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
+            .setStructure("" +
+                "1 - - - - - - - 2" +
+                "| s # # # c p e |" +
+                "| u # i # c p e |" +
+                "| # # # # c p e |" +
+                "3 - - - - - - - 4")
+            .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('i', inventory)
+            .addIngredient('c', collectionBar)
+            .addIngredient('p', idleBar)
+            .addIngredient('e', EnergyBar(3, energyHolder))
+            .build()
         
     }
     

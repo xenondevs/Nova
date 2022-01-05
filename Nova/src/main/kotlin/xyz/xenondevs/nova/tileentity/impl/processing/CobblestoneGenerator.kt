@@ -75,7 +75,7 @@ class CobblestoneGenerator(
     override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT) { createSideConfig(NetworkConnectionType.EXTRACT, BlockSide.FRONT) }
     override val fluidHolder = NovaFluidHolder(this, waterTank to NetworkConnectionType.BUFFER, lavaTank to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     
-    private var mode = retrieveEnum("mode") { GenerationMode.COBBLESTONE }
+    private var mode = retrieveEnum("mode") { Mode.COBBLESTONE }
     private var mbPerTick = 0L
     
     private var currentMode = mode
@@ -191,13 +191,10 @@ class CobblestoneGenerator(
             .addIngredient('m', ChangeModeItem())
             .addIngredient('i', inventory)
             .addIngredient('>', progressItem)
+            .addIngredient('w', FluidBar(3, fluidHolder, waterTank))
+            .addIngredient('l', FluidBar(3, fluidHolder, waterTank))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        init {
-            FluidBar(gui, x = 1, y = 1, height = 3, fluidHolder, waterTank)
-            FluidBar(gui, x = 2, y = 1, height = 3, fluidHolder, lavaTank)
-            EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
-        }
         
         private inner class ChangeModeItem : BaseItem() {
             
@@ -208,7 +205,7 @@ class CobblestoneGenerator(
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
                 if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) {
                     val direction = if (clickType == ClickType.LEFT) 1 else -1
-                    mode = GenerationMode.values()[(mode.ordinal + direction).mod(GenerationMode.values().size)]
+                    mode = Mode.values()[(mode.ordinal + direction).mod(Mode.values().size)]
                     player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
                     notifyWindows()
                 }
@@ -218,12 +215,10 @@ class CobblestoneGenerator(
         
     }
     
-}
-
-private enum class GenerationMode(val takeWater: Boolean, val takeLava: Boolean, val product: ItemStack, val uiItem: NovaMaterial) {
-    
-    COBBLESTONE(false, false, ItemStack(Material.COBBLESTONE), NovaMaterialRegistry.COBBLESTONE_MODE_BUTTON),
-    STONE(true, false, ItemStack(Material.STONE), NovaMaterialRegistry.STONE_MODE_BUTTON),
-    OBSIDIAN(false, true, ItemStack(Material.OBSIDIAN), NovaMaterialRegistry.OBSIDIAN_MODE_BUTTON)
+    enum class Mode(val takeWater: Boolean, val takeLava: Boolean, val product: ItemStack, val uiItem: NovaMaterial) {
+        COBBLESTONE(false, false, ItemStack(Material.COBBLESTONE), NovaMaterialRegistry.COBBLESTONE_MODE_BUTTON),
+        STONE(true, false, ItemStack(Material.STONE), NovaMaterialRegistry.STONE_MODE_BUTTON),
+        OBSIDIAN(false, true, ItemStack(Material.OBSIDIAN), NovaMaterialRegistry.OBSIDIAN_MODE_BUTTON)
+    }
     
 }

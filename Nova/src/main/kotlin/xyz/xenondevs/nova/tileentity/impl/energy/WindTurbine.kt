@@ -116,14 +116,13 @@ class WindTurbine(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| u # # . # # # |" +
-                "| # # # . # # # |" +
-                "| # # # . # # # |" +
+                "| u # # e # # # |" +
+                "| # # # e # # # |" +
+                "| # # # e # # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 4, y = 1, height = 3, energyHolder)
         
     }
     

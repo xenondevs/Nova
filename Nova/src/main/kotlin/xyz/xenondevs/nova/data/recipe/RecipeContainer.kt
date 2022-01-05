@@ -11,7 +11,7 @@ class RecipeContainer(val recipe: Any) {
         else -> throw IllegalArgumentException("Could not find a recipe key")
     }
     
-    val result = if (recipe is Recipe) recipe.result else (recipe as ConversionNovaRecipe).result
+    val result = if (recipe is Recipe) recipe.result else (recipe as NovaRecipe).result
     val type = RecipeType.of(recipe)
     
     override fun equals(other: Any?): Boolean {

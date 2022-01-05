@@ -10,7 +10,8 @@ import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.RecipeGroup
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.hardcoded.HardcodedRecipes
 import xyz.xenondevs.nova.util.ItemUtils.getId
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -65,7 +66,7 @@ object RecipeRegistry : Initializable() {
         }
         
         // add all nova machine recipes
-        getConversionNovaRecipeSequence().forEach {
+        getCreationNovaRecipeSequence().forEach {
             val itemKey = getId(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(RecipeType.of(it).group) { mutableListOf() }
@@ -90,7 +91,7 @@ object RecipeRegistry : Initializable() {
         }
         
         // add all nova machine recipes
-        getConversionNovaRecipeSequence().forEach { recipe ->
+        getUsageNovaRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe).group
             recipe.input.getInputStacks().forEach { inputStack ->
                 val itemKey = getId(inputStack)
@@ -105,7 +106,7 @@ object RecipeRegistry : Initializable() {
     
     private fun loadRecipesByGroup(): Map<RecipeGroup, List<RecipeContainer>> {
         val map = HashMap<RecipeGroup, MutableList<RecipeContainer>>()
-        (getBukkitRecipeSequence() + getConversionNovaRecipeSequence()).forEach {
+        (getBukkitRecipeSequence() + getAllNovaRecipes()).forEach {
             map.getOrPut(RecipeType.of(it).group) { ArrayList() } += RecipeContainer(it)
         }
         return map
@@ -120,11 +121,16 @@ object RecipeRegistry : Initializable() {
             }
     }
     
-    private fun getConversionNovaRecipeSequence(): Sequence<ConversionNovaRecipe> {
-        return RecipeManager.novaRecipes
-            .values.asSequence()
-            .flatMap { it.values }
-            .filterIsInstance<ConversionNovaRecipe>()
+    private fun getAllNovaRecipes(): Sequence<NovaRecipe> {
+        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + HardcodedRecipes.recipes.asSequence()
+    }
+    
+    private fun getCreationNovaRecipeSequence(): Sequence<NovaRecipe> {
+        return getAllNovaRecipes()
+    }
+    
+    private fun getUsageNovaRecipeSequence(): Sequence<ConversionNovaRecipe> {
+        return getAllNovaRecipes().filterIsInstance<ConversionNovaRecipe>()
     }
     
 }

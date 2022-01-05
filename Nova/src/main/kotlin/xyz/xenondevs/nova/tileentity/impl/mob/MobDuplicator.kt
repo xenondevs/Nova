@@ -152,6 +152,12 @@ class MobDuplicator(
             listOf(itemHolder.getNetworkedInventory(inventory) to "inventory.nova.default")
         ) { openWindow(it) }
         
+        private val idleBar = object : VerticalBar(3) {
+            override val barMaterial = NovaMaterialRegistry.GREEN_BAR
+            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
+                itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - timePassed))
+        }
+        
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
@@ -163,18 +169,9 @@ class MobDuplicator(
             .addIngredient('i', VISlotElement(inventory, 0, NovaMaterialRegistry.MOB_CATCHER_PLACEHOLDER.createBasicItemBuilder()))
             .addIngredient('n', ToggleNBTModeItem())
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(3, energyHolder))
+            .addIngredient('p', idleBar)
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
-        
-        private val idleBar = object : VerticalBar(gui, x = 6, y = 1, height = 3) {
-            
-            override val barMaterial = NovaMaterialRegistry.GREEN_BAR
-            
-            override fun modifyItemBuilder(itemBuilder: ItemBuilder) =
-                itemBuilder.setDisplayName(localized(ChatColor.GRAY, "menu.nova.mob_duplicator.idle", totalIdleTime - timePassed))
-            
-        }
         
         fun updateIdleBar() {
             idleBar.percentage = timePassed.toDouble() / totalIdleTime.toDouble()

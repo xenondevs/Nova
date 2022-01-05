@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.builder.ItemBuilder
@@ -9,27 +8,26 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
+import java.util.function.Supplier
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
 
-abstract class VerticalBar(
-    gui: GUI,
-    x: Int, y: Int,
-    height: Int
-) {
+abstract class VerticalBar(height: Int) : Supplier<Item> {
     
     abstract val barMaterial: NovaMaterial
     
     private val barItems = Array(height) { createBarItem(it, height) }
+    private var i = 0
     var percentage: Double = 0.0
         set(value) {
             field = value
             barItems.forEach(Item::notifyWindows)
         }
     
-    init {
-        ((y + height - 1) downTo y).withIndex().forEach { (index, y) -> gui.setItem(x, y, barItems[index]) }
+    override fun get(): Item {
+        i = (i - 1).mod(barItems.size)
+        return barItems[i]
     }
     
     protected open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder

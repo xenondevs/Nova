@@ -68,7 +68,7 @@ class Freezer(
     private var mbPerTick = 0L
     private var mbUsed = 0L
     
-    private var mode = retrieveEnum("mode") { FreezerMode.ICE }
+    private var mode = retrieveEnum("mode") { Mode.ICE }
     
     init {
         handleUpgradeUpdates()
@@ -135,12 +135,9 @@ class Freezer(
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
             .addIngredient('m', ChangeModeItem())
+            .addIngredient('w', FluidBar(3, fluidHolder, waterTank))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        init {
-            FluidBar(gui, 1, 1, 3, fluidHolder, waterTank)
-            EnergyBar(gui, 7, 1, 3, energyHolder)
-        }
         
         fun updateProgress() {
             progressItem.percentage = mbUsed / (1000 * mode.maxCostMultiplier).toDouble()
@@ -155,7 +152,7 @@ class Freezer(
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
                 if (clickType == ClickType.LEFT || clickType == ClickType.RIGHT) {
                     val direction = if (clickType == ClickType.LEFT) 1 else -1
-                    mode = FreezerMode.values()[(mode.ordinal + direction).mod(FreezerMode.values().size)]
+                    mode = Mode.values()[(mode.ordinal + direction).mod(Mode.values().size)]
                     
                     player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
                     notifyWindows()
@@ -163,10 +160,11 @@ class Freezer(
             }
         }
     }
-}
-
-private enum class FreezerMode(val product: ItemStack, val uiItem: NovaMaterial, val maxCostMultiplier: Int) {
-    ICE(ItemStack(Material.ICE), NovaMaterialRegistry.ICE_MODE_BUTTON, 1),
-    PACKED_ICE(ItemStack(Material.PACKED_ICE), NovaMaterialRegistry.PACKED_ICE_MODE_BUTTON, 1),
-    BLUE_ICE(ItemStack(Material.BLUE_ICE), NovaMaterialRegistry.BLUE_ICE_MODE_BUTTON, 5)
+    
+    enum class Mode(val product: ItemStack, val uiItem: NovaMaterial, val maxCostMultiplier: Int) {
+        ICE(ItemStack(Material.ICE), NovaMaterialRegistry.ICE_MODE_BUTTON, 1),
+        PACKED_ICE(ItemStack(Material.PACKED_ICE), NovaMaterialRegistry.PACKED_ICE_MODE_BUTTON, 9),
+        BLUE_ICE(ItemStack(Material.BLUE_ICE), NovaMaterialRegistry.BLUE_ICE_MODE_BUTTON, 81)
+    }
+    
 }

@@ -7,15 +7,19 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 
 interface NovaRecipe {
     val key: NamespacedKey
-    val type: RecipeType<out NovaRecipe>
+    val result: ItemStack
+}
+
+interface SerializableNovaRecipe : NovaRecipe {
+    val type: RecipeType<out SerializableNovaRecipe>
 }
 
 abstract class ConversionNovaRecipe(
     override val key: NamespacedKey,
     val input: RecipeChoice,
-    val result: ItemStack,
+    override val result: ItemStack,
     val time: Int
-) : NovaRecipe
+) : SerializableNovaRecipe
 
 class PulverizerRecipe(
     key: NamespacedKey,

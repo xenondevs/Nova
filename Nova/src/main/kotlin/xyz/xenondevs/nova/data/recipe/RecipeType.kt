@@ -2,15 +2,16 @@ package xyz.xenondevs.nova.data.recipe
 
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.data.serialization.json.*
-import xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype.*
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.*
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.hardcoded.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
 class RecipeType<T : Any> private constructor(
-    val dirName: String,
+    val dirName: String?,
     val recipeClass: KClass<T>,
     val group: RecipeGroup,
-    val deserializer: RecipeDeserializer<T>
+    val deserializer: RecipeDeserializer<T>?
 ) {
     
     init {
@@ -33,6 +34,9 @@ class RecipeType<T : Any> private constructor(
         val GEAR_PRESS = RecipeType("press/gear", GearPressRecipe::class, PressingRecipeGroup, GearPressRecipeDeserializer)
         val PLATE_PRESS = RecipeType("press/plate", PlatePressRecipe::class, PressingRecipeGroup, PlatePressRecipeDeserializer)
         val FLUID_INFUSER = RecipeType("fluid_infuser", FluidInfuserRecipe::class, FluidInfuserRecipeGroup, FluidInfuserRecipeDeserializer)
+        val STAR_COLLECTOR = RecipeType(null, StarCollectorRecipe::class, StarCollectorRecipeGroup, null)
+        val COBBLESTONE_GENERATOR = RecipeType(null, CobblestoneGeneratorRecipe::class, CobblestoneGeneratorRecipeGroup, null)
+        val FREEZER = RecipeType(null, FreezerRecipe::class, FreezerRecipeGroup, null)
         
         @Suppress("UNCHECKED_CAST")
         fun <T : Any> of(recipe: T): RecipeType<out T> {

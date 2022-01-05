@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui.menu.item.recipes.craftingtype
+package xyz.xenondevs.nova.ui.menu.item.recipes.group
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder

@@ -118,9 +118,9 @@ class Sprinkler(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # . # # p |" +
-                "| u # # . # # d |" +
-                "| v # # . # # m |" +
+                "| s # # f # # p |" +
+                "| u # # f # # d |" +
+                "| v # # f # # m |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
@@ -128,11 +128,8 @@ class Sprinkler(
             .addIngredient('p', AddNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('d', DisplayNumberItem { range }.also(rangeItems::add))
+            .addIngredient('f', FluidBar(3, fluidHolder, tank))
             .build()
-        
-        init {
-            FluidBar(gui, 4, 1, 3, fluidHolder, tank)
-        }
         
         fun updateRangeItems() {
             rangeItems.forEach(Item::notifyWindows)

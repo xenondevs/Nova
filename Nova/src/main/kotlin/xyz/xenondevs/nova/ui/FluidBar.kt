@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.util.InventoryUtils
 import org.bukkit.Material
@@ -17,12 +16,10 @@ import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
 
 class FluidBar(
-    gui: GUI,
-    x: Int, y: Int,
     height: Int,
     fluidHolder: NovaFluidHolder,
     private val fluidContainer: FluidContainer
-) : VerticalBar(gui, x, y, height) {
+) : VerticalBar(height) {
     
     private val allowedConnectionType = fluidHolder.allowedConnectionTypes[fluidContainer]!!
     
@@ -88,6 +85,35 @@ class FluidBar(
             }
         }
         
+    }
+    
+}
+
+class StaticFluidBar(
+    private val type: FluidType,
+    private val amount: Long,
+    private val capacity: Long,
+    height: Int
+) : VerticalBar(height) {
+    
+    override val barMaterial: NovaMaterial
+        get() = when (type) {
+            FluidType.WATER -> NovaMaterialRegistry.BLUE_BAR_TRANSPARENT
+            else -> NovaMaterialRegistry.ORANGE_BAR_TRANSPARENT
+        }
+    
+    init {
+        percentage = amount / capacity.toDouble()
+    }
+    
+    override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+        if (amount == Long.MAX_VALUE) {
+            itemBuilder.setDisplayName("∞ mB / ∞ mB")
+        } else {
+            if (capacity == Long.MAX_VALUE) itemBuilder.setDisplayName(NumberFormatUtils.getFluidString(amount) + " / ∞ mB")
+            else itemBuilder.setDisplayName(NumberFormatUtils.getFluidString(amount, capacity))
+        }
+        return itemBuilder
     }
     
 }

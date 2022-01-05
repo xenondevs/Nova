@@ -147,9 +147,9 @@ class Pulverizer(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s u # # # # . |" +
-                "| i # , # o a . |" +
-                "| c # # # # # . |" +
+                "| s u # # # # e |" +
+                "| i # , # o a e |" +
+                "| c # # # # # e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', VISlotElement(inputInv, 0))
             .addIngredient('o', VISlotElement(outputInv, 0))
@@ -158,9 +158,8 @@ class Pulverizer(
             .addIngredient('c', pulverizerProgress)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 3, energyHolder)
         
         init {
             updateProgress()

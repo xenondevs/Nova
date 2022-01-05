@@ -251,10 +251,10 @@ class Harvester(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| c v u s a h . |" +
-                "| m n p # # # . |" +
-                "| i i i i i i . |" +
-                "| i i i i i i . |" +
+                "| c v u s a h e |" +
+                "| m n p # # # e |" +
+                "| i i i i i i e |" +
+                "| i i i i i i e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inventory)
             .addIngredient('c', OpenSideConfigItem(sideConfigGUI))
@@ -266,9 +266,8 @@ class Harvester(
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(4, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, 7, 1, 4, energyHolder)
         
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
         

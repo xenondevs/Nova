@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -10,11 +9,9 @@ import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
 
 class EnergyBar(
-    gui: GUI,
-    x: Int, y: Int,
     height: Int,
     private val energyHolder: EnergyHolder
-) : VerticalBar(gui, x, y, height) {
+) : VerticalBar(height) {
     
     override val barMaterial = NovaMaterialRegistry.RED_BAR
     

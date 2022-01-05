@@ -40,16 +40,13 @@ class InfiniteWaterSource(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # . # # # |" +
-                "| # # # . # # # |" +
-                "| # # # . # # # |" +
+                "| s # # f # # # |" +
+                "| # # # f # # # |" +
+                "| # # # f # # # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
+            .addIngredient('f', FluidBar(3, fluidHolder, fluidContainer))
             .build()
-        
-        init {
-            FluidBar(gui, x = 4, y = 1, height = 3, fluidHolder, fluidContainer)
-        }
         
     }
     

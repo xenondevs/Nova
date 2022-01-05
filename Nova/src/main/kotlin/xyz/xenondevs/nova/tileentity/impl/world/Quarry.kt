@@ -569,10 +569,10 @@ class Quarry(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s u # # # # . |" +
-                "| # # # i i i . |" +
-                "| m n p i i i . |" +
-                "| M N P i i i . |" +
+                "| s u # # # # e |" +
+                "| # # # i i i e |" +
+                "| m n p i i i e |" +
+                "| M N P i i i e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
@@ -583,9 +583,8 @@ class Quarry(
             .addIngredient('N', DepthDisplayItem { sizeY }.also(depthItems::add))
             .addIngredient('P', AddNumberItem({ MIN_DEPTH..MAX_DEPTH }, { sizeY }, ::setDepth).also(depthItems::add))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(4, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, energyHolder)
         
         private fun setSize(size: Int) {
             resize(size, size)

@@ -154,18 +154,17 @@ class FurnaceGenerator(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 6)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # # # # # |" +
-                "| u # # i # # # |" +
-                "| # # # ! # # # |" +
-                "| # # # # # # # |" +
+                "| s # # # # # e |" +
+                "| u # # i # # e |" +
+                "| # # # ! # # e |" +
+                "| # # # # # # e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', SlotElement.VISlotElement(inventory, 0))
             .addIngredient('!', progressItem)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))
+            .addIngredient('e', EnergyBar(4, energyHolder))
             .build()
-        
-        val energyBar = EnergyBar(gui, x = 7, y = 1, height = 4, energyHolder)
         
     }
     
