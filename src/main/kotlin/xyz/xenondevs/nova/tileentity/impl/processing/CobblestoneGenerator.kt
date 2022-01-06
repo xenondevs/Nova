@@ -120,7 +120,7 @@ class CobblestoneGenerator(
     }
     
     private fun getFluidState(container: FluidContainer) =
-        (container.amount.toDouble() / container.capacity.toDouble() * MAX_STATE.toDouble()).roundToInt()
+        (container.amount.toDouble() / container.capacity.toDouble() * MAX_STATE.toDouble()).roundToInt().coerceIn(0..MAX_STATE)
     
     override fun handleTick() {
         val mbToTake = min(mbPerTick, 1000 - mbUsed)
