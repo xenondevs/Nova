@@ -15,6 +15,7 @@ class NovaFluidContainer(
     
     init {
         upgradeHolder?.upgradeUpdateHandlers?.add(::handleUpgradeUpdates)
+        handleUpgradeUpdates()
     }
     
     private fun handleUpgradeUpdates() {

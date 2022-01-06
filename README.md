@@ -21,7 +21,8 @@ If you would like to help translate Nova, you can do so via [Crowdin](https://cr
 
 # Patrons
 
-[SgtLegoTown](https://www.youtube.com/channel/UCq8IXcNv_vWPcSB7C2A3hfQ) - €20<br>
-Ashwin | DarktubeNL - €10
+[SgtLegoTown](https://www.youtube.com/channel/UCq8IXcNv_vWPcSB7C2A3hfQ) - €20  
+Ashwin | DarktubeNL - €10  
+Brett - €5
 
 Want to donate as well? Check out our [Patreon](https://www.patreon.com/xenondevs) page.

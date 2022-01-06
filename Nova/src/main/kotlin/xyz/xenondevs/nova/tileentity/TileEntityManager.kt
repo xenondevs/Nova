@@ -534,16 +534,20 @@ object TileEntityManager : Initializable(), Listener {
                     
                     // create the tile entities in the main thread
                     runTaskSynchronized(TileEntityManager) {
+                        val chunkMap = tileEntityMap.getOrPut(chunkPos) { HashMap() }
+                        
                         tileEntities.forEach { tile ->
-                            val location = tile.location
-                            val tileEntity = TileEntity.create(tile, location)
-                            
-                            val chunkMap = tileEntityMap.getOrPut(chunkPos) { HashMap() }
-                            chunkMap[location] = tileEntity
-                            
-                            locationCache += location
-                            
-                            tileEntity.handleInitialized(false)
+                            try {
+                                val location = tile.location
+                                val tileEntity = TileEntity.create(tile, location)
+                                
+                                chunkMap[location] = tileEntity
+                                locationCache += location
+                                
+                                tileEntity.handleInitialized(false)
+                            } catch (ex: Exception) {
+                                ex.printStackTrace()
+                            }
                         }
                         
                         done.set(true)
