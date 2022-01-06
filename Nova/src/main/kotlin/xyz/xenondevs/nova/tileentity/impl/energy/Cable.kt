@@ -234,7 +234,7 @@ open class Cable(
                 
                 hitboxes += Hitbox(
                     from, to,
-                    { ProtectionManager.canUse(it.player, location) },
+                    { it.action.isRightClick() && ProtectionManager.canUse(it.player, location) },
                     { handleAttachmentHit(it, itemHolder, fluidHolder, face) }
                 )
             }
