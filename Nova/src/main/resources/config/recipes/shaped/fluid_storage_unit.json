@@ -1,0 +1,14 @@
+{
+  "result": "nova:fluid_storage_unit",
+  "shape": [
+    "iei",
+    "tft",
+    "iti"
+  ],
+  "ingredients": {
+    "t": "nova:ultimate_fluid_tank",
+    "e": "minecraft:end_crystal",
+    "i": "nova:iron_plate",
+    "f": "nova:ultimate_machine_frame"
+  }
+}
