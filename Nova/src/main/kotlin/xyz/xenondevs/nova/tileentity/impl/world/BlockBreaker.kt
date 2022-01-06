@@ -5,6 +5,7 @@ import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import org.bukkit.Material
 import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -33,6 +34,7 @@ private val MAX_ENERGY = NovaConfig[BLOCK_BREAKER].getLong("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[BLOCK_BREAKER].getLong("energy_per_tick")!!
 private val BREAK_SPEED_MULTIPLIER = NovaConfig[BLOCK_BREAKER].getDouble("break_speed_multiplier")!!
 private val BREAK_SPEED_CLAMP = NovaConfig[BLOCK_BREAKER].getDouble("break_speed_clamp")!!
+private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
 
 class BlockBreaker(
     uuid: UUID,
@@ -64,6 +66,7 @@ class BlockBreaker(
             && !type.isTraversable()
             && type.isBreakable()
             && ProtectionManager.canBreak(this, block.location)
+            && (!DROP_EXCESS_ON_GROUND && !inventory.isFull())
         ) {
             // consume energy
             energyHolder.energy -= energyHolder.energyConsumption
@@ -88,7 +91,7 @@ class BlockBreaker(
                 block.breakAndTakeDrops()
                 drops.forEach { drop ->
                     val amountLeft = inventory.addItem(SELF_UPDATE_REASON, drop)
-                    if (amountLeft != 0) {
+                    if (DROP_EXCESS_ON_GROUND && amountLeft != 0) {
                         drop.amount = amountLeft
                         world.dropItemNaturally(block.location.center(), drop)
                     }

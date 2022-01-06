@@ -7,6 +7,5 @@
     "min": 1,
     "max": 5,
     "default": 5
-  },
-  "drop_excess_on_ground": true
+  }
 }

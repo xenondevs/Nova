@@ -12,6 +12,7 @@ import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -50,7 +51,7 @@ private val IDLE_TIME = NovaConfig[HARVESTER].getInt("idle_time")!!
 private val MIN_RANGE = NovaConfig[HARVESTER].getInt("range.min")!!
 private val MAX_RANGE = NovaConfig[HARVESTER].getInt("range.max")!!
 private val DEFAULT_RANGE = NovaConfig[HARVESTER].getInt("range.default")!!
-private val DROP_EXCESS_ON_GROUND = NovaConfig[HARVESTER].getBoolean("drop_excess_on_ground")
+private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
 
 class Harvester(
     uuid: UUID,

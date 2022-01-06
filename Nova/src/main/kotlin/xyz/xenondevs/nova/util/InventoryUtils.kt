@@ -21,8 +21,8 @@ fun VirtualInventory.addAll(reason: UpdateReason?, items: List<ItemStack>) =
  * Checks if a [VirtualInventory] is full.
  */
 fun VirtualInventory.isFull(): Boolean {
-    for (item in items)
-        if (item == null || item.amount < item.type.maxStackSize)
+    for ((index, item) in items.withIndex())
+        if (item == null || item.amount < getMaxStackSize(index, -1))
             return false
     return true
 }
