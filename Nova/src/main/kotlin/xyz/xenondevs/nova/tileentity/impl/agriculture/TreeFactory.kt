@@ -8,6 +8,7 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -26,10 +27,7 @@ import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.center
-import xyz.xenondevs.nova.util.dropItem
-import xyz.xenondevs.nova.util.particleBuilder
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
@@ -54,6 +52,8 @@ private val MAX_ENERGY = NovaConfig[TREE_FACTORY].getLong("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[TREE_FACTORY].getLong("energy_per_tick")!!
 private val PROGRESS_PER_TICK = NovaConfig[TREE_FACTORY].getDouble("progress_per_tick")!!
 private val IDLE_TIME = NovaConfig[TREE_FACTORY].getInt("idle_time")!!
+
+private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
 
 private const val MAX_GROWTH_STAGE = 199
 
@@ -100,6 +100,8 @@ class TreeFactory(
     
     override fun handleTick() {
         if (energyHolder.energy >= energyHolder.energyConsumption && plantType != null) {
+            if (!DROP_EXCESS_ON_GROUND && outputInventory.isFull()) return
+
             energyHolder.energy -= energyHolder.energyConsumption
             
             if (idleTimeLeft == 0) {
@@ -126,7 +128,7 @@ class TreeFactory(
                     
                     val loot = PLANTS[plantType]!!.loot
                     val leftover = outputInventory.addItem(SELF_UPDATE_REASON, loot)
-                    if (leftover > 0)
+                    if (DROP_EXCESS_ON_GROUND && leftover > 0)
                         armorStand.location.dropItem(loot.clone().apply { amount = leftover })
                 }
             }

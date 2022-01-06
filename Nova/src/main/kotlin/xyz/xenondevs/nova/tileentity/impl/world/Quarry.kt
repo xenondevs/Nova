@@ -16,6 +16,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -74,6 +75,8 @@ private val DRILL_SPEED_CLAMP = NovaConfig[QUARRY].getDouble("drill_speed_clamp"
 private val MAX_ENERGY = NovaConfig[QUARRY].getLong("capacity")!!
 private val BASE_ENERGY_CONSUMPTION = NovaConfig[QUARRY].getInt("base_energy_consumption")!!
 private val ENERGY_PER_SQUARE_BLOCK = NovaConfig[QUARRY].getInt("energy_consumption_per_square_block")!!
+
+private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
 
 class Quarry(
     uuid: UUID,
@@ -228,6 +231,8 @@ class Quarry(
         if (energyHolder.energy == 0L) return
         
         if (!done || serverTick % 300 == 0) {
+            if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
+
             if (!drilling) {
                 val pointerDestination = pointerDestination ?: selectNextDestination()
                 if (pointerDestination != null) {
@@ -296,7 +301,7 @@ class Quarry(
             block.remove()
             drops.forEach { drop ->
                 val leftover = inventory.addItem(null, drop)
-                if (leftover != 0) {
+                if (DROP_EXCESS_ON_GROUND && leftover != 0) {
                     drop.amount = leftover
                     world.dropItemNaturally(block.location, drop)
                 }

@@ -19,6 +19,7 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer
 import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack
 import org.bukkit.enchantments.Enchantment
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -38,17 +39,15 @@ import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.EntityUtils
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.item.ToolUtils
-import xyz.xenondevs.nova.util.salt
-import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 
 private val MAX_ENERGY = NovaConfig[AUTO_FISHER].getLong("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[AUTO_FISHER].getLong("energy_per_tick")!!
 private val IDLE_TIME = NovaConfig[AUTO_FISHER].getInt("idle_time")!!
+private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
 
 class AutoFisher(
     uuid: UUID,
@@ -86,10 +85,11 @@ class AutoFisher(
     
     override fun handleTick() {
         if (energyHolder.energy >= energyHolder.energyConsumption && !fishingRodInventory.isEmpty && waterBlock.type == Material.WATER) {
+            if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
+
             energyHolder.energy -= energyHolder.energyConsumption
-            
+
             timePassed++
-            
             if (timePassed >= maxIdleTime) {
                 timePassed = 0
                 fish()
@@ -125,7 +125,7 @@ class AutoFisher(
             .map { CraftItemStack.asCraftMirror(it) }
             .forEach {
                 val leftover = inventory.addItem(SELF_UPDATE_REASON, it)
-                if (leftover != 0) {
+                if (DROP_EXCESS_ON_GROUND && leftover != 0) {
                     it.amount = leftover
                     world.dropItemNaturally(itemDropLocation, it)
                 }

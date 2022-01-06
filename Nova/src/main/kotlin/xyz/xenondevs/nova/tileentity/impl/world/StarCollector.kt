@@ -9,6 +9,7 @@ import net.md_5.bungee.api.ChatColor
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Bukkit
 import org.bukkit.util.Vector
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
@@ -40,6 +41,8 @@ private val IDLE_ENERGY_PER_TICK = NovaConfig[STAR_COLLECTOR].getLong("energy_pe
 private val COLLECTING_ENERGY_PER_TICK = NovaConfig[STAR_COLLECTOR].getLong("energy_per_tick_collecting")!!
 private val IDLE_TIME = NovaConfig[STAR_COLLECTOR].getInt("idle_time")!!
 private val COLLECTION_TIME = NovaConfig[STAR_COLLECTOR].getInt("collection_time")!!
+
+private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
 
 private const val STAR_PARTICLE_DISTANCE_PER_TICK = 0.75
 
@@ -97,6 +100,7 @@ class StarCollector(
     
     private fun handleNightTick() {
         if (timeSpentCollecting != -1) {
+            if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
             if (energyHolder.energy >= energyHolder.specialEnergyConsumption) {
                 energyHolder.energy -= energyHolder.specialEnergyConsumption
                 handleCollectionTick()
@@ -114,7 +118,8 @@ class StarCollector(
             timeSpentCollecting = -1
             
             val item = NovaMaterialRegistry.STAR_DUST.createItemStack()
-            if (inventory.addItem(SELF_UPDATE_REASON, item) != 0) location.dropItem(item)
+            val leftOver = inventory.addItem(SELF_UPDATE_REASON, item)
+            if (DROP_EXCESS_ON_GROUND && leftOver != 0) location.dropItem(item)
             
             particleTask.stop()
             rod.setEquipment(EquipmentSlot.HEAD, material.block!!.createItemStack(1))

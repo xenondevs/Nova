@@ -16,6 +16,17 @@ import org.bukkit.inventory.PlayerInventory
 fun VirtualInventory.addAll(reason: UpdateReason?, items: List<ItemStack>) =
     items.forEach { addItem(reason, it) }
 
+
+/**
+ * Checks if a [VirtualInventory] is full.
+ */
+fun VirtualInventory.isFull(): Boolean {
+    for ((index, item) in items.withIndex())
+        if (item == null || item.amount < getMaxStackSize(index, -1))
+            return false
+    return true
+}
+
 /**
  * Adds an [ItemStack] to an [Inventory] while respecting both
  * the max stack size of the inventory as well as the max stack size
