@@ -85,15 +85,13 @@ class AutoFisher(
     
     override fun handleTick() {
         if (energyHolder.energy >= energyHolder.energyConsumption && !fishingRodInventory.isEmpty && waterBlock.type == Material.WATER) {
+            if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
+
             energyHolder.energy -= energyHolder.energyConsumption
-            
+
             timePassed++
-            
             if (timePassed >= maxIdleTime) {
                 timePassed = 0
-
-                if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
-
                 fish()
             }
             
