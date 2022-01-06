@@ -50,6 +50,7 @@ private val IDLE_TIME = NovaConfig[HARVESTER].getInt("idle_time")!!
 private val MIN_RANGE = NovaConfig[HARVESTER].getInt("range.min")!!
 private val MAX_RANGE = NovaConfig[HARVESTER].getInt("range.max")!!
 private val DEFAULT_RANGE = NovaConfig[HARVESTER].getInt("range.default")!!
+private val DROP_EXCESS_ON_GROUND = NovaConfig[HARVESTER].getBoolean("drop_excess_on_ground")
 
 class Harvester(
     uuid: UUID,
@@ -114,7 +115,8 @@ class Harvester(
                 
                 if (timePassed++ >= maxIdleTime) {
                     timePassed = 0
-                    
+
+                    if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
                     if (queuedBlocks.isEmpty()) loadBlocks()
                     harvestNextBlock()
                 }
@@ -192,7 +194,8 @@ class Harvester(
                     // add the drops to the inventory or drop them in the world if they don't fit
                     if (inventory.canHold(drops))
                         inventory.addAll(SELF_UPDATE_REASON, drops)
-                    else world.dropItemsNaturally(block.location, drops)
+                    else if (DROP_EXCESS_ON_GROUND)
+                        world.dropItemsNaturally(block.location, drops)
                     
                     // take energy
                     energyHolder.energy -= energyHolder.specialEnergyConsumption
