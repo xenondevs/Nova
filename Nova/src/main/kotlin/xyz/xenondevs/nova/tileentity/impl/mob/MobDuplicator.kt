@@ -161,9 +161,9 @@ class MobDuplicator(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s # # # # . . |" +
-                "| n # # i # . . |" +
-                "| u # # # # . . |" +
+                "| s # # # # p e |" +
+                "| n # # i # p e |" +
+                "| u # # # # p e |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('i', VISlotElement(inventory, 0, NovaMaterialRegistry.MOB_CATCHER_PLACEHOLDER.createBasicItemBuilder()))

@@ -192,7 +192,7 @@ class CobblestoneGenerator(
             .addIngredient('i', inventory)
             .addIngredient('>', progressItem)
             .addIngredient('w', FluidBar(3, fluidHolder, waterTank))
-            .addIngredient('l', FluidBar(3, fluidHolder, waterTank))
+            .addIngredient('l', FluidBar(3, fluidHolder, lavaTank))
             .addIngredient('e', EnergyBar(3, energyHolder))
             .build()
         

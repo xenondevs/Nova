@@ -232,9 +232,9 @@ class Pump(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s p # . # . M |" +
-                "| u n # . # . # |" +
-                "| v m # . # . # |" +
+                "| s p # f # e M |" +
+                "| u n # f # e # |" +
+                "| v m # f # e # |" +
                 "3 - - - - - - - 4")
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
             .addIngredient('u', OpenUpgradesItem(upgradeHolder))

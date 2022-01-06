@@ -201,9 +201,9 @@ class Breeder(
         override val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 5)
             .setStructure("" +
                 "1 - - - - - - - 2" +
-                "| s p i i i p e |" +
-                "| r n i i i p e |" +
-                "| u m i i i p e |" +
+                "| s p i i i b e |" +
+                "| r n i i i b e |" +
+                "| u m i i i b e |" +
                 "3 - - - - - - - 4")
             .addIngredient('i', inventory)
             .addIngredient('s', OpenSideConfigItem(sideConfigGUI))
@@ -213,7 +213,7 @@ class Breeder(
             .addIngredient('m', RemoveNumberItem({ MIN_RANGE..maxRange }, { range }, { range = it }).also(rangeItems::add))
             .addIngredient('n', DisplayNumberItem { range }.also(rangeItems::add))
             .addIngredient('e', EnergyBar(3, energyHolder))
-            .addIngredient('p', idleBar)
+            .addIngredient('b', idleBar)
             .build()
         
         fun updateRangeItems() = rangeItems.forEach(Item::notifyWindows)
