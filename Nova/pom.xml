@@ -53,12 +53,18 @@
         </repository>
     </repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache.snapshots</id>
-            <url>https://repository.apache.org/snapshots/</url>
-        </pluginRepository>
-    </pluginRepositories>
+    <profiles>
+        <profile>
+            <id>codemc-nms</id>
+            <repositories>
+                <!-- NMS repository -->
+                <repository>
+                    <id>nms-repo</id>
+                    <url>https://repo.codemc.io/repository/nms/</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
 
     <dependencies>
         <!-- Nova API -->
@@ -131,8 +137,64 @@
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
-            <version>7.0.4</version>
+            <version>7.0.6</version>
             <scope>provided</scope>
+            <exclusions>
+                <!-- WG Deps -->
+                <exclusion>
+                    <groupId>com.sk89q.worldguard.worldguard-libs</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.flywaydb</groupId>
+                    <artifactId>flyway-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.spigotmc</groupId>
+                    <artifactId>spigot-api</artifactId>
+                </exclusion>
+                <!-- WE Deps -->
+                <exclusion>
+                    <groupId>com.sk89q.worldedit.worldedit-libs</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-runtime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mozilla</groupId>
+                    <artifactId>rhino-runtime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>it.unimi.dsi</groupId>
+                    <artifactId>fastutil</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.github.TechFortress</groupId>
@@ -145,6 +207,12 @@
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>bukkit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.plotsquared</groupId>
@@ -152,9 +220,79 @@
             <version>6.2.0</version>
             <scope>provided</scope>
             <exclusions>
+                <!-- PS Bukkit Deps -->
                 <exclusion>
                     <groupId>net.kyori</groupId>
                     <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bstats</groupId>
+                    <artifactId>bstats-bukkit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.papermc</groupId>
+                    <artifactId>paperlib</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.enginehub</groupId>
+                    <artifactId>squirrelid</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>dev.notmyfault.serverlib</groupId>
+                    <artifactId>ServerLib</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellectualsites.arkitektonika</groupId>
+                    <artifactId>Arkitektonika-Client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellectualsites.http</groupId>
+                    <artifactId>HTTP4J</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellectualsites.paster</groupId>
+                    <artifactId>Paster</artifactId>
+                </exclusion>
+                <!-- PS Core Deps -->
+                <exclusion>
+                    <groupId>com.google.inject</groupId>
+                    <artifactId>guice</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.inject.extensions</groupId>
+                    <artifactId>guice-assistedinject</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellectualsites.prtree</groupId>
+                    <artifactId>PRTree</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>aopalliance</groupId>
+                    <artifactId>aopalliance</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellectualsites</groupId>
+                    <artifactId>Pipeline</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -196,31 +334,35 @@
             <version>0.1-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
-                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <groupId>org.jetbrains</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R1</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R2</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R4</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R5</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R6</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.github.NichtStudioCode.InvUI</groupId>
+                    <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R7</artifactId>
                 </exclusion>
             </exclusions>
@@ -254,44 +396,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <jvmTarget>17</jvmTarget>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>net.md-5</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.2</version>
+                <version>1.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -335,6 +442,28 @@
                 <configuration>
                     <outputFile>${dir}/${project.artifactId}-${project.version}.jar</outputFile>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
+
+                    <relocations>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>${shadePath}.org.bstats</shadedPattern>
+                        </relocation>
+                    </relocations>
+
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                                <exclude>META-INF/*.MF</exclude>
+                                <exclude>META-INF/DEPENDENCIES</exclude>
+                                <exclude>META-INF/**/module-info.class</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
@@ -342,19 +471,6 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>*</include>
-                                </includes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>${shadePath}.org.bstats</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -364,12 +480,14 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.22.0</version>
             </plugin>
         </plugins>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
