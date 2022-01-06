@@ -5,9 +5,10 @@ import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.awardAdvancement
@@ -32,6 +33,10 @@ object AdvancementManager : Initializable(), Listener {
         LOGGER.info("Loading advancements")
         
         val novaDataPack = File("world/datapacks/nova")
+        if (IS_VERSION_CHANGE) {
+            File("world/datapacks/bukkit/data/nova").deleteRecursively()
+            novaDataPack.deleteRecursively()
+        }
         getResources("datapack/").forEach { name ->
             var content = getResourceAsStream(name).use { it!!.readAllBytes() }.decodeToString()
             
