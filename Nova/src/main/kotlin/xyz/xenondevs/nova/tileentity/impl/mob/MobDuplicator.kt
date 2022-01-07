@@ -14,6 +14,7 @@ import de.studiocode.invui.item.builder.SkullBuilder.HeadTexture
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.ChatColor
+import net.minecraft.world.entity.Mob
 import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
@@ -40,14 +41,11 @@ import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.VerticalBar
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.center
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.isString
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.setLocalizedName
-import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.io.IOException
 import java.net.URL
@@ -60,6 +58,7 @@ private val ENERGY_PER_TICK = NovaConfig[MOB_DUPLICATOR].getLong("energy_per_tic
 private val ENERGY_PER_TICK_NBT = NovaConfig[MOB_DUPLICATOR].getLong("energy_per_tick_nbt")!!
 private val IDLE_TIME = NovaConfig[MOB_DUPLICATOR].getInt("idle_time")!!
 private val IDLE_TIME_NBT = NovaConfig[MOB_DUPLICATOR].getInt("idle_time_nbt")!!
+private val NERF_MOBS = NovaConfig[MOB_DUPLICATOR].getBoolean("nerf_mobs")
 
 class MobDuplicator(
     uuid: UUID,
@@ -139,6 +138,11 @@ class MobDuplicator(
     private fun spawnEntity() {
         val entity = if (keepNbt) EntityUtils.deserializeAndSpawn(entityData!!, spawnLocation, NBTUtils::removeItemData).bukkitEntity
         else spawnLocation.world!!.spawnEntity(spawnLocation, entityType!!)
+
+        val nmsEntity = entity.nmsEntity
+        if (NERF_MOBS && nmsEntity is Mob)
+            nmsEntity.aware = false
+
         if (PATRON_SKULLS.isNotEmpty() && entity is LivingEntity && Random.nextInt(1..1000) == 1) {
             entity.equipment?.setHelmet(PATRON_SKULLS.random().get(), true)
         }
