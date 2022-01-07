@@ -10,6 +10,7 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Axis
 import org.bukkit.Location
+import org.bukkit.OfflinePlayer
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
@@ -179,7 +180,7 @@ class Quarry(
         
         updateEnergyPerTick()
         
-        if (checkPermission && !canPlace(ownerUUID, location, positions)) {
+        if (checkPermission && !canPlace(owner, location, positions)) {
             if (sizeX == MIN_SIZE && sizeZ == MIN_SIZE) {
                 TileEntityManager.destroyAndDropTileEntity(this, true)
                 return false
@@ -517,10 +518,10 @@ class Quarry(
     companion object {
         
         fun canPlace(player: Player, location: Location): Boolean {
-            return canPlace(player.uniqueId, location, location.yaw, MIN_SIZE, MIN_SIZE)
+            return canPlace(player, location, location.yaw, MIN_SIZE, MIN_SIZE)
         }
         
-        private fun canPlace(uuid: UUID, location: Location, yaw: Float, sizeX: Int, sizeZ: Int): Boolean {
+        private fun canPlace(owner: OfflinePlayer, location: Location, yaw: Float, sizeX: Int, sizeZ: Int): Boolean {
             val positions = getMinMaxPositions(
                 location,
                 sizeX, sizeZ,
@@ -528,15 +529,15 @@ class Quarry(
                 BlockSide.RIGHT.getBlockFace(yaw)
             )
             
-            return canPlace(uuid, location, positions)
+            return canPlace(owner, location, positions)
         }
         
-        private fun canPlace(uuid: UUID, location: Location, positions: IntArray): Boolean {
+        private fun canPlace(owner: OfflinePlayer, location: Location, positions: IntArray): Boolean {
             val minLoc = Location(location.world, positions[0].toDouble(), location.y, positions[1].toDouble())
             val maxLoc = Location(location.world, positions[2].toDouble(), location.y, positions[3].toDouble())
             
             minLoc.fullCuboidTo(maxLoc) {
-                if (ProtectionManager.canBreak(uuid, it))
+                if (ProtectionManager.canBreak(owner, it))
                     return@fullCuboidTo true
                 else return@canPlace false
             }
