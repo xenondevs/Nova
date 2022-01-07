@@ -35,6 +35,7 @@ private val ENERGY_PER_TICK = NovaConfig[BLOCK_BREAKER].getLong("energy_per_tick
 private val BREAK_SPEED_MULTIPLIER = NovaConfig[BLOCK_BREAKER].getDouble("break_speed_multiplier")!!
 private val BREAK_SPEED_CLAMP = NovaConfig[BLOCK_BREAKER].getDouble("break_speed_clamp")!!
 private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
+private val DISABLE_BLOCK_BREAK_EFFECTS = DEFAULT_CONFIG.getBoolean("disable_block_break_effects")
 
 class BlockBreaker(
     uuid: UUID,
@@ -88,7 +89,7 @@ class BlockBreaker(
                 drops = event.drops
                 
                 // break block, add items to inventory / drop them if full
-                block.breakAndTakeDrops()
+                block.breakAndTakeDrops(null, !DISABLE_BLOCK_BREAK_EFFECTS)
                 drops.forEach { drop ->
                     val amountLeft = inventory.addItem(SELF_UPDATE_REASON, drop)
                     if (DROP_EXCESS_ON_GROUND && amountLeft != 0) {

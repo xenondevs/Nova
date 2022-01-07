@@ -52,6 +52,7 @@ private val MIN_RANGE = NovaConfig[HARVESTER].getInt("range.min")!!
 private val MAX_RANGE = NovaConfig[HARVESTER].getInt("range.max")!!
 private val DEFAULT_RANGE = NovaConfig[HARVESTER].getInt("range.default")!!
 private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
+private val DISABLE_BLOCK_BREAK_EFFECTS = DEFAULT_CONFIG.getBoolean("disable_block_break_effects")
 
 class Harvester(
     uuid: UUID,
@@ -190,8 +191,8 @@ class Harvester(
                     val event = TileEntityBreakBlockEvent(this, block, drops)
                     callEvent(event)
                     drops = event.drops
-                    block.remove(tool)
-                    
+                    block.remove(tool, !DISABLE_BLOCK_BREAK_EFFECTS)
+
                     // add the drops to the inventory or drop them in the world if they don't fit
                     if (inventory.canHold(drops))
                         inventory.addAll(SELF_UPDATE_REASON, drops)

@@ -77,6 +77,7 @@ private val BASE_ENERGY_CONSUMPTION = NovaConfig[QUARRY].getInt("base_energy_con
 private val ENERGY_PER_SQUARE_BLOCK = NovaConfig[QUARRY].getInt("energy_consumption_per_square_block")!!
 
 private val DROP_EXCESS_ON_GROUND = DEFAULT_CONFIG.getBoolean("drop_excess_on_ground")
+private val DISABLE_BLOCK_BREAK_EFFECTS = DEFAULT_CONFIG.getBoolean("disable_block_break_effects")
 
 class Quarry(
     uuid: UUID,
@@ -298,7 +299,7 @@ class Quarry(
             callEvent(event)
             drops = event.drops
             
-            block.remove()
+            block.remove(null, !DISABLE_BLOCK_BREAK_EFFECTS)
             drops.forEach { drop ->
                 val leftover = inventory.addItem(null, drop)
                 if (DROP_EXCESS_ON_GROUND && leftover != 0) {
