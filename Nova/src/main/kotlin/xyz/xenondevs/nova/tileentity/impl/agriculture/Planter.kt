@@ -161,7 +161,7 @@ class Planter(
             
             // Search for a block that has no block on top of it and is dirt/farmland
             // If the soil or plant block is protected, skip this block
-            if (!ProtectionManager.canPlace(ownerUUID, block.location) || !ProtectionManager.canBreak(ownerUUID, soilBlock.location))
+            if (!ProtectionManager.canPlace(owner, block.location) || !ProtectionManager.canBreak(owner, soilBlock.location))
                 return@indexOfFirst false
             
             // If the plant block is already occupied return false

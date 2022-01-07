@@ -76,7 +76,7 @@ class BlockPlacer(
             && !inventory.isEmpty
             && type == Material.AIR
             && TileEntityManager.getTileEntityAt(placeLocation) == null
-            && ProtectionManager.canPlace(ownerUUID, placeBlock.location)
+            && ProtectionManager.canPlace(owner, placeBlock.location)
         ) {
             if (placeBlock()) energyHolder.energy -= energyHolder.energyConsumption
         }
