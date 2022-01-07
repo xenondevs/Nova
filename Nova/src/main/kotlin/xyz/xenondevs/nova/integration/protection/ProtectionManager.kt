@@ -14,21 +14,24 @@ object ProtectionManager {
         .filter(Integration::isInstalled)
     
     fun canPlace(tileEntity: TileEntity, location: Location) =
-        canPlace(tileEntity.owner, location)
+        !isVanillaProtected(tileEntity.owner, location)
+            && PROTECTION_PLUGINS.all { it.canPlace(tileEntity, location) }
     
     fun canPlace(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
             && PROTECTION_PLUGINS.all { it.canPlace(offlinePlayer, location) }
 
     fun canBreak(tileEntity: TileEntity, location: Location) =
-        canBreak(tileEntity.owner, location)
+        !isVanillaProtected(tileEntity.owner, location)
+            && PROTECTION_PLUGINS.all { it.canBreak(tileEntity, location) }
     
     fun canBreak(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
             && PROTECTION_PLUGINS.all { it.canBreak(offlinePlayer, location) }
 
     fun canUse(tileEntity: TileEntity, location: Location) =
-        canUse(tileEntity.owner, location)
+        !isVanillaProtected(tileEntity.owner, location)
+            && PROTECTION_PLUGINS.all { it.canUse(tileEntity, location) }
     
     fun canUse(offlinePlayer: OfflinePlayer, location: Location) =
         !isVanillaProtected(offlinePlayer, location)
