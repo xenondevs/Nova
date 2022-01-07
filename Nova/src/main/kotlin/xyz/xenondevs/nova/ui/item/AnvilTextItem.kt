@@ -26,6 +26,6 @@ class AnvilTextItem(val builder: ItemBuilder, text: String) : BaseItem() {
         text = ""
     }
     
-    override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
     
 }

@@ -21,7 +21,7 @@ open class ProgressItem(val material: NovaMaterial, private val maxState: Int) :
         return material.item.createItemBuilder("", (percentage * maxState).roundToInt())
     }
     
-    override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
 }
 
 class ProgressArrowItem : ProgressItem(NovaMaterialRegistry.PROGRESS_ARROW, 16)
@@ -35,3 +35,5 @@ class PulverizerProgressItem : ProgressItem(NovaMaterialRegistry.PULVERIZER_PROG
 class LeftRightFluidProgressItem : ProgressItem(NovaMaterialRegistry.FLUID_PROGRESS_LEFT_RIGHT, 16)
 
 class RightLeftFluidProgressItem : ProgressItem(NovaMaterialRegistry.FLUID_PROGRESS_RIGHT_LEFT, 16)
+
+class BrewProgressItem : ProgressItem(NovaMaterialRegistry.BREW_PROGRESS_TRANSPARENT, 16)

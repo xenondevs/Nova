@@ -46,7 +46,7 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
         return builder
     }
     
-    override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
     
 }
 

@@ -613,7 +613,7 @@ class Quarry(
                     .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.size_tip"))
             }
             
-            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+            override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
             
         }
         
@@ -626,7 +626,7 @@ class Quarry(
                     .addLoreLines(localized(ChatColor.GRAY, "menu.nova.quarry.depth_tip"))
             }
             
-            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+            override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
             
         }
         

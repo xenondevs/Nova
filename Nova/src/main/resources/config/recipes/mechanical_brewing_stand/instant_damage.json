@@ -1,0 +1,9 @@
+{
+  "result": "minecraft:instant_damage",
+  "max_amplifier_level": 1,
+  "inputs": [
+    "minecraft:nether_wart",
+    "minecraft:spider_eye",
+    "minecraft:fermented_spider_eye"
+  ]
+}

@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
 import xyz.xenondevs.nova.data.serialization.cbf.Element
 
 @Suppress("UNCHECKED_CAST")
-class ListElement : Element {
+class ListElement : Element, Iterable<Element> {
     
     val list = ArrayList<Element>()
     
@@ -73,6 +73,8 @@ class ListElement : Element {
     }
     
     override fun toString() = list.toString()
+    
+    override fun iterator() = list.iterator()
     
 }
 

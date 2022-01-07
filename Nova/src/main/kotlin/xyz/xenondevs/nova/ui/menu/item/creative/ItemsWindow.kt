@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
+import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
 import xyz.xenondevs.nova.ui.overlay.CustomCharacters
@@ -80,16 +81,6 @@ class ObtainableItem(name: String) : BaseItem() {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         handleRecipeChoiceItemClick(player, clickType, event, itemWrapper)
-    }
-    
-}
-
-private fun clickableItem(provider: ItemProvider, run: (Player) -> Unit): Item {
-    
-    return object : SimpleItem(provider) {
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            if (clickType == ClickType.LEFT) run(player)
-        }
     }
     
 }
@@ -224,7 +215,7 @@ class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private fun createCategoryGUI(category: Category): GUI {
-        return GUIBuilder(GUIType.SCROLL, 9, 4)
+        return GUIBuilder(GUIType.SCROLL_ITEMS, 9, 4)
             .setStructure("" +
                 "x x x x x x x x s" +
                 "x x x x x x x x u" +

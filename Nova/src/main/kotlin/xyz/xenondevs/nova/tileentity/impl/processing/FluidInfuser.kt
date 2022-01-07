@@ -188,7 +188,7 @@ class FluidInfuser(
                 return material.item.createItemBuilder("", (percentage * 16).roundToInt())
             }
             
-            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+            override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
         }
         
     }

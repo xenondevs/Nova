@@ -253,9 +253,9 @@ class Pump(
             
             override fun getItemProvider(): ItemProvider {
                 return if (mode == PumpMode.PUMP)
-                    NovaMaterialRegistry.PUMP_PUMP_ICON.createBasicItemBuilder().setLocalizedName("menu.nova.pump.pump_mode")
+                    NovaMaterialRegistry.PUMP_PUMP_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.pump.pump_mode")
                 else
-                    NovaMaterialRegistry.PUMP_REPLACE_ICON.createBasicItemBuilder().setLocalizedName("menu.nova.pump.replace_mode")
+                    NovaMaterialRegistry.PUMP_REPLACE_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.pump.replace_mode")
             }
             
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
