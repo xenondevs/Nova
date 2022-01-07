@@ -14,6 +14,7 @@ import de.studiocode.invui.item.builder.SkullBuilder.HeadTexture
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import net.md_5.bungee.api.ChatColor
+import net.minecraft.world.entity.Mob
 import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
@@ -139,7 +140,7 @@ class MobDuplicator(
         else spawnLocation.world!!.spawnEntity(spawnLocation, entityType!!)
 
         val nmsEntity = entity.nmsEntity
-        if (NERF_MOBS && nmsEntity is net.minecraft.world.entity.Mob)
+        if (NERF_MOBS && nmsEntity is Mob)
             nmsEntity.aware = false
 
         if (PATRON_SKULLS.isNotEmpty() && entity is LivingEntity && Random.nextInt(1..1000) == 1) {
