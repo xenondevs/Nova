@@ -352,10 +352,10 @@ class Quarry(
         do {
             radius++
             
-            val minX = Integer.max(pointerLocation.blockX - radius, minBreakX)
-            val minZ = Integer.max(pointerLocation.blockZ - radius, minBreakZ)
-            val maxX = Integer.min(pointerLocation.blockX + radius, maxBreakX)
-            val maxZ = Integer.min(pointerLocation.blockZ + radius, maxBreakZ)
+            val minX = max(pointerLocation.blockX - radius, minBreakX)
+            val minZ = max(pointerLocation.blockZ - radius, minBreakZ)
+            val maxX = min(pointerLocation.blockX + radius, maxBreakX)
+            val maxZ = min(pointerLocation.blockZ + radius, maxBreakZ)
             
             for (x in minX..maxX) {
                 for (z in minZ..maxZ) {

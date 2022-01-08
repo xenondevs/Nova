@@ -11,8 +11,8 @@ import xyz.xenondevs.nova.tileentity.TileEntity.TileEntityGUI
 import xyz.xenondevs.nova.ui.UpgradesGUI
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.runTaskLater
-import java.lang.Integer.min
 import java.util.*
+import kotlin.math.min
 
 private fun ItemStack.getUpgradeType(): UpgradeType? {
     val novaType = novaMaterial ?: return null

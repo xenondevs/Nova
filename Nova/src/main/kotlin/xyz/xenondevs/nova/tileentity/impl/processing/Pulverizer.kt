@@ -33,8 +33,8 @@ import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.particle
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.particle.ParticleEffect
-import java.lang.Integer.max
 import java.util.*
+import kotlin.math.max
 
 private val MAX_ENERGY = NovaConfig[PULVERIZER].getLong("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[PULVERIZER].getLong("energy_per_tick")!!
