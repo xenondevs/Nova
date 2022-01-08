@@ -1,0 +1,13 @@
+{
+  "result": "minecraft:slowness",
+  "default_time": 1800,
+  "redstone_multiplier": 2.6666666666666665,
+  "glowstone_multiplier": 0.2222222222222222,
+  "max_duration_level": 1,
+  "max_amplifier_level": 1,
+  "inputs": [
+    "minecraft:nether_wart",
+    "minecraft:sugar",
+    "minecraft:fermented_spider_eye"
+  ]
+}

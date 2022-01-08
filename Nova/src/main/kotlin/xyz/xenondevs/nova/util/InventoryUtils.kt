@@ -5,10 +5,7 @@ import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
-import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.PlayerInventory
+import org.bukkit.inventory.*
 
 /**
  * Adds a [List] of [ItemStack]s to a [VirtualInventory].
@@ -114,6 +111,41 @@ fun Inventory.addPrioritized(prioritizedSlot: Int, itemStack: ItemStack) {
  */
 val Player.hasInventoryOpen: Boolean
     get() = openInventory.topInventory.type != InventoryType.CRAFTING
+
+/**
+ * Tries to remove the first ItemStack#amount items from the first slots that have a similar item.
+ * @return How many items could not be removed
+ */
+fun VirtualInventory.removeFirstMatching(toMatch: ItemStack, updateReason: UpdateReason? = null): Int {
+    var leftOver = toMatch.amount
+    
+    for (i in 0 until size) {
+        val item = getUnsafeItemStack(i)
+        if (toMatch.isSimilar(item)) {
+            leftOver += addItemAmount(updateReason, i, -leftOver)
+            
+            if (leftOver <= 0) break
+        }
+    }
+    
+    return leftOver
+}
+
+/**
+ * Checks if that [VirtualInventory] has ItemStack#amount items.
+ */
+fun VirtualInventory.contains(toCheck: ItemStack): Boolean {
+    var amount = toCheck.amount
+    for (i in 0 until size) {
+        val item = getUnsafeItemStack(i)
+        if (toCheck.isSimilar(item)) {
+            amount -= item.amount
+            if (amount <= 0) return true
+        }
+    }
+    
+    return false
+}
 
 class VoidingVirtualInventory(size: Int) : VirtualInventory(null, size) {
     override fun setItemStackSilently(slot: Int, itemStack: ItemStack?) = Unit

@@ -3,10 +3,38 @@ package xyz.xenondevs.nova.ui.overlay
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.TranslatableComponent
 import kotlin.math.abs
+
+enum class GUITexture(private val char: Char, private val width: Int) {
+    
+    EMPTY_GUI('\uF000', 176),
+    MECHANICAL_BREWING_STAND('\uF200', 176),
+    CONFIGURE_POTION('\uF201', 176);
+    
+    fun getTitle(translate: String): Array<BaseComponent> {
+        return getTitle(TranslatableComponent(translate))
+    }
+    
+    fun getTitle(title: TranslatableComponent): Array<BaseComponent> {
+        return ComponentBuilder()
+            .append(CustomCharacters.getMovingComponent(-8)) // move to side to place overlay
+            .append(char.toString())
+            .font("nova:gui")
+            .color(ChatColor.WHITE)
+            .append(CustomCharacters.getMovingComponent(-width + 7)) // move back to start
+            .append(title)
+            .font("default")
+            .color(ChatColor.DARK_GRAY)
+            .create()
+        
+    }
+    
+}
 
 enum class CustomCharacters(fontName: String, char: Char) {
     
+    // TODO: move these to GUITexture
     EMPTY_GUI("gui", '\uF000'),
     CRAFTING_RECIPE("gui", '\uF001'),
     FURNACE_RECIPE("gui", '\uF002'),

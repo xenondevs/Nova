@@ -34,6 +34,7 @@ class RecipeType<T : Any> private constructor(
         val GEAR_PRESS = RecipeType("press/gear", GearPressRecipe::class, PressingRecipeGroup, GearPressRecipeDeserializer)
         val PLATE_PRESS = RecipeType("press/plate", PlatePressRecipe::class, PressingRecipeGroup, PlatePressRecipeDeserializer)
         val FLUID_INFUSER = RecipeType("fluid_infuser", FluidInfuserRecipe::class, FluidInfuserRecipeGroup, FluidInfuserRecipeDeserializer)
+        val MECHANICAL_BREWING_STAND = RecipeType("mechanical_brewing_stand", MechanicalBrewingStandRecipe::class, FluidInfuserRecipeGroup, MechanicalBrewingStandRecipeDeserializer) // TODO: recipe group
         val STAR_COLLECTOR = RecipeType(null, StarCollectorRecipe::class, StarCollectorRecipeGroup, null)
         val COBBLESTONE_GENERATOR = RecipeType(null, CobblestoneGeneratorRecipe::class, CobblestoneGeneratorRecipeGroup, null)
         val FREEZER = RecipeType(null, FreezerRecipe::class, FreezerRecipeGroup, null)

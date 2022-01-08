@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
 import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
 import xyz.xenondevs.nova.tileentity.impl.processing.*
+import xyz.xenondevs.nova.tileentity.impl.processing.brewing.MechanicalBrewingStand
 import xyz.xenondevs.nova.tileentity.impl.storage.*
 import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
@@ -81,6 +82,7 @@ object NovaMaterialRegistry {
     val FREEZER = registerDefaultTileEntity("FREEZER", 38, ::Freezer, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     val SPRINKLER = registerDefaultTileEntity("SPRINKLER", 39, ::Sprinkler, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val FLUID_STORAGE_UNIT = registerDefaultTileEntity("FLUID_STORAGE_UNIT", 40, ::FluidStorageUnit, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
+    val MECHANICAL_BREWING_STAND = registerDefaultTileEntity("MECHANICAL_BREWING_STAND", 41, ::MechanicalBrewingStand, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     
     // 1000 - 2000: Crafting Items
     // Plates
@@ -199,12 +201,14 @@ object NovaMaterialRegistry {
     val ICE_MODE_BUTTON = registerItem("ICE_MODE_BUTTON", "menu.nova.freezer.mode.ice", 9140)
     val PACKED_ICE_MODE_BUTTON = registerItem("PACKED_ICE_MODE_BUTTON", "menu.nova.freezer.mode.packed_ice", 9141)
     val BLUE_ICE_MODE_BUTTON = registerItem("BLUE_ICE_MODE_BUTTON", "menu.nova.freezer.mode.blue_ice", 9142)
+    val PUMP_PUMP_BUTTON = registerItem("PUMP_PUMP_ICON", "", 9143)
+    val PUMP_REPLACE_BUTTON = registerItem("PUMP_REPLACE_ICON", "", 9144)
     val INVISIBLE_ITEM = registerItem("INVISIBLE", "", 9300)
     val STOPWATCH_ICON = registerItem("STOPWATCH_ICON", "", 9301)
     val SEARCH_ICON = registerItem("SEARCH_ICON", "", 9302)
     val NO_NUMBER = registerItem("NO_NUMBER", "", 9303)
-    val PUMP_PUMP_ICON = registerItem("PUMP_PUMP_ICON", "", 9304)
-    val PUMP_REPLACE_ICON = registerItem("PUMP_REPLACE_ICON", "", 9305)
+    val PLUS_ICON = registerItem("PLUS_ICON", "", 9304)
+    val MINUS_ICON = registerItem("MINUS_ICON", "", 9305)
     val SPEED_UPGRADE_ICON = registerItem("SPEED_UPGRADE_ICON", "", 9402)
     val TRANSLUCENT_SPEED_UPGRADE_ICON = registerItem("TRANSLUCENT_SPEED_UPGRADE_ICON", "", 9403)
     val EFFICIENCY_UPGRADE_ICON = registerItem("EFFICIENCY_UPGRADE_ICON", "", 9404)
@@ -223,6 +227,7 @@ object NovaMaterialRegistry {
     val FISHING_ROD_PLACEHOLDER = registerItem("FISHING_ROD_PLACEHOLDER", "", 9505)
     val SAPLING_PLACEHOLDER = registerItem("SAPLING_PLACEHOLDER", "", 9506)
     val TRASH_CAN_PLACEHOLDER = registerItem("TRASH_CAN_PLACEHOLDER", "", 9507)
+    val BOTTLE_PLACEHOLDER = registerItem("BOTTLE_PLACEHOLDER", "", 9508)
     
     // 10.000 - ? Multi-Texture UI Elements
     val PROGRESS_ARROW = registerItem("PROGRESS_ARROW", "", itemOf((10_000..10_016).toIntArray()))
@@ -239,6 +244,7 @@ object NovaMaterialRegistry {
     val FLUID_PROGRESS_RIGHT_LEFT_TRANSPARENT = registerItem("FLUID_PROGRESS_RIGHT_LEFT_TRANSPARENT", "", itemOf((11_100..11_116).toIntArray()))
     val BLUE_BAR_TRANSPARENT = registerItem("BLUE_BAR_TRANSPARENT", "", itemOf((11_200..11_216).toIntArray()))
     val ORANGE_BAR_TRANSPARENT = registerItem("ORANGE_BAR_TRANSPARENT", "", itemOf((11_300..11_316).toIntArray()))
+    val BREW_PROGRESS_TRANSPARENT = registerItem("BREW_PROGRESS_TRANSPARENT", "", itemOf((11_400..11_416).toIntArray()))
     
     // 100.000 - ? Numbers
     val NUMBER = registerItem("NUMBER", "", itemOf((100_000..100_999).toIntArray()))

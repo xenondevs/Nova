@@ -78,6 +78,9 @@ val ItemStack.displayName: String?
         return null
     }
 
+val ItemStack.localizedName: String?
+    get() = novaMaterial?.localizedName ?: type.localizedName
+
 val Material.soundGroup: SoundGroup
     get() = createBlockData().soundGroup
 

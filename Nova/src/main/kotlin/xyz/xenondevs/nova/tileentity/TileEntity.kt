@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity
 
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.virtualinventory.VirtualInventory
+import de.studiocode.invui.virtualinventory.event.InventoryUpdatedEvent
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
@@ -25,6 +26,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.ui.overlay.GUITexture
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
@@ -182,7 +184,8 @@ abstract class TileEntity(
         salt: String,
         size: Int,
         stackSizes: IntArray,
-        itemHandler: (ItemUpdateEvent) -> Unit
+        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
+        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null
     ): VirtualInventory {
         val invUUID = uuid.salt(salt)
         val inventory = TileInventoryManager.getOrNull(uuid, invUUID)
@@ -190,7 +193,9 @@ abstract class TileEntity(
                 VirtualInventory(invUUID, size, arrayOfNulls(size), stackSizes)
             }
         
-        inventory.setItemUpdateHandler(itemHandler)
+        if (preUpdateHandler != null) inventory.setItemUpdateHandler(preUpdateHandler)
+        if (afterUpdateHandler != null) inventory.setInventoryUpdatedHandler(afterUpdateHandler)
+        
         inventories += inventory
         return inventory
     }
@@ -200,8 +205,12 @@ abstract class TileEntity(
      * When [dropItems] is true, the [VirtualInventory] will automatically be
      * deleted and its contents dropped when the [TileEntity] is destroyed.
      */
-    fun getInventory(salt: String, size: Int, itemHandler: (ItemUpdateEvent) -> Unit) =
-        getInventory(salt, size, IntArray(size) { 64 }, itemHandler)
+    fun getInventory(
+        salt: String,
+        size: Int,
+        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
+        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
+    ) = getInventory(salt, size, IntArray(size) { 64 }, preUpdateHandler, afterUpdateHandler)
     
     /**
      * Gets a [FluidContainer] for this [TileEntity].
@@ -446,7 +455,7 @@ abstract class TileEntity(
         
     }
     
-    abstract inner class TileEntityGUI {
+    abstract inner class TileEntityGUI(private val texture: GUITexture? = null) {
         
         /**
          * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
@@ -463,7 +472,11 @@ abstract class TileEntity(
         /**
          * Opens a Window of the [gui] to the specified [player].
          */
-        fun openWindow(player: Player) = SimpleWindow(player, arrayOf(TranslatableComponent(material.localizedName)), gui).show()
+        fun openWindow(player: Player) {
+            val title = texture?.getTitle(material.localizedName)
+                ?: arrayOf(TranslatableComponent(material.localizedName))
+            SimpleWindow(player, title, gui).show()
+        }
         
         /**
          * Closes all Windows connected to this [TileEntityGUI].

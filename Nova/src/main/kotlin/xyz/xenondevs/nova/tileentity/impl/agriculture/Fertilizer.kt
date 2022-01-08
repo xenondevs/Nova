@@ -139,7 +139,7 @@ class Fertilizer(
     private fun getRandomPlant(): Block? =
         fertilizeRegion.blocks
             .filter {
-                ProtectionManager.canUse(ownerUUID, it.location)
+                ProtectionManager.canUse(this, it.location)
                     && ((it.blockData is Ageable && !it.isFullyAged()) || (it.blockData !is Ageable && it.type in PlantUtils.PLANTS))
             }
             .randomOrNull()

@@ -1,0 +1,9 @@
+{
+  "result": "minecraft:weakness",
+  "default_time": 1800,
+  "redstone_multiplier": 2.6666666666666665,
+  "max_duration_level": 1,
+  "inputs": [
+    "minecraft:fermented_spider_eye"
+  ]
+}

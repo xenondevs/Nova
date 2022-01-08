@@ -160,7 +160,7 @@ class Pump(
             val newBlock = newLocation.block
             
             val fluidType = newBlock.sourceFluidType ?: continue
-            if (fluidTank.accepts(fluidType) && newLocation.center() in region && ProtectionManager.canBreak(ownerUUID, newBlock.location)) {
+            if (fluidTank.accepts(fluidType) && newLocation.center() in region && ProtectionManager.canBreak(this, newBlock.location)) {
                 if (face !in VERTICAL_FACES)
                     sortedFaces.rotateRight()
                 block = newBlock
@@ -176,7 +176,7 @@ class Pump(
             if (r == 0) {
                 val block = location.clone().advance(BlockFace.DOWN).block
                 val fluidType = block.sourceFluidType ?: return@repeat
-                if (fluidTank.accepts(fluidType) && ProtectionManager.canBreak(ownerUUID, block.location))
+                if (fluidTank.accepts(fluidType) && ProtectionManager.canBreak(this, block.location))
                     return block to fluidType
                 return@repeat
             }
@@ -187,7 +187,7 @@ class Pump(
                             continue
                         val block = location.clone().add(x.toDouble(), y.toDouble(), z.toDouble()).block
                         val fluidType = block.sourceFluidType ?: continue
-                        if (fluidTank.accepts(fluidType) && ProtectionManager.canBreak(ownerUUID, block.location))
+                        if (fluidTank.accepts(fluidType) && ProtectionManager.canBreak(this, block.location))
                             return block to fluidType
                     }
                 }
@@ -253,9 +253,9 @@ class Pump(
             
             override fun getItemProvider(): ItemProvider {
                 return if (mode == PumpMode.PUMP)
-                    NovaMaterialRegistry.PUMP_PUMP_ICON.createBasicItemBuilder().setLocalizedName("menu.nova.pump.pump_mode")
+                    NovaMaterialRegistry.PUMP_PUMP_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.pump.pump_mode")
                 else
-                    NovaMaterialRegistry.PUMP_REPLACE_ICON.createBasicItemBuilder().setLocalizedName("menu.nova.pump.replace_mode")
+                    NovaMaterialRegistry.PUMP_REPLACE_BUTTON.createBasicItemBuilder().setLocalizedName("menu.nova.pump.replace_mode")
             }
             
             override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

@@ -84,7 +84,7 @@ object RecipesLoader {
                     
                     val recipe = deserializer.deserialize(element, file)
                     recipes += recipe
-                } catch (ex: IllegalArgumentException) {
+                } catch (ex: Exception) {
                     throw IllegalStateException("Invalid recipe in file ${file.name}.", ex)
                 }
             }
