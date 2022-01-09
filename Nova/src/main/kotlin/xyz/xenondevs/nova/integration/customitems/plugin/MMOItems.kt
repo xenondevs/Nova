@@ -16,11 +16,14 @@ object MMOItems : CustomItemService {
     override val isInstalled = Bukkit.getPluginManager().getPlugin("MMOItems") != null
     override val requiresLoadDelay = false
     
-    private val mmoItems = MMOItemsPlugin.plugin
+    private lateinit var mmoItems: MMOItemsPlugin
     private lateinit var itemTypes: Collection<Type>
     
     init {
-        if (isInstalled) itemTypes = mmoItems.types.all
+        if (isInstalled) {
+            mmoItems = MMOItemsPlugin.plugin
+            itemTypes = mmoItems.types.all
+        }
     }
     
     override fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean {
