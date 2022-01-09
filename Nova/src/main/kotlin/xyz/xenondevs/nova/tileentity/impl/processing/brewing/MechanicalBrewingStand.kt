@@ -267,6 +267,7 @@ class MechanicalBrewingStand(
                 fluidTank.takeFluid(1000)
                 if (!requiredItems!!.all { ingredientsInventory.removeFirstMatching(it, IGNORE_UPDATE_REASON) == 0 })
                     throw IllegalStateException("Could not remove all ingredients from the ingredients inventory")
+                updateAllRequiredStatus()
             }
             
             if (gui.isInitialized()) gui.value.progressItem.percentage = timePassed.toDouble() / maxBrewTime.toDouble()
