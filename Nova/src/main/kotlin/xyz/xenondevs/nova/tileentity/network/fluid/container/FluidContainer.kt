@@ -118,7 +118,7 @@ abstract class FluidContainer(
      * Checks if this [FluidContainer] would accept [amount] of [type].
      */
     open fun accepts(type: FluidType, amount: Long): Boolean {
-        return (this.type == type || (this.type == FluidType.NONE && type in allowedTypes)) && (this.amount + amount <= capacity)
+        return (this.type == type || (this.type == FluidType.NONE && type in allowedTypes)) && (this.amount + amount in 0..capacity)
     }
     
     open fun accepts(type: FluidType): Boolean {
