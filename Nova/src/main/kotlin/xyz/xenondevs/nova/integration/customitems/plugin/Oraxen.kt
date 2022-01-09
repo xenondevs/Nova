@@ -5,7 +5,10 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
+import xyz.xenondevs.nova.util.customModelData
 
 object Oraxen : CustomItemService {
     
@@ -13,6 +16,7 @@ object Oraxen : CustomItemService {
     override val requiresLoadDelay = false
     
     override fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean {
+        // Missing API feature
         return false
     }
     
@@ -27,13 +31,16 @@ object Oraxen : CustomItemService {
     }
     
     override fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
-//        val id = OraxenItems.getIdByItem(item) ?: return false
-//        BlockMechanicFactory.setBlockModel(location.block, id)
+        // API for that is broken
         return true
     }
     
     override fun getItemByName(name: String): ItemStack? {
         return OraxenItems.getItemById(name.removePrefix("oraxen:")).build()
+    }
+    
+    override fun getItemTest(name: String): ItemTest? {
+        return ItemsAdder.getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     
     override fun getNameKey(item: ItemStack): String? {

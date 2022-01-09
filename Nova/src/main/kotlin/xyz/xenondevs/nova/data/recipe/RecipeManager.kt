@@ -13,10 +13,10 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.customModelData
@@ -28,29 +28,35 @@ import xyz.xenondevs.nova.util.removeFirstWhere
 import java.util.*
 import kotlin.experimental.and
 
-class CustomRecipeChoice(private val customChoices: List<Pair<Material, IntArray>>, examples: List<ItemStack>) : ExactChoice(examples) {
+interface ItemTest {
+    
+    val example: ItemStack
+    
+    fun test(item: ItemStack): Boolean
+    
+}
+
+class ModelDataTest(private val type: Material, private val data: IntArray, override val example: ItemStack) : ItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return customChoices.any { (material, requiredModelDataArray) ->
-            item.type == material && requiredModelDataArray.contains(item.customModelData)
-        }
+        return item.type == type && item.customModelData in data
     }
     
 }
 
-class SingleCustomRecipeChoice(private val material: Material, private val customModelData: Int, example: ItemStack) : ExactChoice(example) {
-    
-    override fun test(item: ItemStack): Boolean {
-        return item.type == material && item.customModelData == customModelData
-    }
-    
-}
-
-class ComplexChoice(choices: List<ItemStack>) : ExactChoice(choices) {
+class ComplexTest(override val example: ItemStack) : ItemTest {
     
     override fun test(item: ItemStack): Boolean {
         val testStack = item.namelessCopyOrSelf
-        return choices.any { it.isSimilar(testStack) }
+        return example.isSimilar(testStack)
+    }
+    
+}
+
+class CustomRecipeChoice(private val tests: List<ItemTest>) : ExactChoice(tests.map(ItemTest::example)) {
+    
+    override fun test(item: ItemStack): Boolean {
+        return tests.any { it.test(item) }
     }
     
 }

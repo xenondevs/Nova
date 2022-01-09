@@ -6,8 +6,10 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.DatabaseManager
+import xyz.xenondevs.nova.data.recipe.ItemTest
 import xyz.xenondevs.nova.integration.Integration
 import xyz.xenondevs.nova.integration.customitems.plugin.ItemsAdder
+import xyz.xenondevs.nova.integration.customitems.plugin.MMOItems
 import xyz.xenondevs.nova.integration.customitems.plugin.Oraxen
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
@@ -15,7 +17,7 @@ import java.util.concurrent.CountDownLatch
 
 object CustomItemServiceManager: Initializable() {
     
-    private val PLUGINS: List<CustomItemService> = listOf(ItemsAdder, Oraxen)
+    private val PLUGINS: List<CustomItemService> = listOf(ItemsAdder, Oraxen, MMOItems)
         .filter(Integration::isInstalled)
     
     private val LOAD_DELAYING_PLUGINS_AMOUNT = PLUGINS.count(CustomItemService::requiresLoadDelay)
@@ -46,6 +48,10 @@ object CustomItemServiceManager: Initializable() {
     
     fun getItemByName(name: String): ItemStack? {
         return PLUGINS.firstNotNullOfOrNull { it.getItemByName(name) }
+    }
+    
+    fun getItemTest(name: String): ItemTest? {
+        return PLUGINS.firstNotNullOfOrNull { it.getItemTest(name) }
     }
     
     fun getNameKey(item: ItemStack): String? {

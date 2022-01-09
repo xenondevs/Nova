@@ -10,9 +10,9 @@ import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.data.recipe.ComplexChoice
+import xyz.xenondevs.nova.data.recipe.ComplexTest
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
-import xyz.xenondevs.nova.data.recipe.SingleCustomRecipeChoice
+import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -112,36 +112,30 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
 object ItemUtils {
     
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {
-        if (nameList.any { it.contains("{") }) return ComplexChoice(nameList.map(ItemUtils::toItemStack))
-        
-        val choices = ArrayList<Pair<Material, IntArray>>()
-        val examples = ArrayList<ItemStack>()
-        
-        nameList.forEach { name ->
+        val tests = nameList.map { name ->
             try {
-                val namespace = name.substringBefore(':')
+                if (name.contains("{"))
+                    return@map ComplexTest(toItemStack(name))
                 
+                val namespace = name.substringBefore(':')
                 if (namespace == "nova") {
                     val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
-                    choices += material.item.material to intArrayOf(material.item.data).let { if (material.legacyItemIds != null) it + material.legacyItemIds else it }
-                    examples += material.createItemStack()
+                    val bukkitMaterial = material.item.material
+                    val modelData = intArrayOf(material.item.data).let { if (material.legacyItemIds != null) it + material.legacyItemIds else it }
+                    return@map ModelDataTest(bukkitMaterial, modelData, material.createItemStack())
                 } else if (namespace == "minecraft") {
                     val material = Material.valueOf(name.drop(10).uppercase())
-                    choices += material to intArrayOf(0)
-                    examples += ItemStack(material)
+                    return@map ModelDataTest(material, intArrayOf(0), ItemStack(material))
                 } else if (CustomItemServiceManager.hasNamespace(namespace)) {
-                    val stack = CustomItemServiceManager.getItemByName(name)!!
-                    choices += stack.type to intArrayOf(stack.customModelData)
-                    examples += stack
+                    return@map CustomItemServiceManager.getItemTest(name)
+                        ?: throw IllegalArgumentException("Could not create an item test for $name")
                 } else throw IllegalArgumentException("Invalid item name: $name (Unknown or missing prefix)")
             } catch (ex: Exception) {
                 throw IllegalArgumentException("Unknown item $name", ex)
             }
         }
         
-        return if (choices.size == 1 && choices[0].second.size == 1)
-            SingleCustomRecipeChoice(choices[0].first, choices[0].second[0], examples[0])
-        else CustomRecipeChoice(choices, examples)
+        return CustomRecipeChoice(tests)
     }
     
     @Suppress("LiftReturnOrAssignment")

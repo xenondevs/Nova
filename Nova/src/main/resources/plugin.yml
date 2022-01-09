@@ -25,6 +25,7 @@ softdepend:
   - ItemsAdder
   - Towny
   - Oraxen
+  - MMOItems
 
 permissions:
   nova.command.*:

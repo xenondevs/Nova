@@ -51,6 +51,10 @@
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>Lumine</id>
+            <url>https://mvn.lumine.io/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <profiles>
@@ -324,6 +328,18 @@
             <groupId>com.github.Th0rgal</groupId>
             <artifactId>Oraxen</artifactId>
             <version>2ddf3c68b7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.lumine</groupId>
+            <artifactId>MythicLib-dist</artifactId>
+            <version>1.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.Indyuce</groupId>
+            <artifactId>MMOItems</artifactId>
+            <version>6.7</version>
             <scope>provided</scope>
         </dependency>
 

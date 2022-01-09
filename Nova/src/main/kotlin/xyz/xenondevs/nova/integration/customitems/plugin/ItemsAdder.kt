@@ -13,8 +13,11 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.util.customModelData
 import xyz.xenondevs.nova.util.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.runAsyncTask
 
@@ -71,6 +74,10 @@ object ItemsAdder : CustomItemService {
     override fun getItemByName(name: String): ItemStack? {
         val customItem = CustomStack.getInstance(name)
         return customItem?.itemStack
+    }
+    
+    override fun getItemTest(name: String): ItemTest? {
+        return getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     
     override fun hasNamespace(namespace: String): Boolean {

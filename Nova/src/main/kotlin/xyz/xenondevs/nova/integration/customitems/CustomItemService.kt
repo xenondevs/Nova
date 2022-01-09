@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.integration.customitems
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.recipe.ItemTest
 import xyz.xenondevs.nova.integration.Integration
 
 interface CustomItemService : Integration {
@@ -14,6 +15,7 @@ interface CustomItemService : Integration {
     
     /**
      * Remove a block from the world without handling drops
+     * @return If the block was from this [CustomItemService] and has been removed successfully
      */
     fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean
     
@@ -33,6 +35,7 @@ interface CustomItemService : Integration {
     
     /**
      * Gets all drops of a block from this [CustomItemService]
+     * @return The drops or null if the block isn't from this [CustomItemService]
      */
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>?
     
@@ -40,6 +43,11 @@ interface CustomItemService : Integration {
      * Gets an [ItemStack] from a namespaced name
      */
     fun getItemByName(name: String): ItemStack?
+    
+    /**
+     * Gets an [ItemTest] from a namespaced name
+     */
+    fun getItemTest(name: String): ItemTest?
     
     /**
      * Gets a namespaced name from an [ItemStack]
