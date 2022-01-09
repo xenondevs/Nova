@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.serialization
 
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.serialization.cbf.Element
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.EnumMapElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
@@ -18,6 +19,17 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
         if (includeGlobal && "global" !in data)
             data.putElement("global", globalData)
     }
+    
+    // region element retrieval
+    
+    /**
+     * Retrieves an element from the data [CompoundElement] of this TileEntity.
+     */
+    inline fun <reified T : Element> retrieveElementOrNull(key: String): T? {
+        return data.getElement(key) ?: globalData.getElement(key)
+    }
+    
+    // endregion
     
     //region BackedElement data retrieval
     

@@ -30,7 +30,7 @@ object CobblestoneGeneratorRecipeGroup : RecipeGroup() {
                 ". w l . . . . . ." +
                 ". w l . > . r . ." +
                 ". w l . m . . . .")
-            .addIngredient('r', createRecipeChoiceItem(listOf(container.result)))
+            .addIngredient('r', createRecipeChoiceItem(listOf(container.result!!)))
             .addIngredient('m', recipe.mode.uiItem.itemProvider)
             .addIngredient('>', progressItem)
             .addIngredient('w', StaticFluidBar(FluidType.WATER, 1000, 1000, 3))

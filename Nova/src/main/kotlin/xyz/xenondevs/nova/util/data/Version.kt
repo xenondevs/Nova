@@ -36,7 +36,9 @@ class Version : Comparable<Version> {
             return true
         if (other !is Version)
             return false
-        return this.compareTo(other) == 0
+        return this.major == other.major
+            && this.minor == other.minor
+            && this.patch == other.patch
     }
     
     override fun hashCode(): Int {

@@ -4,11 +4,11 @@ import com.google.gson.JsonParser
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.inventory.*
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.hardcoded.HardcodedRecipes
@@ -93,7 +93,7 @@ object RecipeRegistry : Initializable() {
         // add all nova machine recipes
         getUsageNovaRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe).group
-            recipe.input.getInputStacks().forEach { inputStack ->
+            recipe.getAllInputs().flatMap { it.getInputStacks() }.forEach { inputStack ->
                 val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { LinkedHashSet() }
@@ -125,12 +125,12 @@ object RecipeRegistry : Initializable() {
         return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + HardcodedRecipes.recipes.asSequence()
     }
     
-    private fun getCreationNovaRecipeSequence(): Sequence<NovaRecipe> {
-        return getAllNovaRecipes()
+    private fun getCreationNovaRecipeSequence(): Sequence<ResultingRecipe> {
+        return getAllNovaRecipes().filterIsInstance<ResultingRecipe>()
     }
     
-    private fun getUsageNovaRecipeSequence(): Sequence<ConversionNovaRecipe> {
-        return getAllNovaRecipes().filterIsInstance<ConversionNovaRecipe>()
+    private fun getUsageNovaRecipeSequence(): Sequence<InputChoiceRecipe> {
+        return getAllNovaRecipes().filterIsInstance<InputChoiceRecipe>()
     }
     
 }

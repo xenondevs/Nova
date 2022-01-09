@@ -21,7 +21,7 @@ object StarCollectorRecipeGroup : RecipeGroup() {
                 ". . . . . . . . ." +
                 ". . . . . . . r ." +
                 ". . . . . . . . .")
-            .addIngredient('r', createRecipeChoiceItem(listOf(container.result)))
+            .addIngredient('r', createRecipeChoiceItem(listOf(container.result!!)))
             .build()
     }
     

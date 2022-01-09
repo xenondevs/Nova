@@ -125,7 +125,7 @@ class FluidStorageUnit(
                 return ItemBuilder(type).setDisplayName(component).setAmount(1)
             }
             
-            override fun handleClick(clickType: ClickType?, player: Player?, event: InventoryClickEvent?) = Unit
+            override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
         }
     }
     

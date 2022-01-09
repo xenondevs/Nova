@@ -331,7 +331,7 @@
         <dependency>
             <groupId>de.studiocode.invui</groupId>
             <artifactId>InvUI</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jetbrains</groupId>

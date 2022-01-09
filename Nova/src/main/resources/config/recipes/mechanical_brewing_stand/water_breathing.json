@@ -1,0 +1,11 @@
+{
+  "result": "minecraft:water_breathing",
+  "default_time": 3600,
+  "redstone_multiplier": 2.6666666666666665,
+  "glowstone_multiplier": 0.5,
+  "max_duration_level": 1,
+  "inputs": [
+    "minecraft:nether_wart",
+    "minecraft:pufferfish"
+  ]
+}

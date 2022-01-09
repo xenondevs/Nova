@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.playItemPickupSound
 import kotlin.random.Random
 
 class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Unit) {
@@ -85,7 +86,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
             val location = player.location
             val leftover = player.inventory.addItemCorrectly(item)
             if (leftover != 0) location.world!!.dropItemNaturally(location, item.apply { amount = leftover })
-            else player.playSound(location, Sound.ENTITY_ITEM_PICKUP, 0.5f, Random.nextDouble(0.5, 0.7).toFloat())
+            else player.playItemPickupSound()
         }
         
     }

@@ -5,11 +5,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
+import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.recipe.FluidInfuserRecipe
-import xyz.xenondevs.nova.data.recipe.GearPressRecipe
-import xyz.xenondevs.nova.data.recipe.PlatePressRecipe
-import xyz.xenondevs.nova.data.recipe.PulverizerRecipe
+import xyz.xenondevs.nova.data.recipe.*
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.ItemUtils
 import xyz.xenondevs.nova.util.ItemUtils.getItemBuilder
@@ -182,6 +180,34 @@ object FluidInfuserRecipeDeserializer : RecipeDeserializer<FluidInfuserRecipe> {
         val result = getItemBuilder(json.getString("result")!!).get()
         
         return FluidInfuserRecipe(getRecipeKey(file), mode, fluidType, fluidAmount, input, result, time)
+    }
+    
+}
+
+object MechanicalBrewingStandRecipeDeserializer : RecipeDeserializer<MechanicalBrewingStandRecipe> {
+    
+    override fun deserialize(json: JsonObject, file: File): MechanicalBrewingStandRecipe {
+        val inputs = json.getAsJsonArray("inputs").map { ItemUtils.getRecipeChoice(listOf(it.asString)) }
+        require(inputs.all { it.getInputStacks().size == 1 })
+        
+        val resultName = json.getString("result")
+            ?: throw IllegalArgumentException("No result provided")
+        val result = PotionEffectType.getByKey(NamespacedKey.fromString(resultName))
+            ?: throw IllegalArgumentException("Invalid result")
+        
+        val defaultTime = json.getInt("default_time", 0)
+        val redstoneMultiplier = json.getDouble("redstone_multiplier", 0.0)
+        val glowstoneMultiplier = json.getDouble("glowstone_multiplier", 0.0)
+        val maxDurationLevel = json.getInt("max_duration_level", 0)
+        val maxAmplifierLevel = json.getInt("max_amplifier_level", 0)
+        
+        return MechanicalBrewingStandRecipe(
+            getRecipeKey(file),
+            inputs, result,
+            defaultTime,
+            redstoneMultiplier, glowstoneMultiplier,
+            maxDurationLevel, maxAmplifierLevel
+        )
     }
     
 }
