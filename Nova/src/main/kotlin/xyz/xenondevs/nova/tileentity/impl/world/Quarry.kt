@@ -234,7 +234,7 @@ class Quarry(
         
         if (!done || serverTick % 300 == 0) {
             if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
-
+            
             if (!drilling) {
                 val pointerDestination = pointerDestination ?: selectNextDestination()
                 if (pointerDestination != null) {
@@ -477,7 +477,7 @@ class Quarry(
             if (blockBelow != null && blockBelow.positionEquals(corner)) continue
             
             corner
-                .getStraightLine(Axis.Y, blockBelow?.blockY?.plus(1) ?: 0)
+                .getStraightLine(Axis.Y, (blockBelow?.blockY ?: world.minHeight) + 1)
                 .forEach { createVerticalScaffolding(solidScaffolding, it) }
         }
     }
