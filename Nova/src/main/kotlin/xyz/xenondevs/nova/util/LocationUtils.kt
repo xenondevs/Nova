@@ -294,7 +294,7 @@ fun Location.createColoredParticle(color: Color): Any = ParticleBuilder(Particle
 fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Location? {
     val location = clone()
     if (!countSelf) location.y -= 1
-    while (location.y >= 0) {
+    while (location.y >= (world?.minHeight ?: -64)) {
         val type = location.block.type
         if (!type.isAir && (!requiresSolid || type.isSolid)) return location
         location.y -= 1
