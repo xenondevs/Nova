@@ -36,7 +36,7 @@ object HitboxManager : Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     fun handleInteract(event: PlayerInteractEvent) {
         if (event.hand != EquipmentSlot.HAND || event.isCompletelyDenied()) return
         

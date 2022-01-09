@@ -361,7 +361,7 @@ object TileEntityManager : Initializable(), Listener {
     }
     
     @Synchronized
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     fun handleInteract(event: PlayerInteractEvent) {
         val action = event.action
         val player = event.player
