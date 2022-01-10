@@ -4,11 +4,13 @@ import net.dzikoysk.exposed.upsert.upsert
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.*
 import org.bukkit.block.Block
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
+import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.player.PlayerInteractEvent
@@ -422,6 +424,13 @@ object TileEntityManager : Listener {
             if (tileEntity != null && tileEntity.hasHitboxBeenPlaced)
                 destroyAndDropTileEntity(tileEntity, true)
         }
+    }
+    
+    @Synchronized
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun handleEntityChangeBlock(event: EntityChangeBlockEvent) {
+        if (event.entityType == EntityType.SILVERFISH && event.block.location in locationCache)
+            event.isCancelled = true
     }
     
     @Synchronized
