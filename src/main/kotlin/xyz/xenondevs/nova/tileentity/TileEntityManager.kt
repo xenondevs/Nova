@@ -38,7 +38,6 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.roundToInt
 
@@ -67,14 +66,6 @@ fun ItemStack.getTileEntityData(): CompoundElement? {
 @Suppress("DEPRECATION")
 val Material?.requiresLight: Boolean
     get() = this != null && !isTransparent && isOccluding
-
-private typealias ChunkTask = (CountDownLatch) -> Unit
-
-private fun ChunkTask.runAndAwaitCompletion() {
-    val latch = CountDownLatch(1)
-    invoke(latch)
-    latch.await()
-}
 
 object TileEntityManager : Listener {
     
