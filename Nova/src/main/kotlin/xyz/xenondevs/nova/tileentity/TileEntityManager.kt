@@ -4,11 +4,13 @@ import net.dzikoysk.exposed.upsert.upsert
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.*
 import org.bukkit.block.Block
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
+import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.player.PlayerInteractEvent
@@ -38,7 +40,6 @@ import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.pos
 import java.util.*
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.roundToInt
 
@@ -67,14 +68,6 @@ fun ItemStack.getTileEntityData(): CompoundElement? {
 @Suppress("DEPRECATION")
 val Material?.requiresLight: Boolean
     get() = this != null && !isTransparent && isOccluding
-
-private typealias ChunkTask = (CountDownLatch) -> Unit
-
-private fun ChunkTask.runAndAwaitCompletion() {
-    val latch = CountDownLatch(1)
-    invoke(latch)
-    latch.await()
-}
 
 object TileEntityManager : Initializable(), Listener {
     
@@ -429,6 +422,13 @@ object TileEntityManager : Initializable(), Listener {
             if (tileEntity != null && tileEntity.hasHitboxBeenPlaced)
                 destroyAndDropTileEntity(tileEntity, true)
         }
+    }
+    
+    @Synchronized
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun handleEntityChangeBlock(event: EntityChangeBlockEvent) {
+        if (event.entityType == EntityType.SILVERFISH && event.block.location in locationCache)
+            event.isCancelled = true
     }
     
     @Synchronized
