@@ -159,11 +159,6 @@ class Planter(
             // If there are no seeds search for dirt that can be tilled
             if (seedMaterial == null) return@indexOfFirst autoTill && !emptyHoes && soilType.isTillable()
             
-            // Search for a block that has no block on top of it and is dirt/farmland
-            // If the soil or plant block is protected, skip this block
-            if (!ProtectionManager.canPlace(ownerUUID, block.location) || !ProtectionManager.canBreak(ownerUUID, soilBlock.location))
-                return@indexOfFirst false
-            
             // If the plant block is already occupied return false
             if (!block.type.isAir)
                 return@indexOfFirst false
@@ -174,7 +169,10 @@ class Planter(
                 return@indexOfFirst soilType == Material.FARMLAND
             
             // if soil type is applicable for the seed or can be made applicable
-            return@indexOfFirst seedMaterial.canBePlacedOn(soilType) || (seedMaterial.canBePlacedOn(Material.FARMLAND) && autoTill && !emptyHoes && soilType.isTillable())
+            if (!seedMaterial.canBePlacedOn(soilType) && !(seedMaterial.canBePlacedOn(Material.FARMLAND) && autoTill && !emptyHoes && soilType.isTillable()))
+                return@indexOfFirst false
+            
+            return@indexOfFirst ProtectionManager.canPlace(ownerUUID, block.location) && (!autoTill || ProtectionManager.canBreak(ownerUUID, soilBlock.location))
         }
         
         if (index == -1)

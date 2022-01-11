@@ -21,7 +21,7 @@ object GriefDefender : ProtectionIntegration {
         
         return GriefDefender
             .getPermissionManager()
-            .getActiveFlagPermissionValue(claim, user, flag, null, location.getBlockName(), hashSetOf(), trustType, false)
+            .getActiveFlagPermissionValue(null, location, claim, user, flag, "nova:null", location.getBlockName(), hashSetOf(), trustType, false)
             .asBoolean()
     }
     
