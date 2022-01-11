@@ -25,19 +25,16 @@ object ProtectionManager {
             .expireAfterWrite(30, TimeUnit.SECONDS)
             .build()
     
-    fun canPlace(uuid: UUID, location: Location) =
-        canPlace(Bukkit.getOfflinePlayer(uuid), location)
-    
-    fun canBreak(uuid: UUID, location: Location) =
-        canBreak(Bukkit.getOfflinePlayer(uuid), location)
-    
-    fun canUse(uuid: UUID, location: Location) =
-        canUse(Bukkit.getOfflinePlayer(uuid), location)
-    
     fun canPlace(tileEntity: TileEntity, location: Location): Boolean =
         PROTECTION_CACHE.get(ProtectionLookupKey(0, tileEntity.uuid, location.pos)) {
             !isVanillaProtected(tileEntity.owner, location)
                 && PROTECTION_PLUGINS.all { it.canPlace(tileEntity, location) }
+        }
+    
+    fun canBreak(tileEntity: TileEntity, location: Location): Boolean =
+        PROTECTION_CACHE.get(ProtectionLookupKey(0, tileEntity.uuid, location.pos)) {
+            !isVanillaProtected(tileEntity.owner, location)
+                && PROTECTION_PLUGINS.all { it.canBreak(tileEntity, location) }
         }
     
     fun canUse(tileEntity: TileEntity, location: Location): Boolean =
