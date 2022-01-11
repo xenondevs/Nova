@@ -351,6 +351,14 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun playSound(entity: Entity, sound: Sound, volume: Float, pitch: Float) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun playSound(entity: Entity, sound: Sound, category: SoundCategory, volume: Float, pitch: Float) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun stopSound(sound: Sound) {
         throw UnsupportedOperationException("Player is not online")
     }
