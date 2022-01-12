@@ -420,7 +420,8 @@ object TileEntityManager : Listener {
     @Synchronized
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleEntityChangeBlock(event: EntityChangeBlockEvent) {
-        if (event.entityType == EntityType.SILVERFISH && event.block.location in locationCache)
+        val type = event.entityType
+        if ((type == EntityType.SILVERFISH || type == EntityType.ENDERMAN) && event.block.location in locationCache)
             event.isCancelled = true
     }
     
