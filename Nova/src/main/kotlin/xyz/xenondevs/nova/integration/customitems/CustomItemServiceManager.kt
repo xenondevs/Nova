@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.integration.customitems
 
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.recipe.ItemTest
 import xyz.xenondevs.nova.integration.Integration
@@ -34,8 +34,8 @@ object CustomItemServiceManager: Initializable() {
         return PLUGINS.any { it.placeBlock(item, location, playEffects) }
     }
     
-    fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean {
-        return PLUGINS.any { it.removeBlock(block, tool, playEffects) }
+    fun removeBlock(block: Block, playEffects: Boolean): Boolean {
+        return PLUGINS.any { it.removeBlock(block, playEffects) }
     }
     
     fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
@@ -55,11 +55,11 @@ object CustomItemServiceManager: Initializable() {
     }
     
     fun getNameKey(item: ItemStack): String? {
-        return PLUGINS.firstNotNullOfOrNull { it.getNameKey(item) }
+        return PLUGINS.firstNotNullOfOrNull { it.getId(item) }
     }
     
-    fun hasNamespace(namespace: String): Boolean {
-        return PLUGINS.any { it.hasNamespace(namespace) }
+    fun hasRecipe(key: NamespacedKey): Boolean {
+        return PLUGINS.any { it.hasRecipe(key) }
     }
     
     fun runAfterDataLoad(run: () -> Unit) {

@@ -300,7 +300,7 @@ class Quarry(
             callEvent(event)
             drops = event.drops
             
-            block.remove(null, !DISABLE_BLOCK_BREAK_EFFECTS)
+            block.remove(!DISABLE_BLOCK_BREAK_EFFECTS)
             drops.forEach { drop ->
                 val leftover = inventory.addItem(null, drop)
                 if (DROP_EXCESS_ON_GROUND && leftover != 0) {

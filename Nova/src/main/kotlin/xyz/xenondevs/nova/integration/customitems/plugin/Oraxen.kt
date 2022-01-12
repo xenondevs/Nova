@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.integration.customitems.plugin
 import io.th0rgal.oraxen.items.OraxenItems
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.ItemTest
@@ -15,7 +16,7 @@ object Oraxen : CustomItemService {
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Oraxen") != null
     override val requiresLoadDelay = false
     
-    override fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean {
+    override fun removeBlock(block: Block, playEffects: Boolean): Boolean {
         // Missing API feature
         return false
     }
@@ -43,13 +44,13 @@ object Oraxen : CustomItemService {
         return ItemsAdder.getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     
-    override fun getNameKey(item: ItemStack): String? {
+    override fun getId(item: ItemStack): String? {
         val name = OraxenItems.getIdByItem(item) ?: return null
         return "oraxen:$name"
     }
     
-    override fun hasNamespace(namespace: String): Boolean {
-        return namespace == "oraxen"
+    override fun hasRecipe(key: NamespacedKey): Boolean {
+        return key.namespace == "oraxen"
     }
     
 }

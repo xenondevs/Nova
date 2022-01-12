@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.integration.customitems
 
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.ItemTest
@@ -17,7 +18,7 @@ interface CustomItemService : Integration {
      * Remove a block from the world without handling drops
      * @return If the block was from this [CustomItemService] and has been removed successfully
      */
-    fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean
+    fun removeBlock(block: Block, playEffects: Boolean): Boolean
     
     /**
      * Breaks a block from this [CustomItemService]
@@ -52,11 +53,11 @@ interface CustomItemService : Integration {
     /**
      * Gets a namespaced name from an [ItemStack]
      */
-    fun getNameKey(item: ItemStack): String?
+    fun getId(item: ItemStack): String?
     
     /**
-     * Checks if this [CustomItemService] uses this namespace
+     * Checks if this [CustomItemService] registered a recipe with that [key]
      */
-    fun hasNamespace(namespace: String): Boolean
+    fun hasRecipe(key: NamespacedKey): Boolean
     
 }

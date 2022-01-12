@@ -115,8 +115,10 @@ object RecipeRegistry : Initializable() {
     private fun getBukkitRecipeSequence(): Sequence<Recipe> {
         return BUKKIT_RECIPES.asSequence()
             .filter {
-                val namespace = (it as Keyed).key.namespace
-                (namespace == "minecraft" || namespace == "nova" || CustomItemServiceManager.hasNamespace(namespace)) // do not allow recipes from unsupported plugins to show up
+                val key = (it as Keyed).key
+                val namespace = key.namespace
+                
+                (namespace == "minecraft" || namespace == "nova" || CustomItemServiceManager.hasRecipe(key)) // do not allow recipes from unsupported plugins to show up
                     && (it is ShapedRecipe || it is ShapelessRecipe || it is FurnaceRecipe || it is StonecuttingRecipe || it is SmithingRecipe)
             }
     }

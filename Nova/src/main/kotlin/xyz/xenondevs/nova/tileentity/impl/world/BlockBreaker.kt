@@ -89,7 +89,7 @@ class BlockBreaker(
                 drops = event.drops
                 
                 // break block, add items to inventory / drop them if full
-                block.breakAndTakeDrops(null, !DISABLE_BLOCK_BREAK_EFFECTS)
+                block.remove(!DISABLE_BLOCK_BREAK_EFFECTS)
                 drops.forEach { drop ->
                     val amountLeft = inventory.addItem(SELF_UPDATE_REASON, drop)
                     if (DROP_EXCESS_ON_GROUND && amountLeft != 0) {

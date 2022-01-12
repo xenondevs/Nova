@@ -4,9 +4,11 @@ import dev.lone.itemsadder.api.CustomBlock
 import dev.lone.itemsadder.api.CustomStack
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent.Cause
+import dev.lone.itemsadder.api.ItemsAdder
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -37,8 +39,9 @@ object ItemsAdder : CustomItemService {
         }
     }
     
-    override fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean {
+    override fun removeBlock(block: Block, playEffects: Boolean): Boolean {
         val customBlock = CustomBlock.byAlreadyPlaced(block) ?: return false
+        if (playEffects) customBlock.playBreakEffect()
         customBlock.remove()
         return true
     }
@@ -46,7 +49,8 @@ object ItemsAdder : CustomItemService {
     override fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
         if (customBlock != null) {
-            val loot = customBlock.getLoot(true)
+            val loot = customBlock.getLoot(tool, true)
+            if (playEffects) customBlock.playBreakEffect()
             customBlock.remove()
             return loot
         }
@@ -56,9 +60,7 @@ object ItemsAdder : CustomItemService {
     
     override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
-        if (customBlock != null)
-            return customBlock.getLoot(true)
-        return null
+        return customBlock?.getLoot(tool, true)
     }
     
     override fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
@@ -67,7 +69,7 @@ object ItemsAdder : CustomItemService {
         if (customItem == null || !customItem.isBlock)
             return false
         CustomBlock.place(customItem.namespacedID, location)
-        Material.STONE.playPlaceSoundEffect(location)
+        // TODO: play sound effect
         return true
     }
     
@@ -80,12 +82,11 @@ object ItemsAdder : CustomItemService {
         return getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     
-    override fun hasNamespace(namespace: String): Boolean {
-        // TODO: Not in the ItemsAdder API yet
-        return namespace == "itemsadder"
+    override fun hasRecipe(key: NamespacedKey): Boolean {
+        return ItemsAdder.isCustomRecipe(key)
     }
     
-    override fun getNameKey(item: ItemStack): String? {
+    override fun getId(item: ItemStack): String? {
         return CustomStack.byItemStack(item)?.namespacedID
     }
     

@@ -117,19 +117,19 @@ object ItemUtils {
                 if (name.contains("{"))
                     return@map ComplexTest(toItemStack(name))
                 
-                val namespace = name.substringBefore(':')
-                if (namespace == "nova") {
-                    val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
-                    val bukkitMaterial = material.item.material
-                    val modelData = intArrayOf(material.item.data).let { if (material.legacyItemIds != null) it + material.legacyItemIds else it }
-                    return@map ModelDataTest(bukkitMaterial, modelData, material.createItemStack())
-                } else if (namespace == "minecraft") {
-                    val material = Material.valueOf(name.drop(10).uppercase())
-                    return@map ModelDataTest(material, intArrayOf(0), ItemStack(material))
-                } else if (CustomItemServiceManager.hasNamespace(namespace)) {
-                    return@map CustomItemServiceManager.getItemTest(name)
-                        ?: throw IllegalArgumentException("Could not create an item test for $name")
-                } else throw IllegalArgumentException("Invalid item name: $name (Unknown or missing prefix)")
+                return@map when (name.substringBefore(':')) {
+                    "nova" -> {
+                        val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
+                        val bukkitMaterial = material.item.material
+                        val modelData = intArrayOf(material.item.data).let { if (material.legacyItemIds != null) it + material.legacyItemIds else it }
+                        ModelDataTest(bukkitMaterial, modelData, material.createItemStack())
+                    }
+                    "minecraft" -> {
+                        val material = Material.valueOf(name.drop(10).uppercase())
+                        ModelDataTest(material, intArrayOf(0), ItemStack(material))
+                    }
+                    else -> CustomItemServiceManager.getItemTest(name)!!
+                }
             } catch (ex: Exception) {
                 throw IllegalArgumentException("Unknown item $name", ex)
             }
@@ -141,17 +141,14 @@ object ItemUtils {
     @Suppress("LiftReturnOrAssignment")
     fun getItemBuilder(name: String, basic: Boolean = false): ItemBuilder {
         try {
-            val namespace = name.substringBefore(':')
-            
-            if (namespace == "nova") {
-                val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
-                return if (basic) novaMaterial.createBasicItemBuilder() else novaMaterial.createItemBuilder()
-            } else if (namespace == "minecraft") {
-                return ItemBuilder(toItemStack(name))
-            } else if (CustomItemServiceManager.hasNamespace(namespace)) {
-                val stack = CustomItemServiceManager.getItemByName(name)!!
-                return ItemBuilder(stack)
-            } else throw IllegalArgumentException("Unknown prefix")
+            return when (name.substringBefore(':')) {
+                "nova" -> {
+                    val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
+                    if (basic) novaMaterial.createBasicItemBuilder() else novaMaterial.createItemBuilder()
+                }
+                "minecraft" -> ItemBuilder(toItemStack(name))
+                else -> CustomItemServiceManager.getItemByName(name)!!.let(::ItemBuilder)
+            }
         } catch (ex: Exception) {
             throw IllegalArgumentException("Invalid item name: $name", ex)
         }
@@ -162,19 +159,21 @@ object ItemUtils {
         val localizedName: String
         
         try {
-            val namespace = name.substringBefore(':')
-            
-            if (namespace == "nova") {
-                val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
-                localizedName = novaMaterial.localizedName
-                itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
-            } else if (namespace == "minecraft") {
-                itemStack = toItemStack(name)
-                localizedName = itemStack.type.localizedName!!
-            } else if (CustomItemServiceManager.hasNamespace(namespace)) {
-                itemStack = CustomItemServiceManager.getItemByName(name)!!
-                localizedName = itemStack.displayName ?: ""
-            } else throw IllegalArgumentException("Unknown prefix")
+            when (name.substringBefore(':')) {
+                "nova" -> {
+                    val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
+                    localizedName = novaMaterial.localizedName
+                    itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
+                }
+                "minecraft" -> {
+                    itemStack = toItemStack(name)
+                    localizedName = itemStack.type.localizedName!!
+                }
+                else -> {
+                    itemStack = CustomItemServiceManager.getItemByName(name)!!
+                    localizedName = itemStack.displayName ?: ""
+                }
+            }
         } catch (ex: Exception) {
             throw IllegalArgumentException("Invalid item name: $name", ex)
         }

@@ -5,6 +5,7 @@ import net.Indyuce.mmoitems.api.Type
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.ItemTest
@@ -26,7 +27,7 @@ object MMOItems : CustomItemService {
         }
     }
     
-    override fun removeBlock(block: Block, tool: ItemStack?, playEffects: Boolean): Boolean {
+    override fun removeBlock(block: Block, playEffects: Boolean): Boolean {
         if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) return false
         block.type = Material.AIR
         return true
@@ -73,13 +74,13 @@ object MMOItems : CustomItemService {
         return getItemByName(name)?.let { MMOItemTest(name, it) }
     }
     
-    override fun getNameKey(item: ItemStack): String? {
+    override fun getId(item: ItemStack): String? {
         val id = NBTItem.get(item).getString("MMOITEMS_ITEM_ID")?.takeUnless(String::isBlank) ?: return null
         return "mmoitems:$id"
     }
     
-    override fun hasNamespace(namespace: String): Boolean {
-        return namespace == "mmoitems"
+    override fun hasRecipe(key: NamespacedKey): Boolean {
+        return key.namespace == "mmoitems"
     }
     
 }
@@ -87,7 +88,7 @@ object MMOItems : CustomItemService {
 private class MMOItemTest(private val id: String, override val example: ItemStack) : ItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return id.equals(MMOItems.getNameKey(item), true)
+        return id.equals(MMOItems.getId(item), true)
     }
     
 }

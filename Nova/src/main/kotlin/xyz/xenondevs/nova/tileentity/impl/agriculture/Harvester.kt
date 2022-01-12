@@ -191,7 +191,7 @@ class Harvester(
                     val event = TileEntityBreakBlockEvent(this, block, drops)
                     callEvent(event)
                     drops = event.drops
-                    block.remove(tool, !DISABLE_BLOCK_BREAK_EFFECTS)
+                    block.remove(!DISABLE_BLOCK_BREAK_EFFECTS)
 
                     // add the drops to the inventory or drop them in the world if they don't fit
                     if (inventory.canHold(drops))

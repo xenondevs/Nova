@@ -37,8 +37,8 @@ fun Block.hasSameTypeBelow(): Boolean {
     return type == below.type
 }
 
-fun Block.remove(tool: ItemStack? = null, playEffects: Boolean = true) {
-    val customRemoved = CustomItemServiceManager.removeBlock(this, tool, playEffects)
+fun Block.remove(playEffects: Boolean = true) {
+    val customRemoved = CustomItemServiceManager.removeBlock(this, playEffects)
     if (customRemoved) return
     
     val tileEntity = TileEntityManager.getTileEntityAt(location)
@@ -48,21 +48,6 @@ fun Block.remove(tool: ItemStack? = null, playEffects: Boolean = true) {
     
     if (playEffects) playBreakEffects()
     getMainHalf().type = Material.AIR
-}
-
-fun Block.breakAndTakeDrops(tool: ItemStack? = null, playEffects: Boolean = true): List<ItemStack> {
-    CustomItemServiceManager.breakBlock(this, tool, playEffects)?.let { return it }
-    
-    if (playEffects) playBreakEffects()
-    
-    val tileEntity = TileEntityManager.getTileEntityAt(location)
-    if (tileEntity != null) {
-        return TileEntityManager.destroyTileEntity(tileEntity, true)
-    }
-    
-    val drops = getAllDrops(tool)
-    getMainHalf().type = Material.AIR
-    return drops
 }
 
 fun Block.getAllDrops(tool: ItemStack? = null): List<ItemStack> {
