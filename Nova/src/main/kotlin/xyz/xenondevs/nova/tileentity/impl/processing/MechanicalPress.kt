@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MECHANICAL_PRESS
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
+import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.CONSUME
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.NONE
@@ -90,7 +91,7 @@ class MechanicalPress(
                 energyHolder.energy -= energyHolder.energyConsumption
                 
                 if (timeLeft == 0) {
-                    outputInv.putItemStack(null, 0, currentRecipe!!.result)
+                    outputInv.putItemStack(SELF_UPDATE_REASON, 0, currentRecipe!!.result)
                     currentRecipe = null
                 }
                 
@@ -104,7 +105,7 @@ class MechanicalPress(
         if (inputItem != null) {
             val recipe = RecipeManager.getConversionRecipeFor(type.recipeType, inputItem)
             if (recipe != null && outputInv.canHold(recipe.result)) {
-                inputInv.addItemAmount(null, 0, -1)
+                inputInv.addItemAmount(SELF_UPDATE_REASON, 0, -1)
                 timeLeft = recipe.time
                 currentRecipe = recipe
             }
@@ -112,7 +113,7 @@ class MechanicalPress(
     }
     
     private fun handleInputUpdate(event: ItemUpdateEvent) {
-        if (event.updateReason != null
+        if (event.updateReason != SELF_UPDATE_REASON
             && event.newItemStack != null
             && RecipeManager.getConversionRecipeFor(type.recipeType, event.newItemStack) == null) {
             
@@ -121,7 +122,7 @@ class MechanicalPress(
     }
     
     private fun handleOutputUpdate(event: ItemUpdateEvent) {
-        if (event.updateReason != null && event.newItemStack != null) event.isCancelled = true
+        event.isCancelled == !event.isRemove && event.updateReason != SELF_UPDATE_REASON
     }
     
     override fun saveData() {

@@ -70,7 +70,7 @@ object AsyncExecutor {
     init {
         if (USE_NOVA_SCHEDULER) {
             threadFactory = ThreadFactoryBuilder().setNameFormat("Async Nova Worker - %d").build()
-            executorService = ScheduledThreadPoolExecutor(THREADS)
+            executorService = ScheduledThreadPoolExecutor(THREADS, threadFactory)
         }
     }
     
