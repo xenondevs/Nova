@@ -56,6 +56,7 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.localizedName
 import xyz.xenondevs.nova.util.removeFirstMatching
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import java.awt.Color
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -112,6 +113,7 @@ class MechanicalBrewingStand(
     private var maxBrewTime = 0
     private var timePassed = 0
     
+    private var color = retrieveData("potionColor") { Color(0, 0, 0) }
     private var potionType = retrieveEnum<PotionBuilder.PotionType>("potionType") { PotionBuilder.PotionType.NORMAL }
     private lateinit var potionEffects: List<PotionEffectBuilder>
     private var requiredItems: List<ItemStack>? = null
@@ -129,7 +131,7 @@ class MechanicalBrewingStand(
             potionEffects += PotionEffectBuilder(type, duration, amplifier)
         }
         
-        updatePotionEffects(potionType, potionEffects)
+        updatePotionData(potionType, potionEffects, color)
         handleUpgradeUpdates()
     }
     
@@ -148,15 +150,17 @@ class MechanicalBrewingStand(
         
         storeData("potionEffects", list)
         storeData("potionType", potionType)
+        storeData("potionColor", color)
     }
     
     private fun handleUpgradeUpdates() {
         maxBrewTime = (BREW_TIME / upgradeHolder.getSpeedModifier()).roundToInt()
     }
     
-    private fun updatePotionEffects(type: PotionBuilder.PotionType, effects: List<PotionEffectBuilder>) {
+    private fun updatePotionData(type: PotionBuilder.PotionType, effects: List<PotionEffectBuilder>, color: Color) {
         this.potionEffects = effects.map(PotionEffectBuilder::clone)
         this.potionType = type
+        this.color = color
         
         if (effects.isNotEmpty()) {
             val requiredItems = ArrayList<ItemStack>()
@@ -247,7 +251,11 @@ class MechanicalBrewingStand(
         if (requiredItems != null && requiredItemsStatus != null && outputInventory.isEmpty && requiredItemsStatus!!.values.all { it }) {
             val builder = PotionBuilder(potionType)
             potionEffects.forEach { builder.addEffect(it.build()) }
-            nextPotion = builder.setAmount(3).get()
+            nextPotion = builder
+                .setDisplayName(TranslatableComponent("item.minecraft.potion"))
+                .setAmount(3)
+                .setColor(color)
+                .get()
         } else {
             nextPotion = null
             timePassed = 0
@@ -313,7 +321,8 @@ class MechanicalBrewingStand(
         private val configuratorWindow = PotionConfiguratorWindow(
             potionEffects.map(PotionEffectBuilder::clone),
             potionType,
-            ::updatePotionEffects,
+            color,
+            ::updatePotionData,
             ::openWindow
         )
         
@@ -321,6 +330,7 @@ class MechanicalBrewingStand(
             
             override fun getItemProvider(): ItemProvider {
                 val builder = PotionBuilder(potionType)
+                    .setColor(color)
                     .setBasePotionData(PotionData(PotionType.WATER, false, false))
                     .setDisplayName(TranslatableComponent("menu.nova.mechanical_brewing_stand.configured_potion"))
                 potionEffects.forEach { builder.addEffect(it.build()) }

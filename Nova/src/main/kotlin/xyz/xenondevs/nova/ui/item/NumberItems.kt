@@ -9,6 +9,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.util.playItemPickupSound
 
 open class ChangeNumberItem(
     private val sizeModifier: Int,
@@ -77,3 +78,38 @@ class RemoveNumberItem(
     NovaMaterialRegistry.MINUS_ON_BUTTON.createBasicItemBuilder(),
     NovaMaterialRegistry.MINUS_OFF_BUTTON.createBasicItemBuilder()
 )
+
+open class AioNumberItem(
+    private val numberModifier: Int,
+    private val shiftNumberModifier: Int,
+    private val getRange: () -> IntRange,
+    private val getNumber: () -> Int,
+    private val setNumber: (Int) -> Unit,
+    private val localizedName: String,
+    private val builder: ItemBuilder
+) : BaseItem() {
+    
+    override fun getItemProvider(): ItemProvider =
+        builder.setDisplayName(TranslatableComponent(localizedName, getNumber()))
+    
+    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        val numberModifier = when (clickType) {
+            ClickType.LEFT -> numberModifier
+            ClickType.SHIFT_LEFT -> shiftNumberModifier
+            ClickType.RIGHT -> -numberModifier
+            ClickType.SHIFT_RIGHT -> -shiftNumberModifier
+            else -> return
+        }
+        
+        val currentNumber = getNumber()
+        val number = (currentNumber + numberModifier).coerceIn(getRange())
+        
+        if (number != currentNumber) {
+            player.playItemPickupSound()
+            setNumber(number)
+            notifyWindows()
+        }
+        
+    }
+    
+}

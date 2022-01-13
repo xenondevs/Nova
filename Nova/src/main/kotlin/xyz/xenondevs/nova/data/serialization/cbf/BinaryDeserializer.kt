@@ -41,7 +41,8 @@ interface BinaryDeserializer<T : Element> {
             LocationDeserializer, // 23
             NamespacedKeyDeserializer, // 24
             UpgradesDeserializer, // 25
-            VirtualInventoryDeserializer // 26
+            VirtualInventoryDeserializer, // 26
+            ColorDeserializer // 27
         )
         
         fun getForType(type: Byte) = runCatching { DESERIALIZERS[type.toInt()] }.getOrNull()

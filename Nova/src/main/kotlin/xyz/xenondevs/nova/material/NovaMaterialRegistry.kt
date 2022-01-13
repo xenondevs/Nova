@@ -209,6 +209,7 @@ object NovaMaterialRegistry {
     val NO_NUMBER = registerItem("NO_NUMBER", "", 9303)
     val PLUS_ICON = registerItem("PLUS_ICON", "", 9304)
     val MINUS_ICON = registerItem("MINUS_ICON", "", 9305)
+    val COLOR_PICKER_ICON = registerItem("COLOR_PICKER_ICON", "menu.nova.color_picker", 9306)
     val SPEED_UPGRADE_ICON = registerItem("SPEED_UPGRADE_ICON", "", 9402)
     val TRANSLUCENT_SPEED_UPGRADE_ICON = registerItem("TRANSLUCENT_SPEED_UPGRADE_ICON", "", 9403)
     val EFFICIENCY_UPGRADE_ICON = registerItem("EFFICIENCY_UPGRADE_ICON", "", 9404)

@@ -25,17 +25,22 @@ import xyz.xenondevs.nova.tileentity.impl.processing.brewing.MechanicalBrewingSt
 import xyz.xenondevs.nova.tileentity.impl.processing.brewing.MechanicalBrewingStand.Companion.AVAILABLE_POTION_EFFECTS
 import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.ui.item.clickableItem
+import xyz.xenondevs.nova.ui.menu.ColorPickerWindow
+import xyz.xenondevs.nova.ui.menu.OpenColorPickerWindowItem
+import xyz.xenondevs.nova.ui.menu.PotionColorPreviewItem
 import xyz.xenondevs.nova.ui.overlay.GUITexture
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
+import java.awt.Color
 import kotlin.math.min
 
 class PotionConfiguratorWindow(
     effects: List<PotionEffectBuilder>,
     private var type: PotionBuilder.PotionType,
-    private val updatePotionEffects: (PotionBuilder.PotionType, List<PotionEffectBuilder>) -> Unit,
+    color: Color,
+    private val updatePotionData: (PotionBuilder.PotionType, List<PotionEffectBuilder>, Color) -> Unit,
     openPrevious: (Player) -> Unit
 ) {
     
@@ -49,15 +54,22 @@ class PotionConfiguratorWindow(
         PotionBuilder(PotionBuilder.PotionType.LINGERING).setDisplayName(TranslatableComponent("menu.nova.potion_configurator.potion_type.lingering"))
     )
     
+    private val colorPickerWindow = ColorPickerWindow(
+        PotionColorPreviewItem(
+            PotionBuilder(PotionBuilder.PotionType.NORMAL)
+                .setDisplayName(TranslatableComponent("menu.nova.color_picker.current_color"))
+        ), color, ::openConfigurator)
+    
     private val gui = GUIBuilder(GUIType.SCROLL_GUIS, 9, 6)
         .setStructure("" +
-            "< . t . . . . . s" +
+            "< c t . . . . . s" +
             "x x x x x x x x u" +
             "x x x x x x x x ." +
             "x x x x x x x x ." +
             "x x x x x x x x ." +
             "x x x x x x x x d")
-        .addIngredient('<', BackItem { p -> updatePotionEffects(type, this.effects.keys.filter { it.type != null }); openPrevious(p) })
+        .addIngredient('<', BackItem { p -> updatePotionData(type, this.effects.keys.filter { it.type != null }, colorPickerWindow.color); openPrevious(p) })
+        .addIngredient('c', OpenColorPickerWindowItem(colorPickerWindow))
         .addIngredient('t', potionTypeItem)
         .build()
     
