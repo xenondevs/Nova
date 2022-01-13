@@ -21,8 +21,8 @@ import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.potion.PotionType
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.tileentity.impl.processing.brewing.MechanicalBrewingStand.Companion.ALLOW_DURATION_AMPLIFIER_MIXING
-import xyz.xenondevs.nova.tileentity.impl.processing.brewing.MechanicalBrewingStand.Companion.AVAILABLE_POTION_EFFECTS
+import xyz.xenondevs.nova.tileentity.impl.processing.brewing.ElectricBrewingStand.Companion.ALLOW_DURATION_AMPLIFIER_MIXING
+import xyz.xenondevs.nova.tileentity.impl.processing.brewing.ElectricBrewingStand.Companion.AVAILABLE_POTION_EFFECTS
 import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.ColorPickerWindow
@@ -106,7 +106,7 @@ class PotionConfiguratorWindow(
     }
     
     fun openConfigurator(player: Player) {
-        SimpleWindow(player, GUITexture.CONFIGURE_POTION.getTitle("menu.nova.mechanical_brewing_stand.configure_potion"), gui).show()
+        SimpleWindow(player, GUITexture.CONFIGURE_POTION.getTitle("menu.nova.electric_brewing_stand.configure_potion"), gui).show()
     }
     
     private inner class PotionTypeGUI(private val effect: PotionEffectBuilder) {
@@ -250,7 +250,7 @@ class PotionConfiguratorWindow(
             .build()
         
         fun openPicker(player: Player) {
-            SimpleWindow(player, GUITexture.EMPTY_GUI.getTitle("menu.nova.mechanical_brewing_stand.pick_effect"), gui).show()
+            SimpleWindow(player, GUITexture.EMPTY_GUI.getTitle("menu.nova.electric_brewing_stand.pick_effect"), gui).show()
         }
         
         private inner class ChooseEffectTypeItem(private val type: PotionEffectType) : BaseItem() {

@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.impl.processing.brewing
 
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import xyz.xenondevs.nova.data.recipe.MechanicalBrewingStandRecipe
+import xyz.xenondevs.nova.data.recipe.ElectricBrewingStandRecipe
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -13,8 +13,8 @@ class PotionEffectBuilder(
     amplifierLevel: Int = 0
 ) : Cloneable {
     
-    val recipe: MechanicalBrewingStandRecipe
-        get() = MechanicalBrewingStand.AVAILABLE_POTION_EFFECTS[type]!!
+    val recipe: ElectricBrewingStandRecipe
+        get() = ElectricBrewingStand.AVAILABLE_POTION_EFFECTS[type]!!
     
     var type: PotionEffectType? = type
         set(value) {

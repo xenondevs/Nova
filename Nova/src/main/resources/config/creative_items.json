@@ -23,7 +23,7 @@
         "nova:cobblestone_generator",
         "nova:fluid_infuser",
         "nova:freezer",
-        "nova:mechanical_brewing_stand",
+        "nova:electric_brewing_stand",
         "nova:sprinkler",
         "nova:pump",
         "nova:star_collector",

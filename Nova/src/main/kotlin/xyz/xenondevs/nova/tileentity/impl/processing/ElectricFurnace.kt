@@ -50,7 +50,7 @@ private val MAX_ENERGY = NovaConfig[ELECTRICAL_FURNACE].getLong("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[ELECTRICAL_FURNACE].getLong("energy_per_tick")!!
 private val COOK_SPEED = NovaConfig[ELECTRICAL_FURNACE].getInt("cook_speed")!!
 
-class ElectricalFurnace(
+class ElectricFurnace(
     uuid: UUID,
     data: CompoundElement,
     material: NovaMaterial,
@@ -58,7 +58,7 @@ class ElectricalFurnace(
     armorStand: FakeArmorStand,
 ) : NetworkedTileEntity(uuid, data, material, ownerUUID, armorStand), Upgradable {
     
-    override val gui = lazy { ElectricalFurnaceGUI() }
+    override val gui = lazy { ElectricFurnaceGUI() }
     
     private val inputInventory = getInventory("input", 1, ::handleInputInventoryUpdate)
     private val outputInventory = getInventory("output", 1, ::handleOutputInventoryUpdate)
@@ -173,12 +173,12 @@ class ElectricalFurnace(
             spawnExperienceOrb(armorStand.location, experience)
     }
     
-    inner class ElectricalFurnaceGUI : TileEntityGUI() {
+    inner class ElectricFurnaceGUI : TileEntityGUI() {
         
         private val progressItem = ProgressArrowItem()
         
         private val sideConfigGUI = SideConfigGUI(
-            this@ElectricalFurnace,
+            this@ElectricFurnace,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
                 itemHolder.getNetworkedInventory(inputInventory) to "inventory.nova.input",

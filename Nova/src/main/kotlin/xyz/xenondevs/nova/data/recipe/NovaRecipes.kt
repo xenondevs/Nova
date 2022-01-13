@@ -98,7 +98,7 @@ class FluidInfuserRecipe(
     
 }
 
-class MechanicalBrewingStandRecipe(
+class ElectricBrewingStandRecipe(
     override val key: NamespacedKey,
     override val inputs: List<RecipeChoice>,
     val result: PotionEffectType,
@@ -108,5 +108,5 @@ class MechanicalBrewingStandRecipe(
     val maxDurationLevel: Int,
     val maxAmplifierLevel: Int
 ) : NovaRecipe, MultiInputChoiceRecipe {
-    override val type = RecipeType.MECHANICAL_BREWING_STAND
+    override val type = RecipeType.ELECTRIC_BREWING_STAND
 }

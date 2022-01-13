@@ -9,7 +9,7 @@ import kotlin.math.abs
 enum class GUITexture(private val char: Char, private val width: Int) {
     
     EMPTY_GUI('\uF000', 176),
-    MECHANICAL_BREWING_STAND('\uF200', 176),
+    ELECTRIC_BREWING_STAND('\uF200', 176),
     CONFIGURE_POTION('\uF201', 176),
     PICK_COLOR('\uF202', 176);
     

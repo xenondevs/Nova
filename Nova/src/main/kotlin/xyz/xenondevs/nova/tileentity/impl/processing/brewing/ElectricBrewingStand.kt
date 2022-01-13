@@ -24,14 +24,14 @@ import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.potion.PotionType
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.recipe.MechanicalBrewingStandRecipe
+import xyz.xenondevs.nova.data.recipe.ElectricBrewingStandRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.MECHANICAL_BREWING_STAND
+import xyz.xenondevs.nova.material.NovaMaterialRegistry.ELECTRIC_BREWING_STAND
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -60,16 +60,16 @@ import java.awt.Color
 import java.util.*
 import kotlin.math.roundToInt
 
-private val ENERGY_CAPACITY = NovaConfig[MECHANICAL_BREWING_STAND].getLong("energy_capacity")!!
-private val ENERGY_PER_TICK = NovaConfig[MECHANICAL_BREWING_STAND].getLong("energy_per_tick")!!
-private val FLUID_CAPACITY = NovaConfig[MECHANICAL_BREWING_STAND].getLong("fluid_capacity")!!
-private val BREW_TIME = NovaConfig[MECHANICAL_BREWING_STAND].getInt("brew_time")!!
+private val ENERGY_CAPACITY = NovaConfig[ELECTRIC_BREWING_STAND].getLong("energy_capacity")!!
+private val ENERGY_PER_TICK = NovaConfig[ELECTRIC_BREWING_STAND].getLong("energy_per_tick")!!
+private val FLUID_CAPACITY = NovaConfig[ELECTRIC_BREWING_STAND].getLong("fluid_capacity")!!
+private val BREW_TIME = NovaConfig[ELECTRIC_BREWING_STAND].getInt("brew_time")!!
 
 private val IGNORE_UPDATE_REASON = object : UpdateReason {}
 
 // TODO: potion color picker, name config button 
 
-class MechanicalBrewingStand(
+class ElectricBrewingStand(
     uuid: UUID,
     data: CompoundElement,
     material: NovaMaterial,
@@ -80,14 +80,14 @@ class MechanicalBrewingStand(
     // These values need to be accessed from outside the class
     companion object {
         @Suppress("UNCHECKED_CAST")
-        val AVAILABLE_POTION_EFFECTS: Map<PotionEffectType, MechanicalBrewingStandRecipe> =
-            (RecipeManager.novaRecipes[RecipeType.MECHANICAL_BREWING_STAND]!!.values as Iterable<MechanicalBrewingStandRecipe>)
+        val AVAILABLE_POTION_EFFECTS: Map<PotionEffectType, ElectricBrewingStandRecipe> =
+            (RecipeManager.novaRecipes[RecipeType.ELECTRIC_BREWING_STAND]!!.values as Iterable<ElectricBrewingStandRecipe>)
                 .associateBy { it.result }
         
-        val ALLOW_DURATION_AMPLIFIER_MIXING = NovaConfig[MECHANICAL_BREWING_STAND].getBoolean("duration_amplifier_mixing")
+        val ALLOW_DURATION_AMPLIFIER_MIXING = NovaConfig[ELECTRIC_BREWING_STAND].getBoolean("duration_amplifier_mixing")
     }
     
-    override val gui = lazy(::MechanicalBrewingStandGUI)
+    override val gui = lazy(::ElectricBrewingStandGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.SPEED, UpgradeType.EFFICIENCY, UpgradeType.ENERGY, UpgradeType.FLUID)
     private val fluidTank = getFluidContainer("tank", setOf(FluidType.WATER), FLUID_CAPACITY, upgradeHolder = upgradeHolder)
     private val ingredientsInventory = getInventory("ingredients", 27, null, ::handleIngredientsInventoryAfterUpdate)
@@ -282,10 +282,10 @@ class MechanicalBrewingStand(
         }
     }
     
-    inner class MechanicalBrewingStandGUI : TileEntityGUI(GUITexture.MECHANICAL_BREWING_STAND) {
+    inner class ElectricBrewingStandGUI : TileEntityGUI(GUITexture.ELECTRIC_BREWING_STAND) {
         
         private val sideConfigGUI = SideConfigGUI(
-            this@MechanicalBrewingStand,
+            this@ElectricBrewingStand,
             listOf(EnergyConnectionType.NONE, EnergyConnectionType.CONSUME),
             listOf(
                 itemHolder.getNetworkedInventory(ingredientsInventory) to "inventory.nova.ingredients",
@@ -332,7 +332,7 @@ class MechanicalBrewingStand(
                 val builder = PotionBuilder(potionType)
                     .setColor(color)
                     .setBasePotionData(PotionData(PotionType.WATER, false, false))
-                    .setDisplayName(TranslatableComponent("menu.nova.mechanical_brewing_stand.configured_potion"))
+                    .setDisplayName(TranslatableComponent("menu.nova.electric_brewing_stand.configured_potion"))
                 potionEffects.forEach { builder.addEffect(it.build()) }
                 return builder
             }
@@ -348,7 +348,7 @@ class MechanicalBrewingStand(
             override fun getItemProvider(): ItemProvider {
                 val hasAll = requiredItemsStatus?.all { it.value } ?: false
                 val builder = ItemBuilder(Material.KNOWLEDGE_BOOK)
-                    .setDisplayName(localized(if (hasAll) ChatColor.GREEN else ChatColor.RED, "menu.nova.mechanical_brewing_stand.ingredients"))
+                    .setDisplayName(localized(if (hasAll) ChatColor.GREEN else ChatColor.RED, "menu.nova.electric_brewing_stand.ingredients"))
                 requiredItems
                     ?.asSequence()
                     ?.sortedByDescending { it.amount }

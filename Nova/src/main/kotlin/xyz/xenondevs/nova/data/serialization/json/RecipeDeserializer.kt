@@ -184,9 +184,9 @@ object FluidInfuserRecipeDeserializer : RecipeDeserializer<FluidInfuserRecipe> {
     
 }
 
-object MechanicalBrewingStandRecipeDeserializer : RecipeDeserializer<MechanicalBrewingStandRecipe> {
+object ElectricBrewingStandRecipeDeserializer : RecipeDeserializer<ElectricBrewingStandRecipe> {
     
-    override fun deserialize(json: JsonObject, file: File): MechanicalBrewingStandRecipe {
+    override fun deserialize(json: JsonObject, file: File): ElectricBrewingStandRecipe {
         val inputs = json.getAsJsonArray("inputs").map { ItemUtils.getRecipeChoice(listOf(it.asString)) }
         require(inputs.all { it.getInputStacks().size == 1 })
         
@@ -201,7 +201,7 @@ object MechanicalBrewingStandRecipeDeserializer : RecipeDeserializer<MechanicalB
         val maxDurationLevel = json.getInt("max_duration_level", 0)
         val maxAmplifierLevel = json.getInt("max_amplifier_level", 0)
         
-        return MechanicalBrewingStandRecipe(
+        return ElectricBrewingStandRecipe(
             getRecipeKey(file),
             inputs, result,
             defaultTime,

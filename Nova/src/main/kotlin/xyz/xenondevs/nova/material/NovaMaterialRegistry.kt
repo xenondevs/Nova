@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
 import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
 import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
 import xyz.xenondevs.nova.tileentity.impl.processing.*
-import xyz.xenondevs.nova.tileentity.impl.processing.brewing.MechanicalBrewingStand
+import xyz.xenondevs.nova.tileentity.impl.processing.brewing.ElectricBrewingStand
 import xyz.xenondevs.nova.tileentity.impl.storage.*
 import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
@@ -82,7 +82,7 @@ object NovaMaterialRegistry {
     val FREEZER = registerDefaultTileEntity("FREEZER", 38, ::Freezer, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     val SPRINKLER = registerDefaultTileEntity("SPRINKLER", 39, ::Sprinkler, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val FLUID_STORAGE_UNIT = registerDefaultTileEntity("FLUID_STORAGE_UNIT", 40, ::FluidStorageUnit, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val MECHANICAL_BREWING_STAND = registerDefaultTileEntity("MECHANICAL_BREWING_STAND", 41, ::MechanicalBrewingStand, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
+    val ELECTRIC_BREWING_STAND = registerDefaultTileEntity("ELECTRIC_BREWING_STAND", 41, ::ElectricBrewingStand, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     
     // 1000 - 2000: Crafting Items
     // Plates
@@ -149,7 +149,7 @@ object NovaMaterialRegistry {
     val SCAFFOLDING = register(NovaMaterial("SCAFFOLDING", "item.nova.scaffolding", itemOf(5040), null, null, itemOf((5041..5046).toIntArray())))
     val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", blockOf(5050), listOf(EnergyHolder::modifyItemBuilder), blockOf((5051..5054).toIntArray()), BARRIER, ::WindTurbine, WindTurbine::canPlace)
     val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", blockOf(5060), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5060, 5061)), COBBLESTONE, ::FurnaceGenerator, legacyItemIds = intArrayOf(1))
-    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricalFurnace, legacyItemIds = intArrayOf(11))
+    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", blockOf(5070), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5070, 5071)), COBBLESTONE, ::ElectricFurnace, legacyItemIds = intArrayOf(11))
     val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", blockOf(5080), listOf(EnergyHolder::modifyItemBuilder), blockOf(intArrayOf(5080, 5081, 5082)), BARRIER, ::StarCollector)
     val LAVA_GENERATOR = registerTileEntity("LAVA_GENERATOR", "block.nova.lava_generator", blockOf(5090), listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder), blockOf(intArrayOf(5090, 5091)), COBBLESTONE, ::LavaGenerator)
     
