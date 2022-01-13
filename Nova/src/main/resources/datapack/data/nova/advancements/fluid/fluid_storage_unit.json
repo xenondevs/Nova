@@ -1,14 +1,14 @@
 {
-  "parent": "nova:fluid/fluid_storage_unit",
+  "parent": "nova:fluid/ultimate_fluid_tank",
   "display": {
     "title": {
-      "translate": "advancement.nova.infinite_water_source.title"
+      "translate": "advancement.nova.fluid_storage_unit.title"
     },
     "description": {
-      "translate": "advancement.nova.infinite_water_source.description"
+      "translate": "advancement.nova.fluid_storage_unit.description"
     },
     "icon": {
-      "item": "nova:infinite_water_source"
+      "item": "nova:fluid_storage_unit"
     },
     "show_toast": true,
     "announce_to_chat": true,
@@ -20,7 +20,7 @@
       "conditions": {
         "items": [
           {
-            "items": ["nova:infinite_water_source"]
+            "items": ["nova:fluid_storage_unit"]
           }
         ]
       }

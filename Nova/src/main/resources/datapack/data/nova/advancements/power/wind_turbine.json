@@ -8,7 +8,7 @@
       "translate": "advancement.nova.wind_turbine.description"
     },
     "icon": {
-      "item": "nova:solar_panel"
+      "item": "nova:wind_turbine"
     },
     "show_toast": true,
     "announce_to_chat": true,

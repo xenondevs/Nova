@@ -1,5 +1,5 @@
 {
-  "parent": "nova:agriculture/planter",
+  "parent": "nova:agriculture/sprinkler",
   "display": {
     "title": {
       "translate": "advancement.nova.fertilizer.title"

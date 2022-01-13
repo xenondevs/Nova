@@ -1,26 +1,26 @@
 {
-  "parent": "nova:fluid/fluid_storage_unit",
+  "parent": "nova:fluid/pump",
   "display": {
     "title": {
-      "translate": "advancement.nova.infinite_water_source.title"
+      "translate": "advancement.nova.fluid_infuser.title"
     },
     "description": {
-      "translate": "advancement.nova.infinite_water_source.description"
+      "translate": "advancement.nova.fluid_infuser.description"
     },
     "icon": {
-      "item": "nova:infinite_water_source"
+      "item": "nova:fluid_infuser"
     },
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
   "criteria": {
-    "obtain_infinite_water_source": {
+    "obtain_pump": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": ["nova:infinite_water_source"]
+            "items": ["nova:fluid_infuser"]
           }
         ]
       }

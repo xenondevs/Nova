@@ -1,26 +1,26 @@
 {
-  "parent": "nova:fluid/fluid_storage_unit",
+  "parent": "nova:fluid/cobblestone_generator",
   "display": {
     "title": {
-      "translate": "advancement.nova.infinite_water_source.title"
+      "translate": "advancement.nova.freezer.title"
     },
     "description": {
-      "translate": "advancement.nova.infinite_water_source.description"
+      "translate": "advancement.nova.freezer.description"
     },
     "icon": {
-      "item": "nova:infinite_water_source"
+      "item": "nova:freezer"
     },
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
   "criteria": {
-    "obtain_infinite_water_source": {
+    "obtain_cobblestone_generator": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": ["nova:infinite_water_source"]
+            "items": ["nova:freezer"]
           }
         ]
       }

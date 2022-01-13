@@ -1,26 +1,26 @@
 {
-  "parent": "nova:fluid/pump",
+  "parent": "nova:agriculture/planter",
   "display": {
     "title": {
-      "translate": "advancement.nova.lava_generator.title"
+      "translate": "advancement.nova.sprinkler.title"
     },
     "description": {
-      "translate": "advancement.nova.lava_generator.description"
+      "translate": "advancement.nova.sprinkler.description"
     },
     "icon": {
-      "item": "nova:lava_generator"
+      "item": "nova:sprinkler"
     },
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
   "criteria": {
-    "obtain_lava_generator": {
+    "obtain_fertilizer": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": ["nova:lava_generator"]
+            "items": ["nova:sprinkler"]
           }
         ]
       }

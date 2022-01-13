@@ -1,5 +1,5 @@
 {
-  "parent": "nova:power/furnace_generator",
+  "parent": "nova:power/lava_generator",
   "display": {
     "title": {
       "translate": "advancement.nova.solar_panel.title"
