@@ -1,0 +1,15 @@
+{
+  "result": "nova:electric_brewing_stand",
+  "shape": [
+    "brb",
+    "gfg",
+    "iii"
+  ],
+  "ingredients": {
+    "b": "minecraft:blaze_powder",
+    "r": "minecraft:brewing_stand",
+    "g": "nova:diamond_gear",
+    "f": "nova:ultimate_machine_frame",
+    "i": "nova:iron_plate"
+  }
+}
