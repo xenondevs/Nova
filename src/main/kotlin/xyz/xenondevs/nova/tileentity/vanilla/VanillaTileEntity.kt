@@ -85,6 +85,7 @@ class VanillaContainerTileEntity(container: Container) : ItemStorageVanillaTileE
 class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest) {
     
     private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
+    private lateinit var allowedConnectionTypes: HashMap<NetworkedInventory, NetworkConnectionType>
     override val itemHolder: ItemHolder
     
     private var initialized = false
@@ -92,7 +93,7 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     
     init {
         setInventories()
-        itemHolder = DynamicVanillaItemHolder(this) { inventories }
+        itemHolder = DynamicVanillaItemHolder(this, { inventories }, { allowedConnectionTypes })
         
         runTaskLaterSynchronized(VanillaTileEntityManager, 1) {
             doubleChestLocation = getOtherChestLocation()
@@ -112,6 +113,7 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
         if (chest is Chest) {
             val inventory = NetworkedChestInventory(chest.inventory)
             inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+            allowedConnectionTypes = inventories.entries.associateTo(HashMap()) { (_, inv) -> inv to NetworkConnectionType.BUFFER }
         }
     }
     

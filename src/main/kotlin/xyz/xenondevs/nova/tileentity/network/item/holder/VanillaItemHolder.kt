@@ -22,7 +22,7 @@ abstract class VanillaItemHolder(
     override val itemConfig: MutableMap<BlockFace, NetworkConnectionType> =
         endPoint.retrieveDoubleEnumMap("itemConfig") { CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { NetworkConnectionType.BUFFER } }
     
-    override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType> by lazy {
+    open override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType> by lazy {
         inventories.entries.associate { (_, inv) -> inv to NetworkConnectionType.BUFFER }
     }
     
@@ -71,10 +71,14 @@ class StaticVanillaItemHolder(
 
 class DynamicVanillaItemHolder(
     endPoint: ItemStorageVanillaTileEntity,
-    val inventoriesGetter: () -> MutableMap<BlockFace, NetworkedInventory>
+    val inventoriesGetter: () -> MutableMap<BlockFace, NetworkedInventory>,
+    val allowedConnectionTypesGetter: () -> Map<NetworkedInventory, NetworkConnectionType>
 ) : VanillaItemHolder(endPoint) {
     
     override val inventories: MutableMap<BlockFace, NetworkedInventory>
         get() = inventoriesGetter()
+    
+    override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType>
+        get() = allowedConnectionTypesGetter()
     
 }
