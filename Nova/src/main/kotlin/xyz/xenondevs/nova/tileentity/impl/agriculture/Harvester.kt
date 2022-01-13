@@ -10,7 +10,6 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -117,7 +116,7 @@ class Harvester(
                 
                 if (timePassed++ >= maxIdleTime) {
                     timePassed = 0
-
+                    
                     if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
                     if (queuedBlocks.isEmpty()) loadBlocks()
                     harvestNextBlock()
@@ -147,37 +146,30 @@ class Harvester(
                 val (block, expectedType) = queuedBlocks.first
                 queuedBlocks.removeFirst()
                 
-                if (!ProtectionManager.canBreak(this, block.location)) {
-                    // skip block if it is protected
-                    tryAgain = true
-                    continue
-                }
-                
                 // check that the type hasn't changed
                 if (block.type == expectedType) {
-                    var tool: ItemStack? = null
-                    if (Tag.MINEABLE_AXE.isTagged(expectedType)) {
-                        // set tool to axe
-                        tool = axeInventory.getItemStack(0)
-                        
-                        if (!useTool(axeInventory)) {
-                            // skip block if axe is not available
+                    
+                    val toolInventory: VirtualInventory? = when {
+                        Tag.MINEABLE_AXE.isTagged(expectedType) -> axeInventory
+                        Tag.LEAVES.isTagged(expectedType) -> shearInventory
+                        Tag.MINEABLE_HOE.isTagged(expectedType) -> hoeInventory
+                        else -> null
+                    }
+                    
+                    val tool = toolInventory?.getItemStack(0)
+                    if (!ProtectionManager.canBreak(this, tool, block.location)) {
+                        // skip block if it is protected
+                        tryAgain = true
+                        continue
+                    }
+                    
+                    if (toolInventory != null) {
+                        if (tool == null) {
                             tryAgain = true
                             continue
                         }
-                    } else if (Tag.LEAVES.isTagged(expectedType)) {
-                        // set tool to shears
-                        tool = shearInventory.getItemStack(0)
-                        useTool(shearInventory)
-                    } else if (Tag.MINEABLE_HOE.isTagged(expectedType)) {
-                        // set tool to hoe
-                        tool = hoeInventory.getItemStack(0)
                         
-                        if (!useTool(hoeInventory)) {
-                            // skip block if hoe is not available
-                            tryAgain = true
-                            continue
-                        }
+                        inventory.setItemStack(SELF_UPDATE_REASON, 0, ToolUtils.damageTool(tool))
                     }
                     
                     var drops = (if (PlantUtils.COMPLEX_HARVESTABLE_BLOCKS.contains(expectedType)) {
@@ -192,7 +184,7 @@ class Harvester(
                     callEvent(event)
                     drops = event.drops
                     block.remove(!DISABLE_BLOCK_BREAK_EFFECTS)
-
+                    
                     // add the drops to the inventory or drop them in the world if they don't fit
                     if (inventory.canHold(drops))
                         inventory.addAll(SELF_UPDATE_REASON, drops)
@@ -205,16 +197,6 @@ class Harvester(
             }
             
         } while (tryAgain)
-    }
-    
-    private fun useTool(inventory: VirtualInventory): Boolean {
-        val itemStack = inventory.getItemStack(0)
-        if (itemStack != null) {
-            inventory.setItemStack(SELF_UPDATE_REASON, 0, ToolUtils.damageTool(itemStack))
-            return true
-        }
-        
-        return false
     }
     
     private fun handleInventoryUpdate(event: ItemUpdateEvent) {

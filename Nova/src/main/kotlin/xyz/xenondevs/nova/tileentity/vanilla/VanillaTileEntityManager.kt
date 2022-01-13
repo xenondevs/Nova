@@ -101,7 +101,7 @@ object VanillaTileEntityManager : Initializable(), Listener {
             tileEntity is ItemStorageVanillaTileEntity
             && !player.isSneaking
             && event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH }
-            && ProtectionManager.canUse(player, tileEntity.location)
+            && ProtectionManager.canUseBlock(player, event.item, tileEntity.location)
         ) {
             event.isCancelled = true
             val face = event.blockFace

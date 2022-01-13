@@ -234,7 +234,7 @@ open class Cable(
                 
                 hitboxes += Hitbox(
                     from, to,
-                    { it.action.isRightClick() && ProtectionManager.canUse(it.player, location) },
+                    { it.action.isRightClick() && ProtectionManager.canUseBlock(it.player, it.item, location) },
                     { handleAttachmentHit(it, itemHolder, fluidHolder, face) }
                 )
             }
@@ -274,7 +274,7 @@ open class Cable(
         val player = event.player
         if (player.isSneaking) {
             Bukkit.getPluginManager().callEvent(BlockBreakEvent(location.block, player))
-        } else if (ProtectionManager.canUse(player, location)) {
+        } else if (ProtectionManager.canUseBlock(player, event.item, location)) {
             NetworkManager.runAsync {
                 if (connectedNodes.values.any { node -> node.containsKey(face) }) {
                     it.handleBridgeRemove(this, false)

@@ -59,7 +59,7 @@ object HitboxManager : Listener {
                     
                     var continueRay = true
                     surroundingHitboxes!!.stream()
-                        .filter { it.isInHitbox(location) && ProtectionManager.canUse(player, location) }
+                        .filter { it.isInHitbox(location) && ProtectionManager.canUseBlock(player, event.item, location) }
                         .findFirst()
                         .ifPresent {
                             continueRay = false

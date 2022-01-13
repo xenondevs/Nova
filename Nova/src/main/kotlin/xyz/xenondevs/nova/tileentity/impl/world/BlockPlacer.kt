@@ -74,9 +74,9 @@ class BlockPlacer(
         val type = placeBlock.type
         if (energyHolder.energy >= energyHolder.energyConsumption
             && !inventory.isEmpty
-            && type == Material.AIR
+            && type.isAir
             && TileEntityManager.getTileEntityAt(placeLocation) == null
-            && ProtectionManager.canPlace(this, placeBlock.location)
+            && ProtectionManager.canPlace(this, inventory.items.firstNotNullOf { it }, placeBlock.location)
         ) {
             if (placeBlock()) energyHolder.energy -= energyHolder.energyConsumption
         }

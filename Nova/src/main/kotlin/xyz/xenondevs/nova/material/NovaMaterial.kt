@@ -8,14 +8,16 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
+import xyz.xenondevs.nova.api.NovaMaterial as INovaMaterial
 
 typealias ItemBuilderModifierFun = (ItemBuilder, TileEntity?) -> ItemBuilder
 typealias TileEntityConstructor = ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)
-typealias PlaceCheckFun = ((Player, Location) -> Boolean)
+typealias PlaceCheckFun = ((Player, ItemStack, Location) -> Boolean)
 
 class NovaMaterial(
     val typeName: String,
@@ -29,7 +31,7 @@ class NovaMaterial(
     val placeCheck: PlaceCheckFun? = null,
     val isDirectional: Boolean = true,
     val legacyItemIds: IntArray? = null,
-) : Comparable<NovaMaterial> {
+) : INovaMaterial, Comparable<NovaMaterial> {
     
     val isBlock = block != null && tileEntityConstructor != null
     
@@ -71,6 +73,13 @@ class NovaMaterial(
     
     override fun compareTo(other: NovaMaterial): Int {
         return item.data.compareTo(other.item.data)
+    }
+    
+    override val id: String
+        get() = "nova:${typeName.lowercase()}"
+    
+    override fun getLocalizedName(locale: String): String {
+        return LocaleManager.getTranslatedName(locale, this)
     }
     
     override fun toString() = typeName

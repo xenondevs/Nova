@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.Integration
 import xyz.xenondevs.nova.integration.protection.plugin.*
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit
 
 object ProtectionManager {
     
-    private val PROTECTION_PLUGINS = listOf(GriefPrevention, PlotSquared, WorldGuard, GriefDefender, Towny, EventIntegration)
+    private val PROTECTION_PLUGINS = listOf(GriefPrevention, PlotSquared, WorldGuard, Towny, EventIntegration)
         .filter(Integration::isInstalled)
     
     private val PROTECTION_CACHE: Cache<ProtectionLookupKey, Boolean> =
@@ -25,40 +26,52 @@ object ProtectionManager {
             .expireAfterWrite(30, TimeUnit.SECONDS)
             .build()
     
-    fun canPlace(tileEntity: TileEntity, location: Location): Boolean =
+    fun canPlace(tileEntity: TileEntity, item: ItemStack, location: Location): Boolean =
         PROTECTION_CACHE.get(ProtectionLookupKey(0, tileEntity.uuid, location.pos)) {
             !isVanillaProtected(tileEntity.owner, location)
-                && PROTECTION_PLUGINS.all { it.canPlace(tileEntity, location) }
+                && PROTECTION_PLUGINS.all { it.canPlace(tileEntity, item, location) }
         }
     
-    fun canBreak(tileEntity: TileEntity, location: Location): Boolean =
-        PROTECTION_CACHE.get(ProtectionLookupKey(0, tileEntity.uuid, location.pos)) {
-            !isVanillaProtected(tileEntity.owner, location)
-                && PROTECTION_PLUGINS.all { it.canBreak(tileEntity, location) }
-        }
-    
-    fun canUse(tileEntity: TileEntity, location: Location): Boolean =
-        PROTECTION_CACHE.get(ProtectionLookupKey(0, tileEntity.uuid, location.pos)) {
-            !isVanillaProtected(tileEntity.owner, location)
-                && PROTECTION_PLUGINS.all { it.canUse(tileEntity, location) }
-        }
-    
-    fun canPlace(offlinePlayer: OfflinePlayer, location: Location): Boolean =
+    fun canPlace(offlinePlayer: OfflinePlayer, item: ItemStack, location: Location): Boolean =
         PROTECTION_CACHE.get(ProtectionLookupKey(0, offlinePlayer.uniqueId, location.pos)) {
             !isVanillaProtected(offlinePlayer, location)
-                && PROTECTION_PLUGINS.all { it.canPlace(offlinePlayer, location) }
+                && PROTECTION_PLUGINS.all { it.canPlace(offlinePlayer, item, location) }
         }
     
-    fun canBreak(offlinePlayer: OfflinePlayer, location: Location): Boolean =
+    fun canBreak(tileEntity: TileEntity, item: ItemStack?, location: Location): Boolean =
+        PROTECTION_CACHE.get(ProtectionLookupKey(0, tileEntity.uuid, location.pos)) {
+            !isVanillaProtected(tileEntity.owner, location)
+                && PROTECTION_PLUGINS.all { it.canBreak(tileEntity, item, location) }
+        }
+    
+    fun canBreak(offlinePlayer: OfflinePlayer, item: ItemStack?, location: Location): Boolean =
         PROTECTION_CACHE.get(ProtectionLookupKey(1, offlinePlayer.uniqueId, location.pos)) {
             !isVanillaProtected(offlinePlayer, location)
-                && PROTECTION_PLUGINS.all { it.canBreak(offlinePlayer, location) }
+                && PROTECTION_PLUGINS.all { it.canBreak(offlinePlayer, item, location) }
         }
     
-    fun canUse(offlinePlayer: OfflinePlayer, location: Location): Boolean =
+    fun canUseBlock(tileEntity: TileEntity, item: ItemStack?, location: Location): Boolean =
+        PROTECTION_CACHE.get(ProtectionLookupKey(0, tileEntity.uuid, location.pos)) {
+            !isVanillaProtected(tileEntity.owner, location)
+                && PROTECTION_PLUGINS.all { it.canUseBlock(tileEntity, item, location) }
+        }
+    
+    fun canUseBlock(offlinePlayer: OfflinePlayer, item: ItemStack?, location: Location): Boolean =
         PROTECTION_CACHE.get(ProtectionLookupKey(2, offlinePlayer.uniqueId, location.pos)) {
             !isVanillaProtected(offlinePlayer, location)
-                && PROTECTION_PLUGINS.all { it.canUse(offlinePlayer, location) }
+                && PROTECTION_PLUGINS.all { it.canUseBlock(offlinePlayer, item, location) }
+        }
+    
+    fun canUseItem(tileEntity: TileEntity, item: ItemStack, location: Location): Boolean =
+        PROTECTION_CACHE.get(ProtectionLookupKey(0, tileEntity.uuid, location.pos)) {
+            !isVanillaProtected(tileEntity.owner, location)
+                && PROTECTION_PLUGINS.all { it.canUseBlock(tileEntity, item, location) }
+        }
+    
+    fun canUseItem(offlinePlayer: OfflinePlayer, item: ItemStack, location: Location): Boolean =
+        PROTECTION_CACHE.get(ProtectionLookupKey(2, offlinePlayer.uniqueId, location.pos)) {
+            !isVanillaProtected(offlinePlayer, location)
+                && PROTECTION_PLUGINS.all { it.canUseBlock(offlinePlayer, item, location) }
         }
     
     private fun isVanillaProtected(offlinePlayer: OfflinePlayer, location: Location): Boolean {

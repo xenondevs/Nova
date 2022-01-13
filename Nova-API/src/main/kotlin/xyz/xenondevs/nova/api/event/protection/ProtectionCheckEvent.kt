@@ -3,8 +3,11 @@ package xyz.xenondevs.nova.api.event.protection
 import org.bukkit.Location
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
+import org.bukkit.inventory.ItemStack
 
-class ProtectionCheckEvent(val source: Source, val type: ProtectionType, val location: Location) : Event() {
+class ProtectionCheckEvent(val source: Source, item: ItemStack?, val type: ProtectionType, val location: Location) : Event() {
+    
+    val item = item?.clone()
     
     var allowed = true
     
@@ -22,11 +25,16 @@ class ProtectionCheckEvent(val source: Source, val type: ProtectionType, val loc
     override fun getHandlers(): HandlerList {
         return HANDLERS
     }
-
+    
+    override fun toString(): String {
+        return "ProtectionCheckEvent(source=$source, type=$type, location=$location, item=$item, allowed=$allowed)"
+    }
+    
     enum class ProtectionType {
         BREAK,
         PLACE,
-        USE
+        USE_BLOCK,
+        USE_ITEM
     }
     
 }

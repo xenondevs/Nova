@@ -40,7 +40,7 @@ val SELF_UPDATE_REASON = object : UpdateReason {}
 abstract class TileEntity(
     val uuid: UUID,
     data: CompoundElement,
-    val material: NovaMaterial,
+    override val material: NovaMaterial,
     val ownerUUID: UUID,
     val armorStand: FakeArmorStand,
 ) : DataHolder(data, true), ITileEntity {

@@ -66,7 +66,7 @@ class BlockBreaker(
         if (energyHolder.energy >= ENERGY_PER_TICK
             && !type.isTraversable()
             && type.isBreakable()
-            && ProtectionManager.canBreak(this, block.location)
+            && ProtectionManager.canBreak(this, null, block.location)
             && (!DROP_EXCESS_ON_GROUND && !inventory.isFull())
         ) {
             // consume energy

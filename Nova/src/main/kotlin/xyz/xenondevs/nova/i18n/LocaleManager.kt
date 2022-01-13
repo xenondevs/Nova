@@ -6,9 +6,9 @@ import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import java.net.URL
@@ -43,8 +43,10 @@ object LocaleManager : Initializable() {
     }
     
     fun getTranslation(lang: String, key: String): String {
-        if (!::translationProviders.isInitialized) return key
-        return translationProviders[lang]?.get(key) ?: key
+        var translation = getTranslationOrNull(lang, key)
+        if (translation == null && lang != "en_us")
+            translation = getTranslationOrNull("en_us", key)
+        return translation ?: key
     }
     
     fun getTranslationOrNull(lang: String, key: String): String? {

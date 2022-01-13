@@ -25,4 +25,8 @@ class TileEntityBreakBlockEvent(tileEntity: TileEntity, val block: Block, var dr
         return HANDLERS
     }
     
+    override fun toString(): String {
+        return "TileEntityBreakBlockEvent(tileEntity=$tileEntity, block=$block, drops=$drops)"
+    }
+    
 }

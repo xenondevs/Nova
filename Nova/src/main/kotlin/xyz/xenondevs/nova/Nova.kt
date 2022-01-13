@@ -1,8 +1,12 @@
 package xyz.xenondevs.nova
 
 import org.bstats.bukkit.Metrics
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
+import xyz.xenondevs.nova.api.event.protection.ProtectionCheckEvent
+import xyz.xenondevs.nova.api.event.protection.TileEntitySource
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.database.DatabaseManager
@@ -18,7 +22,7 @@ lateinit var LOGGER: Logger
 lateinit var PLUGIN_MANAGER: PluginManager
 var IS_VERSION_CHANGE: Boolean = false
 
-class Nova : JavaPlugin() {
+class Nova : JavaPlugin(), Listener {
 
     val version = Version(description.version.removeSuffix("-SNAPSHOT"))
     val devBuild = description.version.contains("SNAPSHOT")
@@ -40,6 +44,8 @@ class Nova : JavaPlugin() {
         Metrics(this, 11927)
         NovaConfig.init()
         Initializer.init()
+        
+        PLUGIN_MANAGER.registerEvents(this, this)
     }
     
     override fun onDisable() {
@@ -48,6 +54,14 @@ class Nova : JavaPlugin() {
         }
         DatabaseManager.disconnect()
         AsyncExecutor.shutdown()
+    }
+    
+    @EventHandler
+    fun handleProtectionCheck(event: ProtectionCheckEvent) {
+        val source = event.source
+        if (source is TileEntitySource) {
+            println(source.tileEntity.material.getLocalizedName("en_us") + ": " + source.tileEntity.material.id)
+        }
     }
     
 }

@@ -23,7 +23,6 @@ import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.database.asyncTransaction
@@ -31,6 +30,7 @@ import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -317,6 +317,7 @@ object TileEntityManager : Initializable(), Listener {
                 
                 if (material.placeCheck?.invoke(
                         player,
+                        event.itemInHand,
                         location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
                     ) != false
                 ) {
@@ -364,11 +365,11 @@ object TileEntityManager : Initializable(), Listener {
             if (tileEntity != null) {
                 if (event.hand == EquipmentSlot.HAND) {
                     if (!event.player.isSneaking) {
-                        if (ProtectionManager.canUse(player, block.location)) {
+                        if (ProtectionManager.canUseBlock(player, event.item, block.location)) {
                             event.isCancelled = true
                             tileEntity.handleRightClick(event)
                         }
-                    } else if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH } && ProtectionManager.canBreak(player, block.location)) {
+                    } else if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH } && ProtectionManager.canBreak(player, event.item, block.location)) {
                         destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
                     }
                 } else event.isCancelled = true
@@ -378,7 +379,7 @@ object TileEntityManager : Initializable(), Listener {
             if ((block.type == Material.BARRIER || block.type == Material.CHAIN)
                 && event.player.gameMode == GameMode.SURVIVAL
                 && getTileEntityAt(block.location) != null
-                && ProtectionManager.canBreak(player, block.location)) {
+                && ProtectionManager.canBreak(player, event.item, block.location)) {
                 
                 event.isCancelled = true
                 Bukkit.getPluginManager().callEvent(BlockBreakEvent(block, player))

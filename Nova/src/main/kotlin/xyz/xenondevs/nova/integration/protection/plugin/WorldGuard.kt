@@ -20,6 +20,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.protection.ProtectionIntegration
 import xyz.xenondevs.nova.util.PermissionUtils
 import java.util.*
@@ -42,17 +43,22 @@ object WorldGuard : ProtectionIntegration {
     
     override val isInstalled = PLATFORM != null && PLUGIN != null
     
-    override fun canBreak(player: OfflinePlayer, location: Location): Boolean {
+    override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true
         return runQuery(player, location, Flags.BLOCK_BREAK)
     }
     
-    override fun canPlace(player: OfflinePlayer, location: Location): Boolean {
+    override fun canPlace(player: OfflinePlayer, item: ItemStack, location: Location): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true
         return runQuery(player, location, Flags.BLOCK_PLACE)
     }
     
-    override fun canUse(player: OfflinePlayer, location: Location): Boolean {
+    override fun canUseBlock(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean {
+        if (PLATFORM == null || PLUGIN == null) return true
+        return runQuery(player, location, Flags.USE)
+    }
+    
+    override fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true
         return runQuery(player, location, Flags.USE)
     }

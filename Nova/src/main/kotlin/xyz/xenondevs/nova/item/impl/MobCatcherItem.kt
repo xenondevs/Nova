@@ -38,7 +38,7 @@ object MobCatcherItem : NovaItem() {
     override fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
         if (clicked is Mob
             && clicked.type !in BLACKLISTED_ENTITY_TYPES
-            && ProtectionManager.canUse(player, clicked.location)
+            && ProtectionManager.canUseBlock(player, itemStack, clicked.location)
             && getEntityData(itemStack) == null
         ) {
             

@@ -7,6 +7,7 @@ import net.minecraft.core.Rotations
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -103,8 +104,8 @@ class WindTurbine(
     
     companion object {
         
-        fun canPlace(player: Player, location: Location) =
-            getMultiHitboxLocations(location).all { it.block.type.isAir && ProtectionManager.canPlace(player, it) }
+        fun canPlace(player: Player, item: ItemStack, location: Location) =
+            getMultiHitboxLocations(location).all { it.block.type.isAir && ProtectionManager.canPlace(player, item, it) }
         
         fun getMultiHitboxLocations(location: Location) =
             location.clone().add(0.0, 1.0, 0.0).getStraightLine(Axis.Y, location.blockY + 3)

@@ -16,6 +16,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.event.tileentity.TileEntityBreakBlockEvent
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -180,7 +181,7 @@ class Quarry(
         
         updateEnergyPerTick()
         
-        if (checkPermission && !canPlace(owner, location, positions)) {
+        if (checkPermission && !canBreak(owner, location, positions)) {
             if (sizeX == MIN_SIZE && sizeZ == MIN_SIZE) {
                 TileEntityManager.destroyAndDropTileEntity(this, true)
                 return false
@@ -364,7 +365,7 @@ class Quarry(
                     val topLoc = LocationUtils.getTopBlockBetween(world, x, z, maxBreakY, minBreakY)
                     if (topLoc != null
                         && (topLoc.block.type.isBreakable() || TileEntityManager.getTileEntityAt(topLoc) != null)
-                        && ProtectionManager.canBreak(this, topLoc)) {
+                        && ProtectionManager.canBreak(this, null, topLoc)) {
                         
                         results += topLoc
                     }
@@ -517,29 +518,34 @@ class Quarry(
     
     companion object {
         
-        fun canPlace(player: Player, location: Location): Boolean {
-            return canPlace(player, location, location.yaw, MIN_SIZE, MIN_SIZE)
-        }
-        
-        private fun canPlace(owner: OfflinePlayer, location: Location, yaw: Float, sizeX: Int, sizeZ: Int): Boolean {
+        fun canPlace(player: Player, item: ItemStack, location: Location): Boolean {
             val positions = getMinMaxPositions(
                 location,
-                sizeX, sizeZ,
-                BlockSide.BACK.getBlockFace(yaw),
-                BlockSide.RIGHT.getBlockFace(yaw)
+                MIN_SIZE, MIN_SIZE,
+                BlockSide.BACK.getBlockFace(player.location.yaw),
+                BlockSide.RIGHT.getBlockFace(player.location.yaw)
             )
             
-            return canPlace(owner, location, positions)
-        }
-        
-        private fun canPlace(owner: OfflinePlayer, location: Location, positions: IntArray): Boolean {
             val minLoc = Location(location.world, positions[0].toDouble(), location.y, positions[1].toDouble())
             val maxLoc = Location(location.world, positions[2].toDouble(), location.y, positions[3].toDouble())
             
             minLoc.fullCuboidTo(maxLoc) {
-                if (ProtectionManager.canBreak(owner, it))
+                if (ProtectionManager.canPlace(player, item, it))
                     return@fullCuboidTo true
                 else return@canPlace false
+            }
+            
+            return true
+        }
+        
+        private fun canBreak(owner: OfflinePlayer, location: Location, positions: IntArray): Boolean {
+            val minLoc = Location(location.world, positions[0].toDouble(), location.y, positions[1].toDouble())
+            val maxLoc = Location(location.world, positions[2].toDouble(), location.y, positions[3].toDouble())
+            
+            minLoc.fullCuboidTo(maxLoc) {
+                if (ProtectionManager.canBreak(owner, null, it))
+                    return@fullCuboidTo true
+                else return@canBreak false
             }
             
             return true

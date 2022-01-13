@@ -15,6 +15,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -172,7 +173,8 @@ class Planter(
             if (!seedMaterial.canBePlacedOn(soilType) && !(seedMaterial.canBePlacedOn(Material.FARMLAND) && autoTill && !emptyHoes && soilType.isTillable()))
                 return@indexOfFirst false
             
-            return@indexOfFirst ProtectionManager.canPlace(this, block.location) && (!autoTill || ProtectionManager.canBreak(this, soilBlock.location))
+            return@indexOfFirst ProtectionManager.canPlace(this, ItemStack(seedMaterial), block.location) 
+                && (!autoTill || ProtectionManager.canUseBlock(this, hoesInventory.getItemStack(0), soilBlock.location))
         }
         
         if (index == -1)

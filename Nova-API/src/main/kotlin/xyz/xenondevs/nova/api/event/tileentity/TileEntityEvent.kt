@@ -6,4 +6,10 @@ import xyz.xenondevs.nova.api.TileEntity
 /**
  * A [TileEntity] related event.
  */
-abstract class TileEntityEvent(val tileEntity: TileEntity) : Event()
+abstract class TileEntityEvent(val tileEntity: TileEntity) : Event() {
+    
+    override fun toString(): String {
+        return "TileEntityEvent(tileEntity=$tileEntity)"
+    }
+    
+}

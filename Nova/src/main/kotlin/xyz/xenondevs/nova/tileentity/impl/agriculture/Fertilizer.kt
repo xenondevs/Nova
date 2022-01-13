@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -139,7 +140,7 @@ class Fertilizer(
     private fun getRandomPlant(): Block? =
         fertilizeRegion.blocks
             .filter {
-                ProtectionManager.canUse(this, it.location)
+                ProtectionManager.canUseBlock(this, ItemStack(Material.BONE_MEAL), it.location)
                     && ((it.blockData is Ageable && !it.isFullyAged()) || (it.blockData !is Ageable && it.type in PlantUtils.PLANTS))
             }
             .randomOrNull()
