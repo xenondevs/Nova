@@ -13,6 +13,10 @@ class ColorElement(override val value: Color) : BackedElement<Color>() {
         buf.writeInt(value.rgb)
     }
     
+    override fun toString(): String {
+        return "r=${value.red}, g=${value.green}, b=${value.blue}, a=${value.alpha}"
+    }
+    
 }
 
 object ColorDeserializer : BinaryDeserializer<ColorElement> {

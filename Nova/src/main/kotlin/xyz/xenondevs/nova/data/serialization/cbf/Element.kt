@@ -34,6 +34,10 @@ abstract class BackedElement<T> : Element {
         return value?.hashCode() ?: 0
     }
     
+    override fun toString(): String {
+        return value?.toString() ?: "null"
+    }
+    
     companion object BackedElementRegistry {
         
         val TYPE_TO_ELEMENT: Map<KClass<*>, KFunction<BackedElement<*>>> = mapOf(
