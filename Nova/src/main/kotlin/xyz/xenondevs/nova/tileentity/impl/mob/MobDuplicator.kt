@@ -58,6 +58,7 @@ private val ENERGY_PER_TICK = NovaConfig[MOB_DUPLICATOR].getLong("energy_per_tic
 private val ENERGY_PER_TICK_NBT = NovaConfig[MOB_DUPLICATOR].getLong("energy_per_tick_nbt")!!
 private val IDLE_TIME = NovaConfig[MOB_DUPLICATOR].getInt("idle_time")!!
 private val IDLE_TIME_NBT = NovaConfig[MOB_DUPLICATOR].getInt("idle_time_nbt")!!
+private val ENTITY_LIMIT = NovaConfig[MOB_DUPLICATOR].getInt("entity_limit")!!
 private val NERF_MOBS = NovaConfig[MOB_DUPLICATOR].getBoolean("nerf_mobs")
 
 class MobDuplicator(
@@ -136,6 +137,8 @@ class MobDuplicator(
     }
     
     private fun spawnEntity() {
+        if (ENTITY_LIMIT != -1 && countSurroundingEntities() > ENTITY_LIMIT) return
+        
         val entity = if (keepNbt) EntityUtils.deserializeAndSpawn(entityData!!, spawnLocation, NBTUtils::removeItemData).bukkitEntity
         else spawnLocation.world!!.spawnEntity(spawnLocation, entityType!!)
         
@@ -146,6 +149,15 @@ class MobDuplicator(
         if (PATRON_SKULLS.isNotEmpty() && entity is LivingEntity && Random.nextInt(1..1000) == 1) {
             entity.equipment?.setHelmet(PATRON_SKULLS.random().get(), true)
         }
+    }
+    
+    private fun countSurroundingEntities(): Int {
+        return world.livingEntities.asSequence().filter {
+            it.location.isBetweenXZ(
+                location.clone().subtract(16.0, 0.0, 16.0),
+                location.clone().add(16.0, 0.0, 16.0)
+            )
+        }.count()
     }
     
     inner class MobDuplicatorGUI : TileEntityGUI() {
