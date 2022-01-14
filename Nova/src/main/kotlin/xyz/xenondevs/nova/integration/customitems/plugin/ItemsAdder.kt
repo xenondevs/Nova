@@ -95,6 +95,7 @@ class ItemsAdderLoadListener(private val run: () -> Unit) : Listener {
     @EventHandler
     fun handleItemsAdderLoadData(event: ItemsAdderLoadDataEvent) {
         if (event.cause == Cause.FIRST_LOAD) {
+            LOGGER.info("Starting in 10s...")
             runAsyncTask {
                 Thread.sleep(10_000) // it is a lie, ItemsAdder isn't done yet
                 run()
