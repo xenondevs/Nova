@@ -5,5 +5,5 @@
   "idle_time": 400,
   "idle_time_nbt": 1000,
   "nerf_mobs": false,
-  "entity_limit": -1
+  "entity_limit": 100
 }
