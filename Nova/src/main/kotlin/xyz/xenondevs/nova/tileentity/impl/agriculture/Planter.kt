@@ -176,7 +176,7 @@ class Planter(
             // if soil type is applicable for the seed or can be made applicable
             if (!seedMaterial.canBePlacedOn(soilType) && !(seedMaterial.canBePlacedOn(Material.FARMLAND) && autoTill && !emptyHoes && soilType.isTillable()))
                 return@indexOfFirst false
-    
+            
             return@indexOfFirst ProtectionManager.canPlace(this, ItemStack(seedMaterial), block.location)
                 && (!autoTill || ProtectionManager.canUseBlock(this, hoesInventory.getItemStack(0), soilBlock.location))
         }

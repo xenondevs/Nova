@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.api.event.protection
 import org.bukkit.Location
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
-import org.bukkit.inventory.ItemStack
 
 class ProtectionCheckEvent(val source: Source, val type: ProtectionType, val location: Location) : Event() {
     

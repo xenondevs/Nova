@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.data.recipe
 import org.bukkit.Keyed
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
-import xyz.xenondevs.nova.Nova
 
 class RecipeContainer(val recipe: Any) {
     

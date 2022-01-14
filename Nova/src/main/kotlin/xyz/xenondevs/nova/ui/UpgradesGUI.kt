@@ -22,7 +22,6 @@ import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.playItemPickupSound
-import kotlin.random.Random
 
 class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Unit) {
     

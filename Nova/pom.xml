@@ -77,7 +77,7 @@
             <artifactId>Nova-API</artifactId>
             <version>0.8-SNAPSHOT</version>
         </dependency>
-        
+
         <!-- Spigot -->
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -136,7 +136,7 @@
             <version>${fuzzywuzzy.version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- Provided through plugins -->
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>

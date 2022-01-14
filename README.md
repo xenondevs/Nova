@@ -13,10 +13,12 @@
 </p>
 
 # Nova
+
 Nova is a spigot plugin aimed to provide the experience of a modpack.<br>
 Visit our [spigot page](https://www.spigotmc.org/resources/93648/) for a more detailed explanation.
 
 # Translating
+
 If you would like to help translate Nova, you can do so via [Crowdin](https://crowdin.com/project/novaplugin/)
 
 # Patrons

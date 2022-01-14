@@ -4,9 +4,9 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.Integration
 import xyz.xenondevs.nova.integration.customitems.plugin.ItemsAdder
 import xyz.xenondevs.nova.integration.customitems.plugin.MMOItems
@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
 import java.util.concurrent.CountDownLatch
 
-object CustomItemServiceManager: Initializable() {
+object CustomItemServiceManager : Initializable() {
     
     private val PLUGINS: List<CustomItemService> = listOf(ItemsAdder, Oraxen, MMOItems)
         .filter(Integration::isInstalled)

@@ -11,7 +11,6 @@ import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.item.impl.controlitem.TabItem
 import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.Window

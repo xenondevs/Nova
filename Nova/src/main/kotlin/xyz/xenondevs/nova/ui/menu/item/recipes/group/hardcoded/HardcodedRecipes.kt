@@ -30,7 +30,7 @@ object StarCollectorRecipe : NovaRecipe, ResultingRecipe {
     override val result = NovaMaterialRegistry.STAR_DUST.createItemStack()
 }
 
- class CobblestoneGeneratorRecipe(
+class CobblestoneGeneratorRecipe(
     override val key: NamespacedKey,
     val mode: CobblestoneGenerator.Mode,
     override val result: ItemStack = mode.product
@@ -38,7 +38,7 @@ object StarCollectorRecipe : NovaRecipe, ResultingRecipe {
     override val type = RecipeType.COBBLESTONE_GENERATOR
 }
 
- class FreezerRecipe(
+class FreezerRecipe(
     override val key: NamespacedKey,
     val mode: Freezer.Mode,
     override val result: ItemStack = mode.product

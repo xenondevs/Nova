@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.net.URL
 
 object UpdateReminder : Initializable(), Listener {
-
+    
     override val inMainThread = false
     override val dependsOn: Initializable? = null
     

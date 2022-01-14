@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.menu
 
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.item.builder.PotionBuilder
 import de.studiocode.invui.item.impl.BaseItem

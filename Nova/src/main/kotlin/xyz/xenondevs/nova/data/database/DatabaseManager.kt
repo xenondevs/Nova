@@ -6,12 +6,11 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.runAsyncTask
 import java.io.File
 
@@ -21,7 +20,7 @@ fun asyncTransaction(statement: Transaction.() -> Unit) {
     }
 }
 
-object DatabaseManager: Initializable() {
+object DatabaseManager : Initializable() {
     
     val MYSQL = DEFAULT_CONFIG.getBoolean("mysql.enabled")
     

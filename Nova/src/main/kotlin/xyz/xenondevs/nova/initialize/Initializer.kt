@@ -54,7 +54,7 @@ object Initializer {
             latch.await()
             forceResourcePack()
             callEvent(NovaLoadDataEvent())
-        
+            
             LOGGER.info("Done loading")
         }
     }

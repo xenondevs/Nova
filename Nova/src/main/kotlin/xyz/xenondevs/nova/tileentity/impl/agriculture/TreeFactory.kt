@@ -105,7 +105,7 @@ class TreeFactory(
     override fun handleTick() {
         if (energyHolder.energy >= energyHolder.energyConsumption && plantType != null) {
             if (!DROP_EXCESS_ON_GROUND && outputInventory.isFull()) return
-    
+            
             energyHolder.energy -= energyHolder.energyConsumption
             
             if (idleTimeLeft == 0) {

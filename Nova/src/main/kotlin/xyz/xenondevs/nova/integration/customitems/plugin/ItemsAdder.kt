@@ -7,7 +7,6 @@ import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent.Cause
 import dev.lone.itemsadder.api.ItemsAdder
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
@@ -20,7 +19,6 @@ import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.customModelData
-import xyz.xenondevs.nova.util.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.runAsyncTask
 
 object ItemsAdder : CustomItemService {
