@@ -522,8 +522,8 @@ class Quarry(
             val positions = getMinMaxPositions(
                 location,
                 MIN_SIZE, MIN_SIZE,
-                BlockSide.BACK.getBlockFace(player.location.yaw),
-                BlockSide.RIGHT.getBlockFace(player.location.yaw)
+                BlockSide.BACK.getBlockFace(location.yaw),
+                BlockSide.RIGHT.getBlockFace(location.yaw)
             )
             
             val minLoc = Location(location.world, positions[0].toDouble(), location.y, positions[1].toDouble())
