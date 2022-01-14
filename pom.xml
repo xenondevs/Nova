@@ -88,6 +88,9 @@
                 </executions>
                 <configuration>
                     <jvmTarget>17</jvmTarget>
+                    <args>
+                        <arg>-Xjvm-default=all</arg>
+                    </args>
                 </configuration>
             </plugin>
             <plugin>

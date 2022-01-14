@@ -5,11 +5,12 @@ import com.palmergames.bukkit.towny.utils.PlayerCacheUtil
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
+import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.protection.FakeOnlinePlayer
-import xyz.xenondevs.nova.integration.protection.ProtectionIntegration
+import xyz.xenondevs.nova.integration.protection.InternalProtectionIntegration
 
-object Towny : ProtectionIntegration {
+object Towny : InternalProtectionIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Towny") != null
     
@@ -24,6 +25,12 @@ object Towny : ProtectionIntegration {
     
     override fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location) =
         hasPermission(player, location, ActionType.ITEM_USE)
+    
+    override fun canInteractWithEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?) =
+        hasPermission(player, entity.location, ActionType.ITEM_USE)
+    
+    override fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?) =
+        hasPermission(player, entity.location, ActionType.DESTROY)
     
     private fun hasPermission(player: OfflinePlayer, location: Location, actionType: ActionType) =
         PlayerCacheUtil.getCachePermission(FakeOnlinePlayer(player, location), location, location.block.type, actionType)

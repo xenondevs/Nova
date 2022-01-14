@@ -5,9 +5,7 @@ import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.inventory.ItemStack
 
-class ProtectionCheckEvent(val source: Source, item: ItemStack?, val type: ProtectionType, val location: Location) : Event() {
-    
-    val item = item?.clone()
+class ProtectionCheckEvent(val source: Source, val type: ProtectionType, val location: Location) : Event() {
     
     var allowed = true
     
@@ -27,14 +25,16 @@ class ProtectionCheckEvent(val source: Source, item: ItemStack?, val type: Prote
     }
     
     override fun toString(): String {
-        return "ProtectionCheckEvent(source=$source, type=$type, location=$location, item=$item, allowed=$allowed)"
+        return "ProtectionCheckEvent(source=$source, type=$type, location=$location, allowed=$allowed)"
     }
     
     enum class ProtectionType {
         BREAK,
         PLACE,
         USE_BLOCK,
-        USE_ITEM
+        USE_ITEM,
+        INTERACT_ENTITY,
+        HURT_ENTITY
     }
     
 }

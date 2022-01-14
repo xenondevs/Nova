@@ -20,13 +20,14 @@ import com.sk89q.worldguard.protection.flags.StateFlag
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
+import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.integration.protection.ProtectionIntegration
+import xyz.xenondevs.nova.integration.protection.InternalProtectionIntegration
 import xyz.xenondevs.nova.util.PermissionUtils
 import java.util.*
 import org.bukkit.World as BWorld
 
-object WorldGuard : ProtectionIntegration {
+object WorldGuard : InternalProtectionIntegration {
     
     private val PLUGIN: WorldGuardPlugin?
     private val PLATFORM: WorldGuardPlatform?
@@ -43,25 +44,17 @@ object WorldGuard : ProtectionIntegration {
     
     override val isInstalled = PLATFORM != null && PLUGIN != null
     
-    override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean {
-        if (PLATFORM == null || PLUGIN == null) return true
-        return runQuery(player, location, Flags.BLOCK_BREAK)
-    }
+    override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) = runQuery(player, location, Flags.BLOCK_BREAK)
     
-    override fun canPlace(player: OfflinePlayer, item: ItemStack, location: Location): Boolean {
-        if (PLATFORM == null || PLUGIN == null) return true
-        return runQuery(player, location, Flags.BLOCK_PLACE)
-    }
+    override fun canPlace(player: OfflinePlayer, item: ItemStack, location: Location) = runQuery(player, location, Flags.BLOCK_PLACE)
     
-    override fun canUseBlock(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean {
-        if (PLATFORM == null || PLUGIN == null) return true
-        return runQuery(player, location, Flags.USE)
-    }
+    override fun canUseBlock(player: OfflinePlayer, item: ItemStack?, location: Location) = runQuery(player, location, Flags.USE)
     
-    override fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location): Boolean {
-        if (PLATFORM == null || PLUGIN == null) return true
-        return runQuery(player, location, Flags.USE)
-    }
+    override fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location) = runQuery(player, location, Flags.USE)
+    
+    override fun canInteractWithEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?) = runQuery(player, entity.location, Flags.INTERACT)
+    
+    override fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?) = runQuery(player, entity.location, Flags.DAMAGE_ANIMALS)
     
     private fun runQuery(offlinePlayer: OfflinePlayer, location: Location, vararg flags: StateFlag): Boolean {
         if (PLATFORM == null || PLUGIN == null) return true

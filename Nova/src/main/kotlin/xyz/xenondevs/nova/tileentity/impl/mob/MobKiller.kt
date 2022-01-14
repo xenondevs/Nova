@@ -9,6 +9,7 @@ import net.md_5.bungee.api.ChatColor
 import org.bukkit.entity.Mob
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.MOB_KILLER
@@ -29,7 +30,6 @@ import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
@@ -102,12 +102,10 @@ class MobKiller(
                 
                 val killLimit = min((energyHolder.energy / energyHolder.specialEnergyConsumption).toInt(), KILL_LIMIT)
                 
-                location
-                    .chunk
-                    .getSurroundingChunks(1, includeCurrent = true, ignoreUnloaded = true)
-                    .flatMap { it.entities.asList() }
+                location.world!!.entities
+                    .asSequence()
                     .filterIsInstance<Mob>()
-                    .filter { it.location in region }
+                    .filter { it.location in region && ProtectionManager.canHurtEntity(this, it, null) }
                     .take(killLimit)
                     .forEach { entity ->
                         energyHolder.energy -= energyHolder.specialEnergyConsumption

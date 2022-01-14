@@ -4,7 +4,10 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
-import org.bukkit.entity.*
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.Mob
+import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -38,7 +41,7 @@ object MobCatcherItem : NovaItem() {
     override fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
         if (clicked is Mob
             && clicked.type !in BLACKLISTED_ENTITY_TYPES
-            && ProtectionManager.canUseBlock(player, itemStack, clicked.location)
+            && ProtectionManager.canInteractWithEntity(player, clicked, itemStack)
             && getEntityData(itemStack) == null
         ) {
             
@@ -67,15 +70,18 @@ object MobCatcherItem : NovaItem() {
             
             val data = getEntityData(itemStack)
             if (data != null) {
-                player.inventory.getItem(event.hand!!).amount -= 1
-                player.inventory.addPrioritized(event.hand!!, NovaMaterialRegistry.MOB_CATCHER.createItemStack())
-                
                 val location = player.eyeLocation.getTargetLocation(0.25, 8.0)
                 
-                EntityUtils.deserializeAndSpawn(data, location)
-                if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
-                
-                event.isCancelled = true
+                if (ProtectionManager.canUseItem(player, itemStack, location)) {
+                    player.inventory.getItem(event.hand!!).amount -= 1
+                    player.inventory.addPrioritized(event.hand!!, NovaMaterialRegistry.MOB_CATCHER.createItemStack())
+                    
+                    
+                    EntityUtils.deserializeAndSpawn(data, location)
+                    if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
+                    
+                    event.isCancelled = true
+                }
             }
         }
     }
