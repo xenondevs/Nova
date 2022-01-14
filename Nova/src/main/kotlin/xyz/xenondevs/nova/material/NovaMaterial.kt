@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
-import xyz.xenondevs.nova.api.NovaMaterial as INovaMaterial
+import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 
 typealias ItemBuilderModifierFun = (ItemBuilder, TileEntity?) -> ItemBuilder
 typealias TileEntityConstructor = ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)

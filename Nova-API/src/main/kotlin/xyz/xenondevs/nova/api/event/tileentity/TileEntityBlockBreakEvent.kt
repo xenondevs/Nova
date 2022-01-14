@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.api.event.tileentity
 import org.bukkit.block.Block
 import org.bukkit.event.HandlerList
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.api.TileEntity
+import xyz.xenondevs.nova.api.tileentity.TileEntity
 
 /**
  * Called when a [TileEntity] breaks a block and has passed internal protection checks.

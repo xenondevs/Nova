@@ -1,7 +1,8 @@
-package xyz.xenondevs.nova.api
+package xyz.xenondevs.nova.api.tileentity
 
 import org.bukkit.OfflinePlayer
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.api.material.NovaMaterial
 
 interface TileEntity {
     

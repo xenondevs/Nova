@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.api
+package xyz.xenondevs.nova.api.material
 
 interface NovaMaterial {
     

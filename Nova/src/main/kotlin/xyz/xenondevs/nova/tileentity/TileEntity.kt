@@ -33,7 +33,7 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.region.Region
 import java.util.*
-import xyz.xenondevs.nova.api.TileEntity as ITileEntity
+import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
 val SELF_UPDATE_REASON = object : UpdateReason {}
 

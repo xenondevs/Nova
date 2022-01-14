@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.api.event.tileentity
 
 import org.bukkit.event.Event
-import xyz.xenondevs.nova.api.TileEntity
+import xyz.xenondevs.nova.api.tileentity.TileEntity
 
 /**
  * A [TileEntity] related event.
