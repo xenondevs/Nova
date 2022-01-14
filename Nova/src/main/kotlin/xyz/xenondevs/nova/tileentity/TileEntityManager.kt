@@ -42,6 +42,7 @@ import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.roundToInt
+import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
 val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
 
@@ -69,7 +70,7 @@ fun ItemStack.getTileEntityData(): CompoundElement? {
 val Material?.requiresLight: Boolean
     get() = this != null && !isTransparent && isOccluding
 
-object TileEntityManager : Initializable(), Listener {
+object TileEntityManager : Initializable(), ITileEntityManager, Listener {
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<Location, TileEntity>>()
     private val additionalHitboxMap = HashMap<ChunkPos, HashMap<Location, TileEntity>>()
@@ -185,7 +186,6 @@ object TileEntityManager : Initializable(), Listener {
     @Synchronized
     fun destroyTileEntity(tileEntity: TileEntity, dropItems: Boolean): List<ItemStack> {
         removeTileEntity(tileEntity)
-        
         return tileEntity.getDrops(dropItems)
     }
     
@@ -198,7 +198,12 @@ object TileEntityManager : Initializable(), Listener {
     }
     
     @Synchronized
-    fun getTileEntityAt(location: Location, additionalHitboxes: Boolean = true): TileEntity? {
+    override fun getTileEntityAt(location: Location): TileEntity? {
+        return getTileEntityAt(location, true)
+    }
+    
+    @Synchronized
+    fun getTileEntityAt(location: Location, additionalHitboxes: Boolean): TileEntity? {
         val chunkPos = location.chunkPos
         return tileEntityMap[chunkPos]?.get(location)
             ?: if (additionalHitboxes) additionalHitboxMap[chunkPos]?.get(location) else null

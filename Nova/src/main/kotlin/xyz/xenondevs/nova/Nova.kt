@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova
 
 import org.bstats.bukkit.Metrics
+import org.bukkit.event.Listener
 import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
@@ -9,6 +10,8 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.data.Version
@@ -21,7 +24,7 @@ lateinit var LOGGER: Logger
 lateinit var PLUGIN_MANAGER: PluginManager
 var IS_VERSION_CHANGE: Boolean = false
 
-class Nova : JavaPlugin(), INova {
+class Nova : JavaPlugin(), INova, Listener {
     
     val version = Version(description.version.removeSuffix("-SNAPSHOT"))
     val devBuild = description.version.contains("SNAPSHOT")
@@ -29,6 +32,11 @@ class Nova : JavaPlugin(), INova {
     val pluginFile
         get() = file
     var isUninstalled = false
+    
+    override val tileEntityManager: TileEntityManager
+        get() = TileEntityManager
+    override val materialRegistry: NovaMaterialRegistry
+        get() = NovaMaterialRegistry
     
     override fun onEnable() {
         NOVA = this

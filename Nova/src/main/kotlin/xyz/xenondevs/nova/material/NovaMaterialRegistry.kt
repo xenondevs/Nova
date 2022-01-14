@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.material
 
 import org.bukkit.Material
 import org.bukkit.Material.*
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
@@ -17,7 +18,9 @@ import xyz.xenondevs.nova.tileentity.impl.storage.*
 import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
+import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.toIntArray
+import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
 
 private fun blockOf(data: IntArray) = ModelData(BARRIER, data)
 private fun blockOf(data: Int) = ModelData(BARRIER, intArrayOf(data))
@@ -31,7 +34,7 @@ private fun bulkItemOf(data: Int) = ModelData(NAUTILUS_SHELL, intArrayOf(data))
 private fun bulkItemOf(data: IntArray) = ModelData(NAUTILUS_SHELL, data)
 
 @Suppress("unused", "MemberVisibilityCanBePrivate", "UNUSED_PARAMETER")
-object NovaMaterialRegistry {
+object NovaMaterialRegistry : INovaMaterialRegistry {
     
     private val materialsByModelId = HashMap<Int, NovaMaterial>()
     private val materialsByTypeName = HashMap<String, NovaMaterial>()
@@ -269,10 +272,12 @@ object NovaMaterialRegistry {
     val GIANT_RED_MUSHROOM_MINIATURE = registerItem("GIANT_RED_MUSHROOM_MINIATURE", "", bulkItemOf((204_000..204_500).toIntArray()))
     val GIANT_BROWN_MUSHROOM_MINIATURE = registerItem("GIANT_BROWN_MUSHROOM_MINIATURE", "", bulkItemOf((204_500..205_000).toIntArray()))
     
-    fun get(typeName: String): NovaMaterial = materialsByTypeName[typeName.uppercase()]!!
-    fun get(modelId: Int): NovaMaterial = materialsByModelId[modelId]!!
-    fun getOrNull(typeName: String): NovaMaterial? = materialsByTypeName[typeName.uppercase()]
-    fun getOrNull(modelId: Int): NovaMaterial? = materialsByModelId[modelId]
+    override fun getOrNull(id: String): NovaMaterial? = materialsByTypeName[id.uppercase().removePrefix("NOVA:")]
+    override fun getOrNull(modelData: Int): NovaMaterial? = materialsByModelId[modelData]
+    override fun getOrNull(item: ItemStack): NovaMaterial? = item.novaMaterial
+    override fun get(id: String): NovaMaterial = getOrNull(id)!!
+    override fun get(modelData: Int): NovaMaterial = getOrNull(modelData)!!
+    override fun get(item: ItemStack): NovaMaterial = getOrNull(item)!!
     
     fun registerDefaultTileEntity(
         typeName: String,
