@@ -51,7 +51,10 @@ class VacuumChest(
     private val filterInventory: VirtualInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1)).apply {
         setItemUpdateHandler(::handleFilterInventoryUpdate)
     }
-    override val itemHolder: NovaItemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
+    override val itemHolder: NovaItemHolder = NovaItemHolder(
+        this,
+        inventory to NetworkConnectionType.BUFFER
+    ) { createSideConfig(NetworkConnectionType.EXTRACT) }
     
     override val gui = lazy { VacuumChestGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.RANGE)

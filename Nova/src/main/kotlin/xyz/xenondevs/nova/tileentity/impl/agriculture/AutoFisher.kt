@@ -62,7 +62,11 @@ class AutoFisher(
     override val gui = lazy(::AutoFisherGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM) }
-    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT, fishingRodInventory to NetworkConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(
+        this,
+        inventory to NetworkConnectionType.EXTRACT,
+        fishingRodInventory to NetworkConnectionType.BUFFER
+    ) { createSideConfig(NetworkConnectionType.EXTRACT, BlockSide.BOTTOM) }
     
     private var timePassed = 0
     private var maxIdleTime = 0
@@ -86,9 +90,9 @@ class AutoFisher(
     override fun handleTick() {
         if (energyHolder.energy >= energyHolder.energyConsumption && !fishingRodInventory.isEmpty && waterBlock.type == Material.WATER) {
             if (!DROP_EXCESS_ON_GROUND && inventory.isFull()) return
-
+    
             energyHolder.energy -= energyHolder.energyConsumption
-
+    
             timePassed++
             if (timePassed >= maxIdleTime) {
                 timePassed = 0

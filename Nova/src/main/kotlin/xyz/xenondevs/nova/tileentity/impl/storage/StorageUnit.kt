@@ -45,9 +45,12 @@ class StorageUnit(
     
     override val gui = lazy { StorageUnitGUI() }
     private val inventory = StorageUnitInventory(retrieveOrNull("type"), retrieveOrNull("amount") ?: 0)
-    override val itemHolder = NovaItemHolder(this, uuid to (inventory to NetworkConnectionType.BUFFER))
     private val inputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleInputInventoryUpdate) }
     private val outputInventory = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleOutputInventoryUpdate) }
+    override val itemHolder = NovaItemHolder(
+        this,
+        uuid to (inventory to NetworkConnectionType.BUFFER)
+    ) { createSideConfig(NetworkConnectionType.BUFFER) }
     
     private fun handleInputInventoryUpdate(event: ItemUpdateEvent) {
         if (event.isAdd && inventory.type != null && !inventory.type!!.isSimilar(event.newItemStack))

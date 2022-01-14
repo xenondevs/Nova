@@ -36,7 +36,7 @@ class TrashCan(
     override val itemHolder = NovaItemHolder(
         this,
         inventory to NetworkConnectionType.INSERT,
-        lazyDefaultTypeConfig = ALL_INSERT_CONFIG
+        defaultConnectionConfig = ALL_INSERT_CONFIG
     )
     override val fluidHolder = NovaFluidHolder(this,
         VoidingFluidContainer to NetworkConnectionType.INSERT,

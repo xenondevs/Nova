@@ -70,10 +70,14 @@ class TreeFactory(
     
     override val gui: Lazy<TileEntityGUI> = lazy(::TreeFactoryGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradesUpdate, allowed = UpgradeType.ALL_ENERGY)
-    override val itemHolder = NovaItemHolder(this, outputInventory to NetworkConnectionType.EXTRACT, inputInventory to NetworkConnectionType.BUFFER)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) {
         createExclusiveEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM, BlockSide.BACK)
     }
+    override val itemHolder = NovaItemHolder(
+        this,
+        outputInventory to NetworkConnectionType.EXTRACT,
+        inputInventory to NetworkConnectionType.BUFFER,
+    ) { createExclusiveSideConfig(NetworkConnectionType.EXTRACT, BlockSide.BOTTOM, BlockSide.BACK) }
     
     private var plantType = inputInventory.getItemStack(0)?.type
     private val plant: FakeArmorStand
@@ -101,7 +105,7 @@ class TreeFactory(
     override fun handleTick() {
         if (energyHolder.energy >= energyHolder.energyConsumption && plantType != null) {
             if (!DROP_EXCESS_ON_GROUND && outputInventory.isFull()) return
-
+    
             energyHolder.energy -= energyHolder.energyConsumption
             
             if (idleTimeLeft == 0) {

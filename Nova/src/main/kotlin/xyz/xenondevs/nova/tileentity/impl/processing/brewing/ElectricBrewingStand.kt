@@ -100,15 +100,13 @@ class ElectricBrewingStand(
     override val itemHolder = NovaItemHolder(
         this,
         ingredientsInventory to NetworkConnectionType.BUFFER,
-        outputInventory to NetworkConnectionType.BUFFER,
-        lazyDefaultTypeConfig = { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
-    )
+        outputInventory to NetworkConnectionType.BUFFER
+    ) { createSideConfig(NetworkConnectionType.INSERT) }
     
     override val fluidHolder = NovaFluidHolder(
         this,
-        fluidTank to NetworkConnectionType.BUFFER,
-        defaultConnectionConfig = { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
-    )
+        fluidTank to NetworkConnectionType.BUFFER
+    ) { createSideConfig(NetworkConnectionType.INSERT) }
     
     private var maxBrewTime = 0
     private var timePassed = 0

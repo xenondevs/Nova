@@ -71,7 +71,11 @@ class Planter(
     override val gui = lazy(::PlanterGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_PLANT, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inputInventory to NetworkConnectionType.BUFFER, hoesInventory to NetworkConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(
+        this,
+        inputInventory to NetworkConnectionType.BUFFER,
+        hoesInventory to NetworkConnectionType.BUFFER
+    ) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     
     private var autoTill = retrieveData("autoTill") { true }
     private var maxIdleTime = 0
@@ -172,8 +176,8 @@ class Planter(
             // if soil type is applicable for the seed or can be made applicable
             if (!seedMaterial.canBePlacedOn(soilType) && !(seedMaterial.canBePlacedOn(Material.FARMLAND) && autoTill && !emptyHoes && soilType.isTillable()))
                 return@indexOfFirst false
-            
-            return@indexOfFirst ProtectionManager.canPlace(this, ItemStack(seedMaterial), block.location) 
+    
+            return@indexOfFirst ProtectionManager.canPlace(this, ItemStack(seedMaterial), block.location)
                 && (!autoTill || ProtectionManager.canUseBlock(this, hoesInventory.getItemStack(0), soilBlock.location))
         }
         

@@ -68,7 +68,11 @@ class Harvester(
     override val gui = lazy(::HarvesterGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ENERGY_AND_RANGE)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, ENERGY_PER_BREAK, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory to EXTRACT, shearInventory to BUFFER, axeInventory to BUFFER, hoeInventory to BUFFER)
+    override val itemHolder = NovaItemHolder(
+        this,
+        inventory to EXTRACT,
+        shearInventory to BUFFER, axeInventory to BUFFER, hoeInventory to BUFFER
+    ) { createSideConfig(EXTRACT, BlockSide.FRONT) }
     
     private var maxIdleTime = 0
     private var maxRange = 0

@@ -60,7 +60,7 @@ class Sprinkler(
     override val gui = lazy(::SprinklerGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, UpgradeType.EFFICIENCY, UpgradeType.FLUID, UpgradeType.RANGE)
     private val tank = getFluidContainer("tank", hashSetOf(FluidType.WATER), WATER_CAPACITY, upgradeHolder = upgradeHolder)
-    override val fluidHolder = NovaFluidHolder(this, tank to NetworkConnectionType.BUFFER, defaultConnectionConfig = { createExclusiveSideConfig(NetworkConnectionType.INSERT, BlockSide.BOTTOM) })
+    override val fluidHolder = NovaFluidHolder(this, tank to NetworkConnectionType.BUFFER) { createExclusiveSideConfig(NetworkConnectionType.INSERT, BlockSide.BOTTOM) }
     
     private var maxRange = 0
     private var waterPerMoistureLevel = 0L

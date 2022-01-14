@@ -46,8 +46,7 @@ class FluidStorageUnit(
     val fluidTank = getFluidContainer("fluid", setOf(FluidType.LAVA, FluidType.WATER), MAX_CAPACITY, 0, ::handleFluidUpdate)
     val inventory = getInventory("inventory", 1, ::handleInventoryUpdate)
     private val fluidLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true; it.isMarker = true }
-    
-    override val fluidHolder = NovaFluidHolder(this, fluidTank to NetworkConnectionType.BUFFER)
+    override val fluidHolder = NovaFluidHolder(this, fluidTank to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.BUFFER) }
     
     private fun handleFluidUpdate() {
         val stack = if (fluidTank.hasFluid()) {

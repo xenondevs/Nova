@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.tileentity.impl.world
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
-import org.bukkit.Material
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -41,7 +40,7 @@ class BlockPlacer(
     override val gui = lazy { BlockPlacerGUI() }
     override val upgradeHolder = UpgradeHolder(this, gui, UpgradeType.EFFICIENCY, UpgradeType.ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_PLACE, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER)
+    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     
     private val fakePlayer = EntityUtils.createFakePlayer(location.clone(), UUID.randomUUID(), "Block Placer $uuid")
     private val placeLocation = location.clone().advance(getFace(BlockSide.FRONT))

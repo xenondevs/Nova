@@ -33,7 +33,7 @@ open class FluidTank(
     override val gui = lazy(::FluidTankGUI)
     
     private val fluidContainer = getFluidContainer("tank", hashSetOf(FluidType.WATER, FluidType.LAVA), capacity, 0, ::handleFluidUpdate)
-    override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.BUFFER, defaultConnectionConfig = { createSideConfig(NetworkConnectionType.BUFFER) })
+    override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.BUFFER) }
     private val fluidLevel = FakeArmorStand(armorStand.location) { it.isInvisible = true;it.isMarker = true }
     
     init {

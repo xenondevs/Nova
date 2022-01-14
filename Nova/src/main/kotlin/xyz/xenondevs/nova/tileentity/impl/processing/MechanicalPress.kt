@@ -65,7 +65,11 @@ class MechanicalPress(
     
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(CONSUME, FRONT) }
-    override val itemHolder = NovaItemHolder(this, inputInv to NetworkConnectionType.BUFFER, outputInv to NetworkConnectionType.EXTRACT)
+    override val itemHolder = NovaItemHolder(
+        this,
+        inputInv to NetworkConnectionType.BUFFER,
+        outputInv to NetworkConnectionType.EXTRACT
+    ) { createSideConfig(NetworkConnectionType.INSERT, FRONT) }
     
     private var type: PressType = retrieveEnum("pressType") { PressType.PLATE }
     private var timeLeft: Int = retrieveData("pressTime") { 0 }

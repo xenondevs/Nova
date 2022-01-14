@@ -67,7 +67,7 @@ class Pump(
     private val fluidTank = getFluidContainer("tank", hashSetOf(FluidType.WATER, FluidType.LAVA), FLUID_CAPACITY, upgradeHolder = upgradeHolder)
     
     override val energyHolder = ConsumerEnergyHolder(this, ENERGY_CAPACITY, ENERGY_PER_TICK, 0, upgradeHolder = upgradeHolder) { createExclusiveEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.TOP) }
-    override val fluidHolder = NovaFluidHolder(this, fluidTank to NetworkConnectionType.EXTRACT, defaultConnectionConfig = { createExclusiveSideConfig(NetworkConnectionType.EXTRACT, BlockSide.TOP) })
+    override val fluidHolder = NovaFluidHolder(this, fluidTank to NetworkConnectionType.EXTRACT) { createExclusiveSideConfig(NetworkConnectionType.EXTRACT, BlockSide.TOP) }
     
     private var maxIdleTime = 0
     private var idleTime = 0

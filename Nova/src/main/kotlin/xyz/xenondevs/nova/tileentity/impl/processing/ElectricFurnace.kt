@@ -65,7 +65,11 @@ class ElectricFurnace(
     
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inputInventory to NetworkConnectionType.BUFFER, outputInventory to NetworkConnectionType.EXTRACT)
+    override val itemHolder = NovaItemHolder(
+        this,
+        inputInventory to NetworkConnectionType.BUFFER,
+        outputInventory to NetworkConnectionType.EXTRACT
+    ) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     
     private var currentRecipe: FurnaceRecipe? = retrieveOrNull<NamespacedKey>("currentRecipe")?.let { Bukkit.getRecipe(it) as FurnaceRecipe? }
     private var timeCooked = retrieveData("timeCooked") { 0 }

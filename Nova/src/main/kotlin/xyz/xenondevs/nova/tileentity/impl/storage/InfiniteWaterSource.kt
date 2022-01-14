@@ -27,7 +27,7 @@ class InfiniteWaterSource(
     override val gui = lazy(::InfiniteWaterSourceGUI)
     
     private val fluidContainer = InfiniteFluidContainer
-    override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.EXTRACT, defaultConnectionConfig = { createSideConfig(NetworkConnectionType.EXTRACT) })
+    override val fluidHolder = NovaFluidHolder(this, fluidContainer to NetworkConnectionType.EXTRACT) { createSideConfig(NetworkConnectionType.EXTRACT) }
     
     inner class InfiniteWaterSourceGUI : TileEntityGUI() {
         

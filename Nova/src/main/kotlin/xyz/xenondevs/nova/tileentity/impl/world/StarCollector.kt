@@ -57,7 +57,9 @@ class StarCollector(
     private val inventory = getInventory("inventory", 1, ::handleInventoryUpdate)
     override val gui: Lazy<StarCollectorGUI> = lazy(::StarCollectorGUI)
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradesUpdate, allowed = UpgradeType.ALL_ENERGY)
-    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT)
+    override val itemHolder = NovaItemHolder(this, inventory to NetworkConnectionType.EXTRACT) {
+        createExclusiveSideConfig(NetworkConnectionType.EXTRACT, BlockSide.BOTTOM)
+    }
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, IDLE_ENERGY_PER_TICK, COLLECTING_ENERGY_PER_TICK, upgradeHolder) {
         createExclusiveEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.BOTTOM)
     }

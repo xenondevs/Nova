@@ -55,7 +55,11 @@ class Pulverizer(
     
     override val upgradeHolder = UpgradeHolder(this, gui, ::handleUpgradeUpdates, allowed = UpgradeType.ALL_ENERGY)
     override val energyHolder = ConsumerEnergyHolder(this, MAX_ENERGY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val itemHolder = NovaItemHolder(this, inputInv to NetworkConnectionType.BUFFER, outputInv to NetworkConnectionType.EXTRACT)
+    override val itemHolder = NovaItemHolder(
+        this,
+        inputInv to NetworkConnectionType.BUFFER,
+        outputInv to NetworkConnectionType.EXTRACT
+    ) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     
     private var timeLeft = retrieveData("pulverizerTime") { 0 }
     private var pulverizeSpeed = 0

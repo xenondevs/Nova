@@ -59,9 +59,13 @@ class FluidInfuser(
     private val input = getInventory("input", 1, ::handleInputInventoryUpdate)
     private val output = getInventory("output", 1, ::handleOutputInventoryUpdate)
     private val tank = getFluidContainer("tank", hashSetOf(FluidType.WATER, FluidType.LAVA), FLUID_CAPACITY, upgradeHolder = upgradeHolder)
-    override val itemHolder = NovaItemHolder(this, input to NetworkConnectionType.BUFFER, output to NetworkConnectionType.EXTRACT)
     override val energyHolder = ConsumerEnergyHolder(this, ENERGY_CAPACITY, ENERGY_PER_TICK, 0, upgradeHolder) { createEnergySideConfig(EnergyConnectionType.CONSUME, BlockSide.FRONT) }
-    override val fluidHolder = NovaFluidHolder(this, tank to NetworkConnectionType.BUFFER)
+    override val fluidHolder = NovaFluidHolder(this, tank to NetworkConnectionType.BUFFER) { createSideConfig(NetworkConnectionType.BUFFER, BlockSide.FRONT) }
+    override val itemHolder = NovaItemHolder(
+        this,
+        input to NetworkConnectionType.BUFFER,
+        output to NetworkConnectionType.EXTRACT
+    ) { createSideConfig(NetworkConnectionType.INSERT, BlockSide.FRONT) }
     
     private var mode = retrieveEnum("mode") { InfuserMode.INSERT }
     
