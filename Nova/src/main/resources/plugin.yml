@@ -26,6 +26,7 @@ softdepend:
   - Towny
   - Oraxen
   - MMOItems
+  - AuthMe
 
 permissions:
   nova.command.*:
