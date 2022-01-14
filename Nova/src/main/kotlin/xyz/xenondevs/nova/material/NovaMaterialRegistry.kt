@@ -82,7 +82,7 @@ object NovaMaterialRegistry {
     val FREEZER = registerDefaultTileEntity("FREEZER", 38, ::Freezer, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     val SPRINKLER = registerDefaultTileEntity("SPRINKLER", 39, ::Sprinkler, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val FLUID_STORAGE_UNIT = registerDefaultTileEntity("FLUID_STORAGE_UNIT", 40, ::FluidStorageUnit, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val ELECTRIC_BREWING_STAND = registerDefaultTileEntity("ELECTRIC_BREWING_STAND", 41, ::ElectricBrewingStand, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
+    val ELECTRIC_BREWING_STAND = registerDefaultTileEntity("ELECTRIC_BREWING_STAND", 41, ::ElectricBrewingStand, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
     
     // 1000 - 2000: Crafting Items
     // Plates
