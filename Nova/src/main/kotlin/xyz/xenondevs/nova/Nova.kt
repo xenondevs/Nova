@@ -24,7 +24,7 @@ lateinit var LOGGER: Logger
 lateinit var PLUGIN_MANAGER: PluginManager
 var IS_VERSION_CHANGE: Boolean = false
 
-class Nova : JavaPlugin(), INova, Listener {
+class Nova : JavaPlugin(), INova {
     
     val version = Version(description.version.removeSuffix("-SNAPSHOT"))
     val devBuild = description.version.contains("SNAPSHOT")
