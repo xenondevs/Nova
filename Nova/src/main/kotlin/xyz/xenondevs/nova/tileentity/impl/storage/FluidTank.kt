@@ -41,6 +41,10 @@ open class FluidTank(
     }
     
     private fun handleFluidUpdate() {
+        // Creative Fluid Tank
+        if (fluidContainer.capacity == Long.MAX_VALUE && fluidContainer.hasFluid() && !fluidContainer.isFull())
+            fluidContainer.addFluid(fluidContainer.type!!, fluidContainer.capacity - fluidContainer.amount)
+        
         updateFluidLevel()
     }
     
