@@ -7,11 +7,9 @@ import org.bukkit.craftbukkit.v1_18_R1.CraftServer
 import org.bukkit.craftbukkit.v1_18_R1.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.command.impl.NovaCommand
-import xyz.xenondevs.nova.command.impl.NovaModelDataCommand
-import xyz.xenondevs.nova.command.impl.UninstallCommand
+import xyz.xenondevs.nova.command.impl.*
+import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
 val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher
@@ -21,7 +19,7 @@ object CommandManager : Initializable() {
     private val registeredCommands = ArrayList<String>()
     
     override val inMainThread = true
-    override val dependsOn = CustomItemServiceManager // TODO: depend on RecipeManager
+    override val dependsOn = RecipeRegistry
     
     override fun init() {
         LOGGER.info("Registering Commands")
@@ -33,6 +31,8 @@ object CommandManager : Initializable() {
         registerCommand(NovaCommand)
         registerCommand(UninstallCommand)
         registerCommand(NovaModelDataCommand)
+        registerCommand(NovaRecipeCommand)
+        registerCommand(NovaUsageCommand)
     }
     
     fun registerCommand(command: Command) {

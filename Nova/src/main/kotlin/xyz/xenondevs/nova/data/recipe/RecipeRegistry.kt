@@ -41,11 +41,6 @@ object RecipeRegistry : Initializable() {
         USAGE_RECIPES = loadUsageRecipes()
         RECIPES_BY_TYPE = loadRecipesByGroup()
         LOGGER.info("Finished initializing recipe registry")
-        
-        runTask {
-            CommandManager.registerCommand(NovaRecipeCommand)
-            CommandManager.registerCommand(NovaUsageCommand)
-        }
     }
     
     private fun loadBukkitRecipes(): List<Recipe> {
