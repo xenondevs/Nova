@@ -14,6 +14,7 @@ interface BinaryDeserializer<T : Element> {
     fun read(buf: ByteBuf): T
     
     companion object DeserializerRegistry {
+        
         private val DESERIALIZERS = arrayOf(
             EmptyDeserializer, // 0
             BooleanDeserializer, // 1
@@ -45,7 +46,8 @@ interface BinaryDeserializer<T : Element> {
             ColorDeserializer // 27
         )
         
-        fun getForType(type: Byte) = runCatching { DESERIALIZERS[type.toInt()] }.getOrNull()
+        fun getForType(type: Byte) = DESERIALIZERS.getOrNull(type.toInt())
+        
     }
     
 }
