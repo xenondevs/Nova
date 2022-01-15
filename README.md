@@ -23,7 +23,6 @@ If you would like to help translate Nova, you can do so via [Crowdin](https://cr
 
 # Patrons
 
-[SgtLegoTown](https://www.youtube.com/channel/UCq8IXcNv_vWPcSB7C2A3hfQ) - €20  
 Ashwin | DarktubeNL - €10  
 Brett - €5
 
