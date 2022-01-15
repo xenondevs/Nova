@@ -205,8 +205,9 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
     @Synchronized
     fun getTileEntityAt(location: Location, additionalHitboxes: Boolean): TileEntity? {
         val chunkPos = location.chunkPos
-        return tileEntityMap[chunkPos]?.get(location)
-            ?: if (additionalHitboxes) additionalHitboxMap[chunkPos]?.get(location) else null
+        val blockLocation = location.blockLocation
+        return tileEntityMap[chunkPos]?.get(blockLocation)
+            ?: if (additionalHitboxes) additionalHitboxMap[chunkPos]?.get(blockLocation) else null
     }
     
     @Synchronized
