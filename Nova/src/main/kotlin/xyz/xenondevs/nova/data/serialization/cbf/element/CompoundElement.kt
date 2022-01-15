@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
+import xyz.xenondevs.nova.data.serialization.cbf.DeserializerRegistry
 import xyz.xenondevs.nova.data.serialization.cbf.Element
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.NullElement
 import xyz.xenondevs.nova.util.data.readString
@@ -95,7 +96,7 @@ object CompoundDeserializer : BinaryDeserializer<CompoundElement> {
         val compound = CompoundElement()
         var currentType: Byte
         while ((buf.readByte().also { currentType = it }) != 0.toByte()) {
-            val deserializer = BinaryDeserializer.getForType(currentType)
+            val deserializer = DeserializerRegistry.getForType(currentType)
             requireNotNull(deserializer) { "Invalid type id: $currentType" }
             compound.putElement(buf.readString(), deserializer.read(buf))
         }

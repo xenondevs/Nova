@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.serialization.cbf.element.other
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.serialization.cbf.BackedElement
 import xyz.xenondevs.nova.data.serialization.cbf.BinaryDeserializer
+import xyz.xenondevs.nova.data.serialization.cbf.DeserializerRegistry
 import xyz.xenondevs.nova.data.serialization.cbf.Element
 import xyz.xenondevs.nova.util.data.readString
 import xyz.xenondevs.nova.util.data.writeString
@@ -63,7 +64,7 @@ object EnumMapDeserializer : BinaryDeserializer<EnumMapElement> {
             return EnumMapElement()
         
         val type = buf.readByte()
-        val deserializer = BinaryDeserializer.getForType(type)
+        val deserializer = DeserializerRegistry.getForType(type)
         requireNotNull(deserializer) { "Invalid type id: $type" }
         
         val map = EnumMapElement()
