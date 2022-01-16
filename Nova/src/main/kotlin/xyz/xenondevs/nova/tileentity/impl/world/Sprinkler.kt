@@ -83,6 +83,7 @@ class Sprinkler(
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
         sprinklers -= this
+        VisualRegion.removeRegion(uuid)
     }
     
     private fun updateRegion() {
