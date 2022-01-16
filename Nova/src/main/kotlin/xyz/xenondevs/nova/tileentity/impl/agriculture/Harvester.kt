@@ -173,7 +173,7 @@ class Harvester(
                             continue
                         }
                         
-                        inventory.setItemStack(SELF_UPDATE_REASON, 0, ToolUtils.damageTool(tool))
+                        toolInventory.setItemStack(SELF_UPDATE_REASON, 0, ToolUtils.damageTool(tool))
                     }
                     
                     var drops = (if (PlantUtils.COMPLEX_HARVESTABLE_BLOCKS.contains(expectedType)) {
