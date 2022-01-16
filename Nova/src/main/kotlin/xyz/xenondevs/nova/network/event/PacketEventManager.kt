@@ -3,10 +3,12 @@ package xyz.xenondevs.nova.network.event
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundChatPacket
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
+import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.network.event.impl.ClientboundActionBarPacketEvent
 import xyz.xenondevs.nova.network.event.impl.ClientboundChatPacketEvent
+import xyz.xenondevs.nova.network.event.impl.ServerboundPlaceRecipePacketEvent
 import kotlin.reflect.KClass
 
 object PacketEventManager {
@@ -16,6 +18,7 @@ object PacketEventManager {
     init {
         registerEventType(ClientboundChatPacket::class, ::ClientboundChatPacketEvent)
         registerEventType(ClientboundSetActionBarTextPacket::class, ::ClientboundActionBarPacketEvent)
+        registerEventType(ServerboundPlaceRecipePacket::class, ::ServerboundPlaceRecipePacketEvent)
     }
     
     private fun <P : Packet<*>> registerEventType(clazz: KClass<out P>, constructor: (Player, P) -> PacketEvent<P>) {

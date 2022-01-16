@@ -1,14 +1,12 @@
 package xyz.xenondevs.nova.util
 
+import de.studiocode.invui.util.InventoryUtils
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
-import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.PlayerInventory
+import org.bukkit.inventory.*
 
 /**
  * Adds a [List] of [ItemStack]s to a [VirtualInventory].
@@ -59,6 +57,62 @@ fun Inventory.addItemCorrectly(itemStack: ItemStack): Int {
     }
     
     return amountLeft
+}
+
+/**
+ * Adds [items] to the [Player's][Player] inventory or drops them on
+ * the ground if there is not enough space.
+ */
+fun Player.addToInventoryOrDrop(items: List<ItemStack>) {
+    val inventory = inventory
+    items.forEach {
+        val leftover = inventory.addItemCorrectly(it)
+        if (leftover > 0) {
+            val drop = it.clone().apply { amount = leftover }
+            InventoryUtils.dropItemLikePlayer(this, drop)
+        }
+    }
+}
+
+/**
+ * Checks if this [Inventory] contains all [choices]
+ */
+fun Inventory.containsAll(choices: List<RecipeChoice>): Boolean {
+    val choiceMap = HashMap<RecipeChoice, Int>()
+    for (choice in choices) {
+        val amount = choiceMap[choice] ?: 0
+        choiceMap[choice] = amount + 1
+    }
+    
+    for (item in storageContents) {
+        if (item == null) continue
+        
+        val matchingChoice = choiceMap.keys.firstOrNull { it.test(item) } ?: continue
+        val requiredAmount = choiceMap[matchingChoice]!! - item.amount
+        
+        if (requiredAmount > 0)
+            choiceMap[matchingChoice] = requiredAmount
+        else choiceMap -= matchingChoice
+    }
+    
+    return choiceMap.isEmpty()
+}
+
+/**
+ * Removes one item matching the given [choice] and returns it
+ */
+fun Inventory.takeFirstOccurrence(choice: RecipeChoice): ItemStack? {
+    for (item in storageContents) {
+        if (item == null) continue
+        
+        if (choice.test(item)) {
+            val itemClone = item.clone()
+            item.amount--
+            return itemClone.apply { amount = 1 }
+        }
+    }
+    
+    return null
 }
 
 /**

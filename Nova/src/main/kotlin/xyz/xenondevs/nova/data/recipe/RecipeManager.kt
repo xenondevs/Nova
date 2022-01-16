@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -18,13 +19,11 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.network.event.impl.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
-import xyz.xenondevs.nova.util.customModelData
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.key
-import xyz.xenondevs.nova.util.namelessCopyOrSelf
-import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.removeFirstWhere
 import java.util.*
 import kotlin.experimental.and
 
@@ -66,8 +65,8 @@ private val ALLOW_RESULT_OVERWRITE = DEFAULT_CONFIG.getBoolean("crafting.allow_r
 
 object RecipeManager : Initializable(), Listener {
     
-    private val shapedRecipes = ArrayList<OptimizedShapedRecipe>()
-    private val shapelessRecipes = ArrayList<ShapelessRecipe>()
+    private val shapedRecipes = HashMap<NamespacedKey, OptimizedShapedRecipe>()
+    private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
     val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
     
@@ -84,12 +83,15 @@ object RecipeManager : Initializable(), Listener {
         RecipesLoader.loadRecipes().forEach { recipe ->
             when (recipe) {
                 is Recipe -> {
-                    vanillaRegisteredRecipeKeys += (recipe as Keyed).key
+                    val key = (recipe as Keyed).key
+                    
                     when (recipe) {
-                        is ShapedRecipe -> shapedRecipes += OptimizedShapedRecipe(recipe)
-                        is ShapelessRecipe -> shapelessRecipes += recipe
+                        is ShapedRecipe -> shapedRecipes[key] = OptimizedShapedRecipe(recipe)
+                        is ShapelessRecipe -> shapelessRecipes[key] = recipe
                     }
+                    
                     Bukkit.addRecipe(recipe)
+                    vanillaRegisteredRecipeKeys += key
                 }
                 
                 is NovaRecipe -> {
@@ -135,6 +137,72 @@ object RecipeManager : Initializable(), Listener {
         vanillaRegisteredRecipeKeys.forEach(event.player::discoverRecipe)
     }
     
+    @EventHandler
+    fun handleRecipePlace(event: ServerboundPlaceRecipePacketEvent) {
+        val key = NamespacedKey.fromString(event.packet.recipe.toString())
+        if (key in shapedRecipes) {
+            runTask { fillCraftingInventory(event.player, shapedRecipes[key]!!) }
+            event.isCancelled = true
+        } else if (key in shapelessRecipes) {
+            runTask { fillCraftingInventory(event.player, shapelessRecipes[key]!!) }
+            event.isCancelled = true
+        }
+    }
+    
+    private fun fillCraftingInventory(player: Player, recipe: OptimizedShapedRecipe) {
+        val craftingInventory = player.openInventory.topInventory as CraftingInventory
+        
+        // clear previous items
+        player.addToInventoryOrDrop(craftingInventory.matrix.filterNotNull())
+        craftingInventory.matrix = arrayOfNulls(9)
+        
+        // check if the player has the required ingredients
+        val inventory = player.inventory
+        if (inventory.containsAll(recipe.requiredChoices)) {
+            // fill inventory
+            for (slot in 0 until 9) {
+                val choice = recipe.choiceMatrix[slot] ?: continue
+                
+                val item = inventory.takeFirstOccurrence(choice)
+                if (item != null) {
+                    // Crafting inventory starts at index 1
+                    craftingInventory.setItem(slot + 1, item)
+                }
+            }
+            
+        } else {
+            // send ghost recipe
+            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, recipe.key)
+            player.send(packet)
+        }
+    }
+    
+    private fun fillCraftingInventory(player: Player, recipe: ShapelessRecipe) {
+        val craftingInventory = player.openInventory.topInventory as CraftingInventory
+        
+        // clear previous items
+        player.addToInventoryOrDrop(craftingInventory.matrix.filterNotNull())
+        craftingInventory.matrix = arrayOfNulls(9)
+        
+        // check if the player has the required ingredients
+        val inventory = player.inventory
+        if (inventory.containsAll(recipe.choiceList)) {
+            // fill inventory
+            for ((i, choice) in recipe.choiceList.withIndex()) {
+                val item = inventory.takeFirstOccurrence(choice)
+                if (item != null) {
+                    // Crafting inventory starts at index 1
+                    craftingInventory.setItem(i + 1, item)
+                }
+            }
+            
+        } else {
+            // send ghost recipe
+            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, recipe.key.toString())
+            player.send(packet)
+        }
+    }
+    
     @EventHandler(priority = EventPriority.LOWEST)
     fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
         val predictedRecipe = event.recipe
@@ -174,11 +242,11 @@ object RecipeManager : Initializable(), Listener {
     
     private fun findMatchingShapedRecipe(matrix: Array<ItemStack?>): Recipe? {
         // loop over all shaped recipes from nova
-        return shapedRecipes.firstOrNull { recipe ->
+        return shapedRecipes.values.firstOrNull { recipe ->
             // loop over all items in the crafting grid
             matrix.withIndex().all { (index, matrixStack) ->
                 // check if the item stack matches with the given recipe choice
-                val choice = recipe.choices[index] ?: return@all matrixStack == null
+                val choice = recipe.choiceMatrix[index] ?: return@all matrixStack == null
                 return@all matrixStack != null && choice.test(matrixStack)
             }
         }?.recipe
@@ -186,7 +254,7 @@ object RecipeManager : Initializable(), Listener {
     
     private fun findMatchingShapelessRecipe(matrix: Array<ItemStack?>): Recipe? {
         // loop over all shapeless recipes from nova
-        return shapelessRecipes.firstOrNull { recipe ->
+        return shapelessRecipes.values.firstOrNull { recipe ->
             val choiceList = recipe.choiceList
             
             // loop over all items in the inventory and remove matching choices from the choice list
@@ -206,11 +274,15 @@ object RecipeManager : Initializable(), Listener {
  */
 class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
     
-    val choices: Array<RecipeChoice?>
+    val requiredChoices: List<RecipeChoice>
+    val choiceMatrix: Array<RecipeChoice?>
+    val key: String
     
     init {
         val flatShape = recipe.shape.joinToString("")
-        choices = Array(9) { recipe.choiceMap[flatShape[it]] }
+        choiceMatrix = Array(9) { recipe.choiceMap[flatShape[it]] }
+        requiredChoices = flatShape.mapNotNull { recipe.choiceMap[it] }
+        key = (recipe as Keyed).key.toString()
     }
     
 }

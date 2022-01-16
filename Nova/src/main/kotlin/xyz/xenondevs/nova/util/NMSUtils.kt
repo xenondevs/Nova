@@ -7,7 +7,9 @@ import net.minecraft.core.Rotations
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundAddMobPacket
+import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -60,6 +62,13 @@ val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).serve
 
 val serverTick: Int
     get() = minecraftServer.tickCount
+
+fun ClientboundPlaceGhostRecipePacket(containerId: Int, resourceLocation: String): ClientboundPlaceGhostRecipePacket {
+    val buffer = FriendlyByteBuf(Unpooled.buffer())
+    buffer.writeByte(containerId)
+    buffer.writeResourceLocation(ResourceLocation(resourceLocation))
+    return ClientboundPlaceGhostRecipePacket(buffer)
+}
 
 object NMSUtils {
     
