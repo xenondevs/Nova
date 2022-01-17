@@ -429,6 +429,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getPreviousGameMode(): GameMode? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun setPlayerTime(time: Long, relative: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
