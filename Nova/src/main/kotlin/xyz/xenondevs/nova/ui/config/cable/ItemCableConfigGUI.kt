@@ -5,6 +5,7 @@ import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.virtualinventory.VirtualInventory
+import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.item.impl.getOrCreateFilterConfig
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -15,6 +16,7 @@ import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
+import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.util.putOrRemove
 
 class ItemCableConfigGUI(
@@ -24,7 +26,9 @@ class ItemCableConfigGUI(
     
     val gui: GUI
     private val insertFilterInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1))
+        .apply { setItemUpdateHandler(::checkItem) }
     private val extractFilterInventory = VirtualInventory(null, 1, arrayOfNulls(1), intArrayOf(1))
+        .apply { setItemUpdateHandler(::checkItem) }
     
     init {
         updateValues(false)
@@ -83,6 +87,12 @@ class ItemCableConfigGUI(
                 itemHolder.endPoint.updateNearbyBridges()
             }
         }
+    }
+    
+    private fun checkItem(event: ItemUpdateEvent) {
+        val newStack = event.newItemStack
+        if (newStack != null && newStack.novaMaterial != NovaMaterialRegistry.ITEM_FILTER)
+            event.isCancelled = true
     }
     
 }
