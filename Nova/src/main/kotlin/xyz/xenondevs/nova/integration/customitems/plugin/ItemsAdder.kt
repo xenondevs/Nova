@@ -95,11 +95,7 @@ class ItemsAdderLoadListener(private val run: () -> Unit) : Listener {
     @EventHandler
     fun handleItemsAdderLoadData(event: ItemsAdderLoadDataEvent) {
         if (event.cause == Cause.FIRST_LOAD) {
-            LOGGER.info("Starting in 10s...")
-            runAsyncTask {
-                Thread.sleep(10_000) // it is a lie, ItemsAdder isn't done yet
-                run()
-            }
+            run()
         } else {
             LOGGER.warning("Reloading ItemsAdder might cause issues when items from ItemsAdder are used in Nova recipes.")
         }
