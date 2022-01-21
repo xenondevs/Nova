@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.item.channel.ItemNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
@@ -17,7 +18,7 @@ class ItemNetwork : Network {
     private val bridges = HashSet<ItemBridge>()
     private val channels: Array<ItemNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     
-    private var transferRate = 1
+    private var transferRate = DEFAULT_TRANSFER_RATE
     
     private var nextChannel = 0
     
@@ -85,6 +86,7 @@ class ItemNetwork : Network {
     companion object {
         
         const val CHANNEL_AMOUNT = 4
+        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getInt("network.item.default_transfer_rate")!!
         
     }
     

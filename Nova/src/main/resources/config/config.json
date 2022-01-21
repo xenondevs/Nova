@@ -16,6 +16,17 @@
     "max": 6,
     "default": 4
   },
+  "network": {
+    "energy": {
+      "default_transfer_rate": 9223372036854775807
+    },
+    "item": {
+      "default_transfer_rate": 2147483647
+    },
+    "fluid": {
+      "default_transfer_rate": 9223372036854775807
+    }
+  },
   "crafting": {
     "cache_size": 5000,
     "allow_result_overwrite": false
