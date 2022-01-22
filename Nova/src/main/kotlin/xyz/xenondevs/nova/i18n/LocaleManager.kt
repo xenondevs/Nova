@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.util.formatSafely
 import java.net.URL
 import java.util.zip.ZipInputStream
 
@@ -42,16 +43,16 @@ object LocaleManager : Initializable() {
         LOGGER.info("Finished loading translations")
     }
     
-    fun getTranslation(lang: String, key: String): String {
-        var translation = getTranslationOrNull(lang, key)
+    fun getTranslation(lang: String, key: String, vararg args: Any): String {
+        var translation = getTranslationOrNull(lang, key, *args)
         if (translation == null && lang != "en_us")
-            translation = getTranslationOrNull("en_us", key)
+            translation = getTranslationOrNull("en_us", key, *args)
         return translation ?: key
     }
     
-    fun getTranslationOrNull(lang: String, key: String): String? {
+    fun getTranslationOrNull(lang: String, key: String, vararg args: Any): String? {
         if (!::translationProviders.isInitialized) return null
-        return translationProviders[lang]?.get(key)
+        return translationProviders[lang]?.get(key)?.let { String.formatSafely(it, *args) }
     }
     
     fun hasTranslation(lang: String, key: String): Boolean {
@@ -59,8 +60,8 @@ object LocaleManager : Initializable() {
         return translationProviders[lang]?.containsKey(key) ?: false
     }
     
-    fun getTranslation(player: Player, key: String): String {
-        return getTranslation(player.locale, key)
+    fun getTranslation(player: Player, key: String, vararg args: Any): String {
+        return getTranslation(player.locale, key, *args)
     }
     
     fun getTranslatedName(lang: String, novaMaterial: NovaMaterial): String {

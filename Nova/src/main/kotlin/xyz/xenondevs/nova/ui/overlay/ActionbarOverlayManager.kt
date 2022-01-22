@@ -11,14 +11,18 @@ import org.bukkit.event.Listener
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.network.event.impl.ClientboundActionBarPacketEvent
 import xyz.xenondevs.nova.network.event.impl.ClientboundChatPacketEvent
+import xyz.xenondevs.nova.util.data.forceDefaultFont
+import xyz.xenondevs.nova.util.data.toPlainText
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
+import java.util.*
 
 // TODO: This currently only works with one overlay due to the centering of the text
 object ActionbarOverlayManager : Listener {
     
     private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(TextComponent(""))
-    private val overlays = HashMap<Player, HashSet<ActionbarOverlay>>()
+    private val overlays = HashMap<UUID, HashSet<ActionbarOverlay>>()
+    private val interceptedActionbars = HashMap<UUID, Pair<ArrayList<BaseComponent>, Long>>()
     
     init {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
@@ -26,16 +30,17 @@ object ActionbarOverlayManager : Listener {
     }
     
     fun registerOverlay(player: Player, overlay: ActionbarOverlay) {
-        overlays.getOrPut(player) { HashSet() } += overlay
+        overlays.getOrPut(player.uniqueId) { HashSet() } += overlay
     }
     
     fun unregisterOverlay(player: Player, overlay: ActionbarOverlay) {
-        val playerOverlays = overlays[player]
+        val playerOverlays = overlays[player.uniqueId]
         if (playerOverlays != null) {
-            if (playerOverlays.size <= 1) {
-                overlays.remove(player)
+            playerOverlays -= overlay
+            if (playerOverlays.isEmpty()) {
+                overlays.remove(player.uniqueId)
                 player.send(EMPTY_ACTION_BAR_PACKET)
-            } else playerOverlays.remove(overlay)
+            }
         }
     }
     
@@ -47,32 +52,78 @@ object ActionbarOverlayManager : Listener {
      * between two different plugins trying to send their actionbar.
      */
     private fun handleTick() {
-        overlays.forEach { (player, _) -> player.send(EMPTY_ACTION_BAR_PACKET) }
+        overlays.keys
+            .asSequence()
+            .mapNotNull(Bukkit::getPlayer)
+            .forEach { it.send(EMPTY_ACTION_BAR_PACKET) }
     }
     
     @EventHandler
     private fun handleChatPacket(event: ClientboundChatPacketEvent) {
         if (event.chatType == ChatType.GAME_INFO) {
             val player = event.player
-            if (overlays.containsKey(player))
+            val uuid = player.uniqueId
+            if (overlays.containsKey(uuid)) {
+                val message = event.message
+                if (message != null)
+                    saveInterceptedComponent(player, message)
+                else interceptedActionbars -= uuid
+                
                 event.message = getCurrentText(player)
-            else if (event.message == null)
-                event.isCancelled = true
+            }
         }
     }
     
     @EventHandler
     private fun handleChatPacket(event: ClientboundActionBarPacketEvent) {
         val player = event.player
-        if (overlays.containsKey(player))
+        val uuid = player.uniqueId
+        if (overlays.containsKey(uuid)) {
+            val text = event.text
+            if (event.packet !== EMPTY_ACTION_BAR_PACKET) {
+                if (text != null)
+                    saveInterceptedComponent(player, text)
+                else interceptedActionbars -= uuid
+            }
+            
             event.text = getCurrentText(player)
-        else if (event.text == null)
-            event.isCancelled = true
+        }
+    }
+    
+    private fun saveInterceptedComponent(player: Player, text: Array<BaseComponent>) {
+        val components = ArrayList<BaseComponent>()
+        
+        // calculate the length (in pixels) of the intercepted message
+        val textLength = CustomCharacters.getStringLength(text.toPlainText(player.locale))
+        // to center, move the cursor to the right by half of the length
+        components.add(CustomCharacters.getMovingComponent(textLength / -2))
+        // append the text while explicitly setting it to the default font (required because of the moving component)
+        components.addAll(text.forceDefaultFont())
+        // move half of the text length back so the cursor is in the middle of the screen again (prevents clientside centering)
+        components.add(CustomCharacters.getMovingComponent(textLength / -2))
+        
+        interceptedActionbars[player.uniqueId] = components to System.currentTimeMillis()
     }
     
     private fun getCurrentText(player: Player): Array<BaseComponent> {
+        val uuid = player.uniqueId
         val componentList = ArrayList<BaseComponent>()
-        overlays[player]!!.forEach { componentList.addAll(it.text) }
+        
+        overlays[uuid]!!.forEach {
+            // add text
+            componentList.addAll(it.text)
+            // move back
+            componentList.add(CustomCharacters.getMovingComponent(-it.width))
+        }
+        
+        val interceptedActionbar = interceptedActionbars[uuid]
+        if (interceptedActionbar != null) {
+            val (text, time) = interceptedActionbar
+            if (System.currentTimeMillis() - time < 3000) {
+                componentList.addAll(text)
+            } else interceptedActionbars -= uuid
+        }
+        
         return componentList.toTypedArray()
     }
     

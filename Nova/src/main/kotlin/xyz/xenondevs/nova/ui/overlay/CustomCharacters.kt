@@ -4,6 +4,7 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
+import xyz.xenondevs.nova.util.data.getResourceAsStream
 import kotlin.math.abs
 
 enum class GUITexture(private val char: Char, private val width: Int) {
@@ -62,6 +63,7 @@ enum class CustomCharacters(fontName: String, char: Char) {
     companion object {
         
         private val componentCache = HashMap<Int, BaseComponent>()
+        private val charWidths = getResourceAsStream("char_widths.bin")!!.readAllBytes()
         
         private fun getMovingString(distance: Int): String {
             val start = if (distance < 0) '\uF000'.code else '\uF100'.code
@@ -84,18 +86,12 @@ enum class CustomCharacters(fontName: String, char: Char) {
         
         fun getStringLength(string: String): Int {
             var size = 0
-            string.toCharArray().forEach { size += getCharSize(it) }
+            string.toCharArray().forEach { size += getCharWidth(it) }
             return size
         }
         
-        fun getCharSize(char: Char): Int =
-            when (char) {
-                'k', 'f' -> 4
-                't', 'I', ' ' -> 3
-                'l' -> 2
-                'i' -> 1
-                else -> 5
-            } + 1
+        private fun getCharWidth(char: Char): Int =
+            charWidths[char.code].toInt()
         
     }
     
