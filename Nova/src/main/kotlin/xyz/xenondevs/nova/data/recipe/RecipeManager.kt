@@ -150,8 +150,8 @@ object RecipeManager : Initializable(), Listener {
             } else {
                 // if the recipe is null or it bukkit thinks it found a nova recipe, we do our own calculations
                 // this does two things:
-                // 1. calls the custom test method of NovaRecipeChoice (-> ignores irrelevant nbt data)
-                // 2. allows for the usage of NovaRecipeChoice / ExactChoice in shapeless crafting recipes
+                // 1. Calls the custom test method of CustomRecipeChoice (-> ignores irrelevant nbt data)
+                // 2. Allows the usage of CustomRecipeChoice / ExactChoice in shapeless crafting recipes
                 
                 val matrix = event.inventory.matrix
                 val recipe = if (matrix.size == 9) {
@@ -163,8 +163,12 @@ object RecipeManager : Initializable(), Listener {
             
         }.orElse(null)
         
-        // Set the resulting item stack
-        event.inventory.result = recipe?.result ?: ItemStack(Material.AIR)
+        // This check is required as the result of CraftComplexRecipe (used for coloring shulker boxes) always returns air.
+        // If the recipe has not changed, there is no need to set the result stack again.
+        if (recipe.key != predictedRecipe.key) {
+            // Set the resulting item stack if the recipe has changed
+            event.inventory.result = recipe?.result ?: ItemStack(Material.AIR)
+        }
         
         // If this is a Nova-calculated result, replace it with a NovaCraftingInventory
         if (recipe?.key?.namespace == "nova" || predictedRecipe?.key?.namespace == "nova") {
