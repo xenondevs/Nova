@@ -28,7 +28,6 @@
     }
   },
   "crafting": {
-    "cache_size": 5000,
     "allow_result_overwrite": false
   },
   "nova_executor": {

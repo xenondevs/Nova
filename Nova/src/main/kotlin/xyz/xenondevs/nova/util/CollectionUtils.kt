@@ -128,3 +128,7 @@ fun <T> MutableList<T>.rotateLeft() {
     val first = removeAt(0)
     add(first)
 }
+
+inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
+    return Array(size) { transform(get(it)) }
+}
