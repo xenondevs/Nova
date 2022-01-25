@@ -22,13 +22,17 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.EnergyBar
 import xyz.xenondevs.nova.ui.OpenUpgradesItem
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.add
+import xyz.xenondevs.nova.util.copy
+import xyz.xenondevs.nova.util.getStraightLine
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.abs
 
 private val MAX_ENERGY = NovaConfig[WIND_TURBINE].getLong("capacity")!!
 private val ENERGY_PER_TICK = NovaConfig[WIND_TURBINE].getLong("energy_per_tick")!!
+private val PLAY_ANIMATION = NovaConfig[WIND_TURBINE].getBoolean("animation")
 
 class WindTurbine(
     uuid: UUID,
@@ -92,14 +96,16 @@ class WindTurbine(
     }
     
     override fun handleTick() {
-        runAsyncTask {
+        energyHolder.energy += energyPerTick
+    }
+    
+    override fun handleAsyncTick() {
+        if (PLAY_ANIMATION) {
             turbineModel.useArmorStands {
                 it.setHeadPose(it.headPose.add(0f, 0f, rotationPerTick))
                 it.updateEntityData()
             }
         }
-        
-        energyHolder.energy += energyPerTick
     }
     
     companion object {
