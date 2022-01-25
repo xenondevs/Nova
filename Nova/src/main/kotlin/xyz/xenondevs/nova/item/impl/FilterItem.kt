@@ -50,7 +50,7 @@ object FilterItem : NovaItem() {
         }
     }
     
-    override fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder =
+    override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder =
         itemBuilder.addModifier {
             it.saveFilterConfig(ItemFilter())
             return@addModifier it

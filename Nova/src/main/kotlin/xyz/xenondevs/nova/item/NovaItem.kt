@@ -28,7 +28,7 @@ abstract class NovaItem {
     
     open fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {}
     
-    open fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
+    open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     
     inline fun <reified K> retrieveData(itemStack: ItemStack, key: NamespacedKey): K? {
         return itemStack.itemMeta?.persistentDataContainer?.get(key)

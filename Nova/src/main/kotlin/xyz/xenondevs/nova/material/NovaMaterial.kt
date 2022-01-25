@@ -63,6 +63,7 @@ class NovaMaterial(
     fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder {
         var builder = createBasicItemBuilder()
         itemBuilderModifiers?.forEach { builder = it.invoke(builder, tileEntity) }
+        if (novaItem != null) builder = novaItem.modifyItemBuilder(builder)
         return builder
     }
     
