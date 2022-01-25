@@ -1,7 +1,7 @@
 name: New Item Request
 description: Suggest an idea for a new item.
 title: "[Request - Item] "
-labels: new item
+labels: [ "type: new item" ]
 body:
   - type: input
     attributes:

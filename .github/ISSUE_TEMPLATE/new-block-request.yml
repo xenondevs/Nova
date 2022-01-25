@@ -1,7 +1,7 @@
 name: New Block Request
 description: Suggest an idea for a new block.
 title: "[Request - Block] "
-labels: new block
+labels: [ "type: new block" ]
 body:
   - type: input
     attributes:
