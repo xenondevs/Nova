@@ -23,6 +23,13 @@
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>xenondevs</id>
+            <url>https://repo.xenondevs.xyz/releases</url>
+        </pluginRepository>
+    </pluginRepositories>
+    
     <repositories>
         <repository>
             <id>xenondevs</id>
