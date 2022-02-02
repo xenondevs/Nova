@@ -103,7 +103,7 @@ class ItemDistributor(
                                     // decrease amount by one for the provider
                                     provider.decrementByOne(slot)
                                     // decrease amount by one for the providerContent array
-                                    if (itemStack.amount == 1) providerContent[slot] = null
+                                    if (itemStack.amount <= 1) providerContent[slot] = null
                                     else itemStack.amount -= 1
                                     
                                     didProvide = true

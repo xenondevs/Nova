@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.util.runTaskLater
+import xyz.xenondevs.nova.util.takeUnlessAir
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
 import kotlin.math.min
@@ -154,8 +155,15 @@ class StorageUnit(
                 return arrayOf(type!!.clone().also { it.amount = amount })
             }
         
+        init {
+            // Fix corrupted inventories
+            if (type?.type?.isAir == true) type = null
+        }
+        
         override fun addItem(item: ItemStack): Int {
             val remaining: Int
+            
+            if (item.type.isAir) return 0
             
             if (type == null) { // Storage unit is empty
                 type = item.clone()
@@ -174,11 +182,8 @@ class StorageUnit(
         }
         
         override fun setItem(slot: Int, item: ItemStack?) {
-            amount = item?.amount ?: 0
-            if (item != null || amount == 0)
-                type = item
-            
-            if (amount == 0) type = null
+            amount = item?.takeUnlessAir()?.amount ?: 0
+            type = if (amount != 0) item else null
             if (gui.isInitialized()) gui.value.update()
         }
         
