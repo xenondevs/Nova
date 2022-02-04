@@ -26,6 +26,7 @@ import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.plugin.Plugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.profile.PlayerProfile
 import org.bukkit.scoreboard.Scoreboard
 import org.bukkit.util.BoundingBox
 import org.bukkit.util.RayTraceResult
@@ -117,6 +118,10 @@ class FakeOnlinePlayer(
     
     override fun getBedSpawnLocation(): Location? {
         return offlinePlayer.bedSpawnLocation
+    }
+    
+    override fun getPlayerProfile(): PlayerProfile {
+        return offlinePlayer.playerProfile
     }
     
     @Throws(IllegalArgumentException::class)
