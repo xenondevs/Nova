@@ -1347,6 +1347,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getSpawnCategory(): SpawnCategory {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun setMetadata(metadataKey: String, newMetadataValue: MetadataValue) {
         throw UnsupportedOperationException("Player is not online")
     }
