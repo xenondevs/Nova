@@ -23,6 +23,7 @@ If you would like to help translate Nova, you can do so via [Crowdin](https://cr
 
 # Patrons
 
+FireworkPolymer - €20
 Ashwin | DarktubeNL - €10  
 mrakavin - €10  
 Brett - €5
