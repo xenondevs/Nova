@@ -23,9 +23,10 @@ If you would like to help translate Nova, you can do so via [Crowdin](https://cr
 
 # Patrons
 
-FireworkPolymer - €20
-Ashwin | DarktubeNL - €10  
-mrakavin - €10  
-Brett - €5
+* FireworkPolymer - €20
+* Ashwin | DarktubeNL - €10  
+* mrakavin - €10  
+* Brett - €5
+* Nee - €5
 
 Want to donate as well? Check out our [Patreon](https://www.patreon.com/xenondevs) page.
