@@ -27,7 +27,7 @@ abstract class ChargeableItem(
         storeData(itemStack, ENERGY_KEY, coercedEnergy)
         
         val itemMeta = itemStack.itemMeta!!
-        itemMeta.lore = listOf(NumberFormatUtils.getEnergyString(coercedEnergy, maxEnergy))
+        itemMeta.lore = listOf("§7" + NumberFormatUtils.getEnergyString(coercedEnergy, maxEnergy))
         if (itemMeta is Damageable)
             itemMeta.damage = calculateDamage(itemStack.type, coercedEnergy)
         itemStack.itemMeta = itemMeta
@@ -49,9 +49,8 @@ abstract class ChargeableItem(
         }
     }
     
-    override fun getDefaultItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
-        itemBuilder.damage = calculateDamage(itemBuilder.material, 0)
-        itemBuilder.addLoreLines(NumberFormatUtils.getEnergyString(0, maxEnergy))
+    override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+        itemBuilder.addModifier { setEnergy(it, 0); it }
         return itemBuilder
     }
     

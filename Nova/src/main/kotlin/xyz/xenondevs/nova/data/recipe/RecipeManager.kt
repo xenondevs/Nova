@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.data.recipe
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
@@ -24,8 +22,6 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import java.util.*
-import kotlin.experimental.and
 
 interface ItemTest {
     
@@ -60,7 +56,6 @@ class CustomRecipeChoice(private val tests: List<ItemTest>) : ExactChoice(tests.
     
 }
 
-private val CRAFTING_CACHE_SIZE = DEFAULT_CONFIG.getLong("crafting.cache_size")!!
 private val ALLOW_RESULT_OVERWRITE = DEFAULT_CONFIG.getBoolean("crafting.allow_result_overwrite")
 
 object RecipeManager : Initializable(), Listener {
@@ -69,9 +64,6 @@ object RecipeManager : Initializable(), Listener {
     private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
     val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
-    
-    private val craftingCache: Cache<CraftingMatrix, Optional<Recipe>> =
-        CacheBuilder.newBuilder().concurrencyLevel(1).maximumSize(CRAFTING_CACHE_SIZE).build()
     
     override val inMainThread = true
     override val dependsOn = CustomItemServiceManager
@@ -86,17 +78,29 @@ object RecipeManager : Initializable(), Listener {
                     val key = (recipe as Keyed).key
                     
                     when (recipe) {
-                        is ShapedRecipe -> shapedRecipes[key] = OptimizedShapedRecipe(recipe)
-                        is ShapelessRecipe -> shapelessRecipes[key] = recipe
+                        
+                        is ShapedRecipe -> {
+                            val optimizedRecipe = OptimizedShapedRecipe(recipe)
+                            shapedRecipes[key] = optimizedRecipe
+                            
+                            val nmsRecipe = NovaShapedRecipe(optimizedRecipe)
+                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                        }
+                        
+                        is ShapelessRecipe -> {
+                            shapelessRecipes[key] = recipe
+                            
+                            val nmsRecipe = NovaShapelessRecipe(recipe)
+                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                        }
+                        
+                        else -> Bukkit.addRecipe(recipe)
                     }
                     
-                    Bukkit.addRecipe(recipe)
                     vanillaRegisteredRecipeKeys += key
                 }
                 
-                is NovaRecipe -> {
-                    novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
-                }
+                is NovaRecipe -> novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
                 
                 else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
             }
@@ -135,6 +139,17 @@ object RecipeManager : Initializable(), Listener {
     @EventHandler
     fun handleJoin(event: PlayerJoinEvent) {
         vanillaRegisteredRecipeKeys.forEach(event.player::discoverRecipe)
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
+        val recipe = event.recipe ?: return
+        val namespace = recipe.key.namespace
+        
+        if (namespace == "nova") {
+            // If this is a Nova recipe result, replace it with a NovaCraftingInventory
+            ReflectionRegistry.PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD.set(event, NovaCraftingInventory(recipe, event.inventory))
+        }
     }
     
     @EventHandler
@@ -203,69 +218,6 @@ object RecipeManager : Initializable(), Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.LOWEST)
-    fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
-        val predictedRecipe = event.recipe
-        val recipe = craftingCache.get(CraftingMatrix(event.inventory.matrix)) {
-            if (predictedRecipe != null && (predictedRecipe as Keyed).key.namespace != "nova") {
-                // prevent non-nova recipes from using nova items
-                if (event.inventory.contents.any { it.novaMaterial != null }) {
-                    return@get Optional.empty()
-                } else {
-                    // Bukkit's calculated result is correct
-                    return@get Optional.of(predictedRecipe)
-                }
-            } else {
-                // if the recipe is null or it bukkit thinks it found a nova recipe, we do our own calculations
-                // this does two things:
-                // 1. calls the custom test method of NovaRecipeChoice (-> ignores irrelevant nbt data)
-                // 2. allows for the usage of NovaRecipeChoice / ExactChoice in shapeless crafting recipes
-                
-                val matrix = event.inventory.matrix
-                val recipe = if (matrix.size == 9) {
-                    findMatchingShapedRecipe(matrix) ?: findMatchingShapelessRecipe(matrix)
-                } else findMatchingShapelessRecipe(matrix)
-                
-                return@get Optional.ofNullable(recipe)
-            }
-            
-        }.orElse(null)
-        
-        // Set the resulting item stack
-        event.inventory.result = recipe?.result ?: ItemStack(Material.AIR)
-        
-        // If this is a Nova-calculated result, replace it with a NovaCraftingInventory
-        if (recipe?.key?.namespace == "nova" || predictedRecipe?.key?.namespace == "nova") {
-            ReflectionRegistry.PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD.set(event, NovaCraftingInventory(recipe, event.inventory))
-        }
-    }
-    
-    private fun findMatchingShapedRecipe(matrix: Array<ItemStack?>): Recipe? {
-        // loop over all shaped recipes from nova
-        return shapedRecipes.values.firstOrNull { recipe ->
-            // loop over all items in the crafting grid
-            matrix.withIndex().all { (index, matrixStack) ->
-                // check if the item stack matches with the given recipe choice
-                val choice = recipe.choiceMatrix[index] ?: return@all matrixStack == null
-                return@all matrixStack != null && choice.test(matrixStack)
-            }
-        }?.recipe
-    }
-    
-    private fun findMatchingShapelessRecipe(matrix: Array<ItemStack?>): Recipe? {
-        // loop over all shapeless recipes from nova
-        return shapelessRecipes.values.firstOrNull { recipe ->
-            val choiceList = recipe.choiceList
-            
-            // loop over all items in the inventory and remove matching choices from the choice list
-            // if there is an item stack that does not have a matching choice or the choice list is not empty
-            // at the end of the loop, the recipe doesn't match
-            return@firstOrNull matrix.filterNotNull().all { matrixStack ->
-                choiceList.removeFirstWhere { it.test(matrixStack) }
-            } && choiceList.isEmpty()
-        }
-    }
-    
 }
 
 /**
@@ -283,45 +235,6 @@ class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
         choiceMatrix = Array(9) { recipe.choiceMap[flatShape[it]] }
         requiredChoices = flatShape.mapNotNull { recipe.choiceMap[it] }
         key = (recipe as Keyed).key.toString()
-    }
-    
-}
-
-class CraftingMatrix(matrix: Array<ItemStack?>) {
-    
-    private val matrix = matrix.map { it?.clone() }
-    private val hashCode: Int
-    
-    init {
-        var hash = 1
-        for (item in matrix)
-            hash = 31 * hash + (item?.hashCodeIgnoredAmount() ?: 0)
-        this.hashCode = hash
-    }
-    
-    override fun hashCode(): Int =
-        hashCode
-    
-    override fun equals(other: Any?): Boolean {
-        if (other !is CraftingMatrix || other.matrix.size != matrix.size) return false
-        
-        for (i in matrix.indices) {
-            val item = matrix[i]
-            val otherItem = other.matrix[i]
-            
-            if (!(item?.isSimilar(otherItem) ?: (otherItem == null))) return false
-        }
-        
-        return true
-    }
-    
-    @Suppress("DEPRECATION")
-    private fun ItemStack.hashCodeIgnoredAmount(): Int {
-        var hash = 1
-        hash = hash * 31 + type.hashCode()
-        hash = hash * 31 + (durability and 0xffff.toShort())
-        hash = hash * 31 + if (hasItemMeta()) itemMeta.hashCode() else 0
-        return hash
     }
     
 }

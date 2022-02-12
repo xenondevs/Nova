@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network.fluid
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.fluid.channel.FluidNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
@@ -17,7 +18,7 @@ class FluidNetwork : Network {
     private val bridges = HashSet<FluidBridge>()
     private val channels: Array<FluidNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     
-    private var transferRate = Long.MAX_VALUE
+    private var transferRate = DEFAULT_TRANSFER_RATE
     
     private var nextChannel = 0
     
@@ -85,6 +86,7 @@ class FluidNetwork : Network {
     companion object {
         
         const val CHANNEL_AMOUNT = 4
+        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.fluid.default_transfer_rate")!!
         
     }
     

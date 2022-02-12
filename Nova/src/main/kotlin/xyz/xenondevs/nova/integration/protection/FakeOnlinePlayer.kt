@@ -45,7 +45,7 @@ import java.util.*
 class FakeOnlinePlayer(
     private val offlinePlayer: OfflinePlayer,
     private val location: Location
-) : Player {
+) : Player, OfflinePlayer by offlinePlayer {
     
     override fun hasPermission(name: String): Boolean {
         return PermissionUtils.hasPermission(world, uniqueId, name)
@@ -81,142 +81,6 @@ class FakeOnlinePlayer(
     
     override fun getName(): String {
         return offlinePlayer.name ?: "OfflinePlayer"
-    }
-    
-    override fun getUniqueId(): UUID {
-        return offlinePlayer.uniqueId
-    }
-    
-    override fun isBanned(): Boolean {
-        return offlinePlayer.isBanned
-    }
-    
-    override fun isWhitelisted(): Boolean {
-        return offlinePlayer.isWhitelisted
-    }
-    
-    override fun setWhitelisted(value: Boolean) {
-        offlinePlayer.isWhitelisted = value
-    }
-    
-    override fun getPlayer(): Player? {
-        return offlinePlayer.player
-    }
-    
-    override fun getFirstPlayed(): Long {
-        return offlinePlayer.firstPlayed
-    }
-    
-    override fun getLastPlayed(): Long {
-        return offlinePlayer.lastPlayed
-    }
-    
-    override fun hasPlayedBefore(): Boolean {
-        return offlinePlayer.hasPlayedBefore()
-    }
-    
-    override fun getBedSpawnLocation(): Location? {
-        return offlinePlayer.bedSpawnLocation
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun incrementStatistic(statistic: Statistic) {
-        offlinePlayer.incrementStatistic(statistic)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun decrementStatistic(statistic: Statistic) {
-        offlinePlayer.decrementStatistic(statistic)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun incrementStatistic(statistic: Statistic, amount: Int) {
-        offlinePlayer.incrementStatistic(statistic, amount)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun decrementStatistic(statistic: Statistic, amount: Int) {
-        offlinePlayer.decrementStatistic(statistic, amount)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun setStatistic(statistic: Statistic, newValue: Int) {
-        offlinePlayer.setStatistic(statistic, newValue)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun getStatistic(statistic: Statistic): Int {
-        return offlinePlayer.getStatistic(statistic)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun incrementStatistic(statistic: Statistic, material: Material) {
-        offlinePlayer.incrementStatistic(statistic, material)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun decrementStatistic(statistic: Statistic, material: Material) {
-        offlinePlayer.decrementStatistic(statistic, material)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun getStatistic(statistic: Statistic, material: Material): Int {
-        return offlinePlayer.getStatistic(statistic, material)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun incrementStatistic(statistic: Statistic, material: Material, amount: Int) {
-        offlinePlayer.incrementStatistic(statistic, material, amount)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun decrementStatistic(statistic: Statistic, material: Material, amount: Int) {
-        offlinePlayer.decrementStatistic(statistic, material, amount)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun setStatistic(statistic: Statistic, material: Material, newValue: Int) {
-        offlinePlayer.setStatistic(statistic, material, newValue)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun incrementStatistic(statistic: Statistic, entityType: EntityType) {
-        offlinePlayer.incrementStatistic(statistic, entityType)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun decrementStatistic(statistic: Statistic, entityType: EntityType) {
-        offlinePlayer.decrementStatistic(statistic, entityType)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun getStatistic(statistic: Statistic, entityType: EntityType): Int {
-        return offlinePlayer.getStatistic(statistic, entityType)
-    }
-    
-    @Throws(IllegalArgumentException::class)
-    override fun incrementStatistic(statistic: Statistic, entityType: EntityType, amount: Int) {
-        offlinePlayer.incrementStatistic(statistic, entityType, amount)
-    }
-    
-    override fun decrementStatistic(statistic: Statistic, entityType: EntityType, amount: Int) {
-        offlinePlayer.decrementStatistic(statistic, entityType, amount)
-    }
-    
-    override fun setStatistic(statistic: Statistic, entityType: EntityType, newValue: Int) {
-        offlinePlayer.setStatistic(statistic, entityType, newValue)
-    }
-    
-    override fun isOp(): Boolean {
-        return offlinePlayer.isOp
-    }
-    
-    override fun setOp(value: Boolean) {
-        offlinePlayer.isOp = value
-    }
-    
-    override fun serialize(): Map<String, Any> {
-        return offlinePlayer.serialize()
     }
     
     override fun getDisplayName(): String {
@@ -426,6 +290,10 @@ class FakeOnlinePlayer(
     }
     
     override fun updateInventory() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getPreviousGameMode(): GameMode? {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1476,6 +1344,10 @@ class FakeOnlinePlayer(
     }
     
     override fun getPose(): Pose {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getSpawnCategory(): SpawnCategory {
         throw UnsupportedOperationException("Player is not online")
     }
     

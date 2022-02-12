@@ -1,4 +1,5 @@
 {
   "capacity": 10000,
-  "energy_per_tick": 100
+  "energy_per_tick": 100,
+  "animation": true
 }

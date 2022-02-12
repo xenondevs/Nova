@@ -19,7 +19,7 @@ object ReflectionRegistry {
     val CB_CRAFT_META_ITEM_CLASS = getCBClass("inventory.CraftMetaItem")
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class.java)
     
-    val ARMOR_STAND_ARMOR_ITEMS_FIELD = getField(ArmorStand::class.java, true, "cd")
+    val ARMOR_STAND_ARMOR_ITEMS_FIELD = getField(ArmorStand::class.java, true, "SRF(net.minecraft.world.entity.decoration.ArmorStand armorItems)")
     
     val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class.java, true, "children")
     val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class.java, true, "literals")

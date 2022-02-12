@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util
 
 import io.netty.buffer.Unpooled
 import net.minecraft.core.BlockPos
+import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
 import net.minecraft.core.Rotations
 import net.minecraft.network.FriendlyByteBuf
@@ -17,6 +18,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.entity.EntityType
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld
@@ -28,6 +30,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import java.util.*
+import net.minecraft.world.item.ItemStack as NMSItemStack
 
 val Entity.nmsEntity: net.minecraft.world.entity.Entity
     get() = (this as CraftEntity).handle
@@ -35,8 +38,11 @@ val Entity.nmsEntity: net.minecraft.world.entity.Entity
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
-val ItemStack.nmsStack: net.minecraft.world.item.ItemStack
+val ItemStack.nmsStack: NMSItemStack
     get() = CraftItemStack.asNMSCopy(this)
+
+val NMSItemStack.bukkitStack
+    get() = CraftItemStack.asBukkitCopy(this)
 
 val Location.blockPos: BlockPos
     get() = BlockPos(blockX, blockY, blockZ)
@@ -46,6 +52,9 @@ val World.serverLevel: ServerLevel
 
 val Player.connection: ServerGamePacketListenerImpl
     get() = serverPlayer.connection
+
+val NamespacedKey.resourceLocation: ResourceLocation
+    get() = ResourceLocation(toString())
 
 fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
@@ -68,6 +77,16 @@ fun ClientboundPlaceGhostRecipePacket(containerId: Int, resourceLocation: String
     buffer.writeByte(containerId)
     buffer.writeResourceLocation(ResourceLocation(resourceLocation))
     return ClientboundPlaceGhostRecipePacket(buffer)
+}
+
+fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
+    val nonNullList = if (default == null)
+        NonNullList.createWithCapacity(list.size)
+    else NonNullList.withSize<E>(list.size, default)
+    
+    nonNullList.addAll(list)
+    
+    return nonNullList
 }
 
 object NMSUtils {

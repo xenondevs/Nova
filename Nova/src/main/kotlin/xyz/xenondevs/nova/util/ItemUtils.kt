@@ -109,6 +109,9 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     return first.isSimilar(second)
 }
 
+fun ItemStack.takeUnlessAir(): ItemStack? =
+    if (type.isAir) null else this
+
 object ItemUtils {
     
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {

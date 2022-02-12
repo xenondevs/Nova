@@ -1,12 +1,16 @@
 package xyz.xenondevs.nova.tileentity.network.energy
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.sumOfNoOverflow
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
+
+private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.energy.default_transfer_rate")!!
 
 /**
  * An EnergyNetwork consists of [NetworkBridge] that connect [NetworkEndPoint]
@@ -32,7 +36,7 @@ class EnergyNetwork : Network {
         get() = buffers.sumOfNoOverflow { it.energy }
     private val requestedConsumerEnergy: Long
         get() = consumers.sumOfNoOverflow { it.requestedEnergy }
-    private var transferRate = Long.MAX_VALUE
+    private var transferRate = DEFAULT_TRANSFER_RATE
     
     override fun addAll(network: Network) {
         require(network !== this) { "Can't add to self" }

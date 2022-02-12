@@ -6,4 +6,6 @@ interface ActionbarOverlay {
     
     val text: Array<BaseComponent>
     
+    val width: Int
+    
 }

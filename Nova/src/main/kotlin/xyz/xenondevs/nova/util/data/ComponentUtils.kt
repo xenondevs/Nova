@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.data
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.md_5.bungee.chat.ComponentSerializer
@@ -10,8 +11,12 @@ import net.minecraft.network.chat.Component
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftChatMessage
 import org.bukkit.entity.Entity
+import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.util.localizedName
+import xyz.xenondevs.nova.util.removeMinecraftFormatting
 import net.minecraft.network.chat.TextComponent as NMSTextComponent
+
+private val DEFAULT_FONT_TEMPLATE = ComponentBuilder("").font("default").create()[0]
 
 fun coloredText(color: ChatColor, text: Any): TextComponent {
     val component = TextComponent(text.toString())
@@ -73,4 +78,36 @@ fun Array<out BaseComponent>.toComponent(): Component {
     } catch (e: Exception) {
         throw IllegalArgumentException("Could not convert to Component: ${this.contentToString()}", e)
     }
+}
+
+fun Array<out BaseComponent>.toPlainText(locale: String): String {
+    val sb = StringBuilder()
+    
+    for (component in this) {
+        if (component is TranslatableComponent) {
+            sb.append(component.toPlainText(locale))
+        } else sb.append(component.toPlainText().removeMinecraftFormatting())
+    }
+    
+    return sb.toString()
+}
+
+fun TranslatableComponent.toPlainText(locale: String): String {
+    val with = with?.map { if (it is TranslatableComponent) it.toPlainText(locale) else it.toPlainText() }
+    
+    val text = if (with != null)
+        LocaleManager.getTranslation(locale, translate, *with.toTypedArray())
+    else LocaleManager.getTranslation(locale, translate)
+    
+    return text.removeMinecraftFormatting()
+}
+
+fun Array<out BaseComponent>.forceDefaultFont(): Array<out BaseComponent> {
+    var previousComponent = DEFAULT_FONT_TEMPLATE
+    for (component in this) {
+        component.copyFormatting(previousComponent, false)
+        previousComponent = component
+    }
+    
+    return this
 }
