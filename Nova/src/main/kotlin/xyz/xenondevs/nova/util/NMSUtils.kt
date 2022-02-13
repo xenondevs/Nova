@@ -80,11 +80,14 @@ fun ClientboundPlaceGhostRecipePacket(containerId: Int, resourceLocation: String
 }
 
 fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
-    val nonNullList = if (default == null)
-        NonNullList.createWithCapacity(list.size)
-    else NonNullList.withSize<E>(list.size, default)
-    
-    nonNullList.addAll(list)
+    val nonNullList: NonNullList<E>
+    if (default == null) {
+        nonNullList = NonNullList.createWithCapacity(list.size)
+        nonNullList.addAll(list)
+    } else {
+        nonNullList = NonNullList.withSize(list.size, default)
+        list.forEachIndexed { index, e -> nonNullList[index] = e }
+    }
     
     return nonNullList
 }
