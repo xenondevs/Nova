@@ -498,7 +498,7 @@
             <plugin>
                 <groupId>xyz.xenondevs</groupId>
                 <artifactId>string-remapper-maven-plugin</artifactId>
-                <version>0.1-SNAPSHOT</version>
+                <version>0.2-SNAPSHOT</version>
 
                 <executions>
                     <execution>
@@ -515,6 +515,15 @@
                                 <classes>org.spigotmc:minecraft-server:csrg:maps-spigot:${spigot.version}</classes>
                                 <members>org.spigotmc:minecraft-server:csrg:maps-spigot-members:${spigot.version}</members>
                             </mapsSpigot>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>remove-remapper-sources</id>
+                        <goals>
+                            <goal>cleanup</goal>
+                        </goals>
+                        <configuration>
+                            <srcOut>string-remapper-sources/</srcOut>
                         </configuration>
                     </execution>
                 </executions>
