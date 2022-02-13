@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.ItemManager
+import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.network.PacketListener
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.player.advancement.AdvancementManager
@@ -33,6 +34,7 @@ object Initializer {
     
     private val toInit = listOf(
         UpdateReminder, DatabaseManager, CustomItemServiceManager,
+        PacketItems,
         LocaleManager, ChunkReloadWatcher, FakeArmorStandManager, AdvancementManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         TileEntityManager, NetworkManager, ItemManager, AttachmentManager,
