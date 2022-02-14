@@ -318,7 +318,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         if (material != null) {
             event.isCancelled = true
             
-            if (material.isBlock) {
+            if (material.isTileEntity) {
                 val playerLocation = player.location
                 
                 if (material.placeCheck?.invoke(

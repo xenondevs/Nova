@@ -8,7 +8,7 @@ import java.lang.reflect.Type
 object NovaMaterialSerialization : JsonSerializer<NovaMaterial>, JsonDeserializer<NovaMaterial> {
     
     override fun serialize(src: NovaMaterial, typeOfSrc: Type, context: JsonSerializationContext) =
-        JsonPrimitive(src.typeName)
+        JsonPrimitive(src.id)
     
     
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) =

@@ -27,6 +27,10 @@ object PermanentStorage {
         file.writeText(GSON.toJson(mainObj))
     }
     
+    fun has(key: String): Boolean {
+        return mainObj.has(key)
+    }
+    
     fun remove(key: String) {
         mainObj.remove(key)
         file.writeText(GSON.toJson(mainObj))

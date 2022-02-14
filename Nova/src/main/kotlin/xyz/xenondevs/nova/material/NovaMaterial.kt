@@ -7,6 +7,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
@@ -20,29 +21,23 @@ typealias TileEntityConstructor = ((UUID, CompoundElement, NovaMaterial, UUID, F
 typealias PlaceCheckFun = ((Player, ItemStack, Location) -> Boolean)
 
 class NovaMaterial(
-    val typeName: String,
+    override val id: String,
     val localizedName: String,
-    val item: ModelData,
     val novaItem: NovaItem? = null,
     private val itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
-    val block: ModelData? = null,
     val hitboxType: Material? = null,
     val tileEntityConstructor: TileEntityConstructor? = null,
     val placeCheck: PlaceCheckFun? = null,
-    val isDirectional: Boolean = true,
-    val legacyItemIds: IntArray? = null,
+    val isDirectional: Boolean = true
 ) : INovaMaterial, Comparable<NovaMaterial> {
     
-    val isBlock = block != null && tileEntityConstructor != null
+    val item: ModelData by lazy { Resources.getModelData(id).first!! }
+    val block: ModelData? by lazy { Resources.getModelData(id).second }
     
-    val basicItemProvider: ItemProvider = ItemWrapper(createBasicItemBuilder().get())
-    val itemProvider: ItemProvider = ItemWrapper(createItemStack())
+    val basicItemProvider: ItemProvider by lazy { ItemWrapper(createBasicItemBuilder().get()) }
+    val itemProvider: ItemProvider by lazy { ItemWrapper(createItemStack()) }
     
-    val maxStackSize = item.material.maxStackSize
-    
-    init {
-        require(item.dataArray.isNotEmpty())
-    }
+    val isTileEntity = tileEntityConstructor != null
     
     /**
      * Creates a basic [ItemBuilder][ItemBuilder] without any additional information
@@ -76,13 +71,10 @@ class NovaMaterial(
         return item.data.compareTo(other.item.data)
     }
     
-    override val id: String
-        get() = "nova:${typeName.lowercase()}"
-    
     override fun getLocalizedName(locale: String): String {
         return LocaleManager.getTranslatedName(locale, this)
     }
     
-    override fun toString() = typeName
+    override fun toString() = id
     
 }

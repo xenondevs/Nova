@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.ItemManager
@@ -33,7 +34,7 @@ import java.util.concurrent.CountDownLatch
 object Initializer {
     
     private val toInit = listOf(
-        UpdateReminder, DatabaseManager, CustomItemServiceManager,
+        Resources, UpdateReminder, DatabaseManager, CustomItemServiceManager,
         PacketItems,
         LocaleManager, ChunkReloadWatcher, FakeArmorStandManager, AdvancementManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,

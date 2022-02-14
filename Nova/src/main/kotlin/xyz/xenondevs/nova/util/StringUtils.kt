@@ -36,3 +36,9 @@ fun String.Companion.formatSafely(format: String, vararg args: Any?): String {
 fun String.removeMinecraftFormatting(): String {
     return replace(FORMATTING_FILTER_REGEX, "")
 }
+
+fun String.addPrefix(prefix: String): String =
+    if (startsWith(prefix)) this else "$prefix$this"
+
+fun String.addNamespace(namespace: String): String =
+    addPrefix("$namespace:")

@@ -52,9 +52,12 @@ val Material.localizedName: String?
 
 val ItemStack.novaMaterial: NovaMaterial?
     get() {
-        val customModelData = customModelData
-        val material = NovaMaterialRegistry.getOrNull(customModelData)
-        if (material != null && material.item.material == type) return material
+        
+        // TODO
+        
+//        val customModelData = customModelData
+//        val material = NovaMaterialRegistry.getOrNull(customModelData)
+//        if (material != null && material.item.material == type) return material
         return null
     }
 
@@ -122,9 +125,12 @@ object ItemUtils {
                 
                 return@map when (name.substringBefore(':')) {
                     "nova" -> {
+                        
+                        // TODO
+                        
                         val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
                         val bukkitMaterial = material.item.material
-                        val modelData = intArrayOf(material.item.data).let { if (material.legacyItemIds != null) it + material.legacyItemIds else it }
+                        val modelData = intArrayOf(material.item.data)
                         ModelDataTest(bukkitMaterial, modelData, material.createItemStack())
                     }
                     "minecraft" -> {
@@ -192,7 +198,7 @@ object ItemUtils {
     
     fun getId(itemStack: ItemStack): String {
         val novaMaterial = itemStack.novaMaterial
-        if (novaMaterial != null) return "nova:${novaMaterial.typeName.lowercase()}"
+        if (novaMaterial != null) return "nova:${novaMaterial.id.lowercase()}"
         
         val customNameKey = CustomItemServiceManager.getNameKey(itemStack)
         if (customNameKey != null) return customNameKey

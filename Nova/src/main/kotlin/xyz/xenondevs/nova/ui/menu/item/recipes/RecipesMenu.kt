@@ -8,6 +8,8 @@ import de.studiocode.invui.gui.impl.SimplePagedNestedGUI
 import de.studiocode.invui.gui.impl.SimpleTabGUI
 import de.studiocode.invui.gui.impl.TabGUI
 import de.studiocode.invui.gui.structure.Structure
+import de.studiocode.invui.item.ItemProvider
+import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.controlitem.ControlItem
@@ -27,6 +29,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
@@ -220,10 +223,10 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
 
 private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
     
-    override fun getItemProvider(): ItemBuilder {
+    override fun getItemProvider(): ItemProvider {
         return if (ItemMenu.hasHistory(viewerUUID)) {
-            Icon.LIGHT_ARROW_1_LEFT.itemBuilder
-        } else ItemBuilder(Material.AIR)
+            CoreGUIMaterial.LIGHT_ARROW_1_LEFT.itemProvider
+        } else ItemWrapper(ItemStack(Material.AIR))
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

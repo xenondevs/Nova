@@ -110,8 +110,15 @@ fun JsonArray.getAllStrings() =
 fun JsonArray.getAllDoubles() =
     filter(JsonElement::isNumber).map { it.asDouble }
 
+fun JsonArray.getAllInts() =
+    filter(JsonElement::isNumber).map { it.asInt }
+
 fun <T> JsonArray.toStringList(consumer: (List<String>) -> T) =
     consumer(this.filter(JsonElement::isString).map(JsonElement::getAsString))
+
+fun JsonObject.addAll(other: JsonObject) {
+    other.entrySet().forEach { (property, value) -> add(property, value) }
+}
 
 inline fun <reified T> Gson.fromJson(jsonElement: JsonElement?): T? {
     if (jsonElement == null) return null

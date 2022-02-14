@@ -52,7 +52,7 @@ class BlockPlacer(
             
             val material = item.type
             val novaMaterial = item.novaMaterial
-            if (novaMaterial != null && novaMaterial.isBlock) {
+            if (novaMaterial != null && novaMaterial.isTileEntity) {
                 if (TileEntityLimits.canPlaceTileEntity(ownerUUID, world, novaMaterial) == PlaceResult.ALLOW) {
                     runTask { TileEntityManager.placeTileEntity(ownerUUID, placeLocation, armorStand.location.yaw, novaMaterial, null) }
                     novaMaterial.hitboxType?.playPlaceSoundEffect(placeLocation)

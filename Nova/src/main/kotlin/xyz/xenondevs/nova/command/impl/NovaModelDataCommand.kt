@@ -17,7 +17,7 @@ object NovaModelDataCommand : Command("nvmodeldata") {
             .requiresPermission("nova.command.modeldata")
             .apply {
                 NovaMaterialRegistry.sortedValues.forEach { material ->
-                    then(literal(material.typeName.lowercase())
+                    then(literal(material.id.lowercase())
                         .executesCatching { showModelData(material, it) }
                     )
                 }
@@ -36,7 +36,7 @@ object NovaModelDataCommand : Command("nvmodeldata") {
     private fun showModelData(material: NovaMaterial, ctx: CommandContext<CommandSourceStack>) {
         val localizedName: Any =
             if (material.localizedName.isNotEmpty()) localized(ChatColor.AQUA, material.localizedName)
-            else coloredText(ChatColor.AQUA, material.typeName)
+            else coloredText(ChatColor.AQUA, material.id)
         
         // Send item info
         val item = material.item.material
@@ -50,17 +50,17 @@ object NovaModelDataCommand : Command("nvmodeldata") {
             coloredText(ChatColor.AQUA, material.item.dataArray.contentToString()),
         ))
         
-        if (material.block != null) {
+        val block = material.block
+        if (block != null) {
             // Send block info
-            val block = material.block.material
-            val blockLocalized = localized(ChatColor.AQUA, block)
+            val blockLocalized = localized(ChatColor.AQUA, block.material)
             
             ctx.source.sendSuccess(localized(
                 ChatColor.GRAY,
                 "command.nova.modeldata.block",
                 localizedName,
                 blockLocalized,
-                coloredText(ChatColor.AQUA, material.block.dataArray.contentToString()),
+                coloredText(ChatColor.AQUA, block.dataArray.contentToString()),
             ))
         }
     }

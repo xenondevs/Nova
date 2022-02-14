@@ -88,7 +88,7 @@ class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataF
         
         operator fun get(name: String) = configs[name]!!
         
-        operator fun get(material: NovaMaterial) = configs["machine/${material.typeName.lowercase()}"]!!
+        operator fun get(material: NovaMaterial) = configs["machine/${material.id.lowercase()}"]!!
         
     }
     

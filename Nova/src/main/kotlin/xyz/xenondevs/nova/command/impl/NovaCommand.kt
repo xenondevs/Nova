@@ -40,7 +40,7 @@ object NovaCommand : Command("nova") {
                 .then(argument("player", EntityArgument.players())
                     .apply {
                         OBTAINABLE_NOVA_ITEMS.forEach { material ->
-                            then(literal(material.typeName.lowercase())
+                            then(literal(material.id.lowercase())
                                 .executesCatching { handleGiveTo(it, material, 1) }
                                 .then(argument("amount", IntegerArgumentType.integer())
                                     .executesCatching { handleGiveTo(it, material) }))
@@ -72,7 +72,7 @@ object NovaCommand : Command("nova") {
         handleGiveTo(ctx, material, ctx["amount"])
     
     private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: NovaMaterial, amount: Int) {
-        val itemName = material.localizedName.ifBlank { material.typeName }
+        val itemName = material.localizedName.ifBlank { material.id }
         
         val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
         

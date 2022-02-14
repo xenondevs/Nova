@@ -11,6 +11,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkType
@@ -105,7 +106,7 @@ class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(
     
 }
 
-class BackItem(private val openPrevious: (Player) -> Unit) : SimpleItem(Icon.ARROW_1_LEFT.itemBuilder) {
+class BackItem(private val openPrevious: (Player) -> Unit) : SimpleItem(CoreGUIMaterial.ARROW_1_LEFT.itemProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         openPrevious(player)

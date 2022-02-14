@@ -27,6 +27,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.i18n.LocaleManager
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
@@ -95,7 +96,7 @@ class ItemsWindow(val player: Player) : ItemMenu {
     ) { openSearchWindow() }
     
     private val openMainWindowItem = clickableItem(
-        Icon.ARROW_1_UP.itemBuilder.setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
+        CoreGUIMaterial.ARROW_1_UP.createBasicItemBuilder().setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
     ) { openMainWindow() }
     
     private val mainGUI = GUIBuilder(GUIType.TAB, 9, 6)
@@ -187,7 +188,7 @@ class ItemsWindow(val player: Player) : ItemMenu {
             .apply {
                 setItem(0, textItem)
                 setItem(2, clickableItem(
-                    Icon.X.itemBuilder.setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.clear")
+                    CoreGUIMaterial.X.createBasicItemBuilder().setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.clear")
                 ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
             }
         

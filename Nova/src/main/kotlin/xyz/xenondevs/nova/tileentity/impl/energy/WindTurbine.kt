@@ -79,11 +79,11 @@ class WindTurbine(
         columnModel.addModels(Model(WIND_TURBINE.block!!.createItemStack(1), location))
         
         location.y += 1.0 / 32.0
-        turbineModel.addModels(Model(WIND_TURBINE.block.createItemStack(2), location))
+        turbineModel.addModels(Model(WIND_TURBINE.block!!.createItemStack(2), location))
         
         for (blade in 0..2) {
             turbineModel.addModels(Model(
-                WIND_TURBINE.block.createItemStack(3),
+                WIND_TURBINE.block!!.createItemStack(3),
                 location,
                 Rotations(0f, 0f, blade * 120f)
             ))

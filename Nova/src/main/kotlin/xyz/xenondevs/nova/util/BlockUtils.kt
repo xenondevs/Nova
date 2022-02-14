@@ -155,7 +155,7 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
 
 fun Location.getBlockName(): String {
     val tileEntity = TileEntityManager.getTileEntityAt(this)
-    return if (tileEntity != null) "nova:" + tileEntity.material.typeName.lowercase()
+    return if (tileEntity != null) "nova:" + tileEntity.material.id.lowercase()
     else "minecraft:" + block.type.name.lowercase()
 }
 

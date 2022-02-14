@@ -132,3 +132,7 @@ fun <T> MutableList<T>.rotateLeft() {
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { transform(get(it)) }
 }
+
+inline fun <T> List<T>.mapToIntArray(transform: (T) -> Int): IntArray {
+    return IntArray(size) { transform(get(it)) }
+}

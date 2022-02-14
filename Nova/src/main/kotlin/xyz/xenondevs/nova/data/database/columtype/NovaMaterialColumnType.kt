@@ -15,6 +15,6 @@ class NovaMaterialColumnType : IColumnType by VarCharColumnType(128) {
         NovaMaterialRegistry.get(super.valueFromDB(value) as String)
     
     override fun valueToDB(value: Any?) =
-        super.valueToDB((value as NovaMaterial).typeName)
+        super.valueToDB((value as NovaMaterial).id)
     
 }
