@@ -11,13 +11,13 @@ import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.StaticFluidBar
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 
 private val FLUID_CAPACITY = NovaConfig[NovaMaterialRegistry.FLUID_INFUSER].getLong("fluid_capacity")!!
 
 object FluidInfuserRecipeGroup : RecipeGroup() {
     
-    override val overlay = CustomCharacters.FLUID_INFUSER
+    override val texture = CoreGUITexture.EMPTY_GUI // TODO: change to the correct texture when possible
     override val icon = NovaMaterialRegistry.FLUID_INFUSER.basicItemProvider
     override val priority = 6
     

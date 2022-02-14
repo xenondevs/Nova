@@ -14,7 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.ui.item.AioNumberItem
-import xyz.xenondevs.nova.ui.overlay.GUITexture
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import java.awt.Color
 
 class ColorPickerWindow(
@@ -65,7 +65,8 @@ class ColorPickerWindow(
     }
     
     fun openWindow(player: Player) {
-        SimpleWindow(player, GUITexture.PICK_COLOR.getTitle("menu.nova.color_picker"), gui).show()
+        // TODO: change to correct gui texture when possible
+        SimpleWindow(player, CoreGUITexture.EMPTY_GUI.getTitle("menu.nova.color_picker"), gui).show()
     }
     
 }

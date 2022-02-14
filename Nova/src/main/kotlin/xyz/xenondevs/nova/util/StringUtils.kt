@@ -42,3 +42,6 @@ fun String.addPrefix(prefix: String): String =
 
 fun String.addNamespace(namespace: String): String =
     addPrefix("$namespace:")
+
+fun String.removeNamespace(namespace: String): String =
+    removePrefix("$namespace:")

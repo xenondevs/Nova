@@ -3,15 +3,17 @@ package xyz.xenondevs.nova.addon.assets
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import xyz.xenondevs.nova.data.resources.MaterialType
+import xyz.xenondevs.nova.data.resources.builder.MaterialType
 import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.data.getAllInts
 import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.isString
 
-object AssetsIndexDeserializer {
+object MaterialsIndexDeserializer {
     
-    fun deserializeAssetsIndex(namespace: String, json: JsonObject): List<RegisteredMaterial> {
+    fun deserialize(namespace: String, json: JsonElement): List<RegisteredMaterial> {
+        require(json is JsonObject)
+        
         val index = ArrayList<RegisteredMaterial>()
         
         json.entrySet().forEach { (name, element) ->

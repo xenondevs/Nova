@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import xyz.xenondevs.nova.util.data.getInputStacks
 
 abstract class ConversionRecipeGroup : RecipeGroup() {
@@ -68,23 +68,23 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
 object SmeltingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.FURNACE))
-    override val overlay = CustomCharacters.FURNACE_RECIPE
+    override val texture = CoreGUITexture.RECIPE_SMELTING
 }
 
 object StonecutterRecipeGroup : ConversionRecipeGroup() {
     override val priority = 2
     override val icon = ItemWrapper(ItemStack(Material.STONECUTTER))
-    override val overlay = CustomCharacters.CONVERSION_RECIPE
+    override val texture = CoreGUITexture.RECIPE_CONVERSION
 }
 
 object PulverizingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 4
     override val icon = NovaMaterialRegistry.PULVERIZER.basicItemProvider
-    override val overlay = CustomCharacters.PULVERIZER_RECIPE
+    override val texture = CoreGUITexture.EMPTY_GUI // TODO: change to the correct texture when possible
 }
 
 object PressingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 5
     override val icon = NovaMaterialRegistry.MECHANICAL_PRESS.basicItemProvider
-    override val overlay = CustomCharacters.PRESS_RECIPE
+    override val texture = CoreGUITexture.EMPTY_GUI // TODO: change to the correct texture when possible
 }

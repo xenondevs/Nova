@@ -9,12 +9,12 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.ui.StaticFluidBar
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 
 object FreezerRecipeGroup : RecipeGroup() {
     
     override val priority = 8
-    override val overlay = CustomCharacters.FREEZER
+    override val texture = CoreGUITexture.EMPTY_GUI // TODO: Change to the correct texture when available
     override val icon = NovaMaterialRegistry.FREEZER.basicItemProvider
     
     override fun createGUI(container: RecipeContainer): GUI {

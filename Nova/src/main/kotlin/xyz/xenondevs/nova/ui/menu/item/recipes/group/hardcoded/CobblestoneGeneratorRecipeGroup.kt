@@ -10,12 +10,12 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.ui.StaticFluidBar
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 
 object CobblestoneGeneratorRecipeGroup : RecipeGroup() {
     
     override val priority = 7
-    override val overlay = CustomCharacters.COBBLESTONE_GENERATOR
+    override val texture = CoreGUITexture.EMPTY_GUI // TODO: Change to the correct texture when available
     override val icon = NovaMaterialRegistry.COBBLESTONE_GENERATOR.basicItemProvider
     
     override fun createGUI(container: RecipeContainer): GUI {

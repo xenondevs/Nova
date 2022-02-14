@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.overlay.impl
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import xyz.xenondevs.nova.ui.overlay.ActionbarOverlay
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 
 class JetpackOverlay : ActionbarOverlay {
     
@@ -25,7 +25,7 @@ class JetpackOverlay : ActionbarOverlay {
         val stage = (percentage * 38).toInt()
         
         return ComponentBuilder()
-            .append(CustomCharacters.getMovingComponent(95))
+            .append(MoveCharacters.getMovingComponent(95))
             .append(('\uF000'.code + stage).toChar().toString())
             .font("nova:jetpack")
             .create()

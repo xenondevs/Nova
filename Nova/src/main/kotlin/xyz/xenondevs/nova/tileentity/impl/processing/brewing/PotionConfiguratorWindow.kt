@@ -28,6 +28,7 @@ import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.ColorPickerWindow
 import xyz.xenondevs.nova.ui.menu.OpenColorPickerWindowItem
 import xyz.xenondevs.nova.ui.menu.PotionColorPreviewItem
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import xyz.xenondevs.nova.ui.overlay.GUITexture
 import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.localized
@@ -106,7 +107,8 @@ class PotionConfiguratorWindow(
     }
     
     fun openConfigurator(player: Player) {
-        SimpleWindow(player, GUITexture.CONFIGURE_POTION.getTitle("menu.nova.electric_brewing_stand.configure_potion"), gui).show()
+        // TODO: change to correct gui texture when possible
+        SimpleWindow(player, CoreGUITexture.EMPTY_GUI.getTitle("menu.nova.electric_brewing_stand.configure_potion"), gui).show()
     }
     
     private inner class PotionTypeGUI(private val effect: PotionEffectBuilder) {
@@ -250,7 +252,7 @@ class PotionConfiguratorWindow(
             .build()
         
         fun openPicker(player: Player) {
-            SimpleWindow(player, GUITexture.EMPTY_GUI.getTitle("menu.nova.electric_brewing_stand.pick_effect"), gui).show()
+            SimpleWindow(player, CoreGUITexture.EMPTY_GUI.getTitle("menu.nova.electric_brewing_stand.pick_effect"), gui).show()
         }
         
         private inner class ChooseEffectTypeItem(private val type: PotionEffectType) : BaseItem() {

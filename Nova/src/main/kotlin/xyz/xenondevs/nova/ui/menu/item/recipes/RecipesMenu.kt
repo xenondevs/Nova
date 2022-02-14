@@ -14,7 +14,6 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.controlitem.ControlItem
 import de.studiocode.invui.item.impl.controlitem.TabItem
-import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.Window
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.ChatColor
@@ -30,10 +29,9 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.material.CoreGUIMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 import xyz.xenondevs.nova.util.ItemUtils
 import java.util.*
 
@@ -130,11 +128,11 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
         val pageNumberString = "${currentTab.currentPageIndex + 1} / ${currentTab.pageAmount}"
         
         return ComponentBuilder()
-            .append(CustomCharacters.getMovingComponent(-8)) // move to side to place overlay
-            .append(currentType.overlay.component)
-            .append(CustomCharacters.getMovingComponent(-84)) // move back to the middle
-            .append(CustomCharacters.getMovingComponent((
-                CustomCharacters.getStringLength(pageNumberString) // this would be the string length in the default font
+            .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
+            .append(currentType.texture.component)
+            .append(MoveCharacters.getMovingComponent(-84)) // move back to the middle
+            .append(MoveCharacters.getMovingComponent((
+                MoveCharacters.getStringLength(pageNumberString) // this would be the string length in the default font
                     + pageNumberString.replace(" ", "").length // non-space characters are generally one pixel bigger in this font
                 ) / -2 // divided by -2 to center it
             ))
@@ -181,7 +179,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
     private inner class PageBackItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
-            (if (gui.hasPageBefore()) NovaMaterialRegistry.ARROW_LEFT_ON_BUTTON else NovaMaterialRegistry.ARROW_LEFT_OFF_BUTTON)
+            (if (gui.hasPageBefore()) CoreGUIMaterial.TP_ARROW_LEFT_BTN_ON else CoreGUIMaterial.TP_ARROW_LEFT_BTN_OFF)
                 .createBasicItemBuilder()
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -197,7 +195,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
     private inner class PageForwardItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
-            (if (gui.hasNextPage()) NovaMaterialRegistry.ARROW_RIGHT_ON_BUTTON else NovaMaterialRegistry.ARROW_RIGHT_OFF_BUTTON)
+            (if (gui.hasNextPage()) CoreGUIMaterial.TP_ARROW_RIGHT_BTN_ON else CoreGUIMaterial.TP_ARROW_RIGHT_BTN_OFF)
                 .createBasicItemBuilder()
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

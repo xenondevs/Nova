@@ -1,13 +1,13 @@
 package xyz.xenondevs.nova.addon.assets
 
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import java.io.File
 
-class AssetsPack(val directory: File) {
+class AssetPack(val directory: File) {
     
     val namespace = directory.name
-    val assetsFile = File(directory, "assets.json")
+    val materialsFile = File(directory, "materials.json")
+    val guisFile = File(directory, "guis.json")
     
     // Sub-folders
     val modelsDir = File(directory, "models").takeIf(File::exists)
@@ -20,13 +20,12 @@ class AssetsPack(val directory: File) {
     /**
      * A map containing all nova materials as keys with their corresponding item and block modeldata
      */
-    val assetsIndex: List<RegisteredMaterial>
+    val materialsIndex: List<RegisteredMaterial>? = if (materialsFile.exists())
+        MaterialsIndexDeserializer.deserialize(namespace, JsonParser.parseReader(materialsFile.reader()))
+    else null
     
-    init {
-        if (!assetsFile.exists())
-            throw IllegalArgumentException("Asset Pack does not contain assets.json")
-        
-        assetsIndex = AssetsIndexDeserializer.deserializeAssetsIndex(namespace, JsonParser.parseReader(assetsFile.reader()) as JsonObject)
-    }
+    val guisIndex: Map<String, String>? = if (guisFile.exists())
+        GUIsIndexDeserializer.deserialize(namespace, JsonParser.parseReader(guisFile.reader()))
+    else null
     
 }

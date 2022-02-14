@@ -12,7 +12,6 @@ import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.controlitem.TabItem
-import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.Window
 import de.studiocode.invui.window.impl.merged.split.AnvilSplitWindow
 import de.studiocode.invui.window.impl.single.SimpleWindow
@@ -33,7 +32,8 @@ import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
+import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 import xyz.xenondevs.nova.util.ItemUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getString
@@ -56,12 +56,12 @@ private val CATEGORIES: List<Category> = NovaConfig["creative_items"].getArray("
 
 private val OBTAINABLE_ITEMS: List<ObtainableItem> = CATEGORIES.flatMap { it.items }
 
-private val TAB_BUTTON_CHARACTERS = arrayOf(
-    CustomCharacters.CREATIVE_0,
-    CustomCharacters.CREATIVE_1,
-    CustomCharacters.CREATIVE_2,
-    CustomCharacters.CREATIVE_3,
-    CustomCharacters.CREATIVE_4
+private val TAB_BUTTON_TEXTURES = arrayOf(
+    CoreGUITexture.ITEMS_0,
+    CoreGUITexture.ITEMS_1,
+    CoreGUITexture.ITEMS_2,
+    CoreGUITexture.ITEMS_3,
+    CoreGUITexture.ITEMS_4
 )
 
 class ObtainableItem(name: String) : BaseItem() {
@@ -161,18 +161,13 @@ class ItemsWindow(val player: Player) : ItemMenu {
     private fun getMainWindowTitle(): Array<BaseComponent> {
         return if (filter == "") {
             ComponentBuilder()
-                .append(CustomCharacters.getMovingComponent(-8)) // move to side to place overlay
-                .append(TAB_BUTTON_CHARACTERS[mainGUI.currentTab].component)
+                .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
+                .append(TAB_BUTTON_TEXTURES[mainGUI.currentTab].component)
                 .create()
         } else {
-            ComponentBuilder()
-                .append(CustomCharacters.getMovingComponent(-8)) // move to side to place overlay
-                .append(CustomCharacters.EMPTY_GUI.component)
-                .append(CustomCharacters.getMovingComponent(-170)) // move back to start
-                .append(TranslatableComponent("menu.nova.items.searched").apply { addWith(coloredText(ChatColor.GRAY, filter)) })
-                .font("default")
-                .color(ChatColor.DARK_GRAY)
-                .create()
+            val title = TranslatableComponent("menu.nova.items.searched")
+            title.addWith(coloredText(ChatColor.GRAY, filter))
+            CoreGUITexture.EMPTY_GUI.getTitle(title)
         }
     }
     
@@ -193,9 +188,9 @@ class ItemsWindow(val player: Player) : ItemMenu {
             }
         
         val builder = ComponentBuilder()
-            .append(CustomCharacters.getMovingComponent(-60)) // move to side to place overlay
-            .append(CustomCharacters.SEARCH.component)
-            .append(CustomCharacters.getMovingComponent(-170)) // move back to start
+            .append(MoveCharacters.getMovingComponent(-60)) // move to side to place overlay
+            .append(CoreGUITexture.SEARCH.component)
+            .append(MoveCharacters.getMovingComponent(-170)) // move back to start
         
         builder.append(TranslatableComponent("menu.nova.items.search"))
             .font("default").color(ChatColor.DARK_GRAY)

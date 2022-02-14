@@ -12,13 +12,13 @@ import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import xyz.xenondevs.nova.util.intValue
 
 object TableRecipeGroup : RecipeGroup() {
     
     override val priority = 0
-    override val overlay = CustomCharacters.CRAFTING_RECIPE
+    override val texture = CoreGUITexture.RECIPE_CRAFTING
     override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
     override fun createGUI(container: RecipeContainer): GUI {

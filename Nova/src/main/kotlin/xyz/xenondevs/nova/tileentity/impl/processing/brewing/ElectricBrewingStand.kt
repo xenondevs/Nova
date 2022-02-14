@@ -49,6 +49,7 @@ import xyz.xenondevs.nova.ui.OpenUpgradesItem
 import xyz.xenondevs.nova.ui.config.side.OpenSideConfigItem
 import xyz.xenondevs.nova.ui.config.side.SideConfigGUI
 import xyz.xenondevs.nova.ui.item.BrewProgressItem
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import xyz.xenondevs.nova.ui.overlay.GUITexture
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.contains
@@ -280,7 +281,8 @@ class ElectricBrewingStand(
         }
     }
     
-    inner class ElectricBrewingStandGUI : TileEntityGUI(GUITexture.ELECTRIC_BREWING_STAND) {
+    // TODO: change to correct gui texture when possible
+    inner class ElectricBrewingStandGUI : TileEntityGUI(CoreGUITexture.EMPTY_GUI) {
         
         private val sideConfigGUI = SideConfigGUI(
             this@ElectricBrewingStand,

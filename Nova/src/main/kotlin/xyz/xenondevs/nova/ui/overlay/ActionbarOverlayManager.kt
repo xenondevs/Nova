@@ -94,13 +94,13 @@ object ActionbarOverlayManager : Listener {
         val components = ArrayList<BaseComponent>()
         
         // calculate the length (in pixels) of the intercepted message
-        val textLength = CustomCharacters.getStringLength(text.toPlainText(player.locale))
+        val textLength = MoveCharacters.getStringLength(text.toPlainText(player.locale))
         // to center, move the cursor to the right by half of the length
-        components.add(CustomCharacters.getMovingComponent(textLength / -2))
+        components.add(MoveCharacters.getMovingComponent(textLength / -2))
         // append the text while explicitly setting it to the default font (required because of the moving component)
         components.addAll(text.forceDefaultFont())
         // move half of the text length back so the cursor is in the middle of the screen again (prevents clientside centering)
-        components.add(CustomCharacters.getMovingComponent(textLength / -2))
+        components.add(MoveCharacters.getMovingComponent(textLength / -2))
         
         interceptedActionbars[player.uniqueId] = components to System.currentTimeMillis()
     }
@@ -113,7 +113,7 @@ object ActionbarOverlayManager : Listener {
             // add text
             componentList.addAll(it.text)
             // move back
-            componentList.add(CustomCharacters.getMovingComponent(-it.width))
+            componentList.add(MoveCharacters.getMovingComponent(-it.width))
         }
         
         val interceptedActionbar = interceptedActionbars[uuid]
