@@ -65,7 +65,7 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
         val sortedModelSet = modelOverrides[material]!!
         val dataArray = info.models.mapToIntArray { sortedModelSet.indexOf(it) + 1 }
         
-        return ModelData(material, dataArray)
+        return ModelData(material, dataArray, info.id, info.isBlock)
     }
     
     override fun write() {

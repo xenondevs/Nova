@@ -19,20 +19,21 @@ object MaterialsIndexDeserializer {
         json.entrySet().forEach { (name, element) ->
             val itemInfo: ModelInformation?
             val blockInfo: ModelInformation?
+            val id = name.addNamespace(namespace)
             
             if (element is JsonObject) {
                 itemInfo = deserializeModelList(element, "item")
                     ?.map { it.addNamespace(namespace) }
-                    ?.let { ModelInformation(deserializeMaterialType(element, "item_type"), it) }
+                    ?.let { ModelInformation(deserializeMaterialType(element, "item_type"), it, id, false) }
                 blockInfo = deserializeModelList(element, "block")
                     ?.map { it.addNamespace(namespace) }
-                    ?.let { ModelInformation(deserializeMaterialType(element, "block_type"), it) }
+                    ?.let { ModelInformation(deserializeMaterialType(element, "block_type"), it, id, true) }
             } else {
-                itemInfo = ModelInformation(MaterialType.DEFAULT, listOf(element.asString.addNamespace(namespace)))
+                itemInfo = ModelInformation(MaterialType.DEFAULT, listOf(element.asString.addNamespace(namespace)), id, false)
                 blockInfo = null
             }
             
-            index += RegisteredMaterial(name.addNamespace(namespace), itemInfo, blockInfo)
+            index += RegisteredMaterial(id, itemInfo, blockInfo)
         }
         
         return index
@@ -72,4 +73,4 @@ object MaterialsIndexDeserializer {
 
 data class RegisteredMaterial(val id: String, val itemInfo: ModelInformation?, val blockInfo: ModelInformation?)
 
-data class ModelInformation(val materialType: MaterialType, val models: List<String>)
+data class ModelInformation(val materialType: MaterialType, val models: List<String>, val id: String, val isBlock: Boolean)

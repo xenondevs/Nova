@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
+import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
@@ -55,6 +56,7 @@ object Initializer {
                 }
             }
             latch.await()
+            setGlobalIngredients()
             forceResourcePack()
             callEvent(NovaLoadDataEvent())
             

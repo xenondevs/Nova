@@ -51,7 +51,7 @@ object Resources : Initializable() {
     fun getModelData(id: String): Pair<ModelData?, ModelData?> {
         return modelDataLookup[id]
         // This is a temporary workaround until all items can be found
-            ?: (ModelData(Material.DIRT, intArrayOf(0)) to ModelData(Material.DIRT, intArrayOf(0)))
+            ?: (ModelData(Material.DIRT, intArrayOf(0), id, false) to ModelData(Material.DIRT, intArrayOf(0), id, true))
     }
     
     fun getGUIDataOrNull(id: String): GUIData? {
