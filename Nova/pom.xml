@@ -504,7 +504,7 @@
             <plugin>
                 <groupId>xyz.xenondevs</groupId>
                 <artifactId>string-remapper-maven-plugin</artifactId>
-                <version>0.2-SNAPSHOT</version>
+                <version>0.3</version>
 
                 <executions>
                     <execution>
@@ -514,46 +514,12 @@
                         </goals>
                         <configuration>
                             <remapGoal>${string.remapper.remap.goal}</remapGoal>
-                            <srcIn>${project.basedir}/src/main/kotlin</srcIn>
-                            <srcOut>string-remapper-sources/</srcOut>
+                            <classesIn>${project.build.directory}/classes</classesIn>
                             <mapsMojang>org.spigotmc:minecraft-server:txt:maps-mojang:${spigot.version}</mapsMojang>
                             <mapsSpigot>
                                 <classes>org.spigotmc:minecraft-server:csrg:maps-spigot:${spigot.version}</classes>
                                 <members>org.spigotmc:minecraft-server:csrg:maps-spigot-members:${spigot.version}</members>
                             </mapsSpigot>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>remove-remapper-sources</id>
-                        <goals>
-                            <goal>cleanup</goal>
-                        </goals>
-                        <configuration>
-                            <srcOut>string-remapper-sources/</srcOut>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>compile-spigot</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.build.directory}/string-remapper-sources/</sourceDir>
-                            </sourceDirs>
                         </configuration>
                     </execution>
                 </executions>
