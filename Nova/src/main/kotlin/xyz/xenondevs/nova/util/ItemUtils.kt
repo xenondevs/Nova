@@ -109,8 +109,8 @@ val ItemStack.namelessCopyOrSelf: ItemStack
     }
 
 @Suppress("UNCHECKED_CAST")
-val ItemMeta.unhandledTags: HashMap<String, Tag>
-    get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as HashMap<String, Tag>
+val ItemMeta.unhandledTags: MutableMap<String, Tag>
+    get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, Tag>
 
 fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     val first = this.namelessCopyOrSelf
