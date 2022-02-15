@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util
 import com.mojang.brigadier.StringReader
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.minecraft.commands.arguments.item.ItemParser
+import net.minecraft.nbt.Tag
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
@@ -10,6 +11,7 @@ import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
+import org.bukkit.inventory.meta.ItemMeta
 import xyz.xenondevs.nova.data.recipe.ComplexTest
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
@@ -17,6 +19,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import net.minecraft.world.item.ItemStack as NMSItemStack
@@ -54,7 +57,7 @@ val ItemStack.novaMaterial: NovaMaterial?
     get() {
         
         // TODO
-        
+
 //        val customModelData = customModelData
 //        val material = NovaMaterialRegistry.getOrNull(customModelData)
 //        if (material != null && material.item.material == type) return material
@@ -105,6 +108,10 @@ val ItemStack.namelessCopyOrSelf: ItemStack
         return itemStack
     }
 
+@Suppress("UNCHECKED_CAST")
+val ItemMeta.unhandledTags: HashMap<String, Tag>
+    get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as HashMap<String, Tag>
+
 fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     val first = this.namelessCopyOrSelf
     val second = other?.namelessCopyOrSelf
@@ -114,6 +121,7 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
 
 fun ItemStack.takeUnlessAir(): ItemStack? =
     if (type.isAir) null else this
+
 
 object ItemUtils {
     
