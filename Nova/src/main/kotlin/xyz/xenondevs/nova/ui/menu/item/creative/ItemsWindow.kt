@@ -90,7 +90,7 @@ class ItemsWindow(val player: Player) : ItemMenu {
     private var currentWindow: Window? = null
     
     private val openSearchItem = clickableItem(
-        NovaMaterialRegistry.SEARCH_ICON
+        CoreGUIMaterial.TP_SEARCH
             .createBasicItemBuilder()
             .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search-item")
     ) { openSearchWindow() }
