@@ -39,16 +39,12 @@ object PacketItems : Initializable(), Listener {
         val packet = event.packet
         val items = packet.items
         val carriedItem = packet.carriedItem
-        var changed = false
-        
-        val newItems = items.map { item ->
-            if (isNovaItem(item)) {
-                changed = true
-                return@map getFakeItem(item)
-            } else return@map item
+    
+        items.forEachIndexed { i, item ->
+            if(isNovaItem(item))
+                items[i] = getFakeItem(item)
         }
-        if (changed)
-            event.items = newItems
+
         if (isNovaItem(carriedItem))
             event.carriedItem = getFakeItem(carriedItem)
     }
@@ -65,13 +61,12 @@ object PacketItems : Initializable(), Listener {
     fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val packet = event.packet
         val data = packet.unpackedData ?: return
-        val i = data.indexOfFirst { it.value is MojangStack }
-        if (i == -1) return
-        val dataItem = data[i]
-        val item = dataItem.value as MojangStack
-        if (isNovaItem(item)) {
-            val newDataItem = DataItem(dataItem.accessor as EntityDataAccessor<MojangStack>, getFakeItem(item))
-            data[i] = newDataItem
+        data.forEachIndexed { i, d ->
+            val value = d.value
+            if (value is MojangStack && isNovaItem(value)) {
+                val newDataItem = DataItem(d.accessor as EntityDataAccessor<MojangStack>, getFakeItem(value))
+                data[i] = newDataItem
+            }
         }
     }
     
@@ -79,15 +74,11 @@ object PacketItems : Initializable(), Listener {
     fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
         val packet = event.packet
         val slots = packet.slots
-        var changed = false
         
-        val newSlots = slots.map { slot ->
-            if (isNovaItem(slot.second)) {
-                changed = true
-                return@map MojangPair(slot.first, getFakeItem(slot.second))
-            } else return@map slot
+        slots.forEachIndexed { i, slot ->
+            if (isNovaItem(slot.second))
+                slots[i] = MojangPair(slot.first, getFakeItem(slot.second))
         }
-        if (changed) event.slots = newSlots
     }
     
     @EventHandler
