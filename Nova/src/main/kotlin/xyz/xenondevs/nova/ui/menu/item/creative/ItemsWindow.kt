@@ -27,7 +27,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.material.CoreGUIMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
@@ -131,7 +130,7 @@ class ItemsWindow(val player: Player) : ItemMenu {
         .addIngredient('s', openMainWindowItem)
         .build() as SimplePagedItemsGUI
     
-    private val textItem = AnvilTextItem(NovaMaterialRegistry.INVISIBLE_ITEM.createBasicItemBuilder(), "")
+    private val textItem = AnvilTextItem(CoreGUIMaterial.INVISIBLE_ITEM.createBasicItemBuilder(), "")
     
     private var filteredItems: List<Item>? = null
     private var filter = ""

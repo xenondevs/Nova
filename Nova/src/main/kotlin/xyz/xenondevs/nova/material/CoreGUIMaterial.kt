@@ -28,6 +28,7 @@ object CoreGUIMaterial {
     val HORIZONTAL_LINE = registerItem("nova:gui_horizontal_line")
     val HORIZONTAL_UP = registerItem("nova:gui_horizontal_up")
     val INVENTORY_PART = registerItem("nova:gui_inventory_part")
+    val INVISIBLE_ITEM = registerItem("nova:gui_invisible")
     val LIGHT_ARROW_1_DOWN = registerItem("nova:gui_light_arrow_1_down")
     val LIGHT_ARROW_1_LEFT = registerItem("nova:gui_light_arrow_1_left")
     val LIGHT_ARROW_1_RIGHT = registerItem("nova:gui_light_arrow_1_right")
