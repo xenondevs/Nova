@@ -1,15 +1,15 @@
-package xyz.xenondevs.nova.network.event.impl
+package xyz.xenondevs.nova.network.event.clientbound
 
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
-import xyz.xenondevs.nova.network.event.PacketEvent
+import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 import xyz.xenondevs.nova.util.data.MutableLazy
 
-class ClientboundContainerSetSlotPacketEvent(
+class ContainerSetSlotPacketEvent(
     player: Player,
     packet: ClientboundContainerSetSlotPacket
-) : PacketEvent<ClientboundContainerSetSlotPacket>(player, packet) {
+) : PlayerPacketEvent<ClientboundContainerSetSlotPacket>(player, packet) {
     
     companion object {
         @JvmStatic

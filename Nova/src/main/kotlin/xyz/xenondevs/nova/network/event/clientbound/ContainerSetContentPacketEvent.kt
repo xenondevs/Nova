@@ -1,17 +1,17 @@
-package xyz.xenondevs.nova.network.event.impl
+package xyz.xenondevs.nova.network.event.clientbound
 
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
-import xyz.xenondevs.nova.network.event.PacketEvent
+import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.data.MutableLazy
 import net.minecraft.world.item.ItemStack as MojangStack
 
-class ClientboundContainerSetContentPacketEvent(
+class ContainerSetContentPacketEvent(
     player: Player,
     packet: ClientboundContainerSetContentPacket
-) : PacketEvent<ClientboundContainerSetContentPacket>(player, packet) {
+) : PlayerPacketEvent<ClientboundContainerSetContentPacket>(player, packet) {
     
     companion object {
         @JvmStatic

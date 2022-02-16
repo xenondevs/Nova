@@ -1,14 +1,14 @@
-package xyz.xenondevs.nova.network.event.impl
+package xyz.xenondevs.nova.network.event.clientbound
 
-import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
-import xyz.xenondevs.nova.network.event.PacketEvent
+import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 
-class ServerboundPlaceRecipePacketEvent(
+class SetEntityDataPacketEvent(
     player: Player,
-    packet: ServerboundPlaceRecipePacket
-) : PacketEvent<ServerboundPlaceRecipePacket>(player, packet) {
+    packet: ClientboundSetEntityDataPacket
+) : PlayerPacketEvent<ClientboundSetEntityDataPacket>(player, packet) {
     
     companion object {
         @JvmStatic
@@ -16,6 +16,7 @@ class ServerboundPlaceRecipePacketEvent(
         
         @JvmStatic
         fun getHandlerList() = handlers
+        
     }
     
     override fun getHandlers(): HandlerList {

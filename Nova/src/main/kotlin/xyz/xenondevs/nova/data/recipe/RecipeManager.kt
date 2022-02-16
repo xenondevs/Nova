@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.network.event.impl.ServerboundPlaceRecipePacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.key
@@ -168,7 +168,7 @@ object RecipeManager : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleRecipePlace(event: ServerboundPlaceRecipePacketEvent) {
+    fun handleRecipePlace(event: PlaceRecipePacketEvent) {
         val key = NamespacedKey.fromString(event.packet.recipe.toString())
         if (key in shapedRecipes) {
             runTask { fillCraftingInventory(event.player, shapedRecipes[key]!!) }

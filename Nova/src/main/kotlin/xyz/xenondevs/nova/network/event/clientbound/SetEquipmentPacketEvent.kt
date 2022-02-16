@@ -1,18 +1,18 @@
-package xyz.xenondevs.nova.network.event.impl
+package xyz.xenondevs.nova.network.event.clientbound
 
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
-import xyz.xenondevs.nova.network.event.PacketEvent
+import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 import xyz.xenondevs.nova.util.data.MutableLazy
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
-class ClientboundSetEquipmentPacketEvent(
+class SetEquipmentPacketEvent(
     player: Player,
     packet: ClientboundSetEquipmentPacket
-) : PacketEvent<ClientboundSetEquipmentPacket>(player, packet) {
+) : PlayerPacketEvent<ClientboundSetEquipmentPacket>(player, packet) {
     
     companion object {
         @JvmStatic

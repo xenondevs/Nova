@@ -1,18 +1,18 @@
-package xyz.xenondevs.nova.network.event.impl
+package xyz.xenondevs.nova.network.event.clientbound
 
 import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
-import xyz.xenondevs.nova.network.event.PacketEvent
+import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 import xyz.xenondevs.nova.util.data.MutableLazy
 import xyz.xenondevs.nova.util.data.toBaseComponentArray
 import xyz.xenondevs.nova.util.data.toComponent
 
-class ClientboundActionBarPacketEvent(
+class ActionBarPacketEvent(
     player: Player,
     packet: ClientboundSetActionBarTextPacket
-) : PacketEvent<ClientboundSetActionBarTextPacket>(player, packet) {
+) : PlayerPacketEvent<ClientboundSetActionBarTextPacket>(player, packet) {
     
     companion object {
         @JvmStatic

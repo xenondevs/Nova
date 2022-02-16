@@ -9,8 +9,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.network.event.impl.ClientboundActionBarPacketEvent
-import xyz.xenondevs.nova.network.event.impl.ClientboundChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ActionBarPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ChatPacketEvent
 import xyz.xenondevs.nova.util.data.forceDefaultFont
 import xyz.xenondevs.nova.util.data.toPlainText
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -59,7 +59,7 @@ object ActionbarOverlayManager : Listener {
     }
     
     @EventHandler
-    private fun handleChatPacket(event: ClientboundChatPacketEvent) {
+    private fun handleChatPacket(event: ChatPacketEvent) {
         if (event.chatType == ChatType.GAME_INFO) {
             val player = event.player
             val uuid = player.uniqueId
@@ -75,7 +75,7 @@ object ActionbarOverlayManager : Listener {
     }
     
     @EventHandler
-    private fun handleChatPacket(event: ClientboundActionBarPacketEvent) {
+    private fun handleChatPacket(event: ActionBarPacketEvent) {
         val player = event.player
         val uuid = player.uniqueId
         if (overlays.containsKey(uuid)) {

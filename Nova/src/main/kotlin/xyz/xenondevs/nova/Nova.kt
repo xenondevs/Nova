@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.particle.utils.ReflectionUtils

@@ -1,17 +1,17 @@
-package xyz.xenondevs.nova.network.event.impl
+package xyz.xenondevs.nova.network.event.clientbound
 
 import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.network.protocol.game.ClientboundChatPacket
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
-import xyz.xenondevs.nova.network.event.PacketEvent
+import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 import xyz.xenondevs.nova.util.data.MutableLazy
 import xyz.xenondevs.nova.util.data.toBaseComponentArray
 
-class ClientboundChatPacketEvent(
+class ChatPacketEvent(
     player: Player,
     packet: ClientboundChatPacket
-) : PacketEvent<ClientboundChatPacket>(player, packet) {
+) : PlayerPacketEvent<ClientboundChatPacket>(player, packet) {
     
     companion object {
         @JvmStatic

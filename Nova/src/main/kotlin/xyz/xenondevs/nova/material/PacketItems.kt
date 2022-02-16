@@ -14,7 +14,11 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.network.event.impl.*
+import xyz.xenondevs.nova.network.event.clientbound.ContainerSetContentPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ContainerSetSlotPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.SetEntityDataPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.SetEquipmentPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
@@ -34,7 +38,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleSetContentPacket(event: ClientboundContainerSetContentPacketEvent) {
+    fun handleSetContentPacket(event: ContainerSetContentPacketEvent) {
         val packet = event.packet
         val items = packet.items
         val carriedItem = packet.carriedItem
@@ -49,7 +53,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleSetSlotPacket(event: ClientboundContainerSetSlotPacketEvent) {
+    fun handleSetSlotPacket(event: ContainerSetSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
         if (isNovaItem(item))
@@ -57,7 +61,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
+    fun handleEntityData(event: SetEntityDataPacketEvent) {
         val packet = event.packet
         val data = packet.unpackedData ?: return
         data.forEachIndexed { i, d ->
@@ -70,7 +74,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
+    fun handleSetEquipment(event: SetEquipmentPacketEvent) {
         val packet = event.packet
         val slots = packet.slots
         
@@ -81,7 +85,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleCreativeSetItem(event: ServerboundSetCreativeModeSlotPacketEvent) {
+    fun handleCreativeSetItem(event: SetCreativeModeSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
         if (isFakeItem(item))
