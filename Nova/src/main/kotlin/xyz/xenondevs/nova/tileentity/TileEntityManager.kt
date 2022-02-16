@@ -288,67 +288,6 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         handleChunkUnload(event.chunk.pos)
     }
     
-    // TODO: clean up
-    @Synchronized
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handlePlace(event: BlockPlaceEvent) {
-        val player = event.player
-        val block = event.blockPlaced
-        val location = block.location
-        
-        if (getTileEntityAt(location) != null) {
-            event.isCancelled = true
-            val targetLocation = player.eyeLocation.getTargetLocation(0.25, 0.4)
-            val otherBlock = location.advance(BlockFaceUtils.determineBlockFace(block, targetLocation)).block
-            if (otherBlock.type.isAir) {
-                val replacedState = otherBlock.state
-                otherBlock.type = block.type
-                val placeEvent = BlockPlaceEvent(otherBlock, replacedState, block, event.itemInHand, player, event.canBuild(), event.hand)
-                Bukkit.getPluginManager().callEvent(placeEvent)
-                if (placeEvent.isCancelled) otherBlock.type = Material.AIR
-                else if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(event.hand, event.itemInHand.apply { amount -= 1 })
-            }
-            
-            return
-        }
-        
-        val placedItem = event.itemInHand
-        val material = placedItem.novaMaterial
-        
-        if (material != null) {
-            event.isCancelled = true
-            
-            if (material.isTileEntity) {
-                val playerLocation = player.location
-                
-                if (material.placeCheck?.invoke(
-                        player,
-                        event.itemInHand,
-                        location.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
-                    ) != false
-                ) {
-                    val uuid = player.uniqueId
-                    val result = TileEntityLimits.canPlaceTileEntity(uuid, location.world!!, material)
-                    if (result == PlaceResult.ALLOW) {
-                        placeTileEntity(
-                            uuid,
-                            event.block.location,
-                            playerLocation.yaw,
-                            material,
-                            placedItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
-                        )
-                        
-                        if (player.gameMode == GameMode.SURVIVAL) placedItem.amount--
-                    } else {
-                        player.spigot().sendMessage(
-                            localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
-                        )
-                    }
-                }
-            }
-        }
-    }
-    
     @Synchronized
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun handleBreak(event: BlockBreakEvent) {
@@ -360,6 +299,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         }
     }
     
+    // TODO: clean up
     @Synchronized
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     fun handleInteract(event: PlayerInteractEvent) {
@@ -368,7 +308,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         if (action == Action.RIGHT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
-            if (tileEntity != null) {
+            if (tileEntity != null && !player.isSneaking) {
                 if (event.hand == EquipmentSlot.HAND) {
                     if (!event.player.isSneaking) {
                         if (ProtectionManager.canUseBlock(player, event.item, block.location)) {
@@ -379,6 +319,40 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                         destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
                     }
                 } else event.isCancelled = true
+            } else {
+                val handItem = event.item
+                val handMaterial = event.item?.novaMaterial
+                if (handItem != null && handMaterial != null && handMaterial.isTileEntity) {
+                    event.isCancelled = true
+                    val playerLocation = player.location
+                    val placePos = block.location.advance(event.blockFace)
+                    if (placePos.block.type.isAir
+                        && ProtectionManager.canPlace(player, handItem, placePos)
+                        && handMaterial.placeCheck?.invoke(
+                            player,
+                            handItem,
+                            placePos.apply { yaw = calculateTileEntityYaw(handMaterial, playerLocation.yaw) }
+                        ) != false
+                    ) {
+                        val uuid = player.uniqueId
+                        val result = TileEntityLimits.canPlaceTileEntity(uuid, placePos.world!!, handMaterial)
+                        if (result == PlaceResult.ALLOW) {
+                            placeTileEntity(
+                                uuid,
+                                placePos,
+                                playerLocation.yaw,
+                                handMaterial,
+                                handItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
+                            )
+                            
+                            if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
+                        } else {
+                            player.spigot().sendMessage(
+                                localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
+                            )
+                        }
+                    }
+                }
             }
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!

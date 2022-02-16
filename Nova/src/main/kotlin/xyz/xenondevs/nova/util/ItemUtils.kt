@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util
 import com.mojang.brigadier.StringReader
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.minecraft.commands.arguments.item.ItemParser
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import org.bukkit.Location
 import org.bukkit.Material
@@ -15,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import xyz.xenondevs.nova.data.recipe.ComplexTest
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
+import xyz.xenondevs.nova.data.recipe.NovaIdTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -54,15 +56,9 @@ val Material.localizedName: String?
     get() = CraftMagicNumbers.getItem(this)?.descriptionId
 
 val ItemStack.novaMaterial: NovaMaterial?
-    get() {
-        
-        // TODO
-
-//        val customModelData = customModelData
-//        val material = NovaMaterialRegistry.getOrNull(customModelData)
-//        if (material != null && material.item.material == type) return material
-        return null
-    }
+    get() = (itemMeta?.unhandledTags?.get("nova") as? CompoundTag)
+        ?.getString("id")
+        ?.let(NovaMaterialRegistry::getOrNull)
 
 val ItemStack.customModelData: Int
     get() {
@@ -132,20 +128,16 @@ object ItemUtils {
                     return@map ComplexTest(toItemStack(name))
                 
                 return@map when (name.substringBefore(':')) {
-                    "nova" -> {
-                        
-                        // TODO
-                        
-                        val material = NovaMaterialRegistry.get(name.drop(5).uppercase())
-                        val bukkitMaterial = material.item.material
-                        val modelData = intArrayOf(material.item.data)
-                        ModelDataTest(bukkitMaterial, modelData, material.createItemStack())
-                    }
                     "minecraft" -> {
                         val material = Material.valueOf(name.drop(10).uppercase())
                         ModelDataTest(material, intArrayOf(0), ItemStack(material))
                     }
-                    else -> CustomItemServiceManager.getItemTest(name)!!
+                    else -> {
+                        val novaMaterial = NovaMaterialRegistry.getOrNull(name)
+                        if (novaMaterial != null)
+                            NovaIdTest(name, novaMaterial.createItemStack())
+                        else CustomItemServiceManager.getItemTest(name)!!
+                    }
                 }
             } catch (ex: Exception) {
                 throw IllegalArgumentException("Unknown item $name", ex)
@@ -160,7 +152,7 @@ object ItemUtils {
         try {
             return when (name.substringBefore(':')) {
                 "nova" -> {
-                    val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
+                    val novaMaterial = NovaMaterialRegistry.get(name)
                     if (basic) novaMaterial.createBasicItemBuilder() else novaMaterial.createItemBuilder()
                 }
                 "minecraft" -> ItemBuilder(toItemStack(name))
@@ -177,18 +169,19 @@ object ItemUtils {
         
         try {
             when (name.substringBefore(':')) {
-                "nova" -> {
-                    val novaMaterial = NovaMaterialRegistry.get(name.substringAfter(':').uppercase())
-                    localizedName = novaMaterial.localizedName
-                    itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
-                }
                 "minecraft" -> {
                     itemStack = toItemStack(name)
                     localizedName = itemStack.type.localizedName!!
                 }
                 else -> {
-                    itemStack = CustomItemServiceManager.getItemByName(name)!!
-                    localizedName = itemStack.displayName ?: ""
+                    val novaMaterial = NovaMaterialRegistry.getOrNull(name)
+                    if (novaMaterial != null) {
+                        localizedName = novaMaterial.localizedName
+                        itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
+                    } else {
+                        itemStack = CustomItemServiceManager.getItemByName(name)!!
+                        localizedName = itemStack.displayName ?: ""
+                    }
                 }
             }
         } catch (ex: Exception) {

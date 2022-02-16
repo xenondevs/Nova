@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
@@ -35,6 +36,14 @@ class ModelDataTest(private val type: Material, private val data: IntArray, over
     
     override fun test(item: ItemStack): Boolean {
         return item.type == type && item.customModelData in data
+    }
+    
+}
+
+class NovaIdTest(private val id: String, override val example: ItemStack) : ItemTest {
+    
+    override fun test(item: ItemStack): Boolean {
+        return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id") == id
     }
     
 }
