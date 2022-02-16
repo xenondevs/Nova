@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util
 
 import io.netty.buffer.Unpooled
+import io.netty.channel.ChannelFuture
 import net.minecraft.core.BlockPos
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
@@ -11,6 +12,7 @@ import net.minecraft.network.protocol.game.ClientboundAddMobPacket
 import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -29,6 +31,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.util.*
 import net.minecraft.world.item.ItemStack as NMSItemStack
 
@@ -68,6 +71,9 @@ fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
 
 val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).server
+
+val MinecraftServer.channels: List<ChannelFuture>
+    get() = ReflectionRegistry.SERVER_CONNECTION_LISTENER_CHANNELS_FIELD.get(this.connection) as List<ChannelFuture>
 
 val serverTick: Int
     get() = minecraftServer.tickCount

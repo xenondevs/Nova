@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.server.network.ServerConnectionListener
 import net.minecraft.world.entity.decoration.ArmorStand
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
@@ -21,6 +22,7 @@ object ReflectionRegistry {
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
     
     val ARMOR_STAND_ARMOR_ITEMS_FIELD = getField(ArmorStand::class.java, true, "SRF(net.minecraft.world.entity.decoration.ArmorStand armorItems)")
+    val SERVER_CONNECTION_LISTENER_CHANNELS_FIELD = getField(ServerConnectionListener::class.java, true, "SRF(net.minecraft.server.network.ServerConnectionListener channels)")
     
     val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class.java, true, "children")
     val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class.java, true, "literals")
