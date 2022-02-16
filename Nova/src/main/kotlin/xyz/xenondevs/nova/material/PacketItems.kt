@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.material
 
-import net.minecraft.network.chat.TranslatableComponent
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData.DataItem
 import net.minecraft.world.item.Items
@@ -15,14 +16,12 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.network.event.impl.*
 import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.data.coloredText
+import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
 object PacketItems : Initializable(), Listener {
-    
-    private val MISSING_ITEM = MojangStack(Items.BARRIER).apply {
-        this.hoverName = TranslatableComponent("item.nova.missing")
-    }
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
@@ -39,12 +38,12 @@ object PacketItems : Initializable(), Listener {
         val packet = event.packet
         val items = packet.items
         val carriedItem = packet.carriedItem
-    
+        
         items.forEachIndexed { i, item ->
-            if(isNovaItem(item))
+            if (isNovaItem(item))
                 items[i] = getFakeItem(item)
         }
-
+        
         if (isNovaItem(carriedItem))
             event.carriedItem = getFakeItem(carriedItem)
     }
@@ -111,12 +110,12 @@ object PacketItems : Initializable(), Listener {
     private fun getFakeItem(item: MojangStack): MojangStack {
         val novaTag = item.tag!!.getCompound("nova")
             ?: throw IllegalStateException("Item is not a Nova item!")
-        val id = novaTag.getString("id") ?: return MISSING_ITEM
+        val id = novaTag.getString("id") ?: return getMissingItem(item, null)
         val subId = novaTag.getInt("subId")
         val isBlock = novaTag.getBoolean("isBlock")
         
-        val (itemData, blockData) = Resources.getModelDataOrNull(id) ?: return MISSING_ITEM
-        val data = (if (isBlock) blockData else itemData) ?: return MISSING_ITEM
+        val (itemData, blockData) = Resources.getModelDataOrNull(id) ?: return getMissingItem(item, id)
+        val data = (if (isBlock) blockData else itemData) ?: return getMissingItem(item, id)
         
         val newItem = item.copy()
         newItem.item = CraftMagicNumbers.getItem(data.material)
@@ -124,4 +123,16 @@ object PacketItems : Initializable(), Listener {
         
         return newItem
     }
+    
+    private fun getMissingItem(item: MojangStack, id: String?): MojangStack {
+        val newItem = item.copy()
+        newItem.item = Items.BARRIER
+        newItem.tag!!.putInt("CustomModelData", 0)
+        newItem.tag!!.getCompound("display")!!.put("Lore", NBTUtils.createStringList(
+            listOf(ComponentSerializer.toString(coloredText(ChatColor.RED, "Missing model for $id").withoutPreFormatting()))
+        ))
+        
+        return newItem
+    }
+    
 }

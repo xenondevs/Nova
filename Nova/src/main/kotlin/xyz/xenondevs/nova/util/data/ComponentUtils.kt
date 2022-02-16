@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
 import de.studiocode.invui.item.builder.ItemBuilder
+import de.studiocode.invui.util.ComponentUtils
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -111,3 +112,9 @@ fun Array<out BaseComponent>.forceDefaultFont(): Array<out BaseComponent> {
     
     return this
 }
+
+fun Array<out BaseComponent>.withoutPreFormatting(): Array<out BaseComponent> =
+    ComponentUtils.withoutPreFormatting(*this)
+
+fun BaseComponent.withoutPreFormatting(): Array<out BaseComponent> =
+    ComponentUtils.withoutPreFormatting(this)
