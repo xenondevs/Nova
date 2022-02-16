@@ -59,7 +59,7 @@ object PacketListener : Initializable(), Listener {
     fun handleLogin(event: PlayerLoginEvent) {
         val uuid = event.player.name
         if (uuid !in playerHandlers) {
-            event.disallow(Result.KICK_OTHER, "Something went wrong")
+            event.disallow(Result.KICK_OTHER, "[Nova] Something went wrong")
             return
         }
         playerHandlers[uuid]!!.player = event.player
