@@ -4,7 +4,14 @@ import net.minecraft.world.item.crafting.Ingredient
 import org.bukkit.Keyed
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
+import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.nmsStack
+import xyz.xenondevs.nova.util.resourceLocation
+import net.minecraft.world.item.ItemStack as MojangStack
+import net.minecraft.world.item.crafting.ShapedRecipe as MojangShapedRecipe
+import net.minecraft.world.item.crafting.ShapelessRecipe as MojangShapelessRecipe
+import net.minecraft.world.item.crafting.SmeltingRecipe as MojangFurnaceRecipe
+import net.minecraft.world.item.crafting.StonecutterRecipe as MojangStonecuttingRecipe
 
 val Recipe.key: NamespacedKey
     get() = (this as Keyed).key
@@ -36,3 +43,19 @@ val RecipeChoice?.nmsIngredient: Ingredient
         this is RecipeChoice.ExactChoice -> Ingredient(choices.stream().map { Ingredient.ItemValue(it.nmsStack) })
         else -> throw UnsupportedOperationException("Unsupported RecipeChoice type")
     }.apply { dissolve() }
+
+fun MojangShapedRecipe.copy(newResult: MojangStack): MojangShapedRecipe {
+    return MojangShapedRecipe(id, "", 3, 3, NonNullList(ingredients), newResult)
+}
+
+fun MojangShapelessRecipe.copy(newResult: MojangStack): MojangShapelessRecipe {
+    return MojangShapelessRecipe(id, "", newResult, NonNullList(ingredients))
+}
+
+fun FurnaceRecipe.copy(newResult: MojangStack): MojangFurnaceRecipe {
+    return MojangFurnaceRecipe(key.resourceLocation, "", inputChoice.nmsIngredient, newResult, experience, cookingTime)
+}
+
+fun StonecuttingRecipe.copy(newResult: MojangStack): MojangStonecuttingRecipe {
+    return MojangStonecuttingRecipe(key.resourceLocation, "", inputChoice.nmsIngredient, newResult)
+}

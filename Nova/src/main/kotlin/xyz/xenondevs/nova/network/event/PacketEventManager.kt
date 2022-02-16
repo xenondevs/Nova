@@ -21,6 +21,7 @@ object PacketEventManager {
         registerPlayerEventType(ClientboundContainerSetSlotPacket::class, ::ContainerSetSlotPacketEvent)
         registerPlayerEventType(ClientboundSetEntityDataPacket::class, ::SetEntityDataPacketEvent)
         registerPlayerEventType(ClientboundSetEquipmentPacket::class, ::SetEquipmentPacketEvent)
+        registerPlayerEventType(ClientboundUpdateRecipesPacket::class, ::UpdateRecipesPacketEvent)
         registerPlayerEventType(ServerboundPlaceRecipePacket::class, ::PlaceRecipePacketEvent)
         registerPlayerEventType(ServerboundSetCreativeModeSlotPacket::class, ::SetCreativeModeSlotPacketEvent)
     }

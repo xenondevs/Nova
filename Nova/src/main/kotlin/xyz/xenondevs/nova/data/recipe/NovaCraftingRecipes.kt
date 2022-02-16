@@ -32,7 +32,6 @@ class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : Sha
     override fun toBukkitRecipe(): BukkitShapedRecipe {
         return bukkitRecipe
     }
-    
 }
 
 class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(

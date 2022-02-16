@@ -11,17 +11,16 @@ import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.network.event.clientbound.ContainerSetContentPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.ContainerSetSlotPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.SetEntityDataPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.SetEquipmentPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.*
 import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
+import xyz.xenondevs.nova.util.namespacedKey
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -92,26 +91,38 @@ object PacketItems : Initializable(), Listener {
             event.item = getNovaItem(item)
     }
     
-    private fun isNovaItem(item: MojangStack): Boolean {
+    @EventHandler
+    fun handleRecipes(event: UpdateRecipesPacketEvent) {
+        val packet = event.packet
+        packet.recipes.forEachIndexed { i, recipe ->
+            if (isNovaItem(recipe.resultItem)) {
+                val id = recipe.id.namespacedKey
+                if (id in RecipeManager.fakeRecipes)
+                    packet.recipes[i] = RecipeManager.fakeRecipes[id]!!
+            }
+        }
+    }
+    
+    internal fun isNovaItem(item: MojangStack): Boolean {
         return item.item == SERVER_SIDE_ITEM
             && item.tag != null
             && item.tag!!.contains("nova", NBTUtils.TAG_COMPOUND)
     }
     
-    private fun isFakeItem(item: MojangStack): Boolean {
+    internal fun isFakeItem(item: MojangStack): Boolean {
         return item.tag != null
             && item.tag!!.contains("nova", NBTUtils.TAG_COMPOUND)
             && item.tag!!.contains("CustomModelData", NBTUtils.TAG_INT)
     }
     
-    private fun getNovaItem(item: MojangStack): MojangStack {
+    internal fun getNovaItem(item: MojangStack): MojangStack {
         return item.apply {
             this.item = SERVER_SIDE_ITEM
             tag?.remove("CustomModelData")
         }
     }
     
-    private fun getFakeItem(item: MojangStack): MojangStack {
+    internal fun getFakeItem(item: MojangStack): MojangStack {
         val novaTag = item.tag!!.getCompound("nova")
             ?: throw IllegalStateException("Item is not a Nova item!")
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)

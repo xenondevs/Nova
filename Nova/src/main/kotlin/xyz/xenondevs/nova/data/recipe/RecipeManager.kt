@@ -18,11 +18,14 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.data.copy
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 
 interface ItemTest {
     
@@ -72,6 +75,7 @@ object RecipeManager : Initializable(), Listener {
     private val shapedRecipes = HashMap<NamespacedKey, OptimizedShapedRecipe>()
     private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
+    val fakeRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
     val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
     
     override val inMainThread = true
@@ -94,6 +98,10 @@ object RecipeManager : Initializable(), Listener {
                             
                             val nmsRecipe = NovaShapedRecipe(optimizedRecipe)
                             minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                            
+                            val result = nmsRecipe.resultItem
+                            if (PacketItems.isNovaItem(result))
+                                fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
                         }
                         
                         is ShapelessRecipe -> {
@@ -101,6 +109,24 @@ object RecipeManager : Initializable(), Listener {
                             
                             val nmsRecipe = NovaShapelessRecipe(recipe)
                             minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                            
+                            val result = nmsRecipe.resultItem
+                            if (PacketItems.isNovaItem(result))
+                                fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
+                        }
+                        
+                        is FurnaceRecipe -> {
+                            Bukkit.addRecipe(recipe)
+                            val novaMaterial = recipe.result.novaMaterial
+                            if (novaMaterial != null)
+                                fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
+                        }
+                        
+                        is StonecuttingRecipe -> {
+                            Bukkit.addRecipe(recipe)
+                            val novaMaterial = recipe.result.novaMaterial
+                            if(novaMaterial != null)
+                                fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
                         }
                         
                         else -> Bukkit.addRecipe(recipe)

@@ -59,6 +59,10 @@ val Player.connection: ServerGamePacketListenerImpl
 val NamespacedKey.resourceLocation: ResourceLocation
     get() = ResourceLocation(toString())
 
+@Suppress("DEPRECATION")
+val ResourceLocation.namespacedKey: NamespacedKey
+    get() = NamespacedKey(namespace, path)
+
 fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
     packets.forEach { connection.send(it) }

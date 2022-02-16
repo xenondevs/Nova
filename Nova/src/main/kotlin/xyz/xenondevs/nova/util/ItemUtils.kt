@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import kotlin.math.absoluteValue
 import kotlin.random.Random
-import net.minecraft.world.item.ItemStack as NMSItemStack
+import net.minecraft.world.item.ItemStack as MojangStack
 
 fun Material.isGlass() = name.endsWith("GLASS") || name.endsWith("GLASS_PANE")
 
@@ -83,6 +83,11 @@ val ItemStack.displayName: String?
 val ItemStack.localizedName: String?
     get() = novaMaterial?.localizedName ?: type.localizedName
 
+val MojangStack.novaMaterial: NovaMaterial?
+    get() = tag?.getCompound("nova")
+        ?.getString("id")
+        ?.let(NovaMaterialRegistry::getOrNull)
+
 val Material.soundGroup: SoundGroup
     get() = createBlockData().soundGroup
 
@@ -135,7 +140,7 @@ object ItemUtils {
                     else -> {
                         val novaMaterial = NovaMaterialRegistry.getOrNull(name)
                         if (novaMaterial != null)
-                            NovaIdTest(name, novaMaterial.createItemStack())
+                            NovaIdTest(name, novaMaterial.clientsideProvider.get())
                         else CustomItemServiceManager.getItemTest(name)!!
                     }
                 }
@@ -193,7 +198,7 @@ object ItemUtils {
     
     fun toItemStack(s: String): ItemStack {
         val parser = ItemParser(StringReader(s), false).parse()
-        val nmsStack = NMSItemStack(parser.item, 1).apply { tag = parser.nbt }
+        val nmsStack = MojangStack(parser.item, 1).apply { tag = parser.nbt }
         return CraftItemStack.asBukkitCopy(nmsStack)
     }
     
