@@ -153,10 +153,16 @@ object RecipeManager : Initializable(), Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
         val recipe = event.recipe ?: return
-        val namespace = recipe.key.namespace
         
-        if (namespace == "nova") {
-            // If this is a Nova recipe result, replace it with a NovaCraftingInventory
+        var requiresContainer = recipe.key in vanillaRegisteredRecipeKeys
+        if (!requiresContainer && event.inventory.contents.any { it.novaMaterial != null }) {
+            // prevent non-Nova recipes from using Nova items
+            event.inventory.result = ItemStack(Material.AIR)
+            requiresContainer = true
+        }
+        
+        if (requiresContainer) {
+            // prevent modification of the recipe result by other plugins
             ReflectionRegistry.PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD.set(event, NovaCraftingInventory(recipe, event.inventory))
         }
     }
