@@ -12,11 +12,11 @@ class ModelData(val material: Material, val dataArray: IntArray, val id: String,
     val data: Int
         get() = dataArray[0]
     
-    fun createItemStack(localizedName: String, dataIndex: Int = 0): ItemStack =
-        createItemBuilder(localizedName, dataIndex).get().apply { maxStackSize }
+    fun createItemStack(localizedName: String, subId: Int = 0): ItemStack =
+        createItemBuilder(localizedName, subId).get().apply { maxStackSize }
     
-    fun createItemStack(dataIndex: Int = 0): ItemStack =
-        createItemStack("", dataIndex)
+    fun createItemStack(subId: Int = 0): ItemStack =
+        createItemStack("", subId)
     
     fun createItemBuilder(localizedName: String, subId: Int = 0): ItemBuilder =
         ItemBuilder(PacketItems.SERVER_SIDE_MATERIAL)
@@ -33,7 +33,21 @@ class ModelData(val material: Material, val dataArray: IntArray, val id: String,
                 return@addModifier it
             }
     
-    fun createItemBuilder(dataIndex: Int = 0): ItemBuilder =
-        createItemBuilder("", dataIndex)
+    fun createItemBuilder(subId: Int = 0): ItemBuilder =
+        createItemBuilder("", subId)
+    
+    fun createClientsideItemStack(localizedName: String, subId: Int = 0): ItemStack =
+        createItemBuilder(localizedName, subId).get()
+    
+    fun createClientsideItemStack(subId: Int = 0): ItemStack =
+        createClientsideItemBuilder("", subId).get()
+    
+    fun createClientsideItemBuilder(localizedName: String, subId: Int = 0): ItemBuilder =
+        ItemBuilder(material)
+            .setLocalizedName(localizedName)
+            .setCustomModelData(dataArray[subId])
+    
+    fun createClientsideItemBuilder(subId: Int = 0): ItemBuilder =
+        createClientsideItemBuilder("", subId)
     
 }

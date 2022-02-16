@@ -37,6 +37,9 @@ class NovaMaterial(
     val basicItemProvider: ItemProvider by lazy { ItemWrapper(createBasicItemBuilder().get()) }
     val itemProvider: ItemProvider by lazy { ItemWrapper(createItemStack()) }
     
+    val basicClientsideProvider: ItemProvider by lazy { ItemWrapper(item.createClientsideItemStack(localizedName)) }
+    val clientsideProvider: ItemProvider by lazy { ItemWrapper(modifyItemBuilder(item.createClientsideItemBuilder(localizedName)).get()) }
+    
     val isTileEntity = tileEntityConstructor != null
     
     /**
@@ -56,16 +59,14 @@ class NovaMaterial(
      *
      */
     fun createItemBuilder(tileEntity: TileEntity? = null): ItemBuilder {
-        var builder = createBasicItemBuilder()
-        itemBuilderModifiers?.forEach { builder = it.invoke(builder, tileEntity) }
-        if (novaItem != null) builder = novaItem.modifyItemBuilder(builder)
-        return builder
+        return modifyItemBuilder(createBasicItemBuilder(), tileEntity)
     }
     
     /**
      * Creates an [ItemStack] for this [NovaMaterial].
      */
-    fun createItemStack(amount: Int = 1): ItemStack = createItemBuilder().setAmount(amount).get()
+    fun createItemStack(amount: Int = 1, tileEntity: TileEntity? = null): ItemStack =
+        createItemBuilder(tileEntity).setAmount(amount).get()
     
     override fun compareTo(other: NovaMaterial): Int {
         return item.data.compareTo(other.item.data)
@@ -76,5 +77,13 @@ class NovaMaterial(
     }
     
     override fun toString() = id
+    
+    private fun modifyItemBuilder(itemBuilder: ItemBuilder, tileEntity: TileEntity? = null): ItemBuilder {
+        var builder = itemBuilder
+        itemBuilderModifiers?.forEach { builder = it.invoke(builder, tileEntity) }
+        if (novaItem != null) builder = novaItem.modifyItemBuilder(itemBuilder)
+        
+        return builder
+    }
     
 }
