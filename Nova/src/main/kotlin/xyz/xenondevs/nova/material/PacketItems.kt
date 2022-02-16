@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.material
 
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.chat.ComponentSerializer
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData.DataItem
 import net.minecraft.world.item.Items
@@ -17,6 +19,7 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.network.event.clientbound.*
 import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
+import xyz.xenondevs.nova.util.ItemUtils
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
@@ -43,7 +46,9 @@ object PacketItems : Initializable(), Listener {
         val carriedItem = packet.carriedItem
         
         items.forEachIndexed { i, item ->
-            if (isNovaItem(item))
+            if (isContainerItem(item))
+                items[i] = filterContainerItems(item)
+            else if (isNovaItem(item))
                 items[i] = getFakeItem(item)
         }
         
@@ -55,7 +60,9 @@ object PacketItems : Initializable(), Listener {
     fun handleSetSlotPacket(event: ContainerSetSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
-        if (isNovaItem(item))
+        if (isContainerItem(item))
+            event.item = filterContainerItems(item)
+        else if (isNovaItem(item))
             event.item = getFakeItem(item)
     }
     
@@ -87,6 +94,9 @@ object PacketItems : Initializable(), Listener {
     fun handleCreativeSetItem(event: SetCreativeModeSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
+        if (isContainerItem(item)) {
+            // TODO
+        }
         if (isFakeItem(item))
             event.item = getNovaItem(item)
     }
@@ -115,6 +125,11 @@ object PacketItems : Initializable(), Listener {
             && item.tag!!.contains("CustomModelData", NBTUtils.TAG_INT)
     }
     
+    internal fun isContainerItem(item: MojangStack): Boolean {
+        return item.item == Items.BUNDLE
+            || item.item in ItemUtils.SHULKER_BOX_ITEMS
+    }
+    
     internal fun getNovaItem(item: MojangStack): MojangStack {
         return item.apply {
             this.item = SERVER_SIDE_ITEM
@@ -137,6 +152,57 @@ object PacketItems : Initializable(), Listener {
         newItem.tag!!.putInt("CustomModelData", data.dataArray[subId])
         
         return newItem
+    }
+    
+    internal fun filterContainerItems(item: MojangStack): MojangStack {
+        if (item.tag == null) return item
+        when (item.item) {
+            
+            Items.BUNDLE -> {
+                val tag = item.tag!!
+                if (!tag.contains("Items", NBTUtils.TAG_LIST))
+                    return item
+                
+                val copy = item.copy()
+                val copyTag = copy.tag!!
+                
+                val newItems = filterItemList(copyTag.getList("Items", NBTUtils.TAG_COMPOUND))
+                copyTag.put("Items", newItems)
+                return copy
+            }
+            
+            in ItemUtils.SHULKER_BOX_ITEMS -> {
+                val tag = item.tag!!
+                if (!tag.contains("BlockEntityTag", NBTUtils.TAG_COMPOUND))
+                    return item
+                
+                val copy = item.copy()
+                val copyTag = copy.tag!!
+                val blockEntityTag = copyTag.getCompound("BlockEntityTag")
+                if (!blockEntityTag.contains("Items", NBTUtils.TAG_LIST))
+                    return item
+                
+                val newItems = filterItemList(blockEntityTag.getList("Items", NBTUtils.TAG_COMPOUND))
+                blockEntityTag.put("Items", newItems)
+                return item
+            }
+            
+        }
+        return item
+    }
+    
+    private fun filterItemList(list: ListTag): ListTag {
+        val items = ListTag()
+        val stream = NBTUtils.convertListToStream(list)
+        stream.forEach { contentItem ->
+            val compound = CompoundTag()
+            if (isNovaItem(contentItem))
+                getFakeItem(contentItem).save(compound)
+            else contentItem.save(compound)
+            
+            items.add(compound)
+        }
+        return items
     }
     
     private fun getMissingItem(item: MojangStack, id: String?): MojangStack {

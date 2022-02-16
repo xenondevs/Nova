@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.util.data
 
 import net.minecraft.nbt.*
+import net.minecraft.world.item.ItemStack
+import java.util.stream.Stream
 
 object NBTUtils {
     
@@ -44,6 +46,10 @@ object NBTUtils {
         tag.remove("SaddleItem")
         
         return tag
+    }
+    
+    fun convertListToStream(tag: ListTag) : Stream<ItemStack> {
+        return tag.stream().map { ItemStack.of(it as CompoundTag) }
     }
     
 }
