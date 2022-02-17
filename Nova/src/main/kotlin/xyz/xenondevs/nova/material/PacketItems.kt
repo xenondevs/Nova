@@ -47,7 +47,7 @@ object PacketItems : Initializable(), Listener {
         
         items.forEachIndexed { i, item ->
             if (isContainerItem(item))
-                items[i] = filterContainerItems(item)
+                items[i] = filterContainerItems(item, fromCreative = false)
             else if (isNovaItem(item))
                 items[i] = getFakeItem(item)
         }
@@ -61,7 +61,7 @@ object PacketItems : Initializable(), Listener {
         val packet = event.packet
         val item = packet.item
         if (isContainerItem(item))
-            event.item = filterContainerItems(item)
+            event.item = filterContainerItems(item, fromCreative = false)
         else if (isNovaItem(item))
             event.item = getFakeItem(item)
     }
@@ -73,6 +73,7 @@ object PacketItems : Initializable(), Listener {
         data.forEachIndexed { i, d ->
             val value = d.value
             if (value is MojangStack && isNovaItem(value)) {
+                @Suppress("UNCHECKED_CAST") // Has to be <MojangStack> since the value is a MojangStack
                 val newDataItem = DataItem(d.accessor as EntityDataAccessor<MojangStack>, getFakeItem(value))
                 data[i] = newDataItem
             }
@@ -94,10 +95,9 @@ object PacketItems : Initializable(), Listener {
     fun handleCreativeSetItem(event: SetCreativeModeSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
-        if (isContainerItem(item)) {
-            // TODO
-        }
-        if (isFakeItem(item))
+        if (isContainerItem(item))
+            event.item = filterContainerItems(item, fromCreative = true)
+        else if (isFakeItem(item))
             event.item = getNovaItem(item)
     }
     
@@ -154,7 +154,7 @@ object PacketItems : Initializable(), Listener {
         return newItem
     }
     
-    internal fun filterContainerItems(item: MojangStack): MojangStack {
+    internal fun filterContainerItems(item: MojangStack, fromCreative: Boolean): MojangStack {
         if (item.tag == null) return item
         when (item.item) {
             
@@ -166,7 +166,7 @@ object PacketItems : Initializable(), Listener {
                 val copy = item.copy()
                 val copyTag = copy.tag!!
                 
-                val newItems = filterItemList(copyTag.getList("Items", NBTUtils.TAG_COMPOUND))
+                val newItems = filterItemList(copyTag.getList("Items", NBTUtils.TAG_COMPOUND), fromCreative)
                 copyTag.put("Items", newItems)
                 return copy
             }
@@ -182,7 +182,7 @@ object PacketItems : Initializable(), Listener {
                 if (!blockEntityTag.contains("Items", NBTUtils.TAG_LIST))
                     return item
                 
-                val newItems = filterItemList(blockEntityTag.getList("Items", NBTUtils.TAG_COMPOUND))
+                val newItems = filterItemList(blockEntityTag.getList("Items", NBTUtils.TAG_COMPOUND), fromCreative)
                 blockEntityTag.put("Items", newItems)
                 return item
             }
@@ -191,14 +191,22 @@ object PacketItems : Initializable(), Listener {
         return item
     }
     
-    private fun filterItemList(list: ListTag): ListTag {
+    private fun filterItemList(list: ListTag, fromCreative: Boolean): ListTag {
         val items = ListTag()
         val stream = NBTUtils.convertListToStream(list)
         stream.forEach { contentItem ->
             val compound = CompoundTag()
-            if (isNovaItem(contentItem))
+            
+            if (isContainerItem(contentItem)) {
+                filterContainerItems(contentItem, fromCreative).save(compound)
+            } else if (fromCreative) {
+                if (isFakeItem(contentItem)) // Don't collapse if statement to prevent isNovaItem call
+                    getNovaItem(contentItem).save(compound)
+            } else if (isNovaItem(contentItem)) {
                 getFakeItem(contentItem).save(compound)
-            else contentItem.save(compound)
+            } else {
+                contentItem.save(compound)
+            }
             
             items.add(compound)
         }
