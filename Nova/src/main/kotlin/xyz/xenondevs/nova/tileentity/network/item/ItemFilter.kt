@@ -1,11 +1,27 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
+import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
-import xyz.xenondevs.nova.item.impl.saveFilterConfig
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.util.novaMaterial
+
+private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilterCBF")
+
+fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
+    val container = itemMeta!!.persistentDataContainer
+    return container.get(ITEM_FILTER_KEY, CompoundElementDataType)?.let(::ItemFilter)
+}
+
+fun ItemStack.getOrCreateFilterConfig(): ItemFilter = getFilterConfigOrNull() ?: ItemFilter()
+
+fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
+    val itemMeta = itemMeta!!
+    itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, CompoundElementDataType, itemFilter.compound)
+    setItemMeta(itemMeta)
+}
 
 class ItemFilter(
     var whitelist: Boolean,
@@ -42,7 +58,11 @@ class ItemFilter(
     }
     
     fun createFilterItem(): ItemStack {
-        return NovaMaterialRegistry.ITEM_FILTER.createItemStack().apply { saveFilterConfig(this@ItemFilter) }
+        return creatorFun(this)
+    }
+    
+    companion object {
+        lateinit var creatorFun: (ItemFilter) -> ItemStack
     }
     
 }

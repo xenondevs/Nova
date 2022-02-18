@@ -4,7 +4,6 @@ import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.impl.SimpleItem
-import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Sound
@@ -12,7 +11,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.CoreGUIMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -69,23 +67,23 @@ class SideConfigGUI(
             .addIngredient('e', ClickyTabItem(0) {
                 (if (energyConfigGUI != null) {
                     if (it.currentTab == 0)
-                        NovaMaterialRegistry.ENERGY_SELECTED_BUTTON
-                    else NovaMaterialRegistry.ENERGY_ON_BUTTON
-                } else NovaMaterialRegistry.ENERGY_OFF_BUTTON).itemProvider
+                        CoreGUIMaterial.ENERGY_BTN_SELECTED
+                    else CoreGUIMaterial.ENERGY_BTN_ON
+                } else CoreGUIMaterial.ENERGY_BTN_OFF).itemProvider
             })
             .addIngredient('i', ClickyTabItem(1) {
                 (if (itemConfigGUI != null) {
                     if (it.currentTab == 1)
-                        NovaMaterialRegistry.ITEM_SELECTED_BUTTON
-                    else NovaMaterialRegistry.ITEM_ON_BUTTON
-                } else NovaMaterialRegistry.ITEM_OFF_BUTTON).itemProvider
+                        CoreGUIMaterial.ITEM_BTN_SELECTED
+                    else CoreGUIMaterial.ITEM_BTN_ON
+                } else CoreGUIMaterial.ITEM_BTN_OFF).itemProvider
             })
             .addIngredient('f', ClickyTabItem(2) {
                 (if (fluidConfigGUI != null) {
                     if (it.currentTab == 2)
-                        NovaMaterialRegistry.FLUID_SELECTED_BUTTON
-                    else NovaMaterialRegistry.FLUID_ON_BUTTON
-                } else NovaMaterialRegistry.FLUID_OFF_BUTTON).itemProvider
+                        CoreGUIMaterial.FLUID_BTN_SELECTED
+                    else CoreGUIMaterial.FLUID_BTN_ON
+                } else CoreGUIMaterial.FLUID_BTN_OFF).itemProvider
             })
             .setGUIs(listOf(energyConfigGUI, itemConfigGUI, fluidConfigGUI))
             .build()
@@ -97,7 +95,7 @@ class SideConfigGUI(
     
 }
 
-class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(NovaMaterialRegistry.SIDE_CONFIG_BUTTON.item.createItemBuilder("menu.nova.side_config")) {
+class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(CoreGUIMaterial.SIDE_CONFIG_BTN.item.createItemBuilder("menu.nova.side_config")) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

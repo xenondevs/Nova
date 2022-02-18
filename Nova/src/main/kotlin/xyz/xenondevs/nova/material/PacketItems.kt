@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.network.event.clientbound.*
 import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.util.ItemUtils
@@ -33,7 +32,7 @@ object PacketItems : Initializable(), Listener {
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
     
     override val inMainThread = true
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = Resources
     
     override fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)

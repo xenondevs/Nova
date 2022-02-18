@@ -2,21 +2,20 @@ package xyz.xenondevs.nova.data.resources
 
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.addon.loader.AddonsInitializer
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
-import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ModelData
-import java.io.File
 
-object Resources : Initializable() {
+internal object Resources : Initializable() {
     
-    override val inMainThread = true
-    override val dependsOn: Initializable? = null
+    override val inMainThread = false
+    override val dependsOn = AddonsInitializer
     
-    private lateinit var modelDataLookup: HashMap<String, Pair<ModelData?, ModelData?>>
-    private lateinit var guiDataLookup: HashMap<String, GUIData>
+    private lateinit var modelDataLookup: Map<String, Pair<ModelData?, ModelData?>>
+    private lateinit var guiDataLookup: Map<String, GUIData>
+    internal lateinit var languageLookup: Map<String, Map<String, String>>
     
     override fun init() {
         LOGGER.info("Loading resources")
@@ -34,14 +33,19 @@ object Resources : Initializable() {
     
     fun isInitialized() = ::modelDataLookup.isInitialized && ::guiDataLookup.isInitialized
     
-    internal fun updateModelDataLookup(modelDataLookup: HashMap<String, Pair<ModelData?, ModelData?>>) {
+    internal fun updateModelDataLookup(modelDataLookup: Map<String, Pair<ModelData?, ModelData?>>) {
         this.modelDataLookup = modelDataLookup
         PermanentStorage.store("modelDataLookup", modelDataLookup)
     }
     
-    internal fun updateGuiDataLookup(guiDataLookup: HashMap<String, GUIData>) {
+    internal fun updateGuiDataLookup(guiDataLookup: Map<String, GUIData>) {
         this.guiDataLookup = guiDataLookup
         PermanentStorage.store("guiDataLookup", modelDataLookup)
+    }
+    
+    internal fun updateLanguageLookup(languageLookup: Map<String, Map<String, String>>) {
+        this.languageLookup = languageLookup
+        PermanentStorage.store("languageLookup", this.languageLookup)
     }
     
     fun getModelDataOrNull(id: String): Pair<ModelData?, ModelData?>? {

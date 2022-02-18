@@ -18,9 +18,9 @@ import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
 
 lateinit var NOVA: Nova
-lateinit var LOGGER: Logger
 lateinit var PLUGIN_MANAGER: PluginManager
-var IS_VERSION_CHANGE: Boolean = false
+internal var IS_VERSION_CHANGE: Boolean = false
+internal lateinit var LOGGER: Logger
 
 class Nova : JavaPlugin(), INova {
     
@@ -46,7 +46,7 @@ class Nova : JavaPlugin(), INova {
         PermanentStorage.store("last_version", description.version)
         
         Metrics(this, 11927)
-        NovaConfig.init()
+        NovaConfig.loadDefaultConfig()
         Initializer.init()
     }
     

@@ -7,8 +7,8 @@ import org.bukkit.craftbukkit.v1_18_R1.CraftServer
 import org.bukkit.craftbukkit.v1_18_R1.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.loader.AddonsLoader
 import xyz.xenondevs.nova.command.impl.*
-import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
@@ -19,7 +19,7 @@ object CommandManager : Initializable() {
     private val registeredCommands = ArrayList<String>()
     
     override val inMainThread = true
-    override val dependsOn = RecipeRegistry
+    override val dependsOn = AddonsLoader
     
     override fun init() {
         LOGGER.info("Registering Commands")

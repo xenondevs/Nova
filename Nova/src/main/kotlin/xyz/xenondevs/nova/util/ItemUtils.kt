@@ -37,6 +37,30 @@ fun Material.isBreakable() = blastResistance < 3600000.0f
 
 fun Material.isFluid() = this == Material.WATER || this == Material.BUBBLE_COLUMN || this == Material.LAVA
 
+/**
+ * More reliable function compared to the Spigot API function [Material.isInteractable].
+ * From https://www.spigotmc.org/threads/check-if-a-block-is-interactable.535861/
+ * @author LoneDev
+ */
+fun Material.isActuallyInteractable(): Boolean {
+    return if (!isInteractable) false else when (this) {
+        Material.ACACIA_STAIRS, Material.ANDESITE_STAIRS, Material.BIRCH_STAIRS, Material.BLACKSTONE_STAIRS,
+        Material.BRICK_STAIRS, Material.COBBLESTONE_STAIRS, Material.CRIMSON_STAIRS, Material.DARK_OAK_STAIRS,
+        Material.DARK_PRISMARINE_STAIRS, Material.DIORITE_STAIRS, Material.END_STONE_BRICK_STAIRS, Material.GRANITE_STAIRS,
+        Material.JUNGLE_STAIRS, Material.MOSSY_COBBLESTONE_STAIRS, Material.MOSSY_STONE_BRICK_STAIRS, Material.NETHER_BRICK_STAIRS,
+        Material.OAK_STAIRS, Material.POLISHED_ANDESITE_STAIRS, Material.POLISHED_BLACKSTONE_BRICK_STAIRS, Material.POLISHED_BLACKSTONE_STAIRS,
+        Material.POLISHED_DIORITE_STAIRS, Material.POLISHED_GRANITE_STAIRS, Material.PRISMARINE_BRICK_STAIRS, Material.PRISMARINE_STAIRS,
+        Material.PURPUR_STAIRS, Material.QUARTZ_STAIRS, Material.RED_NETHER_BRICK_STAIRS, Material.RED_SANDSTONE_STAIRS,
+        Material.SANDSTONE_STAIRS, Material.SMOOTH_QUARTZ_STAIRS, Material.SMOOTH_RED_SANDSTONE_STAIRS, Material.SMOOTH_SANDSTONE_STAIRS,
+        Material.SPRUCE_STAIRS, Material.STONE_BRICK_STAIRS, Material.STONE_STAIRS, Material.WARPED_STAIRS,
+        Material.ACACIA_FENCE, Material.BIRCH_FENCE, Material.CRIMSON_FENCE, Material.DARK_OAK_FENCE,
+        Material.JUNGLE_FENCE, Material.MOVING_PISTON, Material.NETHER_BRICK_FENCE, Material.OAK_FENCE,
+        Material.PUMPKIN, Material.REDSTONE_ORE, Material.REDSTONE_WIRE, Material.SPRUCE_FENCE,
+        Material.WARPED_FENCE -> false
+        else -> true
+    }
+}
+
 val Material.fluidType: FluidType?
     get() {
         val fluidType = when (this) {

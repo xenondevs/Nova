@@ -30,7 +30,7 @@
             <url>https://repo.xenondevs.xyz/releases</url>
         </pluginRepository>
     </pluginRepositories>
-    
+
     <repositories>
         <repository>
             <id>xenondevs</id>
@@ -95,9 +95,9 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>net.md-5</groupId>
+                        <groupId>xyz.xenondevs</groupId>
                         <artifactId>specialsource-maven-plugin</artifactId>
-                        <version>1.2.2</version>
+                        <version>1.2.4</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -164,53 +164,51 @@
         </dependency>
 
         <!-- Provided through library loader -->
+        <!-- Not using the provided scope, so they're transitive for addons -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.exposed</groupId>
             <artifactId>exposed-core</artifactId>
             <version>${exposed.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.exposed</groupId>
             <artifactId>exposed-dao</artifactId>
             <version>${exposed.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.exposed</groupId>
             <artifactId>exposed-jdbc</artifactId>
             <version>${exposed.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>${annotations.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>${hikaricp.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>xyz.xenondevs</groupId>
             <artifactId>particle</artifactId>
             <version>${particlelib.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.xdrop</groupId>
             <artifactId>fuzzywuzzy</artifactId>
             <version>${fuzzywuzzy.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
@@ -527,9 +525,9 @@
 
             <!-- re-declare to change execution order -->
             <plugin>
-                <groupId>net.md-5</groupId>
+                <groupId>xyz.xenondevs</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.2</version>
+                <version>1.2.4</version>
             </plugin>
 
             <plugin>
@@ -561,6 +559,14 @@
                             </excludes>
                         </filter>
                     </filters>
+                    <artifactSet>
+                        <includes>
+                            <include>xyz.xenondevs.nova:Nova-API</include>
+                            <include>de.studiocode.invui:*</include>
+                            <include>org.bstats:*</include>
+                            <include>net.dzikoysk:exposed-upsert</include>
+                        </includes>
+                    </artifactSet>
                 </configuration>
                 <executions>
                     <execution>

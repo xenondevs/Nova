@@ -5,9 +5,6 @@ import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.command.CommandManager
-import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
-import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
@@ -15,7 +12,6 @@ import xyz.xenondevs.nova.ui.menu.item.recipes.group.hardcoded.HardcodedRecipes
 import xyz.xenondevs.nova.util.ItemUtils.getId
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.data.getResourceAsStream
-import xyz.xenondevs.nova.util.runTask
 
 object RecipeRegistry : Initializable() {
     
@@ -35,12 +31,12 @@ object RecipeRegistry : Initializable() {
     override val dependsOn = RecipeManager
     
     override fun init() {
-        LOGGER.info("Initializing recipe registry")
+        LOGGER.info("Initializing RecipeRegistry")
         BUKKIT_RECIPES = loadBukkitRecipes()
         CREATION_RECIPES = loadCreationRecipes()
         USAGE_RECIPES = loadUsageRecipes()
         RECIPES_BY_TYPE = loadRecipesByGroup()
-        LOGGER.info("Finished initializing recipe registry")
+        LOGGER.info("Finished initializing RecipeRegistry")
     }
     
     private fun loadBukkitRecipes(): List<Recipe> {

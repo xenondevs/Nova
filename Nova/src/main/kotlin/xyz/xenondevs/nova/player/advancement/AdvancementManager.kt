@@ -8,8 +8,8 @@ import org.bukkit.event.player.PlayerJoinEvent
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.awardAdvancement
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -26,9 +26,10 @@ private val ITEM_REGEXPS = listOf(
 object AdvancementManager : Initializable(), Listener {
     
     override val inMainThread = true
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = Resources
     
     override fun init() {
+        return // TODO
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         LOGGER.info("Loading advancements")
         

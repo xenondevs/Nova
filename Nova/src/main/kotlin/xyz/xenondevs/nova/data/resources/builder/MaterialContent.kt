@@ -15,7 +15,7 @@ import java.util.*
 internal class MaterialContent(private val builder: ResourcePackBuilder) : PackContent {
     
     private val modelOverrides = HashMap<Material, TreeSet<String>>()
-    private val modelDataLookup = HashMap<String, Pair<ModelData?, ModelData?>>()
+    private val toLookup = HashMap<String, Pair<ModelInformation?, ModelInformation?>>()
     
     override fun addFromPack(pack: AssetPack) {
         val materialsIndex = pack.materialsIndex ?: return
@@ -34,10 +34,7 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
             val itemInfo = mat.itemInfo
             val blockInfo = mat.blockInfo
             
-            val itemModelData = itemInfo?.let(::createModelData)
-            val blockModelData = blockInfo?.let(::createModelData)
-            
-            modelDataLookup[mat.id] = itemModelData to blockModelData
+            toLookup[mat.id] = itemInfo to blockInfo
         }
     }
     
@@ -69,6 +66,9 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
     }
     
     override fun write() {
+        val modelDataLookup = toLookup.mapValuesTo(HashMap()) {
+            it.value.first?.let(::createModelData) to it.value.second?.let(::createModelData)
+        }
         Resources.updateModelDataLookup(modelDataLookup)
         
         modelOverrides.forEach { (material, models) ->

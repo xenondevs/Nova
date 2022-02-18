@@ -20,7 +20,7 @@ typealias ItemBuilderModifierFun = (ItemBuilder, TileEntity?) -> ItemBuilder
 typealias TileEntityConstructor = ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)
 typealias PlaceCheckFun = ((Player, ItemStack, Location) -> Boolean)
 
-class NovaMaterial(
+class NovaMaterial internal constructor(
     override val id: String,
     val localizedName: String,
     val novaItem: NovaItem? = null,

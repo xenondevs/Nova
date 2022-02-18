@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.material
 import org.bukkit.Material
 import org.bukkit.Material.*
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.impl.FilterItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
 import xyz.xenondevs.nova.item.impl.MobCatcherItem
 import xyz.xenondevs.nova.tileentity.impl.agriculture.*
@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.tileentity.impl.storage.*
 import xyz.xenondevs.nova.tileentity.impl.world.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
+import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.novaMaterial
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
 
@@ -33,21 +34,14 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     
     // Blocks
     val MECHANICAL_PRESS = registerEnergyTileEntity("MECHANICAL_PRESS", ::MechanicalPress, COBBLESTONE)
-    val BASIC_POWER_CELL = registerEnergyTileEntity("BASIC_POWER_CELL", ::BasicPowerCell, IRON_BLOCK)
-    val ADVANCED_POWER_CELL = registerEnergyTileEntity("ADVANCED_POWER_CELL", ::AdvancedPowerCell, IRON_BLOCK)
-    val ELITE_POWER_CELL = registerEnergyTileEntity("ELITE_POWER_CELL", ::ElitePowerCell, IRON_BLOCK)
-    val ULTIMATE_POWER_CELL = registerEnergyTileEntity("ULTIMATE_POWER_CELL", ::UltimatePowerCell, IRON_BLOCK)
-    val CREATIVE_POWER_CELL = registerEnergyTileEntity("CREATIVE_POWER_CELL", ::CreativePowerCell, IRON_BLOCK)
     val PULVERIZER = registerEnergyTileEntity("PULVERIZER", ::Pulverizer, COBBLESTONE)
     val SOLAR_PANEL = registerEnergyTileEntity("SOLAR_PANEL", ::SolarPanel, BARRIER)
     val QUARRY = registerEnergyTileEntity("QUARRY", ::Quarry, COBBLESTONE, Quarry::canPlace)
     val CHUNK_LOADER = registerEnergyTileEntity("CHUNK_LOADER", ::ChunkLoader, COBBLESTONE)
     val BLOCK_BREAKER = registerEnergyTileEntity("BLOCK_BREAKER", ::BlockBreaker, COBBLESTONE)
     val BLOCK_PLACER = registerEnergyTileEntity("BLOCK_PLACER", ::BlockPlacer, COBBLESTONE)
-    val STORAGE_UNIT = registerDefaultTileEntity("STORAGE_UNIT", ::StorageUnit, BARRIER)
     val CHARGER = registerEnergyTileEntity("CHARGER", ::Charger, COBBLESTONE)
     val MOB_KILLER = registerEnergyTileEntity("MOB_KILLER", ::MobKiller, COBBLESTONE)
-    val VACUUM_CHEST = registerDefaultTileEntity("VACUUM_CHEST", ::VacuumChest, BARRIER)
     val BREEDER = registerEnergyTileEntity("BREEDER", ::Breeder, COBBLESTONE)
     val MOB_DUPLICATOR = registerEnergyTileEntity("MOB_DUPLICATOR", ::MobDuplicator, COBBLESTONE)
     val PLANTER = registerEnergyTileEntity("PLANTER", ::Planter, COBBLESTONE)
@@ -57,7 +51,6 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     val AUTO_FISHER = registerEnergyTileEntity("AUTO_FISHER", ::AutoFisher, COBBLESTONE)
     val LIGHTNING_EXCHANGER = registerEnergyTileEntity("LIGHTNING_EXCHANGER", ::LightningExchanger, BARRIER)
     val TREE_FACTORY = registerEnergyTileEntity("TREE_FACTORY", ::TreeFactory, BARRIER)
-    val TRASH_CAN = registerDefaultTileEntity("TRASH_CAN", ::TrashCan, BARRIER)
     val BASIC_FLUID_TANK = registerDefaultTileEntity("BASIC_FLUID_TANK", ::BasicFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val ADVANCED_FLUID_TANK = registerDefaultTileEntity("ADVANCED_FLUID_TANK", ::AdvancedFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val ELITE_FLUID_TANK = registerDefaultTileEntity("ELITE_FLUID_TANK", ::EliteFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
@@ -109,7 +102,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     val SOLAR_CELL = registerDefaultItem("SOLAR_CELL")
     val MOB_CATCHER = registerDefaultItem("MOB_CATCHER", MobCatcherItem)
     val STAR_SHARDS = registerDefaultItem("STAR_SHARDS")
-    val BASIC_MACHINE_FRAME = registerDefaultItem("BASIC_MACHINE_FRAME")
+    val BASIC_MACHINE_FRAME = registerDefaultItem("nova:basic_machine_frame")
     val ADVANCED_MACHINE_FRAME = registerDefaultItem("ADVANCED_MACHINE_FRAME")
     val ELITE_MACHINE_FRAME = registerDefaultItem("ELITE_MACHINE_FRAME")
     val ULTIMATE_MACHINE_FRAME = registerDefaultItem("ULTIMATE_MACHINE_FRAME")
@@ -117,23 +110,12 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     
     // Upgrades and similar
     val WRENCH = registerDefaultItem("WRENCH")
-    val ITEM_FILTER = registerDefaultItem("ITEM_FILTER", FilterItem)
-    val SPEED_UPGRADE = registerDefaultItem("SPEED_UPGRADE")
-    val EFFICIENCY_UPGRADE = registerDefaultItem("EFFICIENCY_UPGRADE")
-    val ENERGY_UPGRADE = registerDefaultItem("ENERGY_UPGRADE")
-    val RANGE_UPGRADE = registerDefaultItem("RANGE_UPGRADE")
-    val FLUID_UPGRADE = registerDefaultItem("FLUID_UPGRADE")
     
     // Equipment, Attachments
     val JETPACK = registerItem("JETPACK", "item.nova.jetpack", JetpackItem)
     
     // MultiModel Blocks
     // Reserved for legacy cables
-    val BASIC_CABLE = registerTileEntity("BASIC_CABLE", "block.nova.basic_cable", null, STRUCTURE_VOID, ::BasicCable, isDirectional = false)
-    val ADVANCED_CABLE = registerTileEntity("ADVANCED_CABLE", "block.nova.advanced_cable", null, STRUCTURE_VOID, ::AdvancedCable, isDirectional = false)
-    val ELITE_CABLE = registerTileEntity("ELITE_CABLE", "block.nova.elite_cable", null, STRUCTURE_VOID, ::EliteCable, isDirectional = false)
-    val ULTIMATE_CABLE = registerTileEntity("ULTIMATE_CABLE", "block.nova.ultimate_cable", null, STRUCTURE_VOID, ::UltimateCable, isDirectional = false)
-    val CREATIVE_CABLE = registerTileEntity("CREATIVE_CABLE", "block.nova.creative_cable", null, STRUCTURE_VOID, ::CreativeCable, isDirectional = false)
     val SCAFFOLDING = register(NovaMaterial("SCAFFOLDING", "item.nova.scaffolding", null, null))
     val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", listOf(EnergyHolder::modifyItemBuilder), BARRIER, ::WindTurbine, WindTurbine::canPlace)
     val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", listOf(EnergyHolder::modifyItemBuilder), COBBLESTONE, ::FurnaceGenerator)
@@ -167,7 +149,6 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     val NBT_OFF_BUTTON = registerItem("NBT_OFF_BUTTON", "")
     val HOE_ON_BUTTON = registerItem("HOE_ON_BUTTON", "")
     val HOE_OFF_BUTTON = registerItem("HOE_OFF_BUTTON", "")
-    val UPGRADES_BUTTON = registerItem("UPGRADES_BUTTON", "menu.nova.upgrades")
     val ARROW_LEFT_ON_BUTTON = registerItem("ARROW_LEFT_ON_BUTTON", "")
     val ARROW_LEFT_OFF_BUTTON = registerItem("ARROW_LEFT_OFF_BUTTON", "")
     val ARROW_RIGHT_ON_BUTTON = registerItem("ARROW_RIGHT_ON_BUTTON", "")
@@ -198,16 +179,6 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     val PLUS_ICON = registerItem("PLUS_ICON", "")
     val MINUS_ICON = registerItem("MINUS_ICON", "")
     val COLOR_PICKER_ICON = registerItem("COLOR_PICKER_ICON", "menu.nova.color_picker")
-    val SPEED_UPGRADE_ICON = registerItem("SPEED_UPGRADE_ICON", "")
-    val TRANSLUCENT_SPEED_UPGRADE_ICON = registerItem("TRANSLUCENT_SPEED_UPGRADE_ICON", "")
-    val EFFICIENCY_UPGRADE_ICON = registerItem("EFFICIENCY_UPGRADE_ICON", "")
-    val TRANSLUCENT_EFFICIENCY_UPGRADE_ICON = registerItem("TRANSLUCENT_EFFICIENCY_UPGRADE_ICON", "")
-    val ENERGY_UPGRADE_ICON = registerItem("ENERGY_UPGRADE_ICON", "")
-    val TRANSLUCENT_ENERGY_UPGRADE_ICON = registerItem("TRANSLUCENT_ENERGY_UPGRADE_ICON", "")
-    val RANGE_UPGRADE_ICON = registerItem("RANGE_UPGRADE_ICON", "")
-    val TRANSLUCENT_RANGE_UPGRADE_ICON = registerItem("TRANSLUCENT_RANGE_UPGRADE_ICON", "")
-    val FLUID_UPGRADE_ICON = registerItem("FLUID_UPGRADE_ICON", "")
-    val TRANSLUCENT_FLUID_UPGRADE_ICON = registerItem("TRANSLUCENT_FLUID_UPGRADE_ICON", "")
     val HOE_PLACEHOLDER = registerItem("HOE_PLACEHOLDER", "")
     val AXE_PLACEHOLDER = registerItem("AXE_PLACEHOLDER", "")
     val SHEARS_PLACEHOLDER = registerItem("SHEARS_PLACEHOLDER", "")
@@ -257,11 +228,49 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     val GIANT_BROWN_MUSHROOM_MINIATURE = registerItem("GIANT_BROWN_MUSHROOM_MINIATURE", "")
     
     override fun getOrNull(id: String): NovaMaterial? = materialsById[id.uppercase().removePrefix("NOVA:")]
+        ?: materialsById[id]
+    
     override fun getOrNull(item: ItemStack): NovaMaterial? = item.novaMaterial
     override fun get(id: String): NovaMaterial = getOrNull(id)!!
     override fun get(item: ItemStack): NovaMaterial = getOrNull(item)!!
     
-    fun registerDefaultTileEntity(
+    fun registerEnergyTileEntity(
+        addon: Addon,
+        name: String,
+        tileEntityConstructor: TileEntityConstructor?,
+        hitboxType: Material,
+        placeCheck: PlaceCheckFun? = null,
+        isDirectional: Boolean = true
+    ): NovaMaterial {
+        return registerDefaultTileEntity(
+            addon,
+            name,
+            tileEntityConstructor,
+            hitboxType,
+            listOf(EnergyHolder::modifyItemBuilder),
+            placeCheck,
+            isDirectional,
+        )
+    }
+    
+    internal fun registerEnergyTileEntity(
+        id: String,
+        tileEntityConstructor: TileEntityConstructor?,
+        hitboxType: Material,
+        placeCheck: PlaceCheckFun? = null,
+        isDirectional: Boolean = true
+    ): NovaMaterial {
+        return registerDefaultTileEntity(
+            id,
+            tileEntityConstructor,
+            hitboxType,
+            listOf(EnergyHolder::modifyItemBuilder),
+            placeCheck,
+            isDirectional
+        )
+    }
+    
+    internal fun registerDefaultTileEntity(
         id: String,
         tileEntityConstructor: TileEntityConstructor?,
         hitboxType: Material,
@@ -282,26 +291,45 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         )
     }
     
-    fun registerEnergyTileEntity(
-        id: String,
+    fun registerDefaultTileEntity(
+        addon: Addon,
+        name: String,
         tileEntityConstructor: TileEntityConstructor?,
         hitboxType: Material,
+        itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
         placeCheck: PlaceCheckFun? = null,
         isDirectional: Boolean = true,
-        legacyItemIds: IntArray? = null,
     ): NovaMaterial {
-        return registerDefaultTileEntity(
-            id,
+        return registerTileEntity(
+            addon,
+            name,
             tileEntityConstructor,
             hitboxType,
-            listOf(EnergyHolder::modifyItemBuilder),
+            itemBuilderModifiers,
             placeCheck,
-            isDirectional,
-            legacyItemIds
+            isDirectional
         )
     }
     
     fun registerTileEntity(
+        addon: Addon,
+        name: String,
+        tileEntityConstructor: TileEntityConstructor?,
+        hitboxType: Material,
+        itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
+        placeCheck: PlaceCheckFun? = null,
+        isDirectional: Boolean = true,
+    ): NovaMaterial {
+        val namespace = addon.description.id
+        val id = name.addNamespace(namespace)
+        val localizedName = "block.$namespace.$name"
+        val material = NovaMaterial(id, localizedName, null, itemBuilderModifiers, hitboxType,
+            tileEntityConstructor, placeCheck, isDirectional)
+        
+        return register(material)
+    }
+    
+    internal fun registerTileEntity(
         id: String,
         name: String,
         itemBuilderModifiers: List<ItemBuilderModifierFun>?,
@@ -316,13 +344,26 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(material)
     }
     
-    fun registerDefaultItem(id: String, novaItem: NovaItem? = null) =
+    fun registerItem(addon: Addon, name: String, localizedName: String = "", novaItem: NovaItem? = null): NovaMaterial {
+        val namespace = addon.description.id
+        val id = name.addNamespace(namespace)
+        return register(NovaMaterial(id, localizedName, novaItem))
+    }
+    
+    fun registerDefaultItem(addon: Addon, name: String, novaItem: NovaItem? = null): NovaMaterial {
+        val namespace = addon.description.id
+        val id = name.addNamespace(namespace)
+        val localizedName = "item.$namespace.$name"
+        return register(NovaMaterial(id, localizedName, novaItem))
+    }
+    
+    internal fun registerDefaultItem(id: String, novaItem: NovaItem? = null) =
         registerItem(id, "item.nova.${id.lowercase()}", novaItem)
     
-    fun registerItem(id: String, name: String, novaItem: NovaItem? = null) =
+    internal fun registerItem(id: String, name: String, novaItem: NovaItem? = null) =
         register(NovaMaterial(id, name, novaItem))
     
-    fun registerItem(id: String) =
+    internal fun registerItem(id: String) =
         register(NovaMaterial(id, ""))
     
     private fun register(material: NovaMaterial): NovaMaterial {

@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
 import xyz.xenondevs.nova.NOVA
+import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -15,6 +16,12 @@ private val ZIP_FILE = ZipFile(NOVA.pluginFile)
  */
 fun getResources(directory: String = ""): Sequence<String> {
     return ZIP_FILE.stream().asSequence().filter {
+        it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
+    }.map(ZipEntry::getName)
+}
+
+fun getResources(file: File, directory: String = ""): Sequence<String> {
+    return ZipFile(file).stream().asSequence().filter { 
         it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
     }.map(ZipEntry::getName)
 }

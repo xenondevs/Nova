@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -25,8 +26,8 @@ class FluidBar(
     
     override val barMaterial: NovaMaterial
         get() = when (fluidContainer.type) {
-            FluidType.WATER -> NovaMaterialRegistry.BLUE_BAR
-            else -> NovaMaterialRegistry.ORANGE_BAR
+            FluidType.WATER -> CoreGUIMaterial.BAR_BLUE
+            else -> CoreGUIMaterial.BAR_ORANGE
         }
     
     private var amount = 0L

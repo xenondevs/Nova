@@ -2,31 +2,18 @@ package xyz.xenondevs.nova.tileentity.upgrade
 
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.EFFICIENCY_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.EFFICIENCY_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.ENERGY_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.ENERGY_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.FLUID_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.FLUID_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_EFFICIENCY_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_ENERGY_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_FLUID_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_RANGE_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_SPEED_UPGRADE_ICON
 import xyz.xenondevs.nova.util.data.getAllDoubles
 
 enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial, val grayIcon: NovaMaterial) {
     
-    SPEED(SPEED_UPGRADE, SPEED_UPGRADE_ICON, TRANSLUCENT_SPEED_UPGRADE_ICON),
-    EFFICIENCY(EFFICIENCY_UPGRADE, EFFICIENCY_UPGRADE_ICON, TRANSLUCENT_EFFICIENCY_UPGRADE_ICON),
-    ENERGY(ENERGY_UPGRADE, ENERGY_UPGRADE_ICON, TRANSLUCENT_ENERGY_UPGRADE_ICON),
-    FLUID(FLUID_UPGRADE, FLUID_UPGRADE_ICON, TRANSLUCENT_FLUID_UPGRADE_ICON),
-    RANGE(RANGE_UPGRADE, RANGE_UPGRADE_ICON, TRANSLUCENT_RANGE_UPGRADE_ICON);
+    SPEED(CoreItems.SPEED_UPGRADE, CoreGUIMaterial.SPEED_UPGRADE, CoreGUIMaterial.TP_SPEED_UPGRADE),
+    EFFICIENCY(CoreItems.EFFICIENCY_UPGRADE, CoreGUIMaterial.EFFICIENCY_UPGRADE, CoreGUIMaterial.TP_EFFICIENCY_UPGRADE),
+    ENERGY(CoreItems.ENERGY_UPGRADE, CoreGUIMaterial.ENERGY_UPGRADE, CoreGUIMaterial.TP_ENERGY_UPGRADE),
+    FLUID(CoreItems.FLUID_UPGRADE, CoreGUIMaterial.FLUID_UPGRADE, CoreGUIMaterial.TP_FLUID_UPGRADE),
+    RANGE(CoreItems.RANGE_UPGRADE, CoreGUIMaterial.RANGE_UPGRADE, CoreGUIMaterial.TP_RANGE_UPGRADE);
     
     private val modifierCache = HashMap<NovaMaterial, DoubleArray>()
     

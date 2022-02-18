@@ -5,19 +5,21 @@ import com.google.gson.JsonParser
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.loader.AddonManager
+import xyz.xenondevs.nova.addon.loader.AddonsInitializer
+import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.data.getResourceAsStream
-import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.util.data.set
 import java.io.File
 
 val DEFAULT_CONFIG = NovaConfig["config"]
 
-class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataFolder}/$configPath"), false) {
+class NovaConfig(private val configPath: String, private val data: ByteArray) : JsonConfig(File("${NOVA.dataFolder}/$configPath"), false) {
     
     private val defaults: JsonConfig
-    private val internalConfig = JsonConfig(JsonParser.parseReader(getResourceAsStream(configPath)!!.reader()).asJsonObject)
+    private val internalConfig = JsonConfig(JsonParser.parseString(String(data)) as JsonObject)
     
     init {
         extractConfigFiles()
@@ -32,7 +34,7 @@ class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataF
     
     private fun extractConfigFiles() {
         file!!.parentFile.mkdirs()
-        if (!file.exists()) file.writeBytes(getResourceData(configPath))
+        if (!file.exists()) file.writeBytes(data)
     }
     
     private fun updateUnchangedConfigValues() {
@@ -62,20 +64,43 @@ class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataF
     override fun get(path: List<String>) =
         super.get(path) ?: internalConfig.get(path)
     
-    companion object {
+    companion object : Initializable() {
+        
+        override val inMainThread = false
+        override val dependsOn = AddonsInitializer
         
         private val configs = HashMap<String, NovaConfig>()
         private var configDefaults = PermanentStorage.retrieve("configDefaults") { JsonObject() }
         
-        fun init() {
+        fun loadDefaultConfig() {
+            configs["config"] = NovaConfig(
+                "config/config.json",
+                getResourceAsStream("config/config.json")!!.readAllBytes()
+            )
+        }
+        
+        override fun init() {
             LOGGER.info("Loading configs")
             
             getResources("config/")
-                .filterNot { it.startsWith("config/recipes/") }
+                .filterNot { it.startsWith("config/recipes/") || it == "config/config.json" }
                 .forEach {
                     val configName = it.substring(7).substringBeforeLast('.')
-                    configs[configName] = NovaConfig(it)
+                    configs[configName] = NovaConfig(it, getResourceAsStream(it)!!.readAllBytes())
                 }
+            
+            AddonManager.loaders.forEach { loader ->
+                getResources(loader.file, "configs/")
+                    .forEach {
+                        val namespace = loader.description.id
+                        val path = it.substringAfter("configs/")
+                        val configName = "$namespace:${path.substringBeforeLast('.')}"
+                        configs[configName] = NovaConfig(
+                            "config/$namespace/$path",
+                            loader.classLoader.getResourceAsStream(it)!!.readAllBytes()
+                        )
+                    }
+            }
             
             if (IS_VERSION_CHANGE) {
                 val defaultConfig = configs["config"]!!
@@ -88,7 +113,7 @@ class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataF
         
         operator fun get(name: String) = configs[name]!!
         
-        operator fun get(material: NovaMaterial) = configs["machine/${material.id.lowercase()}"]!!
+        operator fun get(material: NovaMaterial) = configs[material.id]!!
         
     }
     

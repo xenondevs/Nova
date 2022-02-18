@@ -4,9 +4,12 @@ import de.studiocode.invui.resourcepack.ForceResourcePack
 import net.md_5.bungee.api.chat.ComponentBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.UpdateReminder
+import xyz.xenondevs.nova.addon.loader.AddonsInitializer
+import xyz.xenondevs.nova.addon.loader.AddonsLoader
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
@@ -35,13 +38,13 @@ import java.util.concurrent.CountDownLatch
 object Initializer {
     
     private val toInit = listOf(
-        Resources, UpdateReminder, DatabaseManager, CustomItemServiceManager,
+        UpdateReminder, AddonsInitializer, NovaConfig, DatabaseManager, Resources, CustomItemServiceManager,
         PacketItems,
         LocaleManager, ChunkReloadWatcher, FakeArmorStandManager, AdvancementManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         TileEntityManager, NetworkManager, ItemManager, AttachmentManager,
         CommandManager, ArmorEquipListener, AbilityManager, PacketListener,
-        LootGeneration
+        LootGeneration, AddonsLoader
     ).sorted()
     
     private val latch = CountDownLatch(toInit.size)
@@ -51,8 +54,12 @@ object Initializer {
         runAsyncTask {
             toInit.forEach {
                 runAsyncTask {
-                    it.dependsOn?.latch?.await()
-                    it.initialize(latch)
+                    try {
+                        it.dependsOn?.latch?.await()
+                        it.initialize(latch)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
             latch.await()

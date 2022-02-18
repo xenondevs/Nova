@@ -5,11 +5,11 @@ import java.util.concurrent.CountDownLatch
 
 abstract class Initializable : Comparable<Initializable> {
     
-    val latch = CountDownLatch(1)
+    internal val latch = CountDownLatch(1)
     
-    abstract val inMainThread: Boolean
+    internal abstract val inMainThread: Boolean
     
-    abstract val dependsOn: Initializable?
+    internal abstract val dependsOn: Initializable?
     
     abstract fun init()
     

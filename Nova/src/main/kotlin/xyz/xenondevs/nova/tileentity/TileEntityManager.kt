@@ -299,6 +299,67 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         }
     }
     
+    private fun handleTileEntityInteract(event: PlayerInteractEvent, tileEntity: TileEntity) {
+        if (event.hand == EquipmentSlot.HAND) {
+            val player = event.player
+            val block = event.clickedBlock!!
+            if (!player.isSneaking) {
+                if (ProtectionManager.canUseBlock(player, event.item, block.location)) {
+                    event.isCancelled = true
+                    tileEntity.handleRightClick(event)
+                }
+            } else if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH } && ProtectionManager.canBreak(player, event.item, block.location)) {
+                destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
+            }
+        } else event.isCancelled = true
+    }
+    
+    private fun handleTileEntityWrenchShift(event: PlayerInteractEvent, tileEntity: TileEntity) {
+        if (ProtectionManager.canBreak(event.player, event.item, event.clickedBlock!!.location)) {
+            destroyAndDropTileEntity(tileEntity, event.player.gameMode == GameMode.SURVIVAL)
+        }
+    }
+    
+    private fun handleTileEntityPlace(event: PlayerInteractEvent, material: NovaMaterial) {
+        event.isCancelled = true
+        
+        val player = event.player
+        val block = event.clickedBlock!!
+        val handItem = event.item!!
+        val playerLocation = player.location
+        val placePos = block.location.advance(event.blockFace)
+        
+        if (placePos.block.type.isAir
+            && ProtectionManager.canPlace(player, handItem, placePos)
+            && material.placeCheck?.invoke(
+                player,
+                handItem,
+                placePos.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
+            ) != false
+        ) {
+            val uuid = player.uniqueId
+            val result = TileEntityLimits.canPlaceTileEntity(uuid, placePos.world!!, material)
+            if (result == PlaceResult.ALLOW) {
+                placeTileEntity(
+                    uuid,
+                    placePos,
+                    playerLocation.yaw,
+                    material,
+                    handItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
+                )
+                
+                if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
+                
+                player.swingMainHand()
+                player.playSound(block.location, material.hitboxType!!.soundGroup.placeSound, 1f, 1f)
+            } else {
+                player.spigot().sendMessage(
+                    localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
+                )
+            }
+        }
+    }
+    
     // TODO: clean up
     @Synchronized
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -308,52 +369,19 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         if (action == Action.RIGHT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
-            if (tileEntity != null && !player.isSneaking) {
-                if (event.hand == EquipmentSlot.HAND) {
-                    if (!event.player.isSneaking) {
-                        if (ProtectionManager.canUseBlock(player, event.item, block.location)) {
-                            event.isCancelled = true
-                            tileEntity.handleRightClick(event)
-                        }
-                    } else if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH } && ProtectionManager.canBreak(player, event.item, block.location)) {
-                        destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
-                    }
-                } else event.isCancelled = true
-            } else {
+            
+            if ((tileEntity == null && !block.type.isActuallyInteractable()) || player.isSneaking) {
                 val handItem = event.item
-                val handMaterial = event.item?.novaMaterial
-                if (handItem != null && handMaterial != null && handMaterial.isTileEntity) {
-                    event.isCancelled = true
-                    val playerLocation = player.location
-                    val placePos = block.location.advance(event.blockFace)
-                    if (placePos.block.type.isAir
-                        && ProtectionManager.canPlace(player, handItem, placePos)
-                        && handMaterial.placeCheck?.invoke(
-                            player,
-                            handItem,
-                            placePos.apply { yaw = calculateTileEntityYaw(handMaterial, playerLocation.yaw) }
-                        ) != false
-                    ) {
-                        val uuid = player.uniqueId
-                        val result = TileEntityLimits.canPlaceTileEntity(uuid, placePos.world!!, handMaterial)
-                        if (result == PlaceResult.ALLOW) {
-                            placeTileEntity(
-                                uuid,
-                                placePos,
-                                playerLocation.yaw,
-                                handMaterial,
-                                handItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
-                            )
-                            
-                            if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
-                        } else {
-                            player.spigot().sendMessage(
-                                localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
-                            )
-                        }
+                val handMaterial = handItem?.novaMaterial
+                
+                if (handMaterial != null) {
+                    if (handMaterial.isTileEntity) {
+                        handleTileEntityPlace(event, handMaterial)
+                    } else if (tileEntity != null && handMaterial == NovaMaterialRegistry.WRENCH) {
+                        handleTileEntityWrenchShift(event, tileEntity)
                     }
                 }
-            }
+            } else if (tileEntity != null) handleTileEntityInteract(event, tileEntity)
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             if ((block.type == Material.BARRIER || block.type == Material.CHAIN)

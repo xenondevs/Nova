@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.runTaskTimer
 import java.util.*
 import kotlin.collections.set
@@ -26,7 +26,7 @@ object AttachmentManager : Initializable(), Listener {
     private var tick = 0
     
     override val inMainThread = true
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = PacketItems
     
     override fun init() {
         LOGGER.info("Initializing AttachmentManager")

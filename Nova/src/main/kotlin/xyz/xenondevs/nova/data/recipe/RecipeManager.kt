@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -79,7 +78,7 @@ object RecipeManager : Initializable(), Listener {
     val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
     
     override val inMainThread = true
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = PacketItems
     
     override fun init() {
         LOGGER.info("Loading recipes")
@@ -125,7 +124,7 @@ object RecipeManager : Initializable(), Listener {
                         is StonecuttingRecipe -> {
                             Bukkit.addRecipe(recipe)
                             val novaMaterial = recipe.result.novaMaterial
-                            if(novaMaterial != null)
+                            if (novaMaterial != null)
                                 fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
                         }
                         

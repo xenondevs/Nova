@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import xyz.xenondevs.nova.initialize.Initializable
@@ -28,7 +29,7 @@ object DatabaseManager : Initializable() {
     private lateinit var dataSource: HikariDataSource
     
     override val inMainThread = false
-    override val dependsOn: Initializable? = null
+    override val dependsOn = NovaConfig
     
     override fun init() {
         LOGGER.info("Connecting to database")

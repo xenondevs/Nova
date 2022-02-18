@@ -15,7 +15,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.config.side.BackItem
@@ -98,8 +98,8 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         
         override fun getItemProvider(): ItemProvider {
             return if (type in upgradeHolder.allowed)
-                NovaMaterialRegistry.NUMBER.item.createItemBuilder(upgradeHolder.upgrades[type] ?: 0)
-            else NovaMaterialRegistry.NO_NUMBER.createBasicItemBuilder()
+                CoreGUIMaterial.NUMBER.item.createItemBuilder(upgradeHolder.upgrades[type] ?: 0)
+            else CoreGUIMaterial.MINUS.createBasicItemBuilder()
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
@@ -108,7 +108,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     
 }
 
-class OpenUpgradesItem(private val upgradeHolder: UpgradeHolder) : SimpleItem(NovaMaterialRegistry.UPGRADES_BUTTON.itemProvider) {
+class OpenUpgradesItem(private val upgradeHolder: UpgradeHolder) : SimpleItem(CoreGUIMaterial.UPGRADES_BTN.itemProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

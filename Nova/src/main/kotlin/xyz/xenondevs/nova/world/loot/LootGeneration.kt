@@ -13,8 +13,6 @@ import xyz.xenondevs.nova.util.data.fromJson
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-private val LOOT_CONFIG = NovaConfig["loot"]
-
 object LootGeneration : Initializable(), Listener {
     
     private val lootTable = ArrayList<LootInfo>()
@@ -23,7 +21,7 @@ object LootGeneration : Initializable(), Listener {
     override val dependsOn = CustomItemServiceManager
     
     override fun init() {
-        lootTable.addAll(GSON.fromJson<ArrayList<LootInfo>>(LOOT_CONFIG.getArray("loot")) ?: emptyList())
+        lootTable.addAll(GSON.fromJson<ArrayList<LootInfo>>(NovaConfig["loot"].getArray("loot")) ?: emptyList())
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }
     
