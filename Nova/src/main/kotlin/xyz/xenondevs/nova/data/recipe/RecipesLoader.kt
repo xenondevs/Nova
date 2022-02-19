@@ -12,6 +12,8 @@ import java.io.InputStream
 
 object RecipesLoader {
     
+    private val RECIPE_FILE_PATTERN = Regex("""^[a-z][a-z0-9_]*.json$""")
+    
     private val recipesDir = File(NOVA.dataFolder, "recipes/")
     private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve("recipeFileHashes") { HashMap() }
     
@@ -86,29 +88,33 @@ object RecipesLoader {
         }
     }
     
-    private fun loadRecipes(folder: String, deserializer: RecipeDeserializer<out Any>): List<Any> {
-        val recipes = ArrayList<Any>()
-        
+    private fun <T> loadRecipes(folder: String, deserializer: RecipeDeserializer<T>): List<T> {
         val recipesDirectory = File("plugins/Nova/recipes/$folder")
-        recipesDirectory.walkTopDown()
-            .filter { it.isFile && it.name.endsWith(".json") }
-            .forEach { file ->
-                try {
-                    val element = file.reader().use { JsonParser.parseReader(it) }
-                    if (element !is JsonObject)
-                        throw IllegalStateException("Invalid recipe in file ${file.name}.")
-                    
-                    if (!element.getBoolean("enabled", default = true))
-                        return@forEach
-                    
-                    val recipe = deserializer.deserialize(element, file)
-                    recipes += recipe
-                } catch (ex: Exception) {
-                    throw IllegalStateException("Invalid recipe in file ${file.name}.", ex)
-                }
+        return recipesDirectory.walkTopDown()
+            .filter { it.isFile && it.name.matches(RECIPE_FILE_PATTERN) }
+            .mapTo(ArrayList()) { loadRecipe(it, deserializer) }
+    }
+    
+    private fun <T> loadRecipe(file: File, deserializer: RecipeDeserializer<T>): T {
+        var recipeFile = file
+        var fallback = 0
+        while (recipeFile.exists()) {
+            try {
+                val element = recipeFile.reader().use { JsonParser.parseReader(it) }
+                if (element !is JsonObject)
+                    throw IllegalArgumentException("Recipe is not a json object")
+                
+                return deserializer.deserialize(element, recipeFile)
+            } catch (ex: Exception) {
+                fallback++
+                recipeFile = File(file.parentFile, "${file.nameWithoutExtension}-$fallback.json")
+                
+                if (!recipeFile.exists())
+                    throw IllegalStateException("Invalid recipe in file ${file.name} (fallback ${fallback - 1}).", ex)
             }
+        }
         
-        return recipes
+        throw IllegalStateException("Recipe file $recipeFile does not exist")
     }
     
 }
