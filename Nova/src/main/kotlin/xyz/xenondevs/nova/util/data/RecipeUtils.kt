@@ -52,8 +52,8 @@ fun MojangShapelessRecipe.copy(newResult: MojangStack): MojangShapelessRecipe {
     return MojangShapelessRecipe(id, "", newResult, NonNullList(ingredients))
 }
 
-fun FurnaceRecipe.copy(newResult: MojangStack): MojangFurnaceRecipe {
-    return MojangFurnaceRecipe(key.resourceLocation, "", inputChoice.nmsIngredient, newResult, experience, cookingTime)
+fun MojangFurnaceRecipe.copy(newResult: MojangStack): MojangFurnaceRecipe {
+    return MojangFurnaceRecipe(id, "", ingredients.first(), newResult, experience, cookingTime)
 }
 
 fun StonecuttingRecipe.copy(newResult: MojangStack): MojangStonecuttingRecipe {

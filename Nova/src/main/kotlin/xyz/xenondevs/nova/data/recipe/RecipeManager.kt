@@ -46,7 +46,7 @@ class ModelDataTest(private val type: Material, private val data: IntArray, over
     
 }
 
-class NovaIdTest(private val id: String, override val example: ItemStack): SingleItemTest {
+class NovaIdTest(private val id: String, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
         return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id") == id
@@ -54,7 +54,7 @@ class NovaIdTest(private val id: String, override val example: ItemStack): Singl
     
 }
 
-class NovaNameTest(private val name: String, override val examples: List<ItemStack>): MultiItemTest {
+class NovaNameTest(private val name: String, override val examples: List<ItemStack>) : MultiItemTest {
     
     override fun test(item: ItemStack): Boolean {
         return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id")
@@ -73,7 +73,7 @@ class ComplexTest(override val example: ItemStack) : SingleItemTest {
 }
 
 class CustomRecipeChoice(private val tests: List<ItemTest>) : ExactChoice(
-    tests.flatMap { 
+    tests.flatMap {
         when (it) {
             is SingleItemTest -> listOf(it.example)
             is MultiItemTest -> it.examples
@@ -94,6 +94,7 @@ object RecipeManager : Initializable(), Listener {
     
     private val shapedRecipes = HashMap<NamespacedKey, OptimizedShapedRecipe>()
     private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
+    private val furnaceRecipes = HashMap<NamespacedKey, FurnaceRecipe>()
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
     private val _fakeRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
     private val _novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
@@ -141,10 +142,14 @@ object RecipeManager : Initializable(), Listener {
                         }
                         
                         is FurnaceRecipe -> {
-                            Bukkit.addRecipe(recipe)
-                            val novaMaterial = recipe.result.novaMaterial
-                            if (novaMaterial != null)
-                                _fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
+                            furnaceRecipes[key] = recipe
+                            
+                            val nmsRecipe = NovaFurnaceRecipe(recipe)
+                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                            
+                            val result = nmsRecipe.resultItem
+                            if (PacketItems.isNovaItem(result))
+                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
                         }
                         
                         is StonecuttingRecipe -> {

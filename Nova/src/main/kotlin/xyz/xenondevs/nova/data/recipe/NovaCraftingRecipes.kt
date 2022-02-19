@@ -1,11 +1,14 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.world.Container
 import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
+import net.minecraft.world.item.crafting.SmeltingRecipe
 import net.minecraft.world.level.Level
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.nmsIngredient
+import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
 
@@ -54,6 +57,23 @@ class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : Sha
     
     override fun toBukkitRecipe(): org.bukkit.inventory.ShapelessRecipe {
         return bukkitRecipe
+    }
+    
+}
+
+class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) : SmeltingRecipe(
+    bukkitRecipe.key.resourceLocation,
+    "",
+    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.result.nmsStack,
+    bukkitRecipe.experience,
+    bukkitRecipe.cookingTime
+) {
+    
+    private val choice = bukkitRecipe.inputChoice
+    
+    override fun matches(container: Container, level: Level): Boolean {
+        return choice.test(container.getItem(0).bukkitStack)
     }
     
 }
