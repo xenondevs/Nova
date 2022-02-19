@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.command.executesCatching
 import xyz.xenondevs.nova.command.requiresConsole
 import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
-import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.capitalize
@@ -42,7 +41,7 @@ object UninstallCommand : Command("nvuninstall") {
                 .map { getOrCreateTileEntity(it) }
                 .forEach { TileEntityManager.destroyTileEntity(it, dropItems = false) }
             
-            SchemaUtils.drop(TileEntitiesTable, TileInventoriesTable)
+            SchemaUtils.drop(TileEntitiesTable)
         }
         File(minecraftServer.getWorldPath(LevelResource.DATAPACK_DIR).toFile(), "bukkit/data/${NOVA.name.lowercase()}").deleteRecursively()
         NOVA.dataFolder.deleteRecursively()

@@ -59,7 +59,7 @@ abstract class TileEntity(
     val chunkPos = chunk.pos
     val facing = armorStand.location.facing
     
-    private val inventories = ArrayList<VirtualInventory>()
+    internal val inventories = ArrayList<VirtualInventory>()
     private val fluidContainers = HashMap<FluidContainer, Boolean>()
     private val multiModels = ArrayList<MultiModel>()
     private val particleTasks = ArrayList<TileEntityParticleTask>()
@@ -155,8 +155,6 @@ abstract class TileEntity(
         armorStand.remove()
         multiModels.forEach { it.close() }
         particleTasks.forEach { it.stop() }
-        if (!unload)
-            TileInventoryManager.remove(uuid, inventories)
     }
     
     /**
@@ -188,10 +186,9 @@ abstract class TileEntity(
         afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null
     ): VirtualInventory {
         val invUUID = uuid.salt(salt)
-        val inventory = TileInventoryManager.getOrNull(uuid, invUUID)
-            ?: retrieveData("inventory.$invUUID") {
-                VirtualInventory(invUUID, size, arrayOfNulls(size), stackSizes)
-            }
+        val inventory = retrieveData("inventory.$invUUID") {
+            VirtualInventory(invUUID, size, arrayOfNulls(size), stackSizes)
+        }
         
         if (preUpdateHandler != null) inventory.setItemUpdateHandler(preUpdateHandler)
         if (afterUpdateHandler != null) inventory.setInventoryUpdatedHandler(afterUpdateHandler)

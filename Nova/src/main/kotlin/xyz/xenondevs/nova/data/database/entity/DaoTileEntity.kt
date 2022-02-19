@@ -6,7 +6,6 @@ import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
-import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import java.util.*
 
 class DaoTileEntity(id: EntityID<UUID>) : Entity<UUID>(id) {
@@ -22,7 +21,6 @@ class DaoTileEntity(id: EntityID<UUID>) : Entity<UUID>(id) {
     var yaw by TileEntitiesTable.yaw
     var type by TileEntitiesTable.type
     var data by TileEntitiesTable.data
-    val inventories by DaoTileInventory referrersOn TileInventoriesTable.tileEntityId
     
     val location
         get() = Location(Bukkit.getWorld(world), x.toDouble(), y.toDouble(), z.toDouble())

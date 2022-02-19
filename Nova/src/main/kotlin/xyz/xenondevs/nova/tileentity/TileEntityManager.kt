@@ -538,9 +538,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         private fun loadChunk(done: AtomicBoolean) {
             if (chunkPos.isLoaded()) {
                 transaction {
-                    val tileEntities = DaoTileEntity.find { (TileEntitiesTable.world eq chunkPos.worldUUID) and (TileEntitiesTable.chunkX eq chunkPos.x) and (TileEntitiesTable.chunkZ eq chunkPos.z) }
-                        .onEach { tile -> tile.inventories.forEach { inventory -> TileInventoryManager.loadInventory(tile.id.value, inventory.id.value, inventory.data) } }
-                        .toList()
+                    val tileEntities = DaoTileEntity.find { (TileEntitiesTable.world eq chunkPos.worldUUID) and (TileEntitiesTable.chunkX eq chunkPos.x) and (TileEntitiesTable.chunkZ eq chunkPos.z) }.toList()
                     
                     if (!NOVA.isEnabled) return@transaction
                     

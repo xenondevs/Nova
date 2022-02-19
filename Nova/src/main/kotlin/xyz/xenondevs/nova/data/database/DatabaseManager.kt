@@ -9,7 +9,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
-import xyz.xenondevs.nova.data.database.table.TileInventoriesTable
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.runAsyncTask
 import java.io.File
@@ -75,7 +74,7 @@ object DatabaseManager : Initializable() {
         database = Database.connect(dataSource)
         
         transaction {
-            SchemaUtils.create(TileEntitiesTable, TileInventoriesTable)
+            SchemaUtils.create(TileEntitiesTable)
         }
     }
     
