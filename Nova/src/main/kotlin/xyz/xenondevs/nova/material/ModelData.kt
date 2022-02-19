@@ -21,17 +21,7 @@ class ModelData(val material: Material, val dataArray: IntArray, val id: String,
     fun createItemBuilder(localizedName: String, subId: Int = 0): ItemBuilder =
         ItemBuilder(PacketItems.SERVER_SIDE_MATERIAL)
             .setLocalizedName(localizedName)
-            .addModifier {
-                val novaCompound = CompoundTag()
-                novaCompound.putString("id", id)
-                novaCompound.putInt("subId", subId)
-                novaCompound.putBoolean("isBlock", isBlock)
-                
-                val meta = it.itemMeta!!
-                meta.unhandledTags["nova"] = novaCompound
-                it.itemMeta = meta
-                return@addModifier it
-            }
+            .addModifier { modifyNBT(it, subId) }
     
     fun createItemBuilder(subId: Int = 0): ItemBuilder =
         createItemBuilder("", subId)
@@ -46,8 +36,22 @@ class ModelData(val material: Material, val dataArray: IntArray, val id: String,
         ItemBuilder(material)
             .setLocalizedName(localizedName)
             .setCustomModelData(dataArray[subId])
+            .addModifier { modifyNBT(it, subId) }
     
     fun createClientsideItemBuilder(subId: Int = 0): ItemBuilder =
         createClientsideItemBuilder("", subId)
+    
+    private fun modifyNBT(itemStack: ItemStack, subId: Int): ItemStack {
+        val novaCompound = CompoundTag()
+        novaCompound.putString("id", id)
+        novaCompound.putInt("subId", subId)
+        novaCompound.putBoolean("isBlock", isBlock)
+        
+        val meta = itemStack.itemMeta!!
+        meta.unhandledTags["nova"] = novaCompound
+        itemStack.itemMeta = meta
+        
+        return itemStack
+    }
     
 }
