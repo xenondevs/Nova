@@ -6,6 +6,7 @@ import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
+import xyz.xenondevs.nova.addon.loader.AddonManager
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
@@ -66,6 +67,9 @@ object NovaCommand : Command("nova") {
                 .requiresPlayerPermission("nova.command.renderDistance")
                 .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
                     .executesCatching { setRenderDistance(it) }))
+            .then(literal("addons")
+                .requiresPermission("nova.command.addons")
+                .executesCatching { sendAddons(it) })
     }
     
     private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: NovaMaterial) =
@@ -160,5 +164,14 @@ object NovaCommand : Command("nova") {
         ))
     }
     
+    private fun sendAddons(ctx: CommandContext<CommandSourceStack>) {
+        val addons = AddonManager.addons.values
+        ctx.source.sendSuccess(localized(
+            ChatColor.WHITE,
+            "command.nova.addons.header",
+            addons.size,
+            addons.joinToString(separator = "§f,") { "§a" + it.description.name }
+        ))
+    }
 }
 

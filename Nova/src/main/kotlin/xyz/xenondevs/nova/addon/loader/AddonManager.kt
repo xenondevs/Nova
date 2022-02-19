@@ -35,7 +35,7 @@ internal object AddonManager {
     
     private val addonsDir = File(NOVA.dataFolder, "addons/")
     internal val loaders = ArrayList<AddonLoader>()
-    private val addons = HashMap<String, Addon>()
+    internal val addons = HashMap<String, Addon>()
     
     fun init() {
         addonsDir.mkdirs()
