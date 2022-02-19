@@ -8,7 +8,7 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 
@@ -70,7 +70,7 @@ object MMOItems : CustomItemService {
         return null
     }
     
-    override fun getItemTest(name: String): ItemTest? {
+    override fun getItemTest(name: String): SingleItemTest? {
         return getItemByName(name)?.let { MMOItemTest(name, it) }
     }
     
@@ -85,7 +85,7 @@ object MMOItems : CustomItemService {
     
 }
 
-private class MMOItemTest(private val id: String, override val example: ItemStack) : ItemTest {
+private class MMOItemTest(private val id: String, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
         return id.equals(MMOItems.getId(item), true)

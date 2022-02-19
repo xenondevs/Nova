@@ -13,8 +13,8 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
-import xyz.xenondevs.nova.data.recipe.RecipeType
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.data.recipe.RecipeTypeRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import xyz.xenondevs.nova.util.data.getInputStacks
@@ -23,11 +23,11 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
     
     override fun createGUI(container: RecipeContainer): GUI =
         when (container.type) {
-            RecipeType.FURNACE -> {
+            RecipeTypeRegistry.FURNACE -> {
                 val recipe = container.recipe as FurnaceRecipe
                 createConversionRecipeGUI(recipe.inputChoice, recipe.result, recipe.cookingTime)
             }
-            RecipeType.STONECUTTER -> {
+            RecipeTypeRegistry.STONECUTTER -> {
                 val recipe = container.recipe as StonecuttingRecipe
                 createConversionRecipeGUI(recipe.inputChoice, recipe.result, 0)
             }
@@ -54,7 +54,7 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
         
         if (time != 0) {
             builder.addIngredient(
-                't', NovaMaterialRegistry.STOPWATCH_ICON
+                't', CoreGUIMaterial.TP_STOPWATCH
                 .createBasicItemBuilder()
                 .setDisplayName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
             )
@@ -75,16 +75,4 @@ object StonecutterRecipeGroup : ConversionRecipeGroup() {
     override val priority = 2
     override val icon = ItemWrapper(ItemStack(Material.STONECUTTER))
     override val texture = CoreGUITexture.RECIPE_CONVERSION
-}
-
-object PulverizingRecipeGroup : ConversionRecipeGroup() {
-    override val priority = 4
-    override val icon = NovaMaterialRegistry.PULVERIZER.basicItemProvider
-    override val texture = CoreGUITexture.EMPTY_GUI // TODO: change to the correct texture when possible
-}
-
-object PressingRecipeGroup : ConversionRecipeGroup() {
-    override val priority = 5
-    override val icon = NovaMaterialRegistry.MECHANICAL_PRESS.basicItemProvider
-    override val texture = CoreGUITexture.EMPTY_GUI // TODO: change to the correct texture when possible
 }

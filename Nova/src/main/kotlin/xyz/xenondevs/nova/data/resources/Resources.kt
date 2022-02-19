@@ -1,17 +1,23 @@
 package xyz.xenondevs.nova.data.resources
 
+import net.lingala.zip4j.ZipFile
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.addon.loader.AddonManager
 import xyz.xenondevs.nova.addon.loader.AddonsInitializer
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ModelData
+import java.io.File
 
 internal object Resources : Initializable() {
     
     override val inMainThread = false
-    override val dependsOn = AddonsInitializer
+    override val dependsOn = setOf(AddonsInitializer)
     
     private lateinit var modelDataLookup: Map<String, Pair<ModelData?, ModelData?>>
     private lateinit var guiDataLookup: Map<String, GUIData>
@@ -19,19 +25,39 @@ internal object Resources : Initializable() {
     
     override fun init() {
         LOGGER.info("Loading resources")
-//        if (PermanentStorage.has("modelDataLookup") && PermanentStorage.has("guiCharLookup")) {
-//            // Load from PermanentStorage
-//            modelDataLookup = PermanentStorage.retrieveOrNull("modelDataLookup")!!
-//            guiCharLookup = PermanentStorage.retrieveOrNull("guiCharLookup")!!
-//        } else {
-        // Create ResourcePack
-//        val pack = ResourcePackBuilder(listOf(coreAssets)).create()
-        
-        // TODO
-//        }
+        // TODO: Build resource pack automatically when addon changes are detected
+        if (PermanentStorage.has("modelDataLookup") && PermanentStorage.has("guiDataLookup") && PermanentStorage.has("languageLookup")) {
+            // Load from PermanentStorage
+            modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, Pair<ModelData?, ModelData?>>>("modelDataLookup")!!
+            languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>("languageLookup")!!
+            guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, GUIData>>("guiDataLookup")!!
+        } else {
+            // Create ResourcePack
+            createResourcePack()
+        }
     }
     
-    fun isInitialized() = ::modelDataLookup.isInitialized && ::guiDataLookup.isInitialized
+    fun createResourcePack(): File {
+        val assetPacksDir = File(NOVA.dataFolder, "ResourcePack/AssetPacks/")
+        assetPacksDir.deleteRecursively()
+        val assetPacks = (AddonManager.loaders.asSequence().map { it.file to it.description.id } + (NOVA.pluginFile to "nova"))
+            .mapTo(ArrayList()) { (addonFile, namespace) ->
+                val assetPackDir = File(assetPacksDir, namespace)
+                
+                val zip = ZipFile(addonFile)
+                zip.fileHeaders.forEach {
+                    if (!it.isDirectory && it.fileName.startsWith("assets/")) {
+                        val file = File(assetPackDir, it.fileName.substringAfter("assets/"))
+                        file.parentFile.mkdirs()
+                        zip.getInputStream(it).copyTo(file.outputStream())
+                    }
+                }
+                
+                return@mapTo AssetPack(assetPackDir, namespace)
+            }
+        
+        return ResourcePackBuilder(assetPacks).create()
+    }
     
     internal fun updateModelDataLookup(modelDataLookup: Map<String, Pair<ModelData?, ModelData?>>) {
         this.modelDataLookup = modelDataLookup
@@ -40,12 +66,12 @@ internal object Resources : Initializable() {
     
     internal fun updateGuiDataLookup(guiDataLookup: Map<String, GUIData>) {
         this.guiDataLookup = guiDataLookup
-        PermanentStorage.store("guiDataLookup", modelDataLookup)
+        PermanentStorage.store("guiDataLookup", guiDataLookup)
     }
     
     internal fun updateLanguageLookup(languageLookup: Map<String, Map<String, String>>) {
         this.languageLookup = languageLookup
-        PermanentStorage.store("languageLookup", this.languageLookup)
+        PermanentStorage.store("languageLookup", languageLookup)
     }
     
     fun getModelDataOrNull(id: String): Pair<ModelData?, ModelData?>? {

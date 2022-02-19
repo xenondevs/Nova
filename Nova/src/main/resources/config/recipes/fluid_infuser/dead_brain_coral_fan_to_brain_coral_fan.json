@@ -1,8 +1,0 @@
-{
-  "mode": "INSERT",
-  "fluid_type": "WATER",
-  "fluid_amount": 100,
-  "input": "minecraft:dead_brain_coral_fan",
-  "result": "minecraft:brain_coral_fan",
-  "time": 10
-}

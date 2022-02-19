@@ -1,8 +1,0 @@
-{
-  "mode": "INSERT",
-  "fluid_type": "WATER",
-  "fluid_amount": 100,
-  "input": "minecraft:dead_fire_coral",
-  "result": "minecraft:fire_coral",
-  "time": 10
-}

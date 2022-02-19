@@ -7,6 +7,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.i18n.LocaleManager
@@ -19,6 +20,8 @@ import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 typealias ItemBuilderModifierFun = (ItemBuilder, TileEntity?) -> ItemBuilder
 typealias TileEntityConstructor = ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)
 typealias PlaceCheckFun = ((Player, ItemStack, Location) -> Boolean)
+
+private val ID_PATTERN = Regex("""^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$""")
 
 class NovaMaterial internal constructor(
     override val id: String,
@@ -41,6 +44,10 @@ class NovaMaterial internal constructor(
     val clientsideProvider: ItemProvider by lazy { ItemWrapper(modifyItemBuilder(item.createClientsideItemBuilder(localizedName)).get()) }
     
     val isTileEntity = tileEntityConstructor != null
+    
+    init {
+        if (!id.matches(ID_PATTERN)) LOGGER.warning("NovaMaterial $id does not match $ID_PATTERN. Registering materials with invalid ids will be denied in the future")
+    }
     
     /**
      * Creates a basic [ItemBuilder][ItemBuilder] without any additional information

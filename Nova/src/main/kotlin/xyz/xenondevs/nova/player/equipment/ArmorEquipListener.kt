@@ -21,7 +21,6 @@ import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.runTask
@@ -35,7 +34,7 @@ private fun InventoryView.isPlayerView() = topInventory is CraftingInventory && 
 object ArmorEquipListener : Initializable(), Listener {
     
     override val inMainThread = false
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
         LOGGER.info("Initializing ArmorEquipListener")

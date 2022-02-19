@@ -3,13 +3,16 @@ package xyz.xenondevs.nova.data.recipe
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.loader.AddonManager
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
+import java.io.InputStream
 
 object RecipesLoader {
     
+    private val recipesDir = File(NOVA.dataFolder, "recipes/")
     private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve("recipeFileHashes") { HashMap() }
     
     init {
@@ -18,35 +21,51 @@ object RecipesLoader {
     }
     
     private fun extractRecipes() {
-        getResources("config/recipes").forEach { entry ->
-            val recipeFile = File(NOVA.dataFolder, "recipes/${entry.substring(14)}")
-            val savedHash = getFileHash(recipeFile)
-            
-            if (recipeFile.exists() && savedHash != null) {
-                val recipeFileHash = HashUtils.getFileHash(recipeFile, "MD5")
-                if (recipeFileHash.contentEquals(savedHash)) {
-                    recipeFile.writeBytes(getResourceData(entry))
-                    storeFileHash(recipeFile)
-                }
-            } else if (savedHash == null) {
-                recipeFile.parentFile.mkdirs()
-                recipeFile.writeBytes(getResourceData(entry))
-                storeFileHash(recipeFile)
+        val existingPaths = ArrayList<String>()
+        
+        // Extract core recipes
+        getResources("recipes/").forEach { path ->
+            existingPaths += path
+            extractRecipe(path) { getResourceAsStream(path)!! }
+        }
+        
+        // Extract recipes from addons
+        AddonManager.loaders.forEach { loader ->
+            getResources(loader.file, "recipes/").forEach { path ->
+                existingPaths += path
+                extractRecipe(path) { loader.classLoader.getResourceAsStream(path)!! }
             }
         }
         
         // find unedited recipe files that are no longer default and remove them
-        val recipesDirectory = File(NOVA.dataFolder, "recipes/")
-        recipesDirectory.walkTopDown().forEach { file ->
-            if (file.isDirectory) return@forEach
+        recipesDir.walkTopDown().forEach { file ->
+            if (file.isDirectory || file.extension != "json") return@forEach
             
-            val pathInZip = "config/recipes/" + file.absolutePath.substring(recipesDirectory.absolutePath.length + 1).replace(File.separatorChar, '/') // TODO: clean up
-            if (!hasResource(pathInZip)
+            val relativePath = NOVA.dataFolder.toURI().relativize(file.toURI()).path
+            
+            if (!existingPaths.contains(relativePath)
                 && HashUtils.getFileHash(file, "MD5").contentEquals(getFileHash(file))) {
                 
                 fileHashes.remove(file.absolutePath)
                 file.delete()
             }
+        }
+    }
+    
+    private fun extractRecipe(path: String, getStream: () -> InputStream) {
+        val recipeFile = File(NOVA.dataFolder, path)
+        val savedHash = getFileHash(recipeFile)
+        
+        if (recipeFile.exists() && savedHash != null) {
+            val recipeFileHash = HashUtils.getFileHash(recipeFile, "MD5")
+            if (recipeFileHash.contentEquals(savedHash)) {
+                getStream().copyTo(recipeFile.outputStream())
+                storeFileHash(recipeFile)
+            }
+        } else if (savedHash == null) {
+            recipeFile.parentFile.mkdirs()
+            getStream().copyTo(recipeFile.outputStream())
+            storeFileHash(recipeFile)
         }
     }
     
@@ -58,7 +77,7 @@ object RecipesLoader {
         fileHashes[originalFile.absolutePath]?.decodeWithBase64()
     
     fun loadRecipes(): List<Any> {
-        return RecipeType.values.flatMap {
+        return RecipeTypeRegistry.types.flatMap {
             val dirName = it.dirName
             val deserializer = it.deserializer
             if (dirName != null && deserializer != null) {

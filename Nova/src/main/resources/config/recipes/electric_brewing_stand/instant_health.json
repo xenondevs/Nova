@@ -1,8 +1,0 @@
-{
-  "result": "minecraft:instant_health",
-  "max_amplifier_level": 1,
-  "inputs": [
-    "minecraft:nether_wart",
-    "minecraft:glistering_melon_slice"
-  ]
-}

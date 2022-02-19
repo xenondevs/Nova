@@ -51,11 +51,12 @@ object Initializer {
     
     
     fun init() {
+        println("init order: $toInit")
         runAsyncTask {
             toInit.forEach {
                 runAsyncTask {
                     try {
-                        it.dependsOn?.latch?.await()
+                        it.dependsOn.forEach { it.latch.await() }
                         it.initialize(latch)
                     } catch (e: Exception) {
                         e.printStackTrace()

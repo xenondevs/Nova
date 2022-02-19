@@ -6,16 +6,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.impl.JetpackItem
-import xyz.xenondevs.nova.item.impl.MobCatcherItem
-import xyz.xenondevs.nova.tileentity.impl.agriculture.*
 import xyz.xenondevs.nova.tileentity.impl.energy.*
-import xyz.xenondevs.nova.tileentity.impl.mob.Breeder
-import xyz.xenondevs.nova.tileentity.impl.mob.MobDuplicator
-import xyz.xenondevs.nova.tileentity.impl.mob.MobKiller
-import xyz.xenondevs.nova.tileentity.impl.processing.*
-import xyz.xenondevs.nova.tileentity.impl.processing.brewing.ElectricBrewingStand
-import xyz.xenondevs.nova.tileentity.impl.storage.*
-import xyz.xenondevs.nova.tileentity.impl.world.*
+import xyz.xenondevs.nova.tileentity.impl.storage.InfiniteWaterSource
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.util.addNamespace
@@ -26,6 +18,7 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegi
 object NovaMaterialRegistry : INovaMaterialRegistry {
     
     private val materialsById = HashMap<String, NovaMaterial>()
+    private val materialsByName = HashMap<String, ArrayList<NovaMaterial>>()
     
     val values: Collection<NovaMaterial>
         get() = materialsById.values
@@ -33,80 +26,9 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     val sortedValues: Set<NovaMaterial> by lazy { materialsById.values.toSortedSet() }
     
     // Blocks
-    val MECHANICAL_PRESS = registerEnergyTileEntity("MECHANICAL_PRESS", ::MechanicalPress, COBBLESTONE)
-    val PULVERIZER = registerEnergyTileEntity("PULVERIZER", ::Pulverizer, COBBLESTONE)
     val SOLAR_PANEL = registerEnergyTileEntity("SOLAR_PANEL", ::SolarPanel, BARRIER)
-    val QUARRY = registerEnergyTileEntity("QUARRY", ::Quarry, COBBLESTONE, Quarry::canPlace)
-    val CHUNK_LOADER = registerEnergyTileEntity("CHUNK_LOADER", ::ChunkLoader, COBBLESTONE)
-    val BLOCK_BREAKER = registerEnergyTileEntity("BLOCK_BREAKER", ::BlockBreaker, COBBLESTONE)
-    val BLOCK_PLACER = registerEnergyTileEntity("BLOCK_PLACER", ::BlockPlacer, COBBLESTONE)
-    val CHARGER = registerEnergyTileEntity("CHARGER", ::Charger, COBBLESTONE)
-    val MOB_KILLER = registerEnergyTileEntity("MOB_KILLER", ::MobKiller, COBBLESTONE)
-    val BREEDER = registerEnergyTileEntity("BREEDER", ::Breeder, COBBLESTONE)
-    val MOB_DUPLICATOR = registerEnergyTileEntity("MOB_DUPLICATOR", ::MobDuplicator, COBBLESTONE)
-    val PLANTER = registerEnergyTileEntity("PLANTER", ::Planter, COBBLESTONE)
-    val HARVESTER = registerEnergyTileEntity("HARVESTER", ::Harvester, COBBLESTONE)
-    val FERTILIZER = registerEnergyTileEntity("FERTILIZER", ::Fertilizer, COBBLESTONE)
-    val WIRELESS_CHARGER = registerEnergyTileEntity("WIRELESS_CHARGER", ::WirelessCharger, COBBLESTONE)
-    val AUTO_FISHER = registerEnergyTileEntity("AUTO_FISHER", ::AutoFisher, COBBLESTONE)
     val LIGHTNING_EXCHANGER = registerEnergyTileEntity("LIGHTNING_EXCHANGER", ::LightningExchanger, BARRIER)
-    val TREE_FACTORY = registerEnergyTileEntity("TREE_FACTORY", ::TreeFactory, BARRIER)
-    val BASIC_FLUID_TANK = registerDefaultTileEntity("BASIC_FLUID_TANK", ::BasicFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val ADVANCED_FLUID_TANK = registerDefaultTileEntity("ADVANCED_FLUID_TANK", ::AdvancedFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val ELITE_FLUID_TANK = registerDefaultTileEntity("ELITE_FLUID_TANK", ::EliteFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val ULTIMATE_FLUID_TANK = registerDefaultTileEntity("ULTIMATE_FLUID_TANK", ::UltimateFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val CREATIVE_FLUID_TANK = registerDefaultTileEntity("CREATIVE_FLUID_TANK", ::CreativeFluidTank, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
     val INFINITE_WATER_SOURCE = registerDefaultTileEntity("INFINITE_WATER_SOURCE", ::InfiniteWaterSource, SANDSTONE)
-    val PUMP = registerDefaultTileEntity("PUMP", ::Pump, BARRIER)
-    val COBBLESTONE_GENERATOR = registerDefaultTileEntity("COBBLESTONE_GENERATOR", ::CobblestoneGenerator, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
-    val FLUID_INFUSER = registerDefaultTileEntity("FLUID_INFUSER", ::FluidInfuser, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
-    val FREEZER = registerDefaultTileEntity("FREEZER", ::Freezer, COBBLESTONE, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
-    val SPRINKLER = registerDefaultTileEntity("SPRINKLER", ::Sprinkler, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val FLUID_STORAGE_UNIT = registerDefaultTileEntity("FLUID_STORAGE_UNIT", ::FluidStorageUnit, BARRIER, listOf(NovaFluidHolder::modifyItemBuilder))
-    val ELECTRIC_BREWING_STAND = registerDefaultTileEntity("ELECTRIC_BREWING_STAND", ::ElectricBrewingStand, BARRIER, listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder))
-    
-    // Crafting Items
-    // Plates
-    val IRON_PLATE = registerDefaultItem("IRON_PLATE")
-    val GOLD_PLATE = registerDefaultItem("GOLD_PLATE")
-    val DIAMOND_PLATE = registerDefaultItem("DIAMOND_PLATE")
-    val NETHERITE_PLATE = registerDefaultItem("NETHERITE_PLATE")
-    val EMERALD_PLATE = registerDefaultItem("EMERALD_PLATE")
-    val REDSTONE_PLATE = registerDefaultItem("REDSTONE_PLATE")
-    val LAPIS_PLATE = registerDefaultItem("LAPIS_PLATE")
-    val COPPER_PLATE = registerDefaultItem("COPPER_PLATE")
-    
-    // Gears
-    val IRON_GEAR = registerDefaultItem("IRON_GEAR")
-    val GOLD_GEAR = registerDefaultItem("GOLD_GEAR")
-    val DIAMOND_GEAR = registerDefaultItem("DIAMOND_GEAR")
-    val NETHERITE_GEAR = registerDefaultItem("NETHERITE_GEAR")
-    val EMERALD_GEAR = registerDefaultItem("EMERALD_GEAR")
-    val REDSTONE_GEAR = registerDefaultItem("REDSTONE_GEAR")
-    val LAPIS_GEAR = registerDefaultItem("LAPIS_GEAR")
-    val COPPER_GEAR = registerDefaultItem("COPPER_GEAR")
-    
-    // Dust
-    val IRON_DUST = registerDefaultItem("IRON_DUST")
-    val GOLD_DUST = registerDefaultItem("GOLD_DUST")
-    val DIAMOND_DUST = registerDefaultItem("DIAMOND_DUST")
-    val NETHERITE_DUST = registerDefaultItem("NETHERITE_DUST")
-    val EMERALD_DUST = registerDefaultItem("EMERALD_DUST")
-    val LAPIS_DUST = registerDefaultItem("LAPIS_DUST")
-    val COAL_DUST = registerDefaultItem("COAL_DUST")
-    val COPPER_DUST = registerDefaultItem("COPPER_DUST")
-    val STAR_DUST = registerDefaultItem("STAR_DUST")
-    
-    // Other
-    val NETHERITE_DRILL = registerDefaultItem("NETHERITE_DRILL")
-    val SOLAR_CELL = registerDefaultItem("SOLAR_CELL")
-    val MOB_CATCHER = registerDefaultItem("MOB_CATCHER", MobCatcherItem)
-    val STAR_SHARDS = registerDefaultItem("STAR_SHARDS")
-    val BASIC_MACHINE_FRAME = registerDefaultItem("nova:basic_machine_frame")
-    val ADVANCED_MACHINE_FRAME = registerDefaultItem("ADVANCED_MACHINE_FRAME")
-    val ELITE_MACHINE_FRAME = registerDefaultItem("ELITE_MACHINE_FRAME")
-    val ULTIMATE_MACHINE_FRAME = registerDefaultItem("ULTIMATE_MACHINE_FRAME")
-    val CREATIVE_MACHINE_FRAME = registerDefaultItem("CREATIVE_MACHINE_FRAME")
     
     // Upgrades and similar
     val WRENCH = registerDefaultItem("WRENCH")
@@ -116,11 +38,8 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     
     // MultiModel Blocks
     // Reserved for legacy cables
-    val SCAFFOLDING = register(NovaMaterial("SCAFFOLDING", "item.nova.scaffolding", null, null))
     val WIND_TURBINE = registerTileEntity("WIND_TURBINE", "block.nova.wind_turbine", listOf(EnergyHolder::modifyItemBuilder), BARRIER, ::WindTurbine, WindTurbine::canPlace)
     val FURNACE_GENERATOR = registerTileEntity("FURNACE_GENERATOR", "block.nova.furnace_generator", listOf(EnergyHolder::modifyItemBuilder), COBBLESTONE, ::FurnaceGenerator)
-    val ELECTRICAL_FURNACE = registerTileEntity("ELECTRICAL_FURNACE", "block.nova.electrical_furnace", listOf(EnergyHolder::modifyItemBuilder), COBBLESTONE, ::ElectricFurnace)
-    val STAR_COLLECTOR = registerTileEntity("STAR_COLLECTOR", "block.nova.star_collector", listOf(EnergyHolder::modifyItemBuilder), BARRIER, ::StarCollector)
     val LAVA_GENERATOR = registerTileEntity("LAVA_GENERATOR", "block.nova.lava_generator", listOf(EnergyHolder::modifyItemBuilder, NovaFluidHolder::modifyItemBuilder), COBBLESTONE, ::LavaGenerator)
     
     // UI Elements
@@ -227,12 +146,11 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     val GIANT_RED_MUSHROOM_MINIATURE = registerItem("GIANT_RED_MUSHROOM_MINIATURE", "")
     val GIANT_BROWN_MUSHROOM_MINIATURE = registerItem("GIANT_BROWN_MUSHROOM_MINIATURE", "")
     
-    override fun getOrNull(id: String): NovaMaterial? = materialsById[id.uppercase().removePrefix("NOVA:")]
-        ?: materialsById[id]
-    
+    override fun getOrNull(id: String): NovaMaterial? = materialsById[id.lowercase()]
     override fun getOrNull(item: ItemStack): NovaMaterial? = item.novaMaterial
     override fun get(id: String): NovaMaterial = getOrNull(id)!!
     override fun get(item: ItemStack): NovaMaterial = getOrNull(item)!!
+    override fun getNonNamespaced(name: String): List<NovaMaterial> = materialsByName[name.lowercase()] ?: emptyList()
     
     fun registerEnergyTileEntity(
         addon: Addon,
@@ -371,6 +289,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         require(id !in materialsById) { "Duplicate NovaMaterial id: $id" }
         
         materialsById[id] = material
+        materialsByName.getOrPut(id.substringAfter(':')) { ArrayList() } += material
         
         return material
     }

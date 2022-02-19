@@ -15,11 +15,11 @@ import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.loader.AddonsLoader
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
-import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.copy
 import xyz.xenondevs.nova.util.data.key
@@ -27,14 +27,18 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 
 interface ItemTest {
-    
-    val example: ItemStack
-    
     fun test(item: ItemStack): Boolean
-    
 }
 
-class ModelDataTest(private val type: Material, private val data: IntArray, override val example: ItemStack) : ItemTest {
+interface SingleItemTest : ItemTest {
+    val example: ItemStack
+}
+
+interface MultiItemTest : ItemTest {
+    val examples: List<ItemStack>
+}
+
+class ModelDataTest(private val type: Material, private val data: IntArray, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
         return item.type == type && item.customModelData in data
@@ -42,7 +46,7 @@ class ModelDataTest(private val type: Material, private val data: IntArray, over
     
 }
 
-class NovaIdTest(private val id: String, override val example: ItemStack) : ItemTest {
+class NovaIdTest(private val id: String, override val example: ItemStack): SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
         return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id") == id
@@ -50,7 +54,16 @@ class NovaIdTest(private val id: String, override val example: ItemStack) : Item
     
 }
 
-class ComplexTest(override val example: ItemStack) : ItemTest {
+class NovaNameTest(private val name: String, override val examples: List<ItemStack>): MultiItemTest {
+    
+    override fun test(item: ItemStack): Boolean {
+        return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id")
+            ?.substringAfter(':') == name
+    }
+    
+}
+
+class ComplexTest(override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
         val testStack = item.namelessCopyOrSelf
@@ -59,7 +72,15 @@ class ComplexTest(override val example: ItemStack) : ItemTest {
     
 }
 
-class CustomRecipeChoice(private val tests: List<ItemTest>) : ExactChoice(tests.map(ItemTest::example)) {
+class CustomRecipeChoice(private val tests: List<ItemTest>) : ExactChoice(
+    tests.flatMap { 
+        when (it) {
+            is SingleItemTest -> listOf(it.example)
+            is MultiItemTest -> it.examples
+            else -> throw UnsupportedOperationException()
+        }
+    }
+) {
     
     override fun test(item: ItemStack): Boolean {
         return tests.any { it.test(item) }
@@ -74,11 +95,16 @@ object RecipeManager : Initializable(), Listener {
     private val shapedRecipes = HashMap<NamespacedKey, OptimizedShapedRecipe>()
     private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
-    val fakeRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
-    val novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
+    private val _fakeRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
+    private val _novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
+    
+    val fakeRecipes: Map<NamespacedKey, MojangRecipe<*>>
+        get() = _fakeRecipes
+    val novaRecipes: Map<RecipeType<*>, Map<NamespacedKey, NovaRecipe>>
+        get() = _novaRecipes
     
     override val inMainThread = true
-    override val dependsOn = PacketItems
+    override val dependsOn = setOf(AddonsLoader)
     
     override fun init() {
         LOGGER.info("Loading recipes")
@@ -100,7 +126,7 @@ object RecipeManager : Initializable(), Listener {
                             
                             val result = nmsRecipe.resultItem
                             if (PacketItems.isNovaItem(result))
-                                fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
+                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
                         }
                         
                         is ShapelessRecipe -> {
@@ -111,21 +137,21 @@ object RecipeManager : Initializable(), Listener {
                             
                             val result = nmsRecipe.resultItem
                             if (PacketItems.isNovaItem(result))
-                                fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
+                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
                         }
                         
                         is FurnaceRecipe -> {
                             Bukkit.addRecipe(recipe)
                             val novaMaterial = recipe.result.novaMaterial
                             if (novaMaterial != null)
-                                fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
+                                _fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
                         }
                         
                         is StonecuttingRecipe -> {
                             Bukkit.addRecipe(recipe)
                             val novaMaterial = recipe.result.novaMaterial
                             if (novaMaterial != null)
-                                fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
+                                _fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
                         }
                         
                         else -> Bukkit.addRecipe(recipe)
@@ -134,7 +160,7 @@ object RecipeManager : Initializable(), Listener {
                     vanillaRegisteredRecipeKeys += key
                 }
                 
-                is NovaRecipe -> novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
+                is NovaRecipe -> _novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
                 
                 else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
             }
@@ -143,31 +169,12 @@ object RecipeManager : Initializable(), Listener {
     
     @Suppress("UNCHECKED_CAST")
     fun <T : ConversionNovaRecipe> getConversionRecipeFor(type: RecipeType<T>, input: ItemStack): T? {
-        return novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
-    }
-    
-    fun getFluidInfuserInsertRecipeFor(fluidType: FluidType, input: ItemStack): FluidInfuserRecipe? {
-        return novaRecipes[RecipeType.FLUID_INFUSER]?.values?.asSequence()
-            ?.map { it as FluidInfuserRecipe }
-            ?.firstOrNull { recipe ->
-                recipe.mode == FluidInfuserRecipe.InfuserMode.INSERT
-                    && recipe.fluidType == fluidType
-                    && recipe.input.test(input)
-            }
-    }
-    
-    fun getFluidInfuserExtractRecipeFor(input: ItemStack): FluidInfuserRecipe? {
-        return novaRecipes[RecipeType.FLUID_INFUSER]?.values?.asSequence()
-            ?.map { it as FluidInfuserRecipe }
-            ?.firstOrNull { recipe ->
-                recipe.mode == FluidInfuserRecipe.InfuserMode.EXTRACT
-                    && recipe.input.test(input)
-            }
+        return _novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
     }
     
     @Suppress("UNCHECKED_CAST")
     fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? {
-        return novaRecipes[type]?.get(key) as T?
+        return _novaRecipes[type]?.get(key) as T?
     }
     
     @EventHandler

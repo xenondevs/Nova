@@ -3,9 +3,8 @@ package xyz.xenondevs.nova.addon.assets
 import com.google.gson.JsonParser
 import java.io.File
 
-class AssetPack(val directory: File) {
+class AssetPack(val directory: File, val namespace: String) {
     
-    val namespace = directory.name
     val materialsFile = File(directory, "materials.json")
     val guisFile = File(directory, "guis.json")
     

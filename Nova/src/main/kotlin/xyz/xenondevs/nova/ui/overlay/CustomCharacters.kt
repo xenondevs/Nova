@@ -4,8 +4,10 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
+import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.GUIData
+import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import kotlin.math.abs
 
@@ -52,7 +54,9 @@ class GUITexture(private val data: GUIData) {
     
     companion object {
         
-        fun of(id: String) = GUITexture(Resources.getGUIData(id))
+        internal fun of(id: String) = GUITexture(Resources.getGUIData(id))
+        
+        fun of(addon: Addon, name: String) = of(name.addNamespace(addon.description.id))
         
     }
     

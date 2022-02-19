@@ -20,7 +20,6 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -39,7 +38,7 @@ object VanillaTileEntityManager : Initializable(), Listener {
     private val tileEntityQueue = LinkedList<VanillaTileEntity>()
     
     override val inMainThread = true
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
         LOGGER.info("Initializing VanillaTileEntityManager")

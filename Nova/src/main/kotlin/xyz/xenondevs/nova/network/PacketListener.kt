@@ -14,7 +14,6 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.PLUGIN_MANAGER
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.channels
 import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.serverPlayer
@@ -22,7 +21,7 @@ import xyz.xenondevs.nova.util.serverPlayer
 object PacketListener : Initializable(), Listener {
     
     override val inMainThread = true
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = emptySet<Initializable>()
     
     private val serverChannels = ArrayList<Channel>()
     private val connectionsList = minecraftServer.connection!!.connections

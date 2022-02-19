@@ -65,7 +65,7 @@ interface NetworkManager {
         }
         
         override val inMainThread = true
-        override val dependsOn = TileEntityManager
+        override val dependsOn = setOf(TileEntityManager)
         
         override fun init() {
             NETWORK_MANAGER.init()

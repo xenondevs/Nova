@@ -32,7 +32,7 @@ object PacketItems : Initializable(), Listener {
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
     
     override val inMainThread = true
-    override val dependsOn = Resources
+    override val dependsOn = setOf(Resources)
     
     override fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)

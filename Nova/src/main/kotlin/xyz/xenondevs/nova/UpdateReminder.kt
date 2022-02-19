@@ -14,7 +14,7 @@ import java.net.URL
 object UpdateReminder : Initializable(), Listener {
     
     override val inMainThread = false
-    override val dependsOn: Initializable? = null
+    override val dependsOn = emptySet<Initializable>()
     
     @Volatile
     private var needsUpdate = false

@@ -1,9 +1,0 @@
-{
-  "input": [
-    "minecraft:lapis_ore",
-    "minecraft:deepslate_lapis_ore"
-  ],
-  "result": "nova:lapis_dust",
-  "amount": 2,
-  "time": 200
-}

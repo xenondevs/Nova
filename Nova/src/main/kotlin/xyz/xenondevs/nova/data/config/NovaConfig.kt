@@ -67,7 +67,7 @@ class NovaConfig(private val configPath: String, private val data: ByteArray) : 
     companion object : Initializable() {
         
         override val inMainThread = false
-        override val dependsOn = AddonsInitializer
+        override val dependsOn = setOf(AddonsInitializer)
         
         private val configs = HashMap<String, NovaConfig>()
         private var configDefaults = PermanentStorage.retrieve("configDefaults") { JsonObject() }

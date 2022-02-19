@@ -30,10 +30,10 @@ object MaterialsIndexDeserializer {
                     ?.let { ModelInformation(deserializeMaterialType(element, "block_type"), it, id, true) }
             } else {
                 itemInfo = ModelInformation(MaterialType.DEFAULT, listOf(element.asString.addNamespace(namespace)), id, false)
-                blockInfo = itemInfo
+                blockInfo = null
             }
             
-            index += RegisteredMaterial(id, itemInfo, blockInfo)
+            index += RegisteredMaterial(id, itemInfo ?: blockInfo, blockInfo ?: itemInfo)
         }
         
         return index

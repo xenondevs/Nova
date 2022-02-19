@@ -7,7 +7,6 @@ import org.bukkit.event.world.ChunkLoadEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 
 object ChunkReloadWatcher : Initializable(), Listener {
     
@@ -17,7 +16,7 @@ object ChunkReloadWatcher : Initializable(), Listener {
     private val CHUNK_LOADS = HashMap<ChunkPos, Pair<Long, Int>>()
     
     override val inMainThread = false
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
         if (DEFAULT_CONFIG.getBoolean("chunk_reload_watcher"))

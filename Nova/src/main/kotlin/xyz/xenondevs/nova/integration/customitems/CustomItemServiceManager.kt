@@ -4,8 +4,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.database.DatabaseManager
-import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.Integration
 import xyz.xenondevs.nova.integration.customitems.plugin.ItemsAdder
@@ -24,7 +23,7 @@ object CustomItemServiceManager : Initializable() {
     val READY_LATCH = CountDownLatch(LOAD_DELAYING_PLUGINS_AMOUNT)
     
     override val inMainThread = false
-    override val dependsOn = DatabaseManager
+    override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
         READY_LATCH.await()
@@ -50,7 +49,7 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.firstNotNullOfOrNull { it.getItemByName(name) }
     }
     
-    fun getItemTest(name: String): ItemTest? {
+    fun getItemTest(name: String): SingleItemTest? {
         return PLUGINS.firstNotNullOfOrNull { it.getItemTest(name) }
     }
     

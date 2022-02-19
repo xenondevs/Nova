@@ -13,7 +13,7 @@ class RecipeContainer(val recipe: Any) {
     }
     
     val result: ItemStack? = if (recipe is Recipe) recipe.result else if (recipe is ResultingRecipe) recipe.result else null
-    val type = RecipeType.of(recipe)
+    val type = RecipeTypeRegistry.getType(recipe)
     
     override fun equals(other: Any?): Boolean {
         return other is RecipeContainer && key == other.key

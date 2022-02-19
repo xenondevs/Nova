@@ -14,10 +14,7 @@ import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
-import xyz.xenondevs.nova.data.recipe.ComplexTest
-import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
-import xyz.xenondevs.nova.data.recipe.ModelDataTest
-import xyz.xenondevs.nova.data.recipe.NovaIdTest
+import xyz.xenondevs.nova.data.recipe.*
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -172,25 +169,34 @@ object ItemUtils {
     )
     
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {
-        val tests = nameList.map { name ->
+        val tests = nameList.map { id ->
             try {
-                if (name.contains("{"))
-                    return@map ComplexTest(toItemStack(name))
+                if (id.contains("{"))
+                    return@map ComplexTest(toItemStack(id))
                 
-                return@map when (name.substringBefore(':')) {
+                when (id.substringBefore(':')) {
                     "minecraft" -> {
-                        val material = Material.valueOf(name.drop(10).uppercase())
-                        ModelDataTest(material, intArrayOf(0), ItemStack(material))
+                        val material = Material.valueOf(id.drop(10).uppercase())
+                        return@map ModelDataTest(material, intArrayOf(0), ItemStack(material))
+                    }
+                    "nova" -> {
+                        val name = id.substringAfter(':')
+                        val novaMaterials = NovaMaterialRegistry.getNonNamespaced(name)
+                        if (novaMaterials.isNotEmpty()) {
+                            return@map NovaNameTest(name, novaMaterials.map { it.clientsideProvider.get() })
+                        } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     else -> {
-                        val novaMaterial = NovaMaterialRegistry.getOrNull(name)
-                        if (novaMaterial != null)
-                            NovaIdTest(name, novaMaterial.clientsideProvider.get())
-                        else CustomItemServiceManager.getItemTest(name)!!
+                        val novaMaterial = NovaMaterialRegistry.getOrNull(id)
+                        if (novaMaterial != null) {
+                            return@map NovaIdTest(id, novaMaterial.clientsideProvider.get())
+                        } else {
+                            return@map CustomItemServiceManager.getItemTest(id)!!
+                        }
                     }
                 }
             } catch (ex: Exception) {
-                throw IllegalArgumentException("Unknown item $name", ex)
+                throw IllegalArgumentException("Unknown item $id", ex)
             }
         }
         
@@ -198,44 +204,59 @@ object ItemUtils {
     }
     
     @Suppress("LiftReturnOrAssignment")
-    fun getItemBuilder(name: String, basic: Boolean = false): ItemBuilder {
+    fun getItemBuilder(id: String, basic: Boolean = false): ItemBuilder {
         try {
-            return when (name.substringBefore(':')) {
+            return when (id.substringBefore(':')) {
+                "minecraft" -> ItemBuilder(toItemStack(id))
                 "nova" -> {
-                    val novaMaterial = NovaMaterialRegistry.get(name)
-                    if (basic) novaMaterial.createBasicItemBuilder() else novaMaterial.createItemBuilder()
+                    val name = id.substringAfter(':')
+                    val novaMaterial = NovaMaterialRegistry.getNonNamespaced(name).first()
+                    
+                    if (basic) novaMaterial.createBasicItemBuilder()
+                    else novaMaterial.createItemBuilder()
                 }
-                "minecraft" -> ItemBuilder(toItemStack(name))
-                else -> CustomItemServiceManager.getItemByName(name)!!.let(::ItemBuilder)
+                else -> {
+                    val novaMaterial = NovaMaterialRegistry.getOrNull(id)
+                    if (novaMaterial != null) {
+                        if (basic) novaMaterial.createBasicItemBuilder()
+                        else novaMaterial.createItemBuilder()
+                    } else CustomItemServiceManager.getItemByName(id)!!.let(::ItemBuilder)
+                }
             }
         } catch (ex: Exception) {
-            throw IllegalArgumentException("Invalid item name: $name", ex)
+            throw IllegalArgumentException("Invalid item name: $id", ex)
         }
     }
     
-    fun getItemAndLocalizedName(name: String, basic: Boolean = false): Pair<ItemStack, String> {
+    fun getItemAndLocalizedName(id: String, basic: Boolean = false): Pair<ItemStack, String> {
         val itemStack: ItemStack
         val localizedName: String
         
         try {
-            when (name.substringBefore(':')) {
+            when (id.substringBefore(':')) {
                 "minecraft" -> {
-                    itemStack = toItemStack(name)
+                    itemStack = toItemStack(id)
                     localizedName = itemStack.type.localizedName!!
                 }
+                "nova" -> {
+                    val name = id.substringAfter(':')
+                    val novaMaterial = NovaMaterialRegistry.getNonNamespaced(name).first()
+                    itemStack = novaMaterial.createItemStack()
+                    localizedName = novaMaterial.localizedName
+                }
                 else -> {
-                    val novaMaterial = NovaMaterialRegistry.getOrNull(name)
+                    val novaMaterial = NovaMaterialRegistry.getOrNull(id)
                     if (novaMaterial != null) {
                         localizedName = novaMaterial.localizedName
                         itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
                     } else {
-                        itemStack = CustomItemServiceManager.getItemByName(name)!!
+                        itemStack = CustomItemServiceManager.getItemByName(id)!!
                         localizedName = itemStack.displayName ?: ""
                     }
                 }
             }
         } catch (ex: Exception) {
-            throw IllegalArgumentException("Invalid item name: $name", ex)
+            throw IllegalArgumentException("Invalid item name: $id", ex)
         }
         
         return itemStack to localizedName

@@ -1,8 +1,0 @@
-{
-  "mode": "INSERT",
-  "fluid_type": "WATER",
-  "fluid_amount": 300,
-  "input": "minecraft:glass_bottle",
-  "result": "minecraft:potion{\"Potion\": \"minecraft:water\"}",
-  "time": 30
-}

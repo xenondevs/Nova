@@ -6,7 +6,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.util.customModelData
@@ -40,7 +40,7 @@ object Oraxen : CustomItemService {
         return OraxenItems.getItemById(name.removePrefix("oraxen:")).build()
     }
     
-    override fun getItemTest(name: String): ItemTest? {
+    override fun getItemTest(name: String): SingleItemTest? {
         return ItemsAdder.getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     

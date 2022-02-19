@@ -9,6 +9,7 @@ import net.minecraft.commands.arguments.selector.EntitySelector
 import xyz.xenondevs.nova.addon.loader.AddonManager
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -21,6 +22,7 @@ import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
@@ -70,6 +72,16 @@ object NovaCommand : Command("nova") {
             .then(literal("addons")
                 .requiresPermission("nova.command.addons")
                 .executesCatching { sendAddons(it) })
+            .then(literal("createResourcePack")
+                .requiresPermission("nova.command.zip")
+                .executesCatching { handleCreateResourcePack(it) }
+            )
+    }
+    
+    private fun handleCreateResourcePack(ctx: CommandContext<CommandSourceStack>) {
+        runAsyncTask {
+            Resources.createResourcePack()
+        }
     }
     
     private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: NovaMaterial) =

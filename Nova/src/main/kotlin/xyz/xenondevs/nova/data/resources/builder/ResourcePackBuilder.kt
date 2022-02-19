@@ -13,23 +13,23 @@ import java.io.File
 @Suppress("MemberVisibilityCanBePrivate")
 internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
     
-    val mainDir = File(NOVA.dataFolder, "ResourcePack")
-    val assetsDir = File(mainDir, "assets")
+    val packDir = File(NOVA.dataFolder, "ResourcePack/pack")
+    val assetsDir = File(packDir, "assets")
     val languageDir = File(assetsDir, "minecraft/lang")
     val guisFile = File(assetsDir, "nova/font/gui.json")
-    val packMetaFile = File(mainDir, "pack.mcmeta")
+    val packMetaFile = File(packDir, "pack.mcmeta")
     
     private val contents = listOf(MaterialContent(this), GUIContent(this), LanguageContent(this))
     
     init {
-        mainDir.deleteRecursively()
-        mainDir.mkdirs()
+        packDir.deleteRecursively()
+        packDir.mkdirs()
     }
     
     fun create(): File {
         // Delete existing files
-        mainDir.deleteRecursively()
-        mainDir.mkdirs()
+        packDir.deleteRecursively()
+        packDir.mkdirs()
         
         // Include asset packs
         packs.forEach { pack ->
@@ -70,10 +70,10 @@ internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
     }
     
     private fun createZip(): File {
-        val file = File(mainDir, "ResourcePack.zip")
+        val file = File(packDir, "ResourcePack.zip")
         val zip = ZipFile(file)
         zip.addFolder(assetsDir)
-        zip.addFile(File(mainDir, "pack.mcmeta"))
+        zip.addFile(File(packDir, "pack.mcmeta"))
         
         return file
     }

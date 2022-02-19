@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.ui.menu.item.recipes.group.hardcoded.HardcodedRecipes
 import xyz.xenondevs.nova.util.ItemUtils.getId
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -28,7 +27,7 @@ object RecipeRegistry : Initializable() {
     var RECIPES_BY_TYPE: Map<RecipeGroup, List<RecipeContainer>> = HashMap()
     
     override val inMainThread = false
-    override val dependsOn = RecipeManager
+    override val dependsOn = setOf(RecipeManager)
     
     override fun init() {
         LOGGER.info("Initializing RecipeRegistry")
@@ -50,7 +49,7 @@ object RecipeRegistry : Initializable() {
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach {
-            val group = RecipeType.of(it).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(it).group ?: return@forEach
             val itemKey = getId(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(group) { mutableListOf() }
@@ -59,7 +58,7 @@ object RecipeRegistry : Initializable() {
         
         // add all nova machine recipes
         getCreationNovaRecipeSequence().forEach {
-            val group = RecipeType.of(it).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(it).group ?: return@forEach
             val itemKey = getId(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(group) { mutableListOf() }
@@ -74,7 +73,7 @@ object RecipeRegistry : Initializable() {
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach { recipe ->
-            val group = RecipeType.of(recipe).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(recipe).group ?: return@forEach
             recipe.getInputStacks().forEach { inputStack ->
                 val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
@@ -85,7 +84,7 @@ object RecipeRegistry : Initializable() {
         
         // add all nova machine recipes
         getUsageNovaRecipeSequence().forEach { recipe ->
-            val group = RecipeType.of(recipe).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(recipe).group ?: return@forEach
             recipe.getAllInputs().flatMap { it.getInputStacks() }.forEach { inputStack ->
                 val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
@@ -100,7 +99,7 @@ object RecipeRegistry : Initializable() {
     private fun loadRecipesByGroup(): Map<RecipeGroup, List<RecipeContainer>> {
         val map = HashMap<RecipeGroup, MutableList<RecipeContainer>>()
         (getBukkitRecipeSequence() + getAllNovaRecipes()).forEach {
-            val group = RecipeType.of(it).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(it).group ?: return@forEach
             map.getOrPut(group) { ArrayList() } += RecipeContainer(it)
         }
         return map
@@ -118,7 +117,7 @@ object RecipeRegistry : Initializable() {
     }
     
     private fun getAllNovaRecipes(): Sequence<NovaRecipe> {
-        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + HardcodedRecipes.recipes.asSequence()
+        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values }// TODO + HardcodedRecipes.recipes.asSequence()
     }
     
     private fun getCreationNovaRecipeSequence(): Sequence<ResultingRecipe> {

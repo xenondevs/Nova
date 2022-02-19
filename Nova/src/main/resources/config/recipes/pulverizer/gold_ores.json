@@ -1,9 +1,0 @@
-{
-  "input": [
-    "minecraft:gold_ore",
-    "minecraft:deepslate_gold_ore"
-  ],
-  "result": "nova:gold_dust",
-  "amount": 2,
-  "time": 200
-}

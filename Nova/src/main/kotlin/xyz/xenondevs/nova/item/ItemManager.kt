@@ -11,14 +11,13 @@ import org.bukkit.event.player.PlayerItemBreakEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.novaMaterial
 
 object ItemManager : Initializable(), Listener {
     override val inMainThread = false
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
         LOGGER.info("Initializing ItemManager")

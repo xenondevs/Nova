@@ -19,7 +19,7 @@ object CommandManager : Initializable() {
     private val registeredCommands = ArrayList<String>()
     
     override val inMainThread = true
-    override val dependsOn = AddonsLoader
+    override val dependsOn = setOf(AddonsLoader)
     
     override fun init() {
         LOGGER.info("Registering Commands")

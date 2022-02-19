@@ -10,10 +10,10 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.loader.AddonsLoader
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
 import xyz.xenondevs.nova.util.emptyEnumMap
@@ -28,7 +28,7 @@ object AbilityManager : Initializable(), Listener {
     private var tick = 0
     
     override val inMainThread = true
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = setOf(AddonsLoader)
     
     override fun init() {
         LOGGER.info("Initializing AbilityManager")

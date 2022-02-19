@@ -4,7 +4,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.integration.Integration
 
 interface CustomItemService : Integration {
@@ -46,9 +46,9 @@ interface CustomItemService : Integration {
     fun getItemByName(name: String): ItemStack?
     
     /**
-     * Gets an [ItemTest] from a namespaced name
+     * Gets an [SingleItemTest] from a namespaced name
      */
-    fun getItemTest(name: String): ItemTest?
+    fun getItemTest(name: String): SingleItemTest?
     
     /**
      * Gets a namespaced name from an [ItemStack]

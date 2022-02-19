@@ -1,8 +1,0 @@
-{
-  "mode": "EXTRACT",
-  "fluid_type": "WATER",
-  "fluid_amount": 1000,
-  "input": "minecraft:water_bucket",
-  "result": "minecraft:bucket",
-  "time": 100
-}

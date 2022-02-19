@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.removeNamespace
 import java.io.File
+import java.io.IOException
 import javax.imageio.ImageIO
 
 internal class GUIContent(private val builder: ResourcePackBuilder) : PackContent {
@@ -16,11 +17,15 @@ internal class GUIContent(private val builder: ResourcePackBuilder) : PackConten
     
     override fun addFromPack(pack: AssetPack) {
         pack.guisIndex?.forEach { (id, path) ->
-            val file = File(pack.texturesDir, path.removeNamespace(pack.namespace))
-            val image = ImageIO.read(file)
-            
-            guiLookup[id] = GUIData(char, path, image.width, image.height)
-            char++
+            try {
+                val file = File(pack.texturesDir, path.removeNamespace(pack.namespace))
+                val image = ImageIO.read(file)
+                
+                guiLookup[id] = GUIData(char, path, image.width, image.height)
+                char++
+            } catch (ex: IOException) {
+                throw IOException("Failed to load gui texture $path")
+            }
         }
     }
     

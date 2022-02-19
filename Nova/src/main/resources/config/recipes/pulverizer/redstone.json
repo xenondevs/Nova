@@ -1,9 +1,0 @@
-{
-  "input": [
-    "nova:redstone_plate",
-    "nova:redstone_gear"
-  ],
-  "result": "minecraft:redstone",
-  "amount": 1,
-  "time": 200
-}

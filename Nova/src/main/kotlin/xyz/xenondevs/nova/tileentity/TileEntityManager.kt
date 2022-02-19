@@ -25,6 +25,8 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.database.asyncTransaction
 import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
@@ -83,7 +85,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
     private val chunkProcessors = HashMap<ChunkPos, ChunkProcessor>()
     
     override val inMainThread = true
-    override val dependsOn = FakeArmorStandManager
+    override val dependsOn = setOf(DatabaseManager, FakeArmorStandManager, NovaConfig)
     
     override fun init() {
         LOGGER.info("Initializing TileEntityManager")

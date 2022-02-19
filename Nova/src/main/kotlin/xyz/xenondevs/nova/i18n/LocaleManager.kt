@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.util.formatSafely
 object LocaleManager : Initializable() {
     
     override val inMainThread = false
-    override val dependsOn = Resources
+    override val dependsOn = setOf(Resources)
     
     private lateinit var translationProviders: Map<String, Map<String, String>>
     
