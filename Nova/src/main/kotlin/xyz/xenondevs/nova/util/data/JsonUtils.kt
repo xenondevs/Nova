@@ -107,6 +107,9 @@ fun JsonArray.addAll(stringArray: Array<String>) =
 fun JsonArray.getAllStrings() =
     filter(JsonElement::isString).map { it.asString }
 
+fun <T : MutableCollection<String>> JsonArray.getAllStringsTo(destination: T) =
+    filter(JsonElement::isString).mapTo(destination) { it.asString }
+
 fun JsonArray.getAllDoubles() =
     filter(JsonElement::isNumber).map { it.asDouble }
 

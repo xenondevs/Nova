@@ -3,6 +3,7 @@ package xyz.xenondevs.nova
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
+import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
@@ -53,6 +54,7 @@ class Nova : JavaPlugin(), INova {
     }
     
     override fun onDisable() {
+        AddonManager.disableAddons()
         disableHandlers.forEach {
             runCatching(it).onFailure(Throwable::printStackTrace)
         }

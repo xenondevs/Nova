@@ -5,8 +5,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonDescription
 import xyz.xenondevs.nova.addon.AddonLogger
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.fromJson
 import java.io.File
 
 class AddonLoader(val file: File) {
@@ -19,8 +17,7 @@ class AddonLoader(val file: File) {
         val descriptionFile = classLoader.getResourceAsStream("addon.json")
             ?: throw IllegalArgumentException("Could not find addon.json in $file")
         
-        description = GSON.fromJson(JsonParser.parseReader(descriptionFile.reader()))
-            ?: throw IllegalArgumentException("Could not deserialize addon description")
+        description = AddonDescription.deserialize(JsonParser.parseReader(descriptionFile.reader()))
     }
     
     fun load(): Addon {

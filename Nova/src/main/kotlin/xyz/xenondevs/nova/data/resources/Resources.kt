@@ -4,9 +4,9 @@ import net.lingala.zip4j.ZipFile
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.addon.assets.AssetPack
-import xyz.xenondevs.nova.addon.loader.AddonManager
-import xyz.xenondevs.nova.addon.loader.AddonsInitializer
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -17,7 +17,7 @@ import java.io.File
 internal object Resources : Initializable() {
     
     override val inMainThread = false
-    override val dependsOn = setOf(AddonsInitializer)
+    override val dependsOn = setOf(AddonsLoader)
     
     private lateinit var modelDataLookup: Map<String, Pair<ModelData?, ModelData?>>
     private lateinit var guiDataLookup: Map<String, GUIData>

@@ -15,7 +15,7 @@ import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.loader.AddonsLoader
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.PacketItems
@@ -105,7 +105,7 @@ object RecipeManager : Initializable(), Listener {
         get() = _novaRecipes
     
     override val inMainThread = true
-    override val dependsOn = setOf(AddonsLoader)
+    override val dependsOn = setOf(AddonsInitializer)
     
     override fun init() {
         LOGGER.info("Loading recipes")

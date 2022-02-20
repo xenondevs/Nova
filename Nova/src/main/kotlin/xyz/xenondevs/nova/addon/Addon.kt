@@ -10,6 +10,7 @@ abstract class Addon {
     lateinit var dataFolder: File
     lateinit var description: AddonDescription
     
+    abstract fun init()
     abstract fun onEnable()
     abstract fun onDisable()
     

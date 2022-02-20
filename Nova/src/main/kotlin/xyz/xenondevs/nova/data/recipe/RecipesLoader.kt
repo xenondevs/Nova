@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.recipe
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.loader.AddonManager
+import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
 import xyz.xenondevs.nova.util.data.*

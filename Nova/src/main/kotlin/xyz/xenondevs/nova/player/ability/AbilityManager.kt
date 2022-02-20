@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.loader.AddonsLoader
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
@@ -28,7 +28,7 @@ object AbilityManager : Initializable(), Listener {
     private var tick = 0
     
     override val inMainThread = true
-    override val dependsOn = setOf(AddonsLoader)
+    override val dependsOn = setOf(AddonsInitializer)
     
     override fun init() {
         LOGGER.info("Initializing AbilityManager")

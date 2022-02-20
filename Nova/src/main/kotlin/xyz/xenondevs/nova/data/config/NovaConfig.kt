@@ -5,8 +5,8 @@ import com.google.gson.JsonParser
 import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.loader.AddonManager
-import xyz.xenondevs.nova.addon.loader.AddonsInitializer
+import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.data.getResourceAsStream

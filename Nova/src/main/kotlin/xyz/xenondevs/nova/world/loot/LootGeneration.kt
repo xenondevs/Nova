@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.LootGenerateEvent
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.loader.AddonsLoader
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.data.GSON
@@ -18,7 +18,7 @@ object LootGeneration : Initializable(), Listener {
     private val lootTable = ArrayList<LootInfo>()
     
     override val inMainThread = false
-    override val dependsOn = setOf(AddonsLoader)
+    override val dependsOn = setOf(NovaConfig, AddonsInitializer)
     
     override fun init() {
         lootTable.addAll(GSON.fromJson<ArrayList<LootInfo>>(NovaConfig["loot"].getArray("loot")) ?: emptyList())

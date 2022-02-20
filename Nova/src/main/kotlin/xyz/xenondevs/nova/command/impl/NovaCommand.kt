@@ -6,7 +6,7 @@ import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
-import xyz.xenondevs.nova.addon.loader.AddonManager
+import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.Resources
