@@ -24,6 +24,7 @@ object CoreGUITexture {
     val RECIPE_SMELTING = GUITexture.of("nova:recipe_smelting")
     val RECIPE_SMITHING = GUITexture.of("nova:recipe_smithing")
     val RECIPE_CONVERSION = GUITexture.of("nova:recipe_conversion")
+    val COLOR_PICKER = GUITexture.of("nova:color_picker")
     
 }
 

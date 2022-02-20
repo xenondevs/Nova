@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.ui.menu
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.builder.ItemBuilder
-import de.studiocode.invui.item.builder.PotionBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.window.impl.single.SimpleWindow
@@ -11,7 +10,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.ui.item.AioNumberItem
 import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
@@ -65,8 +64,7 @@ class ColorPickerWindow(
     }
     
     fun openWindow(player: Player) {
-        // TODO: change to correct gui texture when possible
-        SimpleWindow(player, CoreGUITexture.EMPTY_GUI.getTitle("menu.nova.color_picker"), gui).show()
+        SimpleWindow(player, CoreGUITexture.COLOR_PICKER.getTitle("menu.nova.color_picker"), gui).show()
     }
     
 }
@@ -95,16 +93,7 @@ abstract class ColorPreviewItem(color: Color) : BaseItem() {
     
 }
 
-class PotionColorPreviewItem(builder: PotionBuilder, color: Color = Color(0, 0, 0)) : ColorPreviewItem(color) {
-    
-    private val builder: PotionBuilder = builder.clone()
-    
-    override fun getItemProvider(): PotionBuilder =
-        builder.setColor(color)
-    
-}
-
-class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(NovaMaterialRegistry.COLOR_PICKER_ICON.itemProvider) {
+class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(CoreGUIMaterial.TP_COLOR_PICKER.itemProvider) {
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         window.openWindow(player)
     }

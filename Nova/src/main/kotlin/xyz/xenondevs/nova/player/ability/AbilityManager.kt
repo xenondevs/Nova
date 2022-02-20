@@ -90,8 +90,6 @@ object AbilityManager : Initializable(), Listener {
     
     enum class AbilityType(internal val constructor: (Player) -> Ability) {
         
-        JETPACK(::JetpackFlyAbility)
-        
     }
     
 }

@@ -10,8 +10,8 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -60,7 +60,7 @@ abstract class NetworkedTileEntity(
     }
     
     final override fun handleRightClick(event: PlayerInteractEvent) {
-        if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH }) {
+        if (event.handItems.any { it.novaMaterial == CoreItems.WRENCH }) {
             handleWrenchClick(event)
         } else {
             val holder = holders[NetworkType.FLUID]

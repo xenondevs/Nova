@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.AsyncExecutor
@@ -47,6 +48,7 @@ class Nova : JavaPlugin(), INova {
         
         Metrics(this, 11927)
         NovaConfig.loadDefaultConfig()
+        CoreItems.init()
         Initializer.init()
     }
     

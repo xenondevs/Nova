@@ -93,6 +93,7 @@
     "gui_tp_range_upgrade": "gui/upgrade/tp_range",
     "gui_tp_fluid_upgrade": "gui/upgrade/tp_fluid",
     "gui_tp_stopwatch": "gui/stopwatch",
+    "gui_tp_color_picker": "gui/color_picker",
     "gui_bar_blue": {
         "item": {
             "gui/bar/blue/%s": [0, 16]
@@ -128,6 +129,7 @@
             "gui/number/%s": [0, 999]
         }
     },
+    "wrench": "item/wrench",
     "speed_upgrade": "item/upgrade/speed",
     "efficiency_upgrade": "item/upgrade/efficiency",
     "energy_upgrade": "item/upgrade/energy",

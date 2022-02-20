@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.ChunkPos
@@ -99,7 +99,7 @@ object VanillaTileEntityManager : Initializable(), Listener {
         if (
             tileEntity is ItemStorageVanillaTileEntity
             && !player.isSneaking
-            && event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH }
+            && event.handItems.any { it.novaMaterial == CoreItems.WRENCH }
             && ProtectionManager.canUseBlock(player, event.item, tileEntity.location)
         ) {
             event.isCancelled = true

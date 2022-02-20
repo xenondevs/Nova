@@ -1,11 +1,9 @@
 {
   "resource_pack": {
-    "enabled": true,
-    "url": "https://github.com/xenondevs/NovaRP/releases/download/0.8/NovaRP.zip",
     "materials": {
       "default": "shulker_shell",
       "damageable": "fishing_rod",
-      "translucent": "blue_stained_glass"
+      "translucent": "shulker_shell"
     }
   },
   "mysql": {

@@ -7,7 +7,6 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.i18n.LocaleManager
@@ -46,7 +45,7 @@ class NovaMaterial internal constructor(
     val isTileEntity = tileEntityConstructor != null
     
     init {
-        if (!id.matches(ID_PATTERN)) LOGGER.warning("NovaMaterial $id does not match $ID_PATTERN. Registering materials with invalid ids will be denied in the future")
+        require(id.matches(ID_PATTERN)) { "NovaMaterial id $id does not match $ID_PATTERN" }
     }
     
     /**

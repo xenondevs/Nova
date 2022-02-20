@@ -65,7 +65,7 @@ object Initializer {
             }
             latch.await()
             setGlobalIngredients()
-            forceResourcePack()
+//            forceResourcePack()
             callEvent(NovaLoadDataEvent())
             
             LOGGER.info("Done loading")

@@ -1,0 +1,14 @@
+{
+  "result": "nova:speed_upgrade",
+  "shape": [
+    "rgr",
+    "gig",
+    "ege"
+  ],
+  "ingredients": {
+    "r": "minecraft:redstone",
+    "g": "minecraft:gold_ingot",
+    "i": "minecraft:paper",
+    "e": "minecraft:emerald"
+  }
+}

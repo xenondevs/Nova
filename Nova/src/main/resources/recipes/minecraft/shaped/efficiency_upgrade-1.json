@@ -1,0 +1,14 @@
+{
+  "result": "nova:efficiency_upgrade",
+  "shape": [
+    "dnd",
+    "npn",
+    "ada"
+  ],
+  "ingredients": {
+    "d": "minecraft:lapis_lazuli",
+    "n": "minecraft:iron_ingot",
+    "p": "minecraft:paper",
+    "a": "minecraft:amethyst_shard"
+  }
+}

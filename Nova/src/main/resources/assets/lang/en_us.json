@@ -1,4 +1,11 @@
 {
+  "item.nova.wrench": "Wrench",
+  "item.nova.speed_upgrade": "Speed Upgrade",
+  "item.nova.efficiency_upgrade": "Efficiency Upgrade",
+  "item.nova.energy_upgrade": "Energy Upgrade",
+  "item.nova.range_upgrade": "Range Upgrade",
+  "item.nova.fluid_upgrade": "Fluid Upgrade",
+  
   "menu.nova.energy_per_tick": "%s / tick",
   "menu.nova.items.search": "Search for an Item",
   "menu.nova.items.search.back": "Back to the main inventory",
@@ -43,12 +50,20 @@
   "menu.nova.upgrades.type.energy.off": "This machine does not accept energy upgrades.",
   "menu.nova.upgrades.type.range.off": "This machine does not accept range upgrades.",
   "menu.nova.upgrades.type.fluid.off": "This machine does not accept fluid upgrades.",
+  "menu.nova.color_picker": "Choose a color...",
+  "menu.nova.color_picker.red": "Red: %s",
+  "menu.nova.color_picker.green": "Green: %s",
+  "menu.nova.color_picker.blue": "Blue: %s",
+  "menu.nova.color_picker.current_color": "Current Color",
+  
   "inventory.nova.default": "Inventory",
   "inventory.nova.input": "Input Inventory",
   "inventory.nova.output": "Output Inventory",
+  
   "container.nova.fluid_tank": "Fluid Tank",
   "container.nova.lava_tank": "Lava Tank",
   "container.nova.water_tank": "Water Tank",
+  
   "command.nova.addons.header": "Addons (%s): %s",
   "command.nova.no-players": "No players could be found.",
   "command.nova.no-item-in-hand": "Hold an item in your hand and try again.",

@@ -34,6 +34,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
@@ -310,7 +311,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                     event.isCancelled = true
                     tileEntity.handleRightClick(event)
                 }
-            } else if (event.handItems.any { it.novaMaterial == NovaMaterialRegistry.WRENCH } && ProtectionManager.canBreak(player, event.item, block.location)) {
+            } else if (event.handItems.any { it.novaMaterial == CoreItems.WRENCH } && ProtectionManager.canBreak(player, event.item, block.location)) {
                 destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
             }
         } else event.isCancelled = true
@@ -379,7 +380,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                 if (handMaterial != null) {
                     if (handMaterial.isTileEntity) {
                         handleTileEntityPlace(event, handMaterial)
-                    } else if (tileEntity != null && handMaterial == NovaMaterialRegistry.WRENCH) {
+                    } else if (tileEntity != null && handMaterial == CoreItems.WRENCH) {
                         handleTileEntityWrenchShift(event, tileEntity)
                     }
                 }

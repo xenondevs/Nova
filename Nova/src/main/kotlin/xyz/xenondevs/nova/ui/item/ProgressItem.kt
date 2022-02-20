@@ -6,7 +6,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import kotlin.math.roundToInt
 
 open class ProgressItem(val material: NovaMaterial, private val maxState: Int) : BaseItem() {
@@ -23,5 +22,3 @@ open class ProgressItem(val material: NovaMaterial, private val maxState: Int) :
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
 }
-
-class EnergyProgressItem : ProgressItem(NovaMaterialRegistry.ENERGY_PROGRESS, 16)

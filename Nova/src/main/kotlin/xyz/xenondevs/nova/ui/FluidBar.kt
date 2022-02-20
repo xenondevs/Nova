@@ -9,7 +9,6 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
@@ -99,8 +98,8 @@ class StaticFluidBar(
     
     override val barMaterial: NovaMaterial
         get() = when (type) {
-            FluidType.WATER -> NovaMaterialRegistry.BLUE_BAR_TRANSPARENT
-            else -> NovaMaterialRegistry.ORANGE_BAR_TRANSPARENT
+            FluidType.WATER -> CoreGUIMaterial.TP_BAR_BLUE
+            else -> CoreGUIMaterial.TP_BAR_ORANGE
         }
     
     init {

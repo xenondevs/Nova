@@ -1,0 +1,14 @@
+{
+  "result": "nova:fluid_upgrade",
+  "shape": [
+    "did",
+    "ipi",
+    "bdb"
+  ],
+  "ingredients": {
+    "d": "minecraft:lapis_lazuli",
+    "i": "minecraft:iron_ingot",
+    "p": "minecraft:paper",
+    "b": "minecraft:bucket"
+  }
+}
