@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -420,7 +421,7 @@ abstract class TileEntity(
             return create(
                 tileEntity.id.value,
                 location.clone().apply { center(); yaw = tileEntity.yaw },
-                tileEntity.type,
+                NovaMaterialRegistry.get(tileEntity.type),
                 tileEntity.data,
                 tileEntity.owner
             )

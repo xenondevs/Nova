@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.database.table
 
 import org.jetbrains.exposed.dao.id.IdTable
 import xyz.xenondevs.nova.data.database.columtype.compound
-import xyz.xenondevs.nova.data.database.columtype.novaMaterial
 import java.util.*
 
 object TileEntitiesTable : IdTable<UUID>() {
@@ -16,7 +15,7 @@ object TileEntitiesTable : IdTable<UUID>() {
     val y = integer("y")
     val z = integer("z")
     val yaw = float("yaw")
-    val type = novaMaterial("type")
+    val type = text("type")
     val data = compound("data")
     
     override val primaryKey = PrimaryKey(id)

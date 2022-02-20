@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.PermissionUtils
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
@@ -35,7 +36,7 @@ object TileEntityLimits {
                 .groupBy(TileEntitiesTable.owner, TileEntitiesTable.type)
                 .forEach { row ->
                     val owner = row[TileEntitiesTable.owner]
-                    val type = row[TileEntitiesTable.type]
+                    val type = NovaMaterialRegistry.getOrNull(row[TileEntitiesTable.type]) ?: return@forEach
                     val count = row[countExpr].toInt()
                     if (owner !in placedTileEntities)
                         placedTileEntities[owner] = HashMap()

@@ -260,7 +260,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                         it[y] = location.blockY
                         it[z] = location.blockZ
                         it[yaw] = tileEntity.armorStand.location.yaw
-                        it[type] = tileEntity.material
+                        it[type] = tileEntity.material.id
                         it[data] = tileEntity.data
                     },
                     
@@ -547,6 +547,11 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                         val chunkMap = tileEntityMap.getOrPut(chunkPos) { HashMap() }
                         
                         tileEntities.forEach { tile ->
+                            if (NovaMaterialRegistry.getOrNull(tile.type) == null) {
+                                LOGGER.severe("Could not load tile entity at ${tile.location}: Invalid id ${tile.type}")
+                                return@forEach
+                            }
+                            
                             try {
                                 val location = tile.location
                                 val tileEntity = TileEntity.create(tile, location)
