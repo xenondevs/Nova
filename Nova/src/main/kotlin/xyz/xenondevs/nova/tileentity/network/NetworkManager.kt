@@ -4,6 +4,8 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
@@ -123,7 +125,8 @@ private class NetworkManagerImpl : NetworkManager {
                         val oppositeFace = face.oppositeFace
                         
                         // does the endpoint want a connection at that face?
-                        if (!allowedFaces.contains(face)) return@endPoints
+                        if (!allowedFaces.contains(face) || !hasAccessPermission(endPoint, neighborNode))
+                            return@endPoints
                         
                         if (neighborNode is NetworkBridge) {
                             if (neighborNode.networks[networkType] != null // is the bridge in a network (should always be true)
@@ -184,7 +187,7 @@ private class NetworkManagerImpl : NetworkManager {
         bridge.supportedNetworkTypes.forEach { networkType ->
             val previousNetworks = HashSet<Network>()
             nearbyBridges.forEach { (face, otherBridge) ->
-                if (bridge.canConnect(otherBridge, networkType, face)) {
+                if (bridge.canConnect(otherBridge, networkType, face) && hasAccessPermission(bridge, otherBridge)) {
                     // bridges won't have a network if they haven't been fully initialized yet
                     if (otherBridge.networks.containsKey(networkType)) {
                         // a possible network to connect to
@@ -235,7 +238,7 @@ private class NetworkManagerImpl : NetworkManager {
             
             // Connect EndPoints
             nearbyEndPoints.forEach { (face, endPoint) ->
-                if (bridge.bridgeFaces.contains(face)) {
+                if (bridge.bridgeFaces.contains(face) && hasAccessPermission(bridge, endPoint)) {
                     val allowedFaces = endPoint.allowedFaces[networkType]
                     val oppositeFace = face.oppositeFace
                     if (allowedFaces != null && allowedFaces.contains(oppositeFace)) {
@@ -365,6 +368,11 @@ private class NetworkManagerImpl : NetworkManager {
         
         // update nearby bridges
         if (!unload) bridge.updateNearbyBridges()
+    }
+    
+    private fun hasAccessPermission(source: NetworkNode, target: NetworkNode): Boolean {
+        return (if (source is TileEntity) ProtectionManager.canUseBlock(source, null, target.location) else true)
+            && (if (target is TileEntity) ProtectionManager.canUseBlock(target, null, source.location) else true)
     }
     
 }
