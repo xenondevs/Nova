@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.addon
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.loader.AddonLoader
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import java.io.File
@@ -22,7 +23,7 @@ internal object AddonsLoader : Initializable() {
 internal object AddonsInitializer : Initializable() {
     
     override val inMainThread = true
-    override val dependsOn = setOf(Resources)
+    override val dependsOn = setOf(NovaConfig, Resources)
     
     override fun init() {
         LOGGER.info("Initializing Addons...")

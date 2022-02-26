@@ -15,7 +15,7 @@ fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
     return container.get(ITEM_FILTER_KEY, CompoundElementDataType)?.let(::ItemFilter)
 }
 
-fun ItemStack.getOrCreateFilterConfig(): ItemFilter = getFilterConfigOrNull() ?: ItemFilter()
+fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter = getFilterConfigOrNull() ?: ItemFilter(size)
 
 fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     val itemMeta = itemMeta!!
@@ -23,17 +23,24 @@ fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     setItemMeta(itemMeta)
 }
 
+fun ItemFilter(compound: CompoundElement): ItemFilter {
+    val items: Array<ItemStack?> = compound.getAssertedElement<ListElement>("items").toTypedArray()
+    return ItemFilter(
+        compound.getAsserted("whitelist"),
+        compound.get("nbt") ?: false,
+        items.size,
+        items
+    )
+}
+
 class ItemFilter(
     var whitelist: Boolean,
     var nbt: Boolean,
+    val size: Int,
     var items: Array<ItemStack?>
 ) {
     
-    constructor(compound: CompoundElement) :
-        this(compound.getAsserted("whitelist"), compound.get("nbt")
-            ?: false, compound.getAssertedElement<ListElement>("items").toTypedArray())
-    
-    constructor() : this(true, false, arrayOfNulls(7))
+    constructor(size: Int) : this(true, false, size, arrayOfNulls(size))
     
     val compound: CompoundElement
         get() = CompoundElement().also {

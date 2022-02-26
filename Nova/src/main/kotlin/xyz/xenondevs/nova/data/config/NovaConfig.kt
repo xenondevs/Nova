@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -67,7 +67,7 @@ class NovaConfig(private val configPath: String, private val data: ByteArray) : 
     companion object : Initializable() {
         
         override val inMainThread = false
-        override val dependsOn = setOf(AddonsInitializer)
+        override val dependsOn = setOf(AddonsLoader)
         
         private val configs = HashMap<String, NovaConfig>()
         private var configDefaults = PermanentStorage.retrieve("configDefaults") { JsonObject() }
