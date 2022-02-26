@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 object ProtectionManager {
     
     val integrations: MutableList<ProtectionIntegration> =
-        listOf(GriefPrevention, PlotSquared, WorldGuard, Towny, EventIntegration)
+        listOf(GriefPrevention, PlotSquared, WorldGuard, Towny)
             .filterTo(ArrayList(), InternalProtectionIntegration::isInstalled)
     
     private val PROTECTION_CACHE: Cache<ProtectionLookupKey, Boolean> =
