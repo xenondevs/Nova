@@ -65,7 +65,7 @@
   "container.nova.lava_tank": "Lava Tank",
   "container.nova.water_tank": "Water Tank",
   
-  "command.nova.addons.header": "Addons (%s): %s",
+  "command.nova.addons.header": "Addons (%s): ",
   "command.nova.no-players": "No players could be found.",
   "command.nova.no-item-in-hand": "Hold an item in your hand and try again.",
   "command.nova.give.success": "Gave %s %s to %s",

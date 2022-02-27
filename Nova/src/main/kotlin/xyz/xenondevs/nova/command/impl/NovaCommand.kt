@@ -3,6 +3,11 @@ package xyz.xenondevs.nova.command.impl
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.HoverEvent
+import net.md_5.bungee.api.chat.HoverEvent.Action
+import net.md_5.bungee.api.chat.TextComponent
+import net.md_5.bungee.api.chat.hover.content.Text
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
@@ -169,13 +174,29 @@ object NovaCommand : Command("nova") {
     }
     
     private fun sendAddons(ctx: CommandContext<CommandSourceStack>) {
-        val addons = AddonManager.addons.values
-        ctx.source.sendSuccess(localized(
+        val addons = AddonManager.addons.values.toList()
+        val builder = ComponentBuilder()
+        
+        builder.append(localized(
             ChatColor.WHITE,
             "command.nova.addons.header",
-            addons.size,
-            addons.joinToString(separator = "§f,") { "§a" + it.description.name }
+            addons.size
         ))
+        
+        for (i in addons.indices) {
+            val addon = addons[i]
+            val desc = addon.description
+            
+            val hoverText = TextComponent("§a${desc.name} v${desc.version} by ${desc.authors.joinToString("§f,§a ")}")
+            val component = coloredText(ChatColor.GREEN, desc.name)
+            component.hoverEvent = HoverEvent(Action.SHOW_TEXT, Text(arrayOf(hoverText)))
+            
+            builder.append(component)
+            if (i < addons.size - 1) builder.append("§f, ")
+        }
+        
+        ctx.source.sendSuccess(builder.create())
     }
+    
 }
 
