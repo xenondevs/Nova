@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.config
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import xyz.xenondevs.nova.IS_VERSION_CHANGE
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -100,12 +99,6 @@ class NovaConfig(private val configPath: String, private val data: ByteArray) : 
                             loader.classLoader.getResourceAsStream(it)!!.readAllBytes()
                         )
                     }
-            }
-            
-            if (IS_VERSION_CHANGE) {
-                val defaultConfig = configs["config"]!!
-                defaultConfig["resource_pack.url"] = defaultConfig.internalConfig.getString("resource_pack.url")!!
-                defaultConfig.save(true)
             }
             
             PermanentStorage.store("configDefaults", configDefaults)

@@ -94,6 +94,10 @@
     "gui_tp_fluid_upgrade": "gui/upgrade/tp_fluid",
     "gui_tp_stopwatch": "gui/stopwatch",
     "gui_tp_color_picker": "gui/color_picker",
+    "gui_tp_pixel_arrow_left_off": "gui/pixel_arrow_left_off",
+    "gui_tp_pixel_arrow_left_on": "gui/pixel_arrow_left_on",
+    "gui_tp_pixel_arrow_right_off": "gui/pixel_arrow_right_off",
+    "gui_tp_pixel_arrow_right_on": "gui/pixel_arrow_right_on",
     "gui_bar_blue": {
         "item": {
             "gui/bar/blue/%s": [0, 16]

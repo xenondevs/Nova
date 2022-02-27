@@ -99,6 +99,10 @@ object CoreGUIMaterial {
     val TP_ARROW_RIGHT_BTN_ON = registerItem("nova:gui_tp_arrow_right_btn_on")
     val TP_STOPWATCH = registerItem("nova:gui_tp_stopwatch")
     val TP_COLOR_PICKER = registerItem("nova:gui_tp_color_picker")
+    val TP_PIXEL_ARROW_LEFT_OFF = registerItem("nova:gui_tp_pixel_arrow_left_off")
+    val TP_PIXEL_ARROW_LEFT_ON = registerItem("nova:gui_tp_pixel_arrow_left_on")
+    val TP_PIXEL_ARROW_RIGHT_OFF = registerItem("nova:gui_tp_pixel_arrow_right_off")
+    val TP_PIXEL_ARROW_RIGHT_ON = registerItem("nova:gui_tp_pixel_arrow_right_on")
     
     // Might be moved to a separate addon in the future
     val UPGRADES_BTN = registerItem("nova:gui_upgrades_btn", "menu.nova.upgrades")

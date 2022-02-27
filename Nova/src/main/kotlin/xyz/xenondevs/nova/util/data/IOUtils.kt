@@ -21,7 +21,7 @@ fun getResources(directory: String = ""): Sequence<String> {
 }
 
 fun getResources(file: File, directory: String = ""): Sequence<String> {
-    return ZipFile(file).stream().asSequence().filter { 
+    return ZipFile(file).stream().asSequence().filter {
         it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
     }.map(ZipEntry::getName)
 }
@@ -35,10 +35,20 @@ fun getResourceAsStream(name: String): InputStream? {
     return ZIP_FILE.getInputStream(entry)
 }
 
+fun getResourceAsStream(file: File, name: String): InputStream? {
+    val zipFile = ZipFile(file)
+    return zipFile.getInputStream(zipFile.getEntry(name) ?: return null)
+}
+
 fun hasResource(name: String): Boolean =
     ZIP_FILE.getEntry(name) != null
 
 fun getResourceData(name: String): ByteArray {
     val stream = getResourceAsStream(name) ?: return byteArrayOf()
     return stream.use(InputStream::readBytes)
+}
+
+fun File.write(stream: InputStream) {
+    parentFile.mkdirs()
+    outputStream().use { out -> stream.use { it.copyTo(out) } }
 }

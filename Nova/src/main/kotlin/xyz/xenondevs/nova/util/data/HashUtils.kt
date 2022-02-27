@@ -17,4 +17,10 @@ object HashUtils {
         return md.digest()
     }
     
+    fun getHash(data: ByteArray, algorithm: String): ByteArray {
+        val md = MessageDigest.getInstance(algorithm)
+        md.update(data)
+        return md.digest()
+    }
+    
 }

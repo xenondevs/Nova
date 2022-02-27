@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.ui.item
 import de.studiocode.invui.gui.impl.PagedGUI
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.controlitem.PageItem
-import de.studiocode.invui.resourcepack.Icon
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import xyz.xenondevs.nova.material.CoreGUIMaterial
