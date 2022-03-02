@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.data
 import xyz.xenondevs.nova.NOVA
 import java.io.File
 import java.io.InputStream
+import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.streams.asSequence
@@ -50,5 +51,9 @@ fun getResourceData(name: String): ByteArray {
 
 fun File.write(stream: InputStream) {
     parentFile.mkdirs()
-    outputStream().use { out -> stream.use { it.copyTo(out) } }
+    outputStream().use { out -> stream.use { it.transferTo(out) } }
+}
+
+fun InputStream.transferTo(output: OutputStream, amount: Int) {
+    output.write(this.readNBytes(amount))
 }

@@ -9,9 +9,11 @@ import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
+import xyz.xenondevs.nova.data.resources.builder.PNGMetadataRemover
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ModelData
+import xyz.xenondevs.nova.util.data.write
 import java.io.File
 
 internal object Resources : Initializable() {
@@ -45,11 +47,14 @@ internal object Resources : Initializable() {
                 val assetPackDir = File(assetPacksDir, namespace)
                 
                 val zip = ZipFile(addonFile)
-                zip.fileHeaders.forEach {
-                    if (!it.isDirectory && it.fileName.startsWith("assets/")) {
-                        val file = File(assetPackDir, it.fileName.substringAfter("assets/"))
-                        file.parentFile.mkdirs()
-                        zip.getInputStream(it).copyTo(file.outputStream())
+                zip.fileHeaders.forEach { header ->
+                    if (!header.isDirectory && header.fileName.startsWith("assets/")) {
+                        val file = File(assetPackDir, header.fileName.substringAfter("assets/"))
+                        val inputStream = zip.getInputStream(header)
+                        if (header.fileName.endsWith(".png")) {
+                            file.parentFile.mkdirs()
+                            PNGMetadataRemover.remove(inputStream, file.outputStream())
+                        } else file.write(inputStream)
                     }
                 }
                 
