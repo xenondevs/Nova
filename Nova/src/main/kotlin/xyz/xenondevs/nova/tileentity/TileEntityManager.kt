@@ -115,6 +115,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         tileEntityUUID: UUID? = null
     ) {
         val block = location.block
+        val blockLocation = block.location
         val chunk = location.chunk
         
         // create TileEntity with FakeArmorStand
@@ -134,10 +135,10 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         
         // add to tileEntities map
         val chunkMap = tileEntityMap.getOrPut(chunk.pos) { HashMap() }
-        chunkMap[location] = tileEntity
+        chunkMap[blockLocation] = tileEntity
         
         // add to location cache
-        locationCache += location
+        locationCache += blockLocation
         
         // count for TileEntity limits
         TileEntityLimits.handleTileEntityCreate(ownerUUID, material)

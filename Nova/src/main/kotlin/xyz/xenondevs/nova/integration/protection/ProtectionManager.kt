@@ -8,10 +8,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
-import xyz.xenondevs.nova.integration.protection.plugin.GriefPrevention
-import xyz.xenondevs.nova.integration.protection.plugin.PlotSquared
-import xyz.xenondevs.nova.integration.protection.plugin.Towny
-import xyz.xenondevs.nova.integration.protection.plugin.WorldGuard
+import xyz.xenondevs.nova.integration.protection.plugin.*
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.isBetweenXZ
 import xyz.xenondevs.nova.world.BlockPos
@@ -22,7 +19,7 @@ import java.util.concurrent.TimeUnit
 object ProtectionManager {
     
     val integrations: MutableList<ProtectionIntegration> =
-        listOf(GriefPrevention, PlotSquared, WorldGuard, Towny)
+        listOf(GriefPrevention, PlotSquared, WorldGuard, Towny, ProtectionStones)
             .filterTo(ArrayList(), InternalProtectionIntegration::isInstalled)
     
     private val PROTECTION_CACHE: Cache<ProtectionLookupKey, Boolean> =
