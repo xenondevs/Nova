@@ -421,7 +421,12 @@
             <version>6.7</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>dev.espi</groupId>
+            <artifactId>protectionstones</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+        
         <!-- Not provided -->
         <dependency>
             <groupId>de.studiocode.invui</groupId>
