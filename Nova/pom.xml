@@ -421,6 +421,7 @@
             <groupId>dev.espi</groupId>
             <artifactId>protectionstones</artifactId>
             <version>2.9.0</version>
+            <scope>provided</scope>
         </dependency>
         
         <!-- Not provided -->

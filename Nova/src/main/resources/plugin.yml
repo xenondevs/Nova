@@ -21,6 +21,7 @@ softdepend:
   - GriefPrevention
   - PlotSquared
   - GriefDefender
+  - ProtectionStones
   - Vault
   - ItemsAdder
   - Towny
