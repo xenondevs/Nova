@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
+import java.io.IOException
 import java.net.URL
 
 object UpdateReminder : Initializable(), Listener {
@@ -35,13 +36,18 @@ object UpdateReminder : Initializable(), Listener {
     
     private fun checkVersion() {
         if (needsUpdate) return
-        val newVersion = Version(URL("https://api.spigotmc.org/legacy/update.php?resource=93648").readText())
-        if (newVersion > NOVA.version) {
-            needsUpdate = true
-            if (taskId != -1) {
-                Bukkit.getScheduler().cancelTask(taskId)
-                taskId = -1
+        
+        try {
+            val newVersion = Version(URL("https://api.spigotmc.org/legacy/update.php?resource=93648").readText())
+            if (newVersion > NOVA.version) {
+                needsUpdate = true
+                if (taskId != -1) {
+                    Bukkit.getScheduler().cancelTask(taskId)
+                    taskId = -1
+                }
             }
+        } catch (e: IOException) {
+            LOGGER.warning("Failed to connect to SpigotMC while trying to check for updates")
         }
     }
     
