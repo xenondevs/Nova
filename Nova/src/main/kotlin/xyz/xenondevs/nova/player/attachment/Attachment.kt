@@ -101,7 +101,7 @@ class Attachment(
                     hidden = true
                 } else if (hidden && pitch < 40) {
                     // show armor stand again
-                    val packet = ClientboundSetEquipmentPacket(armorStandId, listOf(Pair(EquipmentSlot.HEAD, itemStack.nmsStack)))
+                    val packet = ClientboundSetEquipmentPacket(armorStandId, mutableListOf(Pair(EquipmentSlot.HEAD, itemStack.nmsStack)))
                     player.send(packet)
                     
                     hidden = false
