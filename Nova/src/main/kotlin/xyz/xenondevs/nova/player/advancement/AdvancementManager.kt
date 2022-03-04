@@ -60,7 +60,7 @@ object AdvancementManager : Initializable(), Listener {
             file.writeText(content)
         }
         
-        minecraftServer.reloadResources(listOf("file/nova"))
+        minecraftServer.reloadResources(minecraftServer.packRepository.selectedIds.toHashSet() + "file/nova")
     }
     
     @EventHandler
