@@ -13,7 +13,13 @@ abstract class NovaItem {
     
     val behaviors = ArrayList<ItemBehavior>()
     
-    open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
+    open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+        var builder = itemBuilder
+        behaviors.forEach {
+            builder = it.modifyItemBuilder(builder)
+        }
+        return builder
+    }
     
     @Suppress("UNCHECKED_CAST")
     fun <T : ItemBehavior> getBehavior(type: KClass<T>): T? {
