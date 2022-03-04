@@ -9,8 +9,8 @@ import net.minecraft.world.item.Items
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
