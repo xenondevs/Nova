@@ -95,14 +95,59 @@ fun JsonArray.addAll(vararg booleans: Boolean) =
 fun JsonArray.addAll(vararg chars: Char) =
     chars.forEach(this::add)
 
+fun JsonArray.addAll(vararg strings: String) =
+    strings.forEach(this::add)
+
 fun JsonArray.addAll(vararg elements: JsonElement) =
     elements.forEach(this::add)
+
+fun JsonArray.addAll(intArray: IntArray) =
+    intArray.forEach(this::add)
+
+fun JsonArray.addAll(longArray: LongArray) =
+    longArray.forEach(this::add)
+
+fun JsonArray.addAll(floatArray: FloatArray) =
+    floatArray.forEach(this::add)
 
 fun JsonArray.addAll(doubleArray: DoubleArray) =
     doubleArray.forEach(this::add)
 
+@JvmName("addAllBooleanArray")
+fun JsonArray.addAll(booleanArray: BooleanArray) =
+    booleanArray.forEach(this::add)
+
+@JvmName("addAllCharArray")
+fun JsonArray.addAll(charArray: CharArray) =
+    charArray.forEach(this::add)
+
+@JvmName("addAllStringArray")
 fun JsonArray.addAll(stringArray: Array<String>) =
     stringArray.forEach(this::add)
+
+@JvmName("addAllElementsArray")
+fun JsonArray.addAll(elementArray: Array<JsonElement>) =
+    elementArray.forEach(this::add)
+
+@JvmName("addAllNumbers")
+fun JsonArray.addAll(numbers: Iterable<Number>) =
+    numbers.forEach(this::add)
+
+@JvmName("addAllBooleans")
+fun JsonArray.addAll(booleans: Iterable<Boolean>) =
+    booleans.forEach(this::add)
+
+@JvmName("addAllChars")
+fun JsonArray.addAll(chars: Iterable<Char>) =
+    chars.forEach(this::add)
+
+@JvmName("addAllStrings")
+fun JsonArray.addAll(strings: Iterable<String>) =
+    strings.forEach(this::add)
+
+@JvmName("addAllElements")
+fun JsonArray.addAll(elements: Iterable<JsonElement>) =
+    elements.forEach(this::add)
 
 fun JsonArray.getAllStrings() =
     filter(JsonElement::isString).map { it.asString }
