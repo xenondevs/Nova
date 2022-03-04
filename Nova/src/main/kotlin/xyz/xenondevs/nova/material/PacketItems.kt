@@ -12,6 +12,7 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
@@ -23,8 +24,22 @@ import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.namespacedKey
+import xyz.xenondevs.nova.util.unhandledTags
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
+
+/**
+ * The fake durability displayed clientside, stored in the nova tag.
+ * Ranges from 0.0 to 1.0
+ */
+var ItemStack.clientsideDurability: Double
+    get() = (itemMeta?.unhandledTags?.get("nova") as CompoundTag?)?.getDouble("durability") ?: 1.0
+    set(value) {
+        require(value in 0.0..1.0)
+        val itemMeta = itemMeta
+        (itemMeta?.unhandledTags?.get("nova") as CompoundTag?)?.putDouble("durability", value)
+        this.itemMeta = itemMeta
+    }
 
 object PacketItems : Initializable(), Listener {
     
@@ -142,6 +157,7 @@ object PacketItems : Initializable(), Listener {
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)
         val subId = novaTag.getInt("subId")
         val isBlock = novaTag.getBoolean("isBlock")
+        val durabilityPercentage = if (novaTag.contains("durability")) novaTag.getDouble("durability") else null
         
         val (itemData, blockData) = Resources.getModelDataOrNull(id) ?: return getMissingItem(item, id)
         val data = (if (isBlock) blockData else itemData) ?: return getMissingItem(item, id)
@@ -149,6 +165,11 @@ object PacketItems : Initializable(), Listener {
         val newItem = item.copy()
         newItem.item = CraftMagicNumbers.getItem(data.material)
         newItem.tag!!.putInt("CustomModelData", data.dataArray[subId])
+        
+        if (durabilityPercentage != null) {
+            val maxDurability = newItem.item.maxDamage
+            newItem.damageValue = maxDurability - (maxDurability * durabilityPercentage).toInt()
+        }
         
         return newItem
     }
