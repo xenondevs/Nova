@@ -20,4 +20,8 @@ abstract class NovaItem {
         return behaviors.firstOrNull { it::class == type } as T?
     }
     
+    fun hasBehavior(type: KClass<out ItemBehavior>): Boolean {
+        return behaviors.any { it::class == type }
+    }
+    
 }
