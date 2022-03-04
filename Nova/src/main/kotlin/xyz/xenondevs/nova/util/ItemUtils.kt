@@ -8,13 +8,17 @@ import net.minecraft.nbt.Tag
 import net.minecraft.world.item.Items
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.SoundGroup
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
+import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.data.recipe.*
+import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -145,6 +149,35 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
 fun ItemStack.takeUnlessAir(): ItemStack? =
     if (type.isAir) null else this
 
+inline fun <reified K> ItemStack.retrieveData(key: NamespacedKey): K? {
+    return itemMeta?.persistentDataContainer?.get(key)
+}
+
+fun <T> ItemStack.retrieveData(key: NamespacedKey, persistentDataType: PersistentDataType<*, T>): T? {
+    return itemMeta?.persistentDataContainer?.get(key, persistentDataType)
+}
+
+inline fun <reified T> ItemStack.storeData(key: NamespacedKey, data: T?) {
+    val itemMeta = itemMeta
+    val dataContainer = itemMeta?.persistentDataContainer
+    if (dataContainer != null) {
+        if (data != null) dataContainer.set(key, data)
+        else dataContainer.remove(key)
+        
+        this.itemMeta = itemMeta
+    }
+}
+
+fun <T> ItemStack.storeData(key: NamespacedKey, dataType: PersistentDataType<*, T>, data: T?) {
+    val itemMeta = itemMeta
+    val dataContainer = itemMeta?.persistentDataContainer
+    if (dataContainer != null) {
+        if (data != null) dataContainer.set(key, dataType, data)
+        else dataContainer.remove(key)
+        
+        this.itemMeta = itemMeta
+    }
+}
 
 object ItemUtils {
     

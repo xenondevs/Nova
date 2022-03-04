@@ -1,30 +1,28 @@
-package xyz.xenondevs.nova.item.impl
+package xyz.xenondevs.nova.item.behavior
 
 import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
-import xyz.xenondevs.nova.player.equipment.EquipMethod
 import xyz.xenondevs.nova.util.NumberFormatUtils
+import xyz.xenondevs.nova.util.retrieveData
+import xyz.xenondevs.nova.util.storeData
 import kotlin.math.roundToInt
 
 private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy64")
 
-abstract class ChargeableItem(
+class Chargeable(
     val maxEnergy: Long,
-) : NovaItem() {
+) : ItemBehavior() {
     
-    fun getEnergy(itemStack: ItemStack) = retrieveData(itemStack, ENERGY_KEY) ?: 0L
+    fun getEnergy(itemStack: ItemStack) = itemStack.retrieveData(ENERGY_KEY) ?: 0L
     
     fun setEnergy(itemStack: ItemStack, energy: Long) {
         val coercedEnergy = energy.coerceIn(0, maxEnergy)
         
-        storeData(itemStack, ENERGY_KEY, coercedEnergy)
+        itemStack.storeData(ENERGY_KEY, coercedEnergy)
         
         val itemMeta = itemStack.itemMeta!!
         itemMeta.lore = listOf("§7" + NumberFormatUtils.getEnergyString(coercedEnergy, maxEnergy))
@@ -41,12 +39,6 @@ abstract class ChargeableItem(
         val percentage = energy.toDouble() / maxEnergy.toDouble()
         val maxDurability = material.maxDurability
         return (maxDurability - (maxDurability * percentage)).roundToInt()
-    }
-    
-    override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {
-        if (event.equipMethod == EquipMethod.BREAK) {
-            event.isCancelled = true
-        }
     }
     
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {

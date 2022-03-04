@@ -14,22 +14,19 @@ import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType.SlotType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.inventory.CraftingInventory
-import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.isCompletelyDenied
+import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.runTask
 
 private fun ItemStack?.getNullIfAir(): ItemStack? {
     return if (this?.type != Material.AIR) this else null
 }
-
-private fun InventoryView.isPlayerView() = topInventory is CraftingInventory && topInventory.size == 5
 
 object ArmorEquipListener : Initializable(), Listener {
     
@@ -55,11 +52,16 @@ object ArmorEquipListener : Initializable(), Listener {
             InventoryAction.PICKUP_ALL,
             InventoryAction.PICKUP_SOME,
             InventoryAction.PICKUP_HALF,
-            InventoryAction.PICKUP_ONE,
+            InventoryAction.PICKUP_ONE -> {
+                if (slotType == SlotType.ARMOR) {
+                    equipEvent = ArmorEquipEvent(player, EquipMethod.NORMAL_CLICK, currentItem, cursorItem)
+                }
+            }
+            
             InventoryAction.PLACE_ALL,
             InventoryAction.PLACE_SOME,
             InventoryAction.PLACE_ONE -> {
-                if (slotType == SlotType.ARMOR) {
+                if (slotType == SlotType.ARMOR && ArmorType.fitsOnSlot(cursorItem, event.rawSlot)) {
                     equipEvent = ArmorEquipEvent(player, EquipMethod.NORMAL_CLICK, currentItem, cursorItem)
                 }
             }
@@ -72,7 +74,7 @@ object ArmorEquipListener : Initializable(), Listener {
             }
             
             InventoryAction.SWAP_WITH_CURSOR -> {
-                if (slotType == SlotType.ARMOR) {
+                if (slotType == SlotType.ARMOR && ArmorType.fitsOnSlot(cursorItem, event.rawSlot)) {
                     equipEvent = ArmorEquipEvent(player, EquipMethod.SWAP, currentItem, cursorItem)
                 }
             }
@@ -80,7 +82,9 @@ object ArmorEquipListener : Initializable(), Listener {
             InventoryAction.HOTBAR_SWAP -> {
                 if (slotType == SlotType.ARMOR) {
                     val hotbarItem = player.inventory.getItem(event.hotbarButton)
-                    equipEvent = ArmorEquipEvent(player, EquipMethod.HOTBAR_SWAP, currentItem, hotbarItem)
+                    if (ArmorType.fitsOnSlot(hotbarItem, event.rawSlot)) {
+                        equipEvent = ArmorEquipEvent(player, EquipMethod.HOTBAR_SWAP, currentItem, hotbarItem)
+                    }
                 }
             }
             

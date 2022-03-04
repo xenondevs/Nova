@@ -170,6 +170,11 @@ val Player.hasInventoryOpen: Boolean
     get() = openInventory.topInventory.type != InventoryType.CRAFTING
 
 /**
+ * Checks if an [InventoryView] is the player inventory
+ */
+fun InventoryView.isPlayerView() = topInventory is CraftingInventory && topInventory.size == 5
+
+/**
  * Tries to remove the first ItemStack#amount items from the first slots that have a similar item.
  * @return How many items could not be removed
  */
