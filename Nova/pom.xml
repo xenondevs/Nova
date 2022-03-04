@@ -7,19 +7,19 @@
     <parent>
         <groupId>xyz.xenondevs.nova</groupId>
         <artifactId>Nova-Parent</artifactId>
-        <version>0.8.7</version>
+        <version>0.8.8</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>Nova</artifactId>
 
     <properties>
-        <exposed.version>0.36.1</exposed.version>
+        <exposed.version>0.37.3</exposed.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <particlelib.version>1.7</particlelib.version>
-        <fuzzywuzzy.version>1.3.1</fuzzywuzzy.version>
+        <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
         <annotations.version>23.0.0</annotations.version>
-        <invui.version>0.3-SNAPSHOT</invui.version>
+        <invui.version>0.5-SNAPSHOT</invui.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>
 
@@ -29,7 +29,7 @@
             <url>https://repo.xenondevs.xyz/releases</url>
         </pluginRepository>
     </pluginRepositories>
-    
+
     <repositories>
         <repository>
             <id>xenondevs</id>
@@ -87,7 +87,7 @@
             <dependencies>
                 <dependency>
                     <groupId>de.studiocode.invui</groupId>
-                    <artifactId>IA-R8</artifactId>
+                    <artifactId>IA-R9</artifactId>
                     <version>${invui.version}</version>
                 </dependency>
             </dependencies>
@@ -137,7 +137,7 @@
             <dependencies>
                 <dependency>
                     <groupId>de.studiocode.invui</groupId>
-                    <artifactId>IA-R8</artifactId>
+                    <artifactId>IA-R9</artifactId>
                     <version>${invui.version}</version>
                     <classifier>remapped-mojang</classifier>
                 </dependency>
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>xyz.xenondevs.nova</groupId>
             <artifactId>Nova-API</artifactId>
-            <version>0.8.7</version>
+            <version>0.8.8</version>
         </dependency>
 
         <!-- Spigot -->
@@ -296,7 +296,7 @@
         <dependency>
             <groupId>com.plotsquared</groupId>
             <artifactId>PlotSquared-Bukkit</artifactId>
-            <version>6.3.0</version>
+            <version>6.4.0</version>
             <scope>provided</scope>
             <exclusions>
                 <!-- PS Bukkit Deps -->
@@ -423,7 +423,7 @@
             <version>2.9.0</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- Not provided -->
         <dependency>
             <groupId>de.studiocode.invui</groupId>
@@ -466,6 +466,10 @@
                     <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R8</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>de.studiocode.invui</groupId>
+                    <artifactId>IA-R9</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -476,7 +480,7 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>2.2.1</version>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>net.dzikoysk</groupId>

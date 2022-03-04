@@ -7,7 +7,7 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.util.*
 import net.minecraft.world.item.ItemStack as MItemStack
