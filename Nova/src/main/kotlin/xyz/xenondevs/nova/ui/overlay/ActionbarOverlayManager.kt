@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
 import java.util.*
 
-// TODO: This currently only works with one overlay due to the centering of the text
 object ActionbarOverlayManager : Listener {
     
     private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(TextComponent(""))
