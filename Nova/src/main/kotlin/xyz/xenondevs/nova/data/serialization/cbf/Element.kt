@@ -35,7 +35,7 @@ abstract class BackedElement<T> : Element {
     }
     
     override fun toString(): String {
-        return value?.toString() ?: "null"
+        return value.toString()
     }
     
     companion object BackedElementRegistry {
