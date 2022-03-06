@@ -16,7 +16,7 @@
     <properties>
         <exposed.version>0.37.3</exposed.version>
         <hikaricp.version>5.0.1</hikaricp.version>
-        <particlelib.version>1.7</particlelib.version>
+        <particlelib.version>1.7.1</particlelib.version>
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
         <zip4j.version>2.9.1</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
