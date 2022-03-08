@@ -13,6 +13,7 @@ import dev.espi.protectionstones.ProtectionStones as ProtectionStonesAPI
 object ProtectionStones : InternalProtectionIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("ProtectionStones") != null
+    override val canRunAsync = false
     
     override fun canBreak(tileEntity: TileEntity, item: ItemStack?, location: Location) =
         !ProtectionStonesAPI.isProtectBlock(location.block)

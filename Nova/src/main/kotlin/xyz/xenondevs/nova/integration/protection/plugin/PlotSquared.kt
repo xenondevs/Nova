@@ -11,6 +11,7 @@ import com.plotsquared.core.location.Location as PlotLocation
 object PlotSquared : InternalProtectionIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("PlotSquared") != null
+    override val canRunAsync = false
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) = isAllowed(player, location)
     

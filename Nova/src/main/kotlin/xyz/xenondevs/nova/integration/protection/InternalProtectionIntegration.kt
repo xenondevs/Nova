@@ -5,5 +5,6 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 interface InternalProtectionIntegration : ProtectionIntegration {
     
     val isInstalled: Boolean
+    val canRunAsync: Boolean
     
 }
