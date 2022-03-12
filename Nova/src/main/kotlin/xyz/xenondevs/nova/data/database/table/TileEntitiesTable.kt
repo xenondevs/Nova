@@ -20,4 +20,8 @@ object TileEntitiesTable : IdTable<UUID>() {
     
     override val primaryKey = PrimaryKey(id)
     
+    init {
+        index(isUnique = true, world, x, y, z)
+    }
+    
 }
