@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.integration
 
-interface Integration {
+interface InternalIntegration {
     
     val isInstalled: Boolean
     

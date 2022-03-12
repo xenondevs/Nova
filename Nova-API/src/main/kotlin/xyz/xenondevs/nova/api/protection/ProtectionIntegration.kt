@@ -9,6 +9,12 @@ import xyz.xenondevs.nova.api.tileentity.TileEntity
 interface ProtectionIntegration {
     
     /**
+     * Specifies from which thread methods in this protection integration are allowed to be called
+     */
+    val executionMode: ExecutionMode
+        get() = ExecutionMode.SERVER
+    
+    /**
      * Checks if that [player] can break a block at that [location] using that [item]
      */
     fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean
@@ -73,5 +79,24 @@ interface ProtectionIntegration {
      */
     fun canHurtEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean =
         canHurtEntity(tileEntity.owner, entity, item)
+    
+    enum class ExecutionMode {
+        
+        /**
+         * The thread will not be changed in order to call the methods
+         */
+        NONE,
+        
+        /**
+         * The methods are always called from the server thread
+         */
+        SERVER,
+        
+        /**
+         * The methods are always called from async threads
+         */
+        ASYNC
+        
+    }
     
 }

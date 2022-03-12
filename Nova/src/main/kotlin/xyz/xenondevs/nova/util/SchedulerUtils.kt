@@ -6,6 +6,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.util.concurrent.ObservableLock
+import xyz.xenondevs.nova.util.concurrent.lockAndRun
+import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
 import java.util.concurrent.*
 
 val USE_NOVA_SCHEDULER = DEFAULT_CONFIG.getBoolean("nova_executor.enabled")

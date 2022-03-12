@@ -41,6 +41,7 @@ object PermissionUtils {
         }
     }
     
+    @Suppress("LiftReturnOrAssignment")
     private fun hasOfflinePermission(world: World, player: OfflinePlayer, permission: String): Boolean {
         if (PERMISSIONS == null) return false
         
@@ -48,10 +49,16 @@ object PermissionUtils {
             .getOrPut(player.uniqueId, ::ConcurrentHashMap)
             .getOrPut(world.uid, ::ConcurrentHashMap)
         
-        if (permissionMap.containsKey(permission)) return permissionMap[permission] ?: false
-        else runAsyncTask { permissionMap[permission] = PERMISSIONS.playerHas(world.name, player, permission) }
-        
-        return false
+        if (permissionMap.containsKey(permission)) {
+            return permissionMap[permission] ?: false
+        } else if (minecraftServer.serverThread != Thread.currentThread()) {
+            val result = PERMISSIONS.playerHas(world.name, player, permission)
+            permissionMap[permission] = result
+            return result
+        } else {
+            runAsyncTask { permissionMap[permission] = PERMISSIONS.playerHas(world.name, player, permission) }
+            return false
+        }
     }
     
 }

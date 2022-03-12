@@ -6,14 +6,14 @@ import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.api.protection.ProtectionIntegration
+import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.protection.FakeOnlinePlayer
-import xyz.xenondevs.nova.integration.protection.InternalProtectionIntegration
 
-object GriefPrevention : InternalProtectionIntegration {
+object GriefPrevention : ProtectionIntegration, InternalIntegration {
     
     private val GRIEF_PREVENTION = if (Bukkit.getPluginManager().getPlugin("GriefPrevention") != null) GriefPrevention.instance else null
     override val isInstalled = GRIEF_PREVENTION != null
-    override val canRunAsync = false
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) =
         GRIEF_PREVENTION?.allowBreak(FakeOnlinePlayer(player, location), location.block, location) == null
