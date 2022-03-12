@@ -63,3 +63,5 @@ permissions:
     description: Players with this permission will be able to bypass the tile entity limits set in the config.
   nova.command.modeldata:
     description: Allows players to use the /nvmodeldata command.
+  nova.command.addons:
+    description: Allows players to use the /nova addons command.
