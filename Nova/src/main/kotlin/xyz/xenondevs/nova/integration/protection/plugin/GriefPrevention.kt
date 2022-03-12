@@ -13,6 +13,7 @@ object GriefPrevention : InternalProtectionIntegration {
     
     private val GRIEF_PREVENTION = if (Bukkit.getPluginManager().getPlugin("GriefPrevention") != null) GriefPrevention.instance else null
     override val isInstalled = GRIEF_PREVENTION != null
+    override val canRunAsync = false
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) =
         GRIEF_PREVENTION?.allowBreak(FakeOnlinePlayer(player, location), location.block, location) == null

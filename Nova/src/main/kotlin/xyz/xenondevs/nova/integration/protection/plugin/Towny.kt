@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.integration.protection.InternalProtectionIntegration
 object Towny : InternalProtectionIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Towny") != null
+    override val canRunAsync = true
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) =
         hasPermission(player, location, ActionType.DESTROY)

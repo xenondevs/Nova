@@ -43,6 +43,7 @@ object WorldGuard : InternalProtectionIntegration {
     }
     
     override val isInstalled = PLATFORM != null && PLUGIN != null
+    override val canRunAsync = true
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) = runQuery(player, location, Flags.BLOCK_BREAK)
     

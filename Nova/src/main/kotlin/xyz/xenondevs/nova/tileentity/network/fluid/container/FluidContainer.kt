@@ -39,8 +39,10 @@ abstract class FluidContainer(
     /**
      * The amount of mB in this container.
      */
-    open var amount: Long = amount
-        protected set
+    open var amount: Long = amount.coerceAtMost(capacity)
+        protected set(value) {
+            field = value.coerceAtMost(capacity)
+        }
     
     val updateHandlers = ArrayList<() -> Unit>()
     
