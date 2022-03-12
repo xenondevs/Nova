@@ -5,15 +5,15 @@ import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.tileentity.TileEntity
-import xyz.xenondevs.nova.integration.protection.InternalProtectionIntegration
+import xyz.xenondevs.nova.integration.InternalIntegration
 import dev.espi.protectionstones.ProtectionStones as ProtectionStonesAPI
 
 // ProtectionStones uses WorldGuard for regions, this integration is only preventing tile entities from breaking the protection stone.
-object ProtectionStones : InternalProtectionIntegration {
+object ProtectionStones : ProtectionIntegration, InternalIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("ProtectionStones") != null
-    override val canRunAsync = false
     
     override fun canBreak(tileEntity: TileEntity, item: ItemStack?, location: Location) =
         !ProtectionStonesAPI.isProtectBlock(location.block)

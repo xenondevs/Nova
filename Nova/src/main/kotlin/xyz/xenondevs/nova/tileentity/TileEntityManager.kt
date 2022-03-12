@@ -40,6 +40,8 @@ import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.concurrent.runIfTrue
+import xyz.xenondevs.nova.util.concurrent.runIfTrueSynchronized
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
@@ -310,18 +312,20 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
             val player = event.player
             val block = event.clickedBlock!!
             if (!player.isSneaking) {
-                if (ProtectionManager.canUseBlock(player, event.item, block.location)) {
-                    event.isCancelled = true
+                event.isCancelled = true
+                ProtectionManager.canUseBlock(player, event.item, block.location).runIfTrue {
                     tileEntity.handleRightClick(event)
                 }
-            } else if (event.handItems.any { it.novaMaterial == CoreItems.WRENCH } && ProtectionManager.canBreak(player, event.item, block.location)) {
-                destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
+            } else if (event.handItems.any { it.novaMaterial == CoreItems.WRENCH }) {
+                ProtectionManager.canBreak(player, event.item, block.location).runIfTrueSynchronized(TileEntityManager) {
+                    destroyAndDropTileEntity(tileEntity, player.gameMode == GameMode.SURVIVAL)
+                }
             }
         } else event.isCancelled = true
     }
     
     private fun handleTileEntityWrenchShift(event: PlayerInteractEvent, tileEntity: TileEntity) {
-        if (ProtectionManager.canBreak(event.player, event.item, event.clickedBlock!!.location)) {
+        ProtectionManager.canBreak(event.player, event.item, event.clickedBlock!!.location).runIfTrueSynchronized(TileEntityManager) {
             destroyAndDropTileEntity(tileEntity, event.player.gameMode == GameMode.SURVIVAL)
         }
     }
@@ -335,33 +339,53 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         val playerLocation = player.location
         val placePos = block.location.advance(event.blockFace)
         
-        if (placePos.block.type.isAir
-            && ProtectionManager.canPlace(player, handItem, placePos)
-            && material.placeCheck?.invoke(
-                player,
-                handItem,
-                placePos.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
-            ) != false
+        ProtectionManager.canPlace(player, handItem, placePos).runIfTrueSynchronized(TileEntityManager) {
+            if (placePos.block.type.isAir && material.placeCheck?.invoke(
+                    player,
+                    handItem,
+                    placePos.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
+                ) != false
+            ) {
+                val uuid = player.uniqueId
+                val result = TileEntityLimits.canPlaceTileEntity(uuid, placePos.world!!, material)
+                if (result == PlaceResult.ALLOW) {
+                    placeTileEntity(
+                        uuid,
+                        placePos,
+                        playerLocation.yaw,
+                        material,
+                        handItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
+                    )
+                    
+                    if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
+                    
+                    player.swingMainHand()
+                    player.playSound(block.location, material.hitboxType!!.soundGroup.placeSound, 1f, 1f)
+                } else {
+                    player.spigot().sendMessage(
+                        localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
+                    )
+                }
+            }
+        }
+    }
+    
+    private fun handlePossibleTileEntityDestroy(event: PlayerInteractEvent, tileEntity: TileEntity) {
+        val block = event.clickedBlock!!
+        val player = event.player
+        
+        if ((block.type == Material.BARRIER || block.type == Material.CHAIN)
+            && event.player.gameMode == GameMode.SURVIVAL
+            && getTileEntityAt(block.location) != null
         ) {
-            val uuid = player.uniqueId
-            val result = TileEntityLimits.canPlaceTileEntity(uuid, placePos.world!!, material)
-            if (result == PlaceResult.ALLOW) {
-                placeTileEntity(
-                    uuid,
-                    placePos,
-                    playerLocation.yaw,
-                    material,
-                    handItem.getTileEntityData()?.let { CompoundElement().apply { putElement("global", it) } }
-                )
-                
-                if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
-                
-                player.swingMainHand()
-                player.playSound(block.location, material.hitboxType!!.soundGroup.placeSound, 1f, 1f)
-            } else {
-                player.spigot().sendMessage(
-                    localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
-                )
+            event.isCancelled = true
+            
+            ProtectionManager.canBreak(player, event.item, block.location).runIfTrueSynchronized(TileEntityManager) {
+                // The tile entity might have been destroyed by now
+                if (getTileEntityAt(block.location) != tileEntity) {
+                    Bukkit.getPluginManager().callEvent(BlockBreakEvent(block, player))
+                    player.playSound(block.location, Sound.BLOCK_STONE_BREAK, 1f, 1f)
+                }
             }
         }
     }
@@ -390,15 +414,9 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
             } else if (tileEntity != null) handleTileEntityInteract(event, tileEntity)
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
-            if ((block.type == Material.BARRIER || block.type == Material.CHAIN)
-                && event.player.gameMode == GameMode.SURVIVAL
-                && getTileEntityAt(block.location) != null
-                && ProtectionManager.canBreak(player, event.item, block.location)) {
-                
-                event.isCancelled = true
-                Bukkit.getPluginManager().callEvent(BlockBreakEvent(block, player))
-                player.playSound(block.location, Sound.BLOCK_STONE_BREAK, 1f, 1f)
-            }
+            val tileEntity = getTileEntityAt(block.location)
+            if (tileEntity != null)
+                handlePossibleTileEntityDestroy(event, tileEntity)
         }
     }
     

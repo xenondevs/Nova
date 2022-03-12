@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.util
+package xyz.xenondevs.nova.util.concurrent
 
 import java.util.concurrent.locks.ReentrantLock
 

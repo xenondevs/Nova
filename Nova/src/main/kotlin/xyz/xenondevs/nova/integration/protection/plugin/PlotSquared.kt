@@ -5,13 +5,13 @@ import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.integration.protection.InternalProtectionIntegration
+import xyz.xenondevs.nova.api.protection.ProtectionIntegration
+import xyz.xenondevs.nova.integration.InternalIntegration
 import com.plotsquared.core.location.Location as PlotLocation
 
-object PlotSquared : InternalProtectionIntegration {
+object PlotSquared : ProtectionIntegration, InternalIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("PlotSquared") != null
-    override val canRunAsync = false
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) = isAllowed(player, location)
     

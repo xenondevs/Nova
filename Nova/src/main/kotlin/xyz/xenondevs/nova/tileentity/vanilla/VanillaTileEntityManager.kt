@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
@@ -100,12 +101,13 @@ object VanillaTileEntityManager : Initializable(), Listener {
             tileEntity is ItemStorageVanillaTileEntity
             && !player.isSneaking
             && event.handItems.any { it.novaMaterial == CoreItems.WRENCH }
-            && ProtectionManager.canUseBlock(player, event.item, tileEntity.location)
         ) {
             event.isCancelled = true
             val face = event.blockFace
-            NetworkManager.runAsync {
-                tileEntity.itemHolder.cycleItemConfig(it, face, true)
+            ProtectionManager.canUseBlock(player, event.item, tileEntity.location).runIfTrue {
+                NetworkManager.runAsync {
+                    tileEntity.itemHolder.cycleItemConfig(it, face, true)
+                }
             }
         }
     }

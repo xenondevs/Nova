@@ -22,12 +22,14 @@ import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.integration.protection.InternalProtectionIntegration
+import xyz.xenondevs.nova.api.protection.ProtectionIntegration
+import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
+import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.util.PermissionUtils
 import java.util.*
 import org.bukkit.World as BWorld
 
-object WorldGuard : InternalProtectionIntegration {
+object WorldGuard : ProtectionIntegration, InternalIntegration {
     
     private val PLUGIN: WorldGuardPlugin?
     private val PLATFORM: WorldGuardPlatform?
@@ -43,7 +45,8 @@ object WorldGuard : InternalProtectionIntegration {
     }
     
     override val isInstalled = PLATFORM != null && PLUGIN != null
-    override val canRunAsync = true
+    
+    override val executionMode = ExecutionMode.NONE
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) = runQuery(player, location, Flags.BLOCK_BREAK)
     

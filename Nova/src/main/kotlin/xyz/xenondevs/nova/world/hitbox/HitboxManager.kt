@@ -13,6 +13,7 @@ import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.castRay
+import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.isCompletelyDenied
 
 object HitboxManager : Listener {
@@ -59,11 +60,13 @@ object HitboxManager : Listener {
                     
                     var continueRay = true
                     surroundingHitboxes!!.stream()
-                        .filter { it.isInHitbox(location) && ProtectionManager.canUseBlock(player, event.item, location) }
+                        .filter { it.isInHitbox(location) }
                         .findFirst()
                         .ifPresent {
                             continueRay = false
-                            it.handleHit(event)
+                            
+                            ProtectionManager.canUseBlock(player, event.item, location)
+                                .runIfTrue { it.handleHit(event) }
                         }
                     
                     return@castRay continueRay

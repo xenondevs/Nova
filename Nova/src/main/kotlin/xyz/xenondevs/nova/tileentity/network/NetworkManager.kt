@@ -10,6 +10,9 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.concurrent.ObservableLock
+import xyz.xenondevs.nova.util.concurrent.lockAndRun
+import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
 import java.util.concurrent.ConcurrentLinkedQueue
 
 typealias NetworkManagerTask = (NetworkManager) -> Unit
@@ -371,8 +374,8 @@ private class NetworkManagerImpl : NetworkManager {
     }
     
     private fun hasAccessPermission(source: NetworkNode, target: NetworkNode): Boolean {
-        return (if (source is TileEntity) ProtectionManager.canUseBlock(source, null, target.location) else true)
-            && (if (target is TileEntity) ProtectionManager.canUseBlock(target, null, source.location) else true)
+        return (if (source is TileEntity) ProtectionManager.canUseBlock(source, null, target.location).get() else true)
+            && (if (target is TileEntity) ProtectionManager.canUseBlock(target, null, source.location).get() else true)
     }
     
 }

@@ -5,9 +5,9 @@ import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
-import xyz.xenondevs.nova.integration.Integration
+import xyz.xenondevs.nova.integration.InternalIntegration
 
-interface CustomItemService : Integration {
+interface CustomItemService : InternalIntegration {
     
     /**
      * If this [CustomItemService] requires the Nova initialization to be delayed

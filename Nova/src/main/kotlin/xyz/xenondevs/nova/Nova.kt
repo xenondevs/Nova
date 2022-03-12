@@ -63,7 +63,7 @@ class Nova : JavaPlugin(), INova {
     }
     
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {
-        ProtectionManager.externalIntegrations.add(integration)
+        ProtectionManager.integrations.add(integration)
     }
     
 }

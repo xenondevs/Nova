@@ -6,7 +6,7 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.Integration
+import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.customitems.plugin.ItemsAdder
 import xyz.xenondevs.nova.integration.customitems.plugin.MMOItems
 import xyz.xenondevs.nova.integration.customitems.plugin.Oraxen
@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch
 object CustomItemServiceManager : Initializable() {
     
     private val PLUGINS: List<CustomItemService> = listOf(ItemsAdder, Oraxen, MMOItems)
-        .filter(Integration::isInstalled)
+        .filter(InternalIntegration::isInstalled)
     
     private val LOAD_DELAYING_PLUGINS_AMOUNT = PLUGINS.count(CustomItemService::requiresLoadDelay)
     val READY_LATCH = CountDownLatch(LOAD_DELAYING_PLUGINS_AMOUNT)
