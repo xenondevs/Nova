@@ -6,20 +6,20 @@ import java.util.stream.Stream
 
 object NBTUtils {
     
-    var TAG_END = 0
-    var TAG_BYTE = 1
-    var TAG_SHORT = 2
-    var TAG_INT = 3
-    var TAG_LONG = 4
-    var TAG_FLOAT = 5
-    var TAG_DOUBLE = 6
-    var TAG_BYTE_ARRAY = 7
-    var TAG_STRING = 8
-    var TAG_LIST = 9
-    var TAG_COMPOUND = 10
-    var TAG_INT_ARRAY = 11
-    var TAG_LONG_ARRAY = 12
-    var TAG_ANY_NUMERIC = 99
+    const val TAG_END = 0
+    const val TAG_BYTE = 1
+    const val TAG_SHORT = 2
+    const val TAG_INT = 3
+    const val TAG_LONG = 4
+    const val TAG_FLOAT = 5
+    const val TAG_DOUBLE = 6
+    const val TAG_BYTE_ARRAY = 7
+    const val TAG_STRING = 8
+    const val TAG_LIST = 9
+    const val TAG_COMPOUND = 10
+    const val TAG_INT_ARRAY = 11
+    const val TAG_LONG_ARRAY = 12
+    const val TAG_ANY_NUMERIC = 99
     
     fun createDoubleList(vararg doubles: Double): ListTag {
         val listTag = ListTag()
