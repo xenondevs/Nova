@@ -24,11 +24,11 @@ object Xenondevs : UploadService {
         val request = HttpMultipartRequest(API_URL, "PUT") { setRequestProperty("key", key) }
         request.addFormFile("pack", file, "pack.zip")
         val response = request.complete()
-        val json = response.jsonResponse as JsonObject
         check(response.isSuccessful) {
             "Failed to upload pack to xenondevs: ${response.statusCode} ${json.getString("error")}." +
                 "Please remember that this feature is only available for Patrons!"
         }
+        val json = response.jsonResponse as JsonObject
         val url = json.getString("url")
         checkNotNull(url) { "Server did not return a url" }
         println("uploaded!: $url")
