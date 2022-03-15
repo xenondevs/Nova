@@ -45,3 +45,15 @@ fun String.addNamespace(namespace: String): String =
 
 fun String.removeNamespace(namespace: String): String =
     removePrefix("$namespace:")
+
+object StringUtils {
+    
+    private val ALPHABET = ('a'..'z') + ('A'..'Z')
+    
+    fun randomString(length: Int, dict: List<Char> = ALPHABET) =
+        buildString {
+            repeat(length) {
+                append(dict.random())
+            }
+        }
+}
