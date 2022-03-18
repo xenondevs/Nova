@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
-import kotlin.collections.Map.Entry
 
 /**
  * Basically cables.
@@ -27,63 +27,27 @@ interface NetworkBridge : NetworkNode {
     /**
      * An identifier to prevent bridges of different tiers from connecting to each other.
      */
-    val typeId: Int
+    val typeId: String
     
     /**
-     * Called when another [NetworkNode] has been placed
-     * or broken right next to this node.
-     *
-     * Not called when [NetworkNode]s nearby get unloaded.
-     *
-     * Useful for updating the model of a cable to connect
-     * to additional sides.
+     * Called when a network update occurs. This includes [NetworkNodes][NetworkNode] being
+     * placed or broken next to this [NetworkBridge] as well as the placement of this bridge itself.
+     * 
+     * This method is not called when adjacent [NetworkNodes][NetworkNode] are loaded / unloaded.
      */
-    fun handleNetworkUpdate()
+    fun handleNetworkUpdate() // TODO: Should be in NetworkNode
     
     /**
-     * Gets a map of attached [NetworkNode]s for each side of this [NetworkBridge].
-     * The content of the maps might be the same in cases where multiple
-     * [NetworkBridge]s are used to connect the same [NetworkNode]s.
+     * Retrieves the serialized networks map from internal storage.
      */
-    fun getNetworkedNodes(networkType: NetworkType): Map<BlockFace, Set<Entry<BlockFace, NetworkNode>>> {
-        val networkedNodes = EnumMap<BlockFace, Set<Entry<BlockFace, NetworkNode>>>(BlockFace::class.java)
-        
-        for ((face, startNode) in connectedNodes[networkType]!!) {
-            val exploredNodes = HashSet<NetworkNode>()
-            val connectedNodeFaces = HashSet<Entry<BlockFace, NetworkNode>>()
-            
-            var unexploredNodes = ArrayList<Entry<BlockFace, NetworkNode>>(1)
-            unexploredNodes.add(AbstractMap.SimpleEntry(face, startNode))
-            
-            while (unexploredNodes.size != 0) { // loop until all nodes are explored
-                val newUnexploredNodes = ArrayList<Entry<BlockFace, NetworkNode>>(6)
-                
-                unexploredNodes.forEach { unexploredEntry ->
-                    val nodeToExplore = unexploredEntry.value
-                    
-                    if (nodeToExplore is NetworkBridge) {
-                        for (connectedEntry in nodeToExplore.connectedNodes[networkType]!!) {
-                            val node = connectedEntry.value
-                            if (node == this) continue
-                            
-                            if (exploredNodes.contains(node)) {
-                                connectedNodeFaces += connectedEntry
-                            } else {
-                                newUnexploredNodes += connectedEntry
-                                exploredNodes += node
-                            }
-                        }
-                    }
-                    // node is now explored
-                    connectedNodeFaces += unexploredEntry
-                }
-                unexploredNodes = newUnexploredNodes
-            }
-            // all nodes that are connected to this bridge in this direction
-            networkedNodes[face] = connectedNodeFaces
-        }
-        
-        return networkedNodes
+    fun retrieveSerializedNetworks(): Map<NetworkType, UUID>?
+    
+    fun setNetwork(networkType: NetworkType, network: Network) {
+        networks[networkType] = network
+    }
+    
+    fun removeNetwork(networkType: NetworkType) {
+        networks -= networkType
     }
     
     /**
@@ -95,5 +59,18 @@ interface NetworkBridge : NetworkNode {
             && other.bridgeFaces.contains(face.oppositeFace)
             && other.supportedNetworkTypes.contains(requestedType)
     }
+    
+    /**
+     * Checks if this bridge is able to connect to its neighboring end point.
+     */
+    fun canConnect(other: NetworkEndPoint, requestedType: NetworkType, face: BlockFace): Boolean {
+        return bridgeFaces.contains(face) && other.allowedFaces[requestedType]?.contains(face.oppositeFace) ?: false
+    }
+    
+    /**
+     * Converts the [networks] map to a serializable version.
+     */
+    fun serializeNetworks(): EnumMap<NetworkType, UUID> =
+        networks.mapValuesTo(emptyEnumMap()) { it.value.uuid }
     
 }

@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util
 
 import de.studiocode.invui.item.Item
 import me.xdrop.fuzzywuzzy.FuzzySearch
+import org.checkerframework.checker.units.qual.K
 import java.util.*
 
 fun <E> List<E>.contentEquals(other: List<E>) = size == other.size && containsAll(other)
@@ -31,6 +32,15 @@ fun <E> MutableIterable<E>.pollFirstWhere(test: (E) -> Boolean): E? {
     }
     
     return null
+}
+
+fun <E> MutableIterable<E>.pollFirst(): E? {
+    val iterator = iterator()
+    return if (iterator.hasNext()) {
+        val element = iterator.next()
+        iterator.remove()
+        element
+    } else null
 }
 
 inline fun <K, V> Iterable<K>.associateWithNotNull(valueSelector: (K) -> V?): Map<K, V> {
@@ -127,6 +137,10 @@ fun <T> MutableList<T>.rotateRight() {
 fun <T> MutableList<T>.rotateLeft() {
     val first = removeAt(0)
     add(first)
+}
+
+fun <K, V> LinkedHashMap<K, V>.poll(): Map.Entry<K, V>? {
+    return entries.pollFirst()
 }
 
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {

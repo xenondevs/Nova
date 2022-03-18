@@ -4,6 +4,7 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidNetwork
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
+import java.util.*
 
 interface Network {
     
@@ -11,6 +12,11 @@ interface Network {
      * The [NetworkType] this network implements.
      */
     val type: NetworkType
+    
+    /**
+     * The [Network's][Network] UUID
+     */
+    val uuid: UUID
     
     /**
      * A set of [NetworkNode]s that are connected to this [Network].
@@ -41,6 +47,12 @@ interface Network {
     fun addAll(network: Network)
     
     /**
+     * Adds all [nodes] to this network. The pair consists of the [NetworkNode] and
+     * the attached face, which can be null for [NetworkBridges][NetworkBridge].
+     */
+    fun addAll(nodes: Iterable<Pair<BlockFace?, NetworkNode>>)
+    
+    /**
      * Adds an [NetworkEndPoint] to this [Network].
      * The [BlockFace] specifies which side of this [NetworkEndPoint]
      * was connected to the network.
@@ -58,9 +70,14 @@ interface Network {
      */
     fun removeNode(node: NetworkNode)
     
+    /**
+     * Removes all [NetworkNodes][NetworkNode] from this [Network].
+     */
+    fun removeAll(nodes: List<NetworkNode>)
+    
 }
 
-enum class NetworkType(val networkConstructor: () -> Network) {
+enum class NetworkType(val networkConstructor: (UUID) -> Network) {
     
     /**
      * Transfers Energy

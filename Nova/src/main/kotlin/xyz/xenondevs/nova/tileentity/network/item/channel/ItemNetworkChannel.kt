@@ -70,7 +70,7 @@ class ItemNetworkChannel {
         createDistributor()
     }
     
-    fun addHolder(holder: ItemHolder, face: BlockFace) {
+    fun addHolder(holder: ItemHolder, face: BlockFace, createDistributor: Boolean) {
         when (holder.itemConfig[face]!!) {
             NetworkConnectionType.INSERT -> addConsumer(holder, face)
             NetworkConnectionType.EXTRACT -> addProvider(holder, face)
@@ -81,17 +81,17 @@ class ItemNetworkChannel {
             else -> throw UnsupportedOperationException()
         }
         
-        createDistributor()
+        if (createDistributor) createDistributor()
     }
     
-    fun removeHolder(holder: ItemHolder) {
+    fun removeHolder(holder: ItemHolder, createDistributor: Boolean) {
         consumers[holder]?.forEach { consumerConfigurations -= it }
         providers[holder]?.forEach { providerConfigurations -= it }
         
         consumers -= holder
         providers -= holder
         
-        createDistributor()
+        if (createDistributor) createDistributor()
     }
     
     fun isEmpty() = consumers.isEmpty() && providers.isEmpty()
@@ -108,7 +108,7 @@ class ItemNetworkChannel {
         providerConfigurations += configuration
     }
     
-    private fun createDistributor() {
+    fun createDistributor() {
         itemDistributor = if (consumerConfigurations.isNotEmpty() && providerConfigurations.isNotEmpty()) {
             val (consumers, providers) = computeAvailableInventories()
             ItemDistributor(consumers, providers)

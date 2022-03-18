@@ -24,7 +24,7 @@ fun NovaFluidHolder(
     defaultContainer: Pair<FluidContainer, NetworkConnectionType>,
     vararg otherContainers: Pair<FluidContainer, NetworkConnectionType>,
     defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer> = { CUBE_FACES.associateWithToEnumMap { defaultContainer.first } },
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)? = null
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
 ): NovaFluidHolder {
     val containers = hashMapOf(defaultContainer).also { it.putAll(otherContainers) }
     val availableContainers = containers.keys.associateByTo(HashMap()) { it.uuid }
@@ -43,7 +43,7 @@ class NovaFluidHolder(
     val availableContainers: Map<UUID, FluidContainer>,
     override val allowedConnectionTypes: Map<FluidContainer, NetworkConnectionType>,
     defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer>,
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)?
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)?
 ) : FluidHolder {
     
     override val containerConfig: MutableMap<BlockFace, FluidContainer> =
@@ -52,7 +52,7 @@ class NovaFluidHolder(
             ?: defaultContainerConfig()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        endPoint.retrieveDoubleEnumMap("fluidConnectionConfig", defaultConnectionConfig ?: DEFAULT_CONNECTION_CONFIG)
+        endPoint.retrieveEnumMap("fluidConnectionConfig", defaultConnectionConfig ?: DEFAULT_CONNECTION_CONFIG)
     
     override val channels: MutableMap<BlockFace, Int> =
         endPoint.retrieveEnumMap("fluidChannels", DEFAULT_CHANNEL_CONFIG)

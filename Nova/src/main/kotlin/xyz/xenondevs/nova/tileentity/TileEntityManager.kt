@@ -39,6 +39,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.concurrent.runIfTrueSynchronized
@@ -286,12 +287,12 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         runAsyncTask { event.world.loadedChunks.forEach { saveChunk(it.pos) } }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun handleChunkLoad(event: ChunkLoadEvent) {
         handleChunkLoad(event.chunk.pos)
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun handleChunkUnload(event: ChunkUnloadEvent) {
         handleChunkUnload(event.chunk.pos)
     }
@@ -586,6 +587,8 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                                 ex.printStackTrace()
                             }
                         }
+                        
+                        NetworkManager.queueChunkLoad(chunkPos)
                         
                         done.set(true)
                     }

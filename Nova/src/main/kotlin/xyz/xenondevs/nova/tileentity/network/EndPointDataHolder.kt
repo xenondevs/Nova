@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.tileentity.network
 import org.bukkit.block.BlockFace
 
 /**
- * Holds the [NetworkType]-specific data for [End Points][NetworkEndPoint].
+ * Holds the [NetworkType]-specific data for [NetworkEndPoints][NetworkEndPoint].
  */
 interface EndPointDataHolder {
     

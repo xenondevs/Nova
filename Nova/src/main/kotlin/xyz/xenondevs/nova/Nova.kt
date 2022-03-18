@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.particle.utils.ReflectionUtils
@@ -55,9 +56,8 @@ class Nova : JavaPlugin(), INova {
     
     override fun onDisable() {
         AddonManager.disableAddons()
-        disableHandlers.forEach {
-            runCatching(it).onFailure(Throwable::printStackTrace)
-        }
+        NetworkManager.unloadAll()
+        disableHandlers.forEach { runCatching(it).onFailure(Throwable::printStackTrace) }
         DatabaseManager.disconnect()
         AsyncExecutor.shutdown()
     }

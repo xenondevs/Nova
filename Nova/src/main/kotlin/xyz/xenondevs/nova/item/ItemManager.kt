@@ -38,7 +38,7 @@ object ItemManager : Initializable(), Listener {
     fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
         if (event.isCancelled) return
         val item = event.player.inventory.getItem(event.hand)
-        findBehaviors(item)?.forEach { it.handleEntityInteract(event.player, item, event.rightClicked, event) }
+        findBehaviors(item)?.forEach { it.handleEntityInteract(event.player, item!!, event.rightClicked, event) }
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

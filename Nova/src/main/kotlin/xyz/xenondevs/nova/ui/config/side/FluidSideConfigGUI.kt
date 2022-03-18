@@ -35,8 +35,8 @@ class FluidSideConfigGUI(
     }
     
     override fun changeConnectionType(blockFace: BlockFace, forward: Boolean): Boolean {
-        NetworkManager.runNow { // TODO: runSync / runAsync ?
-            it.handleEndPointRemove(fluidHolder.endPoint, true)
+        NetworkManager.execute { // TODO: runSync / runAsync ?
+            it.removeEndPoint(fluidHolder.endPoint, false)
             
             val allowedTypes = allowedTypes[fluidHolder.containerConfig[blockFace]!!]!!
             val currentType = fluidHolder.connectionConfig[blockFace]!!
@@ -46,8 +46,8 @@ class FluidSideConfigGUI(
             else if (index == allowedTypes.size) index = 0
             fluidHolder.connectionConfig[blockFace] = allowedTypes[index]
             
-            it.handleEndPointAdd(fluidHolder.endPoint, false)
-            fluidHolder.endPoint.updateNearbyBridges()
+            it.addEndPoint(fluidHolder.endPoint, false)
+                .thenRun { fluidHolder.endPoint.updateNearbyBridges() }
         }
         
         return true
@@ -56,8 +56,8 @@ class FluidSideConfigGUI(
     override fun changeInventory(blockFace: BlockFace, forward: Boolean): Boolean {
         if (containers.size < 2) return false
         
-        NetworkManager.runNow { // TODO: runSync / runAsync ?
-            it.handleEndPointRemove(fluidHolder.endPoint, false)
+        NetworkManager.execute { // TODO: runSync / runAsync ?
+            it.removeEndPoint(fluidHolder.endPoint, false)
             
             val currentContainer = fluidHolder.containerConfig[blockFace]!!
             var index = containers.indexOf(currentContainer)
@@ -73,7 +73,7 @@ class FluidSideConfigGUI(
                 fluidHolder.connectionConfig[blockFace] = allowedTypes[0]
             }
             
-            it.handleEndPointAdd(fluidHolder.endPoint)
+            it.addEndPoint(fluidHolder.endPoint)
         }
         
         return true

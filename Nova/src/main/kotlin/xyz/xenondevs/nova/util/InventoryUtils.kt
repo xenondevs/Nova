@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.util
 import de.studiocode.invui.util.InventoryUtils
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.UpdateReason
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.*
@@ -149,7 +148,7 @@ fun Inventory.getFirstEmptySlot(): Int? {
  * if the given slot is occupied.
  */
 fun PlayerInventory.addPrioritized(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
-    if (getItem(prioritizedSlot).type == Material.AIR) setItem(prioritizedSlot, itemStack)
+    if (getItem(prioritizedSlot)?.takeUnlessAir() == null) setItem(prioritizedSlot, itemStack)
     else addItem(itemStack)
 }
 

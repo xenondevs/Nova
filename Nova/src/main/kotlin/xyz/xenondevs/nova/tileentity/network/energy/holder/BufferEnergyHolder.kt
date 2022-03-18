@@ -3,12 +3,13 @@ package xyz.xenondevs.nova.tileentity.network.energy.holder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import java.util.*
 
 class BufferEnergyHolder(
     endPoint: NetworkedTileEntity,
     defaultMaxEnergy: Long,
     private val creative: Boolean,
-    lazyDefaultConfig: () -> MutableMap<BlockFace, EnergyConnectionType>
+    lazyDefaultConfig: () -> EnumMap<BlockFace, EnergyConnectionType>
 ) : EnergyHolder(endPoint, defaultMaxEnergy, null, lazyDefaultConfig) {
     
     override val requestedEnergy: Long

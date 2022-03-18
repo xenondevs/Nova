@@ -7,8 +7,10 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCBClass
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getConstructor
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
+import java.util.*
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty1
 
@@ -32,5 +34,7 @@ object ReflectionRegistry {
     val CALLABLE_REFERENCE_RECEIVER_FIELD = getField(CallableReference::class.java, true, "receiver")
     
     val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = getField(PrepareItemCraftEvent::class.java, true, "matrix")
+    
+    val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class.java, false, Class::class.java)
     
 }

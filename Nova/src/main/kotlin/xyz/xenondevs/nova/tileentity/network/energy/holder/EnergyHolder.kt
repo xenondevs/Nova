@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.serverTick
+import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.properties.ReadWriteProperty
@@ -20,13 +21,13 @@ sealed class EnergyHolder(
     final override val endPoint: NetworkedTileEntity,
     private val defaultMaxEnergy: Long,
     protected val upgradeHolder: UpgradeHolder?,
-    lazyDefaultConfig: () -> MutableMap<BlockFace, EnergyConnectionType>
+    lazyDefaultConfig: () -> EnumMap<BlockFace, EnergyConnectionType>
 ) : EndPointDataHolder {
     
     val updateHandlers = ArrayList<() -> Unit>()
     
     val energyConfig: MutableMap<BlockFace, EnergyConnectionType> =
-        endPoint.retrieveDoubleEnumMap("energyConfig") { lazyDefaultConfig() }
+        endPoint.retrieveEnumMap("energyConfig") { lazyDefaultConfig() }
     
     override val allowedFaces: Set<BlockFace>
         get() = energyConfig.mapNotNullTo(HashSet()) { if (it.value == EnergyConnectionType.NONE) null else it.key }

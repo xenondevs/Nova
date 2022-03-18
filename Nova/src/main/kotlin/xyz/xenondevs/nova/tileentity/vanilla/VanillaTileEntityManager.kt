@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
+import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
@@ -39,7 +40,7 @@ object VanillaTileEntityManager : Initializable(), Listener {
     private val tileEntityQueue = LinkedList<VanillaTileEntity>()
     
     override val inMainThread = true
-    override val dependsOn = emptySet<Initializable>()
+    override val dependsOn = setOf(TileEntityManager)
     
     override fun init() {
         LOGGER.info("Initializing VanillaTileEntityManager")
@@ -84,6 +85,9 @@ object VanillaTileEntityManager : Initializable(), Listener {
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunkPos]?.get(location)
     
     @Synchronized
+    fun getTileEntitiesInChunk(pos: ChunkPos) = tileEntityMap[pos]?.values?.toList() ?: emptyList()
+    
+    @Synchronized
     private fun createVanillaTileEntity(state: BlockState) =
         when (state) {
             is Chest -> VanillaChestTileEntity(state)
@@ -105,7 +109,7 @@ object VanillaTileEntityManager : Initializable(), Listener {
             event.isCancelled = true
             val face = event.blockFace
             ProtectionManager.canUseBlock(player, event.item, tileEntity.location).runIfTrue {
-                NetworkManager.runAsync {
+                NetworkManager.queueAsync {
                     tileEntity.itemHolder.cycleItemConfig(it, face, true)
                 }
             }
@@ -133,7 +137,11 @@ object VanillaTileEntityManager : Initializable(), Listener {
             val tileEntities = tileEntityMap.remove(chunk.pos)
             tileEntities?.forEach { (location, _) -> locationCache -= location }
             return@synchronized tileEntities
-        }?.forEach { (_, tileEntity) -> tileEntity.handleRemoved(true) }
+        }?.forEach { (_, tileEntity) ->
+            tileEntity.saveData()
+            tileEntity.writeToDataContainer()
+            tileEntity.handleRemoved(true)
+        }
     }
     
     @Synchronized
@@ -179,12 +187,12 @@ object VanillaTileEntityManager : Initializable(), Listener {
         if (event.block.type == Material.AIR) handleBlockBreak(location)
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     fun handleChunkLoad(event: ChunkLoadEvent) {
         handleChunkLoad(event.chunk)
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     fun handleChunkUnload(event: ChunkUnloadEvent) {
         handleChunkUnload(event.chunk)
     }

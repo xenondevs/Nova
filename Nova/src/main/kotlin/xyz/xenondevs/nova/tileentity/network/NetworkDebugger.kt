@@ -18,7 +18,7 @@ object NetworkDebugger {
     private val fluidDebuggers = ArrayList<UUID>()
     
     init {
-        runTaskTimer(0, 1) { NetworkManager.runIfFree(::handleTick) }
+        runTaskTimer(0, 1) { NetworkManager.tryExecute(::handleTick) }
     }
     
     fun toggleDebugger(type: NetworkType, player: Player) {
@@ -42,7 +42,7 @@ object NetworkDebugger {
                 val players = getViewerList(network.type).mapNotNull(Bukkit::getPlayer)
                 if (players.isEmpty()) return@forEach
                 
-                val color = Color(network.hashCode())
+                val color = Color(network.uuid.hashCode())
                 
                 network.nodes.forEach { node ->
                     if (node is NetworkBridge) {

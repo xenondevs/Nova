@@ -82,5 +82,6 @@
   "command.nova.modeldata.block": "The block %s uses %s and has the following custom model data: %s.",
   "command.nova.modeldata.no-nova-item": "Hold an item from Nova in your hand and try again.",
   "command.nova.recipe.no-recipe": "This item does not have a recipe.",
-  "command.nova.usage.no-usage": "This item has no usages."
+  "command.nova.usage.no-usage": "This item has no usages.",
+  "command.nova.network_reload.success": "All active networks have been reloaded."
 }

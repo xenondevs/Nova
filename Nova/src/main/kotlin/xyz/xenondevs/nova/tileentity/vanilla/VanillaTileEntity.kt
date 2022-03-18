@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.*
 import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.runTaskLaterSynchronized
@@ -37,7 +38,9 @@ abstract class VanillaTileEntity(tileState: TileState) : DataHolder(tileState.ge
     
     abstract fun handleInitialized()
     
-    fun updateDataContainer() {
+    abstract fun saveData()
+    
+    fun writeToDataContainer() {
         val tileState = block.state
         if (tileState is TileState) {
             tileState.persistentDataContainer.set(TILE_ENTITY_KEY, CompoundElementDataType, data)
@@ -51,21 +54,31 @@ abstract class ItemStorageVanillaTileEntity(tileState: TileState) : VanillaTileE
     
     abstract val itemHolder: ItemHolder
     override val location = tileState.location
+    override val uuid = HashUtils.getUUID(tileState.location)
     
-    final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> =
-        NetworkType.values().associateWithTo(emptyEnumMap()) { emptyEnumMap() }
-    final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> =
-        NetworkType.values().associateWithTo(emptyEnumMap()) { emptyEnumMap() }
+    final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = emptyEnumMap()
+    final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = emptyEnumMap()
     final override val holders: MutableMap<NetworkType, EndPointDataHolder>
         by lazy { enumMapOf(NetworkType.ITEMS to itemHolder) }
     
     override fun handleInitialized() {
-        NetworkManager.runAsync { it.handleEndPointAdd(this) }
+        NetworkManager.queueAsync { it.addEndPoint(this) }
     }
     
     override fun handleRemoved(unload: Boolean) {
-        val task: NetworkManagerTask = { it.handleEndPointRemove(this, unload) }
-        if (NOVA.isEnabled) NetworkManager.runAsync(task) else NetworkManager.runNow(task)
+        if (!unload) NetworkManager.queueAsync { it.removeEndPoint(this) }
+    }
+    
+    override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? =
+        retrieveEnumMapOrNull("networks")
+    
+    override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? =
+        retrieveEnumMapOrNull("connectedNodes")
+    
+    override fun saveData() {
+        storeEnumMap("networks", serializeNetworks())
+        storeEnumMap("connectedNodes", serializeConnectedNodes())
+        itemHolder.saveData()
     }
     
 }
@@ -112,7 +125,7 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
         val chest = block.state
         if (chest is Chest) {
             val inventory = NetworkedChestInventory(chest.inventory)
-            inventories = CUBE_FACES.associateWithTo(EnumMap(BlockFace::class.java)) { inventory }
+            inventories = CUBE_FACES.associateWithTo(emptyEnumMap()) { inventory }
             allowedConnectionTypes = inventories.entries.associateTo(HashMap()) { (_, inv) -> inv to NetworkConnectionType.BUFFER }
         }
     }
@@ -135,13 +148,13 @@ class VanillaChestTileEntity(chest: Chest) : ItemStorageVanillaTileEntity(chest)
     
     fun handleChestStateChange() {
         setInventories()
-        NetworkManager.runAsync {
-            it.handleEndPointRemove(this, true)
-            it.handleEndPointAdd(this, false)
-            
-            if (!initialized) {
-                initialized = true
-                updateNearbyBridges()
+        NetworkManager.queueAsync {
+            it.removeEndPoint(this, false)
+            it.addEndPoint(this, false).thenRun {
+                if (!initialized) {
+                    initialized = true
+                    updateNearbyBridges()
+                }
             }
         }
     }

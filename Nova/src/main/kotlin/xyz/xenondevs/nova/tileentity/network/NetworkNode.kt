@@ -2,10 +2,11 @@ package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.getNeighboringTileEntitiesOfType
 import java.util.*
 
-interface NetworkNode {
+sealed interface NetworkNode {
     
     /**
      * The location of this [NetworkNode]
@@ -13,51 +14,123 @@ interface NetworkNode {
     val location: Location
     
     /**
-     * Stores the [NetworkNode]s that are connected to this [NetworkNode].
-     *
-     * For [NetworkBridge]s, connected nodes can be [NetworkBridge]s as well as
-     * [NetworkEndPoint]s. For [NetworkEndPoint]s, only [NetworkBridge]s.
-     *
-     * Should always contain the [NetworkType] keys, but only contain the
-     * [BlockFace]s that actually have a [NetworkNode] connected to them.
+     * The uuid of this [NetworkNode]
+     */
+    val uuid: UUID
+    
+    /**
+     * Stores the [NetworkNodes][NetworkNode] that are connected to this [NetworkNode].
      */
     val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>>
     
+    /**
+     * Retrieves the serialized connectedNodes map from internal storage or null if not present.
+     */
+    fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>?
+    
+    /**
+     * Sets given the [node] as a connected [NetworkNode] at the given [face] for the specified [networkType].
+     */
+    fun setConnectedNode(networkType: NetworkType, face: BlockFace, node: NetworkNode) {
+        connectedNodes.getOrPut(networkType) { emptyEnumMap() }[face] = node
+    }
+    
+    /**
+     * Gets the [NetworkNode] that is connected at that [face] under the specified [networkType]
+     * or null if there isn't one.
+     */
+    fun getConnectedNode(networkType: NetworkType, face: BlockFace): NetworkNode? {
+        return connectedNodes[networkType]?.get(face)
+    }
+    
+    /**
+     * Gets the [NetworkNode] that is connected at [face] under any [NetworkType] or null if there isn't one.
+     */
+    fun getConnectedNode(face: BlockFace): NetworkNode? {
+        return connectedNodes.firstNotNullOf { it.value[face] }
+    }
+    
+    /**
+     * Removes the connected [NetworkNode] for the [networkType] at the [face].
+     */
+    fun removeConnectedNode(networkType: NetworkType, face: BlockFace) {
+        connectedNodes[networkType]?.remove(face)
+    }
+    
+    /**
+     * Gets a map of [NetworkType] and [Network] which are attached at this block face.
+     */
     fun getNetworks(face: BlockFace): Map<NetworkType, Network> {
-        return if (this is NetworkBridge) networks
-        else {
-            this as NetworkEndPoint
-            
-            val networks = EnumMap<NetworkType, Network>(NetworkType::class.java)
-            this.networks.forEach { (networkType, faceMap) ->
-                faceMap.forEach { (f, network) -> if (f == face) networks[networkType] = network }
+        return when (this) {
+            is NetworkEndPoint -> {
+                val networks = emptyEnumMap<NetworkType, Network>()
+                this.networks.forEach { (networkType, faceMap) ->
+                    faceMap.forEach { (f, network) -> if (f == face) networks[networkType] = network }
+                }
+                
+                networks
             }
-            
-            networks
+            is NetworkBridge -> networks
         }
     }
     
+    /**
+     * Changes all connections from [previousNetwork] to [newNetwork]
+     */
     fun move(previousNetwork: Network, newNetwork: Network) {
-        if (this is NetworkBridge) {
-            networks.replaceAll { _, network -> if (network == previousNetwork) newNetwork else network }
-        } else if (this is NetworkEndPoint) {
-            networks.forEach { (_, networkMap) ->
+        when (this) {
+            is NetworkBridge -> networks.replaceAll { _, network -> if (network == previousNetwork) newNetwork else network }
+            is NetworkEndPoint -> networks.forEach { (_, networkMap) ->
                 networkMap.replaceAll { _, network -> if (network == previousNetwork) newNetwork else network }
             }
         }
     }
     
-    fun getNearbyNodes() = location.getNeighboringTileEntitiesOfType<NetworkNode>(false)
+    /**
+     * Retrieves a map of directly adjacent [NetworkNodes][NetworkNode], ignoring additional hitboxes.
+     * 
+     * The nodes do not need to be in the same network.
+     */
+    fun getNearbyNodes(): Map<BlockFace, NetworkNode> =
+        location.getNeighboringTileEntitiesOfType(false)
     
-    fun getNearbyEndPoints() = location.getNeighboringTileEntitiesOfType<NetworkEndPoint>(false)
+    /**
+     * Retrieves a map of directly adjacent [NetworkEndPoints][NetworkEndPoint], ignoring additional hitboxes.
+     * 
+     * The end points do not need to be in the same network.
+     */
+    fun getNearbyEndPoints(): Map<BlockFace, NetworkEndPoint> =
+        location.getNeighboringTileEntitiesOfType(false)
     
-    fun getNearbyBridges() =
+    /**
+     * Retrieves a map of directly adjacent [NetworkBridges][NetworkBridge].
+     * 
+     * The bridges do not need to be in the same network.
+     */
+    fun getNearbyBridges(): Map<BlockFace, NetworkBridge> =
         location.getNeighboringTileEntitiesOfType<NetworkBridge>(false).filter { (_, bridge) -> bridge.networks.isNotEmpty() }
     
-    fun getNearbyBridges(networkType: NetworkType) =
+    /**
+     * Retrieves a map of directly adjacent [NetworkBridges][NetworkBridge] supporting the given [networkType].
+     * 
+     * The bridges do not need to be in the same network.
+     */
+    fun getNearbyBridges(networkType: NetworkType): Map<BlockFace, NetworkBridge> =
         getNearbyBridges().filter { (_, bridge) -> bridge.networks[networkType] != null }
     
+    /**
+     * Calls [NetworkBridge.handleNetworkUpdate] for all directly adjacent bridges.
+     */
     fun updateNearbyBridges() =
         getNearbyBridges().forEach { (_, bridge) -> bridge.handleNetworkUpdate() }
+    
+    /**
+     * Converts the [connectedNodes] map to a serializable version.
+     */
+    fun serializeConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>> {
+        return connectedNodes.mapValuesTo(emptyEnumMap()) { faceMap ->
+            faceMap.value.mapValuesTo(emptyEnumMap()) { it.value.uuid }
+        }
+    }
     
 }

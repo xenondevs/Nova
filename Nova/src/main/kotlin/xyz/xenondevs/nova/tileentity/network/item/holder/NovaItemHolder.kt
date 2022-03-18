@@ -18,8 +18,8 @@ fun NovaItemHolder(
     endPoint: NetworkedTileEntity,
     defaultInventory: Pair<VirtualInventory, NetworkConnectionType>,
     vararg otherInventories: Pair<VirtualInventory, NetworkConnectionType>,
-    defaultInvConfig: (() -> MutableMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first.uuid } },
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)? = null
+    defaultInvConfig: (() -> EnumMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first.uuid } },
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
 ): NovaItemHolder {
     val virtualInventories = arrayListOf(defaultInventory).apply { addAll(otherInventories) }
     val networkedInventories: Map<VirtualInventory, NetworkedInventory> = virtualInventories.associate { (vi, _) -> vi to NetworkedVirtualInventory(vi) }
@@ -40,8 +40,8 @@ fun NovaItemHolder(
     endPoint: NetworkedTileEntity,
     defaultInventory: Pair<UUID, Pair<NetworkedInventory, NetworkConnectionType>>,
     vararg otherInventories: Pair<UUID, Pair<NetworkedInventory, NetworkConnectionType>>,
-    defaultInvConfig: (() -> MutableMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first } },
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)? = null
+    defaultInvConfig: (() -> EnumMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first } },
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
 ): NovaItemHolder {
     val allInventories = hashMapOf(defaultInventory).apply { putAll(otherInventories) }
     val networkedInventories = allInventories.mapValuesTo(HashMap()) { (_, pair) -> pair.first }
@@ -60,8 +60,8 @@ class NovaItemHolder(
     override val endPoint: NetworkedTileEntity,
     private val availableInventories: MutableMap<UUID, out NetworkedInventory>,
     override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType>,
-    defaultInvConfig: () -> MutableMap<BlockFace, UUID>,
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)?
+    defaultInvConfig: () -> EnumMap<BlockFace, UUID>,
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)?
 ) : ItemHolder {
     
     override val inventories: MutableMap<BlockFace, NetworkedInventory> =
@@ -69,7 +69,7 @@ class NovaItemHolder(
             .mapValuesTo(enumMapOf()) { availableInventories[it.value]!! }
     
     override val itemConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        endPoint.retrieveDoubleEnumMap("itemConfig", defaultConnectionConfig
+        endPoint.retrieveEnumMap("itemConfig", defaultConnectionConfig
             ?: { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.NONE } })
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
@@ -107,7 +107,7 @@ class NovaItemHolder(
         endPoint.storeEnumMap("extractPriorities", extractPriorities)
         
         if (availableInventories.isNotEmpty())
-            endPoint.storeEnumMap("inventories", inventories.mapValues { findUUID(it.value) })
+            endPoint.storeEnumMap("inventories", inventories.mapValues { findUUID(it.value)!! })
     }
     
 }

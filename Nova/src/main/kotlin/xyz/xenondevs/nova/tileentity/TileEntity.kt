@@ -132,7 +132,7 @@ abstract class TileEntity(
      * The [first] parameter specifies if it is the first time this
      * [TileEntity] got initialized, meaning it has just been placed.
      */
-    abstract fun handleInitialized(first: Boolean)
+    open fun handleInitialized(first: Boolean) = Unit
     
     /**
      * Called after the hitbox block has been placed.

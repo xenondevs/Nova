@@ -5,10 +5,9 @@ import xyz.xenondevs.nova.data.serialization.cbf.Element
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.EnumMapElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
-import xyz.xenondevs.nova.data.serialization.cbf.element.other.toElement
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.emptyEnumMap
-import xyz.xenondevs.nova.util.toEnumMap
+import xyz.xenondevs.nova.util.reflection.type
 import java.util.*
 
 open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlobal: Boolean) {
@@ -83,33 +82,16 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
      * Retrieves an [EnumMap]. If it can't find anything under the
      * given key, the result of the [getAlternative] lambda is returned.
      */
-    inline fun <reified K : Enum<K>, V> retrieveEnumMap(key: String, getAlternative: () -> MutableMap<K, V>): MutableMap<K, V> =
+    inline fun <reified K : Enum<K>, reified V> retrieveEnumMap(key: String, getAlternative: () -> EnumMap<K, V>): EnumMap<K, V> =
         retrieveEnumMapOrNull(key) ?: getAlternative()
     
     /**
      * Retrieves an [EnumMap]. If [data] doesn't contains the given key,
      * ``null`` is returned
      */
-    inline fun <reified K : Enum<K>, V> retrieveEnumMapOrNull(key: String): MutableMap<K, V>? {
+    inline fun <reified K : Enum<K>, reified V> retrieveEnumMapOrNull(key: String): EnumMap<K, V>? {
         val mapElement = data.getElement<EnumMapElement>(key) ?: return null
         return mapElement.toEnumMap()
-    }
-    
-    /**
-     * Retrieves an [EnumMap] where the value is an enum as well. If it
-     * can't find anything under the given key, the result of the
-     * [getAlternative] lambda is returned.
-     */
-    inline fun <reified K : Enum<K>, reified V : Enum<V>> retrieveDoubleEnumMap(key: String, getAlternative: () -> MutableMap<K, V>): MutableMap<K, V> =
-        retrieveDoubleEnumMapOrNull(key) ?: getAlternative()
-    
-    /**
-     * Retrieves an [EnumMap] where the value is an enum as well. If [data]
-     * doesn't contains the given key, ``null`` is returned
-     */
-    inline fun <reified K : Enum<K>, reified V : Enum<V>> retrieveDoubleEnumMapOrNull(key: String): MutableMap<K, V>? {
-        val mapElement = data.getElement<EnumMapElement>(key) ?: return null
-        return mapElement.toDoubleEnumMap()
     }
     
     //endregion
@@ -160,27 +142,32 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
     /**
      * Serializes [EnumMaps][EnumMap] using CBF and stores them in the [data][CompoundElement]
      */
-    inline fun <reified K : Enum<K>, reified V> storeEnumMap(key: String, map: Map<K, V>) {
-        val enumMap = if (map is EnumMap) map else map.toEnumMap()
-        data.putElement(key, enumMap.toElement(V::class))
+    inline fun <K : Enum<K>, reified V> storeEnumMap(key: String, map: Map<K, V>?, global: Boolean = false) {
+        if (map != null)
+            storeData(key, EnumMapElement.of(map, type<V>()), global)
+        else storeData(key, null, global)
     }
     
     /**
      * Serializes [EnumMaps][EnumMap] using CBF and stores them in the [data][CompoundElement]
      * while mapping the values using the given [valueMapper].
      */
-    inline fun <reified K : Enum<K>, reified V, reified R> storeEnumMap(key: String, map: Map<K, V>, valueMapper: (V) -> R) {
-        val enumMap = map.mapValuesTo(emptyEnumMap<K, R>()) { valueMapper(it.value) }
-        data.putElement(key, enumMap.toElement(R::class))
+    inline fun <reified K : Enum<K>, reified V, reified R> storeEnumMap(key: String, map: Map<K, V>?, global: Boolean = false, valueMapper: (V) -> R) {
+        if (map != null) {
+            val enumMap = map.mapValuesTo(emptyEnumMap<K, R>()) { valueMapper(it.value) }
+            storeData(key, EnumMapElement.of(enumMap, type<V>()), global)
+        } else storeData(key, null, global)
     }
     
     /**
      * Serializes [Collections][Collection] using CBF and stores them in the [data] [CompoundElement]
      */
-    inline fun <reified V> storeList(key: String, list: Collection<V>) {
-        val listElement = ListElement()
-        list.forEach { listElement.add(it) }
-        data.putElement(key, listElement)
+    inline fun <reified V> storeList(key: String, list: Collection<V>?, global: Boolean = false) {
+        if (list != null) {
+            val listElement = ListElement()
+            list.forEach { listElement.add(it) }
+            storeData(key, list, global)
+        } else storeData(key, null, global)
     }
     
     // endregion

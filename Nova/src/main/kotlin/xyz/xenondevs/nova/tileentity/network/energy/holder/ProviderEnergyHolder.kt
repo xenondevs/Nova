@@ -5,13 +5,14 @@ import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
+import java.util.*
 
 class ProviderEnergyHolder(
     endPoint: NetworkedTileEntity,
     defaultMaxEnergy: Long,
     private val defaultEnergyGeneration: Long,
     upgradeHolder: UpgradeHolder?,
-    lazyDefaultConfig: () -> MutableMap<BlockFace, EnergyConnectionType>
+    lazyDefaultConfig: () -> EnumMap<BlockFace, EnergyConnectionType>
 ) : EnergyHolder(endPoint, defaultMaxEnergy, upgradeHolder, lazyDefaultConfig) {
     
     var energyGeneration = calculateEnergyGeneration()

@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
@@ -50,9 +51,11 @@ object NovaCommand : Command("nova") {
                 .requiresPlayerPermission("nova.command.debug")
                 .then(literal("removeTileEntities")
                     .then(argument("range", IntegerArgumentType.integer(0))
-                        .executesCatching { removeTileEntities(it) }))
+                        .executesCatching(::removeTileEntities)))
                 .then(literal("getTileEntityData")
-                    .executesCatching { showTileEntityData(it) })
+                    .executesCatching(::showTileEntityData))
+                .then(literal("reloadNetworks")
+                    .executesCatching(::reloadNetworks))
                 .then(literal("energyNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
                 .then(literal("itemNet")
@@ -61,17 +64,17 @@ object NovaCommand : Command("nova") {
                     .executesCatching { toggleNetworkDebugging(NetworkType.FLUID, it) }))
             .then(literal("items")
                 .requiresPlayerPermission("nova.command.items")
-                .executesCatching { openItemInventory(it) })
+                .executesCatching(::openItemInventory))
             .then(literal("renderDistance")
                 .requiresPlayerPermission("nova.command.renderDistance")
                 .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
-                    .executesCatching { setRenderDistance(it) }))
+                    .executesCatching(::setRenderDistance)))
             .then(literal("addons")
                 .requiresPermission("nova.command.addons")
-                .executesCatching { sendAddons(it) })
+                .executesCatching(::sendAddons))
             .then(literal("createResourcePack")
                 .requiresPermission("nova.command.zip")
-                .executesCatching { handleCreateResourcePack(it) }
+                .executesCatching(::handleCreateResourcePack)
             )
     }
     
@@ -116,6 +119,13 @@ object NovaCommand : Command("nova") {
             "command.nova.remove_tile_entities.success",
             coloredText(ChatColor.AQUA, tileEntities.count())
         ))
+    }
+    
+    private fun reloadNetworks(ctx: CommandContext<CommandSourceStack>) {
+        NetworkManager.queueAsync {
+            it.reloadNetworks()
+            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.network_reload.success"))
+        }
     }
     
     private fun showTileEntityData(ctx: CommandContext<CommandSourceStack>) {

@@ -18,3 +18,12 @@ fun CompletableFuture<Boolean>.runIfTrue(run: () -> Unit) {
 fun CompletableFuture<Boolean>.runIfTrueSynchronized(lock: Any, run: () -> Unit) {
     runIfTrue { synchronized(lock, run) }
 }
+
+fun <K, V> Map<K, V>.mapToAllFuture(transform: (Map.Entry<K, V>) -> CompletableFuture<*>?): CompletableFuture<Void> =
+    CompletableFuture.allOf(*mapNotNull(transform).toTypedArray())
+
+fun <T> Iterable<T>.mapToAllFuture(transform: (T) -> CompletableFuture<*>?): CompletableFuture<Void> =
+    CompletableFuture.allOf(*mapNotNull(transform).toTypedArray())
+
+fun <T> Array<T>.mapToAllFuture(transform: (T) -> CompletableFuture<*>?): CompletableFuture<Void> =
+    CompletableFuture.allOf(*mapNotNull(transform).toTypedArray())

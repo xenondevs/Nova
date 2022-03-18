@@ -30,10 +30,10 @@ class ItemSideConfigGUI(
     }
     
     override fun changeConnectionType(blockFace: BlockFace, forward: Boolean): Boolean {
-        NetworkManager.runNow { // TODO: runSync / runAsync ?
+        NetworkManager.execute { // TODO: runSync / runAsync ?
             val allowedTypes = allowedTypes[itemHolder.inventories[blockFace]!!]!!
             
-            it.handleEndPointRemove(itemHolder.endPoint, true)
+            it.removeEndPoint(itemHolder.endPoint, false)
             
             val currentType = itemHolder.itemConfig[blockFace]!!
             var index = allowedTypes.indexOf(currentType)
@@ -42,8 +42,8 @@ class ItemSideConfigGUI(
             else if (index == allowedTypes.size) index = 0
             itemHolder.itemConfig[blockFace] = allowedTypes[index]
             
-            it.handleEndPointAdd(itemHolder.endPoint, false)
-            itemHolder.endPoint.updateNearbyBridges()
+            it.addEndPoint(itemHolder.endPoint, false)
+                .thenRun { itemHolder.endPoint.updateNearbyBridges() }
         }
         
         return true
@@ -52,8 +52,8 @@ class ItemSideConfigGUI(
     override fun changeInventory(blockFace: BlockFace, forward: Boolean): Boolean {
         if (inventories.size < 2) return false
         
-        NetworkManager.runNow { // TODO: runSync / runAsync ?
-            it.handleEndPointRemove(itemHolder.endPoint, false)
+        NetworkManager.execute { // TODO: runSync / runAsync ?
+            it.removeEndPoint(itemHolder.endPoint, false)
             
             val currentInventory = itemHolder.inventories[blockFace]!!
             var index = inventories.indexOf(currentInventory)
@@ -69,7 +69,7 @@ class ItemSideConfigGUI(
                 itemHolder.itemConfig[blockFace] = allowedTypes[0]
             }
             
-            it.handleEndPointAdd(itemHolder.endPoint)
+            it.addEndPoint(itemHolder.endPoint)
         }
         
         return true

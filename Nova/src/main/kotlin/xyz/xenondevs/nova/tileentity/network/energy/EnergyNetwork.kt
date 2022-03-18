@@ -2,11 +2,11 @@ package xyz.xenondevs.nova.tileentity.network.energy
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.sumOfNoOverflow
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
@@ -17,7 +17,7 @@ private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.energy.defau
  * and their [EnergyHolder].<br>
  * [EnergyHolders][EnergyHolder] can provide, consume or buffer energy.
  */
-class EnergyNetwork : Network {
+class EnergyNetwork(override val uuid: UUID) : Network {
     
     override val type = NetworkType.ENERGY
     
@@ -47,6 +47,13 @@ class EnergyNetwork : Network {
         consumers += network.consumers
         bridges += network.bridges
         buffers += network.buffers
+    }
+    
+    override fun addAll(nodes: Iterable<Pair<BlockFace?, NetworkNode>>) {
+        nodes.forEach { (face, node) ->
+            if (node is NetworkBridge) addBridge(node)
+            else if (node is NetworkEndPoint && face != null) addEndPoint(node, face)
+        }
     }
     
     override fun addBridge(bridge: NetworkBridge) {
@@ -105,6 +112,10 @@ class EnergyNetwork : Network {
         } else if (node is EnergyBridge) {
             bridges -= node
         }
+    }
+    
+    override fun removeAll(nodes: List<NetworkNode>) {
+        nodes.forEach { removeNode(it) }
     }
     
     override fun isEmpty() = _nodes.isEmpty()

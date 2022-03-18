@@ -45,7 +45,8 @@ object DeserializerRegistry {
         NamespacedKeyDeserializer, // 24
         UpgradesDeserializer, // 25
         VirtualInventoryDeserializer, // 26
-        ColorDeserializer // 27
+        ColorDeserializer, // 27
+        PairDeserializer, // 28
     )
     
     fun getForType(type: Byte) = DESERIALIZERS.getOrNull(type.toInt())

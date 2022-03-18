@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.*
 import xyz.xenondevs.nova.data.serialization.cbf.element.primitive.*
+import xyz.xenondevs.nova.util.reflection.*
 import java.awt.Color
 import java.util.*
 import kotlin.reflect.KClass
@@ -63,7 +64,8 @@ abstract class BackedElement<T> : Element {
             NamespacedKey::class to ::NamespacedKeyElement,
             CompoundElement::class to ::returnSelf,
             VirtualInventory::class to ::VirtualInventoryElement,
-            Color::class to ::ColorElement
+            Color::class to ::ColorElement,
+            Pair::class to ::PairElement
         )
         
         @Suppress("UNCHECKED_CAST")
