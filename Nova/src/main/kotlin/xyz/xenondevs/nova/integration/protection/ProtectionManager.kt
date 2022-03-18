@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 object ProtectionManager {
     
     val integrations: MutableList<ProtectionIntegration> =
-        listOf(GriefPrevention, PlotSquared, WorldGuard, Towny, ProtectionStones)
+        listOf(GriefPrevention, PlotSquared, WorldGuard, Towny, ProtectionStones, QuickShop)
             .filterTo(ArrayList(), InternalIntegration::isInstalled)
     
     private val PROTECTION_CHECK_EXECUTOR = ThreadPoolExecutor(
