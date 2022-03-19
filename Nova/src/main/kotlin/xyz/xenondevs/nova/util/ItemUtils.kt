@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util
 
 import com.mojang.brigadier.StringReader
 import de.studiocode.invui.item.builder.ItemBuilder
+import io.lumine.mythic.utils.config.properties.Property.Material
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
@@ -61,6 +62,15 @@ fun Material.isActuallyInteractable(): Boolean {
         else -> true
     }
 }
+
+fun Material.isReplaceable(): Boolean =
+    when (this) {
+        Material.AIR, Material.CAVE_AIR, Material.VOID_AIR, Material.WATER, Material.LAVA,
+        Material.GRASS, Material.TALL_GRASS, Material.FERN, Material.DEAD_BUSH, Material.VINE,
+        Material.CRIMSON_ROOTS, Material.WARPED_ROOTS, Material.NETHER_SPROUTS, Material.SEAGRASS, Material.FIRE,
+        Material.SOUL_FIRE, Material.SNOW, Material.STRUCTURE_VOID -> true
+        else -> false
+    }
 
 val Material.fluidType: FluidType?
     get() {

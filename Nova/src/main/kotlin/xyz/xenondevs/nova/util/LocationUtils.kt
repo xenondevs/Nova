@@ -289,6 +289,22 @@ fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double =
     return locations
 }
 
+fun Location.getFullCuboid(other: Location): List<Location> {
+    Preconditions.checkArgument(world != null && other.world == world)
+    
+    val list = ArrayList<Location>()
+    val (min, max) = LocationUtils.sort(this, other)
+    for (x in min.blockX..max.blockX) {
+        for (y in min.blockY..max.blockY) {
+            for (z in min.blockZ..max.blockZ) {
+                list += Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+            }
+        }
+    }
+    
+    return list
+}
+
 fun Location.createColoredParticle(color: Color): Any = ParticleBuilder(ParticleEffect.REDSTONE, this).setColor(color).toPacket()
 
 fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Location? {

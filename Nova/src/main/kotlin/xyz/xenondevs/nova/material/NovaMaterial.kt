@@ -14,11 +14,12 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 
 typealias ItemBuilderModifierFun = (ItemBuilder, TileEntity?) -> ItemBuilder
 typealias TileEntityConstructor = ((UUID, CompoundElement, NovaMaterial, UUID, FakeArmorStand) -> TileEntity)
-typealias PlaceCheckFun = ((Player, ItemStack, Location) -> Boolean)
+typealias PlaceCheckFun = ((Player, ItemStack, Location) -> CompletableFuture<Boolean>)
 
 private val ID_PATTERN = Regex("""^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$""")
 
@@ -30,6 +31,7 @@ class NovaMaterial internal constructor(
     val hitboxType: Material? = null,
     val tileEntityConstructor: TileEntityConstructor? = null,
     val placeCheck: PlaceCheckFun? = null,
+    val isInteractable: Boolean = true,
     val isDirectional: Boolean = true
 ) : INovaMaterial, Comparable<NovaMaterial> {
     

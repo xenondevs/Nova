@@ -166,7 +166,7 @@ open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlob
         if (list != null) {
             val listElement = ListElement()
             list.forEach { listElement.add(it) }
-            storeData(key, list, global)
+            storeData(key, listElement, global)
         } else storeData(key, null, global)
     }
     

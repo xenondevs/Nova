@@ -31,6 +31,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         tileEntityConstructor: TileEntityConstructor?,
         hitboxType: Material,
         placeCheck: PlaceCheckFun? = null,
+        isInteractable: Boolean = true,
         isDirectional: Boolean = true
     ): NovaMaterial {
         return registerTileEntity(
@@ -40,6 +41,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
             hitboxType,
             listOf(EnergyHolder::modifyItemBuilder),
             placeCheck,
+            isInteractable,
             isDirectional,
         )
     }
@@ -51,13 +53,14 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         hitboxType: Material,
         itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
         placeCheck: PlaceCheckFun? = null,
+        isInteractable: Boolean = true,
         isDirectional: Boolean = true,
     ): NovaMaterial {
         val namespace = addon.description.id
         val id = name.addNamespace(namespace)
         val localizedName = "block.$namespace.$name"
         val material = NovaMaterial(id, localizedName, null, itemBuilderModifiers, hitboxType,
-            tileEntityConstructor, placeCheck, isDirectional)
+            tileEntityConstructor, placeCheck, isInteractable, isDirectional)
         
         return register(material)
     }
@@ -69,10 +72,11 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         hitboxType: Material,
         tileEntityConstructor: TileEntityConstructor?,
         placeCheck: PlaceCheckFun? = null,
+        isInteractable: Boolean = true,
         isDirectional: Boolean = true,
     ): NovaMaterial {
         val material = NovaMaterial(id, name, null, itemBuilderModifiers,
-            hitboxType, tileEntityConstructor, placeCheck, isDirectional)
+            hitboxType, tileEntityConstructor, placeCheck, isInteractable, isDirectional)
         
         return register(material)
     }

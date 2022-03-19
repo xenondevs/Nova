@@ -8,6 +8,8 @@ class CombinedBooleanFuture(private val futures: List<CompletableFuture<Boolean>
         futures.forEach { it.thenRun(::handleFutureArrival) }
     }
     
+    constructor(vararg futures: CompletableFuture<Boolean>) : this(futures.asList())
+    
     private fun handleFutureArrival() {
         if (!isDone && canCombine()) {
             complete(getCombined())

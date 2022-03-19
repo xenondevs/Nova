@@ -41,6 +41,7 @@ import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.concurrent.runIfTrueSynchronized
 import xyz.xenondevs.nova.util.data.localized
@@ -283,23 +284,23 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
     }
     
     @EventHandler
-    fun handleWorldSave(event: WorldSaveEvent) {
+    private fun handleWorldSave(event: WorldSaveEvent) {
         runAsyncTask { event.world.loadedChunks.forEach { saveChunk(it.pos) } }
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
-    fun handleChunkLoad(event: ChunkLoadEvent) {
+    private fun handleChunkLoad(event: ChunkLoadEvent) {
         handleChunkLoad(event.chunk.pos)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
-    fun handleChunkUnload(event: ChunkUnloadEvent) {
+    private fun handleChunkUnload(event: ChunkUnloadEvent) {
         handleChunkUnload(event.chunk.pos)
     }
     
     @Synchronized
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun handleBreak(event: BlockBreakEvent) {
+    private fun handleBreak(event: BlockBreakEvent) {
         val location = event.block.location
         val tileEntity = getTileEntityAt(location)
         if (tileEntity != null) {
@@ -335,18 +336,21 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         event.isCancelled = true
         
         val player = event.player
-        val block = event.clickedBlock!!
         val handItem = event.item!!
         val playerLocation = player.location
-        val placePos = block.location.advance(event.blockFace)
         
-        ProtectionManager.canPlace(player, handItem, placePos).runIfTrueSynchronized(TileEntityManager) {
-            if (placePos.block.type.isAir && material.placeCheck?.invoke(
-                    player,
-                    handItem,
-                    placePos.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) }
-                ) != false
-            ) {
+        val placePos = event.clickedBlock!!.location.advance(event.blockFace)
+        val block = placePos.block
+        
+        val placeFuture = if (material.placeCheck != null) {
+            CombinedBooleanFuture(
+                ProtectionManager.canPlace(player, handItem, placePos),
+                material.placeCheck.invoke(player, handItem, placePos.apply { yaw = calculateTileEntityYaw(material, playerLocation.yaw) })
+            )
+        } else ProtectionManager.canPlace(player, handItem, placePos)
+        
+        placeFuture.runIfTrueSynchronized(TileEntityManager) {
+            if (placePos.block.type.isAir) {
                 val uuid = player.uniqueId
                 val result = TileEntityLimits.canPlaceTileEntity(uuid, placePos.world!!, material)
                 if (result == PlaceResult.ALLOW) {
@@ -371,6 +375,29 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         }
     }
     
+    private fun handleNormalBlockPlace(event: PlayerInteractEvent) {
+        event.isCancelled = true
+        
+        val block = event.clickedBlock!!
+        val handItem = event.item!!
+        val player = event.player
+        
+        val replaceLocation = block.location.advance(event.blockFace)
+        val replaceBlock = replaceLocation.block
+        
+        if (replaceBlock.type.isReplaceable() && getTileEntityAt(replaceLocation) == null) {
+            val previousType = replaceBlock.type
+            replaceBlock.type = handItem.type
+            val placeEvent = BlockPlaceEvent(replaceBlock, replaceBlock.state, block, handItem, player, true, event.hand!!)
+            Bukkit.getPluginManager().callEvent(placeEvent)
+            if (placeEvent.isCancelled) {
+                replaceBlock.type = previousType
+            } else if (player.gameMode != GameMode.CREATIVE) {
+                player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
+            }
+        }
+    }
+    
     private fun handlePossibleTileEntityDestroy(event: PlayerInteractEvent, tileEntity: TileEntity) {
         val block = event.clickedBlock!!
         val player = event.player
@@ -391,39 +418,47 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         }
     }
     
-    // TODO: clean up
     @Synchronized
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    fun handleInteract(event: PlayerInteractEvent) {
+    private fun handleInteract(event: PlayerInteractEvent) {
         val action = event.action
         val player = event.player
         if (action == Action.RIGHT_CLICK_BLOCK) {
+            val handItem = event.item
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
             
-            if ((tileEntity == null && !block.type.isActuallyInteractable()) || player.isSneaking) {
-                val handItem = event.item
-                val handMaterial = handItem?.novaMaterial
-                
-                if (handMaterial != null) {
-                    if (handMaterial.isTileEntity) {
-                        handleTileEntityPlace(event, handMaterial)
-                    } else if (tileEntity != null && handMaterial == CoreItems.WRENCH) {
-                        handleTileEntityWrenchShift(event, tileEntity)
+            if (tileEntity != null && !player.isSneaking && tileEntity.material.isInteractable) {
+                handleTileEntityInteract(event, tileEntity)
+            } else {
+                val handNovaMaterial = handItem?.novaMaterial
+                if (tileEntity != null && player.isSneaking && handNovaMaterial == CoreItems.WRENCH) {
+                    handleTileEntityWrenchShift(event, tileEntity)
+                } else if (!block.type.isActuallyInteractable() || player.isSneaking) {
+                    if (handNovaMaterial != null) {
+                        handleTileEntityPlace(event, handNovaMaterial)
+                    } else if (tileEntity != null && block.type.isReplaceable() && handItem?.type?.isBlock == true) {
+                        handleNormalBlockPlace(event)
                     }
                 }
-            } else if (tileEntity != null) handleTileEntityInteract(event, tileEntity)
+            }
         } else if (action == Action.LEFT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             val tileEntity = getTileEntityAt(block.location)
-            if (tileEntity != null)
-                handlePossibleTileEntityDestroy(event, tileEntity)
+            if (tileEntity != null) handlePossibleTileEntityDestroy(event, tileEntity)
         }
     }
     
     @Synchronized
+    @EventHandler
+    private fun handleBlockPlace(event: BlockPlaceEvent) {
+        if (getTileEntityAt(event.block.location) != null)
+            event.isCancelled = true
+    }
+    
+    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleInventoryCreative(event: InventoryCreativeEvent) {
+    private fun handleInventoryCreative(event: InventoryCreativeEvent) {
         val player = event.whoClicked as Player
         val targetBlock = player.getTargetBlockExact(8)
         if (targetBlock != null && targetBlock.type == event.cursor.type) {
@@ -437,19 +472,19 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
     
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handlePistonExtend(event: BlockPistonExtendEvent) {
+    private fun handlePistonExtend(event: BlockPistonExtendEvent) {
         if (event.blocks.any { it.location in locationCache }) event.isCancelled = true
     }
     
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handlePistonRetract(event: BlockPistonRetractEvent) {
+    private fun handlePistonRetract(event: BlockPistonRetractEvent) {
         if (event.blocks.any { it.location in locationCache }) event.isCancelled = true
     }
     
     @Synchronized
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun handleBlockPhysics(event: BlockPhysicsEvent) {
+    private fun handleBlockPhysics(event: BlockPhysicsEvent) {
         val location = event.block.location
         if (location in locationCache && Material.AIR == event.block.type) {
             val tileEntity = getTileEntityAt(location)
@@ -460,7 +495,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
     
     @Synchronized
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun handleEntityChangeBlock(event: EntityChangeBlockEvent) {
+    private fun handleEntityChangeBlock(event: EntityChangeBlockEvent) {
         val type = event.entityType
         if ((type == EntityType.SILVERFISH || type == EntityType.ENDERMAN) && event.block.location in locationCache)
             event.isCancelled = true
@@ -475,11 +510,11 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
     
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleEntityExplosion(event: EntityExplodeEvent) = handleExplosion(event.blockList())
+    private fun handleEntityExplosion(event: EntityExplodeEvent) = handleExplosion(event.blockList())
     
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleBlockExplosion(event: BlockExplodeEvent) = handleExplosion(event.blockList())
+    private fun handleBlockExplosion(event: BlockExplodeEvent) = handleExplosion(event.blockList())
     
     private fun setChunkProcessorGoal(chunkPos: ChunkPos, goal: ChunkProcessor.Goal) {
         synchronized(chunkProcessors) {
