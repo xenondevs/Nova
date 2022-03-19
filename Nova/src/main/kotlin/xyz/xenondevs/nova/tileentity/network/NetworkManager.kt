@@ -254,7 +254,6 @@ private class NetworkManagerImpl : NetworkManager {
             // Add all the network nodes to their networks
             networks.forEach { (network, nodes) -> network.addAll(nodes) }
         } catch (e: NoNetworkDataException) {
-            e.printStackTrace()
             loadNodesIndividually(nodes)
         }
     }
