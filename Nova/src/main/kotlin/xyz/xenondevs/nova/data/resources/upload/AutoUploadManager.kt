@@ -17,7 +17,7 @@ object AutoUploadManager : Initializable() {
     private lateinit var selectedService: UploadService
     
     override fun init() {
-        val config = JsonConfig(DEFAULT_CONFIG.getObject("auto_upload") ?: return)
+        val config = JsonConfig(DEFAULT_CONFIG.getObject("resource_pack.auto_upload") ?: return)
         this.enabled = config.getBoolean("enabled")
         if (!enabled) return
         
