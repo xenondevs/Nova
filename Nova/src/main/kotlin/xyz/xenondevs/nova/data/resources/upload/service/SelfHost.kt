@@ -1,11 +1,13 @@
 package xyz.xenondevs.nova.data.resources.upload.service
 
+import de.studiocode.invui.resourcepack.ForceResourcePack
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.JsonConfig
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import java.io.File
@@ -13,12 +15,14 @@ import kotlin.concurrent.thread
 
 object SelfHost : UploadService {
     
-    private const val DOWNLOAD_URL_FORMAT = "http://%s:%d/"
+    private val selfHostDir = File(NOVA.dataFolder, "ResourcePack/autohost")
+    private val packFile = File(selfHostDir, "pack.zip")
     
     override val name = "SelfHost"
     var host = "localhost" // TODO retrieve ip as default host
     var port = 38519
-    private var file: File? = null
+    val url: String
+        get() = "http://$host:$port"
     
     override fun loadConfig(json: JsonConfig) {
         val host = json.getString("host")
@@ -27,21 +31,25 @@ object SelfHost : UploadService {
         val port = json.getInt("port")
         if (port != null) this.port = port
         
+        var server: NettyApplicationEngine? = null
+        
         thread(name = "ResourcePack Server", isDaemon = true) {
-            embeddedServer(Netty, port = this.port) {
+            server = embeddedServer(Netty, port = this.port) {
                 routing {
                     get {
-                        if (file == null) call.respond(HttpStatusCode.NotFound)
-                        else call.respondFile(file!!)
+                        if (packFile.exists()) call.respondFile(packFile)
+                        else call.respond(HttpStatusCode.NotFound)
                     }
                 }
-            }.start(wait = true)
+            }
+            server!!.start(wait = true)
         }
+        NOVA.disableHandlers += { server!!.stop(1000, 1000) }
     }
     
     override fun upload(file: File): String {
-        this.file = file
-        return DOWNLOAD_URL_FORMAT.format(host, port)
+        file.copyTo(packFile, overwrite = true)
+        return url
     }
     
 }
