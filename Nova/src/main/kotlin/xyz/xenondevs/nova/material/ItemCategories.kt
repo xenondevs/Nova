@@ -36,7 +36,7 @@ object ItemCategories : Initializable() {
     
     lateinit var CATEGORIES: List<ItemCategory>
         private set
-    lateinit var OBTAINABLE_MATERIALS: Set<NovaMaterial>
+    lateinit var OBTAINABLE_MATERIALS: Set<ItemNovaMaterial>
         private set
     lateinit var OBTAINABLE_ITEMS: List<CategorizedItem>
         private set

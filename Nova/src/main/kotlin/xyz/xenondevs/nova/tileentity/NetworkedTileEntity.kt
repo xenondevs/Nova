@@ -10,7 +10,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.CoreItems
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -28,7 +28,7 @@ import kotlin.reflect.KProperty
 abstract class NetworkedTileEntity(
     uuid: UUID,
     data: CompoundElement,
-    material: NovaMaterial,
+    material: TileEntityNovaMaterial,
     ownerUUID: UUID,
     armorStand: FakeArmorStand,
 ) : TileEntity(uuid, data, material, ownerUUID, armorStand), NetworkEndPoint {

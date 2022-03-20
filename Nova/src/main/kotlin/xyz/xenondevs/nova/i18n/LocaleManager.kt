@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.formatSafely
 
 object LocaleManager : Initializable() {
@@ -44,12 +44,12 @@ object LocaleManager : Initializable() {
         return getTranslation(player.locale, key, *args)
     }
     
-    fun getTranslatedName(lang: String, novaMaterial: NovaMaterial): String {
-        return getTranslation(lang, novaMaterial.localizedName)
+    fun getTranslatedName(lang: String, material: ItemNovaMaterial): String {
+        return getTranslation(lang, material.localizedName)
     }
     
-    fun getTranslatedName(player: Player, novaMaterial: NovaMaterial): String {
-        return getTranslation(player, novaMaterial.localizedName)
+    fun getTranslatedName(player: Player, material: ItemNovaMaterial): String {
+        return getTranslation(player, material.localizedName)
     }
     
     private object NovaLanguage : Language() {

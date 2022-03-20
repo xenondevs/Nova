@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.material.ItemCategories
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -84,10 +84,10 @@ object NovaCommand : Command("nova") {
         }
     }
     
-    private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: NovaMaterial) =
+    private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial) =
         handleGiveTo(ctx, material, ctx["amount"])
     
-    private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: NovaMaterial, amount: Int) {
+    private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial, amount: Int) {
         val itemName = material.localizedName.ifBlank { material.id }
         
         val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)

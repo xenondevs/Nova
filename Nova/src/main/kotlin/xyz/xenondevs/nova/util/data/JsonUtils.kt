@@ -6,7 +6,7 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.json.*
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.player.attachment.Attachment
 import xyz.xenondevs.nova.world.loot.LootInfo
 import java.io.File
@@ -22,7 +22,7 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter<Location>(LocationSerialization)
         .registerTypeHierarchyAdapter<Attachment>(AttachmentSerialization)
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
-        .registerTypeHierarchyAdapter<NovaMaterial>(NovaMaterialSerialization)
+        .registerTypeHierarchyAdapter<ItemNovaMaterial>(NovaMaterialSerialization)
         .registerTypeHierarchyAdapter<LootInfo>(LootInfoDeserializer)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()

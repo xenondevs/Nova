@@ -7,7 +7,7 @@ import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import java.util.function.Supplier
 import kotlin.math.max
 import kotlin.math.min
@@ -15,7 +15,7 @@ import kotlin.math.round
 
 abstract class VerticalBar(height: Int) : Supplier<Item> {
     
-    abstract val barMaterial: NovaMaterial
+    abstract val barMaterial: ItemNovaMaterial
     
     private val barItems = Array(height) { createBarItem(it, height) }
     private var i = 0

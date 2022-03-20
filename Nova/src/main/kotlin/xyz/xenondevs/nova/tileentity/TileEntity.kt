@@ -18,8 +18,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -41,7 +41,7 @@ val SELF_UPDATE_REASON = object : UpdateReason {}
 abstract class TileEntity(
     val uuid: UUID,
     data: CompoundElement,
-    override val material: NovaMaterial,
+    override val material: TileEntityNovaMaterial,
     val ownerUUID: UUID,
     val armorStand: FakeArmorStand,
 ) : DataHolder(data, true), ITileEntity {
@@ -421,7 +421,7 @@ abstract class TileEntity(
             return create(
                 tileEntity.id.value,
                 location.clone().apply { center(); yaw = tileEntity.yaw },
-                NovaMaterialRegistry.get(tileEntity.type),
+                NovaMaterialRegistry.get(tileEntity.type) as TileEntityNovaMaterial,
                 tileEntity.data,
                 tileEntity.owner
             )
@@ -430,7 +430,7 @@ abstract class TileEntity(
         fun create(
             uuid: UUID,
             armorStandLocation: Location,
-            material: NovaMaterial,
+            material: TileEntityNovaMaterial,
             data: CompoundElement,
             ownerUUID: UUID
         ): TileEntity {

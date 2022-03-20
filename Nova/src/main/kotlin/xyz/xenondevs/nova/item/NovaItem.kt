@@ -3,11 +3,11 @@ package xyz.xenondevs.nova.item
 import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import kotlin.reflect.KClass
 
 /**
- * Handles actions performed on [ItemStack]s of a [NovaMaterial]
+ * Handles actions performed on [ItemStack]s of a [ItemNovaMaterial]
  */
 abstract class NovaItem {
     

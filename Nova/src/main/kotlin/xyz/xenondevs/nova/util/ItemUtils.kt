@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.data.recipe.*
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -91,7 +91,7 @@ val Material.breakSpeed: Double
 val Material.localizedName: String?
     get() = CraftMagicNumbers.getItem(this)?.descriptionId
 
-val ItemStack.novaMaterial: NovaMaterial?
+val ItemStack.novaMaterial: ItemNovaMaterial?
     get() = (itemMeta?.unhandledTags?.get("nova") as? CompoundTag)
         ?.getString("id")
         ?.let(NovaMaterialRegistry::getOrNull)
@@ -119,7 +119,7 @@ val ItemStack.displayName: String?
 val ItemStack.localizedName: String?
     get() = novaMaterial?.localizedName ?: type.localizedName
 
-val MojangStack.novaMaterial: NovaMaterial?
+val MojangStack.novaMaterial: ItemNovaMaterial?
     get() = tag?.getCompound("nova")
         ?.getString("id")
         ?.let(NovaMaterialRegistry::getOrNull)

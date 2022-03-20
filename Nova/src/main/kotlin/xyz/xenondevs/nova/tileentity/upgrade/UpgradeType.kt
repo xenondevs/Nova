@@ -4,10 +4,10 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.CoreItems
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.data.getAllDoubles
 
-enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial, val grayIcon: NovaMaterial) {
+enum class UpgradeType(val material: ItemNovaMaterial, val icon: ItemNovaMaterial, val grayIcon: ItemNovaMaterial) {
     
     SPEED(CoreItems.SPEED_UPGRADE, CoreGUIMaterial.SPEED_UPGRADE, CoreGUIMaterial.TP_SPEED_UPGRADE),
     EFFICIENCY(CoreItems.EFFICIENCY_UPGRADE, CoreGUIMaterial.EFFICIENCY_UPGRADE, CoreGUIMaterial.TP_EFFICIENCY_UPGRADE),
@@ -15,9 +15,9 @@ enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial, val g
     FLUID(CoreItems.FLUID_UPGRADE, CoreGUIMaterial.FLUID_UPGRADE, CoreGUIMaterial.TP_FLUID_UPGRADE),
     RANGE(CoreItems.RANGE_UPGRADE, CoreGUIMaterial.RANGE_UPGRADE, CoreGUIMaterial.TP_RANGE_UPGRADE);
     
-    private val modifierCache = HashMap<NovaMaterial, DoubleArray>()
+    private val modifierCache = HashMap<ItemNovaMaterial, DoubleArray>()
     
-    operator fun get(material: NovaMaterial): DoubleArray {
+    operator fun get(material: ItemNovaMaterial): DoubleArray {
         return modifierCache.getOrPut(material) {
             val specificConfig = NovaConfig[material]
             return@getOrPut readConfiguredModifier(specificConfig) ?: readConfiguredModifier(DEFAULT_CONFIG)!!

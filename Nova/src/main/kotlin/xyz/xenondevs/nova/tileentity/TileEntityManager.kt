@@ -37,8 +37,8 @@ import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataT
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
-import xyz.xenondevs.nova.material.NovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
@@ -119,7 +119,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         ownerUUID: UUID,
         location: Location,
         yaw: Float,
-        material: NovaMaterial,
+        material: TileEntityNovaMaterial,
         data: CompoundElement?,
         tileEntityUUID: UUID? = null
     ) {
@@ -164,7 +164,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         }
     }
     
-    private fun calculateTileEntityYaw(material: NovaMaterial, playerYaw: Float): Float =
+    private fun calculateTileEntityYaw(material: TileEntityNovaMaterial, playerYaw: Float): Float =
         if (material.isDirectional) ((playerYaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f
     
     @Synchronized
@@ -332,7 +332,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         }
     }
     
-    private fun handleTileEntityPlace(event: PlayerInteractEvent, material: NovaMaterial) {
+    private fun handleTileEntityPlace(event: PlayerInteractEvent, material: TileEntityNovaMaterial) {
         event.isCancelled = true
         
         val player = event.player
@@ -435,9 +435,9 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                 if (tileEntity != null && player.isSneaking && handNovaMaterial == CoreItems.WRENCH) {
                     handleTileEntityWrenchShift(event, tileEntity)
                 } else if (!block.type.isActuallyInteractable() || player.isSneaking) {
-                    if (handNovaMaterial != null) {
+                    if (handNovaMaterial is TileEntityNovaMaterial) {
                         handleTileEntityPlace(event, handNovaMaterial)
-                    } else if (tileEntity != null && block.type.isReplaceable() && handItem?.type?.isBlock == true) {
+                    } else if (tileEntity != null && block.type.isReplaceable() && handNovaMaterial == null && handItem?.type?.isBlock == true) {
                         handleNormalBlockPlace(event)
                     }
                 }

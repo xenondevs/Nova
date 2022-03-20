@@ -4,8 +4,9 @@ import com.mojang.brigadier.context.CommandContext
 import net.md_5.bungee.api.ChatColor
 import net.minecraft.commands.CommandSourceStack
 import xyz.xenondevs.nova.command.*
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.novaMaterial
@@ -33,7 +34,7 @@ object NovaModelDataCommand : Command("nvmodeldata") {
         } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.modeldata.no-nova-item"))
     }
     
-    private fun showModelData(material: NovaMaterial, ctx: CommandContext<CommandSourceStack>) {
+    private fun showModelData(material: ItemNovaMaterial, ctx: CommandContext<CommandSourceStack>) {
         val localizedName: Any =
             if (material.localizedName.isNotEmpty()) localized(ChatColor.AQUA, material.localizedName)
             else coloredText(ChatColor.AQUA, material.id)
@@ -50,7 +51,7 @@ object NovaModelDataCommand : Command("nvmodeldata") {
             coloredText(ChatColor.AQUA, material.item.dataArray.contentToString()),
         ))
         
-        val block = material.block
+        val block = (material as? TileEntityNovaMaterial)?.block
         if (block != null) {
             // Send block info
             val blockLocalized = localized(ChatColor.AQUA, block.material)

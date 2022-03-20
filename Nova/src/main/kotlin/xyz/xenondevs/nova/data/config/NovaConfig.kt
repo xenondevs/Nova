@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.util.data.set
@@ -106,7 +106,7 @@ class NovaConfig(private val configPath: String, private val data: ByteArray) : 
         
         operator fun get(name: String) = configs[name]!!
         
-        operator fun get(material: NovaMaterial) = configs[material.id]!!
+        operator fun get(material: ItemNovaMaterial) = configs[material.id]!!
         
     }
     

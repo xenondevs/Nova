@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.PermissionUtils
 import xyz.xenondevs.nova.util.data.GSON
@@ -19,13 +19,13 @@ object TileEntityLimits {
     private val WORLD_BLACKLIST: Set<World> =
         GSON.fromJson<HashSet<World>>(DEFAULT_CONFIG.getArray("tile_entity_world_blacklist"))!!
     
-    private val TYPE_WORLD_BLACKLIST: Map<NovaMaterial, Set<World>> =
-        GSON.fromJson<HashMap<NovaMaterial, HashSet<World>>>(DEFAULT_CONFIG.getObject("tile_entity_type_world_blacklist"))!!
+    private val TYPE_WORLD_BLACKLIST: Map<ItemNovaMaterial, Set<World>> =
+        GSON.fromJson<HashMap<ItemNovaMaterial, HashSet<World>>>(DEFAULT_CONFIG.getObject("tile_entity_type_world_blacklist"))!!
     
-    private val TYPE_AMOUNT_LIMIT: Map<NovaMaterial, Int> =
-        GSON.fromJson<HashMap<NovaMaterial, Int>>(DEFAULT_CONFIG.getObject("tile_entity_limit"))!!
+    private val TYPE_AMOUNT_LIMIT: Map<ItemNovaMaterial, Int> =
+        GSON.fromJson<HashMap<ItemNovaMaterial, Int>>(DEFAULT_CONFIG.getObject("tile_entity_limit"))!!
     
-    private val placedTileEntities = HashMap<UUID, MutableMap<NovaMaterial, Int>>()
+    private val placedTileEntities = HashMap<UUID, MutableMap<ItemNovaMaterial, Int>>()
     
     init {
         transaction {
@@ -45,7 +45,7 @@ object TileEntityLimits {
         }
     }
     
-    fun canPlaceTileEntity(uuid: UUID, world: World, type: NovaMaterial): PlaceResult {
+    fun canPlaceTileEntity(uuid: UUID, world: World, type: ItemNovaMaterial): PlaceResult {
         if (PermissionUtils.hasPermission(world, uuid, "nova.misc.bypassTileEntityLimits")) return PlaceResult.ALLOW
         
         if (WORLD_BLACKLIST.contains(world)) return PlaceResult.DENY_BLACKLIST
@@ -60,12 +60,12 @@ object TileEntityLimits {
         return PlaceResult.ALLOW
     }
     
-    fun handleTileEntityCreate(uuid: UUID, type: NovaMaterial) {
+    fun handleTileEntityCreate(uuid: UUID, type: ItemNovaMaterial) {
         val materialMap = placedTileEntities.getOrPut(uuid) { hashMapOf() }
         materialMap[type] = (materialMap[type] ?: 0) + 1
     }
     
-    fun handleTileEntityRemove(uuid: UUID, type: NovaMaterial) {
+    fun handleTileEntityRemove(uuid: UUID, type: ItemNovaMaterial) {
         val materialMap = placedTileEntities.getOrPut(uuid) { hashMapOf() }
         materialMap[type] = max(0, (materialMap[type] ?: 0) - 1)
     }
