@@ -21,6 +21,7 @@
         <zip4j.version>2.9.1</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
         <invui.version>0.5-SNAPSHOT</invui.version>
+        <ktor.version>1.6.8</ktor.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>
 
@@ -218,6 +219,16 @@
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
             <version>${zip4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-core</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-netty</artifactId>
+            <version>${ktor.version}</version>
         </dependency>
 
         <!-- Provided through plugins -->

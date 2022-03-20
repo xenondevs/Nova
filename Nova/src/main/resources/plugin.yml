@@ -16,6 +16,8 @@ libraries:
   - xyz.xenondevs:particle:${particlelib.version}
   - me.xdrop:fuzzywuzzy:${fuzzywuzzy.version}
   - net.lingala.zip4j:zip4j:${zip4j.version}
+  - io.ktor:ktor-server-core:${ktor.version}
+  - io.ktor:ktor-server-netty:${ktor.version}
 
 softdepend:
   - WorldGuard
