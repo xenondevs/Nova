@@ -1,5 +1,8 @@
 package xyz.xenondevs.nova
 
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.json.*
 import org.bstats.bukkit.Metrics
 import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
@@ -23,6 +26,12 @@ import xyz.xenondevs.nova.api.Nova as INova
 lateinit var NOVA: Nova
 lateinit var PLUGIN_MANAGER: PluginManager
 internal var IS_VERSION_CHANGE: Boolean = false
+internal val HTTP_CLIENT = HttpClient(CIO) {
+    install(JsonFeature) {
+        serializer = GsonSerializer()
+    }
+    expectSuccess = false
+}
 internal lateinit var LOGGER: Logger
 
 class Nova : JavaPlugin(), INova {
