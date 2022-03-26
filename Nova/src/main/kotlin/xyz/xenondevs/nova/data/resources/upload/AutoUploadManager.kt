@@ -31,7 +31,7 @@ object AutoUploadManager : Initializable() {
         service.loadConfig(config)
     }
     
-    fun uploadPack(pack: File): String {
+    suspend fun uploadPack(pack: File): String {
         require(pack.exists()) { pack.absolutePath + " not found!" }
         return selectedService.upload(pack)
     }

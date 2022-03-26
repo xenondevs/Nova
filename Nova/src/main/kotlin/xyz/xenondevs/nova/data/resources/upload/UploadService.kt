@@ -9,6 +9,6 @@ interface UploadService {
     
     fun loadConfig(json: JsonConfig)
     
-    fun upload(file: File): String
+    suspend fun upload(file: File): String
     
 }
