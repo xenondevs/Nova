@@ -5,8 +5,10 @@ import xyz.xenondevs.nova.data.world.block.property.BlockProperty
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 
-@Suppress("LeakingThis")
-open class NovaBlockState(open val material: BlockNovaMaterial) : BlockState {
+@Suppress("CanBePrimaryConstructorProperty")
+open class NovaBlockState(material: BlockNovaMaterial) : BlockState {
+    
+    open val material = material
     
     override val id = material.id
     private val properties = material.properties.associateWithTo(LinkedHashMap(), BlockPropertyType<*>::create)
