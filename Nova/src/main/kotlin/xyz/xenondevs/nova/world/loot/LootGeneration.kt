@@ -21,6 +21,7 @@ object LootGeneration : Initializable(), Listener {
     override val dependsOn = setOf(NovaConfig, AddonsInitializer)
     
     override fun init() {
+        return // TODO
         lootTable.addAll(GSON.fromJson<ArrayList<LootInfo>>(NovaConfig["loot"].getArray("loot")) ?: emptyList())
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }

@@ -15,10 +15,10 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.data.world.block.property.Directional
+import xyz.xenondevs.nova.data.world.block.state.NovaTileState
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.ui.overlay.GUITexture
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.pos
@@ -41,14 +42,14 @@ val SELF_UPDATE_REASON = object : UpdateReason {}
 abstract class TileEntity(
     val uuid: UUID,
     data: CompoundElement,
-    override val material: TileEntityNovaMaterial,
+    final override val material: TileEntityNovaMaterial,
     val ownerUUID: UUID,
     val armorStand: FakeArmorStand,
 ) : DataHolder(data, true), ITileEntity {
     
     override val owner = Bukkit.getOfflinePlayer(ownerUUID)
-    
     abstract val gui: Lazy<TileEntityGUI>?
+    val blockState = NovaTileState(material, uuid, ownerUUID, data)
     
     @Volatile
     var isValid: Boolean = true
@@ -104,7 +105,7 @@ abstract class TileEntity(
      * Called to get the [ItemStack] to be placed as the head of the [FakeArmorStand].
      */
     open fun getHeadStack(): ItemStack {
-        return material.block!!.createItemStack()
+        return material.block.createItemStack()
     }
     
     /**
@@ -417,14 +418,15 @@ abstract class TileEntity(
     
     companion object {
         
-        fun create(tileEntity: DaoTileEntity, location: Location): TileEntity {
-            return create(
-                tileEntity.id.value,
-                location.clone().apply { center(); yaw = tileEntity.yaw },
-                NovaMaterialRegistry.get(tileEntity.type) as TileEntityNovaMaterial,
-                tileEntity.data,
-                tileEntity.owner
-            )
+        fun create(pos: BlockPos, state: NovaTileState): TileEntity {
+            val location = pos.location.center()
+            
+            val directional = state.getProperty(Directional)
+            if (directional != null)
+                location.yaw = directional.facing.rotationValues.second * 90f
+            else location.yaw = 180f
+            
+            return create(state.uuid, location, state.material, state.data, state.ownerUUID)
         }
         
         fun create(
@@ -442,7 +444,7 @@ abstract class TileEntity(
             }
             
             // create the tile entity
-            val tileEntity = material.tileEntityConstructor!!(uuid, data, material, ownerUUID, armorStand)
+            val tileEntity = material.tileEntityConstructor(uuid, data, material, ownerUUID, armorStand)
             
             // set the head stack and register
             armorStand.setEquipment(EquipmentSlot.HEAD, tileEntity.getHeadStack())

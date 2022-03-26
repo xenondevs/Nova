@@ -71,3 +71,20 @@ fun ByteArray.decompress(): ByteArray {
 fun ByteArray.encodeWithBase64(): String = Base64.getEncoder().encodeToString(this)
 
 fun String.decodeWithBase64(): ByteArray = Base64.getDecoder().decode(this)
+
+fun ByteBuf.writeStringList(array: List<String>) {
+    writeInt(array.size)
+    array.forEach { writeString(it) }
+}
+
+fun ByteBuf.readStringList(): List<String> {
+    return Array(readInt()) { readString() }.asList()
+}
+
+fun ByteBuf.writeUUID(uuid: UUID) {
+    writeLong(uuid.mostSignificantBits)
+    writeLong(uuid.leastSignificantBits)
+}
+
+fun ByteBuf.readUUID(): UUID =
+    UUID(readLong(), readLong())

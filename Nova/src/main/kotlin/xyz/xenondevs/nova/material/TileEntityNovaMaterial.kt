@@ -5,8 +5,8 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
@@ -22,14 +22,12 @@ class TileEntityNovaMaterial internal constructor(
     localizedName: String,
     novaItem: NovaItem? = null,
     private val itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
-    val hitboxType: Material? = null,
-    val tileEntityConstructor: TileEntityConstructor? = null,
+    hitboxType: Material,
+    val tileEntityConstructor: TileEntityConstructor,
     val placeCheck: PlaceCheckFun? = null,
     val isInteractable: Boolean = true,
-    val isDirectional: Boolean = true
-) : ItemNovaMaterial(id, localizedName, novaItem) {
-    
-    val block: ModelData by lazy { Resources.getModelData(id).second!! }
+    properties: List<BlockPropertyType<*>>
+) : BlockNovaMaterial(id, localizedName, novaItem, hitboxType, properties) {
     
     /**
      * Creates an [ItemBuilder][ItemBuilder] for this [ItemNovaMaterial].

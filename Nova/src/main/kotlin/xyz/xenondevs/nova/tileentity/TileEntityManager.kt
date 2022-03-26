@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity
 
-import net.dzikoysk.exposed.upsert.upsert
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.*
 import org.bukkit.block.Block
@@ -19,25 +18,21 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.jetbrains.exposed.sql.Transaction
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.database.DatabaseManager
-import xyz.xenondevs.nova.data.database.asyncTransaction
-import xyz.xenondevs.nova.data.database.entity.DaoTileEntity
-import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
+import xyz.xenondevs.nova.data.world.WorldDataManager
+import xyz.xenondevs.nova.data.world.block.property.Directional
+import xyz.xenondevs.nova.data.world.block.state.BlockState
+import xyz.xenondevs.nova.data.world.block.state.NovaTileState
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.*
@@ -45,6 +40,7 @@ import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.concurrent.runIfTrueSynchronized
 import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.pos
@@ -158,14 +154,14 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         // set the hitbox block (1 tick later to prevent interference with the BlockBreakEvent)
         runTaskLater(1) {
             if (tileEntity.isValid) { // check that the tile entity hasn't been destroyed already
-                material.hitboxType?.run { block.type = this }
+                block.type = material.hitboxType
                 tileEntity.handleHitboxPlaced()
             }
         }
     }
     
     private fun calculateTileEntityYaw(material: TileEntityNovaMaterial, playerYaw: Float): Float =
-        if (material.isDirectional) ((playerYaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f
+        if (Directional in material.properties) ((playerYaw + 180).mod(360f) / 90f).roundToInt() * 90f else 180f
     
     @Synchronized
     fun removeTileEntity(tileEntity: TileEntity) {
@@ -178,10 +174,6 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         tileEntity.additionalHitboxes.forEach {
             additionalHitboxMap[it.chunkPos]?.remove(it)
             locationCache -= it
-        }
-        
-        asyncTransaction {
-            TileEntitiesTable.deleteWhere { TileEntitiesTable.id eq tileEntity.uuid }
         }
         
         location.block.type = Material.AIR
@@ -245,47 +237,21 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
     @Synchronized
     fun saveChunk(chunk: ChunkPos) {
         if (chunk in tileEntityMap)
-            saveChunk(HashSet(tileEntityMap[chunk]!!.values))
+            saveChunk(chunk, HashSet(tileEntityMap[chunk]!!.values))
     }
     
-    private fun saveChunk(tileEntities: Iterable<TileEntity>) {
-        val statement: (Transaction.() -> Unit) = {
-            tileEntities.forEach { tileEntity ->
-                tileEntity.saveData()
-                
-                TileEntitiesTable.upsert(
-                    conflictColumn = TileEntitiesTable.id,
-                    
-                    insertBody = {
-                        val location = tileEntity.location
-                        
-                        it[id] = tileEntity.uuid
-                        it[world] = tileEntity.location.world!!.uid
-                        it[owner] = tileEntity.ownerUUID
-                        it[chunkX] = tileEntity.chunkPos.x
-                        it[chunkZ] = tileEntity.chunkPos.z
-                        it[x] = location.blockX
-                        it[y] = location.blockY
-                        it[z] = location.blockZ
-                        it[yaw] = tileEntity.armorStand.location.yaw
-                        it[type] = tileEntity.material.id
-                        it[data] = tileEntity.data
-                    },
-                    
-                    updateBody = {
-                        it[data] = tileEntity.data
-                    }
-                )
-            }
-        }
+    private fun saveChunk(pos: ChunkPos, tileEntities: Iterable<TileEntity>) {
+        val blockStates: HashMap<BlockPos, BlockState> = tileEntities
+            .onEach(TileEntity::saveData)
+            .associateTo(HashMap()) { it.location.pos to it.blockState }
         
-        if (NOVA.isEnabled) asyncTransaction(statement)
-        else transaction(statement = statement)
+        WorldDataManager.storeBlockStates(pos, blockStates)
     }
     
     @EventHandler
     private fun handleWorldSave(event: WorldSaveEvent) {
-        runAsyncTask { event.world.loadedChunks.forEach { saveChunk(it.pos) } }
+        event.world.loadedChunks.forEach { saveChunk(it.pos) }
+        runAsyncTask { WorldDataManager.saveWorld(event.world) }
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -365,7 +331,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                     if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
                     
                     player.swingMainHand()
-                    player.playSound(block.location, material.hitboxType!!.soundGroup.placeSound, 1f, 1f)
+                    player.playSound(block.location, material.hitboxType.soundGroup.placeSound, 1f, 1f)
                 } else {
                     player.spigot().sendMessage(
                         localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")
@@ -586,7 +552,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                     locationCache.removeAll { it.chunkPos == chunkPos }
                     tileEntityValues.forEach { it.handleRemoved(unload = true) }
                     
-                    saveChunk(tileEntityValues)
+                    saveChunk(chunkPos, tileEntityValues)
                 }
                 
                 done.set(true)
@@ -595,38 +561,25 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         
         private fun loadChunk(done: AtomicBoolean) {
             if (chunkPos.isLoaded()) {
-                transaction {
-                    val tileEntities = DaoTileEntity.find { (TileEntitiesTable.world eq chunkPos.worldUUID) and (TileEntitiesTable.chunkX eq chunkPos.x) and (TileEntitiesTable.chunkZ eq chunkPos.z) }.toList()
+                val tileStates: Map<BlockPos, NovaTileState> =
+                    WorldDataManager.getBlockStates(chunkPos).filterIsInstanceValues()
+                
+                runTaskSynchronized(TileEntityManager) {
+                    val chunkMap = tileEntityMap.getOrPut(chunkPos) { HashMap() }
                     
-                    if (!NOVA.isEnabled) return@transaction
-                    
-                    // create the tile entities in the main thread
-                    runTaskSynchronized(TileEntityManager) {
-                        val chunkMap = tileEntityMap.getOrPut(chunkPos) { HashMap() }
+                    tileStates.forEach { (pos, state) ->
+                        val tileEntity = TileEntity.create(pos, state)
                         
-                        tileEntities.forEach { tile ->
-                            if (NovaMaterialRegistry.getOrNull(tile.type) == null) {
-                                LOGGER.severe("Could not load tile entity at ${tile.location}: Invalid id ${tile.type}")
-                                return@forEach
-                            }
-                            
-                            try {
-                                val location = tile.location
-                                val tileEntity = TileEntity.create(tile, location)
-                                
-                                chunkMap[location] = tileEntity
-                                locationCache += location
-                                
-                                tileEntity.handleInitialized(false)
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                            }
-                        }
+                        val location = pos.location
+                        chunkMap[location] = tileEntity
+                        locationCache += location
                         
-                        NetworkManager.queueChunkLoad(chunkPos)
-                        
-                        done.set(true)
+                        tileEntity.handleInitialized(false)
                     }
+                    
+                    NetworkManager.queueChunkLoad(chunkPos)
+                    
+                    done.set(true)
                 }
             } else done.set(true)
         }

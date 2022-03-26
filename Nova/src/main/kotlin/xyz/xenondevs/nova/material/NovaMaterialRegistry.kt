@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.material
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
+import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.addNamespace
@@ -28,11 +30,11 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     fun registerEnergyTileEntity(
         addon: Addon,
         name: String,
-        tileEntityConstructor: TileEntityConstructor?,
+        tileEntityConstructor: TileEntityConstructor,
         hitboxType: Material,
         placeCheck: PlaceCheckFun? = null,
         isInteractable: Boolean = true,
-        isDirectional: Boolean = true
+        properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
         return registerTileEntity(
             addon,
@@ -42,25 +44,25 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
             listOf(EnergyHolder::modifyItemBuilder),
             placeCheck,
             isInteractable,
-            isDirectional,
+            properties,
         )
     }
     
     fun registerTileEntity(
         addon: Addon,
         name: String,
-        tileEntityConstructor: TileEntityConstructor?,
+        tileEntityConstructor: TileEntityConstructor,
         hitboxType: Material,
         itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
         placeCheck: PlaceCheckFun? = null,
         isInteractable: Boolean = true,
-        isDirectional: Boolean = true,
+        properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
         val namespace = addon.description.id
         val id = name.addNamespace(namespace)
         val localizedName = "block.$namespace.$name"
         val material = TileEntityNovaMaterial(id, localizedName, null, itemBuilderModifiers, hitboxType,
-            tileEntityConstructor, placeCheck, isInteractable, isDirectional)
+            tileEntityConstructor, placeCheck, isInteractable, properties)
         
         return register(material)
     }
@@ -70,13 +72,13 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         name: String,
         itemBuilderModifiers: List<ItemBuilderModifierFun>?,
         hitboxType: Material,
-        tileEntityConstructor: TileEntityConstructor?,
+        tileEntityConstructor: TileEntityConstructor,
         placeCheck: PlaceCheckFun? = null,
         isInteractable: Boolean = true,
-        isDirectional: Boolean = true,
+        properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
         val material = TileEntityNovaMaterial(id, name, null, itemBuilderModifiers,
-            hitboxType, tileEntityConstructor, placeCheck, isInteractable, isDirectional)
+            hitboxType, tileEntityConstructor, placeCheck, isInteractable, properties)
         
         return register(material)
     }

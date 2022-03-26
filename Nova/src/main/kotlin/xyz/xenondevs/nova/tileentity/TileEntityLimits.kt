@@ -1,13 +1,8 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.World
-import org.jetbrains.exposed.sql.count
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.database.table.TileEntitiesTable
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.PermissionUtils
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
@@ -28,21 +23,7 @@ object TileEntityLimits {
     private val placedTileEntities = HashMap<UUID, MutableMap<ItemNovaMaterial, Int>>()
     
     init {
-        transaction {
-            val countExpr = TileEntitiesTable.owner.count()
-            TileEntitiesTable
-                .slice(TileEntitiesTable.owner, TileEntitiesTable.type, countExpr)
-                .selectAll()
-                .groupBy(TileEntitiesTable.owner, TileEntitiesTable.type)
-                .forEach { row ->
-                    val owner = row[TileEntitiesTable.owner]
-                    val type = NovaMaterialRegistry.getOrNull(row[TileEntitiesTable.type]) ?: return@forEach
-                    val count = row[countExpr].toInt()
-                    if (owner !in placedTileEntities)
-                        placedTileEntities[owner] = HashMap()
-                    placedTileEntities[owner]!![type] = count
-                }
-        }
+        // TODO
     }
     
     fun canPlaceTileEntity(uuid: UUID, world: World, type: ItemNovaMaterial): PlaceResult {
