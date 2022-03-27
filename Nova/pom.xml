@@ -46,10 +46,6 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
         <repository>
-            <id>intellectualsites</id>
-            <url>https://mvn.intellectualsites.com/content/groups/public/</url>
-        </repository>
-        <repository>
             <id>panda-lang</id>
             <url>https://repo.panda-lang.org/releases</url>
         </repository>
