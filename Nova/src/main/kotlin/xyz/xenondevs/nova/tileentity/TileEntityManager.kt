@@ -151,6 +151,8 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         // call handleInitialized
         tileEntity.handleInitialized(true)
         
+        WorldDataManager.setBlockState(location.pos, tileEntity.blockState)
+        
         // set the hitbox block (1 tick later to prevent interference with the BlockBreakEvent)
         runTaskLater(1) {
             if (tileEntity.isValid) { // check that the tile entity hasn't been destroyed already
@@ -178,6 +180,8 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
         
         location.block.type = Material.AIR
         tileEntity.additionalHitboxes.forEach { it.block.type = Material.AIR }
+        
+        WorldDataManager.removeBlockState(location.pos)
         
         tileEntity.handleRemoved(unload = false)
         
@@ -331,7 +335,7 @@ object TileEntityManager : Initializable(), ITileEntityManager, Listener {
                     if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
                     
                     player.swingMainHand()
-                    player.playSound(block.location, material.hitboxType.soundGroup.placeSound, 1f, 1f)
+                    material.placeSound?.play(block.location)
                 } else {
                     player.spigot().sendMessage(
                         localized(ChatColor.RED, "nova.tile_entity_limits.${result.name.lowercase()}")

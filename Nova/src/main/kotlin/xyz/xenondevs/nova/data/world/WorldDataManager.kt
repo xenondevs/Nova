@@ -29,6 +29,19 @@ object WorldDataManager : Listener {
     fun getBlockStates(pos: ChunkPos): Map<BlockPos, BlockState> = getChunk(pos).blockStates
     
     @Synchronized
+    fun getBlockState(pos: BlockPos): BlockState? = getChunk(pos.chunkPos).blockStates[pos]
+    
+    @Synchronized
+    fun setBlockState(pos: BlockPos, state: BlockState) {
+        getChunk(pos.chunkPos).blockStates[pos] = state
+    }
+    
+    @Synchronized
+    fun removeBlockState(pos: BlockPos) {
+        getChunk(pos.chunkPos).blockStates -= pos
+    }
+    
+    @Synchronized
     fun saveWorld(world: World) {
         LOGGER.info("Saving world ${world.name}...")
         worlds[world]?.saveAll()

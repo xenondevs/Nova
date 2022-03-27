@@ -5,6 +5,7 @@ import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -68,6 +69,9 @@ fun ArmorStand.setHeadItemSilently(headStack: ItemStack) {
 
 val Entity.localizedName: String?
     get() = (this as CraftEntity).handle.type.descriptionId
+
+val Entity.eyeInWater: Boolean
+    get() = (this as CraftEntity).handle.isEyeInFluid(FluidTags.WATER)
 
 object EntityUtils {
     

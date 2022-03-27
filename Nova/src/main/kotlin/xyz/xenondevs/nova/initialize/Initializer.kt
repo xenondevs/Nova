@@ -33,6 +33,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import xyz.xenondevs.nova.world.block.BlockBreakManager
 import xyz.xenondevs.nova.world.loot.LootGeneration
 import java.util.concurrent.CountDownLatch
 
@@ -45,7 +46,7 @@ object Initializer {
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         TileEntityManager, NetworkManager, ItemManager, AttachmentManager,
         CommandManager, ArmorEquipListener, AbilityManager, PacketListener,
-        LootGeneration, AddonsLoader, ItemCategories
+        LootGeneration, AddonsLoader, ItemCategories, BlockBreakManager
     ).sorted()
     
     private val latch = CountDownLatch(toInit.size)

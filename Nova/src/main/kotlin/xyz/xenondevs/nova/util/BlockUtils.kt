@@ -44,6 +44,12 @@ fun Block.remove(playEffects: Boolean = true) {
     val tileEntity = TileEntityManager.getTileEntityAt(location)
     if (tileEntity != null) {
         TileEntityManager.removeTileEntity(tileEntity)
+        
+        val material = tileEntity.material
+        material.breakSound?.play(location)
+        material.breakParticles?.showBreakParticles(location)
+        
+        return
     }
     
     if (playEffects) playBreakEffects()
@@ -97,8 +103,12 @@ fun Block.playBreakEffects() {
 }
 
 fun Block.showBreakParticles() {
+    type.showBreakParticles(this.location)
+}
+
+fun Material.showBreakParticles(location: Location) {
     particleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5)) {
-        texture(type)
+        texture(this@showBreakParticles)
         offset(0.2, 0.2, 0.2)
         amount(50)
     }.display()

@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.material
 
 import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
@@ -21,13 +20,13 @@ class TileEntityNovaMaterial internal constructor(
     id: String,
     localizedName: String,
     novaItem: NovaItem? = null,
-    private val itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
-    hitboxType: Material,
+    options: BlockOptions,
     val tileEntityConstructor: TileEntityConstructor,
+    private val itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
     val placeCheck: PlaceCheckFun? = null,
     val isInteractable: Boolean = true,
     properties: List<BlockPropertyType<*>>
-) : BlockNovaMaterial(id, localizedName, novaItem, hitboxType, properties) {
+) : BlockNovaMaterial(id, localizedName, novaItem, options, properties) {
     
     /**
      * Creates an [ItemBuilder][ItemBuilder] for this [ItemNovaMaterial].

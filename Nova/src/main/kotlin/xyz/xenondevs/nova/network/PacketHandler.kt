@@ -30,7 +30,7 @@ class PacketHandler() : ChannelDuplexHandler() {
             super.channelRead(ctx, packet)
         }
     }
-
+    
     private fun callEvent(msg: Any?): Packet<*>? {
         if (msg is Packet<*>) {
             val event = PacketEventManager.createAndCallEvent(player, msg) ?: return msg

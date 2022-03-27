@@ -133,6 +133,11 @@
             "gui/number/%s": [0, 999]
         }
     },
+    "break_stage_overlay": {
+        "item": {
+            "block/break_stage/%s": [0, 9]
+        }
+    },
     "wrench": "item/wrench",
     "speed_upgrade": "item/upgrade/speed",
     "efficiency_upgrade": "item/upgrade/efficiency",

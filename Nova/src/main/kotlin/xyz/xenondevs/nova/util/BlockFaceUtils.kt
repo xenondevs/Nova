@@ -57,6 +57,18 @@ val BlockFace.rotationValues: Pair<Int, Int>
         else -> throw IllegalArgumentException("Illegal facing")
     }
 
+val BlockFace.yawPitch: Pair<Float, Float>
+    get() = when (this) {
+        SOUTH -> 0f to 0f
+        WEST -> 90f to 0f
+        NORTH -> 180f to 0f
+        EAST -> 270f to 0f
+        UP -> 0f to 90f
+        DOWN -> 0f to 270f
+    
+        else -> throw UnsupportedOperationException("Unsupported facing")
+    }
+
 val Location.facing: BlockFace
     get() {
         val yawMod = yaw.mod(360f)

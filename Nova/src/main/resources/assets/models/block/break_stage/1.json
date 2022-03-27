@@ -1,0 +1,6 @@
+{
+	"parent": "nova:block/break_stage/break_stage",
+	"textures": {
+		"1": "block/destroy_stage_1"
+	}
+}
