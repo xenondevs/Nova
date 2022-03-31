@@ -12,12 +12,12 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.util.chunkPos
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
+import xyz.xenondevs.nova.world.chunkPos
 import java.util.concurrent.CopyOnWriteArrayList
 
 var Player.armorStandRenderDistance: Int

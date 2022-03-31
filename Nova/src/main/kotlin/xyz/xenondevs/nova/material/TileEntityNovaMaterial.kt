@@ -1,32 +1,44 @@
 package xyz.xenondevs.nova.material
 
 import de.studiocode.invui.item.builder.ItemBuilder
-import org.bukkit.Location
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
-import java.util.*
-import java.util.concurrent.CompletableFuture
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import xyz.xenondevs.nova.world.block.model.BlockModelProviderType
 
 typealias ItemBuilderModifierFun = (ItemBuilder, TileEntity?) -> ItemBuilder
-typealias TileEntityConstructor = ((UUID, CompoundElement, TileEntityNovaMaterial, UUID, FakeArmorStand) -> TileEntity)
-typealias PlaceCheckFun = ((Player, ItemStack, Location) -> CompletableFuture<Boolean>)
+typealias TileEntityConstructor = ((NovaTileEntityState) -> TileEntity)
 
+@Suppress("UNCHECKED_CAST")
 class TileEntityNovaMaterial internal constructor(
     id: String,
     localizedName: String,
-    novaItem: NovaItem? = null,
+    novaItem: NovaItem?,
+    novaBlock: NovaBlock<NovaTileEntityState>,
     options: BlockOptions,
-    val tileEntityConstructor: TileEntityConstructor,
-    private val itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
-    val placeCheck: PlaceCheckFun? = null,
-    val isInteractable: Boolean = true,
-    properties: List<BlockPropertyType<*>>
-) : BlockNovaMaterial(id, localizedName, novaItem, options, properties) {
+    internal val tileEntityConstructor: TileEntityConstructor,
+    private val itemBuilderModifiers: List<ItemBuilderModifierFun>?,
+    modelProvider: BlockModelProviderType<*>,
+    properties: List<BlockPropertyType<*>>,
+    placeCheck: PlaceCheckFun?,
+    multiBlockReceiver: MultiBlockReceiver?
+) : BlockNovaMaterial(
+    id,
+    localizedName,
+    novaItem, 
+    novaBlock as NovaBlock<NovaBlockState>, // fixme: users could cast to BlockNovaMaterial and then call methods on the NovaBlock with a BlockState that is not a NovaTileEntityState
+    options,
+    modelProvider,
+    properties,
+    placeCheck,
+    multiBlockReceiver
+) {
     
     /**
      * Creates an [ItemBuilder][ItemBuilder] for this [ItemNovaMaterial].
@@ -43,6 +55,12 @@ class TileEntityNovaMaterial internal constructor(
      */
     fun createItemStack(amount: Int = 1, tileEntity: TileEntity): ItemStack =
         createItemBuilder(tileEntity).setAmount(amount).get()
+    
+    override fun createBlockState(pos: BlockPos): NovaTileEntityState =
+        NovaTileEntityState(pos, this)
+    
+    override fun createNewBlockState(ctx: BlockPlaceContext): NovaTileEntityState =
+        NovaTileEntityState(this, ctx)
     
     private fun modifyItemBuilder(itemBuilder: ItemBuilder, tileEntity: TileEntity): ItemBuilder {
         var builder = modifyItemBuilder(itemBuilder)

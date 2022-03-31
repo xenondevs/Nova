@@ -27,6 +27,9 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
 
@@ -37,32 +40,23 @@ fun Block.hasSameTypeBelow(): Boolean {
     return type == below.type
 }
 
-fun Block.remove(playEffects: Boolean = true) {
-    val customRemoved = CustomItemServiceManager.removeBlock(this, playEffects)
-    if (customRemoved) return
-    
-    val tileEntity = TileEntityManager.getTileEntityAt(location)
-    if (tileEntity != null) {
-        TileEntityManager.removeTileEntity(tileEntity)
-        
-        val material = tileEntity.material
-        material.breakSound?.play(location)
-        material.breakParticles?.showBreakParticles(location)
-        
+fun Block.remove(ctx: BlockBreakContext, playEffects: Boolean = true) {
+    if (CustomItemServiceManager.removeBlock(this, playEffects))
         return
-    }
+    if (BlockManager.removeBlock(ctx, playEffects))
+        return
     
     if (playEffects) playBreakEffects()
     getMainHalf().type = Material.AIR
 }
 
-fun Block.getAllDrops(tool: ItemStack? = null): List<ItemStack> {
+fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
+    val tool = ctx.item
     CustomItemServiceManager.getDrops(this, tool)?.let { return it }
     
-    val tileEntity = TileEntityManager.getTileEntityAt(location)
-    if (tileEntity != null) {
-        return tileEntity.getDrops(true)
-    }
+    val novaBlockState = BlockManager.getBlock(pos)
+    if (novaBlockState != null)
+        return novaBlockState.material.novaBlock.getDrops(novaBlockState, ctx)
     
     val drops = ArrayList<ItemStack>()
     val state = state

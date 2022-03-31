@@ -3,10 +3,10 @@ package xyz.xenondevs.nova.data.world
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.BlockState
-import xyz.xenondevs.nova.data.world.block.state.NovaTileState
+import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileState
+import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.world.BlockPos
 
 class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
@@ -26,13 +26,13 @@ class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
             val type = palette[buf.readInt()]
             
             val state: BlockState = if (!type.startsWith("minecraft:")) {
-                val material = NovaMaterialRegistry.get(type) as TileEntityNovaMaterial?
+                val material = NovaMaterialRegistry.get(type) as? BlockNovaMaterial
                 if (material == null) {
                     LOGGER.severe("Could not load block at $pos: Invalid id $type")
                     continue
                 }
-                NovaTileState(material)
-            } else VanillaTileState(type)
+                material.createBlockState(pos)
+            } else VanillaTileState(pos, type)
             state.read(buf)
             blockStates[pos] = state
         }
@@ -40,6 +40,8 @@ class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
     
     fun write(buf: ByteBuf, palette: List<String>) {
         blockStates.forEach { (pos, state) ->
+            if (state is LinkedBlockState) return@forEach
+            
             buf.writeByte(1)
             buf.writeByte((pos.x and 0xF shl 4) or (pos.z and 0xF))
             buf.writeShort(pos.y)

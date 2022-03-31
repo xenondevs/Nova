@@ -1,7 +1,6 @@
-package xyz.xenondevs.nova.world.hitbox
+package xyz.xenondevs.nova.world.block.hitbox
 
 import org.bukkit.Bukkit
-import org.bukkit.Chunk
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -15,10 +14,12 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.castRay
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.isCompletelyDenied
+import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.chunkPos
 
 object HitboxManager : Listener {
     
-    private val hitboxes = HashMap<Chunk, ArrayList<Hitbox>>()
+    private val hitboxes = HashMap<ChunkPos, ArrayList<Hitbox>>()
     
     init {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
@@ -45,12 +46,12 @@ object HitboxManager : Listener {
         if (action != Action.PHYSICAL) {
             val player = event.player
             
-            var lastChunk: Chunk? = null
+            var lastChunk: ChunkPos? = null
             var surroundingHitboxes: List<Hitbox>? = null
             player.eyeLocation.castRay(0.1, if (player.gameMode == GameMode.CREATIVE) 8.0 else 4.0) { location ->
                 val block = location.block
                 if (block.type.isTraversable() || !block.boundingBox.contains(location.x, location.y, location.z)) {
-                    val chunk = block.chunk
+                    val chunk = block.chunkPos
                     
                     if (chunk != lastChunk) {
                         // if the ray has moved out of the chunk it was previously in, the surrounding hitboxes need to be recalculated

@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.world.BlockPos
 import kotlin.random.Random
 
 fun Player.playItemPickupSound() {
@@ -23,5 +24,7 @@ class SoundEffect(private val sound: String, category: SoundCategory?= null) {
     fun play(location: Location) {
         location.world!!.playSound(location, sound, category, 1f, Random.nextDouble(0.8, 0.95).toFloat())
     }
+    
+    fun play(pos: BlockPos) = play(pos.location.add(0.5, 0.5, 0.5))
     
 }

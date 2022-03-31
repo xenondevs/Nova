@@ -15,6 +15,8 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.world.WorldDataManager
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -30,6 +32,8 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
+import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.pos
 
 object NovaCommand : Command("nova") {
@@ -49,9 +53,9 @@ object NovaCommand : Command("nova") {
                     }))
             .then(literal("debug")
                 .requiresPlayerPermission("nova.command.debug")
-                .then(literal("removeTileEntities")
+                .then(literal("removeNovaBlocks")
                     .then(argument("range", IntegerArgumentType.integer(0))
-                        .executesCatching(::removeTileEntities)))
+                        .executesCatching(::removeNovaBlocks)))
                 .then(literal("getTileEntityData")
                     .executesCatching(::showTileEntityData))
                 .then(literal("reloadNetworks")
@@ -108,16 +112,16 @@ object NovaCommand : Command("nova") {
         } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.no-players"))
     }
     
-    private fun removeTileEntities(ctx: CommandContext<CommandSourceStack>) {
+    private fun removeNovaBlocks(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
-        val tileEntities = chunks.flatMap { TileEntityManager.getTileEntitiesInChunk(it.pos) }
-        tileEntities.forEach { TileEntityManager.destroyTileEntity(it, false) }
+        val novaBlocks = chunks.flatMap { WorldDataManager.getBlockStates(it.pos).values.filterIsInstance<NovaBlockState>() }
+        novaBlocks.forEach { BlockManager.removeBlock(BlockBreakContext(it.pos)) }
         
         ctx.source.sendSuccess(localized(
             ChatColor.GRAY,
             "command.nova.remove_tile_entities.success",
-            coloredText(ChatColor.AQUA, tileEntities.count())
+            coloredText(ChatColor.AQUA, novaBlocks.count())
         ))
     }
     

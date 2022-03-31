@@ -1,7 +1,8 @@
-package xyz.xenondevs.nova.world.hitbox
+package xyz.xenondevs.nova.world.block.hitbox
 
 import org.bukkit.Location
 import org.bukkit.event.player.PlayerInteractEvent
+import xyz.xenondevs.nova.world.chunkPos
 
 class Hitbox(
     val from: Location,
@@ -10,7 +11,7 @@ class Hitbox(
     val handleHit: (PlayerInteractEvent) -> Unit
 ) {
     
-    val chunk = from.chunk
+    val chunk = from.chunkPos
     
     init {
         HitboxManager.addHitbox(this)

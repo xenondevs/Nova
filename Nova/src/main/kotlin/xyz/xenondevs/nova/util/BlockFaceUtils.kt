@@ -57,29 +57,27 @@ val BlockFace.rotationValues: Pair<Int, Int>
         else -> throw IllegalArgumentException("Illegal facing")
     }
 
-val BlockFace.yawPitch: Pair<Float, Float>
+val BlockFace.yaw: Float
     get() = when (this) {
-        SOUTH -> 0f to 0f
-        WEST -> 90f to 0f
-        NORTH -> 180f to 0f
-        EAST -> 270f to 0f
-        UP -> 0f to 90f
-        DOWN -> 0f to 270f
-    
+        SOUTH -> 0f
+        WEST -> 90f
+        NORTH -> 180f
+        EAST -> 270f
+        UP -> 0f
+        DOWN -> 0f
+        
         else -> throw UnsupportedOperationException("Unsupported facing")
     }
 
-val Location.facing: BlockFace
-    get() {
-        val yawMod = yaw.mod(360f)
-        return when {
-            yawMod >= 315 -> SOUTH
-            yawMod >= 225 -> EAST
-            yawMod >= 135 -> NORTH
-            yawMod >= 45 -> WEST
-            else -> SOUTH
-        }
+val BlockFace.pitch: Float
+    get() = when (this) {
+        UP -> 90f
+        DOWN -> 270f
+        else -> 0f
     }
+
+val Location.facing: BlockFace
+    get() = BlockFaceUtils.getDirection(yaw)
 
 fun Axis.toBlockFace(positive: Boolean): BlockFace =
     when (this) {
@@ -101,6 +99,33 @@ object BlockFaceUtils {
         ).sortedByDescending { it.second.absoluteValue }[0]
         
         return result.first.toBlockFace(result.second >= 0)
+    }
+    
+    fun determineBlockFaceLookingAt(location: Location, maxDistance: Double, stepSize: Double): BlockFace? {
+        var previous = location
+        
+        location.castRay(stepSize, maxDistance) { rayLocation ->
+            val block = rayLocation.block
+            if (block.type.isTraversable() && !block.boundingBox.contains(rayLocation.x, rayLocation.y, rayLocation.z)) {
+                previous = rayLocation.clone()
+                return@castRay true
+            } else {
+                return determineBlockFace(rayLocation.block, previous)
+            }
+        }
+        
+        return null
+    }
+    
+    fun getDirection(yaw: Float): BlockFace {
+        val yawMod = yaw.mod(360f)
+        return when {
+            yawMod >= 315 -> SOUTH
+            yawMod >= 225 -> EAST
+            yawMod >= 135 -> NORTH
+            yawMod >= 45 -> WEST
+            else -> SOUTH
+        }
     }
     
 }

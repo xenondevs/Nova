@@ -12,7 +12,6 @@ import org.bukkit.util.Vector
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
@@ -27,9 +26,6 @@ fun Location(world: World?, x: Int, y: Int, z: Int): Location =
 
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
-
-val Location.chunkPos: ChunkPos
-    get() = ChunkPos(world!!.uid, x.toInt() shr 4, z.toInt() shr 4)
 
 fun Location.dropItems(items: Iterable<ItemStack>) {
     val world = world!!
@@ -105,7 +101,7 @@ fun Location.getNearbyTileEntity(face: BlockFace, additionalHitboxes: Boolean): 
         ?: VanillaTileEntityManager.getTileEntityAt(location)
 }
 
-fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
+inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
     val vector = direction.multiply(stepSize)
     val location = clone()
     var distance = 0.0

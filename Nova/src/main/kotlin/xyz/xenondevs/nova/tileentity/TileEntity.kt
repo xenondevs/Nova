@@ -7,18 +7,16 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
-import net.minecraft.world.entity.EquipmentSlot
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
 import xyz.xenondevs.nova.data.world.block.property.Directional
-import xyz.xenondevs.nova.data.world.block.state.NovaTileState
+import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
@@ -30,53 +28,57 @@ import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.ui.overlay.GUITexture
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
-import xyz.xenondevs.nova.world.pos
+import xyz.xenondevs.nova.world.block.TileEntityBlock
+import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.region.Region
 import java.util.*
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
 val SELF_UPDATE_REASON = object : UpdateReason {}
+val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
 
-abstract class TileEntity(
-    val uuid: UUID,
-    data: CompoundElement,
-    final override val material: TileEntityNovaMaterial,
-    val ownerUUID: UUID,
-    val armorStand: FakeArmorStand,
-) : DataHolder(data, true), ITileEntity {
+abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), ITileEntity {
     
-    override val owner = Bukkit.getOfflinePlayer(ownerUUID)
-    abstract val gui: Lazy<TileEntityGUI>?
-    val blockState = NovaTileState(material, uuid, ownerUUID, data)
+    val pos: BlockPos = blockState.pos
+    val uuid: UUID = blockState.uuid
+    val ownerUUID: UUID = blockState.ownerUUID
+    override val data: CompoundElement = blockState.data
+    override val material: TileEntityNovaMaterial = blockState.material
+    
+    override val owner: OfflinePlayer by lazy { Bukkit.getOfflinePlayer(uuid) }
+    
+    val location: Location
+        get() = pos.location
+    val world: World
+        get() = pos.world
+    val chunk: Chunk
+        get() = chunkPos.chunk!!
+    val chunkPos: ChunkPos
+        get() = pos.chunkPos
+    val facing: BlockFace
+        get() = blockState.getProperty(Directional)!!.facing
     
     @Volatile
     var isValid: Boolean = true
         private set
     
-    val location = armorStand.location.blockLocation
-    val world = location.world!!
-    val chunk = location.chunk
-    val chunkPos = chunk.pos
-    val facing = armorStand.location.facing
-    
+    abstract val gui: Lazy<TileEntityGUI>?
     internal val inventories = ArrayList<VirtualInventory>()
     private val fluidContainers = HashMap<FluidContainer, Boolean>()
     private val multiModels = ArrayList<MultiModel>()
     private val particleTasks = ArrayList<TileEntityParticleTask>()
     
-    val additionalHitboxes = HashSet<Location>()
-    
-    var hasHitboxBeenPlaced = false
-        private set
-    
     override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
         val drops = ArrayList<ItemStack>()
         if (includeSelf) {
             saveData()
+            
             val item = material.createItemBuilder(this).get()
-            if (globalData.isNotEmpty()) item.setTileEntityData(globalData)
+            if (globalData.isNotEmpty())
+                item.itemMeta?.persistentDataContainer?.set(TILE_ENTITY_KEY, CompoundElementDataType, globalData)
+            
             drops += item
         }
         
@@ -102,21 +104,6 @@ abstract class TileEntity(
     }
     
     /**
-     * Called to get the [ItemStack] to be placed as the head of the [FakeArmorStand].
-     */
-    open fun getHeadStack(): ItemStack {
-        return material.block.createItemStack()
-    }
-    
-    /**
-     * Calls the [getHeadStack] function and puts the result on the [FakeArmorStand].
-     */
-    fun updateHeadStack() {
-        armorStand.setEquipment(EquipmentSlot.HEAD, getHeadStack())
-        armorStand.updateEquipment()
-    }
-    
-    /**
      * Called every tick for every TileEntity that is in a loaded chunk.
      */
     open fun handleTick() = Unit
@@ -136,14 +123,6 @@ abstract class TileEntity(
     open fun handleInitialized(first: Boolean) = Unit
     
     /**
-     * Called after the hitbox block has been placed.
-     * This action happens one tick after [handleInitialized] with first: true.
-     */
-    open fun handleHitboxPlaced() {
-        hasHitboxBeenPlaced = true
-    }
-    
-    /**
      * Called after the TileEntity has been removed from the
      * TileEntityManager's TileEntity map because it either got
      * unloaded or destroyed.
@@ -154,25 +133,24 @@ abstract class TileEntity(
         isValid = false
         if (gui?.isInitialized() == true) gui!!.value.closeWindows()
         
-        armorStand.remove()
         multiModels.forEach { it.close() }
         particleTasks.forEach { it.stop() }
     }
     
     /**
-     * Called when a player right-clicks the TileEntity.
+     * Called when a [TileEntityBlock] is interacted with.
      *
-     * Only called once and always for the main hand.
-     * Use [PlayerInteractEvent.handItems] to check both items.
+     * Might be called twice for each hand.
      *
-     * The event has should be cancelled if any action
-     * is performed in that method.
+     * @return If any action was performed.
      */
-    open fun handleRightClick(event: PlayerInteractEvent) {
-        if (gui != null && !event.player.hasInventoryOpen) {
-            event.isCancelled = true
-            gui!!.value.openWindow(event.player)
+    open fun handleRightClick(ctx: BlockInteractContext): Boolean {
+        val player = ctx.source as? Player ?: return false
+        if (gui != null && !player.hasInventoryOpen) {
+            gui!!.value.openWindow(player)
+            return true
         }
+        return false
     }
     
     /**
@@ -285,7 +263,7 @@ abstract class TileEntity(
      * Gets the correct direction a block side.
      */
     fun getFace(blockSide: BlockSide): BlockFace =
-        blockSide.getBlockFace(armorStand.location.yaw)
+        blockSide.getBlockFace(facing.yaw)
     
     /**
      * Creates an energy side config
@@ -393,17 +371,6 @@ abstract class TileEntity(
         return Region(LocationUtils.sort(pos1, pos2))
     }
     
-    /**
-     * Places additional hitboxes for this [TileEntity] and registers them
-     * in the [TileEntityManager].
-     */
-    fun setAdditionalHitboxes(placeBlocks: Boolean, hitboxes: List<Location>) {
-        if (placeBlocks) hitboxes.forEach { it.block.type = material.hitboxType!! }
-        
-        additionalHitboxes += hitboxes
-        TileEntityManager.addTileEntityHitboxLocations(this, hitboxes)
-    }
-    
     override fun equals(other: Any?): Boolean {
         return other is TileEntity && other === this
     }
@@ -413,46 +380,7 @@ abstract class TileEntity(
     }
     
     override fun toString(): String {
-        return "${javaClass.name}(Material: $material, Location: ${armorStand.location.blockLocation}, UUID: $uuid)"
-    }
-    
-    companion object {
-        
-        fun create(pos: BlockPos, state: NovaTileState): TileEntity {
-            val location = pos.location.center()
-            
-            val directional = state.getProperty(Directional)
-            if (directional != null)
-                location.yaw = directional.facing.rotationValues.second * 90f
-            else location.yaw = 180f
-            
-            return create(state.uuid, location, state.material, state.data, state.ownerUUID)
-        }
-        
-        fun create(
-            uuid: UUID,
-            armorStandLocation: Location,
-            material: TileEntityNovaMaterial,
-            data: CompoundElement,
-            ownerUUID: UUID
-        ): TileEntity {
-            // create the fake armor stand
-            val armorStand = FakeArmorStand(armorStandLocation, false) {
-                it.isInvisible = true
-                it.isMarker = true
-                it.setSharedFlagOnFire(material.hitboxType.requiresLight)
-            }
-            
-            // create the tile entity
-            val tileEntity = material.tileEntityConstructor(uuid, data, material, ownerUUID, armorStand)
-            
-            // set the head stack and register
-            armorStand.setEquipment(EquipmentSlot.HEAD, tileEntity.getHeadStack())
-            armorStand.register()
-            
-            return tileEntity
-        }
-        
+        return "${javaClass.name}(Material: $material, Location: ${pos}, UUID: $uuid)"
     }
     
     abstract inner class TileEntityGUI(private val texture: GUITexture? = null) {

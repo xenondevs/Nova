@@ -1,19 +1,35 @@
 package xyz.xenondevs.nova.material
 
+import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.SoundEffect
 import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolLevel
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import xyz.xenondevs.nova.world.block.model.BlockModelProviderType
+import java.util.concurrent.CompletableFuture
+
+typealias PlaceCheckFun = ((Player, ItemStack, Location) -> CompletableFuture<Boolean>)
+typealias MultiBlockReceiver = (BlockPos) -> List<BlockPos>
 
 open class BlockNovaMaterial internal constructor(
     id: String,
     localizedName: String,
-    novaItem: NovaItem? = null,
+    novaItem: NovaItem?,
+    val novaBlock: NovaBlock<NovaBlockState>,
     options: BlockOptions,
-    val properties: List<BlockPropertyType<*>>
+    val modelProvider: BlockModelProviderType<*>,
+    val properties: List<BlockPropertyType<*>>,
+    val placeCheck: PlaceCheckFun?,
+    val multiBlockReceiver: MultiBlockReceiver?
 ) : ItemNovaMaterial(id, localizedName, novaItem) {
     
     val block: ModelData by lazy { Resources.getModelData(id).second!! }
@@ -27,6 +43,12 @@ open class BlockNovaMaterial internal constructor(
     val breakSound = options.breakSound
     val breakParticles = options.breakParticles
     val showBreakAnimation = options.showBreakAnimation
+    
+    internal open fun createBlockState(pos: BlockPos): NovaBlockState =
+        NovaBlockState(pos, this)
+    
+    internal open fun createNewBlockState(ctx: BlockPlaceContext): NovaBlockState =
+        NovaBlockState(this, ctx)
     
 }
 

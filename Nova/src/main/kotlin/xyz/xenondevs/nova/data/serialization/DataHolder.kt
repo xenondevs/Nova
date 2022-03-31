@@ -10,13 +10,12 @@ import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.reflection.type
 import java.util.*
 
-open class DataHolder(val data: CompoundElement = CompoundElement(), includeGlobal: Boolean) {
+abstract class DataHolder(includeGlobal: Boolean) {
     
-    val globalData = data.getElement("global") ?: CompoundElement()
-    
-    init {
-        if (includeGlobal && "global" !in data)
-            data.putElement("global", globalData)
+    abstract val data: CompoundElement
+    val globalData by lazy {
+        val global = data.getElement<CompoundElement>("global")
+        global ?: CompoundElement().also { if (includeGlobal) data.putElement("global", it) }
     }
     
     // region element retrieval

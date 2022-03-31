@@ -19,14 +19,18 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
+import xyz.xenondevs.nova.util.handItems
+import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.util.runAsyncTaskTimer
+import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 
@@ -40,7 +44,7 @@ object VanillaTileEntityManager : Initializable(), Listener {
     private val tileEntityQueue = LinkedList<VanillaTileEntity>()
     
     override val inMainThread = true
-    override val dependsOn = setOf(TileEntityManager)
+    override val dependsOn = setOf(AddonsInitializer)
     
     override fun init() {
         LOGGER.info("Initializing VanillaTileEntityManager")

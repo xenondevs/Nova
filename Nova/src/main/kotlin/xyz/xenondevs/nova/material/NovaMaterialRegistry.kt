@@ -8,6 +8,8 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.world.block.TileEntityBlock
+import xyz.xenondevs.nova.world.block.model.ArmorStandModelProvider
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
 
 object NovaMaterialRegistry : INovaMaterialRegistry {
@@ -32,14 +34,12 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         options: BlockOptions,
         tileEntityConstructor: TileEntityConstructor,
         placeCheck: PlaceCheckFun? = null,
+        multiBlockReceiver: MultiBlockReceiver? = null,
         isInteractable: Boolean = true,
         properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
-        return registerTileEntity(
-            addon, name, options,
-            tileEntityConstructor, listOf(EnergyHolder::modifyItemBuilder), placeCheck,
-            isInteractable, properties,
-        )
+        return registerTileEntity(addon, name, options, tileEntityConstructor, listOf(EnergyHolder::modifyItemBuilder),
+            placeCheck, multiBlockReceiver, isInteractable, properties)
     }
     
     fun registerTileEntity(
@@ -49,36 +49,16 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         tileEntityConstructor: TileEntityConstructor,
         itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
         placeCheck: PlaceCheckFun? = null,
+        multiBlockReceiver: MultiBlockReceiver? = null,
         isInteractable: Boolean = true,
         properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
         val namespace = addon.description.id
         val id = name.addNamespace(namespace)
         val localizedName = "block.$namespace.$name"
-        val material = TileEntityNovaMaterial(
-            id, localizedName, null, options,
-            tileEntityConstructor, itemBuilderModifiers, placeCheck,
-            isInteractable, properties
-        )
-        
-        return register(material)
-    }
-    
-    internal fun registerTileEntity(
-        id: String,
-        name: String,
-        options: BlockOptions,
-        tileEntityConstructor: TileEntityConstructor,
-        itemBuilderModifiers: List<ItemBuilderModifierFun>?,
-        placeCheck: PlaceCheckFun? = null,
-        isInteractable: Boolean = true,
-        properties: List<BlockPropertyType<*>> = listOf(Directional)
-    ): TileEntityNovaMaterial {
-        val material = TileEntityNovaMaterial(
-            id, name, null, options,
-            tileEntityConstructor, itemBuilderModifiers, placeCheck,
-            isInteractable, properties
-        )
+        val material = TileEntityNovaMaterial(id, localizedName, null,
+            if (isInteractable) TileEntityBlock.INTERACTIVE else TileEntityBlock.NON_INTERACTIVE,
+            options, tileEntityConstructor, itemBuilderModifiers, ArmorStandModelProvider, properties, placeCheck, multiBlockReceiver)
         
         return register(material)
     }

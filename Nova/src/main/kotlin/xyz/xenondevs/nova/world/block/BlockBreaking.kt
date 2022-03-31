@@ -6,6 +6,7 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -14,12 +15,8 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.CoreBlockOverlay
-import xyz.xenondevs.nova.network.PacketListener
 import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.tileentity.requiresLight
 import xyz.xenondevs.nova.util.*
@@ -27,18 +24,17 @@ import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 import net.minecraft.world.entity.EquipmentSlot as MojangSlot
 
-internal object BlockBreakManager : Initializable(), Listener {
-    
-    override val inMainThread = true
-    override val dependsOn = setOf(PacketListener)
+internal object BlockBreaking : Listener {
     
     private val breakers = ConcurrentHashMap<Player, Breaker>()
     
-    override fun init() {
+    fun init() {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         runTaskTimer(0, 1, ::handleTick)
     }
@@ -51,11 +47,12 @@ internal object BlockBreakManager : Initializable(), Listener {
     }
     
     private fun handleDestroyStart(player: Player, pos: BlockPos): Boolean {
-        val blockState = WorldDataManager.getBlockState(pos)
-        if (blockState is NovaBlockState) {
+        val blockState = BlockManager.getBlock(pos)
+        if (blockState != null) {
             val material = blockState.material
             if (material.hardness >= 0) {
-                breakers[player] = Breaker(player, pos.location.block, material)
+                breakers[player] = Breaker(player, pos.location.block, blockState)
+                return true
             }
         }
         
@@ -88,8 +85,9 @@ internal object BlockBreakManager : Initializable(), Listener {
 
 private val MINING_FATIGUE = MobEffectInstance(MobEffect.byId(4), Integer.MAX_VALUE, 255, false, false, false)
 
-private class Breaker(val player: Player, val block: Block, val material: BlockNovaMaterial) {
+private class Breaker(val player: Player, val block: Block, val blockState: NovaBlockState) {
     
+    private val material = blockState.material
     private val tool: ItemStack = player.inventory.itemInMainHand
     private val toolCategory: ToolCategory? = ToolCategory.of(tool.type)
     private val correctCategory: Boolean = material.toolCategory == null || material.toolCategory == toolCategory
@@ -101,21 +99,32 @@ private class Breaker(val player: Player, val block: Block, val material: BlockN
         else PacketBreakMethod(block)
     else null
     
+    private var brokeInstantaneously = true
     private var progress = 0.0
     
     fun handleTick() {
         check(!isDone()) { "Breaker is done" }
         
-        progress += ToolUtils.calculateDamage(player, tool, toolCategory, material.hardness, correctCategory, correctLevel)
+        progress += calculateDamage()
         
         if (isDone()) {
             // Stop break animation and mining fatigue effect
             stop()
+            // create a block breaking context
+            val ctx = BlockBreakContext(
+                block.pos,
+                player, player.location,
+                BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 8.0, 0.2),
+                player.inventory.itemInMainHand.takeUnlessAir()
+            )
             // Drop items
-            if (drops) block.location.dropItems(block.getAllDrops(tool))
-            // If the block has a hardness of 0, the effects will be played clientside
-            block.remove(block.type.hardness != 0f)
+            if (player.gameMode != GameMode.CREATIVE && drops)
+                blockState.pos.location.dropItems(material.novaBlock.getDrops(blockState, ctx))
+            // If the block broke instantaneously, the effects will be played clientside
+            block.remove(ctx, !brokeInstantaneously)
         } else {
+            brokeInstantaneously = false
+            
             val percentage = progress / 1
             if (breakMethod != null) breakMethod.breakStage = (percentage * 10).toInt()
             
@@ -159,6 +168,11 @@ private class Breaker(val player: Player, val block: Block, val material: BlockN
     }
     
     fun isDone() = progress >= 1
+    
+    private fun calculateDamage(): Double {
+        if (player.gameMode == GameMode.CREATIVE) return 1.0
+        return ToolUtils.calculateDamage(player, tool, toolCategory, material.hardness, correctCategory, correctLevel)
+    }
     
 }
 

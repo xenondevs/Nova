@@ -5,12 +5,10 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.material.CoreItems
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -20,18 +18,12 @@ import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.reflection.actualDelegate
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-abstract class NetworkedTileEntity(
-    uuid: UUID,
-    data: CompoundElement,
-    material: TileEntityNovaMaterial,
-    ownerUUID: UUID,
-    armorStand: FakeArmorStand,
-) : TileEntity(uuid, data, material, ownerUUID, armorStand), NetworkEndPoint {
+abstract class NetworkedTileEntity(blockState: NovaTileEntityState): TileEntity(blockState), NetworkEndPoint {
     
     final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = emptyEnumMap()
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = emptyEnumMap()
@@ -66,30 +58,29 @@ abstract class NetworkedTileEntity(
         return retrieveEnumMapOrNull("connectedNodes")
     }
     
-    final override fun handleRightClick(event: PlayerInteractEvent) {
-        if (event.handItems.any { it.novaMaterial == CoreItems.WRENCH }) {
-            handleWrenchClick(event)
+    final override fun handleRightClick(ctx: BlockInteractContext): Boolean {
+        val item = ctx.item
+        if (item?.novaMaterial == CoreItems.WRENCH) {
+             handleWrenchClick(ctx)
+            return true
         } else {
             val holder = holders[NetworkType.FLUID]
-            if (holder is NovaFluidHolder) {
-                val player = event.player
-                val hand = event.hand!!
-                
-                val success = when (player.inventory.getItem(hand)?.type) {
-                    Material.BUCKET -> fillBucket(holder, player, hand)
-                    Material.WATER_BUCKET, Material.LAVA_BUCKET -> emptyBucket(holder, player, hand)
+            if (holder is NovaFluidHolder && ctx.source is Player && ctx.hand != null) {
+                val success = when (item?.type) {
+                    Material.BUCKET -> fillBucket(holder, ctx.source, ctx.hand)
+                    Material.WATER_BUCKET, Material.LAVA_BUCKET -> emptyBucket(holder, ctx.source, ctx.hand)
                     else -> false
                 }
                 
-                if (success) return
+                if (success) return true
             }
             
-            handleUnknownRightClick(event)
+            return handleUnknownRightClick(ctx)
         }
     }
     
-    private fun handleWrenchClick(event: PlayerInteractEvent) {
-        val face = event.blockFace
+    private fun handleWrenchClick(ctx: BlockInteractContext) {
+        val face = ctx.clickedFace ?: return
         
         NetworkManager.queueAsync {
             val itemHolder = holders[NetworkType.ITEMS]
@@ -150,8 +141,8 @@ abstract class NetworkedTileEntity(
         return false
     }
     
-    open fun handleUnknownRightClick(event: PlayerInteractEvent) {
-        super.handleRightClick(event)
+    open fun handleUnknownRightClick(ctx: BlockInteractContext): Boolean {
+        return super.handleRightClick(ctx)
     }
     
     override fun handleRemoved(unload: Boolean) {

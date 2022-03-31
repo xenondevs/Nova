@@ -10,6 +10,7 @@ import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.world.chunkPos
 import net.minecraft.world.item.ItemStack as MItemStack
 import org.bukkit.inventory.ItemStack as BItemStack
 

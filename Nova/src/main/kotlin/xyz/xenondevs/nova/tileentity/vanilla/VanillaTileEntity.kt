@@ -29,8 +29,9 @@ private fun TileState.getTileEntityData(): CompoundElement {
     return CompoundElement()
 }
 
-abstract class VanillaTileEntity(tileState: TileState) : DataHolder(tileState.getTileEntityData(), false) {
+abstract class VanillaTileEntity(tileState: TileState) : DataHolder(false) {
     
+    override val data = tileState.getTileEntityData()
     val block = tileState.block
     val type = block.type
     
