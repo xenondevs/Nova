@@ -15,7 +15,7 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
     private val material = blockState.material
     
     private val armorStands = ArrayList<FakeArmorStand>()
-    private val multiBlockPositions = material.multiBlockReceiver?.invoke(pos)
+    private val multiBlockPositions = material.multiBlockLoader?.invoke(pos)
     
     init {
         val location = pos.location.center()

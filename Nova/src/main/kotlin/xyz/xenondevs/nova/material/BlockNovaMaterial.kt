@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.world.block.model.BlockModelProviderType
 import java.util.concurrent.CompletableFuture
 
 typealias PlaceCheckFun = ((Player, ItemStack, Location) -> CompletableFuture<Boolean>)
-typealias MultiBlockReceiver = (BlockPos) -> List<BlockPos>
+typealias MultiBlockLoader = (BlockPos) -> List<BlockPos>
 
 open class BlockNovaMaterial internal constructor(
     id: String,
@@ -29,7 +29,7 @@ open class BlockNovaMaterial internal constructor(
     val modelProvider: BlockModelProviderType<*>,
     val properties: List<BlockPropertyType<*>>,
     val placeCheck: PlaceCheckFun?,
-    val multiBlockReceiver: MultiBlockReceiver?
+    val multiBlockLoader: MultiBlockLoader?
 ) : ItemNovaMaterial(id, localizedName, novaItem) {
     
     val block: ModelData by lazy { Resources.getModelData(id).second!! }

@@ -27,7 +27,7 @@ class TileEntityNovaMaterial internal constructor(
     modelProvider: BlockModelProviderType<*>,
     properties: List<BlockPropertyType<*>>,
     placeCheck: PlaceCheckFun?,
-    multiBlockReceiver: MultiBlockReceiver?
+    multiBlockLoader: MultiBlockLoader?
 ) : BlockNovaMaterial(
     id,
     localizedName,
@@ -37,7 +37,7 @@ class TileEntityNovaMaterial internal constructor(
     modelProvider,
     properties,
     placeCheck,
-    multiBlockReceiver
+    multiBlockLoader
 ) {
     
     /**

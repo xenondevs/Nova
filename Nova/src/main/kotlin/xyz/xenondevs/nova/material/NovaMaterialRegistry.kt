@@ -34,12 +34,12 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         options: BlockOptions,
         tileEntityConstructor: TileEntityConstructor,
         placeCheck: PlaceCheckFun? = null,
-        multiBlockReceiver: MultiBlockReceiver? = null,
+        multiBlockLoader: MultiBlockLoader? = null,
         isInteractable: Boolean = true,
         properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
         return registerTileEntity(addon, name, options, tileEntityConstructor, listOf(EnergyHolder::modifyItemBuilder),
-            placeCheck, multiBlockReceiver, isInteractable, properties)
+            placeCheck, multiBlockLoader, isInteractable, properties)
     }
     
     fun registerTileEntity(
@@ -49,7 +49,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         tileEntityConstructor: TileEntityConstructor,
         itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
         placeCheck: PlaceCheckFun? = null,
-        multiBlockReceiver: MultiBlockReceiver? = null,
+        multiBlockLoader: MultiBlockLoader? = null,
         isInteractable: Boolean = true,
         properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
@@ -58,7 +58,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         val localizedName = "block.$namespace.$name"
         val material = TileEntityNovaMaterial(id, localizedName, null,
             if (isInteractable) TileEntityBlock.INTERACTIVE else TileEntityBlock.NON_INTERACTIVE,
-            options, tileEntityConstructor, itemBuilderModifiers, ArmorStandModelProvider, properties, placeCheck, multiBlockReceiver)
+            options, tileEntityConstructor, itemBuilderModifiers, ArmorStandModelProvider, properties, placeCheck, multiBlockLoader)
         
         return register(material)
     }
