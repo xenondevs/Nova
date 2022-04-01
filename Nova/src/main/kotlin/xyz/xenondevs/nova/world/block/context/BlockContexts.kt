@@ -9,16 +9,16 @@ import java.util.*
 
 data class BlockPlaceContext(
     val pos: BlockPos,
+    val item: ItemStack,
     val source: Any?,
-    val ownerUUID: UUID,
     val sourceLocation: Location?,
+    val ownerUUID: UUID,
     val placedOn: BlockPos,
-    val placedOnFace: BlockFace,
-    val item: ItemStack?
+    val placedOnFace: BlockFace
 ) {
     
     init {
-        require(item?.type?.isAir != true) { "empty item stacks are not allowed" }
+        require(!item.type.isAir) { "empty item stacks are not allowed" }
     }
     
 }

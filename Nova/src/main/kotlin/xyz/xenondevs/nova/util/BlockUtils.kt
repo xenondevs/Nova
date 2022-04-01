@@ -7,7 +7,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.BlockItem
-import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
@@ -24,14 +23,18 @@ import org.bukkit.block.data.type.PistonHead
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
+import java.util.*
 import kotlin.random.Random
+import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceContext
 
 val Block.below: Block
     get() = location.subtract(0.0, 1.0, 0.0).block
@@ -122,11 +125,30 @@ fun Block.setBreakState(entityId: Int, state: Int) {
         .forEach { it.send(packet) }
 }
 
-fun Block.place(player: ServerPlayer, itemStack: ItemStack): Boolean {
+fun Block.place(ctx: BlockPlaceContext, playEffects: Boolean = true): Boolean {
+    val item = ctx.item
+    val novaMaterial = item.novaMaterial
+    if (novaMaterial is BlockNovaMaterial) {
+        BlockManager.placeBlock(novaMaterial, ctx, playEffects)
+        return true
+    }
+    
+    if (CustomItemServiceManager.placeItem(item, ctx.pos.location, playEffects))
+        return true
+    
+    if (item.type.isBlock) {
+        val fakePlayer = EntityUtils.createFakePlayer(ctx.sourceLocation ?: location, UUID.randomUUID(), "")
+        return placeVanilla(fakePlayer, item)
+    }
+    
+    return false
+}
+
+fun Block.placeVanilla(player: ServerPlayer, itemStack: ItemStack, playEffects: Boolean = true): Boolean {
     val location = location
     val nmsStack = itemStack.nmsStack
     val blockItem = nmsStack.item as BlockItem
-    val result = blockItem.place(BlockPlaceContext(UseOnContext(
+    val result = blockItem.place(MojangBlockPlaceContext(UseOnContext(
         world.serverLevel,
         player,
         InteractionHand.MAIN_HAND,
@@ -141,6 +163,7 @@ fun Block.place(player: ServerPlayer, itemStack: ItemStack): Boolean {
     
     if (result.consumesAction()) {
         setBlockEntityDataFromItemStack(itemStack)
+        if (playEffects) itemStack.type.playPlaceSoundEffect(location)
         return true
     }
     return false

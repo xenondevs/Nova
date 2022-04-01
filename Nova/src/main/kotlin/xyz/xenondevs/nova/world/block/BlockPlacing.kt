@@ -73,8 +73,9 @@ internal object BlockPlacing : Listener {
             if (placeLoc.block.type.isReplaceable() && WorldDataManager.getBlockState(placeLoc.pos) == null) {
                 // TODO: Block Limits
                 val ctx = BlockPlaceContext(
-                    placeLoc.pos, player, player.uniqueId, player.location,
-                    event.clickedBlock!!.pos, event.blockFace, handItem
+                    placeLoc.pos, handItem,
+                    player, player.location, player.uniqueId,
+                    event.clickedBlock!!.pos, event.blockFace
                 )
                 
                 BlockManager.placeBlock(material, ctx)
