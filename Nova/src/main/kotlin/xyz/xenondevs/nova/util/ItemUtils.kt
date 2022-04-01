@@ -68,7 +68,7 @@ fun Material.isReplaceable(): Boolean =
         Material.AIR, Material.CAVE_AIR, Material.VOID_AIR, Material.WATER, Material.LAVA,
         Material.GRASS, Material.TALL_GRASS, Material.FERN, Material.DEAD_BUSH, Material.VINE,
         Material.CRIMSON_ROOTS, Material.WARPED_ROOTS, Material.NETHER_SPROUTS, Material.SEAGRASS, Material.FIRE,
-        Material.SOUL_FIRE, Material.SNOW, Material.STRUCTURE_VOID -> true
+        Material.SOUL_FIRE, Material.SNOW, Material.STRUCTURE_VOID, Material.LIGHT -> true
         else -> false
     }
 

@@ -5,10 +5,12 @@ import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
+import org.bukkit.Axis
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,7 +20,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.CoreBlockOverlay
 import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
-import xyz.xenondevs.nova.tileentity.requiresLight
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolUtils
@@ -26,6 +27,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.pos
+import xyz.xenondevs.particle.ParticleEffect
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 import net.minecraft.world.entity.EquipmentSlot as MojangSlot
@@ -99,8 +101,9 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
         else PacketBreakMethod(block)
     else null
     
-    private var brokeInstantaneously = true
     private var progress = 0.0
+    
+    fun isDone() = progress >= 1
     
     fun handleTick() {
         check(!isDone()) { "Breaker is done" }
@@ -120,14 +123,17 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
             // Drop items
             if (player.gameMode != GameMode.CREATIVE && drops)
                 blockState.pos.location.dropItems(material.novaBlock.getDrops(blockState, ctx))
-            // If the block broke instantaneously, the effects will be played clientside
-            block.remove(ctx, !brokeInstantaneously)
+            // If the block broke instantaneously for the client, the effects will also be played clientside
+            block.remove(ctx, calculateClientsideDamage() < 1)
         } else {
-            brokeInstantaneously = false
+            // spawn hit particles if not rendered clientside
+            if (block.type == Material.BARRIER) spawnHitParticles()
             
+            // set the break stage
             val percentage = progress / 1
-            if (breakMethod != null) breakMethod.breakStage = (percentage * 10).toInt()
+            if (breakMethod != null) breakMethod.breakStage = (percentage * 10).toInt() - 1
             
+            // give mining fatigue effect
             val effect = player.getPotionEffect(PotionEffectType.SLOW_DIGGING)
             val packet = if (effect != null) {
                 // The player might actually have mining fatigue.
@@ -167,11 +173,25 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
         player.send(packet)
     }
     
-    fun isDone() = progress >= 1
+    private fun spawnHitParticles() {
+        val texture = material.breakParticles ?: return
+        val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 6.0, 0.2) ?: BlockFace.UP
+        particleBuilder(ParticleEffect.ITEM_CRACK, block.location.add(0.5, 0.5, 0.5).advance(side, 0.6)) {
+            Axis.values().forEach { if (it != side.axis) offset(it, 0.2f) }
+            amount(1)
+            speed(0f)
+            texture(texture)
+        }.display(player)
+    }
     
     private fun calculateDamage(): Double {
         if (player.gameMode == GameMode.CREATIVE) return 1.0
-        return ToolUtils.calculateDamage(player, tool, toolCategory, material.hardness, correctCategory, correctLevel)
+        return ToolUtils.calculateDamage(player, tool, toolCategory, material.hardness, correctCategory, drops)
+    }
+    
+    private fun calculateClientsideDamage(): Double {
+        if (player.gameMode == GameMode.CREATIVE) return 1.0
+        return ToolUtils.calculateDamage(player, tool, toolCategory, block.type.hardness.toDouble(), correctCategory, drops)
     }
     
 }
@@ -207,7 +227,6 @@ private class ArmorStandBreakMethod(block: Block) : BreakMethod(block) {
     private val armorStand = FakeArmorStand(block.location.center(), true) {
         it.isInvisible = true
         it.isMarker = true
-        it.setSharedFlagOnFire(block.type.requiresLight)
     }
     
     override var breakStage: Int = -1

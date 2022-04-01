@@ -90,11 +90,11 @@ object ToolUtils {
         toolCategory: ToolCategory?,
         hardness: Double,
         correctCategory: Boolean,
-        correctLevel: Boolean,
+        correctForDrops: Boolean,
     ): Double = calculateDamage(
         hardness,
         correctCategory,
-        correctLevel,
+        correctForDrops,
         toolCategory?.multipliers?.get(tool.type) ?: 0.0,
         tool.getEnchantmentLevel(Enchantment.DIG_SPEED),
         player.isOnGround,
@@ -106,7 +106,7 @@ object ToolUtils {
     fun calculateDamage(
         hardness: Double,
         correctCategory: Boolean,
-        correctLevel: Boolean,
+        correctForDrops: Boolean,
         toolMultiplier: Double,
         efficiency: Int,
         onGround: Boolean,
@@ -130,7 +130,7 @@ object ToolUtils {
         if (underWater) speedMultiplier /= 5.0
         if (!onGround) speedMultiplier /= 5.0
         
-        return speedMultiplier / hardness / if (correctLevel) 30.0 else 100.0
+        return speedMultiplier / hardness / if (correctForDrops) 30.0 else 100.0
     }
     
     fun isCorrectToolForDrops(tool: Material?, block: Block): Boolean {
