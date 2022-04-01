@@ -14,8 +14,8 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.customModelData
@@ -65,8 +65,7 @@ object ItemsAdder : CustomItemService {
         val customItem = CustomStack.byItemStack(item)
         if (customItem == null || !customItem.isBlock)
             return false
-        CustomBlock.place(customItem.namespacedID, location)
-        // TODO: play sound effect
+        CustomBlock.place(customItem.namespacedID, location)?.playPlaceSound()
         return true
     }
     
