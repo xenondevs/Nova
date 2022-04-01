@@ -76,6 +76,9 @@ val BlockFace.pitch: Float
         else -> 0f
     }
 
+fun BlockFace.getYaw(default: BlockFace): Float =
+    (yaw + default.yaw) % 360
+
 val Location.facing: BlockFace
     get() = BlockFaceUtils.getDirection(yaw)
 

@@ -10,7 +10,7 @@ class Directional : BlockProperty {
     lateinit var facing: BlockFace
     
     override fun init(ctx: BlockPlaceContext) {
-        facing = BlockFaceUtils.getDirection(ctx.sourceLocation?.yaw ?: 0F)
+        facing = BlockFaceUtils.getDirection((ctx.sourceLocation?.yaw ?: 0F) + 180)
     }
     
     override fun read(buf: ByteBuf) {

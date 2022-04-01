@@ -50,7 +50,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     override val owner: OfflinePlayer by lazy { Bukkit.getOfflinePlayer(uuid) }
     
     val location: Location
-        get() = pos.location
+        get() = Location(pos.world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), facing.getYaw(BlockFace.NORTH), 0f)
+    val centerLocation: Location
+        get() = location.center()
     val world: World
         get() = pos.world
     val chunk: Chunk
@@ -58,7 +60,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val chunkPos: ChunkPos
         get() = pos.chunkPos
     val facing: BlockFace
-        get() = blockState.getProperty(Directional)!!.facing
+        get() = blockState.getProperty(Directional)?.facing ?: BlockFace.NORTH
     
     @Volatile
     var isValid: Boolean = true
