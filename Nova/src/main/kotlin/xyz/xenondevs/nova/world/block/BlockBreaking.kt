@@ -92,7 +92,7 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
     private val material = blockState.material
     private val tool: ItemStack = player.inventory.itemInMainHand
     private val toolCategory: ToolCategory? = ToolCategory.of(tool.type)
-    private val correctCategory: Boolean = material.toolCategory == null || material.toolCategory == toolCategory
+    private val correctCategory: Boolean = toolCategory != null && material.toolCategory == toolCategory
     private val correctLevel: Boolean = material.toolLevel == null || tool.type in material.toolLevel.materialsWithHigherTier
     private val drops: Boolean = !material.requiresToolForDrops || (correctCategory && correctLevel)
     
