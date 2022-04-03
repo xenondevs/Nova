@@ -22,6 +22,7 @@ import org.bukkit.block.data.type.Bed
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.config.GlobalValues
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -55,7 +56,7 @@ fun Block.remove(ctx: BlockBreakContext, playEffects: Boolean = true) {
     if (BlockManager.removeBlock(ctx, playEffects))
         return
     
-    if (playEffects) playBreakEffects()
+    if (playEffects && GlobalValues.BLOCK_BREAK_EFFECTS) playBreakEffects()
     getMainHalf().type = Material.AIR
 }
 

@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.data.config.GlobalValues
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -57,7 +58,7 @@ object BlockManager : Initializable() {
         WorldDataManager.removeBlockState(pos)
         state.handleRemoved(true)
         
-        if (playEffects) material.novaBlock.playBreakEffects(state, ctx)
+        if (playEffects && GlobalValues.BLOCK_BREAK_EFFECTS) material.novaBlock.playBreakEffects(state, ctx)
         
         return true
     }
