@@ -68,7 +68,7 @@ abstract class NetworkedTileEntity(
                 val player = event.player
                 val hand = event.hand!!
                 
-                val success = when (player.inventory.getItem(hand).type) {
+                val success = when (player.inventory.getItem(hand)!!.type) {
                     Material.BUCKET -> fillBucket(holder, player, hand)
                     Material.WATER_BUCKET, Material.LAVA_BUCKET -> emptyBucket(holder, player, hand)
                     else -> false
@@ -93,7 +93,7 @@ abstract class NetworkedTileEntity(
     
     private fun emptyBucket(holder: NovaFluidHolder, player: Player, hand: EquipmentSlot): Boolean {
         val bucket = player.inventory.getItem(hand)
-        val type = FluidType.values().first { bucket.isSimilar(it.bucket) }
+        val type = FluidType.values().first { bucket!!.isSimilar(it.bucket) }
         
         val container = holder.availableContainers.values.firstOrNull { it.accepts(type, 1000) && holder.allowedConnectionTypes[it]!!.insert }
         if (container != null) {
@@ -119,10 +119,10 @@ abstract class NetworkedTileEntity(
         if (container != null) {
             if (player.gameMode != GameMode.CREATIVE) {
                 val bucket = container.type!!.bucket!!
-                if (inventory.getItem(hand).amount == 1) {
+                if (inventory.getItem(hand)!!.amount == 1) {
                     inventory.setItem(hand, bucket)
                 } else {
-                    inventory.getItem(hand).amount -= 1
+                    inventory.getItem(hand)!!.amount -= 1
                     inventory.addItem(bucket)
                 }
             }

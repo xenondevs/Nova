@@ -35,7 +35,7 @@ object ItemManager : Initializable(), Listener {
     fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
         if (event.isCancelled) return
         val item = event.player.inventory.getItem(event.hand)
-        if (item.type == Material.AIR) return
+        if (item == null || item.type == Material.AIR) return
         item.novaMaterial?.novaItem?.handleEntityInteract(event.player, item, event.rightClicked, event)
     }
     

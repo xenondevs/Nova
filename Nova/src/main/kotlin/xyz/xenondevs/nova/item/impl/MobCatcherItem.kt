@@ -52,7 +52,7 @@ object MobCatcherItem : NovaItem() {
                 val newCatcher = NovaMaterialRegistry.MOB_CATCHER.createItemStack()
                 absorbEntity(newCatcher, clicked)
                 
-                player.inventory.getItem(event.hand).amount -= 1
+                player.inventory.getItem(event.hand)!!.amount -= 1
                 player.inventory.addPrioritized(event.hand, newCatcher)
                 
                 if (event.hand == EquipmentSlot.HAND) player.swingMainHand() else player.swingOffHand()
@@ -73,7 +73,7 @@ object MobCatcherItem : NovaItem() {
                 val location = player.eyeLocation.getTargetLocation(0.25, 8.0)
                 
                 if (ProtectionManager.canUseItem(player, itemStack, location)) {
-                    player.inventory.getItem(event.hand!!).amount -= 1
+                    player.inventory.getItem(event.hand!!)!!.amount -= 1
                     player.inventory.addPrioritized(event.hand!!, NovaMaterialRegistry.MOB_CATCHER.createItemStack())
                     
                     
