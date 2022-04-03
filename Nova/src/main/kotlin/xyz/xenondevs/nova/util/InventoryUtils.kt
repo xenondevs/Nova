@@ -25,8 +25,14 @@ fun VirtualInventory.isFull(): Boolean {
 }
 
 /**
+ * Checks if a [VirtualInventory] has an empty slot.
+ */
+fun VirtualInventory.hasEmptySlot(): Boolean =
+    items.any { it == null }
+
+/**
  * Adds an [ItemStack] to an [Inventory] while respecting both
- * the max stack size of the inventory as well as the max stack size
+ * the max stack size of the inventory and the max stack size
  * of the item type.
  *
  * Unlike Bukkit's addItem method, the [ItemStack] provided as the

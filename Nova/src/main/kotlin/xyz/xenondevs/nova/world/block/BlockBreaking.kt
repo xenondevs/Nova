@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.CoreBlockOverlay
 import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.util.*
@@ -34,15 +35,46 @@ import net.minecraft.world.entity.EquipmentSlot as MojangSlot
 
 internal object BlockBreaking : Listener {
     
-    private val breakers = ConcurrentHashMap<Player, Breaker>()
+    private val playerBreakers = ConcurrentHashMap<Player, Breaker>()
+    private val internalBreakers = HashMap<Int, BreakMethod>()
     
     fun init() {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         runTaskTimer(0, 1, ::handleTick)
     }
     
+    internal fun setBreakStage(pos: BlockPos, entityId: Int, stage: Int) {
+        val blockState = BlockManager.getBlock(pos) ?: return
+        
+        val block = pos.block
+        var method = internalBreakers[entityId]
+        
+        // check that this is a valid stage, otherwise remove the current break effect
+        if (stage !in 0..9) {
+            method?.stop()
+            internalBreakers -= entityId
+            return
+        }
+        
+        // check that the previous break effect is on that block, otherwise cancel the previous effect
+        if (method != null && method.pos != blockState.pos) {
+            method.stop()
+            method = null
+            internalBreakers -= entityId
+        }
+        
+        // create a new break method if there isn't one
+        if (method == null) {
+            method = getBreakMethod(block, blockState.material, entityId) ?: return
+            internalBreakers[entityId] = method
+        }
+        
+        // set the break stage
+        method.breakStage = stage
+    }
+    
     private fun handleTick() {
-        breakers.removeIf { (_, breaker) ->
+        playerBreakers.removeIf { (_, breaker) ->
             breaker.handleTick()
             return@removeIf breaker.isDone()
         }
@@ -53,7 +85,7 @@ internal object BlockBreaking : Listener {
         if (blockState != null) {
             val material = blockState.material
             if (material.hardness >= 0) {
-                breakers[player] = Breaker(player, pos.location.block, blockState)
+                playerBreakers[player] = Breaker(player, pos.location.block, blockState)
                 return true
             }
         }
@@ -62,7 +94,7 @@ internal object BlockBreaking : Listener {
     }
     
     private fun handleDestroyStop(player: Player): Boolean {
-        val breaker = breakers.remove(player)
+        val breaker = playerBreakers.remove(player)
         if (breaker != null) {
             breaker.stop()
             return true
@@ -85,6 +117,12 @@ internal object BlockBreaking : Listener {
     
 }
 
+private fun getBreakMethod(block: Block, material: BlockNovaMaterial, entityId: Int = Random.nextInt()): BreakMethod? =
+    if (material.showBreakAnimation)
+        if (block.type == Material.BARRIER) ArmorStandBreakMethod(block.pos)
+        else PacketBreakMethod(block.pos, entityId)
+    else null
+
 private val MINING_FATIGUE = MobEffectInstance(MobEffect.byId(4), Integer.MAX_VALUE, 255, false, false, false)
 
 private class Breaker(val player: Player, val block: Block, val blockState: NovaBlockState) {
@@ -96,10 +134,7 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
     private val correctLevel: Boolean = material.toolLevel == null || tool.type in material.toolLevel.materialsWithHigherTier
     private val drops: Boolean = !material.requiresToolForDrops || (correctCategory && correctLevel)
     
-    private val breakMethod: BreakMethod? = if (material.showBreakAnimation)
-        if (block.type == Material.BARRIER) ArmorStandBreakMethod(block)
-        else PacketBreakMethod(block)
-    else null
+    private val breakMethod: BreakMethod? = getBreakMethod(block, material)
     
     private var progress = 0.0
     
@@ -196,7 +231,9 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
     
 }
 
-private abstract class BreakMethod(protected val block: Block) {
+private abstract class BreakMethod(val pos: BlockPos) {
+    
+    val block = pos.block
     
     abstract var breakStage: Int
     
@@ -204,27 +241,25 @@ private abstract class BreakMethod(protected val block: Block) {
     
 }
 
-private class PacketBreakMethod(block: Block) : BreakMethod(block) {
-    
-    private val fakeEntityId = Random.nextInt()
+private class PacketBreakMethod(pos: BlockPos, val fakeEntityId: Int) : BreakMethod(pos) {
     
     override var breakStage: Int = -1
         set(stage) {
             if (field == stage) return
             
             field = stage
-            block.setBreakState(fakeEntityId, stage)
+            block.sendDestructionPacket(fakeEntityId, stage)
         }
     
     override fun stop() {
-        block.setBreakState(fakeEntityId, -1)
+        block.sendDestructionPacket(fakeEntityId, -1)
     }
     
 }
 
-private class ArmorStandBreakMethod(block: Block) : BreakMethod(block) {
+private class ArmorStandBreakMethod(pos: BlockPos) : BreakMethod(pos) {
     
-    private val armorStand = FakeArmorStand(block.location.center(), true) {
+    private val armorStand = FakeArmorStand(pos.location.center(), true) {
         it.isInvisible = true
         it.isMarker = true
     }

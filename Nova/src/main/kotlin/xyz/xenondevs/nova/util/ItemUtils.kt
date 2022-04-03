@@ -25,7 +25,6 @@ import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import kotlin.math.absoluteValue
 import kotlin.random.Random
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -34,8 +33,6 @@ fun Material.isGlass() = name.endsWith("GLASS") || name.endsWith("GLASS_PANE")
 fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmount(amount).get()
 
 fun Material.isTraversable() = isAir || this == Material.WATER || this == Material.BUBBLE_COLUMN || this == Material.LAVA
-
-fun Material.isBreakable() = blastResistance < 3600000.0f
 
 fun Material.isFluid() = this == Material.WATER || this == Material.BUBBLE_COLUMN || this == Material.LAVA
 
@@ -81,12 +78,6 @@ val Material.fluidType: FluidType?
         }
         return fluidType
     }
-
-/**
- * The break speed for a specific material, always positive.
- */
-val Material.breakSpeed: Double
-    get() = 1.0 / hardness.absoluteValue
 
 val Material.localizedName: String?
     get() = CraftMagicNumbers.getItem(this)?.descriptionId

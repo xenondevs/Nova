@@ -24,9 +24,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.world.block.BlockBreaking
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
@@ -38,6 +38,12 @@ import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceCon
 
 val Block.below: Block
     get() = location.subtract(0.0, 1.0, 0.0).block
+
+val Block.hardness: Double
+    get() = BlockManager.getBlock(pos)?.material?.hardness ?: type.hardness.toDouble()
+
+val Block.breakTexture: Material
+    get() = BlockManager.getBlock(pos)?.material?.breakParticles ?: type
 
 fun Block.hasSameTypeBelow(): Boolean {
     return type == below.type
@@ -116,8 +122,17 @@ fun Block.playBreakSound() {
     world.playSound(location, breakSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
 }
 
-fun Block.setBreakState(entityId: Int, state: Int) {
-    val packet = ClientboundBlockDestructionPacket(entityId, location.blockPos, state)
+fun Block.setBreakStage(entityId: Int, state: Int) {
+    val novaBlockState = BlockManager.getBlock(pos)
+    if (novaBlockState != null) {
+        BlockBreaking.setBreakStage(pos, entityId, state)
+    } else {
+        sendDestructionPacket(entityId, state)
+    }
+}
+
+fun Block.sendDestructionPacket(entityId: Int, stage: Int) {
+    val packet = ClientboundBlockDestructionPacket(entityId, location.blockPos, stage)
     
     chunk.getSurroundingChunks(1, true)
         .flatMap { it.entities.toList() }
@@ -178,12 +193,6 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
         val world = this.world.serverLevel
         world.getBlockEntity(BlockPos(x, y, z), true)?.load(tileEntityTag)
     }
-}
-
-fun Location.getBlockName(): String {
-    val tileEntity = TileEntityManager.getTileEntityAt(this)
-    return if (tileEntity != null) "nova:" + tileEntity.material.id.lowercase()
-    else "minecraft:" + block.type.name.lowercase()
 }
 
 fun Block.isSourceFluid(): Boolean {
