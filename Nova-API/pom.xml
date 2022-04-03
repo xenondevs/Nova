@@ -7,7 +7,7 @@
     <parent>
         <artifactId>Nova-Parent</artifactId>
         <groupId>xyz.xenondevs.nova</groupId>
-        <version>0.8.9</version>
+        <version>0.8.10</version>
     </parent>
 
     <artifactId>Nova-API</artifactId>
