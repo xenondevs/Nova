@@ -31,10 +31,13 @@ object TileEntityManager : ITileEntityManager, Listener {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach { handleChunkUnload(it.pos) } }
         
-        runTaskTimerSynchronized(this, 0, 1) { tileEntities.forEach(TileEntity::handleTick) }
-        runAsyncTaskTimerSynchronized(this, 0, 1) { tileEntities.forEach(TileEntity::handleAsyncTick) }
+        runTaskTimerSynchronized(this, 0, 1) {
+            tileEntities.toList().forEach { tileEntity -> if (tileEntity.isValid) tileEntity.handleTick() }
+        }
+        runAsyncTaskTimerSynchronized(this, 0, 1) {
+            tileEntities.toList().forEach { tileEntity -> if (tileEntity.isValid) tileEntity.handleAsyncTick() }
+        }
     }
-    
     
     fun registerTileEntity(state: NovaTileEntityState) {
         tileEntityMap.getOrPut(state.pos.chunkPos) { HashMap() }[state.pos] = state.tileEntity
