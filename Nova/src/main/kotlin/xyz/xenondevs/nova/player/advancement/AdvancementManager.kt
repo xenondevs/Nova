@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.util.insert
 import xyz.xenondevs.nova.util.minecraftServer
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.io.File
 
 private val ITEM_REGEXPS = listOf(
@@ -60,9 +61,15 @@ object AdvancementManager : Initializable(), Listener {
             file.writeText(content)
         }
         
+        val recipes = minecraftServer.recipeManager.recipes
+        val byName = ReflectionRegistry.RECIPE_MANAGER_BY_NAME_FIELD.get(minecraftServer.recipeManager)
+        
         minecraftServer.packRepository.reload()
         minecraftServer.packRepository.setSelected(minecraftServer.packRepository.selectedIds.toMutableSet() + "file/nova")
         minecraftServer.reloadResources(minecraftServer.packRepository.selectedIds)
+        
+        minecraftServer.recipeManager.recipes = recipes
+        ReflectionRegistry.RECIPE_MANAGER_BY_NAME_FIELD.set(minecraftServer.recipeManager, byName)
     }
     
     @EventHandler

@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.reflection
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.item.crafting.RecipeManager
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCBClass
@@ -20,6 +21,7 @@ object ReflectionRegistry {
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class.java)
     
     val ARMOR_STAND_ARMOR_ITEMS_FIELD = getField(ArmorStand::class.java, true, "SRF(net.minecraft.world.entity.decoration.ArmorStand armorItems)")
+    val RECIPE_MANAGER_BY_NAME_FIELD = getField(RecipeManager::class.java, true, "SRF(net.minecraft.world.item.crafting.RecipeManager byName)")
     
     val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class.java, true, "children")
     val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class.java, true, "literals")
