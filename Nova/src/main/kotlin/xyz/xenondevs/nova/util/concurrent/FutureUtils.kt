@@ -7,10 +7,14 @@ import java.util.concurrent.CompletableFuture
 fun CompletableFuture<Boolean>.runIfTrue(run: () -> Unit) {
     val mainThread = minecraftServer.serverThread == Thread.currentThread()
     thenRun {
-        if (get()) {
-            if (mainThread && minecraftServer.serverThread != Thread.currentThread()) 
-                runTask(run)
-            else run()
+        try {
+            if (get()) {
+                if (mainThread && minecraftServer.serverThread != Thread.currentThread())
+                    runTask(run)
+                else run()
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace()
         }
     }
 }
