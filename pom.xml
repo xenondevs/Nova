@@ -23,14 +23,7 @@
         <module>Nova</module>
         <module>Nova-API</module>
     </modules>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache-snapshots</id>
-            <url>https://repository.apache.org/snapshots/</url>
-        </pluginRepository>
-    </pluginRepositories>
-
+    
     <repositories>
         <repository>
             <id>spigot-repo</id>
