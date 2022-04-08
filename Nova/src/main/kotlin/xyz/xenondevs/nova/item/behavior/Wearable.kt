@@ -12,11 +12,10 @@ import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.ArmorType
 import xyz.xenondevs.nova.player.equipment.EquipMethod
 import xyz.xenondevs.nova.util.isPlayerView
-import xyz.xenondevs.nova.util.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessAir
 
 class Wearable(private val type: ArmorType) : ItemBehavior() {
     
-    @Suppress("UNNECESSARY_SAFE_CALL")
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_AIR
             && player.inventory.getItem(type.equipmentSlot)?.takeUnlessAir() == null
