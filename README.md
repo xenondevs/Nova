@@ -24,7 +24,6 @@ If you would like to help translate Nova, you can do so via [Crowdin](https://cr
 # Patrons
 
 * Ashwin | DarktubeNL - €10  
-* mrakavin - €10  
-* Brett - €5
+* mrakavin - €10
 
 Want to donate as well? Check out our [Patreon](https://www.patreon.com/xenondevs) page.
