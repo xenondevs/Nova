@@ -17,11 +17,13 @@ import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
+import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.logging.Level
 import kotlin.concurrent.thread
 
 internal object WorldDataManager : Initializable(), Listener {
@@ -54,9 +56,18 @@ internal object WorldDataManager : Initializable(), Listener {
         if (pos.isLoaded()) {
             val blockStates = getBlockStates(pos)
             
-            runTask { 
+            runTask {
                 if (pos.isLoaded()) {
-                    blockStates.forEach { (_, blockState) -> blockState.handleInitialized(false) }
+                    blockStates.removeIf { (_, blockState) ->
+                        try {
+                            blockState.handleInitialized(false)
+                        } catch (e: Exception) {
+                            LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", e)
+                            return@removeIf true
+                        }
+                        return@removeIf false
+                    }
+                    
                     val event = NovaChunkLoadedEvent(pos, blockStates)
                     Bukkit.getPluginManager().callEvent(event)
                 }
@@ -71,7 +82,7 @@ internal object WorldDataManager : Initializable(), Listener {
     }
     
     @Synchronized
-    fun getBlockStates(pos: ChunkPos): Map<BlockPos, BlockState> = getChunk(pos).blockStates
+    fun getBlockStates(pos: ChunkPos): MutableMap<BlockPos, BlockState> = getChunk(pos).blockStates
     
     @Synchronized
     fun getBlockState(pos: BlockPos): BlockState? = getChunk(pos.chunkPos).blockStates[pos]

@@ -36,7 +36,7 @@ class NovaTileEntityState : NovaBlockState {
         this.ownerUUID = ctx.ownerUUID
         this.data = CompoundElement()
         
-        val globalData = ctx.item?.itemMeta?.persistentDataContainer?.get(TILE_ENTITY_KEY, CompoundElementDataType)
+        val globalData = ctx.item.itemMeta?.persistentDataContainer?.get(TILE_ENTITY_KEY, CompoundElementDataType)
         if (globalData != null) data.putElement("global", globalData)
     }
     
@@ -63,10 +63,16 @@ class NovaTileEntityState : NovaBlockState {
     }
     
     override fun write(buf: ByteBuf) {
+        tileEntity.saveData()
+        
         super.write(buf)
         buf.writeUUID(uuid)
         buf.writeUUID(ownerUUID)
         data.write(buf)
+    }
+    
+    override fun toString(): String {
+        return "NovaTileEntityState(pos=$pos, id=$id, uuid=$uuid, ownerUUID=$ownerUUID, data=$data)"
     }
     
 }

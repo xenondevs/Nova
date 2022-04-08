@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolUtils
+import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext

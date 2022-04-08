@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 
@@ -27,23 +26,6 @@ interface ItemHolder : EndPointDataHolder {
     
     fun isInsert(face: BlockFace): Boolean {
         return NetworkConnectionType.INSERT in itemConfig[face]!!.included
-    }
-    
-    fun cycleItemConfig(manager: NetworkManager, face: BlockFace, plus: Boolean) {
-        manager.removeEndPoint(endPoint, false)
-        
-        val currentConfig = itemConfig[face]!!
-        val inventory = inventories[face]!!
-        val allowedConfigs = allowedConnectionTypes[inventory]!!.included
-        var index = allowedConfigs.indexOf(currentConfig) + if (plus) 1 else -1
-        
-        if (index >= allowedConfigs.size) index = 0
-        else if (index < 0) index = allowedConfigs.lastIndex
-        
-        itemConfig[face] = allowedConfigs[index]
-        
-        manager.addEndPoint(endPoint, false)
-        endPoint.updateNearbyBridges()
     }
     
 }

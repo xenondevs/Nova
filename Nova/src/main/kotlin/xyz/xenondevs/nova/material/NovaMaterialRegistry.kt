@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.addNamespace
-import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.TileEntityBlock
 import xyz.xenondevs.nova.world.block.model.ArmorStandModelProvider
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry

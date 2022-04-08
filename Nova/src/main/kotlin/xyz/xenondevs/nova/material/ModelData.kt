@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.data.setLocalizedName
-import xyz.xenondevs.nova.util.unhandledTags
+import xyz.xenondevs.nova.util.item.unhandledTags
 
 class ModelData(val material: Material, val dataArray: IntArray, val id: String, val isBlock: Boolean) {
     

@@ -6,8 +6,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.material.clientsideDurability
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.retrieveData
-import xyz.xenondevs.nova.util.storeData
+import xyz.xenondevs.nova.util.item.retrieveData
+import xyz.xenondevs.nova.util.item.storeData
 
 private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy64")
 

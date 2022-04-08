@@ -26,6 +26,8 @@ import xyz.xenondevs.nova.data.config.GlobalValues
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.world.block.BlockBreaking
 import xyz.xenondevs.nova.world.block.BlockManager

@@ -32,7 +32,7 @@ import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
-import xyz.xenondevs.nova.util.ItemUtils
+import xyz.xenondevs.nova.util.item.ItemUtils
 import java.util.*
 
 fun Player.showRecipes(item: ItemStack) = showRecipes(ItemUtils.getId(item))

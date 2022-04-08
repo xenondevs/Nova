@@ -226,6 +226,7 @@ private class NetworkManagerImpl : NetworkManager {
     override fun reloadNetworks() {
         val chunks = Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.map(Chunk::pos)
         chunks.forEach { unloadChunk(it, true) }
+        networks.clear()
         chunks.forEach { loadChunk(it, true) }
     }
     

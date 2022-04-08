@@ -6,8 +6,8 @@ import com.google.gson.JsonObject
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.ItemUtils
-import xyz.xenondevs.nova.util.ItemUtils.getItemBuilder
+import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.ItemUtils.getItemBuilder
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
 

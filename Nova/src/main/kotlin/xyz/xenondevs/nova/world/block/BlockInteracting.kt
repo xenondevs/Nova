@@ -12,34 +12,28 @@ import org.bukkit.event.block.*
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.pos
 
 internal object BlockInteracting : Listener {
     
-    private val previousInteracted = HashSet<Pair<Player, BlockPos>>()
-    
     fun init() {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
-        runTaskTimer(0, 1) { previousInteracted.clear() }
     }
     
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    fun handleInteract(event: PlayerInteractEvent) {
+    @EventHandler(priority = EventPriority.NORMAL)
+    fun handleInteract(e: WrappedPlayerInteractEvent) {
+        val event = e.event
+        if (event.isCompletelyDenied())
+            return
+        
         val player = event.player
         if (event.action == Action.RIGHT_CLICK_BLOCK && !player.isSneaking) {
             val pos = event.clickedBlock!!.pos
-            
-            // checks if the block has already been interacted with (different hand)
-            if (player to pos in previousInteracted) {
-                event.isCancelled = true
-                return
-            }
             
             val blockState = BlockManager.getBlock(pos)
             if (blockState != null) {
@@ -47,8 +41,6 @@ internal object BlockInteracting : Listener {
                 val ctx = BlockInteractContext(pos, player, player.location, event.blockFace, event.item, event.hand)
                 val cancelled = material.novaBlock.handleInteract(blockState, ctx)
                 event.isCancelled = cancelled
-                
-                if (cancelled) previousInteracted += player to pos
             }
         }
     }

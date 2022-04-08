@@ -8,16 +8,16 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
-import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.util.item.novaMaterial
 
 object ItemManager : Initializable(), Listener {
     override val inMainThread = false
@@ -28,15 +28,16 @@ object ItemManager : Initializable(), Listener {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }
     
-    @EventHandler
-    fun handleInteract(event: PlayerInteractEvent) {
+    @EventHandler(priority = EventPriority.LOW)
+    fun handleInteract(e: WrappedPlayerInteractEvent) {
+        val event = e.event
         if (event.isCompletelyDenied()) return
+        
         findBehaviors(event.item)?.forEach { it.handleInteract(event.player, event.item!!, event.action, event) }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
-        if (event.isCancelled) return
         val item = event.player.inventory.getItem(event.hand)
         findBehaviors(item)?.forEach { it.handleEntityInteract(event.player, item!!, event.rightClicked, event) }
     }

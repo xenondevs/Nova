@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.customModelData
+import xyz.xenondevs.nova.util.item.customModelData
 
 object ItemsAdder : CustomItemService {
     

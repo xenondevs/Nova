@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
+import xyz.xenondevs.nova.util.item.isTraversable
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 

@@ -75,6 +75,7 @@
   "command.nova.remove_tile_entities.success": "Removed %s tile entities.",
   "command.nova.network_debug.energy": "Toggled debug-view for Energy-Networks",
   "command.nova.network_debug.items": "Toggled debug-view for Item-Networks",
+  "command.nova.network_debug.fluid": "Toggled debug-view for Fluid-Networks",
   "command.nova.render_distance": "Your render distance has been set to %s.",
   "command.nova.show_tile_entity_data.success": "This %s has the following data:\n%s",
   "command.nova.show_tile_entity_data.failure": "Please look at a tile entity and try again.",

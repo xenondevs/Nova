@@ -154,7 +154,7 @@ object NovaCommand : Command("nova") {
                 sendSuccess(tileEntity.material.localizedName, tileEntity.data)
             } else {
                 val vanillaTileEntity = VanillaTileEntityManager.getTileEntityAt(location)
-                if (vanillaTileEntity != null) sendSuccess(vanillaTileEntity.type.name, vanillaTileEntity.data)
+                if (vanillaTileEntity != null) sendSuccess(vanillaTileEntity.block.type.name, vanillaTileEntity.data)
                 else sendFailure()
             }
         } else sendFailure()

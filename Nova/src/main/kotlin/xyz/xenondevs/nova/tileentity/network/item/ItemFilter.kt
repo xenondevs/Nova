@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
-import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.util.item.novaMaterial
 
 private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilterCBF")
 

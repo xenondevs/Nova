@@ -12,6 +12,7 @@ import org.bukkit.util.Vector
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
+import xyz.xenondevs.nova.util.item.isTraversable
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color

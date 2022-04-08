@@ -8,9 +8,9 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.util.ItemUtils.getId
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.data.getResourceAsStream
+import xyz.xenondevs.nova.util.item.ItemUtils.getId
 
 object RecipeRegistry : Initializable() {
     

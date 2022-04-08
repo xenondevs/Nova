@@ -8,7 +8,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -16,14 +15,17 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.BlockFaceUtils
+import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.getTargetLocation
 import xyz.xenondevs.nova.util.reflection.actualDelegate
+import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-abstract class NetworkedTileEntity(blockState: NovaTileEntityState): TileEntity(blockState), NetworkEndPoint {
+abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity(blockState), NetworkEndPoint {
     
     final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = emptyEnumMap()
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = emptyEnumMap()
@@ -60,33 +62,18 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState): TileEntity(
     
     final override fun handleRightClick(ctx: BlockInteractContext): Boolean {
         val item = ctx.item
-        if (item?.novaMaterial == CoreItems.WRENCH) {
-             handleWrenchClick(ctx)
-            return true
-        } else {
-            val holder = holders[NetworkType.FLUID]
-            if (holder is NovaFluidHolder && ctx.source is Player && ctx.hand != null) {
-                val success = when (item?.type) {
-                    Material.BUCKET -> fillBucket(holder, ctx.source, ctx.hand)
-                    Material.WATER_BUCKET, Material.LAVA_BUCKET -> emptyBucket(holder, ctx.source, ctx.hand)
-                    else -> false
-                }
-                
-                if (success) return true
+        val holder = holders[NetworkType.FLUID]
+        if (holder is NovaFluidHolder && ctx.source is Player && ctx.hand != null) {
+            val success = when (item?.type) {
+                Material.BUCKET -> fillBucket(holder, ctx.source, ctx.hand)
+                Material.WATER_BUCKET, Material.LAVA_BUCKET -> emptyBucket(holder, ctx.source, ctx.hand)
+                else -> false
             }
             
-            return handleUnknownRightClick(ctx)
+            if (success) return true
         }
-    }
-    
-    private fun handleWrenchClick(ctx: BlockInteractContext) {
-        val face = ctx.clickedFace ?: return
         
-        NetworkManager.queueAsync {
-            val itemHolder = holders[NetworkType.ITEMS]
-            if (itemHolder is ItemHolder)
-                itemHolder.cycleItemConfig(it, face, true)
-        }
+        return handleUnknownRightClick(ctx)
     }
     
     private fun emptyBucket(holder: NovaFluidHolder, player: Player, hand: EquipmentSlot): Boolean {

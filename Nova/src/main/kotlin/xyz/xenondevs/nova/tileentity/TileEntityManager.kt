@@ -3,10 +3,7 @@ package xyz.xenondevs.nova.tileentity
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.util.runAsyncTaskTimerSynchronized
@@ -29,7 +26,6 @@ object TileEntityManager : ITileEntityManager, Listener {
     
     init {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        NOVA.disableHandlers += { Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach { handleChunkUnload(it.pos) } }
         
         runTaskTimerSynchronized(this, 0, 1) {
             tileEntities.toList().forEach { tileEntity -> if (tileEntity.isValid) tileEntity.handleTick() }
@@ -39,11 +35,11 @@ object TileEntityManager : ITileEntityManager, Listener {
         }
     }
     
-    fun registerTileEntity(state: NovaTileEntityState) {
+    internal fun registerTileEntity(state: NovaTileEntityState) {
         tileEntityMap.getOrPut(state.pos.chunkPos) { HashMap() }[state.pos] = state.tileEntity
     }
     
-    fun unregisterTileEntity(state: NovaTileEntityState) {
+    internal fun unregisterTileEntity(state: NovaTileEntityState) {
         tileEntityMap[state.pos.chunkPos]?.remove(state.pos)
     }
     
@@ -52,26 +48,15 @@ object TileEntityManager : ITileEntityManager, Listener {
     }
     
     fun getTileEntityAt(location: Location, additionalHitboxes: Boolean): TileEntity? {
-        val blockState = BlockManager.getBlock(location.pos, additionalHitboxes)
+        return getTileEntityAt(location.pos, additionalHitboxes)
+    }
+    
+    fun getTileEntityAt(pos: BlockPos, additionalHitboxes: Boolean = true): TileEntity? {
+        val blockState = BlockManager.getBlock(pos, additionalHitboxes)
         return if (blockState is NovaTileEntityState && blockState.isInitialized) blockState.tileEntity else null
     }
     
     @Synchronized
     fun getTileEntitiesInChunk(chunkPos: ChunkPos) = tileEntityMap[chunkPos]?.values?.toList() ?: emptyList()
-    
-    @EventHandler(priority = EventPriority.LOWEST)
-    private fun handleChunkUnload(event: ChunkUnloadEvent) {
-        handleChunkUnload(event.chunk.pos)
-    }
-    
-    @Synchronized
-    private fun handleChunkUnload(chunkPos: ChunkPos) {
-        if (chunkPos in tileEntityMap) {
-            val tileEntities = tileEntityMap[chunkPos]!!
-            
-            tileEntityMap -= chunkPos
-            tileEntities.values.forEach { it.saveData() }
-        }
-    }
     
 }

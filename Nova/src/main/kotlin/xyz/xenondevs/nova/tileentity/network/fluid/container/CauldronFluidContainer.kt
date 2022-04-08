@@ -25,23 +25,32 @@ private var Block.fluidType: FluidType?
     }
 
 // This will allow players to cheat small amounts of fluids, but that shouldn't be a big issue.
-private var Block.fluidAmount: Long
+private fun Block.setFluidAmount(amount: Long, type: FluidType?) {
+    require(amount <= 1000)
+    
+    val level = (amount / 333).toInt()
+    if (level > 0) {
+        var levelled = blockData as? Levelled
+        if (levelled == null) {
+            fluidType = type
+            levelled = blockData as Levelled
+        }
+        
+        levelled.level = level
+        blockData = levelled
+    } else this.type = Material.CAULDRON
+}
+
+private val Block.fluidAmount: Long
     get() {
         val levelled = blockData
         if (levelled is Levelled) {
-            return (levelled.level / levelled.maximumLevel * 1000).toLong()
+            return levelled.level * 333L + 1
         }
         
         return 0L
     }
-    set(amount) {
-        val levelled = blockData
-        if (levelled is Levelled) {
-            levelled.level = ((amount / 1000.0) * (1.0 / levelled.maximumLevel)).toInt()
-        }
-    }
 
-// TODO: implement
 class CauldronFluidContainer(
     uuid: UUID,
     private val cauldron: Block,
@@ -53,23 +62,27 @@ class CauldronFluidContainer(
     1000
 ) {
     
-    override var type: FluidType?
-        get() = super.type
-        set(fluidType) {
-            super.type = fluidType
-            cauldron.fluidType = fluidType
-        }
+    private var selfUpdate = false
     
     override var amount: Long
         get() = super.amount
         set(amount) {
+            if (super.amount == amount)
+                return
+            
             super.amount = amount
-            cauldron.fluidAmount = amount
+            
+            selfUpdate = true
+            cauldron.setFluidAmount(amount, type)
+            selfUpdate = false
         }
     
     fun handleBlockUpdate() {
+        if (selfUpdate)
+            return
+        
         super.type = cauldron.fluidType
-        super.amount = if (type != null) cauldron.fluidAmount else 0L
+        super.amount = cauldron.fluidAmount
         
         callUpdateHandlers()
     }

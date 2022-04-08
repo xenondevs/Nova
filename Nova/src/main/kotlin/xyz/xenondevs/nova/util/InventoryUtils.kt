@@ -6,6 +6,7 @@ import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.*
+import xyz.xenondevs.nova.util.item.takeUnlessAir
 
 /**
  * Adds a [List] of [ItemStack]s to a [VirtualInventory].

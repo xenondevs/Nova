@@ -23,6 +23,10 @@ import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.copy
 import xyz.xenondevs.nova.util.data.key
+import xyz.xenondevs.nova.util.item.customModelData
+import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
+import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 

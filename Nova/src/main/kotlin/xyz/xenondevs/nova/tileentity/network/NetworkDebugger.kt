@@ -35,7 +35,7 @@ object NetworkDebugger {
         }
     
     private fun handleTick(manager: NetworkManager) {
-        if (energyDebuggers.isEmpty() && itemDebuggers.isEmpty()) return
+        if (energyDebuggers.isEmpty() && itemDebuggers.isEmpty() && fluidDebuggers.isEmpty()) return
         
         manager.networks
             .forEach { network ->

@@ -12,9 +12,16 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
+import xyz.xenondevs.nova.util.facing
+import xyz.xenondevs.nova.util.isCompletelyDenied
+import xyz.xenondevs.nova.util.item.isActuallyInteractable
+import xyz.xenondevs.nova.util.item.isReplaceable
+import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.pos
 
@@ -32,8 +39,11 @@ internal object BlockPlacing : Listener {
             event.isCancelled = true
     }
     
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private fun handleInteract(event: PlayerInteractEvent) {
+    @EventHandler(priority = EventPriority.HIGH)
+    private fun handleInteract(e: WrappedPlayerInteractEvent) {
+        val event = e.event
+        if (event.isCompletelyDenied()) return
+        
         val action = event.action
         val player = event.player
         if (action == Action.RIGHT_CLICK_BLOCK) {

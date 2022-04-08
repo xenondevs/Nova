@@ -4,10 +4,11 @@ import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
-import xyz.xenondevs.nova.data.world.block.state.VanillaTileState
+import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.world.BlockPos
+import java.util.logging.Level
 
 class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
     
@@ -25,16 +26,20 @@ class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
             val pos = BlockPos(file.world.world, (chunkX shl 4) + relX, y, (chunkZ shl 4) + relZ)
             val type = palette[buf.readInt()]
             
-            val state: BlockState = if (!type.startsWith("minecraft:")) {
-                val material = NovaMaterialRegistry.get(type) as? BlockNovaMaterial
-                if (material == null) {
-                    LOGGER.severe("Could not load block at $pos: Invalid id $type")
-                    continue
-                }
-                material.createBlockState(pos)
-            } else VanillaTileState(pos, type)
-            state.read(buf)
-            blockStates[pos] = state
+            try {
+                val state: BlockState = if (!type.startsWith("minecraft:")) {
+                    val material = NovaMaterialRegistry.get(type) as? BlockNovaMaterial
+                    if (material == null) {
+                        LOGGER.severe("Could not load block at $pos: Invalid id $type")
+                        continue
+                    }
+                    material.createBlockState(pos)
+                } else VanillaTileEntityState(pos, type)
+                state.read(buf)
+                blockStates[pos] = state
+            } catch (e: Exception) {
+                LOGGER.log(Level.SEVERE, "Failed to load block at $pos", e)
+            }
         }
     }
     

@@ -11,13 +11,13 @@ import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
-import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
 
 class FluidBar(
     height: Int,
-    fluidHolder: NovaFluidHolder,
+    fluidHolder: FluidHolder,
     private val fluidContainer: FluidContainer
 ) : VerticalBar(height) {
     

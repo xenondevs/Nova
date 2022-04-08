@@ -12,13 +12,13 @@ import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType.SlotType
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.isRightClick
@@ -120,7 +120,8 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
-    fun handleInteract(event: PlayerInteractEvent) {
+    fun handleInteract(e: WrappedPlayerInteractEvent) {
+        val event = e.event
         if (event.isCompletelyDenied()) return
         
         val item = event.item

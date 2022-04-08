@@ -2,18 +2,18 @@ package xyz.xenondevs.nova.world.block.hitbox
 
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.castRay
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.isCompletelyDenied
+import xyz.xenondevs.nova.util.item.isTraversable
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.chunkPos
 
@@ -39,7 +39,8 @@ object HitboxManager : Listener {
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
-    fun handleInteract(event: PlayerInteractEvent) {
+    fun handleInteract(e: WrappedPlayerInteractEvent) {
+        val event = e.event
         if (event.hand != EquipmentSlot.HAND || event.isCompletelyDenied()) return
         
         val action = event.action
@@ -75,7 +76,5 @@ object HitboxManager : Listener {
             }
         }
     }
-    
-    private fun Material.isTraversable() = isAir || name == "WATER" || name == "LAVA"
     
 }
