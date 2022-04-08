@@ -68,7 +68,7 @@ class NovaItemHolder(
         (endPoint.retrieveEnumMapOrNull<BlockFace, UUID>("inventories") ?: defaultInvConfig())
             .mapValuesTo(enumMapOf()) { availableInventories[it.value]!! }
     
-    override val itemConfig: MutableMap<BlockFace, NetworkConnectionType> =
+    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
         endPoint.retrieveEnumMap("itemConfig", defaultConnectionConfig
             ?: { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.NONE } })
     
@@ -99,7 +99,7 @@ class NovaItemHolder(
         availableInventories.firstNotNullOfOrNull { if (it.value == networkedInventory) it.key else null }
     
     override fun saveData() {
-        endPoint.storeEnumMap("itemConfig", itemConfig)
+        endPoint.storeEnumMap("itemConfig", connectionConfig)
         endPoint.storeEnumMap("insertFilters", insertFilters) { it.compound }
         endPoint.storeEnumMap("extractFilters", extractFilters) { it.compound }
         endPoint.storeEnumMap("channels", channels)

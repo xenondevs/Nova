@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.energy.holder
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import java.util.*
 
@@ -11,9 +11,10 @@ class ConsumerEnergyHolder(
     defaultMaxEnergy: Long,
     private val defaultEnergyConsumption: Long,
     private val defaultSpecialEnergyConsumption: Long,
+    override val allowedConnectionType: NetworkConnectionType,
     upgradeHolder: UpgradeHolder?,
-    lazyDefaultConfig: () -> EnumMap<BlockFace, EnergyConnectionType>
-) : EnergyHolder(endPoint, defaultMaxEnergy, upgradeHolder, lazyDefaultConfig) {
+    lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
+) : NovaEnergyHolder(endPoint, defaultMaxEnergy, upgradeHolder, lazyDefaultConfig) {
     
     var energyConsumption = calculateEnergyConsumption(defaultEnergyConsumption)
     var specialEnergyConsumption = calculateEnergyConsumption(defaultSpecialEnergyConsumption)

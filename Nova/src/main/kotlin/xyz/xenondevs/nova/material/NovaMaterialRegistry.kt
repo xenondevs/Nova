@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.TileEntityBlock
@@ -38,7 +38,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         isInteractable: Boolean = true,
         properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
-        return registerTileEntity(addon, name, options, tileEntityConstructor, listOf(EnergyHolder::modifyItemBuilder),
+        return registerTileEntity(addon, name, options, tileEntityConstructor, listOf(NovaEnergyHolder::modifyItemBuilder),
             placeCheck, multiBlockLoader, isInteractable, properties)
     }
     

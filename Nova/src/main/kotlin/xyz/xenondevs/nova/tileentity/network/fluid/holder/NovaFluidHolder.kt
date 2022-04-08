@@ -21,17 +21,17 @@ private val DEFAULT_CONNECTION_CONFIG = { CUBE_FACES.associateWithToEnumMap { Ne
 private val DEFAULT_CHANNEL_CONFIG = { CUBE_FACES.associateWithToEnumMap { 0 } }
 private val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithToEnumMap { 50 } }
 
-fun <T> FluidHolder(
+fun <T> NovaFluidHolder(
     endPoint: T,
     defaultContainer: Pair<FluidContainer, NetworkConnectionType>,
     vararg otherContainers: Pair<FluidContainer, NetworkConnectionType>,
     defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer> = { CUBE_FACES.associateWithToEnumMap { defaultContainer.first } },
     defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
-): FluidHolder where T : NetworkEndPoint, T : DataHolder {
+): NovaFluidHolder where T : NetworkEndPoint, T : DataHolder {
     val containers = hashMapOf(defaultContainer).also { it.putAll(otherContainers) }
     val availableContainers = containers.keys.associateByTo(HashMap()) { it.uuid }
     
-    return FluidHolder(
+    return NovaFluidHolder(
         endPoint,
         availableContainers,
         containers,
@@ -40,13 +40,13 @@ fun <T> FluidHolder(
     )
 }
 
-fun <T> FluidHolder(
+fun <T> NovaFluidHolder(
     endPoint: T,
     availableContainers: Map<UUID, FluidContainer>,
     allowedConnectionTypes: Map<FluidContainer, NetworkConnectionType>,
     defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer>,
     defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)?
-): FluidHolder where T : NetworkEndPoint, T : DataHolder =
+): NovaFluidHolder where T : NetworkEndPoint, T : DataHolder =
     NovaFluidHolder(
         endPoint,
         endPoint,

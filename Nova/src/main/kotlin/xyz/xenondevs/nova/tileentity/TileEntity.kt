@@ -19,7 +19,6 @@ import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
-import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
@@ -266,34 +265,6 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     fun getFace(blockSide: BlockSide): BlockFace =
         blockSide.getBlockFace(facing.yaw)
-    
-    /**
-     * Creates an energy side config
-     */
-    fun createEnergySideConfig(
-        default: EnergyConnectionType,
-        vararg blocked: BlockSide
-    ): EnumMap<BlockFace, EnergyConnectionType> {
-        
-        val blockedFaces = blocked.map(::getFace)
-        return CUBE_FACES.associateWithTo(enumMapOf()) {
-            if (it in blockedFaces) EnergyConnectionType.NONE else default
-        }
-    }
-    
-    /**
-     * Creates an energy side config
-     */
-    fun createExclusiveEnergySideConfig(
-        type: EnergyConnectionType,
-        vararg sides: BlockSide
-    ): EnumMap<BlockFace, EnergyConnectionType> {
-        
-        val sideFaces = sides.map(::getFace)
-        return CUBE_FACES.associateWithTo(emptyEnumMap()) {
-            if (it in sideFaces) type else EnergyConnectionType.NONE
-        }
-    }
     
     /**
      * Creates a side config

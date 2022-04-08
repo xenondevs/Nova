@@ -16,7 +16,7 @@ abstract class VanillaItemHolder(
     final override val endPoint: ItemStorageVanillaTileEntity
 ) : ItemHolder {
     
-    override val itemConfig: MutableMap<BlockFace, NetworkConnectionType> =
+    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
         endPoint.retrieveEnumMap("itemConfig") { CUBE_FACES.associateWithTo(emptyEnumMap()) { NetworkConnectionType.BUFFER } }
     
     open override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType> by lazy {
@@ -41,7 +41,7 @@ abstract class VanillaItemHolder(
         endPoint.retrieveEnumMap("channels", DEFAULT_CHANNELS)
     
     override fun saveData() {
-        endPoint.storeEnumMap("itemConfig", itemConfig)
+        endPoint.storeEnumMap("itemConfig", connectionConfig)
         endPoint.storeEnumMap("insertFilters", insertFilters) { it.compound }
         endPoint.storeEnumMap("extractFilters", extractFilters) { it.compound }
         endPoint.storeEnumMap("insertPriorities", insertPriorities)

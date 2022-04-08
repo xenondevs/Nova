@@ -11,9 +11,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkType
-import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.ui.item.ClickyTabItem
 
 class SideConfigGUI(
     endPoint: NetworkEndPoint,
-    allowedEnergyTypes: List<EnergyConnectionType>? = null,
+    allowedEnergyType: NetworkConnectionType? = null,
     inventories: List<Pair<NetworkedInventory, String>>? = null,
     fluidContainers: List<Pair<FluidContainer, String>>? = null,
     openPrevious: (Player) -> Unit
@@ -31,19 +31,19 @@ class SideConfigGUI(
     
     constructor(
         endPoint: NetworkEndPoint,
-        allowedEnergyTypes: List<EnergyConnectionType>?,
+        allowedEnergyType: NetworkConnectionType?,
         openPrevious: (Player) -> Unit
-    ) : this(endPoint, allowedEnergyTypes, null, null, openPrevious)
+    ) : this(endPoint, allowedEnergyType, null, null, openPrevious)
     
     constructor(
         endPoint: NetworkEndPoint,
-        allowedEnergyTypes: List<EnergyConnectionType>?,
+        allowedEnergyType: NetworkConnectionType?,
         inventories: List<Pair<NetworkedInventory, String>>?,
         openPrevious: (Player) -> Unit
-    ) : this(endPoint, allowedEnergyTypes, inventories, null, openPrevious)
+    ) : this(endPoint, allowedEnergyType, inventories, null, openPrevious)
     
-    private val energyConfigGUI = if (allowedEnergyTypes != null)
-        EnergySideConfigGUI(endPoint.holders[NetworkType.ENERGY] as EnergyHolder, allowedEnergyTypes) else null
+    private val energyConfigGUI = if (allowedEnergyType != null)
+        EnergySideConfigGUI(endPoint.holders[NetworkType.ENERGY] as EnergyHolder, allowedEnergyType) else null
     
     private val itemConfigGUI = if (inventories != null)
         ItemSideConfigGUI(endPoint.holders[NetworkType.ITEMS] as ItemHolder, inventories) else null

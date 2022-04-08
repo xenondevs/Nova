@@ -71,7 +71,7 @@ class ItemNetworkChannel {
     }
     
     fun addHolder(holder: ItemHolder, face: BlockFace, createDistributor: Boolean) {
-        when (holder.itemConfig[face]!!) {
+        when (holder.connectionConfig[face]!!) {
             NetworkConnectionType.INSERT -> addConsumer(holder, face)
             NetworkConnectionType.EXTRACT -> addProvider(holder, face)
             NetworkConnectionType.BUFFER -> {

@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.CauldronFluidContainer
-import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.enumMapOf
@@ -15,7 +15,7 @@ class VanillaCauldronTileEntity internal constructor(
 ) : NetworkedVanillaTileEntity(blockState) {
     
     private val container = CauldronFluidContainer(uuid, block)
-    private val fluidHolder = FluidHolder(
+    private val fluidHolder = NovaFluidHolder(
         this,
         container to NetworkConnectionType.BUFFER,
     ) { CUBE_FACES.associateWithTo(emptyEnumMap()) { NetworkConnectionType.BUFFER } }

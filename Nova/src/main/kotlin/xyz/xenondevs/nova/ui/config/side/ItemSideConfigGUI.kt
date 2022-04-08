@@ -35,12 +35,12 @@ class ItemSideConfigGUI(
             
             it.removeEndPoint(itemHolder.endPoint, false)
             
-            val currentType = itemHolder.itemConfig[blockFace]!!
+            val currentType = itemHolder.connectionConfig[blockFace]!!
             var index = allowedTypes.indexOf(currentType)
             if (forward) index++ else index--
             if (index < 0) index = allowedTypes.lastIndex
             else if (index == allowedTypes.size) index = 0
-            itemHolder.itemConfig[blockFace] = allowedTypes[index]
+            itemHolder.connectionConfig[blockFace] = allowedTypes[index]
             
             it.addEndPoint(itemHolder.endPoint, false)
                 .thenRun { itemHolder.endPoint.updateNearbyBridges() }
@@ -65,8 +65,8 @@ class ItemSideConfigGUI(
             itemHolder.inventories[blockFace] = newInventory
             
             val allowedTypes = allowedTypes[newInventory]!!
-            if (!allowedTypes.contains(itemHolder.itemConfig[blockFace]!!)) {
-                itemHolder.itemConfig[blockFace] = allowedTypes[0]
+            if (!allowedTypes.contains(itemHolder.connectionConfig[blockFace]!!)) {
+                itemHolder.connectionConfig[blockFace] = allowedTypes[0]
             }
             
             it.addEndPoint(itemHolder.endPoint)
@@ -81,7 +81,7 @@ class ItemSideConfigGUI(
     
     override fun getConnectionType(blockFace: BlockFace): NetworkConnectionType {
         // TODO: surround with NetworkManager lock
-        return itemHolder.itemConfig[blockFace]!!
+        return itemHolder.connectionConfig[blockFace]!!
     }
     
     override fun getInventoryButtonBuilder(blockFace: BlockFace): ItemBuilder {
