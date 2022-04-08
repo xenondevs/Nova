@@ -19,13 +19,13 @@ class PacketHandler(val player: Player) : ChannelDuplexHandler() {
         super.channelRead(ctx, packet)
     }
     
-    private fun callEvent(msg: Any?): Packet<*>? {
+    private fun callEvent(msg: Any?): Any? {
         if (msg is Packet<*>) {
             val event = PacketEventManager.createAndCallEvent(player, msg) ?: return msg
             return if (event.isCancelled) null else event.packet
         }
         
-        return null
+        return msg
     }
     
 }
