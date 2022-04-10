@@ -468,6 +468,14 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getWorldBorder(): WorldBorder? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setWorldBorder(border: WorldBorder?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun isHealthScaled(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
