@@ -11,10 +11,11 @@ class ConsumerEnergyHolder(
     defaultMaxEnergy: Long,
     private val defaultEnergyConsumption: Long,
     private val defaultSpecialEnergyConsumption: Long,
-    override val allowedConnectionType: NetworkConnectionType,
     upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : NovaEnergyHolder(endPoint, defaultMaxEnergy, upgradeHolder, lazyDefaultConfig) {
+    
+    override val allowedConnectionType = NetworkConnectionType.INSERT
     
     var energyConsumption = calculateEnergyConsumption(defaultEnergyConsumption)
     var specialEnergyConsumption = calculateEnergyConsumption(defaultSpecialEnergyConsumption)

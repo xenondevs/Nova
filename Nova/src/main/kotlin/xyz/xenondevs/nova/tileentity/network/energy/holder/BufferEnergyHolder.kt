@@ -8,10 +8,11 @@ import java.util.*
 class BufferEnergyHolder(
     endPoint: NetworkedTileEntity,
     defaultMaxEnergy: Long,
-    override val allowedConnectionType: NetworkConnectionType,
     private val creative: Boolean,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : NovaEnergyHolder(endPoint, defaultMaxEnergy, null, lazyDefaultConfig) {
+    
+    override val allowedConnectionType = NetworkConnectionType.BUFFER
     
     override val requestedEnergy: Long
         get() = if (creative) Long.MAX_VALUE else maxEnergy - energy

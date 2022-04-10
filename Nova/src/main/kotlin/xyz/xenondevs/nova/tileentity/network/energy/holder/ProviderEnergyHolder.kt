@@ -11,10 +11,11 @@ class ProviderEnergyHolder(
     endPoint: NetworkedTileEntity,
     defaultMaxEnergy: Long,
     private val defaultEnergyGeneration: Long,
-    override val allowedConnectionType: NetworkConnectionType,
     upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : NovaEnergyHolder(endPoint, defaultMaxEnergy, upgradeHolder, lazyDefaultConfig) {
+    
+    override val allowedConnectionType = NetworkConnectionType.EXTRACT
     
     var energyGeneration = calculateEnergyGeneration()
     
