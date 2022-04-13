@@ -19,11 +19,8 @@ import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
 import xyz.xenondevs.nova.util.data.setLocalizedName
 
 class EnergySideConfigGUI(
-    val energyHolder: EnergyHolder,
-    allowedType: NetworkConnectionType
+    val energyHolder: EnergyHolder
 ) : SimpleGUI(9, 3) {
-    
-    private val allowedTypes = allowedType.included
     
     private val structure = Structure("" +
         "# # # # u # # # #" +
@@ -45,6 +42,7 @@ class EnergySideConfigGUI(
         NetworkManager.execute {
             it.removeEndPoint(energyHolder.endPoint, false)
             
+            val allowedTypes = energyHolder.allowedConnectionType.included
             val currentType = energyHolder.connectionConfig[blockFace]!!
             var index = allowedTypes.indexOf(currentType)
             if (forward) index++ else index--
