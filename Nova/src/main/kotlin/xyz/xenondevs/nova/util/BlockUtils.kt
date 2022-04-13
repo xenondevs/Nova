@@ -110,7 +110,7 @@ fun Block.place(ctx: BlockPlaceContext, playEffects: Boolean = true): Boolean {
         return true
     }
     
-    if (CustomItemServiceManager.placeItem(item, ctx.pos.location, playEffects))
+    if (CustomItemServiceManager.placeBlock(item, ctx.pos.location, playEffects))
         return true
     
     if (item.type.isBlock) {

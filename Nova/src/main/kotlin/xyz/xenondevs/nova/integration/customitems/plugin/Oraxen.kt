@@ -6,9 +6,11 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
+import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 
 object Oraxen : CustomItemService {
@@ -34,6 +36,15 @@ object Oraxen : CustomItemService {
     override fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
         // API for that is broken
         return true
+    }
+    
+    override fun getItemType(item: ItemStack): CustomItemType? {
+        return if (MMOItems.getId(item) != null) CustomItemType.NORMAL else null
+    }
+    
+    override fun getBlockType(block: Block): CustomBlockType? {
+        // Missing API feature
+        return null
     }
     
     override fun getItemByName(name: String): ItemStack? {

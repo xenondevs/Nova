@@ -9,7 +9,9 @@ import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
+import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 
 object MMOItems : CustomItemService {
@@ -59,6 +61,14 @@ object MMOItems : CustomItemService {
     
     override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
         return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.let(::listOf)
+    }
+    
+    override fun getItemType(item: ItemStack): CustomItemType? {
+        return if (getId(item) != null) CustomItemType.NORMAL else null
+    }
+    
+    override fun getBlockType(block: Block): CustomBlockType? {
+        return if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) null else CustomBlockType.NORMAL
     }
     
     override fun getItemByName(name: String): ItemStack? {

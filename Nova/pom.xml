@@ -419,8 +419,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.LoneDev6</groupId>
-            <artifactId>api-itemsadder</artifactId>
-            <version>3.0.0</version>
+            <artifactId>API-ItemsAdder</artifactId>
+            <version>3.1.0b</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

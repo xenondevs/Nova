@@ -25,6 +25,7 @@ import xyz.xenondevs.nova.player.advancement.AdvancementManager
 import xyz.xenondevs.nova.player.attachment.AttachmentManager
 import xyz.xenondevs.nova.player.equipment.ArmorEquipListener
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
+import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
@@ -44,7 +45,8 @@ object Initializer {
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeArmorStandManager,
         AdvancementManager, RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
-        AbilityManager, PacketListener, LootGeneration, AddonsLoader, ItemCategories, BlockManager, WorldDataManager
+        AbilityManager, PacketListener, LootGeneration, AddonsLoader, ItemCategories, BlockManager, WorldDataManager,
+        TileEntityManager
     ).sorted()
     
     private val latch = CountDownLatch(toInit.size)

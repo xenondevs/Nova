@@ -29,7 +29,7 @@ object CustomItemServiceManager : Initializable() {
         READY_LATCH.await()
     }
     
-    fun placeItem(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
+    fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
         return PLUGINS.any { it.placeBlock(item, location, playEffects) }
     }
     
@@ -43,6 +43,14 @@ object CustomItemServiceManager : Initializable() {
     
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
         return PLUGINS.firstNotNullOfOrNull { it.getDrops(block, tool) }
+    }
+    
+    fun getItemType(item: ItemStack): CustomItemType? {
+        return PLUGINS.firstNotNullOfOrNull { it.getItemType(item) }
+    }
+    
+    fun getBlockType(block: Block): CustomBlockType? {
+        return PLUGINS.firstNotNullOfOrNull { it.getBlockType(block) }
     }
     
     fun getItemByName(name: String): ItemStack? {

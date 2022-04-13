@@ -41,6 +41,18 @@ interface CustomItemService : InternalIntegration {
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>?
     
     /**
+     * Gets the [CustomItemType] of this [ItemStack] or null if the [ItemStack] is not
+     * from this [CustomItemService]
+     */
+    fun getItemType(item: ItemStack): CustomItemType?
+    
+    /**
+     * Gets the [CustomBlockType] of this [Block] or null if the [Block] is not
+     * from this [CustomItemService]
+     */
+    fun getBlockType(block: Block): CustomBlockType?
+    
+    /**
      * Gets an [ItemStack] from a namespaced name
      */
     fun getItemByName(name: String): ItemStack?
