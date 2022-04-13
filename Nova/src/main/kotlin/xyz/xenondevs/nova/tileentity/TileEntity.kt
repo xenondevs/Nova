@@ -77,8 +77,11 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             saveData()
             
             val item = material.createItemBuilder(this).get()
-            if (globalData.isNotEmpty())
-                item.itemMeta?.persistentDataContainer?.set(TILE_ENTITY_KEY, CompoundElementDataType, globalData)
+            if (globalData.isNotEmpty()) {
+                val itemMeta = item.itemMeta!!
+                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, CompoundElementDataType, globalData)
+                item.itemMeta = itemMeta
+            }
             
             drops += item
         }
