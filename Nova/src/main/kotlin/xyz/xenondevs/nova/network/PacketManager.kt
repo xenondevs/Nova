@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerLoginEvent.Result
+import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.PLUGIN_MANAGER
@@ -18,7 +19,7 @@ import xyz.xenondevs.nova.util.channels
 import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.serverPlayer
 
-object PacketListener : Initializable(), Listener {
+object PacketManager : Initializable(), Listener {
     
     override val inMainThread = true
     override val dependsOn = emptySet<Initializable>()
@@ -29,16 +30,18 @@ object PacketListener : Initializable(), Listener {
     val playerHandlers = HashMap<String, PacketHandler>()
     
     override fun init() {
-        LOGGER.info("Initializing PacketListener")
+        LOGGER.info("Registering packet handlers")
         PLUGIN_MANAGER.registerEvents(this, NOVA)
         registerHandlers()
-        NOVA.disableHandlers += {
-            Bukkit.getOnlinePlayers().forEach(::unregisterHandler)
-            serverChannels.forEach { channel ->
-                channel.eventLoop().submit {
-                    val pipeline = channel.pipeline()
-                    pipeline.context("nova_pipeline_adapter")?.handler()?.run(pipeline::remove)
-                }
+    }
+    
+    override fun disable() {
+        LOGGER.info("Unregistering packet handlers")
+        Bukkit.getOnlinePlayers().forEach(::unregisterHandler)
+        serverChannels.forEach { channel ->
+            channel.eventLoop().submit {
+                val pipeline = channel.pipeline()
+                pipeline.context("nova_pipeline_adapter")?.handler()?.run(pipeline::remove)
             }
         }
     }
@@ -55,13 +58,18 @@ object PacketListener : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleLogin(event: PlayerLoginEvent) {
-        val uuid = event.player.name
-        if (uuid !in playerHandlers) {
+    private fun handleLogin(event: PlayerLoginEvent) {
+        val handler = playerHandlers[event.player.name]
+        if (handler == null) {
             event.disallow(Result.KICK_OTHER, "[Nova] Something went wrong")
             return
         }
-        playerHandlers[uuid]!!.player = event.player
+        handler.player = event.player
+    }
+    
+    @EventHandler
+    private fun handleQuit(event: PlayerQuitEvent) {
+        playerHandlers -= event.player.name
     }
     
     object PipelineAdapter : ChannelInboundHandlerAdapter() {
@@ -87,7 +95,7 @@ object PacketListener : Initializable(), Listener {
         override fun initChannel(channel: Channel) {
             synchronized(connectionsList) {
                 channel.eventLoop().submit {
-                    channel.pipeline().addBefore("packet_handler", "nova_packet_handler", PacketHandler())
+                    channel.pipeline().addBefore("packet_handler", "nova_packet_handler", PacketHandler(channel))
                 }
             }
         }
@@ -95,8 +103,8 @@ object PacketListener : Initializable(), Listener {
     }
     
     private fun registerHandler(player: Player) {
-        val pipeline = player.serverPlayer.connection.connection.channel.pipeline()
-        pipeline.addBefore("packet_handler", "nova_packet_handler", PacketHandler(player))
+        val channel = player.serverPlayer.connection.connection.channel
+        channel.pipeline().addBefore("packet_handler", "nova_packet_handler", PacketHandler(channel, player))
     }
     
     private fun unregisterHandler(player: Player) {

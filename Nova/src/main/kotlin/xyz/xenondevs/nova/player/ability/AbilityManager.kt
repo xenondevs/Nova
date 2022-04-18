@@ -31,7 +31,11 @@ object AbilityManager : Initializable(), Listener {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerJoin)
         runTaskTimer(0, 1) { activeAbilities.values.flatMap(Map<*, Ability>::values).forEach(Ability::handleTick) }
-        NOVA.disableHandlers.add { Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerQuit) }
+    }
+    
+    override fun disable() {
+        LOGGER.info("Removing active abilities")
+        Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerQuit)
     }
     
     fun giveAbility(player: Player, type: AbilityType<*>) {

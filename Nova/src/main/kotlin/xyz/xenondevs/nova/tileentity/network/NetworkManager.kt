@@ -113,11 +113,13 @@ interface NetworkManager {
         override val dependsOn = emptySet<Initializable>()
         
         override fun init() {
+            LOGGER.info("Initializing NetworkManager")
             NETWORK_MANAGER.init()
             Bukkit.getPluginManager().registerEvents(this, NOVA)
         }
-        
-        fun unloadAll() {
+    
+        override fun disable() {
+            LOGGER.info("Unloading networks")
             Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach { unloadChunk(it.pos) }
         }
         

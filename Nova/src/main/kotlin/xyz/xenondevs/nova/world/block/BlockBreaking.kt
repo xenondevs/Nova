@@ -260,9 +260,9 @@ private class PacketBreakMethod(pos: BlockPos, val fakeEntityId: Int) : BreakMet
 
 private class ArmorStandBreakMethod(pos: BlockPos) : BreakMethod(pos) {
     
-    private val armorStand = FakeArmorStand(pos.location.center(), true) {
-        it.isInvisible = true
-        it.isMarker = true
+    private val armorStand = FakeArmorStand(pos.location.center(), true) { _, data ->
+        data.invisible = true
+        data.marker = true
     }
     
     override var breakStage: Int = -1
@@ -271,11 +271,9 @@ private class ArmorStandBreakMethod(pos: BlockPos) : BreakMethod(pos) {
             
             field = stage
             if (stage in 0..9) {
-                armorStand.setEquipment(MojangSlot.HEAD, CoreBlockOverlay.BREAK_STAGE_OVERLAY.item.createItemStack(stage))
-                armorStand.updateEquipment()
+                armorStand.setEquipment(MojangSlot.HEAD, CoreBlockOverlay.BREAK_STAGE_OVERLAY.item.createItemStack(stage), true)
             } else {
-                armorStand.setEquipment(MojangSlot.HEAD, null)
-                armorStand.updateEquipment()
+                armorStand.setEquipment(MojangSlot.HEAD, null, true)
             }
         }
     

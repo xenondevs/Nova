@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.PacketItems
-import xyz.xenondevs.nova.network.PacketListener
+import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.player.advancement.AdvancementManager
 import xyz.xenondevs.nova.player.attachment.AttachmentManager
@@ -37,6 +37,7 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.loot.LootGeneration
 import java.util.concurrent.CountDownLatch
+import java.util.logging.Level
 
 object Initializer {
     
@@ -45,12 +46,11 @@ object Initializer {
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeArmorStandManager,
         AdvancementManager, RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
-        AbilityManager, PacketListener, LootGeneration, AddonsLoader, ItemCategories, BlockManager, WorldDataManager,
+        AbilityManager, PacketManager, LootGeneration, AddonsLoader, ItemCategories, BlockManager, WorldDataManager,
         TileEntityManager
     ).sorted()
     
     private val latch = CountDownLatch(toInit.size)
-    
     
     fun init() {
         runAsyncTask {
@@ -60,7 +60,7 @@ object Initializer {
                         it.dependsOn.forEach { it.latch.await() }
                         it.initialize(latch)
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $it", e)
                         latch.countDown()
                     }
                 }
@@ -72,6 +72,16 @@ object Initializer {
                 setGlobalIngredients()
                 AddonManager.enableAddons()
                 LOGGER.info("Done loading")
+            }
+        }
+    }
+    
+    fun disable() {
+        toInit.reversed().forEach {
+            try {
+                it.disable()
+            } catch (e: Exception) {
+                LOGGER.log(Level.SEVERE, "An exception occurred trying to disable $it", e)
             }
         }
     }

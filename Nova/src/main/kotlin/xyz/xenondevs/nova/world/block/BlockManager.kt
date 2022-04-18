@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 object BlockManager : Initializable() {
     
     override val inMainThread = true
-    override val dependsOn = setOf(AddonsInitializer)
+    override val dependsOn = setOf(AddonsInitializer, WorldDataManager)
     
     override fun init() {
         LOGGER.info("Initializing BlockManager")

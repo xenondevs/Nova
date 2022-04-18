@@ -31,8 +31,12 @@ object AttachmentManager : Initializable(), Listener {
         LOGGER.info("Initializing AttachmentManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getOnlinePlayers().forEach { loadAttachments(it) }
-        NOVA.disableHandlers.add { Bukkit.getOnlinePlayers().forEach { saveAndRemoveAttachments(it) } }
         runTaskTimer(0, 1) { attachments.values.flatten().forEach { it.handleTick(tick++) } }
+    }
+    
+    override fun disable() {
+        LOGGER.info("Saving attachments")
+        Bukkit.getOnlinePlayers().forEach { saveAndRemoveAttachments(it) }
     }
     
     fun registerAttachment(attachment: Attachment) {

@@ -6,7 +6,6 @@ import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer
 import org.bukkit.craftbukkit.v1_18_R2.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.command.impl.*
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.initialize.Initializable
@@ -25,7 +24,10 @@ object CommandManager : Initializable() {
     override fun init() {
         LOGGER.info("Registering Commands")
         registerCommands()
-        NOVA.disableHandlers += this::unregisterCommands
+    }
+    
+    override fun disable() {
+        registeredCommands.forEach { unregisterCommand(it) }
     }
     
     private fun registerCommands() {
@@ -47,10 +49,6 @@ object CommandManager : Initializable() {
         craftServer.commandMap.register("nova", vanillaCommandWrapper)
         
         craftServer.syncCommands()
-    }
-    
-    private fun unregisterCommands() {
-        registeredCommands.forEach { unregisterCommand(it) }
     }
     
     private fun unregisterCommand(name: String) {

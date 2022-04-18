@@ -1,20 +1,25 @@
 package xyz.xenondevs.nova.network
 
+import io.netty.channel.Channel
 import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
+import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.login.ServerboundHelloPacket
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.network.event.PacketEventManager
+import java.util.concurrent.ConcurrentLinkedQueue
 
-class PacketHandler() : ChannelDuplexHandler() {
+class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
     
-    constructor(player: Player) : this() {
-        this.player = player
-    }
-    
+    val queue = ConcurrentLinkedQueue<FriendlyByteBuf>()
     var player: Player? = null
+    
+    constructor(channel: Channel, player: Player) : this(channel) {
+        this.player = player
+        PacketManager.playerHandlers[player.name] = this
+    }
     
     override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
         val packet = callEvent(msg) ?: return
@@ -23,11 +28,24 @@ class PacketHandler() : ChannelDuplexHandler() {
     
     override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
         if (msg is ServerboundHelloPacket) {
-            PacketListener.playerHandlers[msg.gameProfile.name] = this
+            PacketManager.playerHandlers[msg.gameProfile.name] = this
             super.channelRead(ctx, msg)
         } else {
             val packet = callEvent(msg) ?: return
             super.channelRead(ctx, packet)
+        }
+    }
+    
+    override fun flush(ctx: ChannelHandlerContext?) {
+        try {
+            if (player != null) {
+                while (queue.isNotEmpty()) {
+                    channel.write(queue.poll().duplicate())
+                }
+            }
+            super.flush(ctx)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
     

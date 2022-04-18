@@ -44,11 +44,11 @@ class MultiModel {
         
         return models.map { model ->
             val location = model.location
-            val armorStand = FakeArmorStand(location) {
-                it.setEquipment(EquipmentSlot.HEAD, model.itemStack)
-                it.isInvisible = true
-                it.isMarker = true
-                it.setHeadPose(model.headPose)
+            val armorStand = FakeArmorStand(location) { ast, data ->
+                ast.setEquipment(EquipmentSlot.HEAD, model.itemStack, false)
+                data.invisible = true
+                data.marker = true
+                data.headRotation = model.headPose
             }
             
             currentModels[armorStand] = model

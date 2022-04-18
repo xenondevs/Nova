@@ -21,11 +21,12 @@ object ChunkLoadManager : Initializable() {
         
         Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false }
         forceLoadedChunks.removeIf { it.key.chunk?.apply { isForceLoaded = true } == null }
-        
-        NOVA.disableHandlers += {
-            if (!NOVA.isUninstalled)
-                PermanentStorage.store("forceLoadedChunks", forceLoadedChunks)
-        }
+    }
+    
+    override fun disable() {
+        LOGGER.info("Saving force-loaded chunks")
+        if (!NOVA.isUninstalled)
+            PermanentStorage.store("forceLoadedChunks", forceLoadedChunks)
     }
     
     fun submitChunkLoadRequest(chunk: ChunkPos, uuid: UUID) {

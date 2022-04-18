@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.tileentity.requiresLight
 import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.yaw
+import xyz.xenondevs.nova.world.armorstand.ArmorStandDataHolder
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 
 class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
@@ -28,15 +29,15 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
         multiBlockPositions?.forEachIndexed { i, otherPos ->
             armorStands += FakeArmorStand(
                 otherPos.location.center().apply { yaw = location.yaw }, false
-            ) { setArmorStandValues(it, i + 1) }
+            ) { ast, data -> setArmorStandValues(ast, data, i + 1) }
         }
     }
     
-    private fun setArmorStandValues(armorStand: FakeArmorStand, subId: Int = 0) {
-        armorStand.isInvisible = true
-        armorStand.isMarker = true
-        armorStand.setSharedFlagOnFire(material.hitboxType.requiresLight)
-        armorStand.setEquipment(EquipmentSlot.HEAD, material.block.createClientsideItemStack(subId))
+    private fun setArmorStandValues(armorStand: FakeArmorStand, data: ArmorStandDataHolder, subId: Int = 0) {
+        data.invisible = true
+        data.marker = true
+        data.onFire = material.hitboxType.requiresLight
+        armorStand.setEquipment(EquipmentSlot.HEAD, material.block.createClientsideItemStack(subId), false)
     }
     
     override fun load(placed: Boolean) {
@@ -56,8 +57,7 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
     }
     
     override fun update(subId: Int) {
-        armorStands[0].setEquipment(EquipmentSlot.HEAD, material.block.createClientsideItemStack(subId))
-        armorStands[0].updateEquipment()
+        armorStands[0].setEquipment(EquipmentSlot.HEAD, material.block.createClientsideItemStack(subId), true)
     }
     
     companion object : BlockModelProviderType<ArmorStandModelProvider> {

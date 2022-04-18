@@ -1,23 +1,21 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.util
 
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelFuture
 import net.minecraft.core.BlockPos
 import net.minecraft.core.NonNullList
-import net.minecraft.core.Registry
 import net.minecraft.core.Rotations
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ClientboundAddMobPacket
 import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
-import net.minecraft.world.entity.EntityType
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -30,12 +28,14 @@ import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.util.Vector
+import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import java.util.*
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import java.util.concurrent.atomic.AtomicInteger
+import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.item.ItemStack as NMSItemStack
 
-val Entity.nmsEntity: net.minecraft.world.entity.Entity
+val Entity.nmsEntity: MojangEntity
     get() = (this as CraftEntity).handle
 
 val Player.serverPlayer: ServerPlayer
@@ -44,7 +44,7 @@ val Player.serverPlayer: ServerPlayer
 val ItemStack.nmsStack: NMSItemStack
     get() = CraftItemStack.asNMSCopy(this)
 
-val NMSItemStack.bukkitStack
+val NMSItemStack.bukkitStack: ItemStack
     get() = CraftItemStack.asBukkitCopy(this)
 
 val Location.blockPos: BlockPos
@@ -66,6 +66,16 @@ val ResourceLocation.namespacedKey: NamespacedKey
 fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
     packets.forEach { connection.send(it) }
+}
+
+fun Player.send(vararg bufs: FriendlyByteBuf, retain: Boolean = true, flush: Boolean = true) {
+    val queue = PacketManager.playerHandlers[name]!!.queue
+    bufs.forEach {
+        if (retain) it.retain()
+        queue += it
+    }
+    
+    if (flush) connection.connection.channel.flush()
 }
 
 fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
@@ -104,37 +114,10 @@ fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
 
 object NMSUtils {
     
-    fun createTeleportPacket(id: Int, location: Location): ClientboundTeleportEntityPacket {
-        val buffer = FriendlyByteBuf(Unpooled.buffer())
-        buffer.writeVarInt(id)
-        buffer.writeDouble(location.x)
-        buffer.writeDouble(location.y)
-        buffer.writeDouble(location.z)
-        buffer.writeByte(location.yaw.toPackedByte().toInt())
-        buffer.writeByte(location.pitch.toPackedByte().toInt())
-        buffer.writeBoolean(true)
-        
-        return ClientboundTeleportEntityPacket(buffer)
-    }
-    
-    fun createAddMobPacket(id: Int, uuid: UUID, type: EntityType<*>, location: Location, velocity: Vector? = null): ClientboundAddMobPacket {
-        val buffer = FriendlyByteBuf(Unpooled.buffer())
-        
-        val packedYaw = location.yaw.toPackedByte().toInt()
-        buffer.writeVarInt(id)
-        buffer.writeUUID(uuid)
-        buffer.writeVarInt(Registry.ENTITY_TYPE.getId(type))
-        buffer.writeDouble(location.x)
-        buffer.writeDouble(location.y)
-        buffer.writeDouble(location.z)
-        buffer.writeByte(packedYaw)
-        buffer.writeByte(location.pitch.toPackedByte().toInt())
-        buffer.writeByte(packedYaw)
-        buffer.writeShort(velocity?.x?.toFixedPoint()?.toInt() ?: 0)
-        buffer.writeShort(velocity?.y?.toFixedPoint()?.toInt() ?: 0)
-        buffer.writeShort(velocity?.z?.toFixedPoint()?.toInt() ?: 0)
-        
-        return ClientboundAddMobPacket(buffer)
-    }
+    val ENTITY_COUNTER = ReflectionUtils.getField(
+        MojangEntity::class.java,
+        true,
+        "SRF(net.minecraft.world.entity.Entity ENTITY_COUNTER)"
+    ).get(null) as AtomicInteger
     
 }

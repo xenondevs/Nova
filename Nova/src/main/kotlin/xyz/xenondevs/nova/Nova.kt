@@ -10,14 +10,11 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.logging.Logger
@@ -50,9 +47,9 @@ class Nova : JavaPlugin(), INova {
     
     override fun onEnable() {
         NOVA = this
-        ReflectionUtils.setPlugin(this)
         LOGGER = logger
         PLUGIN_MANAGER = server.pluginManager
+        ReflectionUtils.setPlugin(this)
         
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
         PermanentStorage.store("last_version", description.version)
@@ -65,10 +62,8 @@ class Nova : JavaPlugin(), INova {
     
     override fun onDisable() {
         AddonManager.disableAddons()
-        NetworkManager.unloadAll()
+        Initializer.disable()
         disableHandlers.forEach { runCatching(it).onFailure(Throwable::printStackTrace) }
-        DatabaseManager.disconnect()
-        AsyncExecutor.shutdown()
     }
     
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {

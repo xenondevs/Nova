@@ -14,7 +14,9 @@ abstract class Initializable : Comparable<Initializable> {
     
     abstract fun init()
     
-    open fun initialize(parentLatch: CountDownLatch) {
+    open fun disable() = Unit
+    
+    fun initialize(parentLatch: CountDownLatch) {
         if (inMainThread) {
             runTask {
                 init()

@@ -74,6 +74,8 @@ object AsyncExecutor {
         if (USE_NOVA_SCHEDULER) {
             threadFactory = ThreadFactoryBuilder().setNameFormat("Async Nova Worker - %d").build()
             executorService = ScheduledThreadPoolExecutor(THREADS, threadFactory)
+            
+            NOVA.disableHandlers += executorService::shutdown
         }
     }
     
@@ -94,11 +96,5 @@ object AsyncExecutor {
                 t.printStackTrace()
             }
         }, delay, TimeUnit.MILLISECONDS)
-    
-    fun shutdown() {
-        if (USE_NOVA_SCHEDULER) {
-            executorService.shutdown()
-        }
-    }
     
 }

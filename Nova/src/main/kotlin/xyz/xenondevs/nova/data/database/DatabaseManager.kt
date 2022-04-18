@@ -40,7 +40,8 @@ object DatabaseManager : Initializable() {
         } else connectSqlite()
     }
     
-    fun disconnect() {
+    override fun disable() {
+        LOGGER.info("Disconnecting from database")
         dataSource.close()
     }
     

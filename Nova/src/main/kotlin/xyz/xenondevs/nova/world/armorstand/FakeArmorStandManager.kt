@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
@@ -39,7 +40,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
     
     override val inMainThread = false
-    override val dependsOn = emptySet<Initializable>()
+    override val dependsOn = setOf(PacketManager)
     
     override fun init() {
         LOGGER.info("Initializing FakeArmorStandManager")
@@ -48,13 +49,14 @@ object FakeArmorStandManager : Initializable(), Listener {
         Bukkit.getOnlinePlayers().forEach { player ->
             handleChunksChange(player, player.location.chunkPos)
         }
-        
-        NOVA.disableHandlers += {
-            synchronized(FakeArmorStandManager) {
-                chunkArmorStands.forEach { (chunk, armorStands) ->
-                    val viewers = chunkViewers[chunk] ?: return@forEach
-                    armorStands.forEach { armorStand -> viewers.forEach { viewer -> armorStand.despawn(viewer) } }
-                }
+    }
+    
+    override fun disable() {
+        LOGGER.info("Despawning fake armor stands")
+        synchronized(FakeArmorStandManager) {
+            chunkArmorStands.forEach { (chunk, armorStands) ->
+                val viewers = chunkViewers[chunk] ?: return@forEach
+                armorStands.forEach { armorStand -> viewers.forEach { viewer -> armorStand.despawn(viewer) } }
             }
         }
     }
