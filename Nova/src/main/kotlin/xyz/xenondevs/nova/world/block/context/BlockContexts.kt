@@ -48,6 +48,7 @@ data class BlockInteractContext(
     
     init {
         require(item?.type?.isAir != true) { "empty item stacks are not allowed" }
+        require(hand == null || hand == EquipmentSlot.HAND || hand == EquipmentSlot.OFF_HAND) { "equipment slot is not a hand" }
     }
     
 }

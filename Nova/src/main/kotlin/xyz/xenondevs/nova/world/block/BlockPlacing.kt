@@ -13,15 +13,12 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
-import xyz.xenondevs.nova.util.facing
-import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaMaterial
-import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.pos
 
@@ -91,7 +88,7 @@ internal object BlockPlacing : Listener {
                 BlockManager.placeBlock(material, ctx)
                 
                 if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
-                player.swingMainHand()
+                runTask { player.swingHand(event.hand!!) }
             }
         }
     }
