@@ -9,6 +9,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.network.event.impl.ClientboundActionBarPacketEvent
 import xyz.xenondevs.nova.network.event.impl.ClientboundChatPacketEvent
 import xyz.xenondevs.nova.util.data.forceDefaultFont
@@ -17,7 +18,6 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
 import java.util.*
 
-// TODO: This currently only works with one overlay due to the centering of the text
 object ActionbarOverlayManager : Listener {
     
     private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(TextComponent(""))
@@ -25,8 +25,10 @@ object ActionbarOverlayManager : Listener {
     private val interceptedActionbars = HashMap<UUID, Pair<ArrayList<BaseComponent>, Long>>()
     
     init {
-        Bukkit.getPluginManager().registerEvents(this, NOVA)
-        runTaskTimer(0, 1, ::handleTick)
+        if (DEFAULT_CONFIG.getBoolean("actionbar_overlay")) {
+            Bukkit.getPluginManager().registerEvents(this, NOVA)
+            runTaskTimer(0, 1, ::handleTick)
+        }
     }
     
     fun registerOverlay(player: Player, overlay: ActionbarOverlay) {
