@@ -6,7 +6,7 @@
 
     <groupId>xyz.xenondevs.nova</groupId>
     <artifactId>Nova-Parent</artifactId>
-    <version>0.8.11</version>
+    <version>0.8.12</version>
     <packaging>pom</packaging>
 
     <properties>
