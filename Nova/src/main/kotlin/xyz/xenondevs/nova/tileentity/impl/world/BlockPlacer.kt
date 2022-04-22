@@ -54,7 +54,14 @@ class BlockPlacer(
             val novaMaterial = item.novaMaterial
             if (novaMaterial != null && novaMaterial.isBlock) {
                 if (TileEntityLimits.canPlaceTileEntity(ownerUUID, world, novaMaterial) == PlaceResult.ALLOW) {
-                    runTask { TileEntityManager.placeTileEntity(ownerUUID, placeLocation, armorStand.location.yaw, novaMaterial, item.getTileEntityData()) }
+                    runTask {
+                        TileEntityManager.placeTileEntity(
+                            ownerUUID,
+                            placeLocation,
+                            armorStand.location.yaw,
+                            novaMaterial,
+                            CompoundElement().apply { put("global", item.getTileEntityData()) })
+                    }
                     novaMaterial.hitboxType?.playPlaceSoundEffect(placeLocation)
                 } else continue
             } else if (!CustomItemServiceManager.placeItem(item, placeLocation, true)) {
