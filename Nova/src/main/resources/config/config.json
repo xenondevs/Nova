@@ -55,5 +55,6 @@
   "chunk_reload_watcher": false,
   "use_metric_prefixes": false,
   "drop_excess_on_ground": true,
-  "block_break_effects": true
+  "block_break_effects": true,
+  "actionbar_overlay": true
 }

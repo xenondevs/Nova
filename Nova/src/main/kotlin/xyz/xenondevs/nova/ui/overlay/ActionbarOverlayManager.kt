@@ -9,6 +9,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.network.event.clientbound.ActionBarPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ChatPacketEvent
 import xyz.xenondevs.nova.util.data.forceDefaultFont
@@ -24,8 +25,10 @@ object ActionbarOverlayManager : Listener {
     private val interceptedActionbars = HashMap<UUID, Pair<ArrayList<BaseComponent>, Long>>()
     
     init {
-        Bukkit.getPluginManager().registerEvents(this, NOVA)
-        runTaskTimer(0, 1, ::handleTick)
+        if (DEFAULT_CONFIG.getBoolean("actionbar_overlay")) {
+            Bukkit.getPluginManager().registerEvents(this, NOVA)
+            runTaskTimer(0, 1, ::handleTick)
+        }
     }
     
     fun registerOverlay(player: Player, overlay: ActionbarOverlay) {
