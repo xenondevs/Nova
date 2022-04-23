@@ -51,7 +51,7 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
     fun write(buf: ByteBuf) {
         buf.writeByte(0) // File format version
         
-        val palette = chunks.asSequence().filterNotNull().flatMap { it.blockStates.values }.mapTo(HashSet()) { it.id }.toList()
+        val palette = chunks.asSequence().filterNotNull().flatMap { it.blockStates.values }.mapTo(HashSet()) { it.id.toString() }.toList()
         buf.writeStringList(palette)
         
         val availableChunks = BooleanArray(1024) {

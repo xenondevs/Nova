@@ -48,7 +48,7 @@ abstract class VanillaTileEntity internal constructor(val blockState: VanillaTil
     
     internal companion object {
         fun of(blockState: VanillaTileEntityState): VanillaTileEntity? =
-            Type.values().firstOrNull { it.id == blockState.id }?.constructor?.invoke(blockState)
+            Type.values().firstOrNull { it.id == blockState.id.toString() }?.constructor?.invoke(blockState)
     }
     
 }

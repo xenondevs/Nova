@@ -50,7 +50,7 @@ class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
             buf.writeByte(1)
             buf.writeByte((pos.x and 0xF shl 4) or (pos.z and 0xF))
             buf.writeShort(pos.y)
-            buf.writeInt(palette.indexOf(state.id))
+            buf.writeInt(palette.indexOf(state.id.toString()))
             state.write(buf)
         }
         buf.writeByte(0)

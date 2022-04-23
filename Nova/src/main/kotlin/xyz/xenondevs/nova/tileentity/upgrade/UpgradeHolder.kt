@@ -1,59 +1,54 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
+import de.studiocode.invui.virtualinventory.event.InventoryUpdatedEvent
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.data.serialization.cbf.element.other.UpgradesElement
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.TileEntityGUI
 import xyz.xenondevs.nova.ui.UpgradesGUI
 import xyz.xenondevs.nova.util.item.novaMaterial
-import xyz.xenondevs.nova.util.runTaskLater
-import java.util.*
+import xyz.xenondevs.nova.util.mapKeysNotNullTo
 import kotlin.math.min
 
-private fun ItemStack.getUpgradeType(): UpgradeType? {
-    val novaType = novaMaterial ?: return null
-    return UpgradeType.values().firstOrNull { it.material == novaType }
+private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
+    val novaMaterial = novaMaterial ?: return null
+    return UpgradeTypeRegistry.of(novaMaterial)
 }
 
 class UpgradeHolder(
     tileEntity: TileEntity,
     val lazyGUI: Lazy<TileEntityGUI>,
     private val defaultUpdateHandler: (() -> Unit)?,
-    vararg allowed: UpgradeType
+    vararg allowed: UpgradeType<*>
 ) {
     
-    val data = tileEntity.data
     val material = tileEntity.material
-    val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handleNewInput) }
-    val allowed = allowed.toList()
-    val upgrades = EnumMap<UpgradeType, Int>(UpgradeType::class.java)
+    val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handlePreInvUpdate); setInventoryUpdatedHandler(::handlePostInvUpdate) }
+    val allowed: Set<UpgradeType<*>> = allowed.toSet()
+    val upgrades: HashMap<UpgradeType<*>, Int> =
+        tileEntity.retrieveElementOrNull<CompoundElement>("upgrades")
+            ?.toHashMap<Int>()
+            ?.mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of(it.key) }
+            ?: HashMap()
     
     val gui by lazy { UpgradesGUI(this) { lazyGUI.value.openWindow(it) } }
-    
     val upgradeUpdateHandlers = ArrayList<() -> Unit>()
     
-    constructor(tileEntity: TileEntity, lazyGUI: Lazy<TileEntityGUI>, vararg allowed: UpgradeType) :
+    constructor(tileEntity: TileEntity, lazyGUI: Lazy<TileEntityGUI>, vararg allowed: UpgradeType<*>) :
         this(tileEntity, lazyGUI, null, allowed = allowed)
     
     constructor(tileEntity: TileEntity, lazyGUI: Lazy<TileEntityGUI>, defaultUpdateHandler: (() -> Unit)? = null) :
-        this(tileEntity, lazyGUI, defaultUpdateHandler, allowed = UpgradeType.values())
-    
-    init {
-        val savedUpgrades = data.get<EnumMap<UpgradeType, Int>>("upgrades")
-        if (savedUpgrades != null)
-            upgrades.putAll(savedUpgrades)
-    }
+        this(tileEntity, lazyGUI, defaultUpdateHandler, allowed = UpgradeTypeRegistry.types.toTypedArray())
     
     /**
      * Tries adding the given amount of upgrades and
      * returns the amount it wasn't able to add
      */
     @Suppress("LiftReturnOrAssignment")
-    fun addUpgrade(type: UpgradeType, amount: Int): Int {
+    fun addUpgrade(type: UpgradeType<*>, amount: Int): Int {
         if (type !in allowed || amount == 0)
             return amount
         
@@ -69,7 +64,7 @@ class UpgradeHolder(
         }
     }
     
-    fun removeUpgrade(type: UpgradeType, all: Boolean): ItemStack? {
+    fun removeUpgrade(type: UpgradeType<*>, all: Boolean): ItemStack? {
         val amount = upgrades[type] ?: return null
         
         if (all) {
@@ -80,27 +75,25 @@ class UpgradeHolder(
         }
         
         handleUpgradeUpdates()
-        return type.material.createItemStack(if (all) amount else 1)
+        return type.item.createItemStack(if (all) amount else 1)
     }
     
-    fun getModifier(type: UpgradeType): Double {
+    fun <T> getValue(type: UpgradeType<T>): T {
         val amount = upgrades[type] ?: 0
-        return type[material][amount]
+        return type.getValue(material, amount)
     }
     
-    fun getLimit(type: UpgradeType): Int = min(type[material].size - 1, 999)
+    fun getLevel(type: UpgradeType<*>): Int {
+        return upgrades[type] ?: 0
+    }
     
-    fun getSpeedModifier(): Double = getModifier(UpgradeType.SPEED)
+    fun hasUpgrade(type: UpgradeType<*>): Boolean {
+        return type in upgrades
+    }
     
-    fun getEfficiencyModifier(): Double = getModifier(UpgradeType.EFFICIENCY)
+    fun getLimit(type: UpgradeType<*>): Int = min(type.getUpgradeValues(material).size - 1, 999)
     
-    fun getEnergyModifier(): Double = getModifier(UpgradeType.ENERGY)
-    
-    fun getFluidModifier(): Double = getModifier(UpgradeType.FLUID)
-    
-    fun getRangeModifier(): Int = getModifier(UpgradeType.RANGE).toInt()
-    
-    private fun handleNewInput(event: ItemUpdateEvent) {
+    private fun handlePreInvUpdate(event: ItemUpdateEvent) {
         if (event.updateReason == SELF_UPDATE_REASON || event.isRemove || event.newItemStack == null)
             return
         
@@ -123,16 +116,18 @@ class UpgradeHolder(
             addedAmount = limit - currentAmount
             event.newItemStack.amount = addedAmount
         }
-        
-        runTaskLater(1) {
-            val vi = event.virtualInventory
-            var item = vi.items[0]
-            if (item != null) {
-                val amountLeft = addUpgrade(upgradeType, item.amount)
-                if (amountLeft == 0) item = null
-                else item.amount = amountLeft
-                vi.setItemStack(SELF_UPDATE_REASON, 0, item)
-            }
+    }
+    
+    private fun handlePostInvUpdate(event: InventoryUpdatedEvent) {
+        var item = event.newItemStack?.clone()
+        if (item != null) {
+            val upgradeType = item.getUpgradeType()!!
+            
+            val amountLeft = addUpgrade(upgradeType, item.amount)
+            if (amountLeft == 0) item = null
+            else item.amount = amountLeft
+            input.setItemStack(SELF_UPDATE_REASON, 0, item)
+            
             handleUpgradeUpdates()
         }
     }
@@ -143,10 +138,12 @@ class UpgradeHolder(
         defaultUpdateHandler?.invoke() // This is separate from the arraylist, so it is always called last.
     }
     
-    fun dropUpgrades() = upgrades.map { (type, amount) -> type.material.createItemStack(amount) }
+    fun dropUpgrades() = upgrades.map { (type, amount) -> type.item.createItemStack(amount) }
     
     fun save(compound: CompoundElement) {
-        compound.putElement("upgrades", UpgradesElement(upgrades))
+        val upgradesCompound = CompoundElement()
+        upgrades.forEach { upgradesCompound.put(it.key.id.toString(), it.value) }
+        compound.putElement("upgrades", upgradesCompound)
     }
     
 }

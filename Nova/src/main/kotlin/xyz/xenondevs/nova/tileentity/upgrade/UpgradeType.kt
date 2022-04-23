@@ -1,35 +1,51 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import com.google.gson.JsonElement
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.data.getAllDoubles
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry.register
 
-enum class UpgradeType(val material: ItemNovaMaterial, val icon: ItemNovaMaterial, val grayIcon: ItemNovaMaterial) {
+class UpgradeType<T> internal constructor(
+    val id: NamespacedId,
+    val item: ItemNovaMaterial,
+    val icon: ItemNovaMaterial,
+    val configLoader: (JsonElement) -> T
+) {
     
-    SPEED(CoreItems.SPEED_UPGRADE, CoreGUIMaterial.SPEED_UPGRADE, CoreGUIMaterial.TP_SPEED_UPGRADE),
-    EFFICIENCY(CoreItems.EFFICIENCY_UPGRADE, CoreGUIMaterial.EFFICIENCY_UPGRADE, CoreGUIMaterial.TP_EFFICIENCY_UPGRADE),
-    ENERGY(CoreItems.ENERGY_UPGRADE, CoreGUIMaterial.ENERGY_UPGRADE, CoreGUIMaterial.TP_ENERGY_UPGRADE),
-    FLUID(CoreItems.FLUID_UPGRADE, CoreGUIMaterial.FLUID_UPGRADE, CoreGUIMaterial.TP_FLUID_UPGRADE),
-    RANGE(CoreItems.RANGE_UPGRADE, CoreGUIMaterial.RANGE_UPGRADE, CoreGUIMaterial.TP_RANGE_UPGRADE);
+    private val modifierCache = HashMap<ItemNovaMaterial, List<T>>()
+    private val defaultConfig by lazy { NovaConfig["${id.namespace}:upgrade_modifiers"] }
     
-    private val modifierCache = HashMap<ItemNovaMaterial, DoubleArray>()
+    fun getValue(material: ItemNovaMaterial, level: Int): T {
+        val values = getUpgradeValues(material)
+        return values[level.coerceIn(0..values.lastIndex)]
+    }
     
-    operator fun get(material: ItemNovaMaterial): DoubleArray {
+    fun getUpgradeValues(material: ItemNovaMaterial): List<T> {
         return modifierCache.getOrPut(material) {
             val specificConfig = NovaConfig[material]
-            return@getOrPut readConfiguredModifier(specificConfig) ?: readConfiguredModifier(DEFAULT_CONFIG)!!
+            
+            val jsonArray = specificConfig.getArray("upgrade_values.${id.name}") ?: defaultConfig.getArray(id.name)
+            checkNotNull(jsonArray) { "No upgrade values present for $id" }
+            
+            val list = ArrayList<T>()
+            jsonArray.forEach { list += configLoader(it) }
+            
+            return@getOrPut list
         }
     }
     
-    private fun readConfiguredModifier(config: NovaConfig): DoubleArray? =
-        config.getArray("upgrade_modifiers.${name.lowercase()}")?.getAllDoubles()?.toDoubleArray()
-    
     companion object {
-        val ALL_ENERGY = arrayOf(SPEED, EFFICIENCY, ENERGY)
-        val ENERGY_AND_RANGE = arrayOf(SPEED, EFFICIENCY, ENERGY, RANGE)
+        val SPEED = register("speed", CoreItems.SPEED_UPGRADE, CoreGUIMaterial.SPEED_UPGRADE) { it.asDouble }
+        val EFFICIENCY = register("efficiency", CoreItems.EFFICIENCY_UPGRADE, CoreGUIMaterial.EFFICIENCY_UPGRADE) { it.asDouble }
+        val ENERGY = register("energy", CoreItems.ENERGY_UPGRADE, CoreGUIMaterial.ENERGY_UPGRADE) { it.asDouble }
+        val FLUID = register("fluid", CoreItems.FLUID_UPGRADE, CoreGUIMaterial.FLUID_UPGRADE) { it.asDouble }
+        val RANGE = register("range", CoreItems.RANGE_UPGRADE, CoreGUIMaterial.RANGE_UPGRADE) { it.asInt }
+        
+        internal fun init() = Unit
     }
+    
     
 }

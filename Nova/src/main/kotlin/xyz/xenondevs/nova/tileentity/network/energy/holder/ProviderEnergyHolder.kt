@@ -22,8 +22,8 @@ class ProviderEnergyHolder(
     private fun calculateEnergyGeneration(): Long {
         upgradeHolder ?: return defaultEnergyGeneration
         
-        return if (UpgradeType.SPEED in upgradeHolder.allowed) (defaultEnergyGeneration * upgradeHolder.getSpeedModifier()).toLong()
-        else (defaultEnergyGeneration * upgradeHolder.getEfficiencyModifier()).toLong()
+        return if (UpgradeType.SPEED in upgradeHolder.allowed) (defaultEnergyGeneration * upgradeHolder.getValue(UpgradeType.SPEED)).toLong()
+        else (defaultEnergyGeneration * upgradeHolder.getValue(UpgradeType.EFFICIENCY)).toLong()
     }
     
     override fun handleUpgradesUpdate() {

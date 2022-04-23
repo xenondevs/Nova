@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.util
 
 import de.studiocode.invui.item.Item
 import me.xdrop.fuzzywuzzy.FuzzySearch
-import org.checkerframework.checker.units.qual.K
 import java.util.*
 
 fun <E> List<E>.contentEquals(other: List<E>) = size == other.size && containsAll(other)
@@ -110,6 +109,24 @@ inline fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Bool
     }
     
     return this
+}
+
+inline fun <K, V, R, M : MutableMap<K, R>> MutableMap<K, V>.mapValuesNotNullTo(destination: M, valueSelector: (Map.Entry<K, V>) -> R?): M {
+    for (entry in this.entries) {
+        val value = valueSelector(entry)
+        if (value != null) destination[entry.key] = value
+    }
+    
+    return destination
+}
+
+inline fun <K, V, R, M : MutableMap<R, V>> MutableMap<K, V>.mapKeysNotNullTo(destination: M, keySelector: (Map.Entry<K, V>) -> R?): M {
+    for (entry in this.entries) {
+        val key = keySelector(entry)
+        if (key != null) destination[key] = entry.value
+    }
+    
+    return destination
 }
 
 inline fun <K, V, M : MutableMap<K, V>> Iterable<K>.associateWithNotNullTo(destination: M, valueSelector: (K) -> V?): M {

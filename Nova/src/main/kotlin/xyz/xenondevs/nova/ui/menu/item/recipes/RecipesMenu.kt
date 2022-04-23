@@ -72,10 +72,10 @@ fun Player.showUsages(id: String): Boolean {
  */
 private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeContainer>>, info: String? = null) : ItemMenu {
     
-    private val recipesGuiStructure = Structure("" +
-        "< . . . . . . . >" +
-        "x x x x x x x x x" +
-        "x x x x x x x x x" +
+    private val recipesGuiStructure = Structure(
+        "< . . . . . . . >",
+        "x x x x x x x x x",
+        "x x x x x x x x x",
         "x x x x x x x x x")
         .addIngredient('<', ::PageBackItem)
         .addIngredient('>', ::PageForwardItem)
@@ -93,14 +93,15 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
             .map { it.key to it.value }
             .sortedBy { it.first }
         
-        mainGUI = GUIBuilder(GUIType.TAB, 9, 6)
-            .setStructure("" +
-                "b . . . . . . . ." +
-                "x x x x x x x x x" +
-                "x x x x x x x x x" +
-                "x x x x x x x x x" +
-                "x x x x x x x x x" +
-                ". . . . . . . . .")
+        mainGUI = GUIBuilder(GUIType.TAB)
+            .setStructure(
+                "b . . . . . . . .",
+                "x x x x x x x x x",
+                "x x x x x x x x x",
+                "x x x x x x x x x",
+                "x x x x x x x x x",
+                ". . . . . . . . ."
+            )
             .setGUIs(craftingTabs.map { it.second })
             .addIngredient('b', LastRecipeItem(viewerUUID))
             .build()
@@ -210,7 +211,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
     
     private inner class PagedRecipesGUI(recipes: List<GUI>) {
         
-        val gui: GUI = GUIBuilder(GUIType.PAGED_GUIs, 9, 4)
+        val gui: GUI = GUIBuilder(GUIType.PAGED_GUIs)
             .setStructure(recipesGuiStructure)
             .setGUIs(recipes)
             .build()

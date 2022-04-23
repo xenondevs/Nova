@@ -73,19 +73,19 @@ class NovaConfig(private val configPath: String, private val data: ByteArray) : 
         
         fun loadDefaultConfig() {
             configs["config"] = NovaConfig(
-                "config/config.json",
-                getResourceAsStream("config/config.json")!!.readAllBytes()
+                "configs/config.json",
+                getResourceAsStream("configs/config.json")!!.readAllBytes()
             )
         }
         
         override fun init() {
             LOGGER.info("Loading configs")
             
-            getResources("config/")
-                .filterNot { it.startsWith("config/recipes/") || it == "config/config.json" }
+            getResources("configs/nova/")
                 .forEach {
-                    val configName = it.substring(7).substringBeforeLast('.')
-                    configs[configName] = NovaConfig(it, getResourceAsStream(it)!!.readAllBytes())
+                    val path = it.substringAfter("configs/nova/")
+                    val configName = "nova:${path.substringBeforeLast('.')}"
+                    configs[configName] = NovaConfig("configs/nova/$path", getResourceAsStream(it)!!.readAllBytes())
                 }
             
             AddonManager.loaders.forEach { loader ->
@@ -95,7 +95,7 @@ class NovaConfig(private val configPath: String, private val data: ByteArray) : 
                         val path = it.substringAfter("configs/")
                         val configName = "$namespace:${path.substringBeforeLast('.')}"
                         configs[configName] = NovaConfig(
-                            "config/$namespace/$path",
+                            "configs/$namespace/$path",
                             loader.classLoader.getResourceAsStream(it)!!.readAllBytes()
                         )
                     }
@@ -106,7 +106,7 @@ class NovaConfig(private val configPath: String, private val data: ByteArray) : 
         
         operator fun get(name: String) = configs[name]!!
         
-        operator fun get(material: ItemNovaMaterial) = configs[material.id]!!
+        operator fun get(material: ItemNovaMaterial) = configs[material.id.toString()]!!
         
     }
     

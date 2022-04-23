@@ -18,18 +18,18 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.getInt
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getString
+import xyz.xenondevs.nova.util.item.ItemUtils
 import java.io.File
 import java.io.InputStream
 
 object ItemCategories : Initializable() {
     
     private const val PATH_IN_JAR = "item_categories.json"
-    private val CATEGORIES_FILE = File(NOVA.dataFolder, "config/item_categories.json").apply { parentFile.mkdirs() }
+    private val CATEGORIES_FILE = File(NOVA.dataFolder, "configs/item_categories.json").apply { parentFile.mkdirs() }
     
     override val inMainThread = true
     override val dependsOn = setOf(AddonsInitializer)

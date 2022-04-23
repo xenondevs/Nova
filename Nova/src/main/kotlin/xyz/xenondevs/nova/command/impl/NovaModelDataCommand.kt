@@ -17,8 +17,8 @@ object NovaModelDataCommand : Command("nvmodeldata") {
         builder = builder
             .requiresPermission("nova.command.modeldata")
             .apply {
-                NovaMaterialRegistry.sortedValues.forEach { material ->
-                    then(literal(material.id.lowercase())
+                NovaMaterialRegistry.values.forEach { material ->
+                    then(literal(material.id.toString())
                         .executesCatching { showModelData(material, it) }
                     )
                 }

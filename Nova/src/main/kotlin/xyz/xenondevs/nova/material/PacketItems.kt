@@ -19,12 +19,12 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.network.event.clientbound.*
 import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
-import xyz.xenondevs.nova.util.namespacedKey
+import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.unhandledTags
+import xyz.xenondevs.nova.util.namespacedKey
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 

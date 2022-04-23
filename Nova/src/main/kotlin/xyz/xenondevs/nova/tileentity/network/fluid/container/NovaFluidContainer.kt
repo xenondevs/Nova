@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.fluid.container
 
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import java.util.*
 
 class NovaFluidContainer(
@@ -19,7 +20,7 @@ class NovaFluidContainer(
     }
     
     private fun handleUpgradeUpdates() {
-        capacity = (baseCapacity * upgradeHolder!!.getFluidModifier()).toLong()
+        capacity = (baseCapacity * upgradeHolder!!.getValue(UpgradeType.FLUID)).toLong()
     }
     
 }

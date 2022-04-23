@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.player.attachment.Attachment
@@ -18,6 +19,7 @@ val GSON: Gson =
     GsonBuilder()
         .setPrettyPrinting()
         .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
+        .registerTypeHierarchyAdapter<NamespacedId>(NamespacedIdTypeAdapter)
         .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerialization)
         .registerTypeHierarchyAdapter<Location>(LocationSerialization)
         .registerTypeHierarchyAdapter<Attachment>(AttachmentSerialization)

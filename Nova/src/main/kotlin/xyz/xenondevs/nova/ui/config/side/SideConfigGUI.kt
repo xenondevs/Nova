@@ -62,13 +62,14 @@ class SideConfigGUI(
         
         require(energyConfigGUI != null || itemConfigGUI != null || fluidConfigGUI != null)
         
-        mainGUI = GUIBuilder(GUIType.TAB, 9, 5)
-            .setStructure("" +
-                "< # # e i f # # #" +
-                "- - - - - - - - -" +
-                "x x x x x x x x x" +
-                "x x x x x x x x x" +
-                "x x x x x x x x x")
+        mainGUI = GUIBuilder(GUIType.TAB)
+            .setStructure(
+                "< # # e i f # # #",
+                "- - - - - - - - -",
+                "x x x x x x x x x",
+                "x x x x x x x x x",
+                "x x x x x x x x x"
+            )
             .addIngredient('<', BackItem(openPrevious))
             .addIngredient('e', ClickyTabItem(0) {
                 (if (energyConfigGUI != null) {

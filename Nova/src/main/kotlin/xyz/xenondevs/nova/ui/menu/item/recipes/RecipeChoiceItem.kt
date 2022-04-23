@@ -11,8 +11,8 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {

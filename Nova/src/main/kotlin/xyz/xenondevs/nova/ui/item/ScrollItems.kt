@@ -18,3 +18,17 @@ class ScrollDownItem : ScrollItem(1) {
         if (gui.canScroll(1)) CoreGUIMaterial.ARROW_1_DOWN.itemProvider else CoreGUIMaterial.LIGHT_ARROW_1_DOWN.itemProvider
     
 }
+
+class ScrollLeftItem : ScrollItem(-1) {
+    
+    override fun getItemProvider(gui: ScrollGUI): ItemProvider =
+        if (gui.canScroll(-1)) CoreGUIMaterial.ARROW_1_LEFT.itemProvider else CoreGUIMaterial.LIGHT_ARROW_1_LEFT.itemProvider
+    
+}
+
+class ScrollRightItem : ScrollItem(1) {
+    
+    override fun getItemProvider(gui: ScrollGUI): ItemProvider =
+        if (gui.canScroll(1)) CoreGUIMaterial.ARROW_1_RIGHT.itemProvider else CoreGUIMaterial.LIGHT_ARROW_1_RIGHT.itemProvider
+    
+}

@@ -4,6 +4,7 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import java.util.*
 
 class ConsumerEnergyHolder(
@@ -21,8 +22,8 @@ class ConsumerEnergyHolder(
     var specialEnergyConsumption = calculateEnergyConsumption(defaultSpecialEnergyConsumption)
     
     private fun calculateEnergyConsumption(default: Long): Long =
-        (default * ((upgradeHolder?.getSpeedModifier() ?: 1.0)
-            / (upgradeHolder?.getEfficiencyModifier() ?: 1.0))).toLong()
+        (default * ((upgradeHolder?.getValue(UpgradeType.SPEED) ?: 1.0)
+            / (upgradeHolder?.getValue(UpgradeType.EFFICIENCY) ?: 1.0))).toLong()
     
     override fun handleUpgradesUpdate() {
         energyConsumption = calculateEnergyConsumption(defaultEnergyConsumption)

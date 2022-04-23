@@ -43,11 +43,12 @@ class ColorPickerWindow(
             updateColorPreview()
         }
     
-    private val gui = GUIBuilder(GUIType.NORMAL, 9, 3)
-        .setStructure("" +
-            "< . . . p . . . ." +
-            ". . . . . . . . ." +
-            ". . r . g . b . .")
+    private val gui = GUIBuilder(GUIType.NORMAL)
+        .setStructure(
+            "< . . . p . . . .",
+            ". . . . . . . . .",
+            ". . r . g . b . ."
+        )
         .addIngredient('p', colorPreviewItem)
         .addIngredient('r', ChangeColorItem({ red }, { red = it }, "menu.nova.color_picker.red", ItemBuilder(Material.RED_DYE)))
         .addIngredient('g', ChangeColorItem({ green }, { green = it }, "menu.nova.color_picker.green", ItemBuilder(Material.LIME_DYE)))

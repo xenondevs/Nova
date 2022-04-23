@@ -20,7 +20,7 @@
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
         <zip4j.version>2.9.1</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
-        <invui.version>0.5-SNAPSHOT</invui.version>
+        <invui.version>0.6-SNAPSHOT</invui.version>
         <ktor.version>1.6.8</ktor.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>

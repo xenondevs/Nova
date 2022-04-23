@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.material
 
 import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
@@ -17,7 +18,7 @@ typealias TileEntityConstructor = ((NovaTileEntityState) -> TileEntity)
 
 @Suppress("UNCHECKED_CAST")
 class TileEntityNovaMaterial internal constructor(
-    id: String,
+    id: NamespacedId,
     localizedName: String,
     novaItem: NovaItem?,
     novaBlock: NovaBlock<NovaTileEntityState>,

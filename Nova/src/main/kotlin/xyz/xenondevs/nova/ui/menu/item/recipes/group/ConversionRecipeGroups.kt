@@ -13,7 +13,7 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
-import xyz.xenondevs.nova.data.recipe.RecipeTypeRegistry
+import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
@@ -23,11 +23,11 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
     
     override fun createGUI(container: RecipeContainer): GUI =
         when (container.type) {
-            RecipeTypeRegistry.FURNACE -> {
+            RecipeType.FURNACE -> {
                 val recipe = container.recipe as FurnaceRecipe
                 createConversionRecipeGUI(recipe.inputChoice, recipe.result, recipe.cookingTime)
             }
-            RecipeTypeRegistry.STONECUTTER -> {
+            RecipeType.STONECUTTER -> {
                 val recipe = container.recipe as StonecuttingRecipe
                 createConversionRecipeGUI(recipe.inputChoice, recipe.result, 0)
             }
@@ -44,11 +44,12 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
         createConversionRecipeGUI(createRecipeChoiceItem(input), result, time)
     
     private fun createConversionRecipeGUI(inputUIItem: Item, outputItem: ItemStack, time: Int): GUI {
-        val builder = GUIBuilder(GUIType.NORMAL, 9, 3)
-            .setStructure("" +
-                ". . t . . . . . ." +
-                ". . i . . . r . ." +
-                ". . . . . . . . .")
+        val builder = GUIBuilder(GUIType.NORMAL)
+            .setStructure(
+                ". . t . . . . . .",
+                ". . i . . . r . .",
+                ". . . . . . . . ."
+            )
             .addIngredient('i', inputUIItem)
             .addIngredient('r', createRecipeChoiceItem(listOf(outputItem)))
         

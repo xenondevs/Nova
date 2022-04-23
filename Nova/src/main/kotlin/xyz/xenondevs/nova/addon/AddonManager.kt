@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.addon
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.loader.AddonLoader
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
@@ -34,8 +35,6 @@ internal object AddonsInitializer : Initializable() {
 
 internal object AddonManager {
     
-    private val ID_PATTERN = Regex("""^[a-z][a-z0-9_]*$""")
-    
     private val addonsDir = File(NOVA.dataFolder, "addons/")
     internal val loaders = ArrayList<AddonLoader>()
     internal val addons = LinkedHashMap<String, Addon>()
@@ -50,11 +49,9 @@ internal object AddonManager {
                 val loader = AddonLoader(it)
                 val description = loader.description
                 
-                if (!description.id.matches(ID_PATTERN)) {
-                    LOGGER.severe("Failed to load addon ${loader.file.name}: Id ${description.id} does not match $ID_PATTERN")
-                    return@forEach
-                } else if (description.id == "nova") {
-                    LOGGER.severe("Failed to load addon ${loader.file.name}: 'nova' is not a valid id")
+                val id = description.id
+                if (!NamespacedId.isValidNamespace(id) || id == "nova") {
+                    LOGGER.severe("Failed to load addon ${loader.file.name}: \"$id\" is not a valid id")
                     return@forEach
                 }
                 

@@ -20,11 +20,12 @@ object SmithingRecipeGroup : RecipeGroup() {
     override fun createGUI(container: RecipeContainer): GUI {
         val recipe = container.recipe as SmithingRecipe
         
-        return GUIBuilder(GUIType.NORMAL, 9, 3)
-            .setStructure("" +
-                ". . . . . . . . ." +
-                ". . 1 . 2 . . r ." +
-                ". . . . . . . . .")
+        return GUIBuilder(GUIType.NORMAL)
+            .setStructure(
+                ". . . . . . . . .",
+                ". . 1 . 2 . . r .",
+                ". . . . . . . . ."
+            )
             .addIngredient('1', createRecipeChoiceItem(recipe.base))
             .addIngredient('2', createRecipeChoiceItem(recipe.addition))
             .addIngredient('r', createRecipeChoiceItem(listOf(recipe.result)))

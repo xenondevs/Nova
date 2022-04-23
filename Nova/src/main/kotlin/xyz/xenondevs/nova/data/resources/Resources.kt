@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.data.resources
 
 import net.lingala.zip4j.ZipFile
-import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
 import xyz.xenondevs.nova.data.resources.builder.PNGMetadataRemover
@@ -79,14 +79,28 @@ internal object Resources : Initializable() {
         PermanentStorage.store("languageLookup", languageLookup)
     }
     
+    fun getModelDataOrNull(id: NamespacedId): Pair<ModelData?, ModelData?>? {
+        return modelDataLookup[id.toString()]
+    }
+    
+    fun getModelData(id: NamespacedId): Pair<ModelData?, ModelData?> {
+        return modelDataLookup[id.toString()]!!
+    }
+    
+    fun getGUIDataOrNull(id: NamespacedId): GUIData? {
+        return guiDataLookup[id.toString()]
+    }
+    
+    fun getGUIData(id: NamespacedId): GUIData {
+        return guiDataLookup[id.toString()]!!
+    }
+    
     fun getModelDataOrNull(id: String): Pair<ModelData?, ModelData?>? {
         return modelDataLookup[id]
     }
     
     fun getModelData(id: String): Pair<ModelData?, ModelData?> {
-        return modelDataLookup[id]
-        // This is a temporary workaround until all items can be found
-            ?: (ModelData(Material.DIRT, intArrayOf(0), id, false) to ModelData(Material.DIRT, intArrayOf(0), id, true))
+        return modelDataLookup[id]!!
     }
     
     fun getGUIDataOrNull(id: String): GUIData? {

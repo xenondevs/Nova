@@ -4,19 +4,18 @@ import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 
-private val ID_PATTERN = Regex("""^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$""")
-
 open class ItemNovaMaterial internal constructor(
-    final override val id: String,
+    final override val id: NamespacedId,
     val localizedName: String,
     val novaItem: NovaItem? = null,
-) : INovaMaterial, Comparable<ItemNovaMaterial> {
+) : INovaMaterial {
     
     val item: ModelData by lazy { Resources.getModelData(id).first!! }
     
@@ -25,10 +24,6 @@ open class ItemNovaMaterial internal constructor(
     
     val basicClientsideProvider: ItemProvider by lazy { ItemWrapper(item.createClientsideItemStack(localizedName)) }
     val clientsideProvider: ItemProvider by lazy { ItemWrapper(modifyItemBuilder(item.createClientsideItemBuilder(localizedName)).get()) }
-    
-    init {
-        require(id.matches(ID_PATTERN)) { "NovaMaterial id $id does not match $ID_PATTERN" }
-    }
     
     /**
      * Creates a basic [ItemBuilder][ItemBuilder] without any additional information
@@ -55,10 +50,7 @@ open class ItemNovaMaterial internal constructor(
     override fun getLocalizedName(locale: String): String =
         LocaleManager.getTranslatedName(locale, this)
     
-    override fun compareTo(other: ItemNovaMaterial): Int =
-        id.compareTo(other.id)
-    
-    override fun toString() = id
+    override fun toString() = id.toString()
     
     protected fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
         var builder = itemBuilder

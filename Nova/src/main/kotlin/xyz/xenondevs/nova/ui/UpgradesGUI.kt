@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.ui
 
 import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.SlotElement.VISlotElement
 import de.studiocode.invui.gui.builder.GUIBuilder
 import de.studiocode.invui.gui.builder.guitype.GUIType
+import de.studiocode.invui.gui.structure.Markers
 import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
@@ -19,6 +19,8 @@ import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.config.side.BackItem
+import xyz.xenondevs.nova.ui.item.ScrollLeftItem
+import xyz.xenondevs.nova.ui.item.ScrollRightItem
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.playItemPickupSound
@@ -27,28 +29,42 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     
     private val upgradeItems = ArrayList<Item>()
     
-    val gui: GUI = GUIBuilder(GUIType.NORMAL, 9, 4)
-        .setStructure("" +
-            "< - - - - - - - 2" +
-            "| i # s c e r f |" +
-            "| # # S C E R F |" +
-            "3 - - - - - - - 4")
-        .addIngredient('<', BackItem(openPrevious))
-        .addIngredient('i', VISlotElement(upgradeHolder.input, 0))
-        .addIngredient('s', UpgradeDisplay(UpgradeType.SPEED))
-        .addIngredient('c', UpgradeDisplay(UpgradeType.EFFICIENCY))
-        .addIngredient('e', UpgradeDisplay(UpgradeType.ENERGY))
-        .addIngredient('r', UpgradeDisplay(UpgradeType.RANGE))
-        .addIngredient('f', UpgradeDisplay(UpgradeType.FLUID))
-        .addIngredient('S', UpgradeCounter(UpgradeType.SPEED))
-        .addIngredient('C', UpgradeCounter(UpgradeType.EFFICIENCY))
-        .addIngredient('E', UpgradeCounter(UpgradeType.ENERGY))
-        .addIngredient('R', UpgradeCounter(UpgradeType.RANGE))
-        .addIngredient('F', UpgradeCounter(UpgradeType.FLUID))
+    private val upgradeScrollGUI = GUIBuilder(GUIType.SCROLL_ITEMS)
+        .setStructure(
+            "x x x x x",
+            "x x x x x",
+            "< - - - >"
+        )
+        .addIngredient('<', ScrollLeftItem())
+        .addIngredient('>', ScrollRightItem())
+        .addIngredient('x', Markers.ITEM_LIST_SLOT_VERTICAL)
+        .setBackground(CoreGUIMaterial.INVENTORY_PART.itemProvider)
+        .setItems(createUpgradeItemList())
         .build()
+    
+    val gui: GUI = GUIBuilder(GUIType.NORMAL)
+        .setStructure(
+            "b - - - - - - - 2",
+            "| i # . . . . . |",
+            "| # # . . . . . |",
+            "3 - - . . . . . 4"
+        )
+        .addIngredient('i', upgradeHolder.input)
+        .addIngredient('b', BackItem(openPrevious))
+        .build()
+        .apply { fillRectangle(3, 1, upgradeScrollGUI, true) }
     
     init {
         upgradeHolder.lazyGUI.value.subGUIs += gui
+    }
+    
+    private fun createUpgradeItemList(): List<Item> {
+        val list = ArrayList<Item>()
+        upgradeHolder.allowed.forEach {
+            list += UpgradeDisplay(it)
+            list += UpgradeCounter(it)
+        }
+        return list
     }
     
     fun openWindow(player: Player) {
@@ -59,23 +75,21 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         upgradeItems.forEach(Item::notifyWindows)
     }
     
-    private inner class UpgradeDisplay(private val type: UpgradeType) : BaseItem() {
+    private inner class UpgradeDisplay(private val type: UpgradeType<*>) : BaseItem() {
         
         init {
             upgradeItems += this
         }
         
         override fun getItemProvider(): ItemProvider {
-            val builder = (if (type in upgradeHolder.allowed) type.icon else type.grayIcon).createBasicItemBuilder()
-            val typeName = type.name.lowercase()
-            if (type in upgradeHolder.allowed) {
-                builder.setDisplayName(localized(
-                    ChatColor.GRAY,
-                    "menu.nova.upgrades.type.$typeName",
-                    upgradeHolder.upgrades[type] ?: 0,
-                    upgradeHolder.getLimit(type)
-                ))
-            } else builder.setDisplayName(localized(ChatColor.RED, "menu.nova.upgrades.type.$typeName.off"))
+            val builder = type.icon.createBasicItemBuilder()
+            val typeId = type.id
+            builder.setDisplayName(localized(
+                ChatColor.GRAY,
+                "menu.${typeId.namespace}.upgrades.type.${typeId.name}",
+                upgradeHolder.upgrades[type] ?: 0,
+                upgradeHolder.getLimit(type)
+            ))
             
             return builder
         }
@@ -90,7 +104,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         
     }
     
-    private inner class UpgradeCounter(private val type: UpgradeType) : BaseItem() {
+    private inner class UpgradeCounter(private val type: UpgradeType<*>) : BaseItem() {
         
         init {
             upgradeItems += this

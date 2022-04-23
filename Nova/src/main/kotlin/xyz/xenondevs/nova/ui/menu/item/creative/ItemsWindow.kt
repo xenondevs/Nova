@@ -58,43 +58,47 @@ class ItemsWindow(val player: Player) : ItemMenu {
         CoreGUIMaterial.ARROW_1_UP.createBasicItemBuilder().setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
     ) { openMainWindow() }
     
-    private val tabPagesGUI = GUIBuilder(GUIType.PAGED_ITEMS, 9, 2)
-        .setStructure("" +
-            "x . x . x . x . x" +
-            "< . . . . . . . >")
+    private val tabPagesGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+        .setStructure(
+            "x . x . x . x . x",
+            "< . . . . . . . >"
+        )
         .addIngredient('<', TabPageBackItem())
         .addIngredient('>', TabPageForwardItem())
         .build().apply { addPageChangeHandler(::handleTabPageChange) }
     
-    private val mainGUI = GUIBuilder(GUIType.TAB, 9, 6)
-        .setStructure("" +
-            ". . . . . . . . ." +
-            ". . . . . . . . ." +
-            "x x x x x x x x x" +
-            "x x x x x x x x x" +
-            "x x x x x x x x x" +
-            "x x x x x x x x x")
+    private val mainGUI = GUIBuilder(GUIType.TAB)
+        .setStructure(
+            ". . . . . . . . .",
+            ". . . . . . . . .",
+            "x x x x x x x x x",
+            "x x x x x x x x x",
+            "x x x x x x x x x",
+            "x x x x x x x x x"
+        )
         .addIngredient('s', openSearchItem)
         .setGUIs(ItemCategories.CATEGORIES.map(::createCategoryGUI))
         .build().apply { fillRectangle(0, 0, tabPagesGUI, true) }
     
-    private val searchResultsGUI = GUIBuilder(GUIType.PAGED_ITEMS, 9, 6)
-        .setStructure("" +
-            "# # # < s > # # #" +
-            "x x x x x x x x x" +
-            "x x x x x x x x x" +
-            "x x x x x x x x x" +
-            "x x x x x x x x x" +
-            "x x x x x x x x x")
+    private val searchResultsGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+        .setStructure(
+            "# # # < s > # # #",
+            "x x x x x x x x x",
+            "x x x x x x x x x",
+            "x x x x x x x x x",
+            "x x x x x x x x x",
+            "x x x x x x x x x"
+        )
         .addIngredient('s', openSearchItem)
         .build() as SimplePagedItemsGUI
     
-    private val searchPreviewGUI = GUIBuilder(GUIType.PAGED_ITEMS, 9, 4)
-        .setStructure("" +
-            "x x x x x x x x x" +
-            "x x x x x x x x x" +
-            "x x x x x x x x x" +
-            "# # # < # > # # s")
+    private val searchPreviewGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+        .setStructure(
+            "x x x x x x x x x",
+            "x x x x x x x x x",
+            "x x x x x x x x x",
+            "# # # < # > # # s"
+        )
         .addIngredient('s', openMainWindowItem)
         .build() as SimplePagedItemsGUI
     
@@ -183,12 +187,13 @@ class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private fun createCategoryGUI(category: ItemCategory): GUI {
-        return GUIBuilder(GUIType.SCROLL_ITEMS, 9, 4)
-            .setStructure("" +
-                "x x x x x x x x s" +
-                "x x x x x x x x u" +
-                "x x x x x x x x ." +
-                "x x x x x x x x d")
+        return GUIBuilder(GUIType.SCROLL_ITEMS)
+            .setStructure(
+                "x x x x x x x x s",
+                "x x x x x x x x u",
+                "x x x x x x x x .",
+                "x x x x x x x x d"
+            )
             .addIngredient('s', openSearchItem)
             .setItems(category.items)
             .build()

@@ -24,11 +24,12 @@ object TableRecipeGroup : RecipeGroup() {
     override fun createGUI(container: RecipeContainer): GUI {
         val recipe = container.recipe as Recipe
         
-        val gui = GUIBuilder(GUIType.NORMAL, 9, 3)
-            .setStructure("" +
-                ". . . . . . . . ." +
-                ". . . . . . . r ." +
-                ". . . . . . . . .")
+        val gui = GUIBuilder(GUIType.NORMAL)
+            .setStructure(
+                ". . . . . . . . .",
+                ". . . . . . . r .",
+                ". . . . . . . . ."
+            )
             .addIngredient('r', createRecipeChoiceItem(listOf(recipe.result)))
             .build()
         

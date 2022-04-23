@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -21,7 +22,7 @@ typealias PlaceCheckFun = ((Player, ItemStack, Location) -> CompletableFuture<Bo
 typealias MultiBlockLoader = (BlockPos) -> List<BlockPos>
 
 open class BlockNovaMaterial internal constructor(
-    id: String,
+    id: NamespacedId,
     localizedName: String,
     novaItem: NovaItem?,
     val novaBlock: NovaBlock<NovaBlockState>,

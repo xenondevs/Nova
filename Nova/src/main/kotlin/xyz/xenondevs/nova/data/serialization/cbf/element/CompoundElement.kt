@@ -67,6 +67,11 @@ class CompoundElement : BackedElement<CompoundElement>() {
         return enumValueOf<T>(constant)
     }
     
+    @Suppress("UNCHECKED_CAST")
+    fun <V> toHashMap(): HashMap<String, V> {
+        return elements.mapValuesTo(HashMap()) { (it.value as BackedElement<V>).value }
+    }
+    
     override fun toString(): String {
         return toString(depth = 0)
     }

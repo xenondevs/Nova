@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.serverTick
 import java.util.*
@@ -26,7 +27,7 @@ sealed class NovaEnergyHolder(
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
         endPoint.retrieveEnumMap("energyConfig") { lazyDefaultConfig() }
     
-    var maxEnergy = (defaultMaxEnergy * (upgradeHolder?.getEnergyModifier() ?: 1.0)).toLong()
+    var maxEnergy = (defaultMaxEnergy * (upgradeHolder?.getValue(UpgradeType.ENERGY) ?: 1.0)).toLong()
     
     override var energy: Long = endPoint.retrieveData("energy") { 0L }
         set(value) {
@@ -65,7 +66,7 @@ sealed class NovaEnergyHolder(
     }
     
     private fun calculateMaxEnergy(): Long =
-        (defaultMaxEnergy * (upgradeHolder?.getEnergyModifier() ?: 1.0)).toLong()
+        (defaultMaxEnergy * (upgradeHolder?.getValue(UpgradeType.ENERGY) ?: 1.0)).toLong()
     
     private fun callUpdateHandlers() =
         updateHandlers.forEach { it() }

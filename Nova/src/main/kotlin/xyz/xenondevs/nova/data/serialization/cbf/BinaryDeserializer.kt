@@ -43,7 +43,7 @@ object DeserializerRegistry {
         ItemStackDeserializer, // 22
         LocationDeserializer, // 23
         NamespacedKeyDeserializer, // 24
-        UpgradesDeserializer, // 25
+        null, // 25
         VirtualInventoryDeserializer, // 26
         ColorDeserializer, // 27
         PairDeserializer, // 28

@@ -237,7 +237,7 @@ object ItemUtils {
     
     fun getId(itemStack: ItemStack): String {
         val novaMaterial = itemStack.novaMaterial
-        if (novaMaterial != null) return "nova:${novaMaterial.id.lowercase()}"
+        if (novaMaterial != null) return novaMaterial.id.toString()
         
         val customNameKey = CustomItemServiceManager.getNameKey(itemStack)
         if (customNameKey != null) return customNameKey
