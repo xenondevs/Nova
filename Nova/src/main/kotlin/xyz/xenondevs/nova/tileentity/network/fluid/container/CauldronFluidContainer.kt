@@ -28,24 +28,38 @@ private var Block.fluidType: FluidType?
 private fun Block.setFluidAmount(amount: Long, type: FluidType?) {
     require(amount <= 1000)
     
-    val level = (amount / 333).toInt()
-    if (level > 0) {
-        var levelled = blockData as? Levelled
-        if (levelled == null) {
-            fluidType = type
-            levelled = blockData as Levelled
+    when (type) {
+        FluidType.WATER -> {
+            val level = (amount / 333).toInt()
+            if (level > 0) {
+                var levelled = blockData as? Levelled
+                if (levelled == null) {
+                    fluidType = type
+                    levelled = blockData as Levelled
+                }
+                
+                levelled.level = level
+                blockData = levelled
+            } else this.type = Material.CAULDRON
         }
         
-        levelled.level = level
-        blockData = levelled
-    } else this.type = Material.CAULDRON
+        FluidType.LAVA -> {
+            this.type = if (amount == 1000L)
+                Material.LAVA_CAULDRON
+            else Material.CAULDRON
+        }
+        
+        else -> this.type = Material.CAULDRON
+    }
 }
 
 private val Block.fluidAmount: Long
     get() {
-        val levelled = blockData
-        if (levelled is Levelled) {
+        if (type == Material.WATER_CAULDRON) {
+            val levelled = blockData as Levelled
             return levelled.level * 333L + 1
+        } else if (type == Material.LAVA_CAULDRON) {
+            return 1000L
         }
         
         return 0L
