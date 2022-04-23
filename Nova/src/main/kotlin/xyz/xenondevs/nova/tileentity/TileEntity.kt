@@ -46,7 +46,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     override val data: CompoundElement = blockState.data
     override val material: TileEntityNovaMaterial = blockState.material
     
-    override val owner: OfflinePlayer by lazy { Bukkit.getOfflinePlayer(uuid) }
+    override val owner: OfflinePlayer by lazy { Bukkit.getOfflinePlayer(ownerUUID) }
     
     val location: Location
         get() = Location(pos.world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), facing.getYaw(BlockFace.NORTH), 0f)
