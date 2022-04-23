@@ -7,6 +7,7 @@ import java.util.concurrent.CountDownLatch
 abstract class Initializable : Comparable<Initializable> {
     
     internal val latch = CountDownLatch(1)
+    internal var isInitialized = false
     
     internal abstract val inMainThread: Boolean
     
@@ -20,11 +21,13 @@ abstract class Initializable : Comparable<Initializable> {
         if (inMainThread) {
             runTask {
                 init()
+                isInitialized = true
                 this.latch.countDown()
                 parentLatch.countDown()
             }
         } else {
             init()
+            isInitialized = true
             this.latch.countDown()
             parentLatch.countDown()
         }

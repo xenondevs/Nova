@@ -39,7 +39,7 @@ fun Player.showRecipes(item: ItemStack) = showRecipes(ItemUtils.getId(item))
 
 fun Player.showRecipes(id: String): Boolean {
     val recipes = RecipeRegistry.CREATION_RECIPES[id]
-    val info = RecipeRegistry.CREATION_INFO[id]
+    val info = RecipeRegistry.creationInfo[id]
     if (recipes != null) {
         RecipesWindow(this, recipes, info).show()
         return true
@@ -55,7 +55,7 @@ fun Player.showUsages(item: ItemStack) = showUsages(ItemUtils.getId(item))
 
 fun Player.showUsages(id: String): Boolean {
     val recipes = RecipeRegistry.USAGE_RECIPES[id]
-    val info = RecipeRegistry.USAGE_INFO[id]
+    val info = RecipeRegistry.usageInfo[id]
     if (recipes != null) {
         RecipesWindow(this, recipes, info).show()
         return true

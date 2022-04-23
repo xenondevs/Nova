@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.data.recipe
 
-import com.google.gson.JsonParser
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.inventory.*
@@ -9,14 +8,9 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.data.getInputStacks
-import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.item.ItemUtils.getId
 
 object RecipeRegistry : Initializable() {
-    
-    private val ITEM_INFO = JsonParser.parseReader(getResourceAsStream("item_info.json")!!.reader()).asJsonObject
-    val CREATION_INFO = ITEM_INFO.get("creation").asJsonObject.entrySet().associate { it.key to it.value.asString }
-    val USAGE_INFO = ITEM_INFO.get("usage").asJsonObject.entrySet().associate { it.key to it.value.asString }
     
     private var BUKKIT_RECIPES: List<Recipe> = ArrayList()
     
@@ -28,6 +22,23 @@ object RecipeRegistry : Initializable() {
     
     override val inMainThread = false
     override val dependsOn = setOf(RecipeManager)
+    
+    private val hardcodedRecipes = ArrayList<NovaRecipe>()
+    val creationInfo = HashMap<String, String>()
+    val usageInfo = HashMap<String, String>()
+    
+    fun addHardcodedRecipes(recipes: List<NovaRecipe>) {
+        check(!isInitialized) { "Recipes are already initialized" }
+        hardcodedRecipes += recipes
+    }
+    
+    fun addCreationInfo(info: Map<String, String>) {
+        creationInfo += info
+    }
+    
+    fun addUsageInfo(info: Map<String, String>) {
+        usageInfo += info
+    }
     
     override fun init() {
         LOGGER.info("Initializing RecipeRegistry")
@@ -117,7 +128,7 @@ object RecipeRegistry : Initializable() {
     }
     
     private fun getAllNovaRecipes(): Sequence<NovaRecipe> {
-        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values }// TODO + HardcodedRecipes.recipes.asSequence()
+        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + hardcodedRecipes.asSequence()
     }
     
     private fun getCreationNovaRecipeSequence(): Sequence<ResultingRecipe> {

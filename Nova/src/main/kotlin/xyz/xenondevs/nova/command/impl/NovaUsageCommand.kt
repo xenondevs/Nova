@@ -14,7 +14,7 @@ object NovaUsageCommand : Command("nvusage") {
         builder = builder
             .requiresPlayerPermission("nova.command.nvusage")
             .apply {
-                (RecipeRegistry.USAGE_RECIPES.keys + RecipeRegistry.USAGE_INFO.keys).forEach { id ->
+                (RecipeRegistry.USAGE_RECIPES.keys + RecipeRegistry.usageInfo.keys).forEach { id ->
                     then(literal(id)
                         .executesCatching { it.player.showUsages(id) }
                     )

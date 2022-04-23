@@ -40,9 +40,6 @@ class UpgradeHolder(
     constructor(tileEntity: TileEntity, lazyGUI: Lazy<TileEntityGUI>, vararg allowed: UpgradeType<*>) :
         this(tileEntity, lazyGUI, null, allowed = allowed)
     
-    constructor(tileEntity: TileEntity, lazyGUI: Lazy<TileEntityGUI>, defaultUpdateHandler: (() -> Unit)? = null) :
-        this(tileEntity, lazyGUI, defaultUpdateHandler, allowed = UpgradeTypeRegistry.types.toTypedArray())
-    
     /**
      * Tries adding the given amount of upgrades and
      * returns the amount it wasn't able to add
