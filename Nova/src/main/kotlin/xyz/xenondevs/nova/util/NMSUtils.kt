@@ -16,6 +16,7 @@ import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
+import net.minecraft.world.InteractionHand
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -27,6 +28,7 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -62,6 +64,12 @@ val NamespacedKey.resourceLocation: ResourceLocation
 @Suppress("DEPRECATION")
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
+
+val InteractionHand.bukkitSlot: EquipmentSlot
+    get() = when (this) {
+        InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
+        InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
+    }
 
 fun Player.send(vararg packets: Packet<*>) {
     val connection = connection

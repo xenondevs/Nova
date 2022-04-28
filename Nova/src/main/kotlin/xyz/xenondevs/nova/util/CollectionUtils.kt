@@ -47,6 +47,18 @@ inline fun <K, V> Iterable<K>.associateWithNotNull(valueSelector: (K) -> V?): Ma
     return associateWithNotNullTo(destination, valueSelector)
 }
 
+inline fun <reified R> Iterable<*>.firstInstanceOfOrNull(): R? {
+    val iterator = iterator()
+    while (iterator.hasNext()) {
+        val element = iterator.next()
+        
+        if (element is R)
+            return element
+    }
+    
+    return null
+}
+
 fun <E> Collection<E>.searchFor(query: String, getString: (E) -> String): List<E> {
     val elements = HashMap<String, E>()
     

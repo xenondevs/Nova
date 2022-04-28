@@ -3,7 +3,10 @@
     "materials": {
       "default": "shulker_shell",
       "damageable": "fishing_rod",
-      "translucent": "shulker_shell"
+      "translucent": "shulker_shell",
+      "consumable": "apple",
+      "always_consumable": "golden_apple",
+      "fast_consumable": "dried_kelp"
     }
   },
   "mysql": {

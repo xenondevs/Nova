@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item
 
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -9,19 +10,27 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.UseItemPacketEvent
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.util.bukkitSlot
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.takeUnlessAir
 
 object ItemManager : Initializable(), Listener {
+    
     override val inMainThread = false
     override val dependsOn = emptySet<Initializable>()
+    
+    private val usedItems = HashMap<Player, ItemStack>()
     
     override fun init() {
         LOGGER.info("Initializing ItemManager")
@@ -69,6 +78,30 @@ object ItemManager : Initializable(), Listener {
         if (event.click == ClickType.NUMBER_KEY) {
             val hotbarItem = player.inventory.getItem(event.hotbarButton)
             findBehaviors(hotbarItem)?.forEach { it.handleInventoryHotbarSwap(player, hotbarItem!!, event) }
+        }
+    }
+    
+    // This method stores the last used item for the RELEASE_USE_ITEM action below
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun handleUseItem(event: UseItemPacketEvent) {
+        val player = event.player
+        val item = player.inventory.getItem(event.hand.bukkitSlot)?.takeUnlessAir()
+        if (item != null)
+            usedItems[player] = item
+        else usedItems -= player
+    }
+    
+    @EventHandler
+    fun handlePlayerQuit(event: PlayerQuitEvent) {
+        usedItems -= event.player
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun handleAction(event: PlayerActionPacketEvent) {
+        if (event.action == ServerboundPlayerActionPacket.Action.RELEASE_USE_ITEM) {
+            val player = event.player
+            val item = usedItems[player]
+            findBehaviors(item)?.forEach { it.handleRelease(player, item!!, event) }
         }
     }
     

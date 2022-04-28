@@ -7,6 +7,7 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -315,6 +316,12 @@ fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Loca
     
     return null
 }
+
+fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Sequence<Player> =
+    world!!.players
+        .asSequence()
+        .filter { it !in excluded }
+        .filter { distance(it.location) <= maxDistance }
 
 object LocationUtils {
     

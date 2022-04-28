@@ -15,7 +15,11 @@ fun Player.playClickSound() {
     playSound(location, Sound.UI_BUTTON_CLICK, 0.5f, 1f)
 }
 
-class SoundEffect(private val sound: String, category: SoundCategory?= null) {
+fun Location.playSoundNearby(maxDistance: Double, sound: Sound, volume: Float, pitch: Float, vararg excluded: Player) =
+    getPlayersNearby(maxDistance, excluded = excluded)
+        .forEach { it.playSound(this, sound, volume, pitch) }
+
+class SoundEffect(private val sound: String, category: SoundCategory? = null) {
     
     private val category = category ?: SoundCategory.MASTER
     

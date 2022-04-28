@@ -69,6 +69,11 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(ItemNovaMaterial(NamespacedId(namespace, name), "item.$namespace.$name", novaItem))
     }
     
+    fun registerFood(addon: Addon, name: String, options: FoodOptions): FoodNovaMaterial {
+        val namespace = addon.description.id
+        return register(FoodNovaMaterial(NamespacedId(namespace, name), "item.$namespace.$name", options))
+    }
+    
     internal fun registerDefaultCoreItem(name: String, novaItem: NovaItem? = null) =
         register(ItemNovaMaterial(NamespacedId("nova", name), "item.nova.$name", novaItem))
     

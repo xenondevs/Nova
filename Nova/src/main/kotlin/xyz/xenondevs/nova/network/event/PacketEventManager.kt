@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.network.event.clientbound.*
 import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.UseItemPacketEvent
 import xyz.xenondevs.nova.util.callEvent
 import kotlin.reflect.KClass
 
@@ -25,9 +26,11 @@ object PacketEventManager {
         registerPlayerEventType(ClientboundSetEquipmentPacket::class, ::SetEquipmentPacketEvent)
         registerPlayerEventType(ClientboundUpdateRecipesPacket::class, ::UpdateRecipesPacketEvent)
         registerPlayerEventType(ClientboundBlockDestructionPacket::class, ::BlockDestructionPacketEvent)
+        registerPlayerEventType(ClientboundSoundPacket::class, ::SoundPacketEvent)
         registerPlayerEventType(ServerboundPlaceRecipePacket::class, ::PlaceRecipePacketEvent)
         registerPlayerEventType(ServerboundSetCreativeModeSlotPacket::class, ::SetCreativeModeSlotPacketEvent)
         registerPlayerEventType(ServerboundPlayerActionPacket::class, ::PlayerActionPacketEvent)
+        registerPlayerEventType(ServerboundUseItemPacket::class, ::UseItemPacketEvent)
     }
     
     private fun <P : Packet<*>> registerEventType(clazz: KClass<out P>, constructor: (P) -> PacketEvent<P>) {

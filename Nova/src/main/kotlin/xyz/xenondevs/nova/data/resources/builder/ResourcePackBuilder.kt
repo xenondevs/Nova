@@ -84,7 +84,10 @@ enum class MaterialType {
     
     DEFAULT,
     DAMAGEABLE,
-    TRANSLUCENT;
+    TRANSLUCENT,
+    CONSUMABLE,
+    ALWAYS_CONSUMABLE,
+    FAST_CONSUMABLE;
     
     val configuredMaterial = Material.valueOf(DEFAULT_CONFIG.getString("resource_pack.materials.${name.lowercase()}")!!.uppercase())
     

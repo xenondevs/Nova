@@ -9,11 +9,11 @@ import kotlin.reflect.KClass
 /**
  * Handles actions performed on [ItemStack]s of a [ItemNovaMaterial]
  */
-abstract class NovaItem {
+class NovaItem(val behaviors: List<ItemBehavior>) {
     
-    val behaviors = ArrayList<ItemBehavior>()
+    constructor(vararg behaviors: ItemBehavior) : this(behaviors.toList())
     
-    open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+    fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
         var builder = itemBuilder
         behaviors.forEach {
             builder = it.modifyItemBuilder(builder)
