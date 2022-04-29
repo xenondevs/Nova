@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.database.DatabaseManager
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.data.resources.Resources
@@ -42,7 +41,7 @@ import java.util.logging.Level
 object Initializer {
     
     private val toInit = listOf(
-        UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, DatabaseManager, Resources,
+        UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, Resources,
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeArmorStandManager,
         AdvancementManager, RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,

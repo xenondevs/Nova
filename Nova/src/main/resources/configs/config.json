@@ -9,14 +9,6 @@
       "fast_consumable": "dried_kelp"
     }
   },
-  "mysql": {
-    "enabled": false,
-    "address": "localhost",
-    "port": 3306,
-    "username": "",
-    "password": "",
-    "database": ""
-  },
   "armor_stand_render_distance": {
     "min": 1,
     "max": 6,

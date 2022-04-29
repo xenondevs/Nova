@@ -14,7 +14,6 @@
     <artifactId>Nova</artifactId>
 
     <properties>
-        <exposed.version>0.37.3</exposed.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <particlelib.version>1.7.1</particlelib.version>
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
@@ -44,10 +43,6 @@
         <repository>
             <id>enginehub</id>
             <url>https://maven.enginehub.org/repo/</url>
-        </repository>
-        <repository>
-            <id>panda-lang</id>
-            <url>https://repo.panda-lang.org/releases</url>
         </repository>
         <repository>
             <id>glaremasters</id>
@@ -175,21 +170,6 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-core</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-dao</artifactId>
-            <version>${exposed.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-jdbc</artifactId>
-            <version>${exposed.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -518,11 +498,6 @@
             <artifactId>bstats-bukkit</artifactId>
             <version>3.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>net.dzikoysk</groupId>
-            <artifactId>exposed-upsert</artifactId>
-            <version>1.0.3</version>
-        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -616,7 +591,6 @@
                             <include>xyz.xenondevs.nova:Nova-API</include>
                             <include>de.studiocode.invui:*</include>
                             <include>org.bstats:*</include>
-                            <include>net.dzikoysk:exposed-upsert</include>
                         </includes>
                     </artifactSet>
                 </configuration>

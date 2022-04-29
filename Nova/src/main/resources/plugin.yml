@@ -8,9 +8,6 @@ api-version: 1.18
 libraries:
   - org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin.version}
   - org.jetbrains.kotlin:kotlin-reflect:${kotlin.version}
-  - org.jetbrains.exposed:exposed-core:${exposed.version}
-  - org.jetbrains.exposed:exposed-dao:${exposed.version}
-  - org.jetbrains.exposed:exposed-jdbc:${exposed.version}
   - org.jetbrains:annotations:${annotations.version}
   - com.zaxxer:HikariCP:${hikaricp.version}
   - xyz.xenondevs:particle:${particlelib.version}
