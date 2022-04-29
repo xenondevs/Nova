@@ -1,13 +1,9 @@
 package xyz.xenondevs.nova.addon
 
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import xyz.xenondevs.nova.util.data.getAllStrings
-import xyz.xenondevs.nova.util.data.getAllStringsTo
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getString
+import org.bukkit.configuration.file.YamlConfiguration
+import java.io.Reader
 
-data class AddonDescription(
+data class AddonDescription internal constructor(
     val id: String,
     val name: String,
     val version: String,
@@ -15,7 +11,9 @@ data class AddonDescription(
     val authors: List<String>,
     val depend: Set<String>,
     val softdepend: Set<String>,
-    val spigotResourceId: Int
+    val spigotResourceId: Int,
+    val repositories: List<String>,
+    val libraries: List<String>
 ) : Comparable<AddonDescription> {
     
     override fun compareTo(other: AddonDescription): Int {
@@ -42,18 +40,20 @@ data class AddonDescription(
     
     companion object {
         
-        fun deserialize(element: JsonElement): AddonDescription {
-            element as JsonObject
+        fun deserialize(reader: Reader): AddonDescription {
+            val cfg = YamlConfiguration.loadConfiguration(reader)
             
             return AddonDescription(
-                element.getString("id")!!,
-                element.getString("name")!!,
-                element.getString("version")!!,
-                element.getString("main")!!,
-                element.getAsJsonArray("authors")?.getAllStrings() ?: emptyList(),
-                element.getAsJsonArray("depend")?.getAllStringsTo(HashSet()) ?: emptySet(),
-                element.getAsJsonArray("softdepend")?.getAllStringsTo(HashSet()) ?: emptySet(),
-                element.getInt("spigotResourceId") ?: -1
+                cfg.getString("id")!!,
+                cfg.getString("name")!!,
+                cfg.getString("version")!!,
+                cfg.getString("main")!!,
+                cfg.getStringList("authors"),
+                cfg.getStringList("depend").toHashSet(),
+                cfg.getStringList("softdepend").toHashSet(),
+                cfg.getInt("spigotResourceId", -1),
+                cfg.getStringList("repositories"),
+                cfg.getStringList("libraries")
             )
         }
         

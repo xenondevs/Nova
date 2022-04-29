@@ -57,10 +57,6 @@ class NamespacedId internal constructor(override val namespace: String, override
             return NamespacedId(namespace, name)
         }
         
-        fun isValidNamespace(namespace: String): Boolean {
-            return namespace.matches(PART_PATTERN)
-        }
-        
     }
     
 }

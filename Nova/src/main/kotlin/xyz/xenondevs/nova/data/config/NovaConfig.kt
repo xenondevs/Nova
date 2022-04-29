@@ -88,14 +88,13 @@ class NovaConfig(private val configPath: String, private val data: ByteArray) : 
                     configs[configName] = NovaConfig("configs/nova/$path", getResourceAsStream(it)!!.readAllBytes())
                 }
             
-            AddonManager.loaders.forEach { loader ->
+            AddonManager.loaders.forEach { (id, loader) ->
                 getResources(loader.file, "configs/")
                     .forEach {
-                        val namespace = loader.description.id
                         val path = it.substringAfter("configs/")
-                        val configName = "$namespace:${path.substringBeforeLast('.')}"
+                        val configName = "$id:${path.substringBeforeLast('.')}"
                         configs[configName] = NovaConfig(
-                            "configs/$namespace/$path",
+                            "configs/$id/$path",
                             loader.classLoader.getResourceAsStream(it)!!.readAllBytes()
                         )
                     }

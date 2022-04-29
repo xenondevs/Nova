@@ -42,7 +42,7 @@ internal object Resources : Initializable() {
     fun createResourcePack(): File {
         val assetPacksDir = File(NOVA.dataFolder, "ResourcePack/AssetPacks/")
         assetPacksDir.deleteRecursively()
-        val assetPacks = (AddonManager.loaders.asSequence().map { it.file to it.description.id } + (NOVA.pluginFile to "nova"))
+        val assetPacks = (AddonManager.loaders.asSequence().map { (id, loader) -> loader.file to id } + (NOVA.pluginFile to "nova"))
             .mapTo(ArrayList()) { (addonFile, namespace) ->
                 val assetPackDir = File(assetPacksDir, namespace)
                 

@@ -31,7 +31,7 @@ object RecipesLoader {
         }
         
         // Extract recipes from addons
-        AddonManager.loaders.forEach { loader ->
+        AddonManager.loaders.values.forEach { loader ->
             getResources(loader.file, "recipes/").forEach { path ->
                 existingPaths += path
                 UpdatableFile.load(File(NOVA.dataFolder, path)) { getResourceAsStream(loader.file, path)!! }

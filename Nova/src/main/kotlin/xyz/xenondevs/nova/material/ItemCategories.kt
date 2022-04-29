@@ -54,9 +54,9 @@ object ItemCategories : Initializable() {
             getResourceAsStream(PATH_IN_JAR)?.run { loadCategories(defaultCategories, "nova", this) }
             
             // Addon categories
-            AddonManager.loaders.forEach {
-                val stream = getResourceAsStream(it.file, PATH_IN_JAR) ?: return@forEach
-                loadCategories(defaultCategories, it.description.id, stream)
+            AddonManager.loaders.forEach { (id, loader) ->
+                val stream = getResourceAsStream(loader.file, PATH_IN_JAR) ?: return@forEach
+                loadCategories(defaultCategories, id, stream)
             }
             
             val categories = defaultCategories.values.sortedBy { it.first }.map { it.second }

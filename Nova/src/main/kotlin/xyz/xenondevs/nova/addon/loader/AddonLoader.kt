@@ -1,23 +1,24 @@
 package xyz.xenondevs.nova.addon.loader
 
-import com.google.gson.JsonParser
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonDescription
 import xyz.xenondevs.nova.addon.AddonLogger
+import xyz.xenondevs.nova.addon.AddonManager
 import java.io.File
 
-class AddonLoader(val file: File) {
+internal class AddonLoader(val file: File) {
     
-    val classLoader = AddonClassLoader(file, javaClass.classLoader)
+    val classLoader = AddonClassLoader(this, javaClass.classLoader)
     val description: AddonDescription
+    val logger: AddonLogger
     lateinit var addon: Addon
     
     init {
-        val descriptionFile = classLoader.getResourceAsStream("addon.json")
-            ?: throw IllegalArgumentException("Could not find addon.json in $file")
+        val descriptionFile = classLoader.getResourceAsStream("addon.yml")
+            ?: throw IllegalArgumentException("Could not find addon.yml")
         
-        description = AddonDescription.deserialize(JsonParser.parseReader(descriptionFile.reader()))
+        description = AddonDescription.deserialize(descriptionFile.reader())
+        logger = AddonLogger(description.name)
     }
     
     fun load(): Addon {
@@ -25,8 +26,8 @@ class AddonLoader(val file: File) {
         addon = mainClass.constructors.first { it.parameterCount == 0 }.newInstance() as Addon
         addon.addonFile = file
         addon.description = description
-        addon.dataFolder = File(NOVA.dataFolder, "addons/${description.id}/")
-        addon.logger = AddonLogger(addon)
+        addon.logger = logger
+        addon.dataFolder = File(AddonManager.addonsDir, description.id)
         return addon
     }
     
