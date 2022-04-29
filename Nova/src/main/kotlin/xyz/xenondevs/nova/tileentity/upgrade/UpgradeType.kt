@@ -16,7 +16,7 @@ class UpgradeType<T> internal constructor(
 ) {
     
     private val modifierCache = HashMap<ItemNovaMaterial, List<T>>()
-    private val defaultConfig by lazy { NovaConfig["${id.namespace}:upgrade_modifiers"] }
+    private val defaultConfig by lazy { NovaConfig["${id.namespace}:upgrade_values"] }
     
     fun getValue(material: ItemNovaMaterial, level: Int): T {
         val values = getUpgradeValues(material)
