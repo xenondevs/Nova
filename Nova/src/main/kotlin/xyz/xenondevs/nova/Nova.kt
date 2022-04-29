@@ -34,7 +34,7 @@ internal lateinit var LOGGER: Logger
 class Nova : JavaPlugin(), INova {
     
     val version = Version(description.version.removeSuffix("-SNAPSHOT"))
-    val devBuild = description.version.contains("SNAPSHOT")
+    val isDevBuild = description.version.contains("SNAPSHOT")
     val disableHandlers = ArrayList<() -> Unit>()
     val pluginFile
         get() = file
