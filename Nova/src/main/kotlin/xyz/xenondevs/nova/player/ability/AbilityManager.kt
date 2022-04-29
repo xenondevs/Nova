@@ -68,7 +68,7 @@ object AbilityManager : Initializable(), Listener {
         
         if (abilityMap != null) {
             val abilitiesJson = JsonArray()
-            abilityMap.keys.forEach { abilitiesJson.add(it.id) }
+            abilityMap.keys.forEach { abilitiesJson.add(it.id.toString()) }
             dataContainer.set(ABILITIES_KEY, JsonElementDataType, abilitiesJson)
         } else {
             dataContainer.remove(ABILITIES_KEY)
