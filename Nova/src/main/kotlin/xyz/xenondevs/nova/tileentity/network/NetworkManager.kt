@@ -152,8 +152,6 @@ private class NetworkManagerImpl : NetworkManager {
     val nodesById = HashMap<UUID, NetworkNode>()
     
     fun init() {
-        LOGGER.info("Initializing NetworkManager")
-        
         runTaskTimer(0, 1) {
             // If the NetworkManager is busy at the moment, sync tasks will not be executed
             // in order to not block the main thread.
