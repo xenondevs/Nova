@@ -46,6 +46,8 @@ fun String.addNamespace(namespace: String): String =
 fun String.removeNamespace(namespace: String): String =
     removePrefix("$namespace:")
 
+operator fun Any.plus(other: String) = this.toString() + other
+
 object StringUtils {
     
     private val ALPHABET = ('a'..'z') + ('A'..'Z')
