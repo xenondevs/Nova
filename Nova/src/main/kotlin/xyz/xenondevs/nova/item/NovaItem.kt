@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import kotlin.reflect.KClass
+import kotlin.reflect.full.superclasses
 
 /**
  * Handles actions performed on [ItemStack]s of a [ItemNovaMaterial]
@@ -23,7 +24,7 @@ class NovaItem(val behaviors: List<ItemBehavior>) {
     
     @Suppress("UNCHECKED_CAST")
     fun <T : ItemBehavior> getBehavior(type: KClass<T>): T? {
-        return behaviors.firstOrNull { it::class == type } as T?
+        return behaviors.firstOrNull { type == it::class || type in it::class.superclasses } as T?
     }
     
     fun hasBehavior(type: KClass<out ItemBehavior>): Boolean {

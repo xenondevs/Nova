@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.material
 
-import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.impl.Wrench
+import xyz.xenondevs.nova.item.impl.WrenchBehavior
 
 object CoreItems {
     
@@ -12,7 +11,7 @@ object CoreItems {
     val RANGE_UPGRADE = NovaMaterialRegistry.registerDefaultCoreItem("range_upgrade")
     val FLUID_UPGRADE = NovaMaterialRegistry.registerDefaultCoreItem("fluid_upgrade")
     
-    val WRENCH = NovaMaterialRegistry.registerDefaultCoreItem("wrench", NovaItem(Wrench))
+    val WRENCH = NovaMaterialRegistry.registerDefaultCoreItem("wrench", WrenchBehavior)
     
     fun init() = Unit
     

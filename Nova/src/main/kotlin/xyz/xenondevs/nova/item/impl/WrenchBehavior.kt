@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.pos
 
-internal object Wrench : ItemBehavior() {
+internal object WrenchBehavior : ItemBehavior() {
     
     private val WRENCH_MODE_KEY = NamespacedKey(NOVA, "wrench_mode")
     

@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.TileEntityBlock
@@ -60,25 +61,56 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(material)
     }
     
-    fun registerItem(addon: Addon, name: String, localizedName: String = "", novaItem: NovaItem? = null): ItemNovaMaterial {
+    fun registerItem(addon: Addon, name: String, localizedName: String = "", novaItem: NovaItem?): ItemNovaMaterial {
         return register(ItemNovaMaterial(NamespacedId(addon.description.id, name), localizedName, novaItem))
     }
     
-    fun registerDefaultItem(addon: Addon, name: String, novaItem: NovaItem? = null): ItemNovaMaterial {
+    fun registerItem(addon: Addon, name: String, localizedName: String = "", vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
+        return register(ItemNovaMaterial(
+            NamespacedId(addon.description.id, name),
+            localizedName,
+            itemBehaviors.takeUnless(Array<*>::isEmpty)?.let(::NovaItem)
+        ))
+    }
+    
+    fun registerDefaultItem(addon: Addon, name: String, novaItem: NovaItem?): ItemNovaMaterial {
         val namespace = addon.description.id
-        return register(ItemNovaMaterial(NamespacedId(namespace, name), "item.$namespace.$name", novaItem))
+        return register(ItemNovaMaterial(NamespacedId(addon.description.id, name), "item.$namespace.$name", novaItem))
+    }
+    
+    fun registerDefaultItem(addon: Addon, name: String, vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
+        val namespace = addon.description.id
+        return register(ItemNovaMaterial(
+            NamespacedId(namespace, name),
+            "item.$namespace.$name",
+            itemBehaviors.takeUnless(Array<*>::isEmpty)?.let(::NovaItem)
+        ))
     }
     
     fun registerFood(addon: Addon, name: String, options: FoodOptions): FoodNovaMaterial {
         val namespace = addon.description.id
-        return register(FoodNovaMaterial(NamespacedId(namespace, name), "item.$namespace.$name", options))
+        return register(FoodNovaMaterial(
+            NamespacedId(namespace, name),
+            "item.$namespace.$name",
+            options
+        ))
     }
     
-    internal fun registerDefaultCoreItem(name: String, novaItem: NovaItem? = null) =
-        register(ItemNovaMaterial(NamespacedId("nova", name), "item.nova.$name", novaItem))
+    internal fun registerDefaultCoreItem(name: String, vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
+        return register(ItemNovaMaterial(
+            NamespacedId("nova", name),
+            "item.nova.$name",
+            itemBehaviors.takeUnless(Array<*>::isEmpty)?.let(::NovaItem)
+        ))
+    }
     
-    internal fun registerCoreItem(name: String, localizedName: String = "", novaItem: NovaItem? = null) =
-        register(ItemNovaMaterial(NamespacedId("nova", name), localizedName, novaItem))
+    internal fun registerCoreItem(name: String, localizedName: String = "", vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
+        return register(ItemNovaMaterial(
+            NamespacedId("nova", name),
+            localizedName,
+            itemBehaviors.takeUnless(Array<*>::isEmpty)?.let(::NovaItem)
+        ))
+    }
     
     private fun <T : ItemNovaMaterial> register(material: T): T {
         val id = material.id
