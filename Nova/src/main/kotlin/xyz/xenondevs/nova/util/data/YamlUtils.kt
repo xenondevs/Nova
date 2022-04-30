@@ -82,6 +82,12 @@ fun ConfigurationSection.getStringListOrNull(path: String): List<String>? =
 fun ConfigurationSection.getBooleanOrNull(path: String): Boolean? =
     if (isSet(path)) getBoolean(path) else null
 
+fun ConfigurationSection.getByteOrNull(path: String): Byte? =
+    if (isSet(path)) getInt(path).toByte() else null
+
+fun ConfigurationSection.getShortOrNull(path: String): Short? =
+    if (isSet(path)) getInt(path).toShort() else null
+
 fun ConfigurationSection.getIntOrNull(path: String): Int? =
     if (isSet(path)) getInt(path) else null
 
@@ -90,6 +96,18 @@ fun ConfigurationSection.getLongOrNull(path: String): Long? =
 
 fun ConfigurationSection.getDoubleOrNull(path: String): Double? =
     if (isSet(path)) getDouble(path) else null
+
+fun ConfigurationSection.getFloatOrNull(path: String): Float? =
+    if (isSet(path)) getDouble(path).toFloat() else null
+
+fun ConfigurationSection.getByte(path: String, def: Byte = 0): Byte =
+    getByteOrNull(path) ?: def
+
+fun ConfigurationSection.getShort(path: String, def: Short = 0): Short =
+    getShortOrNull(path) ?: def
+
+fun ConfigurationSection.getFloat(path: String, def: Float = 0f): Float =
+    getFloatOrNull(path) ?: def
 
 fun ConfigurationSection(parent: ConfigurationSection, path: String, map: Map<String, Any>): ConfigurationSection {
     val memorySection = ReflectionRegistry.MEMORY_SECTION_CONSTRUCTOR.newInstance(parent, path)
