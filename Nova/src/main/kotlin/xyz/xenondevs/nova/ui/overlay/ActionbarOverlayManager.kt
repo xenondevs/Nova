@@ -25,7 +25,7 @@ object ActionbarOverlayManager : Listener {
     private val interceptedActionbars = HashMap<UUID, Pair<ArrayList<BaseComponent>, Long>>()
     
     init {
-        if (DEFAULT_CONFIG.getBoolean("actionbar_overlay")) {
+        if (DEFAULT_CONFIG.getBoolean("actionbar_overlay.enabled")) {
             Bukkit.getPluginManager().registerEvents(this, NOVA)
             runTaskTimer(0, 1, ::handleTick)
         }

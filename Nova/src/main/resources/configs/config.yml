@@ -1,0 +1,68 @@
+# Configuration options for the resource pack
+resource_pack:
+  # TODO
+  auto_upload:
+    enabled: false
+  # Configures which materials are used for custom items. Can be changed to mitigate conflicts with other plugins that use custom resource packs.
+  # These values can be changed at any time, existing items in the world will keep working.
+  materials:
+    default:
+      type: shulker_shell
+      modelDataStart: 1
+    damageable:
+      type: fishing_rod
+      modelDataStart: 1
+    translucent:
+      type: shulker_shell
+      modelDataStart: 1
+    consumable:
+      type: apple
+      modelDataStart: 1
+    always_consumable:
+      type: golden_apple
+      modelDataStart: 1
+    fast_consumable:
+      type: dried_kelp
+      modelDataStart: 1
+
+# The render distance for armor stands from Nova, in chunks.
+# Note that the render distance is limited by the entity render distance of the client.
+armor_stand_render_distance:
+  min: 1
+  max: 6
+  default: 4
+
+# The actionbar overlay used for custom UIs
+actionbar_overlay:
+  enabled: true
+
+# Default transfer rates for networks when tile entities are directly connected.
+network:
+  energy:
+    default_transfer_rate: 9223372036854775807
+  item:
+    default_transfer_rate: 2147483647
+  fluid:
+    default_transfer_rate: 9223372036854775807
+
+# Performance options
+performance:
+  # Nova's executor caps the amount of threads that are allowed to run simultaneously in order to prevent OutOfMemoryErrors.
+  nova_executor:
+    # If enabled, Nova's own executor will be used. Otherwise, Bukkit's scheduler system is used.
+    enabled: true
+    # The amount of threads to be started.
+    threads: 200
+  # If excess items should be dropped on the ground.
+  drop_excess_on_ground: true
+  # If block break effects such as particles and sounds should be played.
+  block_break_effects: true
+
+debug:
+  # The chunk reload watcher will print stack traces if repeated chunk loads and unloads are detected.
+  watch_chunk_reloads: false
+  # If other plugins should be allowed to overwrite the results of Nova recipes.
+  allow_craft_result_overwrite: false
+
+# If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
+use_metric_prefixes: false

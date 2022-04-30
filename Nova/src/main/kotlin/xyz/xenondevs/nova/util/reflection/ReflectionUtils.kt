@@ -70,6 +70,10 @@ object ReflectionUtils {
         return CB_PACKAGE_PATH + name
     }
     
+    fun getClass(name: String): Class<*> {
+        return Class.forName(name)
+    }
+    
     fun getCBClass(name: String): Class<*> {
         return Class.forName(getCB(name))
     }
@@ -80,8 +84,10 @@ object ReflectionUtils {
         return method
     }
     
-    fun getConstructor(clazz: Class<*>, declared: Boolean, vararg args: Class<*>): Constructor<*> {
-        return if (declared) clazz.getDeclaredConstructor(*args) else clazz.getConstructor(*args)
+    fun <C> getConstructor(clazz: Class<C>, declared: Boolean, vararg args: Class<*>): Constructor<C> {
+        val constructor = if (declared) clazz.getDeclaredConstructor(*args) else clazz.getConstructor(*args)
+        if (declared) constructor.isAccessible = true
+        return constructor
     }
     
     fun getField(clazz: Class<*>, declared: Boolean, name: String): Field {

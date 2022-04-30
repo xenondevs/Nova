@@ -130,7 +130,7 @@ class FluidNetwork(override val uuid: UUID) : Network {
     companion object {
         
         const val CHANNEL_AMOUNT = 4
-        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.fluid.default_transfer_rate")!!
+        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.fluid.default_transfer_rate")
         
     }
     

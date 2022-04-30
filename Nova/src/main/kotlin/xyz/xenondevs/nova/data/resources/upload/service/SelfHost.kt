@@ -6,9 +6,10 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.JsonConfig
 import xyz.xenondevs.nova.data.resources.upload.UploadService
+import xyz.xenondevs.nova.util.data.getIntOrNull
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -23,11 +24,11 @@ object SelfHost : UploadService {
     val url: String
         get() = "http://$host:$port"
     
-    override fun loadConfig(json: JsonConfig) {
-        val host = json.getString("host")
+    override fun loadConfig(cfg: ConfigurationSection) {
+        val host = cfg.getString("host")
         if (host != null) this.host = host
         
-        val port = json.getInt("port")
+        val port = cfg.getIntOrNull("port")
         if (port != null) this.port = port
         
         var server: NettyApplicationEngine? = null

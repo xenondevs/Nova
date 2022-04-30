@@ -84,7 +84,9 @@ object NovaCommand : Command("nova") {
     
     private fun handleCreateResourcePack(ctx: CommandContext<CommandSourceStack>) {
         runAsyncTask {
+            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.create_resource_pack.start"))
             Resources.createResourcePack()
+            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.create_resource_pack.success"))
         }
     }
     

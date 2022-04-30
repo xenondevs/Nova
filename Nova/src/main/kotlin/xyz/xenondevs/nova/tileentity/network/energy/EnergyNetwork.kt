@@ -9,7 +9,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
-private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.energy.default_transfer_rate")!!
+private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.energy.default_transfer_rate")
 
 /**
  * An EnergyNetwork consists of [NetworkBridge] that connect [NetworkEndPoint]

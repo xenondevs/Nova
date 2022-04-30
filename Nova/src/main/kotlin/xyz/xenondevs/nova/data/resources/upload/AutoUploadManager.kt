@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.data.resources.upload
 
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.JsonConfig
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
@@ -18,7 +17,7 @@ object AutoUploadManager : Initializable() {
     private lateinit var selectedService: UploadService
     
     override fun init() {
-        val config = JsonConfig(DEFAULT_CONFIG.getObject("resource_pack.auto_upload") ?: return)
+        val config = DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!!
         this.enabled = config.getBoolean("enabled")
         if (!enabled) return
         

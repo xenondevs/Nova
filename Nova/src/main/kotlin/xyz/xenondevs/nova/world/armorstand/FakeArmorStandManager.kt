@@ -31,9 +31,9 @@ var Player.armorStandRenderDistance: Int
 object FakeArmorStandManager : Initializable(), Listener {
     
     val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "armor_stand_render_distance")
-    val DEFAULT_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.default")!!
-    val MIN_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.min")!!
-    val MAX_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.max")!!
+    val DEFAULT_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.default")
+    val MIN_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.min")
+    val MAX_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.max")
     
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()

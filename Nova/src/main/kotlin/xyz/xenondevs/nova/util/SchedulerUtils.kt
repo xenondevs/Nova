@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.util.concurrent.lockAndRun
 import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
 import java.util.concurrent.*
 
-val USE_NOVA_SCHEDULER = DEFAULT_CONFIG.getBoolean("nova_executor.enabled")
+val USE_NOVA_SCHEDULER = DEFAULT_CONFIG.getBoolean("performance.nova_executor.enabled")
 
 inline fun runTaskLater(delay: Long, noinline run: () -> Unit) =
     Bukkit.getScheduler().runTaskLater(NOVA, run, delay)
@@ -65,7 +65,7 @@ inline fun runAsyncTaskTimer(delay: Long, period: Long, noinline run: () -> Unit
 
 object AsyncExecutor {
     
-    private val THREADS = DEFAULT_CONFIG.getInt("nova_executor.threads")!!
+    private val THREADS = DEFAULT_CONFIG.getInt("performance.nova_executor.threads")
     
     private lateinit var threadFactory: ThreadFactory
     private lateinit var executorService: ScheduledExecutorService

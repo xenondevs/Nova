@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.getIntOrNull
 import java.io.File
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -89,6 +90,13 @@ enum class MaterialType {
     ALWAYS_CONSUMABLE,
     FAST_CONSUMABLE;
     
-    val configuredMaterial = Material.valueOf(DEFAULT_CONFIG.getString("resource_pack.materials.${name.lowercase()}")!!.uppercase())
+    val material: Material
+    val modelDataStart: Int
+    
+    init {
+        val section = DEFAULT_CONFIG.getConfigurationSection("resource_pack.materials.${name.lowercase()}")!!
+        material = Material.valueOf(section.getString("type")!!.uppercase())
+        modelDataStart = section.getIntOrNull("modelDataStart")!!
+    }
     
 }

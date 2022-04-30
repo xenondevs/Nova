@@ -82,5 +82,7 @@
   "command.nova.modeldata.no-nova-item": "Hold an item from Nova in your hand and try again.",
   "command.nova.recipe.no-recipe": "This item does not have a recipe.",
   "command.nova.usage.no-usage": "This item has no usages.",
-  "command.nova.network_reload.success": "All active networks have been reloaded."
+  "command.nova.network_reload.success": "All active networks have been reloaded.",
+  "command.nova.create_resource_pack.start": "Creating resource pack... please wait",
+  "command.nova.create_resource_pack.success": "Resource pack created."
 }

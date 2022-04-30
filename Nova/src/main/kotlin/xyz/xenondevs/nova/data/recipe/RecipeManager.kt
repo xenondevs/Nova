@@ -92,7 +92,7 @@ class CustomRecipeChoice(private val tests: List<ItemTest>) : ExactChoice(
     
 }
 
-private val ALLOW_RESULT_OVERWRITE = DEFAULT_CONFIG.getBoolean("crafting.allow_result_overwrite")
+private val ALLOW_RESULT_OVERWRITE = DEFAULT_CONFIG.getBoolean("debug.allow_craft_result_overwrite")
 
 object RecipeManager : Initializable(), Listener {
     

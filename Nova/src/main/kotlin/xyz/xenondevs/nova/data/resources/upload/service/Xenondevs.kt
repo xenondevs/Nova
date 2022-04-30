@@ -5,8 +5,8 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.ContentType.Application.Zip
+import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.HTTP_CLIENT
-import xyz.xenondevs.nova.data.config.JsonConfig
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.data.http.BinaryBufferedBody
@@ -19,8 +19,8 @@ object Xenondevs : UploadService {
     override val name = "xenondevs"
     lateinit var key: String
     
-    override fun loadConfig(json: JsonConfig) {
-        key = json.getString("key")
+    override fun loadConfig(cfg: ConfigurationSection) {
+        key = cfg.getString("key")
             ?: throw IllegalArgumentException("No key specified for xenondevs upload service")
     }
     

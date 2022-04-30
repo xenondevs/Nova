@@ -131,7 +131,7 @@ class ItemNetwork(override val uuid: UUID) : Network {
     companion object {
         
         const val CHANNEL_AMOUNT = 4
-        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getInt("network.item.default_transfer_rate")!!
+        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getInt("network.item.default_transfer_rate")
         
     }
     

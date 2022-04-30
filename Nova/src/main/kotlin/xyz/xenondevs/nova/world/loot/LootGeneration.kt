@@ -1,15 +1,11 @@
 package xyz.xenondevs.nova.world.loot
 
-import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.LootGenerateEvent
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.fromJson
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -22,8 +18,8 @@ object LootGeneration : Initializable(), Listener {
     
     override fun init() {
         return // TODO
-        lootTable.addAll(GSON.fromJson<ArrayList<LootInfo>>(NovaConfig["loot"].getArray("loot")) ?: emptyList())
-        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
+//        lootTable.addAll(GSON.fromJson<ArrayList<LootInfo>>(NovaConfig["loot"].getArray("loot")) ?: emptyList())
+//        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }
     
     @EventHandler

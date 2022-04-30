@@ -39,7 +39,7 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
     }
     
     private fun loadInfo(info: ModelInformation, namespace: String) {
-        val material = info.materialType.configuredMaterial
+        val material = info.materialType.material
         val modelList = modelOverrides.getOrPut(material) { TreeSet() }
         info.models.forEach {
             modelList += it
@@ -58,11 +58,12 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
     }
     
     private fun createModelData(info: ModelInformation): ModelData {
-        val material = info.materialType.configuredMaterial
+        val material = info.materialType.material
+        val modelDataStart = calculateModelDataStart(material)
         val sortedModelSet = modelOverrides[material]!!
-        val dataArray = info.models.mapToIntArray { sortedModelSet.indexOf(it) + 1 }
+        val dataArray = info.models.mapToIntArray { sortedModelSet.indexOf(it) + modelDataStart }
         
-        return ModelData(material, dataArray, info.id, info.isBlock)
+        return ModelData(info.materialType.material, dataArray, info.id, info.isBlock)
     }
     
     override fun write() {
@@ -86,7 +87,7 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
             
             val overridesArr = JsonArray().also { modelObj.add("overrides", it) }
             
-            var customModelData = 1
+            var customModelData = calculateModelDataStart(material)
             models.forEach {
                 val overrideObj = JsonObject().apply(overridesArr::add)
                 overrideObj.add("predicate", JsonObject().apply { addProperty("custom_model_data", customModelData) })
@@ -99,5 +100,10 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
             file.writeText(GSON.toJson(modelObj))
         }
     }
+    
+    private fun calculateModelDataStart(material: Material): Int =
+        MaterialType.values()
+            .filter { it.material == material }
+            .maxOf { it.modelDataStart }
     
 }

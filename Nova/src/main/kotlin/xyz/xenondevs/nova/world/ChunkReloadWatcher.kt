@@ -19,7 +19,7 @@ object ChunkReloadWatcher : Initializable(), Listener {
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
-        if (DEFAULT_CONFIG.getBoolean("chunk_reload_watcher"))
+        if (DEFAULT_CONFIG.getBoolean("debug.watch_chunk_reloads"))
             Bukkit.getPluginManager().registerEvents(this, NOVA)
     }
     

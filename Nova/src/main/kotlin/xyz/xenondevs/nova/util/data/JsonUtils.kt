@@ -4,6 +4,7 @@ import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.json.*
@@ -26,6 +27,7 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
         .registerTypeHierarchyAdapter<ItemNovaMaterial>(NovaMaterialSerialization)
         .registerTypeHierarchyAdapter<LootInfo>(LootInfoDeserializer)
+        .registerTypeHierarchyAdapter<YamlConfiguration>(YamlConfigurationTypeAdapter)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()
         .create()
