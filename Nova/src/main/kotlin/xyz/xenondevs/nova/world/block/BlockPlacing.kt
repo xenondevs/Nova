@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block
 
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
@@ -16,10 +17,12 @@ import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
+import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.pos
 
 internal object BlockPlacing : Listener {
@@ -77,18 +80,23 @@ internal object BlockPlacing : Listener {
         } else ProtectionManager.canPlace(player, handItem, placeLoc)
         
         placeFuture.runIfTrue {
-            if (placeLoc.block.type.isReplaceable() && WorldDataManager.getBlockState(placeLoc.pos) == null) {
-                // TODO: Block Limits
-                val ctx = BlockPlaceContext(
-                    placeLoc.pos, handItem,
-                    player, player.location, player.uniqueId,
-                    event.clickedBlock!!.pos, event.blockFace
-                )
-                
+            if (!placeLoc.block.type.isReplaceable() || WorldDataManager.getBlockState(placeLoc.pos) != null)
+                return@runIfTrue
+            
+            val ctx = BlockPlaceContext(
+                placeLoc.pos, handItem,
+                player, player.location, player.uniqueId,
+                event.clickedBlock!!.pos, event.blockFace
+            )
+            
+            val result = TileEntityLimits.canPlace(ctx)
+            if (result.allowed) {
                 BlockManager.placeBlock(material, ctx)
                 
                 if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
                 runTask { player.swingHand(event.hand!!) }
+            } else {
+                player.spigot().sendMessage(localized(ChatColor.RED, result.message))
             }
         }
     }

@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.GlobalValues
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
@@ -33,6 +34,7 @@ import xyz.xenondevs.nova.world.block.BlockBreaking
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
@@ -106,6 +108,9 @@ fun Block.place(ctx: BlockPlaceContext, playEffects: Boolean = true): Boolean {
     val item = ctx.item
     val novaMaterial = item.novaMaterial
     if (novaMaterial is BlockNovaMaterial) {
+        if (novaMaterial is TileEntityNovaMaterial && !TileEntityLimits.canPlace(ctx).allowed)
+            return false
+        
         BlockManager.placeBlock(novaMaterial, ctx, playEffects)
         return true
     }

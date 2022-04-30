@@ -7,12 +7,14 @@ import xyz.xenondevs.nova.data.config.GlobalValues
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import xyz.xenondevs.nova.world.block.limits.TileEntityTracker
 
 object BlockManager : Initializable() {
     
@@ -45,12 +47,19 @@ object BlockManager : Initializable() {
         state.handleInitialized(true)
         
         material.novaBlock.handlePlace(state, ctx)
-        if (playEffects) material.placeSound?.play(ctx.pos)
+        if (playEffects)
+            material.placeSound?.play(ctx.pos)
+        
+        if (state is NovaTileEntityState)
+            TileEntityTracker.handleBlockPlace(state.material, ctx)
     }
     
     fun removeBlock(ctx: BlockBreakContext, playEffects: Boolean = true): Boolean {
         val pos = ctx.pos
         val state = getBlock(ctx.pos) ?: return false
+        
+        if (state is NovaTileEntityState)
+            TileEntityTracker.handleBlockBreak(state.tileEntity, ctx)
         
         val material = state.material
         material.novaBlock.handleBreak(state, ctx)
@@ -58,7 +67,8 @@ object BlockManager : Initializable() {
         WorldDataManager.removeBlockState(pos)
         state.handleRemoved(true)
         
-        if (playEffects && GlobalValues.BLOCK_BREAK_EFFECTS) material.novaBlock.playBreakEffects(state, ctx)
+        if (playEffects && GlobalValues.BLOCK_BREAK_EFFECTS)
+            material.novaBlock.playBreakEffects(state, ctx)
         
         return true
     }
