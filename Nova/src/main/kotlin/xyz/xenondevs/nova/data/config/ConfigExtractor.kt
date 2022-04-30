@@ -40,8 +40,6 @@ object ConfigExtractor {
         cfg.getKeys(true).filterNot(internalCfg::isSet).forEach { path ->
             cfg.set(path, null)
             storedCfg.set(path, null)
-            
-            println("removed unused key $path")
         }
         
         // add keys that are new
@@ -51,8 +49,6 @@ object ConfigExtractor {
             cfg.setComments(path, internalCfg.getComments(path))
             cfg.setInlineComments(path, internalCfg.getInlineComments(path))
             storedCfg.set(path, internalValue)
-            
-            println("added brand new key $path")
         }
         
         // update keys that were unchanged by the user
@@ -72,8 +68,6 @@ object ConfigExtractor {
                 cfg.setComments(path, internalCfg.getComments(path))
                 cfg.setInlineComments(path, internalCfg.getInlineComments(path))
                 storedCfg.set(path, internalValue)
-                
-                println("updated value $path")
             }
         }
         
