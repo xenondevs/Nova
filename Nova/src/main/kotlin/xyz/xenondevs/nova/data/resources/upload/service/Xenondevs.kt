@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.data.resources.upload.service
 import com.google.gson.JsonObject
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.ContentType.Application.Zip
 import xyz.xenondevs.nova.HTTP_CLIENT
@@ -27,11 +26,11 @@ object Xenondevs : UploadService {
     
     override suspend fun upload(file: File): String {
         println("uploading")
-        val json = HTTP_CLIENT.put<HttpStatement>(API_URL) {
+        val json = HTTP_CLIENT.preparePut(API_URL) {
             header("key", key)
-            body = BinaryBufferedBody(file.inputStream(), contentType = Zip)
+            setBody(BinaryBufferedBody(file.inputStream(), contentType = Zip))
         }.execute { response ->
-            val json = response.receive<JsonObject>()
+            val json = response.body<JsonObject>()
             check(response.status.isSuccess()) {
                 "Failed to upload pack to xenondevs: ${response.status} ${json.getString("error")}." +
                     "Please remember that this feature is only available for Patrons!"

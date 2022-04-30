@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.data.resources.upload.service
 
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.JsonConfig
 import xyz.xenondevs.nova.data.resources.upload.UploadService
