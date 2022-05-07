@@ -8,8 +8,10 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.login.ServerboundHelloPacket
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.network.event.PacketEventManager
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.logging.Level
 
 class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
     
@@ -45,7 +47,7 @@ class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
             }
             super.flush(ctx)
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.log(Level.SEVERE, "An exception occurred trying to flush packets", e)
         }
     }
     

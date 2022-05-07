@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.item.ItemUtils
 import java.io.File
 import java.io.InputStream
+import java.util.logging.Level
 
 object ItemCategories : Initializable() {
     
@@ -120,7 +121,7 @@ data class ItemCategory(val name: String, val icon: ItemProvider, val items: Lis
                 
                 return ItemCategory(name, ItemWrapper(icon), items)
             } catch (e: Exception) {
-                e.printStackTrace()
+                LOGGER.log(Level.SEVERE, "Could not deserialize item category", e)
             }
             
             return null

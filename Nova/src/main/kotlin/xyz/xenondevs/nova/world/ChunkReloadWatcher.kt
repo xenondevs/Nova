@@ -4,9 +4,11 @@ import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
+import java.util.logging.Level
 
 object ChunkReloadWatcher : Initializable(), Listener {
     
@@ -34,16 +36,16 @@ object ChunkReloadWatcher : Initializable(), Listener {
             CHUNK_LOADS[pos] = currentTime to reloadAmount
             
             if (reloadAmount >= RELOAD_LIMIT) {
-                ChunkReloadException(pos, reloadAmount).printStackTrace()
+                LOGGER.log(
+                    Level.INFO,
+                    "(This is not an error, you can disable this message in plugins/Nova/config/config.yml)" +
+                        "Nova has detected a Chunk loading multiple times in a short timeframe." +
+                        "$pos | Reload #$reloadAmount" +
+                        "A stacktrace is attached for debugging purposes:",
+                    Exception()
+                )
             }
         } else CHUNK_LOADS[pos] = currentTime to 1
     }
     
 }
-
-private class ChunkReloadException(pos: ChunkPos, amount: Int) : Exception("""
-    (This is not an error, you can disable this message in plugins/Nova/config/config.json)
-    Nova has detected a Chunk loading multiple times in a short timeframe.
-    $pos | Reload #$amount
-    A stacktrace is attached for debugging purposes:
-    """.trimMargin())

@@ -25,6 +25,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.logging.Level
 import kotlin.concurrent.thread
 
 typealias NetworkManagerTask = (NetworkManager) -> Unit
@@ -193,7 +194,7 @@ private class NetworkManagerImpl : NetworkManager {
                         }
                     }
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    LOGGER.log(Level.SEVERE, "An exception occurred in a NetworkManager task", e)
                 }
                 
                 // All tasks are done for this tick

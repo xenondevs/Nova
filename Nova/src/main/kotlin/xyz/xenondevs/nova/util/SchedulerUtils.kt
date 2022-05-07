@@ -4,12 +4,14 @@ package xyz.xenondevs.nova.util
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bukkit.Bukkit
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.util.concurrent.ObservableLock
 import xyz.xenondevs.nova.util.concurrent.lockAndRun
 import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
 import java.util.concurrent.*
+import java.util.logging.Level
 
 val USE_NOVA_SCHEDULER = DEFAULT_CONFIG.getBoolean("performance.nova_executor.enabled")
 
@@ -84,7 +86,7 @@ object AsyncExecutor {
             try {
                 task()
             } catch (t: Throwable) {
-                t.printStackTrace()
+                LOGGER.log(Level.SEVERE, "An exception occurred running a task", t)
             }
         }
     
@@ -93,7 +95,7 @@ object AsyncExecutor {
             try {
                 task()
             } catch (t: Throwable) {
-                t.printStackTrace()
+                LOGGER.log(Level.SEVERE, "An exception occurred running a task", t)
             }
         }, delay, TimeUnit.MILLISECONDS)
     

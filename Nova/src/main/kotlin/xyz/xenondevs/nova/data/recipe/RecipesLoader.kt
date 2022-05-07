@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.recipe
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.UpdatableFile
@@ -10,6 +11,7 @@ import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import java.io.File
+import java.util.logging.Level
 
 object RecipesLoader {
     
@@ -91,7 +93,7 @@ object RecipesLoader {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.log(Level.SEVERE, "Invalid recipe in $file", e)
         }
         
         return null

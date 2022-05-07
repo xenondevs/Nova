@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.particle.utils.ReflectionUtils
+import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
 
@@ -62,7 +63,11 @@ class Nova : JavaPlugin(), INova {
     override fun onDisable() {
         AddonManager.disableAddons()
         Initializer.disable()
-        disableHandlers.forEach { runCatching(it).onFailure(Throwable::printStackTrace) }
+        disableHandlers.forEach {
+            runCatching(it).onFailure { ex ->
+                LOGGER.log(Level.SEVERE, "An exception occurred while running a disable handler", ex)
+            }
+        }
     }
     
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {

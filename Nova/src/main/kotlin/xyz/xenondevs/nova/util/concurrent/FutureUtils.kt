@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.util.concurrent
 
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.runTask
 import java.util.concurrent.CompletableFuture
+import java.util.logging.Level
 
 fun CompletableFuture<Boolean>.runIfTrue(run: () -> Unit) {
     val mainThread = minecraftServer.serverThread == Thread.currentThread()
@@ -14,7 +16,7 @@ fun CompletableFuture<Boolean>.runIfTrue(run: () -> Unit) {
                 else run()
             }
         } catch (t: Throwable) {
-            t.printStackTrace()
+            LOGGER.log(Level.SEVERE, "", t)
         }
     }
 }
