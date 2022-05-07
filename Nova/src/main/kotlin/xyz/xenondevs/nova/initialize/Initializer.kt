@@ -20,7 +20,6 @@ import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.player.ability.AbilityManager
-import xyz.xenondevs.nova.player.advancement.AdvancementManager
 import xyz.xenondevs.nova.player.attachment.AttachmentManager
 import xyz.xenondevs.nova.player.equipment.ArmorEquipListener
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
@@ -43,7 +42,7 @@ object Initializer {
     private val toInit = listOf(
         UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, Resources,
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeArmorStandManager,
-        AdvancementManager, RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
+        RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, PacketManager, LootGeneration, AddonsLoader, ItemCategories, BlockManager, WorldDataManager,
         TileEntityManager
