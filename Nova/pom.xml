@@ -524,7 +524,7 @@
             <plugin>
                 <groupId>xyz.xenondevs</groupId>
                 <artifactId>string-remapper-maven-plugin</artifactId>
-                <version>0.4</version>
+                <version>0.5</version>
 
                 <executions>
                     <execution>
@@ -541,6 +541,10 @@
                                 <classes>org.spigotmc:minecraft-server:csrg:maps-spigot:${spigot.version}</classes>
                                 <members>org.spigotmc:minecraft-server:csrg:maps-spigot-members:${spigot.version}</members>
                             </mapsSpigot>
+                            <classes>
+                                <class>xyz.xenondevs.nova.util.reflection.ReflectionRegistry</class>
+                                <class>xyz.xenondevs.nova.util.NMSUtils</class>
+                            </classes>
                         </configuration>
                     </execution>
                 </executions>
