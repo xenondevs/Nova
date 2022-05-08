@@ -14,6 +14,7 @@ class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
     
     private val chunkX = (file.regionX shl 5) + relChunkX
     private val chunkZ = (file.regionZ shl 5) + relChunkZ
+    val packedCoords = (relChunkX shl 5 or relChunkZ).toShort()
     
     var blockStates = HashMap<BlockPos, BlockState>()
     
@@ -43,17 +44,25 @@ class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
         }
     }
     
-    fun write(buf: ByteBuf, palette: List<String>) {
+    fun write(buf: ByteBuf, pool: MutableList<String>): Boolean {
+        var changedPool = false
         blockStates.forEach { (pos, state) ->
             if (state is LinkedBlockState) return@forEach
             
             buf.writeByte(1)
             buf.writeByte((pos.x and 0xF shl 4) or (pos.z and 0xF))
             buf.writeShort(pos.y)
-            buf.writeInt(palette.indexOf(state.id.toString()))
+            var stateIndex = pool.indexOf(state.id.toString())
+            if (stateIndex == -1) {
+                pool.add(state.id.toString())
+                stateIndex = pool.size - 1
+                changedPool = true
+            }
+            buf.writeInt(stateIndex)
             state.write(buf)
         }
         buf.writeByte(0)
+        return changedPool
     }
     
     fun hasData(): Boolean = blockStates.isNotEmpty()

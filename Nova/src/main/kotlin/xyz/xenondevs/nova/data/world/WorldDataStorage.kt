@@ -1,12 +1,9 @@
 package xyz.xenondevs.nova.data.world
 
-import io.netty.buffer.Unpooled
 import org.bukkit.World
-import xyz.xenondevs.nova.util.data.toByteArray
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.world.ChunkPos
 import java.io.File
-import java.nio.channels.FileChannel
 
 class WorldDataStorage(val world: World) {
     
@@ -25,26 +22,13 @@ class WorldDataStorage(val world: World) {
         
         return regionFiles.getOrPut(rid) {
             val file = File(regionsFolder, "r.$rx.$rz.nvr")
-            val regionFile = RegionFile(this, file, rx, rz)
-            
-            if (file.exists()) {
-                file.inputStream().use {
-                    val mbuf = it.channel.map(FileChannel.MapMode.READ_ONLY, 0, file.length())
-                    val buf = Unpooled.wrappedBuffer(mbuf)
-                    regionFile.read(buf)
-                }
-            }
-            
-            return@getOrPut regionFile
+            return@getOrPut RegionFile(this, file, rx, rz).apply(RegionFile::init)
         }
     }
     
     fun saveAll() {
         regionFiles.removeIf { (_, regionFile) ->
-            val buf = Unpooled.buffer()
-            regionFile.write(buf)
-            regionFile.file.writeBytes(buf.toByteArray())
-            
+            regionFile.saveAll()
             return@removeIf !regionFile.isAnyChunkLoaded()
         }
     }

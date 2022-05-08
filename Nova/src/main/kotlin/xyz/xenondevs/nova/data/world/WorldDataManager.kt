@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.data.world
 
 import org.bukkit.Bukkit
-import org.bukkit.Chunk
 import org.bukkit.World
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
+import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.nova.LOGGER
@@ -32,20 +32,22 @@ internal object WorldDataManager : Initializable(), Listener {
     override val dependsOn: Set<Initializable> = setOf(VanillaTileEntityManager, NetworkManager, AddonsInitializer)
     
     private val worlds = HashMap<World, WorldDataStorage>()
-    private val chunkLoadQueue = ConcurrentLinkedQueue<ChunkPos>()
+    private val tasks = ConcurrentLinkedQueue<Task>() // TODO: Map RegionFile -> Queue
     
     override fun init() {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
-        
-        chunkLoadQueue += Bukkit.getWorlds().flatMap { it.loadedChunks.map(Chunk::pos) }
+        tasks += Bukkit.getWorlds().flatMap { world -> world.loadedChunks.map { ChunkLoadTask(it.pos) } }
         NOVA.disableHandlers += { Bukkit.getWorlds().forEach(::saveWorld) }
         
-        thread(name = "Nova WorldDataManager", isDaemon = true) {
+        thread(name = "Nova WorldDataManager", isDaemon = true) { // TODO: Use Phaser instead of Thread.sleep
             while (NOVA.isEnabled) {
-                while (chunkLoadQueue.isNotEmpty()) {
-                    loadChunk(chunkLoadQueue.poll())
+                while (tasks.isNotEmpty()) {
+                    when(val task = tasks.poll()) {
+                        is ChunkLoadTask -> loadChunk(task.pos)
+                        is ChunkUnloadTask -> unloadChunk(task.pos)
+                        is SaveWorldTask -> saveWorld(task.world)
+                    }
                 }
-                
                 Thread.sleep(50)
             }
         }
@@ -76,6 +78,14 @@ internal object WorldDataManager : Initializable(), Listener {
     }
     
     @Synchronized
+    private fun unloadChunk(pos: ChunkPos) {
+        val region = getRegion(pos)
+        val chunk = region.getChunk(pos)
+        region.save(chunk)
+        region.chunks[chunk.packedCoords.toInt()] = null
+    }
+    
+    @Synchronized
     private fun saveWorld(world: World) {
         LOGGER.info("Saving world ${world.name}...")
         worlds[world]?.saveAll()
@@ -102,6 +112,10 @@ internal object WorldDataManager : Initializable(), Listener {
         worlds.getOrPut(world) { WorldDataStorage(world) }
     
     @Synchronized
+    private fun getRegion(pos: ChunkPos): RegionFile =
+        getWorldStorage(pos.world!!).getRegion(pos)
+    
+    @Synchronized
     private fun getChunk(pos: ChunkPos): RegionChunk =
         getWorldStorage(pos.world!!).getRegion(pos).getChunk(pos)
     
@@ -113,13 +127,18 @@ internal object WorldDataManager : Initializable(), Listener {
     
     @EventHandler
     private fun handleChunkLoad(event: ChunkLoadEvent) {
-        chunkLoadQueue += event.chunk.pos
+        tasks += ChunkLoadTask(event.chunk.pos)
+    }
+    
+    @EventHandler
+    private fun handleChunkUnload(event: ChunkUnloadEvent) {
+        tasks += ChunkUnloadTask(event.chunk.pos)
     }
     
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handleWorldSave(event: WorldSaveEvent) {
-        saveWorld(event.world)
+        tasks += SaveWorldTask(event.world)
     }
     
 }
