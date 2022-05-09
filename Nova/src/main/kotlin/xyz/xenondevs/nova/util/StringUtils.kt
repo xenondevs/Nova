@@ -46,6 +46,12 @@ fun String.addNamespace(namespace: String): String =
 fun String.removeNamespace(namespace: String): String =
     removePrefix("$namespace:")
 
+fun String.startsWithAny(vararg prefixes: String): Boolean {
+    for (prefix in prefixes)
+        if (startsWith(prefix)) return true
+    return false
+}
+
 operator fun Any.plus(other: String) = this.toString() + other
 
 object StringUtils {

@@ -9,7 +9,10 @@ import io.ktor.server.routing.*
 import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.upload.UploadService
+import xyz.xenondevs.nova.util.data.getBooleanOrNull
 import xyz.xenondevs.nova.util.data.getIntOrNull
+import xyz.xenondevs.nova.util.data.http.ConnectionUtils
+import xyz.xenondevs.nova.util.startsWithAny
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -19,17 +22,27 @@ object SelfHost : UploadService {
     private val packFile = File(selfHostDir, "pack.zip")
     
     override val name = "SelfHost"
-    var host = "localhost" // TODO retrieve ip as default host
+    
+    lateinit var host: String
     var port = 38519
+    var portNeeded = true
+    
     val url: String
-        get() = "http://$host:$port"
+        get() = buildString {
+            if (!host.startsWithAny("http://", "https://"))
+                append("http://")
+            append(host)
+            if (portNeeded)
+                append(":$port")
+        }
     
     override fun loadConfig(cfg: ConfigurationSection) {
-        val host = cfg.getString("host")
-        if (host != null) this.host = host
+        val configuredHost = cfg.getString("host")
+        this.host = configuredHost ?: ConnectionUtils.SERVER_IP
         
         val port = cfg.getIntOrNull("port")
         if (port != null) this.port = port
+        portNeeded = cfg.getBooleanOrNull("portNeeded") ?: (configuredHost != null)
         
         var server: NettyApplicationEngine? = null
         
