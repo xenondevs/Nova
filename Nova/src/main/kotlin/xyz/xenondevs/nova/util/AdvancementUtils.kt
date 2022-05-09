@@ -2,29 +2,23 @@ package xyz.xenondevs.nova.util
 
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.nbt.CompoundTag
-import xyz.xenondevs.kadvancements.Advancement
-import xyz.xenondevs.kadvancements.Criterion
-import xyz.xenondevs.kadvancements.FrameType
-import xyz.xenondevs.kadvancements.builder.AdvancementBuilder
-import xyz.xenondevs.kadvancements.builder.CriteriaBuilder
-import xyz.xenondevs.kadvancements.builder.DisplayBuilder
-import xyz.xenondevs.kadvancements.builder.advancement
-import xyz.xenondevs.kadvancements.builder.predicate.ItemPredicateBuilder
+import xyz.xenondevs.kadvancements.*
+import xyz.xenondevs.kadvancements.predicate.ItemPredicate
 import xyz.xenondevs.kadvancements.predicate.NbtPredicate
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 
-fun ItemPredicateBuilder.nbt(compound: CompoundTag) {
+fun ItemPredicate.Builder.nbt(compound: CompoundTag) {
     nbt(NbtPredicate(compound))
 }
 
-fun ItemPredicateBuilder.nbt(init: CompoundTag.() -> Unit) {
+fun ItemPredicate.Builder.nbt(init: CompoundTag.() -> Unit) {
     val tag = CompoundTag()
     tag.init()
     nbt(tag)
 }
 
-fun DisplayBuilder.icon(icon: ItemNovaMaterial) {
+fun Display.Builder.icon(icon: ItemNovaMaterial) {
     icon(icon.clientsideProvider.get())
 }
 
@@ -40,7 +34,7 @@ fun CriteriaBuilder.obtainNovaItem(item: ItemNovaMaterial): Criterion {
     }
 }
 
-fun advancement(addon: Addon, name: String, init: AdvancementBuilder.() -> Unit): Advancement =
+fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit): Advancement =
     advancement("${addon.description.id}:$name", init)
 
 fun obtainNovaItemAdvancement(
