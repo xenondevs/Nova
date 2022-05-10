@@ -26,7 +26,6 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter<Attachment>(AttachmentSerialization)
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
         .registerTypeHierarchyAdapter<ItemNovaMaterial>(NovaMaterialSerialization)
-        .registerTypeHierarchyAdapter<LootInfo>(LootInfoDeserializer)
         .registerTypeHierarchyAdapter<YamlConfiguration>(YamlConfigurationTypeAdapter)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()
