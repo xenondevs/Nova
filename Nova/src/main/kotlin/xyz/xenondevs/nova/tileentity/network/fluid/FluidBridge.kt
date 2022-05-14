@@ -7,6 +7,6 @@ interface FluidBridge : NetworkBridge {
     /**
      * How much fluid can be transferred per tick.
      */
-    var fluidTransferRate: Long
+    val fluidTransferRate: Long
     
 }

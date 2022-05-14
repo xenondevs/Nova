@@ -6,6 +6,9 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import kotlin.collections.component1
@@ -15,17 +18,13 @@ import kotlin.reflect.KProperty
 
 val DEFAULT_CONFIG by configReloadable { NovaConfig["config"] }
 
-fun <T> configReloadable(initializer: () -> T) : ConfigReloadable<T> {
-    return ConfigReloadable(initializer)
-}
-
 object NovaConfig : Initializable() {
     
     override val inMainThread = false
     override val dependsOn = setOf(AddonsLoader)
     
     private val configs = HashMap<String, YamlConfiguration>()
-    val reloadables = arrayListOf<Reloadable>()
+    internal val configReloadables = arrayListOf<Reloadable>()
     
     fun loadDefaultConfig() {
         LOGGER.info("Loading default config")
@@ -64,10 +63,13 @@ object NovaConfig : Initializable() {
         }
     }
     
-    fun reload() {
+    internal fun reload() {
         loadDefaultConfig()
         init()
-        reloadables.sorted().forEach(Reloadable::reload)
+        UpgradeTypeRegistry.types.forEach(Reloadable::reload)
+        configReloadables.sorted().forEach(Reloadable::reload)
+        TileEntityManager.tileEntities.forEach(Reloadable::reload)
+        NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
     }
     
     operator fun get(name: String): YamlConfiguration =
@@ -78,37 +80,55 @@ object NovaConfig : Initializable() {
     
 }
 
-class ConfigReloadable<T>(val initializer: () -> T) : Reloadable {
-    private var shouldReload = false
-    var value: T = initializer()
+fun <T : Any> configReloadable(initializer: () -> T): ConfigReloadable<T> {
+    return ConfigReloadable(initializer)
+}
+
+fun <T : Any> notReloadable(value: T): StaticReloadable<T> = StaticReloadable(value)
+
+class ConfigReloadable<T : Any> internal constructor(val initializer: () -> T) : ValueReloadable<T> {
+    
+    private var shouldReload = true
+    private var _value: T? = null
+    override val value: T
+        get() {
+            if (shouldReload) {
+                _value = initializer()
+                shouldReload = false
+            }
+            
+            return _value!!
+        }
     
     init {
-        NovaConfig.reloadables.add(this)
+        NovaConfig.configReloadables += this
     }
     
     override fun reload() {
         shouldReload = true
     }
     
-    operator fun getValue(ref: Any?, property: KProperty<*>) : T {
-        if (shouldReload) {
-            value = initializer()
-            shouldReload = false
-        }
-        return value
-    }
+}
+
+class StaticReloadable<T : Any> internal constructor(override val value: T) : ValueReloadable<T>
+
+interface ValueReloadable<T : Any> : Reloadable {
+    
+    val value: T
+    
+    operator fun getValue(ref: Any?, property: KProperty<*>): T = value
+    
 }
 
 interface Reloadable : Comparable<Reloadable> {
-    fun reload()
     
-    override fun compareTo(other: Reloadable): Int {
-        if (other !is ConfigReloadable<*>) {
-            return -1
+    fun reload() = Unit
+    
+    override fun compareTo(other: Reloadable): Int =
+        when {
+            other !is ConfigReloadable<*> -> -1
+            this is ConfigReloadable<*> -> 0
+            else -> 1
         }
-        if (this is ConfigReloadable<*>) {
-            return 0
-        }
-        return 1
-    }
+    
 }

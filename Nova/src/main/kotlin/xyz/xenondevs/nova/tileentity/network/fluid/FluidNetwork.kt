@@ -117,6 +117,10 @@ class FluidNetwork(override val uuid: UUID) : Network {
     
     override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
     
+    override fun reload() {
+        transferRate = bridges.firstOrNull()?.fluidTransferRate ?: DEFAULT_TRANSFER_RATE
+    }
+    
     override fun handleTick() {
         val startingChannel = nextChannel
         var amountLeft = transferRate

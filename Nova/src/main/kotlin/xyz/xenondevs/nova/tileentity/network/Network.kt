@@ -1,12 +1,13 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidNetwork
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import java.util.*
 
-interface Network {
+interface Network : Reloadable {
     
     /**
      * The [NetworkType] this network implements.
@@ -63,7 +64,6 @@ interface Network {
      * Adds a [NetworkBridge] to this [Network].
      */
     fun addBridge(bridge: NetworkBridge)
-    
     
     /**
      * Removes a [NetworkNode] from this [Network].

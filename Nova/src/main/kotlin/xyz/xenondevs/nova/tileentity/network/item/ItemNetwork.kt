@@ -118,6 +118,10 @@ class ItemNetwork(override val uuid: UUID) : Network {
     
     override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
     
+    override fun reload() {
+        bridges.firstOrNull()?.itemTransferRate ?: DEFAULT_TRANSFER_RATE
+    }
+    
     override fun handleTick() {
         val startingChannel = nextChannel
         var transfersLeft = transferRate

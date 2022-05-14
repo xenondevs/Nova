@@ -36,7 +36,6 @@ object CommandManager : Initializable() {
         registerCommand(NovaModelDataCommand)
         registerCommand(NovaRecipeCommand)
         registerCommand(NovaUsageCommand)
-        registerCommand(NovaConfigCommand)
     }
     
     fun registerCommand(command: Command) {

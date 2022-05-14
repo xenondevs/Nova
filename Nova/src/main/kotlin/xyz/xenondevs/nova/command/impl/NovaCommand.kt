@@ -13,6 +13,7 @@ import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.*
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -78,8 +79,16 @@ object NovaCommand : Command("nova") {
                 .executesCatching(::sendAddons))
             .then(literal("createResourcePack")
                 .requiresPermission("nova.command.zip")
-                .executesCatching(::handleCreateResourcePack)
-            )
+                .executesCatching(::handleCreateResourcePack))
+            .then(literal("reload")
+                .requiresPermission("nova.command.reload")
+                .executesCatching(::handleReload))
+    }
+    
+    private fun handleReload(ctx: CommandContext<CommandSourceStack>) {
+        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_configs.start"))
+        NovaConfig.reload()
+        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_configs.success"))
     }
     
     private fun handleCreateResourcePack(ctx: CommandContext<CommandSourceStack>) {

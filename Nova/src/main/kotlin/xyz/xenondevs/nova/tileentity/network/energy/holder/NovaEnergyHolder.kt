@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.energy.holder
 
 import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -17,23 +18,20 @@ import kotlin.reflect.KProperty
 
 sealed class NovaEnergyHolder(
     final override val endPoint: NetworkedTileEntity,
-    defaultMaxEnergy: Long,
+    defaultMaxEnergy: ValueReloadable<Long>,
     protected val upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : EnergyHolder {
+    
+    private val defaultMaxEnergy by defaultMaxEnergy
     
     val updateHandlers = ArrayList<() -> Unit>()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
         endPoint.retrieveEnumMap("energyConfig") { lazyDefaultConfig() }
     
-    var defaultMaxEnergy = defaultMaxEnergy
-        set(value) {
-            field = value
-            handleUpgradesUpdate()
-        }
-    
-    var maxEnergy = (defaultMaxEnergy * (upgradeHolder?.getValue(UpgradeType.ENERGY) ?: 1.0)).toLong()
+    var maxEnergy = calculateMaxEnergy()
+        private set
     
     override var energy: Long = endPoint.retrieveData("energy") { 0L }
         set(value) {
@@ -54,16 +52,12 @@ sealed class NovaEnergyHolder(
     var energyMinus by TickedLong()
     var energyPlus by TickedLong()
     
-    init {
-        upgradeHolder?.upgradeUpdateHandlers?.add(::handleUpgradesUpdate)
-    }
-    
     override fun saveData() {
         endPoint.storeData("energy", energy, true)
         endPoint.storeEnumMap("energyConfig", connectionConfig)
     }
     
-    protected open fun handleUpgradesUpdate() {
+    override fun reload() {
         maxEnergy = calculateMaxEnergy()
         
         if (energy > maxEnergy) {

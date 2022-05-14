@@ -7,6 +7,6 @@ interface EnergyBridge : NetworkBridge {
     /**
      * How much energy can be transferred per tick.
      */
-    var energyTransferRate: Long
+    val energyTransferRate: Long
     
 }

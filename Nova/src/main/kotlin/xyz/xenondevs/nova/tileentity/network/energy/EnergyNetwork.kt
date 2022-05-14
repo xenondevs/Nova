@@ -122,6 +122,10 @@ class EnergyNetwork(override val uuid: UUID) : Network {
     
     override fun isValid() = bridges.isNotEmpty() || ((providers.isNotEmpty() && consumers.isNotEmpty()) || (buffers.isNotEmpty() && (providers.isNotEmpty() || consumers.isNotEmpty())))
     
+    override fun reload() {
+        transferRate = bridges.firstOrNull()?.energyTransferRate ?: DEFAULT_TRANSFER_RATE
+    }
+    
     /**
      * Called every tick to transfer energy.
      */
