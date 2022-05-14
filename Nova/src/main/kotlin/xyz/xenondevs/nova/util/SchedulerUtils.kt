@@ -7,13 +7,14 @@ import org.bukkit.Bukkit
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.util.concurrent.ObservableLock
 import xyz.xenondevs.nova.util.concurrent.lockAndRun
 import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
 import java.util.concurrent.*
 import java.util.logging.Level
 
-val USE_NOVA_SCHEDULER = DEFAULT_CONFIG.getBoolean("performance.nova_executor.enabled")
+val USE_NOVA_SCHEDULER by configReloadable { DEFAULT_CONFIG.getBoolean("performance.nova_executor.enabled") }
 
 inline fun runTaskLater(delay: Long, noinline run: () -> Unit) =
     Bukkit.getScheduler().runTaskLater(NOVA, run, delay)

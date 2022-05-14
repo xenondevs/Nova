@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.upgrade
 
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -16,7 +17,7 @@ class UpgradeType<T> internal constructor(
 ) {
     
     private val modifierCache = HashMap<ItemNovaMaterial, List<T>>()
-    private val defaultConfig by lazy { NovaConfig["${id.namespace}:upgrade_values"] }
+    private val defaultConfig by configReloadable { NovaConfig["${id.namespace}:upgrade_values"] }
     
     fun getValue(material: ItemNovaMaterial, level: Int): T {
         val values = getUpgradeValues(material)

@@ -10,13 +10,24 @@ import java.util.*
 class ConsumerEnergyHolder(
     endPoint: NetworkedTileEntity,
     defaultMaxEnergy: Long,
-    private val defaultEnergyConsumption: Long,
-    private val defaultSpecialEnergyConsumption: Long,
+    defaultEnergyConsumption: Long,
+    defaultSpecialEnergyConsumption: Long,
     upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : NovaEnergyHolder(endPoint, defaultMaxEnergy, upgradeHolder, lazyDefaultConfig) {
     
     override val allowedConnectionType = NetworkConnectionType.INSERT
+    
+    var defaultEnergyConsumption = defaultEnergyConsumption
+        set(value) {
+            field = value
+            handleUpgradesUpdate()
+        }
+    var defaultSpecialEnergyConsumption = defaultSpecialEnergyConsumption
+        set(value) {
+            field = value
+            handleUpgradesUpdate()
+        }
     
     var energyConsumption = calculateEnergyConsumption(defaultEnergyConsumption)
     var specialEnergyConsumption = calculateEnergyConsumption(defaultSpecialEnergyConsumption)

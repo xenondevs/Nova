@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
@@ -92,7 +93,7 @@ class CustomRecipeChoice(private val tests: List<ItemTest>) : ExactChoice(
     
 }
 
-private val ALLOW_RESULT_OVERWRITE = DEFAULT_CONFIG.getBoolean("debug.allow_craft_result_overwrite")
+private val ALLOW_RESULT_OVERWRITE by configReloadable { DEFAULT_CONFIG.getBoolean("debug.allow_craft_result_overwrite") }
 
 object RecipeManager : Initializable(), Listener {
     

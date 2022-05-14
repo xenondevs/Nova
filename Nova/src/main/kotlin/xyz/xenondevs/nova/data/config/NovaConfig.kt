@@ -11,8 +11,13 @@ import xyz.xenondevs.nova.util.data.getResources
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.reflect.KProperty
 
-val DEFAULT_CONFIG: YamlConfiguration = NovaConfig["config"]
+val DEFAULT_CONFIG by configReloadable { NovaConfig["config"] }
+
+fun <T> configReloadable(initializer: () -> T) : ConfigReloadable<T> {
+    return ConfigReloadable(initializer)
+}
 
 object NovaConfig : Initializable() {
     
@@ -20,6 +25,7 @@ object NovaConfig : Initializable() {
     override val dependsOn = setOf(AddonsLoader)
     
     private val configs = HashMap<String, YamlConfiguration>()
+    val reloadables = arrayListOf<Reloadable>()
     
     fun loadDefaultConfig() {
         LOGGER.info("Loading default config")
@@ -58,10 +64,51 @@ object NovaConfig : Initializable() {
         }
     }
     
+    fun reload() {
+        loadDefaultConfig()
+        init()
+        reloadables.sorted().forEach(Reloadable::reload)
+    }
+    
     operator fun get(name: String): YamlConfiguration =
         configs[name]!!
     
     operator fun get(material: ItemNovaMaterial): YamlConfiguration =
         configs[material.id.toString()]!!
     
+}
+
+class ConfigReloadable<T>(val initializer: () -> T) : Reloadable {
+    private var shouldReload = false
+    var value: T = initializer()
+    
+    init {
+        NovaConfig.reloadables.add(this)
+    }
+    
+    override fun reload() {
+        shouldReload = true
+    }
+    
+    operator fun getValue(ref: Any?, property: KProperty<*>) : T {
+        if (shouldReload) {
+            value = initializer()
+            shouldReload = false
+        }
+        return value
+    }
+}
+
+interface Reloadable : Comparable<Reloadable> {
+    fun reload()
+    
+    override fun compareTo(other: Reloadable): Int {
+        if (other !is ConfigReloadable<*>) {
+            return -1
+        }
+        if (this is ConfigReloadable<*>) {
+            return 0
+        }
+        return 1
+    }
 }

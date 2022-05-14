@@ -17,7 +17,7 @@ import kotlin.reflect.KProperty
 
 sealed class NovaEnergyHolder(
     final override val endPoint: NetworkedTileEntity,
-    private val defaultMaxEnergy: Long,
+    defaultMaxEnergy: Long,
     protected val upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : EnergyHolder {
@@ -26,6 +26,12 @@ sealed class NovaEnergyHolder(
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
         endPoint.retrieveEnumMap("energyConfig") { lazyDefaultConfig() }
+    
+    var defaultMaxEnergy = defaultMaxEnergy
+        set(value) {
+            field = value
+            handleUpgradesUpdate()
+        }
     
     var maxEnergy = (defaultMaxEnergy * (upgradeHolder?.getValue(UpgradeType.ENERGY) ?: 1.0)).toLong()
     

@@ -7,6 +7,6 @@ interface ItemBridge : NetworkBridge {
     /**
      * How many items can be transferred per second.
      */
-    val itemTransferRate: Int
+    var itemTransferRate: Int
     
 }
