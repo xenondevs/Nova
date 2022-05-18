@@ -21,7 +21,7 @@ private val ABILITIES_KEY = NamespacedKey(NOVA, "abilities_0.9")
 
 object AbilityManager : Initializable(), Listener {
     
-    private val activeAbilities = HashMap<Player, HashMap<AbilityType<*>, Ability>>()
+    val activeAbilities = HashMap<Player, HashMap<AbilityType<*>, Ability>>()
     
     override val inMainThread = true
     override val dependsOn = setOf(AddonsInitializer)
