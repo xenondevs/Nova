@@ -14,6 +14,7 @@ import net.minecraft.commands.arguments.selector.EntitySelector
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -47,9 +48,9 @@ object NovaCommand : Command("nova") {
                     .apply {
                         ItemCategories.OBTAINABLE_MATERIALS.forEach { material ->
                             then(literal(material.id.toString())
-                                .executesCatching { handleGiveTo(it, material, 1) }
+                                .executesCatching { giveTo(it, material, 1) }
                                 .then(argument("amount", IntegerArgumentType.integer())
-                                    .executesCatching { handleGiveTo(it, material) }))
+                                    .executesCatching { giveTo(it, material) }))
                         }
                     }))
             .then(literal("debug")
@@ -79,19 +80,28 @@ object NovaCommand : Command("nova") {
                 .executesCatching(::sendAddons))
             .then(literal("createResourcePack")
                 .requiresPermission("nova.command.zip")
-                .executesCatching(::handleCreateResourcePack))
+                .executesCatching(::createResourcePack))
             .then(literal("reload")
                 .requiresPermission("nova.command.reload")
-                .executesCatching(::handleReload))
+                .then(literal("configs")
+                    .executesCatching(::reloadConfigs))
+                .then(literal("recipes")
+                    .executesCatching(::reloadRecipes)))
     }
     
-    private fun handleReload(ctx: CommandContext<CommandSourceStack>) {
+    private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
         ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_configs.start"))
         NovaConfig.reload()
         ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_configs.success"))
     }
     
-    private fun handleCreateResourcePack(ctx: CommandContext<CommandSourceStack>) {
+    private fun reloadRecipes(ctx: CommandContext<CommandSourceStack>) {
+        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_recipes.start"))
+        RecipeManager.reload()
+        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_recipes.success"))
+    }
+    
+    private fun createResourcePack(ctx: CommandContext<CommandSourceStack>) {
         runAsyncTask {
             ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.create_resource_pack.start"))
             Resources.createResourcePack()
@@ -99,10 +109,10 @@ object NovaCommand : Command("nova") {
         }
     }
     
-    private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial) =
-        handleGiveTo(ctx, material, ctx["amount"])
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial) =
+        giveTo(ctx, material, ctx["amount"])
     
-    private fun handleGiveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial, amount: Int) {
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial, amount: Int) {
         val itemName = material.localizedName.ifBlank { material.id.toString() }
         
         val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)

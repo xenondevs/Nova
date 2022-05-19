@@ -115,7 +115,10 @@ object RecipeManager : Initializable(), Listener {
     override fun init() {
         LOGGER.info("Loading recipes")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        
+        loadRecipes()
+    }
+    
+    private fun loadRecipes() {
         RecipesLoader.loadRecipes().forEach { recipe ->
             when (recipe) {
                 is Recipe -> {
@@ -175,6 +178,21 @@ object RecipeManager : Initializable(), Listener {
                 else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
             }
         }
+    }
+    
+    fun reload() {
+        vanillaRegisteredRecipeKeys.forEach { minecraftServer.recipeManager.removeRecipe(it.resourceLocation) }
+        
+        shapedRecipes.clear()
+        shapelessRecipes.clear()
+        furnaceRecipes.clear()
+        vanillaRegisteredRecipeKeys.clear()
+        _fakeRecipes.clear()
+        _novaRecipes.clear()
+        
+        loadRecipes()
+        RecipeRegistry.init()
+        RecipeTypeRegistry.types.forEach { it.group?.invalidateCache() }
     }
     
     @Suppress("UNCHECKED_CAST")
