@@ -7,13 +7,14 @@ import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.initialize.Initializable
 import java.io.File
 
-object AutoUploadManager : Initializable() {
+internal object AutoUploadManager : Initializable() {
     
-    internal var enabled = false
+    private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost)
+    
     override val inMainThread = false
     override val dependsOn = setOf(NovaConfig)
     
-    private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost)
+    private var enabled = false
     private lateinit var selectedService: UploadService
     
     override fun init() {
@@ -28,6 +29,15 @@ object AutoUploadManager : Initializable() {
         
         this.selectedService = service
         service.loadConfig(config)
+    }
+    
+    override fun disable() {
+        if (enabled) selectedService.disable()
+    }
+    
+    fun reload() {
+        disable()
+        init()
     }
     
     suspend fun uploadPack(pack: File): String {

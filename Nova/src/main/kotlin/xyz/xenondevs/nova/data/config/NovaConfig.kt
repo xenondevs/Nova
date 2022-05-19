@@ -4,14 +4,18 @@ import org.bukkit.configuration.file.YamlConfiguration
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
+import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry
+import xyz.xenondevs.nova.ui.overlay.ActionbarOverlayManager
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
+import xyz.xenondevs.nova.world.ChunkReloadWatcher
+import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -72,6 +76,10 @@ object NovaConfig : Initializable() {
         TileEntityManager.tileEntities.forEach(Reloadable::reload)
         NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
         AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)
+        AutoUploadManager.reload()
+        ActionbarOverlayManager.reload()
+        TileEntityLimits.reload()
+        ChunkReloadWatcher.reload()
     }
     
     operator fun get(name: String): YamlConfiguration =

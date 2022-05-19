@@ -16,18 +16,19 @@ import xyz.xenondevs.nova.util.startsWithAny
 import java.io.File
 import kotlin.concurrent.thread
 
-object SelfHost : UploadService {
+internal object SelfHost : UploadService {
     
     private val selfHostDir = File(NOVA.dataFolder, "ResourcePack/autohost")
     private val packFile = File(selfHostDir, "pack.zip")
+    private lateinit var server: NettyApplicationEngine
     
     override val name = "SelfHost"
     
-    lateinit var host: String
-    var port = 38519
-    var portNeeded = true
+    private lateinit var host: String
+    private var port = 38519
+    private var portNeeded = true
     
-    val url: String
+    private val url: String
         get() = buildString {
             if (!host.startsWithAny("http://", "https://"))
                 append("http://")
@@ -44,8 +45,6 @@ object SelfHost : UploadService {
         if (port != null) this.port = port
         portNeeded = cfg.getBooleanOrNull("portNeeded") ?: (configuredHost != null)
         
-        var server: NettyApplicationEngine? = null
-        
         thread(name = "ResourcePack Server", isDaemon = true) {
             server = embeddedServer(Netty, port = this.port) {
                 routing {
@@ -55,9 +54,12 @@ object SelfHost : UploadService {
                     }
                 }
             }
-            server!!.start(wait = true)
+            server.start(wait = true)
         }
-        NOVA.disableHandlers += { server!!.stop(1000, 1000) }
+    }
+    
+    override fun disable() {
+        server.stop(1000, 1000)
     }
     
     override suspend fun upload(file: File): String {

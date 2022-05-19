@@ -36,12 +36,6 @@ object ConfigExtractor {
     private fun updateExistingConfig(file: File, storedCfg: YamlConfiguration, internalCfg: YamlConfiguration): YamlConfiguration {
         val cfg = YamlConfiguration.loadConfiguration(file)
         
-        // remove keys that no longer exist
-        cfg.getKeys(true).filterNot(internalCfg::isSet).forEach { path ->
-            cfg.set(path, null)
-            storedCfg.set(path, null)
-        }
-        
         // add keys that are new
         internalCfg.getKeys(true).filterNot(cfg::isSet).forEach { path ->
             val internalValue = internalCfg.get(path)

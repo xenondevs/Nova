@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world
 
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import xyz.xenondevs.nova.LOGGER
@@ -21,6 +22,11 @@ object ChunkReloadWatcher : Initializable(), Listener {
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
+        reload()
+    }
+    
+    fun reload() {
+        HandlerList.unregisterAll(this)
         if (DEFAULT_CONFIG.getBoolean("debug.watch_chunk_reloads"))
             Bukkit.getPluginManager().registerEvents(this, NOVA)
     }

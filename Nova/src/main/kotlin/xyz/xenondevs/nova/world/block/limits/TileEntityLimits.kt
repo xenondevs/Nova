@@ -7,9 +7,13 @@ import java.util.logging.Level
 
 object TileEntityLimits {
     
-    private val limiters: List<BlockLimiter>
+    private lateinit var limiters: List<BlockLimiter>
     
     init {
+        reload()
+    }
+    
+    fun reload() {
         val limiters = ArrayList<BlockLimiter>()
         
         try {

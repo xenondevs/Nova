@@ -18,14 +18,15 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
 import xyz.xenondevs.nova.world.chunkPos
 import java.util.concurrent.CopyOnWriteArrayList
 
 var Player.armorStandRenderDistance: Int
-    get() = persistentDataContainer
-        .get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER)
-        ?: DEFAULT_RENDER_DISTANCE
+    get() = (persistentDataContainer.get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER) ?: DEFAULT_RENDER_DISTANCE)
+        .coerceIn(MIN_RENDER_DISTANCE..MAX_RENDER_DISTANCE)
     set(value) =
         persistentDataContainer.set(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER, value)
 

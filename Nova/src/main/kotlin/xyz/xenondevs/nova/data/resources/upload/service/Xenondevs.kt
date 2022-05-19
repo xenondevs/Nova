@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.data.http.BinaryBufferedBody
 import java.io.File
 
-object Xenondevs : UploadService {
+internal object Xenondevs : UploadService {
     
     private const val API_URL = "https://api.xenondevs.xyz/nova/rp/patreon/upload"
     
@@ -42,5 +42,7 @@ object Xenondevs : UploadService {
         println("uploaded!: $url")
         return url
     }
+    
+    override fun disable() = Unit
     
 }
