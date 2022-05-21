@@ -39,6 +39,22 @@ object NumberFormatUtils {
     
     private val NUMBER_FORMAT = NumberFormat.getInstance(Locale.US).apply { isGroupingUsed = true }
     
+    private val ROMAN_NUMERALS = treeMapOf(
+        1 to "I",
+        4 to "IV",
+        5 to "V",
+        9 to "IX",
+        10 to "X",
+        40 to "XL",
+        50 to "L",
+        90 to "XC",
+        100 to "C",
+        400 to "CD",
+        500 to "D",
+        900 to "CM",
+        1000 to "M"
+    )
+    
     fun getEnergyString(energy: Long): String =
         if (GlobalValues.USE_METRIC_PREFIXES)
             getSoleString(IGNORED_ENERGY_PREFIXES, BigDecimal(energy), "J")
@@ -85,6 +101,13 @@ object NumberFormatUtils {
         
         val prefixedUnit = "${prefix.prefixSymbol}$unit"
         return "§r$prefixedNumber $prefixedUnit / $prefixedMaxNumber $prefixedUnit"
+    }
+    
+    fun getRomanNumeral(number: Int): String {
+        val l = ROMAN_NUMERALS.floorKey(number)
+        if (number == l)
+            return ROMAN_NUMERALS[number]!!
+        return  ROMAN_NUMERALS[l]!! + getRomanNumeral(number - l)
     }
     
 }

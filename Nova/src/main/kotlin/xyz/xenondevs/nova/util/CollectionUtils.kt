@@ -179,3 +179,5 @@ inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
 inline fun <T> List<T>.mapToIntArray(transform: (T) -> Int): IntArray {
     return IntArray(size) { transform(get(it)) }
 }
+
+fun <K, V> treeMapOf(vararg pairs: Pair<K, V>) = TreeMap<K, V>().apply { putAll(pairs) }

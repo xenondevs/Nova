@@ -4,6 +4,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.data.GSON
 import java.io.File
 
@@ -22,12 +23,18 @@ internal class LanguageContent(private val builder: ResourcePackBuilder) : PackC
     }
     
     override fun write() {
+        extractRomanNumerals(languageLookup["en_us"]!!)
         Resources.updateLanguageLookup(languageLookup)
         languageLookup.forEach { (name, content) ->
             val file = File(builder.languageDir, "$name.json")
             file.parentFile.mkdirs()
             file.writeText(GSON.toJson(content))
         }
+    }
+    
+    private fun extractRomanNumerals(map: HashMap<String, String>) {
+        for (i in 6..254)
+            map["potion.potency.$i"] = NumberFormatUtils.getRomanNumeral(i + 1)
     }
     
 }
