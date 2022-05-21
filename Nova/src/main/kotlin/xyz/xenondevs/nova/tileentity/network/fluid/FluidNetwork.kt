@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.fluid
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.fluid.channel.FluidNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
@@ -116,6 +117,10 @@ class FluidNetwork(override val uuid: UUID) : Network {
     
     override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
     
+    override fun reload() {
+        transferRate = bridges.firstOrNull()?.fluidTransferRate ?: DEFAULT_TRANSFER_RATE
+    }
+    
     override fun handleTick() {
         val startingChannel = nextChannel
         var amountLeft = transferRate
@@ -130,7 +135,7 @@ class FluidNetwork(override val uuid: UUID) : Network {
     companion object {
         
         const val CHANNEL_AMOUNT = 4
-        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.fluid.default_transfer_rate")
+        private val DEFAULT_TRANSFER_RATE by configReloadable { DEFAULT_CONFIG.getLong("network.fluid.default_transfer_rate") }
         
     }
     

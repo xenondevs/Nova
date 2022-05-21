@@ -45,6 +45,10 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         if (first) NetworkManager.queueAsync { it.addEndPoint(this, true) }
     }
     
+    override fun reload() {
+        holders.forEach { (_, holder) -> holder.reload() }
+    }
+    
     override fun saveData() {
         super.saveData()
         holders.values.forEach(EndPointDataHolder::saveData)

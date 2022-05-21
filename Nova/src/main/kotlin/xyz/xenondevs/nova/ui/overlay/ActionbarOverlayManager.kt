@@ -7,7 +7,9 @@ import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.network.event.clientbound.ActionBarPacketEvent
@@ -20,14 +22,26 @@ import java.util.*
 
 object ActionbarOverlayManager : Listener {
     
+    private var tickTask: BukkitTask? = null
+    
     private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(TextComponent(""))
     private val overlays = HashMap<UUID, HashSet<ActionbarOverlay>>()
     private val interceptedActionbars = HashMap<UUID, Pair<ArrayList<BaseComponent>, Long>>()
     
     init {
+        reload()
+    }
+    
+    fun reload() {
+        if (tickTask != null) {
+            tickTask?.cancel()
+            HandlerList.unregisterAll(this)
+            tickTask = null
+        }
+        
         if (DEFAULT_CONFIG.getBoolean("actionbar_overlay.enabled")) {
             Bukkit.getPluginManager().registerEvents(this, NOVA)
-            runTaskTimer(0, 1, ::handleTick)
+            tickTask = runTaskTimer(0, 1, ::handleTick)
         }
     }
     

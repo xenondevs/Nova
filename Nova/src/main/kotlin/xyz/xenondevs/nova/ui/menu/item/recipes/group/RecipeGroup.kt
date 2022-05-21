@@ -19,6 +19,10 @@ abstract class RecipeGroup : Comparable<RecipeGroup> {
         return guiCache.getOrPut(container) { createGUI(container) }
     }
     
+    fun invalidateCache() {
+        guiCache.clear()
+    }
+    
     override fun compareTo(other: RecipeGroup): Int {
         return this.priority.compareTo(other.priority)
     }

@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.getIntOrNull
 import java.io.File
@@ -90,13 +91,7 @@ enum class MaterialType {
     ALWAYS_CONSUMABLE,
     FAST_CONSUMABLE;
     
-    val material: Material
-    val modelDataStart: Int
-    
-    init {
-        val section = DEFAULT_CONFIG.getConfigurationSection("resource_pack.materials.${name.lowercase()}")!!
-        material = Material.valueOf(section.getString("type")!!.uppercase())
-        modelDataStart = section.getIntOrNull("modelDataStart")!!
-    }
+    val material: Material by configReloadable { DEFAULT_CONFIG.getString("resource_pack.materials.${name.lowercase()}.type")!!.let { Material.valueOf(it.uppercase()) } }
+    val modelDataStart: Int by configReloadable { DEFAULT_CONFIG.getIntOrNull("resource_pack.materials.${name.lowercase()}.modelDataStart")!! }
     
 }

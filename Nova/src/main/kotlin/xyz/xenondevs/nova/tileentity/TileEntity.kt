@@ -12,6 +12,8 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.Reloadable
+import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
 import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
@@ -24,6 +26,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.overlay.GUITexture
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.BlockPos
@@ -38,7 +41,7 @@ import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 val SELF_UPDATE_REASON = object : UpdateReason {}
 val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
 
-abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), ITileEntity {
+abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), Reloadable, ITileEntity {
     
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid
@@ -157,6 +160,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         return false
     }
     
+    fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder =
+        UpgradeHolder(this, gui!!, ::reload, *allowed)
+    
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
      * When [dropItems] is true, the [VirtualInventory] will automatically be
@@ -199,7 +205,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getFluidContainer(
         name: String,
         types: Set<FluidType>,
-        capacity: Long,
+        capacity: ValueReloadable<Long>,
         defaultAmount: Long = 0,
         updateHandler: (() -> Unit)? = null,
         upgradeHolder: UpgradeHolder? = null,

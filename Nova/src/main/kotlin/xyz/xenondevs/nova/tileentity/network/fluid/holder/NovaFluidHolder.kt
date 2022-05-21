@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.associateWithToEnumMap
@@ -81,6 +82,10 @@ class NovaFluidHolder(
     
     override val extractPriorities: MutableMap<BlockFace, Int> =
         dataHolder.retrieveEnumMap("fluidExtractPriorities", DEFAULT_PRIORITIES)
+    
+    override fun reload() {
+        availableContainers.forEach { (_, container) -> if (container is NovaFluidContainer) container.reload() }
+    }
     
     override fun saveData() {
         dataHolder.storeEnumMap("channels", channels)

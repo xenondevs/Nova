@@ -157,7 +157,7 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
                 player.inventory.itemInMainHand.takeUnlessAir()
             )
             // Drop items
-            if (player.gameMode != GameMode.CREATIVE && drops)
+            if (player.gameMode == GameMode.CREATIVE || drops)
                 blockState.pos.location.dropItems(material.novaBlock.getDrops(blockState, ctx))
             // If the block broke instantaneously for the client, the effects will also be played clientside
             block.remove(ctx, calculateClientsideDamage() < 1)

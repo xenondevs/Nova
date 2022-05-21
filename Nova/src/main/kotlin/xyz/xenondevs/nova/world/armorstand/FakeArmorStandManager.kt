@@ -11,29 +11,31 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
 import xyz.xenondevs.nova.world.chunkPos
 import java.util.concurrent.CopyOnWriteArrayList
 
 var Player.armorStandRenderDistance: Int
-    get() = persistentDataContainer
-        .get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER)
-        ?: DEFAULT_RENDER_DISTANCE
+    get() = (persistentDataContainer.get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER) ?: DEFAULT_RENDER_DISTANCE)
+        .coerceIn(MIN_RENDER_DISTANCE..MAX_RENDER_DISTANCE)
     set(value) =
         persistentDataContainer.set(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER, value)
 
 object FakeArmorStandManager : Initializable(), Listener {
     
     val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "armor_stand_render_distance")
-    val DEFAULT_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.default")
-    val MIN_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.min")
-    val MAX_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.max")
+    val DEFAULT_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.default") }
+    val MIN_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.min") }
+    val MAX_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.max") }
     
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()

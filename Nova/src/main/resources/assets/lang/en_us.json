@@ -85,6 +85,10 @@
   "command.nova.network_reload.success": "All active networks have been reloaded.",
   "command.nova.create_resource_pack.start": "Creating resource pack... please wait",
   "command.nova.create_resource_pack.success": "Resource pack created.",
+  "command.nova.reload_configs.start": "Reloading configs...",
+  "command.nova.reload_configs.success": "Reloaded configs.",
+  "command.nova.reload_recipes.start": "Reloading recipes...",
+  "command.nova.reload_recipes.success": "Reloaded recipes.",
   
   "nova.tile_entity_limits.world_blacklist.deny": "You are not allowed to place any blocks from Nova in this world.",
   "nova.tile_entity_limits.type_world_blacklist.deny": "You are not allowed to place this block in this world.",

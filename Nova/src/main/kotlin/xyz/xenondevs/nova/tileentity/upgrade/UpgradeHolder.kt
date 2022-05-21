@@ -18,10 +18,10 @@ private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
     return UpgradeTypeRegistry.of(novaMaterial)
 }
 
-class UpgradeHolder(
+class UpgradeHolder internal constructor(
     tileEntity: TileEntity,
     val lazyGUI: Lazy<TileEntityGUI>,
-    private val defaultUpdateHandler: (() -> Unit)?,
+    private val updateHandler: (() -> Unit)?,
     vararg allowed: UpgradeType<*>
 ) {
     
@@ -35,10 +35,6 @@ class UpgradeHolder(
             ?: HashMap()
     
     val gui by lazy { UpgradesGUI(this) { lazyGUI.value.openWindow(it) } }
-    val upgradeUpdateHandlers = ArrayList<() -> Unit>()
-    
-    constructor(tileEntity: TileEntity, lazyGUI: Lazy<TileEntityGUI>, vararg allowed: UpgradeType<*>) :
-        this(tileEntity, lazyGUI, null, allowed = allowed)
     
     /**
      * Tries adding the given amount of upgrades and
@@ -131,8 +127,7 @@ class UpgradeHolder(
     
     private fun handleUpgradeUpdates() {
         gui.updateUpgrades()
-        upgradeUpdateHandlers.forEach { it() }
-        defaultUpdateHandler?.invoke() // This is separate from the arraylist, so it is always called last.
+        updateHandler?.invoke()
     }
     
     fun dropUpgrades() = upgrades.map { (type, amount) -> type.item.createItemStack(amount) }
