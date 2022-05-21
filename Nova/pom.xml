@@ -20,7 +20,7 @@
         <zip4j.version>2.10.0</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
         <invui.version>0.6-SNAPSHOT</invui.version>
-        <ktor.version>2.0.0</ktor.version>
+        <ktor.version>2.0.1</ktor.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>
 
@@ -322,7 +322,7 @@
         <dependency>
             <groupId>com.plotsquared</groupId>
             <artifactId>PlotSquared-Bukkit</artifactId>
-            <version>6.4.0</version>
+            <version>6.6.3</version>
             <scope>provided</scope>
             <exclusions>
                 <!-- PS Bukkit Deps -->
@@ -446,13 +446,13 @@
         <dependency>
             <groupId>dev.espi</groupId>
             <artifactId>protectionstones</artifactId>
-            <version>2.9.0</version>
+            <version>2.10.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.maxgamer</groupId>
             <artifactId>QuickShop</artifactId>
-            <version>5.1.0.5</version>
+            <version>5.1.0.6</version>
             <scope>provided</scope>
         </dependency>
 
