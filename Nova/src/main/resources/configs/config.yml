@@ -66,3 +66,7 @@ debug:
 
 # If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
 use_metric_prefixes: false
+
+update-reminder:
+  # If update reminders should be shown.
+  enabled: true

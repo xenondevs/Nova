@@ -6,6 +6,8 @@ import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
@@ -15,14 +17,16 @@ import java.net.URL
 object UpdateReminder : Initializable(), Listener {
     
     override val inMainThread = false
-    override val dependsOn = emptySet<Initializable>()
+    override val dependsOn = setOf(NovaConfig)
+    
+    private val enabled = DEFAULT_CONFIG.getBoolean("update-reminder.enabled", true)
     
     @Volatile
     private var needsUpdate = false
     private var taskId: Int = -1
     
     override fun init() {
-        if (NOVA.isDevBuild) return
+        if (NOVA.isDevBuild || !enabled) return
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         taskId = runAsyncTaskTimer(0, 12000) {
             checkVersion()
