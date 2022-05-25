@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.player.attachment.Attachment
-import xyz.xenondevs.nova.world.loot.LootInfo
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*
@@ -163,6 +162,9 @@ fun JsonArray.getAllDoubles() =
 
 fun JsonArray.getAllInts() =
     filter(JsonElement::isNumber).map { it.asInt }
+
+fun JsonArray.getAllJsonObjects() =
+    filterIsInstance<JsonObject>()
 
 fun <T> JsonArray.toStringList(consumer: (List<String>) -> T) =
     consumer(this.filter(JsonElement::isString).map(JsonElement::getAsString))

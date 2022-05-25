@@ -20,7 +20,14 @@ interface RecipeDeserializer<T> {
             element is JsonArray -> element.getAllStrings()
             element.isString() -> listOf(element.asString)
             else -> throw IllegalArgumentException()
+        }.map { ids ->
+            // Id fallbacks
+            ids.replace(" ", "")
+                .split(';')
+                .firstOrNull(ItemUtils::isIdRegistered)
+                ?: throw IllegalArgumentException("Invalid item id(s): $ids")
         }
+        
         return ItemUtils.getRecipeChoice(nameList)
     }
     

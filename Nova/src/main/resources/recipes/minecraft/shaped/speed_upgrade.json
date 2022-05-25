@@ -8,8 +8,8 @@
   "ingredients": {
     "r": "minecraft:redstone",
     "g": "minecraft:gold_ingot",
-    "i": "nova:iron_plate",
-    "a": "nova:gold_gear",
+    "i": "nova:iron_plate; minecraft:paper",
+    "a": "nova:gold_gear; minecraft:gold_ingot",
     "e": "minecraft:emerald"
   }
 }

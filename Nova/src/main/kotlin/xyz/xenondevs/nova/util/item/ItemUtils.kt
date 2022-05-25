@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.*
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
@@ -134,6 +135,20 @@ object ItemUtils {
         Items.WHITE_SHULKER_BOX,
         Items.YELLOW_SHULKER_BOX
     )
+    
+    fun isIdRegistered(id: String): Boolean {
+        try {
+            val nid = NamespacedId.of(id, "minecraft")
+            return when (nid.namespace) {
+                "minecraft" -> runCatching { Material.valueOf(nid.name.uppercase()) }.isSuccess
+                "nova" -> NovaMaterialRegistry.getNonNamespaced(nid.name).isNotEmpty()
+                else -> NovaMaterialRegistry.getOrNull(id) != null || CustomItemServiceManager.getItemByName(id) != null
+            }
+        } catch(ignored: Exception) {
+        }
+        
+        return false
+    }
     
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {
         val tests = nameList.map { id ->

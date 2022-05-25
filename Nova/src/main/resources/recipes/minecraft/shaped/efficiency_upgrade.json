@@ -1,15 +1,15 @@
 {
   "result": "nova:efficiency_upgrade",
   "shape": [
-    "dnd",
+    "lnl",
     "nin",
     "aga"
   ],
   "ingredients": {
-    "d": "nova:lapis_dust",
+    "l": "nova:lapis_dust; minecraft:lapis_lazuli",
     "n": "minecraft:iron_ingot",
-    "i": "nova:iron_plate",
-    "g": "nova:emerald_gear",
+    "i": "nova:iron_plate; minecraft:paper",
+    "g": "nova:emerald_gear; minecraft:lapis_lazuli",
     "a": "minecraft:amethyst_shard"
   }
 }
