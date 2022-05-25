@@ -540,7 +540,7 @@
             <plugin>
                 <groupId>xyz.xenondevs</groupId>
                 <artifactId>string-remapper-maven-plugin</artifactId>
-                <version>0.5</version>
+                <version>0.6</version>
 
                 <executions>
                     <execution>
