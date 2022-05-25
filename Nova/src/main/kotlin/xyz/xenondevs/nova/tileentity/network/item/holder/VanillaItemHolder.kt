@@ -17,7 +17,7 @@ abstract class VanillaItemHolder(
 ) : ItemHolder {
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        endPoint.retrieveEnumMap("itemConfig") { CUBE_FACES.associateWithTo(emptyEnumMap()) { NetworkConnectionType.BUFFER } }
+        endPoint.retrieveEnumMap("itemConfig") { CUBE_FACES.associateWithTo(emptyEnumMap()) { NetworkConnectionType.INSERT } }
     
     open override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType> by lazy {
         inventories.entries.associate { (_, inv) -> inv to NetworkConnectionType.BUFFER }

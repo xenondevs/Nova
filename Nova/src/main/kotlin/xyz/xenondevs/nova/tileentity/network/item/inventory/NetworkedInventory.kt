@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkException
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.isFull
 
 private val UPDATE_REASON = CustomUpdateReason("NetworkedVirtualInventory")
 
@@ -46,6 +47,11 @@ interface NetworkedInventory {
      */
     fun decrementByOne(slot: Int)
     
+    /**
+     * If all slots of this inventory are filled up to their max stack size
+     */
+    fun isFull(): Boolean
+    
 }
 
 /**
@@ -71,6 +77,10 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
     override fun decrementByOne(slot: Int) {
         if (virtualInventory.addItemAmount(UPDATE_REASON, slot, -1) != -1)
             throwNetworkException()
+    }
+    
+    override fun isFull(): Boolean {
+        return virtualInventory.isFull()
     }
     
     override fun equals(other: Any?) =
@@ -106,6 +116,10 @@ open class NetworkedBukkitInventory(val inventory: Inventory) : NetworkedInvento
     override fun decrementByOne(slot: Int) {
         val item = inventory.getItem(slot)
         if (item != null) item.amount -= 1
+    }
+    
+    override fun isFull(): Boolean {
+        return inventory.isFull()
     }
     
     override fun equals(other: Any?) =
@@ -179,6 +193,16 @@ class NetworkedRangedBukkitInventory(
         }
         
         return amount
+    }
+    
+    override fun isFull(): Boolean {
+        for (slot in slots) {
+            val item = inventory.getItem(slot)
+            if (item == null || item.amount < item.type.maxStackSize)
+                return false
+        }
+        
+        return true
     }
     
     override fun equals(other: Any?) =

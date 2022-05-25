@@ -26,6 +26,16 @@ fun VirtualInventory.isFull(): Boolean {
 }
 
 /**
+ * Checks if an [Inventory] is full.
+ */
+fun Inventory.isFull(): Boolean {
+    for (item in contents)
+        if (item == null || item.amount < item.type.maxStackSize)
+            return false
+    return true
+}
+
+/**
  * Checks if a [VirtualInventory] has an empty slot.
  */
 fun VirtualInventory.hasEmptySlot(): Boolean =
