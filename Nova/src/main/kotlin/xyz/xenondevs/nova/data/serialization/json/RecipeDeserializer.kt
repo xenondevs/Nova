@@ -24,7 +24,7 @@ interface RecipeDeserializer<T> {
             // Id fallbacks
             ids.replace(" ", "")
                 .split(';')
-                .firstOrNull(ItemUtils::isIdRegistered)
+                .firstOrNull { ItemUtils.isIdRegistered(it.substringBefore('{'))}
                 ?: throw IllegalArgumentException("Invalid item id(s): $ids")
         }
         
