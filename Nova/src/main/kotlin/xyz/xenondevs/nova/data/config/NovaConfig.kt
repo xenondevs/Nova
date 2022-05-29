@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.config
 
 import org.bukkit.configuration.file.YamlConfiguration
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
@@ -80,6 +81,7 @@ object NovaConfig : Initializable() {
         ActionbarOverlayManager.reload()
         TileEntityLimits.reload()
         ChunkReloadWatcher.reload()
+        UpdateReminder.reload()
     }
     
     operator fun get(name: String): YamlConfiguration =

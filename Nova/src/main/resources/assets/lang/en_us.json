@@ -95,5 +95,5 @@
   "nova.tile_entity_limits.amount.deny": "You cannot place more blocks of this type.",
   "nova.tile_entity_limits.amount_per_world.deny": "You cannot place more blocks of this type in this world.",
 
-  "nova.outdated_version": "§cYou're running an outdated version of §bNova§c.\nPlease download the latest version at "
+  "nova.outdated_version": "You're running an outdated version of %s.\nPlease download the latest version at %s"
 }

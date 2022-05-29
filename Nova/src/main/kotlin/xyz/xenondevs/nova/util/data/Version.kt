@@ -13,10 +13,10 @@ class Version : Comparable<Version> {
     }
     
     constructor(version: String) {
-        val split = version.split('.')
-        this.major = split.getOrNull(0)?.toInt() ?: 0
-        this.minor = split.getOrNull(1)?.toInt() ?: 0
-        this.patch = split.getOrNull(2)?.toInt() ?: 0
+        val split = version.removeSuffix("-SNAPSHOT").split('.')
+        this.major = split.getOrNull(0)?.toIntOrNull() ?: 0
+        this.minor = split.getOrNull(1)?.toIntOrNull() ?: 0
+        this.patch = split.getOrNull(2)?.toIntOrNull() ?: 0
     }
     
     override fun toString() = "$major.$minor.$patch"
