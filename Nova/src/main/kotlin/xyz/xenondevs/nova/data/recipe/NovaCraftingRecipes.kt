@@ -29,7 +29,7 @@ class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : Sha
         return container.width == width && container.height == height &&
             container.contents.withIndex().all { (index, matrixStack) ->
                 // check if the item stack matches with the given recipe choice
-                val choice = optimizedRecipe.choices[index] ?: return@all matrixStack.isEmpty
+                val choice = optimizedRecipe.choiceMatrix[index] ?: return@all matrixStack.isEmpty
                 return@all matrixStack != null && choice.test(matrixStack.bukkitStack)
             }
     }
