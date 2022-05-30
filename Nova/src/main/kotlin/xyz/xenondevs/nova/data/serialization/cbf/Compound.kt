@@ -54,7 +54,7 @@ class Compound internal constructor(
     
     override fun toString(): String {
         val builder = StringBuilder()
-        builder.append("{\n")
+        builder.append("{")
         (binMap.entries + map.entries).forEach { (key, value) ->
             builder.append("\n\"$key\": $value")
         }
