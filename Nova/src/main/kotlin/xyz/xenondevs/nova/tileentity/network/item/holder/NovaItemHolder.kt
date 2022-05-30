@@ -65,7 +65,7 @@ class NovaItemHolder(
 ) : ItemHolder {
     
     override val inventories: MutableMap<BlockFace, NetworkedInventory> =
-        (endPoint.retrieveOrNull<EnumMap<BlockFace, NetworkedInventory>>("inventories") ?: defaultInvConfig())
+        (endPoint.retrieveOrNull<EnumMap<BlockFace, UUID>>("inventories") ?: defaultInvConfig())
             .mapValuesTo(enumMapOf()) { availableInventories[it.value]!! }
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
