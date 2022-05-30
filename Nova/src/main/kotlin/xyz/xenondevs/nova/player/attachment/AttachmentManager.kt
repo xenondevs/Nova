@@ -9,9 +9,8 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
-import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
+import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundDataType
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.runTaskTimer
 import java.util.*
@@ -75,12 +74,10 @@ object AttachmentManager : Initializable(), Listener {
     }
     
     private fun loadAttachments(player: Player) {
-        val dataContainer = player.persistentDataContainer
-        val compound = dataContainer.get(ATTACHMENTS_KEY, CompoundElementDataType)
-        if (compound != null) {
-            val list = compound.getAssertedElement<ListElement>("attachments")
-            list.toCollection(ArrayList<CompoundElement>()).forEach { Attachment(it) }
-        }
+        player.persistentDataContainer
+            .get(ATTACHMENTS_KEY, CompoundDataType)
+            ?.get<List<Compound>>("attachments")
+            ?.forEach(::Attachment)
     }
     
     private fun saveAndRemoveAttachments(player: Player) {
@@ -93,11 +90,9 @@ object AttachmentManager : Initializable(), Listener {
     
     private fun saveAttachments(player: Player) {
         val dataContainer = player.persistentDataContainer
-        val list = ListElement()
-        val activeAttachments = attachments[player.uniqueId]
+        val activeAttachments = attachments[player.uniqueId]?.toList()
         if (activeAttachments != null && activeAttachments.isNotEmpty()) {
-            activeAttachments.forEach { list += it.toCompoundElement() }
-            dataContainer.set(ATTACHMENTS_KEY, CompoundElementDataType, CompoundElement().apply { putElement("attachments", list) })
+            dataContainer.set(ATTACHMENTS_KEY, CompoundDataType, Compound().apply { set("attachments", activeAttachments) })
         } else dataContainer.remove(ATTACHMENTS_KEY)
     }
     

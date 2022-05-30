@@ -2,21 +2,21 @@ package xyz.xenondevs.nova.data.world.block.state
 
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundDeserializer
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.cbf.CBF
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.world.BlockPos
 
 class VanillaTileEntityState(override val pos: BlockPos, override val id: NamespacedId) : BlockState {
     
-    lateinit var data: CompoundElement
+    lateinit var data: Compound
     lateinit var tileEntity: VanillaTileEntity
     
     constructor(pos: BlockPos, id: String) : this(pos, NamespacedId.of(id))
     
     override fun handleInitialized(placed: Boolean) {
-        if (!::data.isInitialized) data = CompoundElement()
+        if (!::data.isInitialized) data = Compound()
         tileEntity = VanillaTileEntity.of(this)!!
         tileEntity.handleInitialized()
         VanillaTileEntityManager.registerTileEntity(this)
@@ -28,12 +28,12 @@ class VanillaTileEntityState(override val pos: BlockPos, override val id: Namesp
     }
     
     override fun read(buf: ByteBuf) {
-        data = CompoundDeserializer.read(buf)
+        data = CBF.read(buf)!!
     }
     
     override fun write(buf: ByteBuf) {
         tileEntity.saveData()
-        data.write(buf)
+        CBF.write(data, buf)
     }
     
     override fun toString(): String {

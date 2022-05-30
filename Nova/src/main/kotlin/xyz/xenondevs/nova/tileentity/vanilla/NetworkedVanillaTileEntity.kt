@@ -24,14 +24,14 @@ abstract class NetworkedVanillaTileEntity internal constructor(state: VanillaTil
     }
     
     override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? =
-        retrieveEnumMapOrNull("networks")
+        retrieveOrNull<EnumMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
     
     override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? =
-        retrieveEnumMapOrNull("connectedNodes")
+        retrieveOrNull<EnumMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     
     override fun saveData() {
-        storeEnumMap("networks", serializeNetworks())
-        storeEnumMap("connectedNodes", serializeConnectedNodes())
+        storeData("networks", serializeNetworks())
+        storeData("connectedNodes", serializeConnectedNodes())
     }
     
 }

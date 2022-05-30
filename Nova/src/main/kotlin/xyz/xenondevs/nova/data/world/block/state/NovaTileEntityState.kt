@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.data.world.block.state
 
 import io.netty.buffer.ByteBuf
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundDeserializer
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
+import xyz.xenondevs.nova.data.serialization.cbf.CBF
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
+import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundDataType
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -19,7 +19,7 @@ class NovaTileEntityState : NovaBlockState {
     override val material: TileEntityNovaMaterial
     lateinit var uuid: UUID
     lateinit var ownerUUID: UUID
-    lateinit var data: CompoundElement
+    lateinit var data: Compound
     
     lateinit var tileEntity: TileEntity
     
@@ -34,10 +34,10 @@ class NovaTileEntityState : NovaBlockState {
         this.material = material
         this.uuid = UUID.randomUUID()
         this.ownerUUID = ctx.ownerUUID
-        this.data = CompoundElement()
+        this.data = Compound()
         
-        val globalData = ctx.item.itemMeta?.persistentDataContainer?.get(TILE_ENTITY_KEY, CompoundElementDataType)
-        if (globalData != null) data.putElement("global", globalData)
+        val globalData = ctx.item.itemMeta?.persistentDataContainer?.get(TILE_ENTITY_KEY, CompoundDataType)
+        if (globalData != null) data["global"] = globalData
     }
     
     override fun handleInitialized(placed: Boolean) {
@@ -59,7 +59,7 @@ class NovaTileEntityState : NovaBlockState {
         super.read(buf)
         uuid = buf.readUUID()
         ownerUUID = buf.readUUID()
-        data = CompoundDeserializer.read(buf)
+        data = CBF.read(buf)!!
     }
     
     override fun write(buf: ByteBuf) {
@@ -68,7 +68,7 @@ class NovaTileEntityState : NovaBlockState {
         super.write(buf)
         buf.writeUUID(uuid)
         buf.writeUUID(ownerUUID)
-        data.write(buf)
+        CBF.write(data, buf)
     }
     
     override fun toString(): String {

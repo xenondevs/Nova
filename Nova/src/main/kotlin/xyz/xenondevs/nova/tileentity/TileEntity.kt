@@ -15,8 +15,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundElementDataType
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
+import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundDataType
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
@@ -46,7 +46,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid
     val ownerUUID: UUID = blockState.ownerUUID
-    override val data: CompoundElement = blockState.data
+    override val data: Compound = blockState.data
     override val material: TileEntityNovaMaterial = blockState.material
     
     override val owner: OfflinePlayer by lazy { Bukkit.getOfflinePlayer(ownerUUID) }
@@ -82,7 +82,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             val item = material.createItemBuilder(this).get()
             if (globalData.isNotEmpty()) {
                 val itemMeta = item.itemMeta!!
-                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, CompoundElementDataType, globalData)
+                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, CompoundDataType, globalData)
                 item.itemMeta = itemMeta
             }
             
@@ -103,9 +103,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         
         inventories.forEach { storeData("inventory.${it.uuid}", it) }
         fluidContainers.forEach { (container, global) ->
-            val data = CompoundElement()
-            data.put("amount", container.amount)
-            data.put("type", container.type)
+            val data = Compound()
+            data["amount"] = container.amount
+            data["type"] = container.type
             storeData("fluidContainer.${container.uuid}", data, global)
         }
     }
@@ -213,9 +213,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): FluidContainer {
         val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
         
-        val fluidData = retrieveOrNull<CompoundElement>("fluidContainer.$uuid")
-        val storedAmount = fluidData?.getAsserted<Long>("amount")
-        val storedType = fluidData?.getEnumConstant<FluidType>("type")
+        val fluidData = retrieveOrNull<Compound>("fluidContainer.$uuid")
+        val storedAmount = fluidData?.get<Long>("amount")
+        val storedType = fluidData?.get<FluidType>("type")
         
         val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, storedAmount
             ?: defaultAmount, capacity, upgradeHolder)

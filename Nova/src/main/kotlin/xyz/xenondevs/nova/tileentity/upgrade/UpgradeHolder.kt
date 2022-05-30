@@ -4,7 +4,7 @@ import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.InventoryUpdatedEvent
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.TileEntityGUI
@@ -29,10 +29,8 @@ class UpgradeHolder internal constructor(
     val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handlePreInvUpdate); setInventoryUpdatedHandler(::handlePostInvUpdate) }
     val allowed: Set<UpgradeType<*>> = allowed.toSet()
     val upgrades: HashMap<UpgradeType<*>, Int> =
-        tileEntity.retrieveElementOrNull<CompoundElement>("upgrades")
-            ?.toHashMap<Int>()
-            ?.mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of(it.key) }
-            ?: HashMap()
+        tileEntity.retrieveData<Map<String, Int>>("upgrades", ::HashMap)
+            .mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of(it.key) }
     
     val gui by lazy { UpgradesGUI(this) { lazyGUI.value.openWindow(it) } }
     
@@ -132,10 +130,8 @@ class UpgradeHolder internal constructor(
     
     fun dropUpgrades() = upgrades.map { (type, amount) -> type.item.createItemStack(amount) }
     
-    fun save(compound: CompoundElement) {
-        val upgradesCompound = CompoundElement()
-        upgrades.forEach { upgradesCompound.put(it.key.id.toString(), it.value) }
-        compound.putElement("upgrades", upgradesCompound)
+    fun save(compound: Compound) {
+        compound["upgrades"] = upgrades.mapKeys { it.key.id }
     }
     
 }

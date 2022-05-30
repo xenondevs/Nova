@@ -28,7 +28,7 @@ sealed class NovaEnergyHolder(
     val updateHandlers = ArrayList<() -> Unit>()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        endPoint.retrieveEnumMap("energyConfig") { lazyDefaultConfig() }
+        endPoint.retrieveData("energyConfig") { lazyDefaultConfig() }
     
     var maxEnergy = calculateMaxEnergy()
         private set
@@ -54,7 +54,7 @@ sealed class NovaEnergyHolder(
     
     override fun saveData() {
         endPoint.storeData("energy", energy, true)
-        endPoint.storeEnumMap("energyConfig", connectionConfig)
+        endPoint.storeData("energyConfig", connectionConfig)
     }
     
     override fun reload() {

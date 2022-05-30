@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.K_PROPERTY_1_GET_DELEGATE_METHOD
 import java.lang.reflect.*
 import kotlin.jvm.internal.CallableReference
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -47,8 +48,16 @@ inline val <K, reified V> Map<K, V>.valueClass: Class<V>
 
 inline fun <reified T> type(): Type = object : TypeToken<T>() {}.type
 
-val Type.representedClass: Class<*>?
-    get() = runCatching { Class.forName(typeName) }.getOrNull()
+val Type.representedClass: Class<*>
+    get() = when (this) {
+        is ParameterizedType -> rawType as Class<*>
+        is WildcardType -> upperBounds[0] as Class<*>
+        is Class<*> -> this
+        else -> throw IllegalStateException("Type $this is not a class")
+    }
+
+val Type.representedKClass: KClass<*>
+    get() = representedClass.kotlin
 
 fun <T : Enum<*>> enumValueOf(enumClass: Class<T>, name: String): T =
     enumClass.enumConstants.first { it.name == name }

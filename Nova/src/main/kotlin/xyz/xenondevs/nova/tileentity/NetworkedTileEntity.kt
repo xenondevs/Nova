@@ -52,16 +52,16 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     override fun saveData() {
         super.saveData()
         holders.values.forEach(EndPointDataHolder::saveData)
-        storeEnumMap("networks", serializeNetworks())
-        storeEnumMap("connectedNodes", serializeConnectedNodes())
+        storeData("networks", serializeNetworks())
+        storeData("connectedNodes", serializeConnectedNodes())
     }
     
     override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveEnumMapOrNull("networks")
+        return retrieveOrNull<EnumMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
     }
     
     override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveEnumMapOrNull("connectedNodes")
+        return retrieveOrNull<EnumMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     }
     
     final override fun handleRightClick(ctx: BlockInteractContext): Boolean {

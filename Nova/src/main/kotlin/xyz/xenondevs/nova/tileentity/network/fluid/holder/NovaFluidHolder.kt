@@ -67,34 +67,34 @@ class NovaFluidHolder(
 ) : FluidHolder {
     
     override val containerConfig: MutableMap<BlockFace, FluidContainer> =
-        (dataHolder.retrieveEnumMapOrNull<BlockFace, UUID>("fluidContainerConfig")
+        (dataHolder.retrieveOrNull<EnumMap<BlockFace, UUID>>("fluidContainerConfig")
             ?.mapValuesTo(emptyEnumMap()) { availableContainers[it.value] })
             ?: defaultContainerConfig()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        dataHolder.retrieveEnumMap("fluidConnectionConfig", defaultConnectionConfig ?: DEFAULT_CONNECTION_CONFIG)
+        dataHolder.retrieveData("fluidConnectionConfig", defaultConnectionConfig ?: DEFAULT_CONNECTION_CONFIG)
     
     override val channels: MutableMap<BlockFace, Int> =
-        dataHolder.retrieveEnumMap("fluidChannels", DEFAULT_CHANNEL_CONFIG)
+        dataHolder.retrieveData("fluidChannels", DEFAULT_CHANNEL_CONFIG)
     
     override val insertPriorities: MutableMap<BlockFace, Int> =
-        dataHolder.retrieveEnumMap("fluidInsertPriorities", DEFAULT_PRIORITIES)
+        dataHolder.retrieveData("fluidInsertPriorities", DEFAULT_PRIORITIES)
     
     override val extractPriorities: MutableMap<BlockFace, Int> =
-        dataHolder.retrieveEnumMap("fluidExtractPriorities", DEFAULT_PRIORITIES)
+        dataHolder.retrieveData("fluidExtractPriorities", DEFAULT_PRIORITIES)
     
     override fun reload() {
         availableContainers.forEach { (_, container) -> if (container is NovaFluidContainer) container.reload() }
     }
     
     override fun saveData() {
-        dataHolder.storeEnumMap("channels", channels)
-        dataHolder.storeEnumMap("fluidConnectionConfig", connectionConfig)
-        dataHolder.storeEnumMap("fluidInsertPriorities", insertPriorities)
-        dataHolder.storeEnumMap("fluidExtractPriorities", extractPriorities)
+        dataHolder.storeData("channels", channels)
+        dataHolder.storeData("fluidConnectionConfig", connectionConfig)
+        dataHolder.storeData("fluidInsertPriorities", insertPriorities)
+        dataHolder.storeData("fluidExtractPriorities", extractPriorities)
         
         if (availableContainers.isNotEmpty()) {
-            dataHolder.storeEnumMap("fluidContainerConfig", containerConfig.mapValues { it.value.uuid })
+            dataHolder.storeData("fluidContainerConfig", containerConfig.mapValues { it.value.uuid })
         }
     }
     

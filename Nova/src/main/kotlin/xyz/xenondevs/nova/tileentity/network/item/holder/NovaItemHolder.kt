@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
@@ -65,29 +65,29 @@ class NovaItemHolder(
 ) : ItemHolder {
     
     override val inventories: MutableMap<BlockFace, NetworkedInventory> =
-        (endPoint.retrieveEnumMapOrNull<BlockFace, UUID>("inventories") ?: defaultInvConfig())
+        (endPoint.retrieveOrNull<EnumMap<BlockFace, NetworkedInventory>>("inventories") ?: defaultInvConfig())
             .mapValuesTo(enumMapOf()) { availableInventories[it.value]!! }
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        endPoint.retrieveEnumMap("itemConfig", defaultConnectionConfig
+        endPoint.retrieveData("itemConfig", defaultConnectionConfig
             ?: { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.NONE } })
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveEnumMap<BlockFace, CompoundElement>("insertFilters") { emptyEnumMap() }
+        endPoint.retrieveData<EnumMap<BlockFace, Compound>>("insertFilters") { emptyEnumMap() }
             .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
     
     override val extractFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveEnumMap<BlockFace, CompoundElement>("extractFilters") { emptyEnumMap() }
+        endPoint.retrieveData<EnumMap<BlockFace, Compound>>("extractFilters") { emptyEnumMap() }
             .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
     
     override val insertPriorities: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("insertPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
+        endPoint.retrieveData("insertPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
     
     override val extractPriorities: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("extractPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
+        endPoint.retrieveData("extractPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
     
     override val channels: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("channels") { CUBE_FACES.associateWithToEnumMap { 0 } }
+        endPoint.retrieveData("channels") { CUBE_FACES.associateWithToEnumMap { 0 } }
     
     fun getNetworkedInventory(virtualInventory: VirtualInventory) =
         availableInventories[virtualInventory.uuid]!!
@@ -99,15 +99,15 @@ class NovaItemHolder(
         availableInventories.firstNotNullOfOrNull { if (it.value == networkedInventory) it.key else null }
     
     override fun saveData() {
-        endPoint.storeEnumMap("itemConfig", connectionConfig)
-        endPoint.storeEnumMap("insertFilters", insertFilters) { it.compound }
-        endPoint.storeEnumMap("extractFilters", extractFilters) { it.compound }
-        endPoint.storeEnumMap("channels", channels)
-        endPoint.storeEnumMap("insertPriorities", insertPriorities)
-        endPoint.storeEnumMap("extractPriorities", extractPriorities)
+        endPoint.storeData("itemConfig", connectionConfig)
+        endPoint.storeData("insertFilters", insertFilters.mapValues { it.value.compound })
+        endPoint.storeData("extractFilters", extractFilters.mapValues { it.value.compound })
+        endPoint.storeData("channels", channels)
+        endPoint.storeData("insertPriorities", insertPriorities)
+        endPoint.storeData("extractPriorities", extractPriorities)
         
         if (availableInventories.isNotEmpty())
-            endPoint.storeEnumMap("inventories", inventories.mapValues { findUUID(it.value)!! })
+            endPoint.storeData("inventories", inventories.mapValues { findUUID(it.value)!! })
     }
     
 }

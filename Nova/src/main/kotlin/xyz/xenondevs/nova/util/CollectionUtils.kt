@@ -123,7 +123,7 @@ inline fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Bool
     return this
 }
 
-inline fun <K, V, R, M : MutableMap<K, R>> MutableMap<K, V>.mapValuesNotNullTo(destination: M, valueSelector: (Map.Entry<K, V>) -> R?): M {
+inline fun <K, V, R, M : MutableMap<K, R>> Map<K, V>.mapValuesNotNullTo(destination: M, valueSelector: (Map.Entry<K, V>) -> R?): M {
     for (entry in this.entries) {
         val value = valueSelector(entry)
         if (value != null) destination[entry.key] = value
@@ -132,7 +132,7 @@ inline fun <K, V, R, M : MutableMap<K, R>> MutableMap<K, V>.mapValuesNotNullTo(d
     return destination
 }
 
-inline fun <K, V, R, M : MutableMap<R, V>> MutableMap<K, V>.mapKeysNotNullTo(destination: M, keySelector: (Map.Entry<K, V>) -> R?): M {
+inline fun <K, V, R, M : MutableMap<R, V>> Map<K, V>.mapKeysNotNullTo(destination: M, keySelector: (Map.Entry<K, V>) -> R?): M {
     for (entry in this.entries) {
         val key = keySelector(entry)
         if (key != null) destination[key] = entry.value

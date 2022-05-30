@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.ItemCategories
@@ -161,7 +161,7 @@ object NovaCommand : Command("nova") {
             "command.nova.show_tile_entity_data.failure"
         ))
         
-        fun sendSuccess(name: String, data: CompoundElement) = ctx.source.sendSuccess(localized(
+        fun sendSuccess(name: String, data: Compound) = ctx.source.sendSuccess(localized(
             ChatColor.GRAY,
             "command.nova.show_tile_entity_data.success",
             localized(ChatColor.AQUA, name),
