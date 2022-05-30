@@ -1,5 +1,5 @@
 name: Bug Report
-description: Create a report to help us improve.
+description: Create a bug report to help us improve.
 title: "[Bug] "
 labels: [ "type: bug" ]
 body:
@@ -17,16 +17,16 @@ body:
   - type: dropdown
     id: plugins
     attributes:
-      label: Other plugins
+      label: Before creating a bug report, please validate that the issue you're encountering is not caused by another plugin (Remove all other plugins from the server). If it is, please name the plugin that causes the issue.
       options:
-        - This bug also occurs when no other plugins are present.
+        - There are no other plugins running on my server.
         - This issue is about a specific plugin incompatibility.
     validations:
       required: true
   - type: input
     attributes:
       label: Plugin Version, Server Software, Server Version
-      description: "The plugin version and server software that were used to cause this bug. Use /version to get your server version."
+      description: "The plugin version, server software and server software version that were used to cause this bug. Use /version to get your server version. If this issue is about a specific plugin incompatibility, also provide the version of that plugin."
       placeholder: "Nova: 0.4.1, Spigot: 3241-Spigot-6c1c1b2-1492826 (MC: 1.17.1)"
     validations:
       required: true
@@ -45,14 +45,14 @@ body:
   - type: textarea
     attributes:
       label: Steps to reproduce
-      description: Steps to reproduce this behavior.
+      description: Steps to reproduce this behavior. Provide a minimal reproducible example.
       placeholder: "1. Place [...]\n2. Attach [...]\n3. Click on [...] then [...]"
     validations:
       required: true
   - type: textarea
     attributes:
       label: Errors
-      description: If any errors or stacktraces appeared in the console, please link to them here. Please use Pastebin to post stacktraces.
+      description: If any errors or stacktraces appeared in the console, please link to them here. Please use Pastebin or similar sites to post stacktraces.
     validations:
       required: false
   - type: textarea
