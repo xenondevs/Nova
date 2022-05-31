@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
 
 /**
@@ -46,10 +45,6 @@ interface NetworkBridge : NetworkNode {
         networks[networkType] = network
     }
     
-    fun removeNetwork(networkType: NetworkType) {
-        networks -= networkType
-    }
-    
     /**
      * Checks if this bridge is able to connect to its neighboring bridge.
      */
@@ -70,7 +65,7 @@ interface NetworkBridge : NetworkNode {
     /**
      * Converts the [networks] map to a serializable version.
      */
-    fun serializeNetworks(): EnumMap<NetworkType, UUID> =
-        networks.mapValuesTo(emptyEnumMap()) { it.value.uuid }
+    fun serializeNetworks(): HashMap<String, UUID> =
+        networks.entries.associateTo(HashMap()) { it.key.id.toString() to it.value.uuid }
     
 }

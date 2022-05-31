@@ -48,9 +48,9 @@ interface NetworkEndPoint : NetworkNode {
     /**
      * Converts the [networks] map to a serializable version.
      */
-    fun serializeNetworks(): Map<NetworkType, Map<BlockFace, UUID>> {
-        return networks.mapValuesTo(emptyEnumMap()) { faceMap ->
-            faceMap.value.mapValuesTo(emptyEnumMap()) { it.value.uuid }
+    fun serializeNetworks(): Map<String, Map<BlockFace, UUID>> {
+        return networks.entries.associateTo (HashMap()) { entry ->
+            entry.key.id.toString() to entry.value.mapValuesTo(emptyEnumMap()) { it.value.uuid }
         }
     }
     

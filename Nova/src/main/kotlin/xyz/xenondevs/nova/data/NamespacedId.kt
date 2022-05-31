@@ -5,13 +5,13 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
 @Suppress("DEPRECATION")
-class NamespacedId internal constructor(override val namespace: String, override val name: String) : INamespacedId {
+class NamespacedId(override val namespace: String, override val name: String) : INamespacedId {
     
     private val id = "$namespace:$name"
     
-    internal constructor(addon: Addon, name: String) : this(addon.description.id, name)
+    constructor(addon: Addon, name: String) : this(addon.description.id, name)
     
-    internal constructor(name: String) : this("nova", name)
+    constructor(name: String) : this("nova", name)
     
     init {
         require(namespace.matches(PART_PATTERN)) { "Namespace \"$namespace\" does not match pattern $PART_PATTERN" }
@@ -20,6 +20,10 @@ class NamespacedId internal constructor(override val namespace: String, override
     
     override fun toNamespacedKey(): NamespacedKey {
         return NamespacedKey(namespace, name)
+    }
+    
+    fun toString(separator: String): String {
+        return namespace + separator + name
     }
     
     override fun toString(): String {
@@ -34,7 +38,7 @@ class NamespacedId internal constructor(override val namespace: String, override
         return id.hashCode()
     }
     
-    internal companion object {
+    companion object {
         
         val PART_PATTERN = Regex("""^[a-z][a-z\d_]*$""")
         val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_]*:[a-z][a-z\d_]*$""")

@@ -13,9 +13,7 @@ import java.util.*
 
 object NetworkDebugger {
     
-    private val energyDebuggers = ArrayList<UUID>()
-    private val itemDebuggers = ArrayList<UUID>()
-    private val fluidDebuggers = ArrayList<UUID>()
+    private val debuggers = HashMap<NetworkType, ArrayList<UUID>>()
     
     init {
         runTaskTimer(0, 1) { NetworkManager.tryExecute(::handleTick) }
@@ -28,14 +26,10 @@ object NetworkDebugger {
     }
     
     private fun getViewerList(type: NetworkType): ArrayList<UUID> =
-        when (type) {
-            NetworkType.ENERGY -> energyDebuggers
-            NetworkType.ITEMS -> itemDebuggers
-            NetworkType.FLUID -> fluidDebuggers
-        }
+        debuggers.getOrPut(type, ::ArrayList)
     
     private fun handleTick(manager: NetworkManager) {
-        if (energyDebuggers.isEmpty() && itemDebuggers.isEmpty() && fluidDebuggers.isEmpty()) return
+        if (debuggers.isEmpty() || debuggers.all { it.value.isEmpty() }) return
         
         manager.networks
             .forEach { network ->

@@ -63,7 +63,7 @@ sealed interface NetworkNode {
     fun getNetworks(face: BlockFace): Map<NetworkType, Network> {
         return when (this) {
             is NetworkEndPoint -> {
-                val networks = emptyEnumMap<NetworkType, Network>()
+                val networks = HashMap<NetworkType, Network>()
                 this.networks.forEach { (networkType, faceMap) ->
                     faceMap.forEach { (f, network) -> if (f == face) networks[networkType] = network }
                 }
@@ -128,7 +128,7 @@ sealed interface NetworkNode {
      * Converts the [connectedNodes] map to a serializable version.
      */
     fun serializeConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>> {
-        return connectedNodes.mapValuesTo(emptyEnumMap()) { faceMap ->
+        return connectedNodes.mapValuesTo(HashMap()) { faceMap ->
             faceMap.value.mapValuesTo(emptyEnumMap()) { it.value.uuid }
         }
     }

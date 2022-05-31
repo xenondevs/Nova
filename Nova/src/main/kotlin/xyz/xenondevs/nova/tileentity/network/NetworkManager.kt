@@ -423,7 +423,7 @@ private class NetworkManagerImpl : NetworkManager {
         // add endPoint to nodesById
         nodesById[endPoint.uuid] = endPoint
         
-        return NetworkType.values().mapToAllFuture networks@{ networkType ->
+        return NetworkTypeRegistry.types.mapToAllFuture networks@{ networkType ->
             val allowedFaces = endPoint.allowedFaces[networkType]
             if (allowedFaces != null) { // does the endpoint want to have any connections?
                 // loop over all bridges nearby to possibly connect to
@@ -678,12 +678,10 @@ private class NetworkManagerImpl : NetworkManager {
                 } else {
                     // keep the current network, just remove the bridge from it
                     currentNetwork.removeNode(bridge)
-                    bridge.removeNetwork(networkType)
                 }
             } else {
                 // just remove the bridge from the current network
                 currentNetwork.removeNode(bridge)
-                bridge.removeNetwork(networkType)
                 
                 // remove the network if it isn't valid
                 if (!currentNetwork.isValid()) removeNetwork(currentNetwork)

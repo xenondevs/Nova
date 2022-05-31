@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.cbf.Compound.CompoundBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.*
 import xyz.xenondevs.nova.data.serialization.cbf.instancecreator.EnumMapInstanceCreator
+import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.util.data.toByteArray
 import xyz.xenondevs.nova.util.reflection.representedKClass
 import xyz.xenondevs.nova.util.reflection.type
@@ -36,13 +37,13 @@ interface InstanceCreator<T> {
 @Suppress("UNCHECKED_CAST")
 object CBF {
     
-    private val typeAdapters = HashMap<KClass<*>, BinaryAdapter<*>>()
-    private val typeHierarchyAdapters = HashMap<KClass<*>, BinaryAdapter<*>>()
+    private val binaryAdapters = HashMap<KClass<*>, BinaryAdapter<*>>()
+    private val binaryHierarchyAdapters = HashMap<KClass<*>, BinaryAdapter<*>>()
     
     private val instanceCreators = HashMap<KClass<*>, InstanceCreator<*>>()
     
     init {
-        // binary adapters
+        // default binary adapters
         registerBinaryAdapter(Boolean::class, BooleanBinaryAdapter)
         registerBinaryAdapter(BooleanArray::class, BooleanArrayBinaryAdapter)
         registerBinaryAdapter(Byte::class, ByteBinaryAdapter)
@@ -61,16 +62,19 @@ object CBF {
         registerBinaryAdapter(CharArray::class, CharArrayBinaryAdapter)
         registerBinaryAdapter(String::class, StringBinaryAdapter)
         registerBinaryAdapter(Array<String>::class, StringArrayBinaryAdapter)
+        registerBinaryAdapter(UUID::class, UUIDBinaryAdapter)
+        registerBinaryAdapter(Pair::class, PairBinaryAdapter)
+        registerBinaryAdapter(Triple::class, TripleBinaryAdapter)
+        registerBinaryAdapter(Compound::class, CompoundBinaryAdapter)
+        
+        // binary adapters for bukkit / nova
         registerBinaryAdapter(Color::class, ColorBinaryAdapter)
         registerBinaryAdapter(ItemStack::class, ItemStackBinaryAdapter)
         registerBinaryAdapter(Location::class, LocationBinaryAdapter)
         registerBinaryAdapter(NamespacedKey::class, NamespacedKeyBinaryAdapter)
         registerBinaryAdapter(NamespacedId::class, NamespacedIdBinaryAdapter)
-        registerBinaryAdapter(UUID::class, UUIDBinaryAdapter)
-        registerBinaryAdapter(Pair::class, PairBinaryAdapter)
-        registerBinaryAdapter(Triple::class, TripleBinaryAdapter)
         registerBinaryAdapter(VirtualInventory::class, VirtualInventoryBinaryAdapter)
-        registerBinaryAdapter(Compound::class, CompoundBinaryAdapter)
+        registerBinaryAdapter(NetworkType::class, NetworkTypeBinaryAdapter)
         
         // binary hierarchy adapters
         registerBinaryHierarchyAdapter(Enum::class, EnumBinaryAdapter)
@@ -82,11 +86,11 @@ object CBF {
     }
     
     fun <T : Any> registerBinaryAdapter(clazz: KClass<T>, adapter: BinaryAdapter<T>) {
-        typeAdapters[clazz] = adapter
+        binaryAdapters[clazz] = adapter
     }
     
     fun <T : Any> registerBinaryHierarchyAdapter(clazz: KClass<T>, adapter: BinaryAdapter<T>) {
-        typeHierarchyAdapters[clazz] = adapter
+        binaryHierarchyAdapters[clazz] = adapter
     }
     
     fun <T : Any> registerInstanceCreator(clazz: KClass<*>, creator: InstanceCreator<T>) {
@@ -145,10 +149,13 @@ object CBF {
     }
     
     private fun <R> getBinaryAdapter(clazz: KClass<*>): BinaryAdapter<R> {
-        val typeAdapter: BinaryAdapter<*> =
-            if (clazz in typeAdapters)
-                typeAdapters[clazz]!!
-            else typeHierarchyAdapters.entries.first { it.key.isSuperclassOf(clazz) }.value
+        val typeAdapter: BinaryAdapter<*>? =
+            if (clazz in binaryAdapters)
+                binaryAdapters[clazz]
+            else binaryHierarchyAdapters.entries.firstOrNull { it.key.isSuperclassOf(clazz) }?.value
+        
+        if (typeAdapter == null)
+            throw IllegalStateException("No binary adapter registered for $clazz")
         
         return typeAdapter as BinaryAdapter<R>
     }

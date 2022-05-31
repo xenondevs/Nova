@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.tileentity.network.fluid.container.CauldronFluidContai
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
-import xyz.xenondevs.nova.util.enumMapOf
 
 class VanillaCauldronTileEntity internal constructor(
     blockState: VanillaTileEntityState
@@ -21,7 +20,7 @@ class VanillaCauldronTileEntity internal constructor(
     ) { CUBE_FACES.associateWithTo(emptyEnumMap()) { NetworkConnectionType.BUFFER } }
     
     override val holders: Map<NetworkType, EndPointDataHolder> =
-        enumMapOf(NetworkType.FLUID to fluidHolder)
+        hashMapOf(NetworkType.FLUID to fluidHolder)
     
     init {
         handleBlockUpdate()

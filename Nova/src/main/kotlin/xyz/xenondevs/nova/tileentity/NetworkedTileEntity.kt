@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.getTargetLocation
 import xyz.xenondevs.nova.util.reflection.actualDelegate
 import xyz.xenondevs.nova.util.swingHand
@@ -27,10 +26,10 @@ import kotlin.reflect.KProperty
 
 abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity(blockState), NetworkEndPoint {
     
-    final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = emptyEnumMap()
-    final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = emptyEnumMap()
+    final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = HashMap()
+    final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = HashMap()
     final override val holders: MutableMap<NetworkType, EndPointDataHolder> by lazy {
-        val map: EnumMap<NetworkType, EndPointDataHolder> = emptyEnumMap()
+        val map = HashMap<NetworkType, EndPointDataHolder>()
         if (::energyHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.ENERGY] = energyHolder
         if (::itemHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.ITEMS] = itemHolder
         if (::fluidHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.FLUID] = fluidHolder
@@ -57,11 +56,11 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     }
     
     override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveOrNull<EnumMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
+        return retrieveOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
     }
     
     override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveOrNull<EnumMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
+        return retrieveOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     }
     
     final override fun handleRightClick(ctx: BlockInteractContext): Boolean {

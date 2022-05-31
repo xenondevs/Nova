@@ -188,7 +188,7 @@ object NovaCommand : Command("nova") {
         
         ctx.source.sendSuccess(localized(
             ChatColor.GRAY,
-            "command.nova.network_debug." + type.name.lowercase()
+            "command.nova.network_debug." + type.id.toString(".")
         ))
     }
     

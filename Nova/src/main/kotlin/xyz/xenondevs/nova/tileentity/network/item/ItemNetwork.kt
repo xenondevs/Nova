@@ -63,8 +63,6 @@ class ItemNetwork(override val uuid: UUID) : Network {
     }
     
     private fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace, createDistributor: Boolean): ItemNetworkChannel? {
-        if (endPoint in _nodes) return null
-        
         val itemHolder = endPoint.holders[NetworkType.ITEMS]
         require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
         
