@@ -57,7 +57,6 @@
     "command.nova.get_nearest_data.failed": "Es konnte keine TileEntity in deiner Nähe gefunden werden.",
     "command.nova.remove_obsolete_models.success": "%s Rüstungsständer wurden entfernt.",
     "command.nova.remove_tile_entities.success": "%s TileEntites wurden entfernt.",
-    "command.nova.network_debug.items": "Debug-Ansicht für Item-Netzwerke umgeschaltet.",
     "command.nova.render_distance": "Deine Renderdistanz wurde auf %s gesetzt.",
     "command.nova.show_tile_entity_data.success": "%s hat folgende Daten:\n%s",
     "command.nova.show_tile_entity_data.failure": "Es konnte keine TileEntity gefunden werden. Schaue eine TileEntity an und versuche es erneut.",
@@ -67,7 +66,6 @@
     "command.nova.recipe.no-recipe": "Dieses Item hat kein Crafting-Rezept.",
     "command.nova.usage.no-usage": "Dieses Item kommt nicht in anderen Crafting-Rezepten vor.",
     "nova.tile_entity_limits.amount.deny": "Du hast das Limit für diesen Block-Typ erreicht.",
-    "item.nova.wrench.mode.fluid": "Modus: Flüssigkeiten",
     "menu.nova.energy_per_tick": "%s / tick",
     "menu.nova.items.searched": "Items §8(%s§7...§8)",
     "menu.nova.creative": "Items",
@@ -85,5 +83,11 @@
     "menu.nova.upgrades": "Upgrades",
     "command.nova.network_reload.success": "Alle aktiven Netzwerke wurden neu geladen.",
     "command.nova.create_resource_pack.success": "Ressourcenpaket erstellt.",
-    "nova.tile_entity_limits.world_blacklist.deny": "Du darfst keine Blöcke von Nova in dieser Welt setzen."
+    "nova.tile_entity_limits.world_blacklist.deny": "Du darfst keine Blöcke von Nova in dieser Welt setzen.",
+    "item.nova.wrench.mode.nova.items": "Modus: Items",
+    "item.nova.wrench.mode.nova.fluid": "Modus: Flüssigkeiten",
+    "command.nova.network_debug.nova.fluid": "Debug-Ansicht für Flüssigkeits-Netzwerke umgeschaltet.",
+    "item.nova.wrench.mode.nova.energy": "Modus: Energie",
+    "command.nova.network_debug.nova.items": "Debug-Ansicht für Item-Netzwerke umgeschaltet.",
+    "command.nova.network_debug.nova.energy": "Debug-Ansicht für Energie-Netzwerke umgeschaltet."
 }
