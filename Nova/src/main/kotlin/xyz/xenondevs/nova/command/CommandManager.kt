@@ -6,7 +6,10 @@ import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer
 import org.bukkit.craftbukkit.v1_18_R2.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.command.impl.*
+import xyz.xenondevs.nova.command.impl.NovaCommand
+import xyz.xenondevs.nova.command.impl.NovaModelDataCommand
+import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
+import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ItemCategories
@@ -32,7 +35,6 @@ object CommandManager : Initializable() {
     
     private fun registerCommands() {
         registerCommand(NovaCommand)
-        registerCommand(UninstallCommand)
         registerCommand(NovaModelDataCommand)
         registerCommand(NovaRecipeCommand)
         registerCommand(NovaUsageCommand)
