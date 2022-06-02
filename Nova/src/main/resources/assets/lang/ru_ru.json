@@ -63,7 +63,6 @@
     "command.nova.get_nearest_data.failed": "Невозможно найти сущность в этом чанке.",
     "command.nova.remove_obsolete_models.success": "Убрана %s стойка брони.",
     "command.nova.remove_tile_entities.success": "Убрана %s сущность.",
-    "command.nova.network_debug.items": "Включён просмотр отладки для сети предметов",
     "command.nova.render_distance": "Ваша прорисовка была изменена на: %s.",
     "command.nova.show_tile_entity_data.success": "%s имеет следующие данные:\n%s",
     "command.nova.show_tile_entity_data.failure": "Пожалуйста, посмотрите на сущность и попробуйте ещё раз.",

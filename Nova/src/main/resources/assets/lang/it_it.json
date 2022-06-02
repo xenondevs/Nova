@@ -62,7 +62,6 @@
     "command.nova.get_nearest_data.failed": "Impossibile trovare un blocco tecnico nelle vicinanze.",
     "command.nova.remove_obsolete_models.success": "Rimossi %s supporti per armature.",
     "command.nova.remove_tile_entities.success": "Rimossi %s blocchi tecnici.",
-    "command.nova.network_debug.items": "Visualizzazione di debug della Rete Oggetti attivata",
     "command.nova.render_distance": "La distanza di rendering è stata impostata a %s.",
     "command.nova.show_tile_entity_data.success": "Questo %s ha i seguenti dati:\n%s",
     "command.nova.show_tile_entity_data.failure": "Si prega di guardare un blocco tecnico e riprovare.",

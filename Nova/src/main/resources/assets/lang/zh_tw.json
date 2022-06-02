@@ -63,7 +63,6 @@
     "command.nova.get_nearest_data.failed": "無法在附近找到方塊實體",
     "command.nova.remove_obsolete_models.success": "移除了 %s 個盔甲座",
     "command.nova.remove_tile_entities.success": "移除了 %s 個方塊實體",
-    "command.nova.network_debug.items": "切換了物品網路的除錯視角",
     "command.nova.render_distance": "你的渲染距離已被設置為 %s",
     "command.nova.show_tile_entity_data.success": "這個 %s 擁有下列資料:\n%s",
     "command.nova.show_tile_entity_data.failure": "請看著方塊實體並再試一次",

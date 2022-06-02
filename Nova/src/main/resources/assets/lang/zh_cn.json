@@ -63,7 +63,6 @@
     "command.nova.get_nearest_data.failed": "无法在附近找到方块实体。",
     "command.nova.remove_obsolete_models.success": "成功移除 %s 个盔甲架.",
     "command.nova.remove_tile_entities.success": "成功移除 %s 个 方块实体.",
-    "command.nova.network_debug.items": "已切换物品网络调试视图",
     "command.nova.render_distance": "您的渲染距离已设置为%s。",
     "command.nova.show_tile_entity_data.success": "此 %s 有以下数据：\n%s",
     "command.nova.show_tile_entity_data.failure": "请看向一个方块实体并重试",

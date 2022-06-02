@@ -55,7 +55,6 @@
     "command.nova.get_nearest_data.failed": "Não foi possível encontrar uma entidade de bloco por perto.",
     "command.nova.remove_obsolete_models.success": "Suporte de armadura de %s removido.",
     "command.nova.remove_tile_entities.success": "%s bloco de entidades removidos.",
-    "command.nova.network_debug.items": "Debug-view alterada para Item-Networks",
     "command.nova.render_distance": "Sua distância de renderização foi definida para %s.",
     "command.nova.show_tile_entity_data.success": "Este %s tem os seguintes dados:\n%s",
     "command.nova.show_tile_entity_data.failure": "Por favor, olhe para uma entidade de bloco e tente novamente.",

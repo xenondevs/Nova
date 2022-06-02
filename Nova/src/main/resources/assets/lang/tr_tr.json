@@ -63,7 +63,6 @@
     "command.nova.get_nearest_data.failed": "Yakınlarda Bloğumsu canlı bulunamadı.",
     "command.nova.remove_obsolete_models.success": "%s Tane zırh askısı silindi",
     "command.nova.remove_tile_entities.success": "%s Tane Bloğumsu canlı Silindi",
-    "command.nova.network_debug.items": "Eşya Kanalları için Hata Ayıklama Açıldı",
     "command.nova.render_distance": "Görüş açınız %s'ye ayarlandı.",
     "command.nova.show_tile_entity_data.success": "Bu %s, bu veriye sahip:\n%s",
     "command.nova.show_tile_entity_data.failure": "Bloğumsu canlıya bakıp birdaha deneyin.",

@@ -48,7 +48,6 @@
     "command.nova.get_nearest_data.failed": "Nie można znaleźć obiektu w pobliżu.",
     "command.nova.remove_obsolete_models.success": "Usunięto %s stojaków na zbroję.",
     "command.nova.remove_tile_entities.success": "Usunięto %s obiektów.",
-    "command.nova.network_debug.items": "Włączono widok debugowania dla sieci pozycji",
     "command.nova.render_distance": "Odległość renderowania została ustawiona na %s.",
     "nova.tile_entity_limits.amount.deny": "Nie możesz umieścić więcej bloków tego typu."
 }

@@ -62,7 +62,6 @@
     "command.nova.get_nearest_data.failed": "Não foi possível encontrar um tile de entidade por perto.",
     "command.nova.remove_obsolete_models.success": "Removido %s suportes de armadura.",
     "command.nova.remove_tile_entities.success": "Removido %s entidades de tile.",
-    "command.nova.network_debug.items": "Alterado modo de visão de debug para redes de itens",
     "command.nova.render_distance": "Sua distância de renderização foi definida para %s.",
     "command.nova.show_tile_entity_data.success": "Está %s possui os seguintes dados: %s",
     "command.nova.show_tile_entity_data.failure": "Por favor, olhe para um bloco válido e tente novamente.",

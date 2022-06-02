@@ -54,7 +54,6 @@
     "command.nova.get_nearest_data.failed": "Impossible de trouver une tile entity à proximité.",
     "command.nova.remove_obsolete_models.success": "%s porte armures supprimés.",
     "command.nova.remove_tile_entities.success": "%s tile entities supprimées.",
-    "command.nova.network_debug.items": "Vue de débugage basculée pour les réseaux d'objets",
     "command.nova.render_distance": "Votre distance de rendu a bien été définie à %s.",
     "command.nova.show_tile_entity_data.success": "Ça %s a la data suivante %s",
     "command.nova.show_tile_entity_data.failure": "Veuillez regarder sur la tile entity et réessayer après.",
