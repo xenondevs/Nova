@@ -1,10 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
 import xyz.xenondevs.nova.NOVA
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.RandomAccessFile
+import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.math.max
@@ -131,4 +128,17 @@ fun RandomAccessFile.readString(): String {
 
 fun RandomAccessFile.readStringList(): List<String> {
     return Array(readInt()) { readString() }.asList()
+}
+
+inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
+    try {
+        return block()
+    } finally {
+        closeable.forEach {
+            try {
+                it.close()
+            } catch (ignored: Exception) {
+            }
+        }
+    }
 }
