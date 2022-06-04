@@ -1,9 +1,7 @@
 package xyz.xenondevs.nova.data.resources
 
-import de.studiocode.invui.resourcepack.ForceResourcePack
 import kotlinx.coroutines.runBlocking
 import net.lingala.zip4j.ZipFile
-import net.md_5.bungee.api.chat.ComponentBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -56,11 +54,8 @@ internal object Resources : Initializable() {
         if (AutoUploadManager.enabled) {
             runBlocking {
                 val url = AutoUploadManager.uploadPack(file)
-                ForceResourcePack.getInstance().setResourcePack(
-                    url,
-                    ComponentBuilder("Nova Resource Pack").create(),
-                    true
-                )
+                if (url == null)
+                    LOGGER.warning("The resource pack was not uploaded. (Misconfigured auto uploader?)")
             }
         }
     }

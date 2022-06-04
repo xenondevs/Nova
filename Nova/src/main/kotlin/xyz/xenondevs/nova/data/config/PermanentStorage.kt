@@ -22,8 +22,11 @@ object PermanentStorage {
         else JsonObject()
     }
     
-    fun store(key: String, data: Any) {
-        mainObj.add(key, GSON.toJsonTree(data))
+    fun store(key: String, data: Any?) {
+        if (data != null)
+            mainObj.add(key, GSON.toJsonTree(data))
+        else mainObj.remove(key)
+        
         file.writeText(GSON.toJson(mainObj))
     }
     

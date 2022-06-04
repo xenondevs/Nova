@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.command.impl
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
+import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.HoverEvent
@@ -16,6 +17,8 @@ import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -27,6 +30,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
+import xyz.xenondevs.nova.util.data.ComponentUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
@@ -78,9 +82,12 @@ object NovaCommand : Command("nova") {
             .then(literal("addons")
                 .requiresPermission("nova.command.addons")
                 .executesCatching(::sendAddons))
-            .then(literal("createResourcePack")
-                .requiresPermission("nova.command.zip")
-                .executesCatching(::createResourcePack))
+            .then(literal("resourcePack")
+                .requiresPermission("nova.command.resourcePack")
+                .then(literal("create")
+                    .executesCatching(::createResourcePack))
+                .then(literal("reupload")
+                    .executesCatching(::reuploadResourcePack)))
             .then(literal("reload")
                 .requiresPermission("nova.command.reload")
                 .then(literal("configs")
@@ -103,9 +110,22 @@ object NovaCommand : Command("nova") {
     
     private fun createResourcePack(ctx: CommandContext<CommandSourceStack>) {
         runAsyncTask {
-            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.create_resource_pack.start"))
+            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.create.start"))
             Resources.createResourcePack()
-            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.create_resource_pack.success"))
+            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.create.success"))
+        }
+    }
+    
+    private fun reuploadResourcePack(ctx: CommandContext<CommandSourceStack>) {
+        runAsyncTask {
+            runBlocking {
+                ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.reupload.start"))
+                val url = AutoUploadManager.uploadPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
+                
+                if (url != null)
+                    ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.reupload.success", ComponentUtils.createLinkComponent(url)))
+                else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.resource_pack.reupload.fail"))
+            }
         }
     }
     

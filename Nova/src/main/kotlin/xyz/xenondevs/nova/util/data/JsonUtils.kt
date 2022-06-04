@@ -171,6 +171,11 @@ fun JsonObject.addAll(other: JsonObject) {
     other.entrySet().forEach { (property, value) -> add(property, value) }
 }
 
+inline fun <reified T> Gson.fromJson(json: String?): T? {
+    if (json == null) return null
+    return fromJson(json, type<T>())
+}
+
 inline fun <reified T> Gson.fromJson(jsonElement: JsonElement?): T? {
     if (jsonElement == null) return null
     return fromJson(jsonElement, type<T>())

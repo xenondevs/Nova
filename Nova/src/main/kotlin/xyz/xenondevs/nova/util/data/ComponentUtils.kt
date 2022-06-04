@@ -3,10 +3,7 @@ package xyz.xenondevs.nova.util.data
 import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.util.ComponentUtils
 import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TextComponent
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.md_5.bungee.api.chat.*
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.network.chat.Component
 import org.bukkit.Material
@@ -119,3 +116,14 @@ fun Array<out BaseComponent>.withoutPreFormatting(): Array<out BaseComponent> =
 
 fun BaseComponent.withoutPreFormatting(): Array<out BaseComponent> =
     ComponentUtils.withoutPreFormatting(this)
+
+object ComponentUtils {
+    
+    fun createLinkComponent(url: String): BaseComponent {
+        return ComponentBuilder(url)
+            .color(ChatColor.AQUA)
+            .event(ClickEvent(ClickEvent.Action.OPEN_URL, url))
+            .create()[0]
+    }
+    
+}

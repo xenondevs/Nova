@@ -26,7 +26,7 @@ internal class LanguageContent(private val builder: ResourcePackBuilder) : PackC
         extractRomanNumerals(languageLookup["en_us"]!!)
         Resources.updateLanguageLookup(languageLookup)
         languageLookup.forEach { (name, content) ->
-            val file = File(builder.languageDir, "$name.json")
+            val file = File(ResourcePackBuilder.LANGUAGE_DIR, "$name.json")
             file.parentFile.mkdirs()
             file.writeText(GSON.toJson(content))
         }

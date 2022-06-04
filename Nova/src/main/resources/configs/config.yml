@@ -3,6 +3,9 @@ resource_pack:
   # TODO
   auto_upload:
     enabled: false
+    # We host the most common resource packs ourselves. If your resource pack is already hosted by us, our service will be used.
+    # If the pack is not hosted by us, your configured auto uploader will be used.
+    use_common_packs: true
   # Configures which materials are used for custom items. Can be changed to mitigate conflicts with other plugins that use custom resource packs.
   # These values can be changed at any time, existing items in the world will keep working.
   materials:

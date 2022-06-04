@@ -47,8 +47,8 @@ internal class GUIContent(private val builder: ResourcePackBuilder) : PackConten
             provider.add("chars", JsonArray().apply { add(char) })
         }
         
-        builder.guisFile.parentFile.mkdirs()
-        builder.guisFile.writeText(GSON.toJson(guiObj))
+        ResourcePackBuilder.GUIS_FILE.parentFile.mkdirs()
+        ResourcePackBuilder.GUIS_FILE.writeText(GSON.toJson(guiObj))
     }
     
 }

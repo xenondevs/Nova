@@ -45,7 +45,7 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
             modelList += it
             
             // Create default item model file if no model file is present
-            val file = File(builder.assetsDir, "$namespace/models/${it.removePrefix("$namespace:")}.json")
+            val file = File(ResourcePackBuilder.ASSETS_DIR, "$namespace/models/${it.removePrefix("$namespace:")}.json")
             if (!file.exists()) {
                 val modelObj = JsonObject()
                 modelObj.addProperty("parent", "item/generated")
@@ -73,7 +73,7 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
         Resources.updateModelDataLookup(modelDataLookup)
         
         modelOverrides.forEach { (material, models) ->
-            val file = File(builder.assetsDir, "minecraft/models/item/${material.name.lowercase()}.json")
+            val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/models/item/${material.name.lowercase()}.json")
             val modelObj = JsonObject()
             
             // fixme: This does not cover all cases

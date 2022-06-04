@@ -17,24 +17,17 @@ import java.io.File
 @Suppress("MemberVisibilityCanBePrivate")
 internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
     
-    private val resourcePackDir = File(NOVA.dataFolder, "ResourcePack")
-    val packDir = File(resourcePackDir, "pack")
-    val assetsDir = File(packDir, "assets")
-    val languageDir = File(assetsDir, "minecraft/lang")
-    val guisFile = File(assetsDir, "nova/font/gui.json")
-    val packMetaFile = File(packDir, "pack.mcmeta")
-    
     private val contents = listOf(MaterialContent(this), GUIContent(this), LanguageContent(this))
     
     init {
-        packDir.deleteRecursively()
-        packDir.mkdirs()
+        PACK_DIR.deleteRecursively()
+        PACK_DIR.mkdirs()
     }
     
     fun create(): File {
         // Delete existing files
-        packDir.deleteRecursively()
-        packDir.mkdirs()
+        PACK_DIR.deleteRecursively()
+        PACK_DIR.mkdirs()
         
         // Include asset packs
         packs.forEach { pack ->
@@ -52,7 +45,7 @@ internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
     }
     
     private fun copyBasicAssets(pack: AssetPack) {
-        val namespace = File(assetsDir, pack.namespace)
+        val namespace = File(ASSETS_DIR, pack.namespace)
         
         // Copy textures folder
         pack.texturesDir?.copyRecursively(File(namespace, "textures"))
@@ -70,18 +63,29 @@ internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
         packObj.addProperty("pack_format", 8)
         packObj.addProperty("description", "Nova (${packs.size} AssetPacks loaded)")
         
-        packMetaFile.parentFile.mkdirs()
-        packMetaFile.writeText(GSON.toJson(packMcmetaObj))
+        PACK_MCMETA_FILE.parentFile.mkdirs()
+        PACK_MCMETA_FILE.writeText(GSON.toJson(packMcmetaObj))
     }
     
     private fun createZip(): File {
         val parameters = ZipParameters().apply { isIncludeRootFolder = false }
-        val file = File(resourcePackDir, "ResourcePack.zip")
-        val zip = ZipFile(file)
-        zip.addFolder(packDir, parameters)
-        IOUtils.removeZipTimestamps(file)
+        val zip = ZipFile(RESOURCE_PACK_FILE)
+        zip.addFolder(PACK_DIR, parameters)
+        IOUtils.removeZipTimestamps(RESOURCE_PACK_FILE)
         
-        return file
+        return RESOURCE_PACK_FILE
+    }
+    
+    companion object {
+        
+        private val RESOURCE_PACK_DIR = File(NOVA.dataFolder, "ResourcePack")
+        val PACK_DIR = File(RESOURCE_PACK_DIR, "pack")
+        val ASSETS_DIR = File(PACK_DIR, "assets")
+        val LANGUAGE_DIR = File(ASSETS_DIR, "minecraft/lang")
+        val GUIS_FILE = File(ASSETS_DIR, "nova/font/gui.json")
+        val PACK_MCMETA_FILE = File(PACK_DIR, "pack.mcmeta")
+        
+        val RESOURCE_PACK_FILE = File(RESOURCE_PACK_DIR, "ResourcePack.zip")
     }
     
 }
