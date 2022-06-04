@@ -82,7 +82,7 @@
     "nova.outdated_version": "Du benutzt eine veraltete Version von %s.\nBitte lade die neuste Version auf %s herunter.",
     "menu.nova.upgrades": "Upgrades",
     "command.nova.network_reload.success": "Alle aktiven Netzwerke wurden neu geladen.",
-    "command.nova.create_resource_pack.success": "Ressourcenpaket erstellt.",
+    "command.nova.create_resource_pack.success": "Ressourcenpaket erstellt. Ein Server-Neustart ist empfohlen.",
     "nova.tile_entity_limits.world_blacklist.deny": "Du darfst keine Blöcke von Nova in dieser Welt setzen.",
     "item.nova.wrench.mode.nova.items": "Modus: Items",
     "item.nova.wrench.mode.nova.fluid": "Modus: Flüssigkeiten",
