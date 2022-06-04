@@ -80,7 +80,7 @@
     "command.nova.usage.no-usage": "This item has no usages.",
     "command.nova.network_reload.success": "All active networks have been reloaded.",
     "command.nova.create_resource_pack.start": "Creating resource pack... please wait",
-    "command.nova.create_resource_pack.success": "Resource pack created.",
+    "command.nova.create_resource_pack.success": "Resource pack created. A server restart is recommended.",
     "command.nova.reload_configs.start": "Reloading configs...",
     "command.nova.reload_configs.success": "Reloaded configs.",
     "command.nova.reload_recipes.start": "Reloading recipes...",
