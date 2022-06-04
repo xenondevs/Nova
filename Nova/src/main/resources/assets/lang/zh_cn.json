@@ -80,7 +80,6 @@
     "command.nova.network_debug.nova.fluid": "液体网络调试视角已切换。",
     "command.nova.addons.header": "扩展(%s): ",
     "command.nova.network_reload.success": "所有激活的网络都已重载。",
-    "command.nova.create_resource_pack.start": "正在创建资源包...请等待",
     "command.nova.reload_configs.start": "正在重载配置文件...",
     "command.nova.reload_configs.success": "配置文件已重载。",
     "command.nova.reload_recipes.start": "正在重载合成表...",
@@ -88,6 +87,5 @@
     "nova.tile_entity_limits.world_blacklist.deny": "你不允许在此世界放置新星科技的方块。",
     "nova.tile_entity_limits.type_world_blacklist.deny": "你不允许在此世界放置此方块。",
     "nova.tile_entity_limits.amount_per_world.deny": "你不能再在此世界放置更多此种类的方块了。",
-    "nova.outdated_version": "您正在使用过时的版本： %s.\n请下载最新版本： %s",
-    "command.nova.create_resource_pack.success": "资源包已创建。"
+    "nova.outdated_version": "您正在使用过时的版本： %s.\n请下载最新版本： %s"
 }

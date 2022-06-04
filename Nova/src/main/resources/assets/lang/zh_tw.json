@@ -80,7 +80,6 @@
     "command.nova.network_debug.nova.fluid": "切換流體網路的除錯模式",
     "command.nova.addons.header": "附加套件 (%s): ",
     "command.nova.network_reload.success": "已重新載入所有網路",
-    "command.nova.create_resource_pack.start": "正在創建資源包... 請稍後",
     "command.nova.reload_configs.start": "正在重新載入設定檔...",
     "command.nova.reload_configs.success": "已重新載入設定檔",
     "command.nova.reload_recipes.start": "正在重新載入配方...",
@@ -88,6 +87,5 @@
     "nova.tile_entity_limits.world_blacklist.deny": "你在這個世界無法放置任何Nova方塊",
     "nova.tile_entity_limits.type_world_blacklist.deny": "你在這個世界無法放置方塊",
     "nova.tile_entity_limits.amount_per_world.deny": "你無法在這個世界放置更多此類型的方塊",
-    "nova.outdated_version": "正在運行過時版本的 %s\n請到 %s 下載最新版本",
-    "command.nova.create_resource_pack.success": "已創建資源包"
+    "nova.outdated_version": "正在運行過時版本的 %s\n請到 %s 下載最新版本"
 }
