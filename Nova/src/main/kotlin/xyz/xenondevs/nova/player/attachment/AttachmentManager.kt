@@ -75,7 +75,6 @@ object AttachmentManager : Initializable(), Listener {
     private fun handlePassengersSet(event: SetPassengersPacketEvent) {
         val attachments = (activeAttachments.entries.firstOrNull { it.key.entityId == event.vehicle } ?: return).value.values
         event.passengers += attachments.map(Attachment::entityId)
-        println(event.passengers.contentToString())
     }
     
     private fun loadAttachments(player: Player) {

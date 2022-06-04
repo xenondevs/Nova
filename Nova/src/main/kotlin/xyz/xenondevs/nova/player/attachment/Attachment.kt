@@ -25,7 +25,6 @@ open class Attachment(
         data.marker = true
         
         ast.spawnHandler = {
-            println("spawn, sending packet to $it")
             // This packet will be modified in AbilityManager to include all attachment armor stands
             runTaskLater(1) {
                 it.send(ClientboundSetPassengersPacket(player.entityId, player.passengers.mapToIntArray(Entity::getEntityId)))
