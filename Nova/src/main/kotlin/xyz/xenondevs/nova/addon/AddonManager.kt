@@ -42,6 +42,9 @@ internal object AddonManager {
     val loaders = HashMap<String, AddonLoader>()
     val addons = LinkedHashMap<String, Addon>()
     
+    var addonsHashCode = -1
+        private set
+    
     init {
         addonsDir.mkdirs()
     }
@@ -68,6 +71,8 @@ internal object AddonManager {
                 LOGGER.log(Level.SEVERE, "An exception occurred trying to load ${it.name}", t)
             }
         }
+        
+        generateAddonsHashCode()
     }
     
     fun initializeAddons() {
@@ -118,5 +123,16 @@ internal object AddonManager {
     
     private fun getAddonString(description: AddonDescription) =
         "${description.name} [${description.id}] v${description.version}"
+    
+    private fun generateAddonsHashCode() {
+        var result = 0
+        loaders.values.forEach {
+            val description = it.description
+            result = result * 31 + description.id.hashCode()
+            result = result * 31 + description.version.hashCode()
+        }
+        
+        addonsHashCode = result
+    }
     
 }

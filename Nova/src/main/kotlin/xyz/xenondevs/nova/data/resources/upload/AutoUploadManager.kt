@@ -14,7 +14,9 @@ internal object AutoUploadManager : Initializable() {
     override val inMainThread = false
     override val dependsOn = setOf(NovaConfig)
     
-    private var enabled = false
+    var enabled = false
+        private set
+    
     private lateinit var selectedService: UploadService
     
     override fun init() {

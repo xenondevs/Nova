@@ -1,6 +1,9 @@
 package xyz.xenondevs.nova.data.resources
 
+import de.studiocode.invui.resourcepack.ForceResourcePack
+import kotlinx.coroutines.runBlocking
 import net.lingala.zip4j.ZipFile
+import net.md_5.bungee.api.chat.ComponentBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -11,6 +14,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
 import xyz.xenondevs.nova.data.resources.builder.PNGMetadataRemover
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ModelData
 import xyz.xenondevs.nova.util.data.write
@@ -27,8 +31,12 @@ internal object Resources : Initializable() {
     
     override fun init() {
         LOGGER.info("Loading resources")
-        // TODO: Build resource pack automatically when addon changes are detected
-        if (PermanentStorage.has("modelDataLookup") && PermanentStorage.has("guiDataLookup") && PermanentStorage.has("languageLookup")) {
+        if (
+            PermanentStorage.retrieveOrNull<Int>("addonsHashCode") == AddonManager.addonsHashCode
+            && PermanentStorage.has("modelDataLookup")
+            && PermanentStorage.has("guiDataLookup")
+            && PermanentStorage.has("languageLookup")
+        ) {
             // Load from PermanentStorage
             modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, Pair<ModelData?, ModelData?>>>("modelDataLookup")!!
             languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>("languageLookup")!!
@@ -36,13 +44,31 @@ internal object Resources : Initializable() {
         } else {
             // Create ResourcePack
             createResourcePack()
+            // Store addonsHashCode
+            PermanentStorage.store("addonsHashCode", AddonManager.addonsHashCode)
         }
     }
     
-    fun createResourcePack(): File {
+    fun createResourcePack() {
+        val assetPacks = extractAssetPacks()
+        val file = ResourcePackBuilder(assetPacks).create()
+        
+        if (AutoUploadManager.enabled) {
+            runBlocking {
+                val url = AutoUploadManager.uploadPack(file)
+                ForceResourcePack.getInstance().setResourcePack(
+                    url,
+                    ComponentBuilder("Nova Resource Pack").create(),
+                    true
+                )
+            }
+        }
+    }
+    
+    private fun extractAssetPacks(): List<AssetPack> {
         val assetPacksDir = File(NOVA.dataFolder, "ResourcePack/AssetPacks/")
         assetPacksDir.deleteRecursively()
-        val assetPacks = (AddonManager.loaders.asSequence().map { (id, loader) -> loader.file to id } + (NOVA.pluginFile to "nova"))
+        return (AddonManager.loaders.asSequence().map { (id, loader) -> loader.file to id } + (NOVA.pluginFile to "nova"))
             .mapTo(ArrayList()) { (addonFile, namespace) ->
                 val assetPackDir = File(assetPacksDir, namespace)
                 
@@ -60,8 +86,6 @@ internal object Resources : Initializable() {
                 
                 return@mapTo AssetPack(assetPackDir, namespace)
             }
-        
-        return ResourcePackBuilder(assetPacks).create()
     }
     
     internal fun updateModelDataLookup(modelDataLookup: Map<String, Pair<ModelData?, ModelData?>>) {

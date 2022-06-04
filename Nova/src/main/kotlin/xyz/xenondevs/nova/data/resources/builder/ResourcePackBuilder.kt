@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonObject
 import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.model.ZipParameters
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -9,13 +10,15 @@ import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.IOUtils
 import xyz.xenondevs.nova.util.data.getIntOrNull
 import java.io.File
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
     
-    val packDir = File(NOVA.dataFolder, "ResourcePack/pack")
+    private val resourcePackDir = File(NOVA.dataFolder, "ResourcePack")
+    val packDir = File(resourcePackDir, "pack")
     val assetsDir = File(packDir, "assets")
     val languageDir = File(assetsDir, "minecraft/lang")
     val guisFile = File(assetsDir, "nova/font/gui.json")
@@ -72,10 +75,11 @@ internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
     }
     
     private fun createZip(): File {
-        val file = File(packDir, "ResourcePack.zip")
+        val parameters = ZipParameters().apply { isIncludeRootFolder = false }
+        val file = File(resourcePackDir, "ResourcePack.zip")
         val zip = ZipFile(file)
-        zip.addFolder(assetsDir)
-        zip.addFile(File(packDir, "pack.mcmeta"))
+        zip.addFolder(packDir, parameters)
+        IOUtils.removeZipTimestamps(file)
         
         return file
     }

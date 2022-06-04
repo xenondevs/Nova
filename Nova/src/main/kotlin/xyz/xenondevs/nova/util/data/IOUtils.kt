@@ -1,9 +1,13 @@
 package xyz.xenondevs.nova.util.data
 
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.util.StringUtils
 import java.io.*
+import java.nio.file.attribute.FileTime
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 import kotlin.math.max
 import kotlin.streams.asSequence
 
@@ -141,4 +145,32 @@ inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
             }
         }
     }
+}
+
+object IOUtils {
+    
+    fun removeZipTimestamps(zip: File) {
+        val zero = FileTime.fromMillis(0L)
+        
+        val temp = File(zip.parentFile, zip.name + StringUtils.randomString(5))
+        
+        val zin = ZipInputStream(zip.inputStream())
+        val zout = ZipOutputStream(temp.outputStream())
+        
+        use(zin, zout) {
+            while (true) {
+                val entry = zin.nextEntry ?: break
+                entry.lastAccessTime = zero
+                entry.lastModifiedTime = zero
+                entry.creationTime = zero
+                
+                zout.putNextEntry(entry)
+                zin.copyTo(zout)
+            }
+        }
+        
+        zip.delete()
+        temp.renameTo(zip)
+    }
+    
 }
