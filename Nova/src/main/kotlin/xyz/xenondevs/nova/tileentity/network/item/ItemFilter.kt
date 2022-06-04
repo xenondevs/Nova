@@ -4,21 +4,23 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.cbf.Compound
-import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundDataType
+import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.item.novaMaterial
 
-private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilterCBF")
+private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
 
 fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
     val container = itemMeta!!.persistentDataContainer
-    return container.get(ITEM_FILTER_KEY, CompoundDataType)?.let(::ItemFilter)
+    return container.get<Compound>(ITEM_FILTER_KEY)?.let(::ItemFilter)
 }
 
 fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter = getFilterConfigOrNull() ?: ItemFilter(size)
 
 fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     val itemMeta = itemMeta!!
-    itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, CompoundDataType, itemFilter.compound)
+    
+    itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, itemFilter.compound)
     setItemMeta(itemMeta)
 }
 

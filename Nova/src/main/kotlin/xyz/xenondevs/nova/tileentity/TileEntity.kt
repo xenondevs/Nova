@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.cbf.Compound
-import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundDataType
+import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
@@ -82,7 +82,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             val item = material.createItemBuilder(this).get()
             if (globalData.isNotEmpty()) {
                 val itemMeta = item.itemMeta!!
-                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, CompoundDataType, globalData)
+                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, globalData)
                 item.itemMeta = itemMeta
             }
             

@@ -26,7 +26,7 @@ class FakeArmorStand(
     private val viewers: List<Player>
         get() = FakeArmorStandManager.getChunkViewers(chunk)
     
-    private val entityId = NMSUtils.ENTITY_COUNTER.incrementAndGet()
+    val entityId = NMSUtils.ENTITY_COUNTER.incrementAndGet()
     private val uuid = UUID.randomUUID()
     
     private var spawnBuf: FriendlyByteBuf? = null
@@ -42,6 +42,9 @@ class FakeArmorStand(
     
     private val equipment = Array<MojangStack>(6) { MojangStack.EMPTY }
     private val entityDataHolder = ArmorStandDataHolder(entityId)
+    
+    var spawnHandler: ((Player) -> Unit)? = null
+    var despawnHandler: ((Player) -> Unit)? = null
     
     init {
         beforeSpawn?.invoke(this, entityDataHolder)
@@ -77,6 +80,8 @@ class FakeArmorStand(
         val dataBuf = this.dataBuf ?: entityDataHolder.createCompleteDataBuf().also { this.dataBuf = it }
         
         player.send(spawnBuf, equipmentBuf, dataBuf)
+        
+        spawnHandler?.invoke(player)
     }
     
     /**
@@ -84,6 +89,7 @@ class FakeArmorStand(
      */
     fun despawn(player: Player) {
         player.send(despawnBuf)
+        despawnHandler?.invoke(player)
     }
     
     /**
@@ -140,14 +146,12 @@ class FakeArmorStand(
      * This function automatically chooses which packet (Teleport / Pos / PosRot / Rot) to send.
      */
     fun teleport(newLocation: Location) {
-        if (newLocation.world != actualLocation.world) throw UnsupportedOperationException("Teleporting to different worlds is not supported.")
-        
         // release the spawn buf as the location has changed
         spawnBuf?.release()
         spawnBuf = null
         
         val viewers = viewers
-        if (viewers.isNotEmpty()) {
+        if (newLocation.world == actualLocation.world && viewers.isNotEmpty()) {
             var buf: FriendlyByteBuf? = null
             
             // get the correct packet for this kind of movement

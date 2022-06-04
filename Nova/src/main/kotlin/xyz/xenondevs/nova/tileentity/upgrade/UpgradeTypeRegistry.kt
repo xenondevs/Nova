@@ -4,36 +4,43 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 
+@Suppress("UNCHECKED_CAST")
 object UpgradeTypeRegistry {
     
-    private val _types = ArrayList<UpgradeType<*>>()
-    val types: List<UpgradeType<*>>
-        get() = _types
+    private val _types = HashMap<NamespacedId, UpgradeType<*>>()
+    val types: Collection<UpgradeType<*>>
+        get() = _types.values
     
     init {
-        UpgradeType.init() // Loads the default upgrade types
+        UpgradeType // Loads the default upgrade types
     }
     
-    @Suppress("UNCHECKED_CAST")
     fun <T> register(
         addon: Addon, name: String,
         item: ItemNovaMaterial, icon: ItemNovaMaterial,
         configLoader: (Any) -> T = { it as T }
-    ): UpgradeType<T> =
-        UpgradeType(NamespacedId(addon.description.id, name), item, icon, configLoader).also(_types::add)
+    ): UpgradeType<T> {
+        val id = NamespacedId(addon.description.id, name)
+        val type = UpgradeType(id, item, icon, configLoader)
+        _types[id] = type
+        return type
+    }
     
-    @Suppress("UNCHECKED_CAST")
     internal fun <T> register(
         name: String,
         item: ItemNovaMaterial, icon: ItemNovaMaterial,
         configLoader: (Any) -> T = { it as T }
-    ): UpgradeType<T> =
-        UpgradeType(NamespacedId("nova", name), item, icon, configLoader).also(_types::add)
+    ): UpgradeType<T> {
+        val id = NamespacedId("nova", name)
+        val type = UpgradeType(id, item, icon, configLoader)
+        _types[id] = type
+        return type
+    }
     
-    fun of(id: String): UpgradeType<*>? =
-        types.firstOrNull { it.id.toString() == id }
+    fun <T : UpgradeType<*>> of(id: NamespacedId): UpgradeType<*>? =
+        _types[id] as? T
     
-    fun of(item: ItemNovaMaterial): UpgradeType<*>? =
-        types.firstOrNull { it.item == item }
+    fun <T: UpgradeType<*>> of(item: ItemNovaMaterial): UpgradeType<*>? =
+        types.firstOrNull { it.item == item } as? T
     
 }

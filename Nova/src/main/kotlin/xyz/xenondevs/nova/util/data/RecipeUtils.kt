@@ -28,7 +28,6 @@ fun Recipe.getInputStacks(): List<ItemStack> =
         else -> throw UnsupportedOperationException("Unsupported Recipe type: ${javaClass.name}")
     }
 
-
 fun RecipeChoice.getInputStacks(): List<ItemStack> =
     when (this) {
         is RecipeChoice.MaterialChoice -> choices.map(::ItemStack)

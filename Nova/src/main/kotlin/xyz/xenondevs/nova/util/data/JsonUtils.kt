@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.player.attachment.Attachment
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*
@@ -22,7 +21,6 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter<NamespacedId>(NamespacedIdTypeAdapter)
         .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerialization)
         .registerTypeHierarchyAdapter<Location>(LocationSerialization)
-        .registerTypeHierarchyAdapter<Attachment>(AttachmentSerialization)
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
         .registerTypeHierarchyAdapter<ItemNovaMaterial>(NovaMaterialSerialization)
         .registerTypeHierarchyAdapter<YamlConfiguration>(YamlConfigurationTypeAdapter)

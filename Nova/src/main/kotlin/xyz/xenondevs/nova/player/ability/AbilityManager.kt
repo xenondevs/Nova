@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.player.ability
 
-import com.google.gson.JsonArray
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -11,9 +10,10 @@ import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.serialization.persistentdata.JsonElementDataType
+import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
@@ -63,28 +63,23 @@ object AbilityManager : Initializable(), Listener {
     }
     
     private fun saveActiveAbilities(player: Player) {
-        val abilityMap = activeAbilities[player]
+        val abilities = activeAbilities[player]?.map { it.key.id }
         val dataContainer = player.persistentDataContainer
         
-        if (abilityMap != null) {
-            val abilitiesJson = JsonArray()
-            abilityMap.keys.forEach { abilitiesJson.add(it.id.toString()) }
-            dataContainer.set(ABILITIES_KEY, JsonElementDataType, abilitiesJson)
-        } else {
-            dataContainer.remove(ABILITIES_KEY)
-        }
+        if (abilities != null)
+            dataContainer.set(ABILITIES_KEY, abilities)
+        else dataContainer.remove(ABILITIES_KEY)
     }
     
     private fun handlePlayerJoin(player: Player) {
         val dataContainer = player.persistentDataContainer
-        val array = dataContainer.get(ABILITIES_KEY, JsonElementDataType)?.asJsonArray
+        val ids = dataContainer.get<List<NamespacedId>>(ABILITIES_KEY)
         
-        array?.getAllStrings()
-            ?.forEach {
-                val abilityType = AbilityTypeRegistry.getAbilityType<AbilityType<*>>(it)
-                if (abilityType != null)
-                    giveAbility(player, abilityType)
-            }
+        ids?.forEach {
+            val abilityType = AbilityTypeRegistry.of<AbilityType<*>>(it)
+            if (abilityType != null)
+                giveAbility(player, abilityType)
+        }
     }
     
     private fun handlePlayerQuit(player: Player) {

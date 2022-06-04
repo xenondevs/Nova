@@ -4,6 +4,7 @@ import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.InventoryUpdatedEvent
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.tileentity.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -15,7 +16,7 @@ import kotlin.math.min
 
 private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
     val novaMaterial = novaMaterial ?: return null
-    return UpgradeTypeRegistry.of(novaMaterial)
+    return UpgradeTypeRegistry.of<UpgradeType<*>>(novaMaterial)
 }
 
 class UpgradeHolder internal constructor(
@@ -29,8 +30,8 @@ class UpgradeHolder internal constructor(
     val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handlePreInvUpdate); setInventoryUpdatedHandler(::handlePostInvUpdate) }
     val allowed: Set<UpgradeType<*>> = allowed.toSet()
     val upgrades: HashMap<UpgradeType<*>, Int> =
-        tileEntity.retrieveData<Map<String, Int>>("upgrades", ::HashMap)
-            .mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of(it.key) }
+        tileEntity.retrieveData<Map<NamespacedId, Int>>("upgrades", ::HashMap)
+            .mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of<UpgradeType<*>>(it.key) }
     
     val gui by lazy { UpgradesGUI(this) { lazyGUI.value.openWindow(it) } }
     

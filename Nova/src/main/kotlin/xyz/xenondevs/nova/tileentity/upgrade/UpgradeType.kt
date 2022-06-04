@@ -47,8 +47,6 @@ class UpgradeType<T> internal constructor(
         val ENERGY = register<Double>("energy", CoreItems.ENERGY_UPGRADE, CoreGUIMaterial.ENERGY_UPGRADE)
         val FLUID = register<Double>("fluid", CoreItems.FLUID_UPGRADE, CoreGUIMaterial.FLUID_UPGRADE)
         val RANGE = register<Int>("range", CoreItems.RANGE_UPGRADE, CoreGUIMaterial.RANGE_UPGRADE)
-        
-        internal fun init() = Unit
     }
     
     

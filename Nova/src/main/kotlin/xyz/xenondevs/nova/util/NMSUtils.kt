@@ -10,6 +10,7 @@ import net.minecraft.core.Rotations
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.dedicated.DedicatedServer
@@ -77,7 +78,7 @@ fun Player.send(vararg packets: Packet<*>) {
 }
 
 fun Player.send(vararg bufs: FriendlyByteBuf, retain: Boolean = true, flush: Boolean = true) {
-    val queue = PacketManager.playerHandlers[name]!!.queue
+    val queue = PacketManager.playerHandlers[name]?.queue ?: return
     bufs.forEach {
         if (retain) it.retain()
         queue += it
@@ -105,6 +106,13 @@ fun ClientboundPlaceGhostRecipePacket(containerId: Int, resourceLocation: String
     buffer.writeByte(containerId)
     buffer.writeResourceLocation(ResourceLocation(resourceLocation))
     return ClientboundPlaceGhostRecipePacket(buffer)
+}
+
+fun ClientboundSetPassengersPacket(vehicle: Int, passengers: IntArray): ClientboundSetPassengersPacket {
+    val buffer = FriendlyByteBuf(Unpooled.buffer())
+    buffer.writeVarInt(vehicle)
+    buffer.writeVarIntArray(passengers)
+    return ClientboundSetPassengersPacket(buffer)
 }
 
 fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {

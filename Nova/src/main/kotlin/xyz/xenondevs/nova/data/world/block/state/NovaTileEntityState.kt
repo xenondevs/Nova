@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.world.block.state
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.serialization.cbf.CBF
 import xyz.xenondevs.nova.data.serialization.cbf.Compound
-import xyz.xenondevs.nova.data.serialization.persistentdata.CompoundDataType
+import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -36,7 +36,7 @@ class NovaTileEntityState : NovaBlockState {
         this.ownerUUID = ctx.ownerUUID
         this.data = Compound()
         
-        val globalData = ctx.item.itemMeta?.persistentDataContainer?.get(TILE_ENTITY_KEY, CompoundDataType)
+        val globalData = ctx.item.itemMeta?.persistentDataContainer?.get<Compound>(TILE_ENTITY_KEY)
         if (globalData != null) data["global"] = globalData
     }
     

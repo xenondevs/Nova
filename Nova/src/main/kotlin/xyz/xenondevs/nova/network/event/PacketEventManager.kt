@@ -27,6 +27,7 @@ object PacketEventManager {
         registerPlayerEventType(ClientboundUpdateRecipesPacket::class, ::UpdateRecipesPacketEvent)
         registerPlayerEventType(ClientboundBlockDestructionPacket::class, ::BlockDestructionPacketEvent)
         registerPlayerEventType(ClientboundSoundPacket::class, ::SoundPacketEvent)
+        registerPlayerEventType(ClientboundSetPassengersPacket::class, ::SetPassengersPacketEvent)
         registerPlayerEventType(ServerboundPlaceRecipePacket::class, ::PlaceRecipePacketEvent)
         registerPlayerEventType(ServerboundSetCreativeModeSlotPacket::class, ::SetCreativeModeSlotPacketEvent)
         registerPlayerEventType(ServerboundPlayerActionPacket::class, ::PlayerActionPacketEvent)
