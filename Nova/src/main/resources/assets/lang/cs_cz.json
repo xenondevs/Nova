@@ -72,7 +72,6 @@
     "command.nova.usage.no-usage": "Tento předmět nemá využití.",
     "nova.tile_entity_limits.amount.deny": "Nemůžeš položit více bloků tohoto typu.",
     "command.nova.addons.header": "Rozšíření (%š): ",
-    "item.nova.wrench.mode.fluid": "Režim: Kapaliny",
     "menu.nova.energy_per_tick": "%s / tick",
     "command.nova.network_reload.success": "Všechny aktivní sítě byli znovu načteny.",
     "command.nova.create_resource_pack.start": "Vytvářím resouce pack... chvíli strpení",
