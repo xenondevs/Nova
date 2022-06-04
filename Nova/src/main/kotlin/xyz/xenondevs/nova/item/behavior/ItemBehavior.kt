@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.item.behavior
 
 import de.studiocode.invui.item.builder.ItemBuilder
+import net.md_5.bungee.api.chat.BaseComponent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -9,6 +10,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.item.LoreContext
 import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 
@@ -24,5 +26,6 @@ abstract class ItemBehavior {
     open fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerActionPacketEvent) = Unit
     
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
+    open fun getLore(itemStack: ItemStack, context: LoreContext?): List<Array<BaseComponent>> = emptyList()
     
 }

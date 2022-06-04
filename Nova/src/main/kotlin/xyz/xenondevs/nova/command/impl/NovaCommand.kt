@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.material.AdvancedTooltips
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -75,6 +76,9 @@ object NovaCommand : Command("nova") {
             .then(literal("items")
                 .requiresPlayerPermission("nova.command.items")
                 .executesCatching(::openItemInventory))
+            .then(literal("advancedTooltips")
+                .requiresPlayerPermission("nova.command.advancedTooltips")
+                .executesCatching(::toggleAdvancedTooltips))
             .then(literal("renderDistance")
                 .requiresPlayerPermission("nova.command.renderDistance")
                 .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
@@ -114,6 +118,11 @@ object NovaCommand : Command("nova") {
             Resources.createResourcePack()
             ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.create.success"))
         }
+    }
+    
+    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.advanced_tooltips." + AdvancedTooltips.toggle(player)))
     }
     
     private fun reuploadResourcePack(ctx: CommandContext<CommandSourceStack>) {

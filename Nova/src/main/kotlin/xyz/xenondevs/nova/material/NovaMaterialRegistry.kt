@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
-import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
+import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.TileEntityBlock
 import xyz.xenondevs.nova.world.block.model.ArmorStandModelProvider
@@ -37,7 +37,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         isInteractive: Boolean = true,
         properties: List<BlockPropertyType<*>> = listOf(Directional)
     ): TileEntityNovaMaterial {
-        return registerTileEntity(addon, name, options, tileEntityConstructor, listOf(NovaEnergyHolder::modifyItemBuilder),
+        return registerTileEntity(addon, name, options, tileEntityConstructor,
             placeCheck, multiBlockLoader, isInteractive, properties)
     }
     
@@ -46,7 +46,6 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         name: String,
         options: BlockOptions,
         tileEntityConstructor: TileEntityConstructor,
-        itemBuilderModifiers: List<ItemBuilderModifierFun>? = null,
         placeCheck: PlaceCheckFun? = null,
         multiBlockLoader: MultiBlockLoader? = null,
         isInteractive: Boolean = true,
@@ -54,9 +53,9 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     ): TileEntityNovaMaterial {
         val namespace = addon.description.id
         val material = TileEntityNovaMaterial(
-            NamespacedId(namespace, name), "block.$namespace.$name", null,
+            NamespacedId(namespace, name), "block.$namespace.$name", NovaItem(TileEntityItemBehavior),
             if (isInteractive) TileEntityBlock.INTERACTIVE else TileEntityBlock.NON_INTERACTIVE,
-            options, tileEntityConstructor, itemBuilderModifiers, ArmorStandModelProvider, properties, placeCheck, multiBlockLoader
+            options, tileEntityConstructor, ArmorStandModelProvider, properties, placeCheck, multiBlockLoader
         )
         return register(material)
     }

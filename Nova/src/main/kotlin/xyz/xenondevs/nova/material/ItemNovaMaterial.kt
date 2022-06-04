@@ -3,12 +3,18 @@ package xyz.xenondevs.nova.material
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
+import net.md_5.bungee.chat.ComponentSerializer
+import net.minecraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.i18n.LocaleManager
+import xyz.xenondevs.nova.item.LoreContext
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.data.withoutPreFormatting
+import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 
 open class ItemNovaMaterial internal constructor(
@@ -52,9 +58,22 @@ open class ItemNovaMaterial internal constructor(
     
     override fun toString() = id.toString()
     
-    protected fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+    protected fun modifyItemBuilder(itemBuilder: ItemBuilder, context: LoreContext? = null): ItemBuilder {
         var builder = itemBuilder
-        if (novaItem != null) builder = novaItem.modifyItemBuilder(itemBuilder)
+        if (novaItem != null) {
+            builder = novaItem.modifyItemBuilder(itemBuilder)
+            builder.addModifier { itemStack ->
+                val lore = novaItem.getLore(itemStack, context)
+                if (lore.isNotEmpty()) {
+                    val meta = itemStack.itemMeta!!
+                    val novaCompound = meta.unhandledTags["nova"] as CompoundTag
+                    novaCompound.put("lore", NBTUtils.createStringList(lore.map { ComponentSerializer.toString(it.withoutPreFormatting()) }))
+                    itemStack.itemMeta = meta
+                }
+    
+                itemStack
+            }
+        }
         
         return builder
     }

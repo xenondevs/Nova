@@ -135,7 +135,7 @@ object RecipeManager : Initializable(), Listener {
                             
                             val result = nmsRecipe.resultItem
                             if (PacketItems.isNovaItem(result))
-                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
+                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(null, result))
                         }
                         
                         is ShapelessRecipe -> {
@@ -146,7 +146,7 @@ object RecipeManager : Initializable(), Listener {
                             
                             val result = nmsRecipe.resultItem
                             if (PacketItems.isNovaItem(result))
-                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
+                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(null, result))
                         }
                         
                         is FurnaceRecipe -> {
@@ -157,7 +157,7 @@ object RecipeManager : Initializable(), Listener {
                             
                             val result = nmsRecipe.resultItem
                             if (PacketItems.isNovaItem(result))
-                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(result))
+                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(null, result))
                         }
                         
                         is StonecuttingRecipe -> {

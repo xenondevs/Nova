@@ -1,10 +1,13 @@
 package xyz.xenondevs.nova.item.behavior
 
 import de.studiocode.invui.item.builder.ItemBuilder
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.ValueReloadable
+import xyz.xenondevs.nova.item.LoreContext
 import xyz.xenondevs.nova.material.clientsideDurability
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.item.retrieveData
@@ -29,13 +32,7 @@ class Chargeable(
     
     fun setEnergy(itemStack: ItemStack, energy: Long) {
         val coercedEnergy = energy.coerceIn(0, maxEnergy)
-        
         itemStack.storeData(ENERGY_KEY, coercedEnergy)
-        
-        val itemMeta = itemStack.itemMeta!!
-        itemMeta.lore = listOf("§7" + NumberFormatUtils.getEnergyString(coercedEnergy, maxEnergy))
-        itemStack.itemMeta = itemMeta
-        
         itemStack.clientsideDurability = coercedEnergy.toDouble() / maxEnergy.toDouble()
     }
     
@@ -46,6 +43,11 @@ class Chargeable(
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
         itemBuilder.addModifier { setEnergy(it, 0); it }
         return itemBuilder
+    }
+    
+    override fun getLore(itemStack: ItemStack, context: LoreContext?): List<Array<BaseComponent>> {
+        val energy = getEnergy(itemStack)
+        return listOf(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, maxEnergy)))
     }
     
 }

@@ -51,6 +51,9 @@ permissions:
   nova.command.items:
     description: Allows players to open the nova items menu.
     default: true
+  "nova.command.advancedTooltips":
+    description: Allows players to toggle advanced tooltips for Nova items.
+    default: true
   nova.command.renderDistance:
     description: Allows players to configure their armor stand render distance.
     default: true
@@ -68,3 +71,5 @@ permissions:
     description: Allows players to use the /nvmodeldata command.
   nova.command.addons:
     description: Allows players to use the /nova addons command.
+  nova.command.resourcePack:
+    description: Allows players to create and reupload the resource pack.

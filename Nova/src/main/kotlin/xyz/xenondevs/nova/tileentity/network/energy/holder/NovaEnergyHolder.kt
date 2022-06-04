@@ -1,14 +1,11 @@
 package xyz.xenondevs.nova.tileentity.network.energy.holder
 
-import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.serverTick
 import java.util.*
 import kotlin.math.max
@@ -70,18 +67,6 @@ sealed class NovaEnergyHolder(
     
     private fun callUpdateHandlers() =
         updateHandlers.forEach { it() }
-    
-    companion object {
-        
-        fun modifyItemBuilder(builder: ItemBuilder, tileEntity: TileEntity?): ItemBuilder {
-            val energy = tileEntity
-                ?.let { (tileEntity as NetworkedTileEntity).energyHolder.energy }
-                ?: 0
-            builder.addLoreLines("§7" + NumberFormatUtils.getEnergyString(energy))
-            return builder
-        }
-        
-    }
     
 }
 

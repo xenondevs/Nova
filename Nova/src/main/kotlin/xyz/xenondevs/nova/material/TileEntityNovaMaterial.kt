@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.impl.TileEntityContext
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -24,7 +25,6 @@ class TileEntityNovaMaterial internal constructor(
     novaBlock: NovaBlock<NovaTileEntityState>,
     options: BlockOptions,
     internal val tileEntityConstructor: TileEntityConstructor,
-    private val itemBuilderModifiers: List<ItemBuilderModifierFun>?,
     modelProvider: BlockModelProviderType<*>,
     properties: List<BlockPropertyType<*>>,
     placeCheck: PlaceCheckFun?,
@@ -32,7 +32,7 @@ class TileEntityNovaMaterial internal constructor(
 ) : BlockNovaMaterial(
     id,
     localizedName,
-    novaItem, 
+    novaItem,
     novaBlock as NovaBlock<NovaBlockState>, // fixme: users could cast to BlockNovaMaterial and then call methods on the NovaBlock with a BlockState that is not a NovaTileEntityState
     options,
     modelProvider,
@@ -48,7 +48,7 @@ class TileEntityNovaMaterial internal constructor(
      * returned by the [tileEntityConstructor] function.
      */
     fun createItemBuilder(tileEntity: TileEntity): ItemBuilder {
-        return modifyItemBuilder(createBasicItemBuilder(), tileEntity)
+        return modifyItemBuilder(createBasicItemBuilder(), TileEntityContext(tileEntity))
     }
     
     /**
@@ -62,11 +62,5 @@ class TileEntityNovaMaterial internal constructor(
     
     override fun createNewBlockState(ctx: BlockPlaceContext): NovaTileEntityState =
         NovaTileEntityState(this, ctx)
-    
-    private fun modifyItemBuilder(itemBuilder: ItemBuilder, tileEntity: TileEntity): ItemBuilder {
-        var builder = modifyItemBuilder(itemBuilder)
-        itemBuilderModifiers?.forEach { builder = it.invoke(builder, tileEntity) }
-        return builder
-    }
     
 }

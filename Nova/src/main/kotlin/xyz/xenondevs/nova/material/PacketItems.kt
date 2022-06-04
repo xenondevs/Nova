@@ -1,15 +1,18 @@
 package xyz.xenondevs.nova.material
 
 import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.StringTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData.DataItem
 import net.minecraft.world.item.Items
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
@@ -19,9 +22,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.network.event.clientbound.*
 import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
-import xyz.xenondevs.nova.util.data.NBTUtils
-import xyz.xenondevs.nova.util.data.coloredText
-import xyz.xenondevs.nova.util.data.withoutPreFormatting
+import xyz.xenondevs.nova.util.data.*
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.namespacedKey
@@ -41,6 +42,7 @@ var ItemStack.clientsideDurability: Double
         this.itemMeta = itemMeta
     }
 
+@Suppress("DEPRECATION")
 object PacketItems : Initializable(), Listener {
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
@@ -55,6 +57,7 @@ object PacketItems : Initializable(), Listener {
     
     @EventHandler
     fun handleSetContentPacket(event: ContainerSetContentPacketEvent) {
+        val player = event.player
         val packet = event.packet
         val items = packet.items
         val carriedItem = packet.carriedItem
@@ -63,11 +66,11 @@ object PacketItems : Initializable(), Listener {
             if (isContainerItem(item))
                 items[i] = filterContainerItems(item, fromCreative = false)
             else if (isNovaItem(item))
-                items[i] = getFakeItem(item)
+                items[i] = getFakeItem(player, item)
         }
         
         if (isNovaItem(carriedItem))
-            event.carriedItem = getFakeItem(carriedItem)
+            event.carriedItem = getFakeItem(player, carriedItem)
     }
     
     @EventHandler
@@ -77,18 +80,19 @@ object PacketItems : Initializable(), Listener {
         if (isContainerItem(item))
             event.item = filterContainerItems(item, fromCreative = false)
         else if (isNovaItem(item))
-            event.item = getFakeItem(item)
+            event.item = getFakeItem(event.player, item)
     }
     
     @EventHandler
     fun handleEntityData(event: SetEntityDataPacketEvent) {
+        val player = event.player
         val packet = event.packet
         val data = packet.unpackedData ?: return
         data.forEachIndexed { i, d ->
             val value = d.value
             if (value is MojangStack && isNovaItem(value)) {
                 @Suppress("UNCHECKED_CAST") // Has to be <MojangStack> since the value is a MojangStack
-                val newDataItem = DataItem(d.accessor as EntityDataAccessor<MojangStack>, getFakeItem(value))
+                val newDataItem = DataItem(d.accessor as EntityDataAccessor<MojangStack>, getFakeItem(player, value, false))
                 data[i] = newDataItem
             }
         }
@@ -96,12 +100,13 @@ object PacketItems : Initializable(), Listener {
     
     @EventHandler
     fun handleSetEquipment(event: SetEquipmentPacketEvent) {
+        val player = event.player
         val packet = event.packet
         val slots = packet.slots
         
         slots.forEachIndexed { i, slot ->
             if (isNovaItem(slot.second))
-                slots[i] = MojangPair(slot.first, getFakeItem(slot.second))
+                slots[i] = MojangPair(slot.first, getFakeItem(player, slot.second))
         }
     }
     
@@ -147,24 +152,62 @@ object PacketItems : Initializable(), Listener {
     internal fun getNovaItem(item: MojangStack): MojangStack {
         return item.apply {
             this.item = SERVER_SIDE_ITEM
-            tag?.remove("CustomModelData")
+            
+            val tag = tag!!
+            tag.remove("CustomModelData")
+            tag.remove("Damage")
+            
+            val nova = tag.getOrNull<CompoundTag>("nova")
+            val display = tag.getOrNull<CompoundTag>("display")
+            
+            if (nova != null && display != null) {
+                display.remove("Lore")
+                
+                val clientName = display.getOrNull<StringTag>("Name")?.asString
+                val novaName = nova.getOrNull<StringTag>("name")?.asString
+                
+                if (clientName == novaName)
+                    display.remove("Name")
+            }
         }
     }
     
-    internal fun getFakeItem(item: MojangStack): MojangStack {
-        val novaTag = item.tag!!.getCompound("nova")
+    internal fun getFakeItem(player: Player?, item: MojangStack, useName: Boolean = true): MojangStack {
+        val itemTag = item.tag!!
+        val novaTag = itemTag.getCompound("nova")
             ?: throw IllegalStateException("Item is not a Nova item!")
+        
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)
         val subId = novaTag.getInt("subId")
         val isBlock = novaTag.getBoolean("isBlock")
         val durabilityPercentage = if (novaTag.contains("durability")) novaTag.getDouble("durability") else null
+        val name = novaTag.getString("name")
+        val lore = if (novaTag.contains("lore")) novaTag.getList("lore", NBTUtils.TAG_STRING) else null
         
         val (itemData, blockData) = Resources.getModelDataOrNull(id) ?: return getMissingItem(item, id)
         val data = (if (isBlock) blockData else itemData) ?: return getMissingItem(item, id)
         
         val newItem = item.copy()
+        val newItemTag = newItem.tag!!
         newItem.item = CraftMagicNumbers.getItem(data.material)
-        newItem.tag!!.putInt("CustomModelData", data.dataArray[subId])
+        newItemTag.putInt("CustomModelData", data.dataArray[subId])
+        
+        val displayTag: CompoundTag = if (newItemTag.contains("display")) {
+            newItemTag.getCompound("display")
+        } else CompoundTag().also { newItemTag.put("display", it) }
+        
+        if (useName && !displayTag.contains("Name")) {
+            displayTag.putString("Name", name)
+        }
+        
+        if (lore != null) {
+            displayTag.put("Lore", lore)
+        }
+        
+        if (player != null && player in AdvancedTooltips.players) {
+            val newLore = displayTag.getOrPut("Lore", ::ListTag)
+            newLore.add(StringTag.valueOf(ComponentSerializer.toString(TextComponent.fromLegacyText("§8$id").withoutPreFormatting())))
+        }
         
         if (durabilityPercentage != null) {
             val maxDurability = newItem.item.maxDamage
@@ -223,7 +266,7 @@ object PacketItems : Initializable(), Listener {
                 if (isFakeItem(contentItem)) // Don't collapse if statement to prevent isNovaItem call
                     getNovaItem(contentItem).save(compound)
             } else if (isNovaItem(contentItem)) {
-                getFakeItem(contentItem).save(compound)
+                getFakeItem(null, contentItem).save(compound)
             } else {
                 contentItem.save(compound)
             }

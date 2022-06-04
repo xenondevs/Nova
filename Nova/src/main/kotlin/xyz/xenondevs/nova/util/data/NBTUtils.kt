@@ -48,8 +48,26 @@ object NBTUtils {
         return tag
     }
     
-    fun convertListToStream(tag: ListTag) : Stream<ItemStack> {
+    fun convertListToStream(tag: ListTag): Stream<ItemStack> {
         return tag.stream().map { ItemStack.of(it as CompoundTag) }
     }
     
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T : Tag> CompoundTag.getOrPut(key: String, create: () -> T): T {
+    if (contains(key))
+        return get(key) as T
+    
+    val value = create()
+    put(key, value)
+    
+    return value
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T : Tag> CompoundTag.getOrNull(key: String): T? {
+    return if (contains(key)) {
+        get(key) as? T
+    } else null
 }
