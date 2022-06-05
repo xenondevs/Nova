@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.unhandledTags
 
 class ModelData(val material: Material, val dataArray: IntArray, val id: String) {
@@ -19,9 +20,9 @@ class ModelData(val material: Material, val dataArray: IntArray, val id: String)
     fun createClientsideItemBuilder(name: Array<BaseComponent>? = null, lore: List<Array<BaseComponent>>? = null, subId: Int = 0): ItemBuilder =
         ItemBuilder(material)
             .setDisplayName(*name ?: emptyArray())
-            .setLore(lore)
             .setCustomModelData(dataArray[subId])
             .addModifier { modifyNBT(it, subId, true) }
+            .apply { lore?.forEach { addLoreLines(it.withoutPreFormatting()) } }
     
     private fun modifyNBT(itemStack: ItemStack, subId: Int, clientside: Boolean): ItemStack {
         val novaCompound = CompoundTag()
