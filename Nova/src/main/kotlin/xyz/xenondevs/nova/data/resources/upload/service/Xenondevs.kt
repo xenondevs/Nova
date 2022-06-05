@@ -25,7 +25,6 @@ internal object Xenondevs : UploadService {
     }
     
     override suspend fun upload(file: File): String {
-        println("uploading")
         val json = HTTP_CLIENT.preparePut(API_URL) {
             header("key", key)
             setBody(BinaryBufferedBody(file.inputStream(), contentType = Zip))
@@ -39,7 +38,6 @@ internal object Xenondevs : UploadService {
         }
         val url = json.getString("url")
         checkNotNull(url) { "Server did not return a url" }
-        println("uploaded!: $url")
         return url
     }
     

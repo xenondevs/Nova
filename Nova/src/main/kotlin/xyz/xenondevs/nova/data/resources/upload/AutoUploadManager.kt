@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.initialize.Initializable
@@ -24,7 +25,7 @@ internal object AutoUploadManager : Initializable() {
     override val inMainThread = false
     override val dependsOn = setOf(NovaConfig)
     
-    private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost)
+    private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost, CustomMultiPart)
     
     private val commonPacks: Set<String> by lazy { GSON.fromJson<HashSet<String>>(LIST_COMMON_URL.readText()) ?: emptySet() }
     
@@ -82,7 +83,7 @@ internal object AutoUploadManager : Initializable() {
         }
         
         if (url == null)
-            selectedService?.upload(pack)
+            url = selectedService?.upload(pack)
         
         this.url = url
         forceResourcePack()
