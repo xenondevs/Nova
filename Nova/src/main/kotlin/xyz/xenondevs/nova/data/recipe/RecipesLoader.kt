@@ -55,10 +55,9 @@ object RecipesLoader {
         if (file.name.matches(RECIPE_FILE_PATTERN)) {
             UpdatableFile.load(file) { if (addon != null) getResourceAsStream(addon.file, path)!! else getResourceAsStream(path)!! }
             return NOVA.dataFolder.toURI().relativize(file.toURI()).path
-        } else {
-            LOGGER.severe("Could not load recipe file $path: Invalid file name")
         }
-    
+        
+        LOGGER.severe("Could not load recipe file $path: Invalid file name")
         return null
     }
     

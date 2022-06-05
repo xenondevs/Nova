@@ -9,7 +9,10 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.world.loot.LootItem
+import xyz.xenondevs.nova.world.loot.LootTable
 import java.io.File
+import java.io.Reader
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.reflect.KProperty
@@ -24,6 +27,9 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
         .registerTypeHierarchyAdapter<ItemNovaMaterial>(NovaMaterialSerialization)
         .registerTypeHierarchyAdapter<YamlConfiguration>(YamlConfigurationTypeAdapter)
+        .registerTypeHierarchyAdapter<IntRange>(IntRangeSerialization)
+        .registerTypeHierarchyAdapter<LootTable>(LootTableSerialization)
+        .registerTypeHierarchyAdapter<LootItem>(LootItemSerialization)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()
         .create()
@@ -179,6 +185,10 @@ inline fun <reified T> Gson.fromJson(json: String?): T? {
 inline fun <reified T> Gson.fromJson(jsonElement: JsonElement?): T? {
     if (jsonElement == null) return null
     return fromJson(jsonElement, type<T>())
+}
+
+inline fun <reified T> Gson.fromJson(reader: Reader): T? {
+    return fromJson(reader, type<T>())
 }
 
 inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: Any): GsonBuilder =
