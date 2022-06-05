@@ -175,6 +175,9 @@ object PacketItems : Initializable(), Listener {
         val novaTag = itemTag.getCompound("nova")
             ?: throw IllegalStateException("Item is not a Nova item!")
         
+        if (novaTag.contains("clientside"))
+            return item
+        
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)
         val material = NovaMaterialRegistry.getOrNull(id) ?: return getMissingItem(item, id)
         val subId = novaTag.getInt("subId")

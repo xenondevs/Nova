@@ -21,7 +21,7 @@ class ItemSideConfigGUI(
     private val allowedTypes = itemHolder.allowedConnectionTypes.mapValues { (_, type) -> type.included }
     private val buttonBuilders = inventories.withIndex().associate { (index, triple) ->
         triple.first to BUTTON_COLORS[index]
-            .createBasicItemBuilder()
+            .createClientsideItemBuilder()
             .addLoreLines(TranslatableComponent(triple.second).apply { color = ChatColor.AQUA })
     }
     

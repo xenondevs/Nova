@@ -44,7 +44,7 @@ abstract class VerticalBar(height: Int) : Supplier<Item> {
             val displayPercentage = max(min((percentage - displayPercentageStart) * totalSections, 1.0), 0.0)
             val state = round(displayPercentage * 16).toInt()
             
-            return modifyItemBuilder(barMaterial.item.createItemBuilder(state))
+            return modifyItemBuilder(barMaterial.item.createClientsideItemBuilder(subId = state))
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit

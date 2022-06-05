@@ -186,7 +186,7 @@ object ItemUtils {
     }
     
     @Suppress("LiftReturnOrAssignment")
-    fun getItemBuilder(id: String, basic: Boolean = false): ItemBuilder {
+    fun getItemBuilder(id: String, basicClientSide: Boolean = false): ItemBuilder {
         try {
             return when (id.substringBefore(':')) {
                 "minecraft" -> ItemBuilder(toItemStack(id))
@@ -194,13 +194,13 @@ object ItemUtils {
                     val name = id.substringAfter(':')
                     val novaMaterial = NovaMaterialRegistry.getNonNamespaced(name).first()
                     
-                    if (basic) novaMaterial.createBasicItemBuilder()
+                    if (basicClientSide) novaMaterial.item.createClientsideItemBuilder()
                     else novaMaterial.createItemBuilder()
                 }
                 else -> {
                     val novaMaterial = NovaMaterialRegistry.getOrNull(id)
                     if (novaMaterial != null) {
-                        if (basic) novaMaterial.createBasicItemBuilder()
+                        if (basicClientSide) novaMaterial.item.createClientsideItemBuilder()
                         else novaMaterial.createItemBuilder()
                     } else CustomItemServiceManager.getItemByName(id)!!.let(::ItemBuilder)
                 }

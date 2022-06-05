@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.data.setLocalizedName
 class PageBackItem : PageItem(false) {
     
     override fun getItemProvider(gui: PagedGUI): ItemProvider {
-        val itemBuilder = (if (gui.hasPageBefore()) CoreGUIMaterial.ARROW_1_LEFT else CoreGUIMaterial.LIGHT_ARROW_1_LEFT).createBasicItemBuilder()
+        val itemBuilder = (if (gui.hasPageBefore()) CoreGUIMaterial.ARROW_1_LEFT else CoreGUIMaterial.LIGHT_ARROW_1_LEFT).createClientsideItemBuilder()
         itemBuilder.setLocalizedName("menu.nova.paged.back")
         itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {
@@ -32,7 +32,7 @@ class PageBackItem : PageItem(false) {
 class PageForwardItem : PageItem(true) {
     
     override fun getItemProvider(gui: PagedGUI): ItemProvider {
-        val itemBuilder = (if (gui.hasNextPage()) CoreGUIMaterial.ARROW_1_RIGHT else CoreGUIMaterial.LIGHT_ARROW_1_RIGHT).createBasicItemBuilder()
+        val itemBuilder = (if (gui.hasNextPage()) CoreGUIMaterial.ARROW_1_RIGHT else CoreGUIMaterial.LIGHT_ARROW_1_RIGHT).createClientsideItemBuilder()
         itemBuilder.setLocalizedName("menu.nova.paged.forward")
         itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {

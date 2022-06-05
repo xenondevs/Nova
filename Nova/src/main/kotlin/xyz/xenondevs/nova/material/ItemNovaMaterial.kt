@@ -22,17 +22,13 @@ open class ItemNovaMaterial internal constructor(
     val novaItem = novaItem ?: NovaItem()
     val item: ModelData by lazy { Resources.getModelData(id).first!! }
     
-    val basicItemProviders: LazyArray<ItemProvider> by lazy {
-        LazyArray(item.dataArray.size) { ItemWrapper(item.createItemBuilder(it).get()) }
-    }
-    
     val itemProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { ItemWrapper(this.novaItem.modifyItemBuilder(item.createItemBuilder(it)).get()) }
     }
     
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
-            val itemStack = basicItemProvider.get()
+            val itemStack = item.createItemBuilder(subId).get()
             ItemWrapper(item.createClientsideItemBuilder(
                 this.novaItem.getName(itemStack),
                 null,
@@ -52,7 +48,6 @@ open class ItemNovaMaterial internal constructor(
         }
     }
     
-    val basicItemProvider: ItemProvider by lazy { basicItemProviders[0] }
     val itemProvider: ItemProvider by lazy { itemProviders[0] }
     val basicClientsideProvider: ItemProvider by lazy { basicClientsideProviders[0] }
     val clientsideProvider: ItemProvider by lazy { clientsideProviders[0] }
@@ -76,6 +71,9 @@ open class ItemNovaMaterial internal constructor(
      */
     fun createItemBuilder(): ItemBuilder =
         novaItem.modifyItemBuilder(createBasicItemBuilder())
+    
+    fun createClientsideItemBuilder(): ItemBuilder =
+        item.createClientsideItemBuilder()
     
     /**
      * Creates an [ItemStack] for this [ItemNovaMaterial].

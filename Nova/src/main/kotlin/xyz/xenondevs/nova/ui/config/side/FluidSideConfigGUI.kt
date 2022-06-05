@@ -26,7 +26,7 @@ class FluidSideConfigGUI(
     private val buttonBuilders: Map<FluidContainer, ItemBuilder> =
         inventories.withIndex().associate { (index, triple) ->
             triple.first to BUTTON_COLORS[index]
-                .createBasicItemBuilder()
+                .createClientsideItemBuilder()
                 .addLoreLines(TranslatableComponent(triple.second).apply { color = ChatColor.AQUA })
         }
     

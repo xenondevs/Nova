@@ -63,13 +63,13 @@ class EnergySideConfigGUI(
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (energyHolder.connectionConfig[blockFace]!!) {
                 NetworkConnectionType.NONE ->
-                    CoreGUIMaterial.GRAY_BTN.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
+                    CoreGUIMaterial.GRAY_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
                 NetworkConnectionType.EXTRACT ->
-                    CoreGUIMaterial.ORANGE_BTN.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
+                    CoreGUIMaterial.ORANGE_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
                 NetworkConnectionType.INSERT ->
-                    CoreGUIMaterial.BLUE_BTN.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
+                    CoreGUIMaterial.BLUE_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
                 NetworkConnectionType.BUFFER ->
-                    CoreGUIMaterial.GREEN_BTN.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
+                    CoreGUIMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
             }.setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         

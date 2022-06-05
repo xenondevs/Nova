@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
@@ -58,6 +59,18 @@ object AbilityManager : Initializable(), Listener {
         if (abilityMap.size == 1)
             activeAbilities -= player
         else abilityMap -= type
+        
+        saveActiveAbilities(player)
+    }
+    
+    fun takeAbility(player: Player, ability: Ability) {
+        val abilityMap = activeAbilities[player] ?: return
+        
+        abilityMap.removeIf { it.value == ability }
+        ability.handleRemove()
+        
+        if (abilityMap.isEmpty())
+            activeAbilities -= player
         
         saveActiveAbilities(player)
     }
