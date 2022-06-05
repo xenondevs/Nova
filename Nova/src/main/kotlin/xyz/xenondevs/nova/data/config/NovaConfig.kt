@@ -63,7 +63,7 @@ object NovaConfig : Initializable() {
                     val configName = "$id:${path.substringBeforeLast('.')}"
                     configs[configName] = ConfigExtractor.extract(
                         "configs/$id/$path",
-                        loader.classLoader.getResourceAsStream(it)!!.readAllBytes()
+                        getResourceAsStream(loader.file, it)!!.readAllBytes()
                     )
                 }
         }
