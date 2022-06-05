@@ -38,10 +38,12 @@ import xyz.xenondevs.nova.world.region.Region
 import java.util.*
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
-val SELF_UPDATE_REASON = object : UpdateReason {}
-val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
-
 abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), Reloadable, ITileEntity {
+    
+    companion object {
+        val SELF_UPDATE_REASON = object : UpdateReason {}
+        val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
+    }
     
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid
@@ -69,17 +71,24 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         private set
     
     abstract val gui: Lazy<TileEntityGUI>?
-    internal val inventories = ArrayList<VirtualInventory>()
-    private val fluidContainers = HashMap<FluidContainer, Boolean>()
+    
     private val multiModels = ArrayList<MultiModel>()
     private val particleTasks = ArrayList<TileEntityParticleTask>()
+    
+    private val _inventories = HashMap<VirtualInventory, Boolean>()
+    private val _fluidContainers = HashMap<NovaFluidContainer, Boolean>()
+    
+    val inventories: List<VirtualInventory>
+        get() = _inventories.keys.toList()
+    val fluidContainers: List<FluidContainer>
+        get() = _fluidContainers.keys.toList()
     
     override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
         val drops = ArrayList<ItemStack>()
         if (includeSelf) {
             saveData()
             
-            val item = material.createItemBuilder(this).get()
+            val item = material.createItemStack()
             if (globalData.isNotEmpty()) {
                 val itemMeta = item.itemMeta!!
                 itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, globalData)
@@ -90,7 +99,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         }
         
         if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
-        inventories.forEach { drops += it.items.filterNotNull() }
+        _inventories.forEach { (inv, global) -> if (!global) drops += inv.items.filterNotNull() }
         return drops
     }
     
@@ -101,12 +110,16 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         if (this is Upgradable)
             upgradeHolder.save(data)
         
-        inventories.forEach { storeData("inventory.${it.uuid}", it) }
-        fluidContainers.forEach { (container, global) ->
-            val data = Compound()
-            data["amount"] = container.amount
-            data["type"] = container.type
-            storeData("fluidContainer.${container.uuid}", data, global)
+        _inventories.forEach { (inv, global) ->
+            storeData("inventory.${inv.uuid}", inv, global)
+        }
+        
+        _fluidContainers.forEach { (con, global) ->
+            val compound = Compound()
+            compound["amount"] = con.amount
+            compound["type"] = con.type
+            
+            storeData("fluidContainer.${con.uuid}", compound, global)
         }
     }
     
@@ -165,15 +178,14 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
-     * When [dropItems] is true, the [VirtualInventory] will automatically be
-     * deleted and its contents dropped when the [TileEntity] is destroyed.
      */
     fun getInventory(
         salt: String,
         size: Int,
         stackSizes: IntArray,
+        global: Boolean = false,
         preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
-        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null
+        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
     ): VirtualInventory {
         val invUUID = uuid.salt(salt)
         val inventory = retrieveData("inventory.$invUUID") {
@@ -183,21 +195,30 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         if (preUpdateHandler != null) inventory.setItemUpdateHandler(preUpdateHandler)
         if (afterUpdateHandler != null) inventory.setInventoryUpdatedHandler(afterUpdateHandler)
         
-        inventories += inventory
+        _inventories[inventory] = global
         return inventory
     }
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
-     * When [dropItems] is true, the [VirtualInventory] will automatically be
-     * deleted and its contents dropped when the [TileEntity] is destroyed.
      */
     fun getInventory(
         salt: String,
         size: Int,
         preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
         afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
-    ) = getInventory(salt, size, IntArray(size) { 64 }, preUpdateHandler, afterUpdateHandler)
+    ) = getInventory(salt, size, IntArray(size) { 64 }, false, preUpdateHandler, afterUpdateHandler)
+    
+    /**
+     * Gets a [VirtualInventory] for this [TileEntity].
+     */
+    fun getInventory(
+        salt: String,
+        size: Int,
+        global: Boolean = false,
+        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
+        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
+    ) = getInventory(salt, size, IntArray(size) { 64 }, global, preUpdateHandler, afterUpdateHandler)
     
     /**
      * Gets a [FluidContainer] for this [TileEntity].
@@ -220,13 +241,13 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, storedAmount
             ?: defaultAmount, capacity, upgradeHolder)
         updateHandler?.apply(container.updateHandlers::add)
-        fluidContainers[container] = global
+        _fluidContainers[container] = global
         return container
     }
     
     /**
      * Creates a new [MultiModel] for this [TileEntity].
-     * When the [TileEntity] is removed, all [Model]s belonging
+     * When the [TileEntity] is removed, all [Models][Model] belonging
      * to this [MultiModel] will be removed.
      */
     fun createMultiModel(): MultiModel {

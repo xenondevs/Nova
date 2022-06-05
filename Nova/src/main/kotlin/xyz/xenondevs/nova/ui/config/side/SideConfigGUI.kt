@@ -102,7 +102,7 @@ class SideConfigGUI(
     
 }
 
-class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(CoreGUIMaterial.SIDE_CONFIG_BTN.item.createItemBuilder("menu.nova.side_config")) {
+class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(CoreGUIMaterial.SIDE_CONFIG_BTN.itemProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)

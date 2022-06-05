@@ -101,7 +101,7 @@ fun TranslatableComponent.toPlainText(locale: String): String {
     return text.removeMinecraftFormatting()
 }
 
-fun Array<out BaseComponent>.forceDefaultFont(): Array<out BaseComponent> {
+fun Array<BaseComponent>.forceDefaultFont(): Array<BaseComponent> {
     var previousComponent = DEFAULT_FONT_TEMPLATE
     for (component in this) {
         component.copyFormatting(previousComponent, false)
@@ -111,11 +111,14 @@ fun Array<out BaseComponent>.forceDefaultFont(): Array<out BaseComponent> {
     return this
 }
 
-fun Array<out BaseComponent>.withoutPreFormatting(): Array<out BaseComponent> =
+fun Array<BaseComponent>.withoutPreFormatting(): Array<BaseComponent> =
     ComponentUtils.withoutPreFormatting(*this)
 
-fun BaseComponent.withoutPreFormatting(): Array<out BaseComponent> =
+fun BaseComponent.withoutPreFormatting(): Array<BaseComponent> =
     ComponentUtils.withoutPreFormatting(this)
+
+fun Array<BaseComponent>.serialize(): String =
+    ComponentSerializer.toString(this)
 
 object ComponentUtils {
     

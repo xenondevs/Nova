@@ -17,7 +17,7 @@ open class ProgressItem(val material: ItemNovaMaterial, private val maxState: In
         }
     
     override fun getItemProvider(): ItemProvider {
-        return material.item.createItemBuilder("", (percentage * maxState).roundToInt())
+        return material.item.createItemBuilder((percentage * maxState).roundToInt())
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit

@@ -7,25 +7,37 @@ resource_pack:
     # If the pack is not hosted by us, your configured auto uploader will be used.
     use_common_packs: true
   # Configures which materials are used for custom items. Can be changed to mitigate conflicts with other plugins that use custom resource packs.
-  # These values can be changed at any time, existing items in the world will keep working.
+  # These values can be changed at any time, existing items in the world will use the new material and adjusted model data.
+  # When changing the material type, please make sure to select another material with the same abilities.
+  # A resource pack rebuild is required for changes to take effect.
   materials:
+    # The default material to be used if no specific ability is needed.
     default:
       type: shulker_shell
       modelDataStart: 1
+    # The material for damageable items.
     damageable:
       type: fishing_rod
       modelDataStart: 1
+    # The material for items which can be rendered translucent by the client.
     translucent:
       type: shulker_shell
       modelDataStart: 1
+    # The material for consumable items.
     consumable:
       type: apple
       modelDataStart: 1
+    # The material for items that can always be consumed, regardless of the current food level.
     always_consumable:
       type: golden_apple
       modelDataStart: 1
+    # The material for items which can be consumed fast.
     fast_consumable:
       type: dried_kelp
+      modelDataStart: 1
+    # Some items require a specific material that cannot be changed (for example armor pieces).
+    # The property below adjusts the model data start for all of them.
+    custom:
       modelDataStart: 1
 
 # The render distance for armor stands from Nova, in chunks.

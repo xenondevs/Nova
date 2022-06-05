@@ -10,7 +10,6 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.item.LoreContext
 import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 
@@ -26,6 +25,7 @@ abstract class ItemBehavior {
     open fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerActionPacketEvent) = Unit
     
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
-    open fun getLore(itemStack: ItemStack, context: LoreContext?): List<Array<BaseComponent>> = emptyList()
+    open fun getName(itemStack: ItemStack): Array<BaseComponent>? = null
+    open fun getLore(itemStack: ItemStack): List<Array<BaseComponent>>? = null
     
 }

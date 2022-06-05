@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.material
 
+import de.studiocode.invui.item.ItemProvider
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -10,6 +11,7 @@ import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.SoundEffect
+import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolLevel
 import xyz.xenondevs.nova.world.BlockPos
@@ -44,6 +46,9 @@ open class BlockNovaMaterial internal constructor(
     val breakSound = options.breakSound
     val breakParticles = options.breakParticles
     val showBreakAnimation = options.showBreakAnimation
+    
+    val blockProviders: LazyArray<ItemProvider> by lazy { LazyArray(block.dataArray.size) { block.createClientsideItemBuilder(null, null, it) } }
+    val blockProvider: ItemProvider by lazy { blockProviders[0] }
     
     internal open fun createBlockState(pos: BlockPos): NovaBlockState =
         NovaBlockState(pos, this)

@@ -64,7 +64,7 @@ object CoreGUIMaterial {
     val MINUS_BTN_ON = registerCoreItem("gui_minus_btn_on")
     val PLUS_BTN_OFF = registerCoreItem("gui_plus_btn_off")
     val PLUS_BTN_ON = registerCoreItem("gui_plus_btn_on")
-    val SIDE_CONFIG_BTN = registerCoreItem("gui_side_config_btn")
+    val SIDE_CONFIG_BTN = registerCoreItem("gui_side_config_btn", "menu.nova.side_config")
     val ENERGY_BTN_OFF = registerCoreItem("gui_energy_btn_off")
     val ENERGY_BTN_ON = registerCoreItem("gui_energy_btn_on")
     val ENERGY_BTN_SELECTED = registerCoreItem("gui_energy_btn_selected")

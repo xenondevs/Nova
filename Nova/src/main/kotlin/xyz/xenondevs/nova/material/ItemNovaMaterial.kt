@@ -3,33 +3,63 @@ package xyz.xenondevs.nova.material
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
-import net.md_5.bungee.chat.ComponentSerializer
-import net.minecraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.item.LoreContext
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.util.data.NBTUtils
-import xyz.xenondevs.nova.util.data.withoutPreFormatting
-import xyz.xenondevs.nova.util.item.unhandledTags
+import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 
+@Suppress("MemberVisibilityCanBePrivate", "LeakingThis")
 open class ItemNovaMaterial internal constructor(
     final override val id: NamespacedId,
     val localizedName: String,
-    val novaItem: NovaItem? = null,
+    novaItem: NovaItem? = null,
 ) : INovaMaterial {
     
+    val novaItem = novaItem ?: NovaItem()
     val item: ModelData by lazy { Resources.getModelData(id).first!! }
     
-    val basicItemProvider: ItemProvider by lazy { ItemWrapper(createBasicItemBuilder().get()) }
-    val itemProvider: ItemProvider by lazy { ItemWrapper(createItemStack()) }
+    val basicItemProviders: LazyArray<ItemProvider> by lazy {
+        LazyArray(item.dataArray.size) { ItemWrapper(item.createItemBuilder(it).get()) }
+    }
     
-    val basicClientsideProvider: ItemProvider by lazy { ItemWrapper(item.createClientsideItemStack(localizedName)) }
-    val clientsideProvider: ItemProvider by lazy { ItemWrapper(modifyItemBuilder(item.createClientsideItemBuilder(localizedName)).get()) }
+    val itemProviders: LazyArray<ItemProvider> by lazy {
+        LazyArray(item.dataArray.size) { ItemWrapper(this.novaItem.modifyItemBuilder(item.createItemBuilder(it)).get()) }
+    }
+    
+    val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
+        LazyArray(item.dataArray.size) { subId ->
+            val itemStack = basicItemProvider.get()
+            ItemWrapper(item.createClientsideItemBuilder(
+                this.novaItem.getName(itemStack),
+                null,
+                subId
+            ).get())
+        }
+    }
+    
+    val clientsideProviders: LazyArray<ItemProvider> by lazy {
+        LazyArray(item.dataArray.size) { subId ->
+            val itemStack = itemProvider.get()
+            ItemWrapper(this.novaItem.modifyItemBuilder(item.createClientsideItemBuilder(
+                this.novaItem.getName(itemStack),
+                this.novaItem.getLore(itemStack),
+                subId
+            )).get())
+        }
+    }
+    
+    val basicItemProvider: ItemProvider by lazy { basicItemProviders[0] }
+    val itemProvider: ItemProvider by lazy { itemProviders[0] }
+    val basicClientsideProvider: ItemProvider by lazy { basicClientsideProviders[0] }
+    val clientsideProvider: ItemProvider by lazy { clientsideProviders[0] }
+    
+    init {
+        this.novaItem.setMaterial(this)
+    }
     
     /**
      * Creates a basic [ItemBuilder][ItemBuilder] without any additional information
@@ -39,13 +69,13 @@ open class ItemNovaMaterial internal constructor(
      * a `createItemBuilder` function for a [TileEntity].
      */
     fun createBasicItemBuilder(): ItemBuilder =
-        item.createItemBuilder(localizedName)
+        item.createItemBuilder()
     
     /**
      * Creates an [ItemBuilder][ItemBuilder] for this [ItemNovaMaterial].
      */
     fun createItemBuilder(): ItemBuilder =
-        modifyItemBuilder(createBasicItemBuilder())
+        novaItem.modifyItemBuilder(createBasicItemBuilder())
     
     /**
      * Creates an [ItemStack] for this [ItemNovaMaterial].
@@ -57,25 +87,5 @@ open class ItemNovaMaterial internal constructor(
         LocaleManager.getTranslatedName(locale, this)
     
     override fun toString() = id.toString()
-    
-    protected fun modifyItemBuilder(itemBuilder: ItemBuilder, context: LoreContext? = null): ItemBuilder {
-        var builder = itemBuilder
-        if (novaItem != null) {
-            builder = novaItem.modifyItemBuilder(itemBuilder)
-            builder.addModifier { itemStack ->
-                val lore = novaItem.getLore(itemStack, context)
-                if (lore.isNotEmpty()) {
-                    val meta = itemStack.itemMeta!!
-                    val novaCompound = meta.unhandledTags["nova"] as CompoundTag
-                    novaCompound.put("lore", NBTUtils.createStringList(lore.map { ComponentSerializer.toString(it.withoutPreFormatting()) }))
-                    itemStack.itemMeta = meta
-                }
-    
-                itemStack
-            }
-        }
-        
-        return builder
-    }
     
 }

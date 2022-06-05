@@ -3,13 +3,14 @@ package xyz.xenondevs.nova.addon.assets
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import org.bukkit.Material
 import xyz.xenondevs.nova.data.resources.builder.MaterialType
 import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.data.getAllInts
 import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.isString
 
-object MaterialsIndexDeserializer {
+internal object MaterialsIndexDeserializer {
     
     fun deserialize(namespace: String, json: JsonElement): List<RegisteredMaterial> {
         require(json is JsonObject)
@@ -24,12 +25,12 @@ object MaterialsIndexDeserializer {
             if (element is JsonObject) {
                 itemInfo = deserializeModelList(element, "item")
                     ?.map { it.addNamespace(namespace) }
-                    ?.let { ModelInformation(deserializeMaterialType(element, "item_type"), it, id, false) }
+                    ?.let { ModelInformation(deserializeMaterialType(element, "item"), it, id) }
                 blockInfo = deserializeModelList(element, "block")
                     ?.map { it.addNamespace(namespace) }
-                    ?.let { ModelInformation(deserializeMaterialType(element, "block_type"), it, id, true) }
+                    ?.let { ModelInformation(deserializeMaterialType(element, "block"), it, id) }
             } else {
-                itemInfo = ModelInformation(MaterialType.DEFAULT, listOf(element.asString.addNamespace(namespace)), id, false)
+                itemInfo = ModelInformation(MaterialType.DEFAULT.material, listOf(element.asString.addNamespace(namespace)), id)
                 blockInfo = null
             }
             
@@ -39,9 +40,24 @@ object MaterialsIndexDeserializer {
         return index
     }
     
-    private fun deserializeMaterialType(json: JsonObject, path: String): MaterialType =
-        json.get(path)?.takeUnless(JsonElement::isJsonNull)?.asString?.uppercase()?.let(MaterialType::valueOf)
+    private fun deserializeMaterialType(json: JsonObject, path: String): Material {
+        val material = json.get(path + "_material")
+            ?.takeUnless(JsonElement::isJsonNull)
+            ?.asString?.uppercase()
+            ?.let(Material::valueOf)
+        
+        if (material != null) {
+            return material
+        }
+        
+        val materialType = json.get(path + "_type")
+            ?.takeUnless(JsonElement::isJsonNull)
+            ?.asString?.uppercase()
+            ?.let(MaterialType::valueOf)
             ?: MaterialType.DEFAULT
+        
+        return materialType.material
+    }
     
     private fun deserializeModelList(json: JsonObject, path: String): List<String>? {
         val element = json.get(path)?.takeUnless(JsonElement::isJsonNull) ?: return null
@@ -71,6 +87,6 @@ object MaterialsIndexDeserializer {
     
 }
 
-data class RegisteredMaterial(val id: String, val itemInfo: ModelInformation?, val blockInfo: ModelInformation?)
+internal data class RegisteredMaterial(val id: String, val itemInfo: ModelInformation?, val blockInfo: ModelInformation?)
 
-data class ModelInformation(val materialType: MaterialType, val models: List<String>, val id: String, val isBlock: Boolean)
+internal data class ModelInformation(val material: Material, val models: List<String>, val id: String)

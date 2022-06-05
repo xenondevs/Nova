@@ -12,6 +12,9 @@ class Compound internal constructor(
     private val map: HashMap<String, Any?>
 ) {
     
+    val keys: Set<String>
+        get() = binMap.keys + map.keys
+    
     constructor() : this(HashMap(), HashMap())
     
     operator fun set(key: String, value: Any?) {
@@ -20,7 +23,7 @@ class Compound internal constructor(
     }
     
     fun <T> get(type: Type, key: String): T? {
-        map[key]?.let { return it as T }
+        map[key]?.let { return it as? T }
         
         val bytes = binMap[key] ?: return null
         val value = CBF.read<T>(type, bytes)

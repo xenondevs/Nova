@@ -2,9 +2,11 @@ package xyz.xenondevs.nova.item
 
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
@@ -13,22 +15,32 @@ import kotlin.reflect.full.superclasses
  */
 class NovaItem(val behaviors: List<ItemBehavior>) {
     
+    private lateinit var material: ItemNovaMaterial
+    private lateinit var name: Array<BaseComponent>
+    
     constructor(vararg behaviors: ItemBehavior) : this(behaviors.toList())
+    
+    internal fun setMaterial(material: ItemNovaMaterial) {
+        if (::material.isInitialized)
+            throw IllegalStateException("NovaItems cannot be used for multiple materials")
+        
+        this.material = material
+        this.name = TranslatableComponent(material.localizedName).withoutPreFormatting()
+    }
     
     fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
         var builder = itemBuilder
-        behaviors.forEach {
-            builder = it.modifyItemBuilder(builder)
-        }
+        behaviors.forEach { builder = it.modifyItemBuilder(builder) }
         return builder
     }
     
-    fun getLore(itemStack: ItemStack, context: LoreContext?): List<Array<BaseComponent>> {
+    fun getName(itemStack: ItemStack): Array<BaseComponent> {
+        return behaviors.firstNotNullOfOrNull { it.getName(itemStack) } ?: name
+    }
+    
+    fun getLore(itemStack: ItemStack): List<Array<BaseComponent>> {
         val lore = ArrayList<Array<BaseComponent>>()
-        behaviors.forEach { 
-            lore += it.getLore(itemStack, context)
-        }
-        
+        behaviors.forEach { it.getLore(itemStack)?.also(lore::addAll) }
         return lore
     }
     
@@ -42,5 +54,3 @@ class NovaItem(val behaviors: List<ItemBehavior>) {
     }
     
 }
-
-interface LoreContext

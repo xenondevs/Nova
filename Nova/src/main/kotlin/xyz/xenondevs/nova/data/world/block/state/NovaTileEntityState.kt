@@ -5,8 +5,8 @@ import xyz.xenondevs.nova.data.serialization.cbf.CBF
 import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
-import xyz.xenondevs.nova.tileentity.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.tileentity.TileEntity.Companion.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.data.readUUID
 import xyz.xenondevs.nova.util.data.writeUUID

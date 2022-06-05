@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.material
 
 import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
@@ -22,6 +21,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.network.event.clientbound.*
 import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
+import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.*
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.unhandledTags
@@ -157,16 +157,14 @@ object PacketItems : Initializable(), Listener {
             tag.remove("CustomModelData")
             tag.remove("Damage")
             
-            val nova = tag.getOrNull<CompoundTag>("nova")
             val display = tag.getOrNull<CompoundTag>("display")
             
-            if (nova != null && display != null) {
+            if (display != null) {
                 display.remove("Lore")
                 
-                val clientName = display.getOrNull<StringTag>("Name")?.asString
-                val novaName = nova.getOrNull<StringTag>("name")?.asString
-                
-                if (clientName == novaName)
+                // If the name component doesn't contain '"text":"', the item was not renamed in an anvil and the name can be removed
+                val name = display.getOrNull<StringTag>("Name")
+                if (name != null && name.asString?.contains("\"text\":\"") != true)
                     display.remove("Name")
             }
         }
@@ -178,14 +176,11 @@ object PacketItems : Initializable(), Listener {
             ?: throw IllegalStateException("Item is not a Nova item!")
         
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)
+        val material = NovaMaterialRegistry.getOrNull(id) ?: return getMissingItem(item, id)
         val subId = novaTag.getInt("subId")
-        val isBlock = novaTag.getBoolean("isBlock")
         val durabilityPercentage = if (novaTag.contains("durability")) novaTag.getDouble("durability") else null
-        val name = novaTag.getString("name")
-        val lore = if (novaTag.contains("lore")) novaTag.getList("lore", NBTUtils.TAG_STRING) else null
         
-        val (itemData, blockData) = Resources.getModelDataOrNull(id) ?: return getMissingItem(item, id)
-        val data = (if (isBlock) blockData else itemData) ?: return getMissingItem(item, id)
+        val data = Resources.getModelDataOrNull(id)?.first ?: return getMissingItem(item, id)
         
         val newItem = item.copy()
         val newItemTag = newItem.tag!!
@@ -196,18 +191,17 @@ object PacketItems : Initializable(), Listener {
             newItemTag.getCompound("display")
         } else CompoundTag().also { newItemTag.put("display", it) }
         
-        if (useName && !displayTag.contains("Name")) {
-            displayTag.putString("Name", name)
-        }
+        val novaItem = material.novaItem
+        val bukkitStack = item.bukkitStack
+        if (useName && !displayTag.contains("Name"))
+            displayTag.putString("Name", novaItem.getName(bukkitStack).serialize())
         
-        if (lore != null) {
-            displayTag.put("Lore", lore)
-        }
-        
-        if (player != null && player in AdvancedTooltips.players) {
-            val newLore = displayTag.getOrPut("Lore", ::ListTag)
-            newLore.add(StringTag.valueOf(ComponentSerializer.toString(TextComponent.fromLegacyText("§8$id").withoutPreFormatting())))
-        }
+        val loreTag = ListTag()
+        val lore = novaItem.getLore(bukkitStack)
+        lore.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
+        if (player != null && player in AdvancedTooltips.players)
+            loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
+        displayTag.put("Lore", loreTag)
         
         if (durabilityPercentage != null) {
             val maxDurability = newItem.item.maxDamage

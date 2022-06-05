@@ -39,7 +39,7 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
     }
     
     private fun loadInfo(info: ModelInformation, namespace: String) {
-        val material = info.materialType.material
+        val material = info.material
         val modelList = modelOverrides.getOrPut(material) { TreeSet() }
         info.models.forEach {
             modelList += it
@@ -58,12 +58,12 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
     }
     
     private fun createModelData(info: ModelInformation): ModelData {
-        val material = info.materialType.material
+        val material = info.material
         val modelDataStart = calculateModelDataStart(material)
         val sortedModelSet = modelOverrides[material]!!
         val dataArray = info.models.mapToIntArray { sortedModelSet.indexOf(it) + modelDataStart }
         
-        return ModelData(info.materialType.material, dataArray, info.id, info.isBlock)
+        return ModelData(info.material, dataArray, info.id)
     }
     
     override fun write() {
@@ -104,6 +104,6 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
     private fun calculateModelDataStart(material: Material): Int =
         MaterialType.values()
             .filter { it.material == material }
-            .maxOf { it.modelDataStart }
+            .maxOfOrNull { it.modelDataStart } ?: MaterialType.CUSTOM_DATA_START
     
 }

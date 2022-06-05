@@ -14,7 +14,6 @@ import xyz.xenondevs.nova.util.data.IOUtils
 import xyz.xenondevs.nova.util.data.getIntOrNull
 import java.io.File
 
-@Suppress("MemberVisibilityCanBePrivate")
 internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
     
     private val contents = listOf(MaterialContent(this), GUIContent(this), LanguageContent(this))
@@ -101,5 +100,9 @@ enum class MaterialType {
     
     val material: Material by configReloadable { DEFAULT_CONFIG.getString("resource_pack.materials.${name.lowercase()}.type")!!.let { Material.valueOf(it.uppercase()) } }
     val modelDataStart: Int by configReloadable { DEFAULT_CONFIG.getIntOrNull("resource_pack.materials.${name.lowercase()}.modelDataStart")!! }
+    
+    companion object {
+        val CUSTOM_DATA_START: Int by configReloadable { DEFAULT_CONFIG.getIntOrNull("resource_pack.materials.custom.modelDataStart")!! }
+    }
     
 }

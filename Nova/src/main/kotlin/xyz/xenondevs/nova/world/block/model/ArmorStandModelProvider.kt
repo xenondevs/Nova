@@ -37,7 +37,7 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
         data.invisible = true
         data.marker = true
         data.onFire = material.hitboxType.requiresLight
-        armorStand.setEquipment(EquipmentSlot.HEAD, material.block.createClientsideItemStack(subId), false)
+        armorStand.setEquipment(EquipmentSlot.HEAD, material.blockProviders[subId].get(), false)
     }
     
     override fun load(placed: Boolean) {
@@ -57,7 +57,7 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
     }
     
     override fun update(subId: Int) {
-        armorStands[0].setEquipment(EquipmentSlot.HEAD, material.block.createClientsideItemStack(subId), true)
+        armorStands[0].setEquipment(EquipmentSlot.HEAD, material.blockProviders[subId].get(), true)
     }
     
     companion object : BlockModelProviderType<ArmorStandModelProvider> {

@@ -8,6 +8,8 @@ fun <E> List<E>.contentEquals(other: List<E>) = size == other.size && containsAl
 
 fun <E> Set<E>.contentEquals(other: Set<E>) = size == other.size && containsAll(other)
 
+fun <E> Collection<E>.takeUnlessEmpty(): Collection<E>? = ifEmpty { null }
+
 fun <E> MutableIterable<E>.removeFirstWhere(test: (E) -> Boolean): Boolean {
     val iterator = iterator()
     while (iterator.hasNext()) {

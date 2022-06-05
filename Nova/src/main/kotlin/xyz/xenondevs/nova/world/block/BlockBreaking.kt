@@ -271,7 +271,7 @@ private class ArmorStandBreakMethod(pos: BlockPos) : BreakMethod(pos) {
             
             field = stage
             if (stage in 0..9) {
-                armorStand.setEquipment(MojangSlot.HEAD, CoreBlockOverlay.BREAK_STAGE_OVERLAY.item.createClientsideItemStack(stage), true)
+                armorStand.setEquipment(MojangSlot.HEAD, CoreBlockOverlay.BREAK_STAGE_OVERLAY.clientsideProviders[stage].get(), true)
             } else {
                 armorStand.setEquipment(MojangSlot.HEAD, null, true)
             }

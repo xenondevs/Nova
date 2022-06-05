@@ -7,13 +7,12 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.ValueReloadable
-import xyz.xenondevs.nova.item.LoreContext
 import xyz.xenondevs.nova.material.clientsideDurability
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.util.item.storeData
 
-private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy64")
+private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy")
 
 class Chargeable(
     maxEnergy: ValueReloadable<Long>,
@@ -45,7 +44,7 @@ class Chargeable(
         return itemBuilder
     }
     
-    override fun getLore(itemStack: ItemStack, context: LoreContext?): List<Array<BaseComponent>> {
+    override fun getLore(itemStack: ItemStack): List<Array<BaseComponent>> {
         val energy = getEnergy(itemStack)
         return listOf(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, maxEnergy)))
     }
