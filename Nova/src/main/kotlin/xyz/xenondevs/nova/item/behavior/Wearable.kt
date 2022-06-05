@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.item.behavior
 
 import org.bukkit.Bukkit
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.inventory.ClickType
@@ -14,7 +15,17 @@ import xyz.xenondevs.nova.player.equipment.EquipMethod
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 
-class Wearable(private val type: ArmorType) : ItemBehavior() {
+class Wearable(private val type: ArmorType, private val armor: Double = 0.0, private val armorToughness: Double = 0.0) : ItemBehavior() {
+    
+    override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {
+        if (equipped) {
+            player.getAttribute(Attribute.GENERIC_ARMOR)!!.baseValue += armor
+            player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)!!.baseValue += armorToughness
+        } else {
+            player.getAttribute(Attribute.GENERIC_ARMOR)!!.baseValue -= armor
+            player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)!!.baseValue -= armorToughness
+        }
+    }
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_AIR
