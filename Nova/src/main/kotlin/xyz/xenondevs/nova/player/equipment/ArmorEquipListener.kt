@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.player.equipment
 
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -42,6 +43,7 @@ object ArmorEquipListener : Initializable(), Listener {
     fun handleInventoryClick(event: InventoryClickEvent) {
         val view = event.view
         val player = event.whoClicked as Player
+        val creative = player.gameMode == GameMode.CREATIVE
         val currentItem = event.currentItem.getNullIfAir()
         val cursorItem = event.cursor.getNullIfAir()
         val slotType = event.slotType
@@ -61,7 +63,7 @@ object ArmorEquipListener : Initializable(), Listener {
             InventoryAction.PLACE_ALL,
             InventoryAction.PLACE_SOME,
             InventoryAction.PLACE_ONE -> {
-                if (slotType == SlotType.ARMOR && ArmorType.fitsOnSlot(cursorItem, event.rawSlot)) {
+                if (slotType == SlotType.ARMOR && (creative || ArmorType.fitsOnSlot(cursorItem, event.rawSlot))) {
                     equipEvent = ArmorEquipEvent(player, EquipMethod.NORMAL_CLICK, currentItem, cursorItem)
                 }
             }
@@ -74,7 +76,7 @@ object ArmorEquipListener : Initializable(), Listener {
             }
             
             InventoryAction.SWAP_WITH_CURSOR -> {
-                if (slotType == SlotType.ARMOR && ArmorType.fitsOnSlot(cursorItem, event.rawSlot)) {
+                if (slotType == SlotType.ARMOR && (creative || ArmorType.fitsOnSlot(cursorItem, event.rawSlot))) {
                     equipEvent = ArmorEquipEvent(player, EquipMethod.SWAP, currentItem, cursorItem)
                 }
             }
@@ -82,7 +84,7 @@ object ArmorEquipListener : Initializable(), Listener {
             InventoryAction.HOTBAR_SWAP -> {
                 if (slotType == SlotType.ARMOR) {
                     val hotbarItem = player.inventory.getItem(event.hotbarButton)
-                    if (ArmorType.fitsOnSlot(hotbarItem, event.rawSlot)) {
+                    if (creative || ArmorType.fitsOnSlot(hotbarItem, event.rawSlot)) {
                         equipEvent = ArmorEquipEvent(player, EquipMethod.HOTBAR_SWAP, currentItem, hotbarItem)
                     }
                 }
