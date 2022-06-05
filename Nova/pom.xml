@@ -20,6 +20,9 @@
         <annotations.version>23.0.0</annotations.version>
         <invui.version>0.6-SNAPSHOT</invui.version>
         <ktor.version>2.0.1</ktor.version>
+        <maven-resolver-provider.version>3.8.5</maven-resolver-provider.version>
+        <maven-resolver-connector-basic.version>1.8.0</maven-resolver-connector-basic.version>
+        <maven-resolver-transport-http.version>1.8.0</maven-resolver-transport-http.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>
 
@@ -224,6 +227,25 @@
             <groupId>io.ktor</groupId>
             <artifactId>ktor-serialization-gson-jvm</artifactId>
             <version>${ktor.version}</version>
+        </dependency>
+        <!-- Provided through library loader, not transitive -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-resolver-provider</artifactId>
+            <version>3.8.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-connector-basic</artifactId>
+            <version>${maven-resolver-connector-basic.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-transport-http</artifactId>
+            <version>${maven-resolver-transport-http.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Provided through plugins -->

@@ -18,6 +18,9 @@ libraries:
   - io.ktor:ktor-client-cio-jvm:${ktor.version}
   - io.ktor:ktor-client-content-negotiation-jvm:${ktor.version}
   - io.ktor:ktor-serialization-gson-jvm:${ktor.version}
+  - org.apache.maven:maven-resolver-provider:${maven-resolver-provider.version}
+  - org.apache.maven.resolver:maven-resolver-connector-basic:${maven-resolver-connector-basic.version}
+  - org.apache.maven.resolver:maven-resolver-transport-http:${maven-resolver-transport-http.version}
 
 softdepend:
   - WorldGuard
