@@ -10,6 +10,7 @@ import net.minecraft.core.Rotations
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
@@ -113,6 +114,13 @@ fun ClientboundSetPassengersPacket(vehicle: Int, passengers: IntArray): Clientbo
     buffer.writeVarInt(vehicle)
     buffer.writeVarIntArray(passengers)
     return ClientboundSetPassengersPacket(buffer)
+}
+
+fun ClientboundRotateHeadPacket(entity: Int, yaw: Float): ClientboundRotateHeadPacket {
+    val buffer = FriendlyByteBuf(Unpooled.buffer())
+    buffer.writeVarInt(entity)
+    buffer.writeByte(yaw.toPackedByte().toInt())
+    return ClientboundRotateHeadPacket(buffer)
 }
 
 fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {

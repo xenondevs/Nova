@@ -42,6 +42,11 @@ open class Attachment(
             // teleport the armor stand near the player because it's not actually a passenger
             armorStand.teleport(player.location)
         }
+        
+        if (serverTick % 3 == 0) {
+            val headRotPacket = ClientboundRotateHeadPacket(entityId, player.location.yaw)
+            armorStand.viewers.forEach { it.send(headRotPacket) }
+        }
     }
     
 }

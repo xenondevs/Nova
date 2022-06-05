@@ -23,7 +23,7 @@ class FakeArmorStand(
 ) {
     
     private var registered = false
-    private val viewers: List<Player>
+    val viewers: List<Player>
         get() = FakeArmorStandManager.getChunkViewers(chunk)
     
     val entityId = NMSUtils.ENTITY_COUNTER.incrementAndGet()
@@ -141,7 +141,7 @@ class FakeArmorStand(
     }
     
     /**
-     * Teleports the [FakeArmorStand] to a different location. (Different worlds aren't supported)
+     * Teleports the [FakeArmorStand] to a different location.
      *
      * This function automatically chooses which packet (Teleport / Pos / PosRot / Rot) to send.
      */
