@@ -9,7 +9,6 @@ libraries:
   - org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin.version}
   - org.jetbrains.kotlin:kotlin-reflect:${kotlin.version}
   - org.jetbrains:annotations:${annotations.version}
-  - com.zaxxer:HikariCP:${hikaricp.version}
   - xyz.xenondevs:particle:${particlelib.version}
   - me.xdrop:fuzzywuzzy:${fuzzywuzzy.version}
   - net.lingala.zip4j:zip4j:${zip4j.version}

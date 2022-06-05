@@ -14,7 +14,6 @@
     <artifactId>Nova</artifactId>
 
     <properties>
-        <hikaricp.version>5.0.1</hikaricp.version>
         <particlelib.version>1.7.1</particlelib.version>
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
         <zip4j.version>2.10.0</zip4j.version>
@@ -167,16 +166,10 @@
             <artifactId>spigot</artifactId>
             <classifier>remapped-mojang</classifier>
             <version>${spigot.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Provided through library loader -->
         <!-- Not using the provided scope, so they're transitive for addons -->
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
@@ -186,11 +179,6 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>${annotations.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
         </dependency>
         <dependency>
             <groupId>xyz.xenondevs</groupId>
