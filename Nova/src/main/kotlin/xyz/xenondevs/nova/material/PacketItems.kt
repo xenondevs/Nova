@@ -74,7 +74,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleSetSlotPacket(event: ContainerSetSlotPacketEvent) {
+    private fun handleSetSlotPacket(event: ContainerSetSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
         if (isContainerItem(item))
@@ -84,7 +84,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleEntityData(event: SetEntityDataPacketEvent) {
+    private fun handleEntityData(event: SetEntityDataPacketEvent) {
         val player = event.player
         val packet = event.packet
         val data = packet.unpackedData ?: return
@@ -99,7 +99,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleSetEquipment(event: SetEquipmentPacketEvent) {
+    private fun handleSetEquipment(event: SetEquipmentPacketEvent) {
         val player = event.player
         val packet = event.packet
         val slots = packet.slots
@@ -111,7 +111,7 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleCreativeSetItem(event: SetCreativeModeSlotPacketEvent) {
+    private fun handleCreativeSetItem(event: SetCreativeModeSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
         if (isContainerItem(item))
@@ -121,13 +121,13 @@ object PacketItems : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleRecipes(event: UpdateRecipesPacketEvent) {
+    private fun handleRecipes(event: UpdateRecipesPacketEvent) {
         val packet = event.packet
         packet.recipes.forEachIndexed { i, recipe ->
             if (isNovaItem(recipe.resultItem)) {
                 val id = recipe.id.namespacedKey
-                if (id in RecipeManager.fakeRecipes)
-                    packet.recipes[i] = RecipeManager.fakeRecipes[id]!!
+                if (id in RecipeManager.clientsideRecipes)
+                    packet.recipes[i] = RecipeManager.clientsideRecipes[id]!!
             }
         }
     }
@@ -138,18 +138,18 @@ object PacketItems : Initializable(), Listener {
             && item.tag!!.contains("nova", NBTUtils.TAG_COMPOUND)
     }
     
-    internal fun isFakeItem(item: MojangStack): Boolean {
+    private fun isFakeItem(item: MojangStack): Boolean {
         return item.tag != null
             && item.tag!!.contains("nova", NBTUtils.TAG_COMPOUND)
             && item.tag!!.contains("CustomModelData", NBTUtils.TAG_INT)
     }
     
-    internal fun isContainerItem(item: MojangStack): Boolean {
+    private fun isContainerItem(item: MojangStack): Boolean {
         return item.item == Items.BUNDLE
             || item.item in ItemUtils.SHULKER_BOX_ITEMS
     }
     
-    internal fun getNovaItem(item: MojangStack): MojangStack {
+    private fun getNovaItem(item: MojangStack): MojangStack {
         return item.apply {
             this.item = SERVER_SIDE_ITEM
             
@@ -174,9 +174,6 @@ object PacketItems : Initializable(), Listener {
         val itemTag = item.tag!!
         val novaTag = itemTag.getCompound("nova")
             ?: throw IllegalStateException("Item is not a Nova item!")
-        
-        if (novaTag.contains("clientside"))
-            return item
         
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)
         val material = NovaMaterialRegistry.getOrNull(id) ?: return getMissingItem(item, id)
@@ -214,7 +211,7 @@ object PacketItems : Initializable(), Listener {
         return newItem
     }
     
-    internal fun filterContainerItems(item: MojangStack, fromCreative: Boolean): MojangStack {
+    private fun filterContainerItems(item: MojangStack, fromCreative: Boolean): MojangStack {
         if (item.tag == null) return item
         when (item.item) {
             

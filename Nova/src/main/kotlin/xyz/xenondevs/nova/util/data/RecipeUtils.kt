@@ -4,10 +4,10 @@ import net.minecraft.world.item.crafting.Ingredient
 import org.bukkit.Keyed
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
+import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.nmsStack
 import xyz.xenondevs.nova.util.resourceLocation
-import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.crafting.ShapedRecipe as MojangShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe as MojangShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe as MojangFurnaceRecipe
@@ -43,18 +43,31 @@ val RecipeChoice?.nmsIngredient: Ingredient
         else -> throw UnsupportedOperationException("Unsupported RecipeChoice type")
     }.apply { dissolve() }
 
-fun MojangShapedRecipe.copy(newResult: MojangStack): MojangShapedRecipe {
-    return MojangShapedRecipe(id, "", 3, 3, NonNullList(ingredients), newResult)
+fun Ingredient.clientsideCopy(): Ingredient {
+    val items = items.map { if (PacketItems.isNovaItem(it)) PacketItems.getFakeItem(null, it) else it }
+    return Ingredient(items.stream().map { Ingredient.ItemValue(it) })
 }
 
-fun MojangShapelessRecipe.copy(newResult: MojangStack): MojangShapelessRecipe {
-    return MojangShapelessRecipe(id, "", newResult, NonNullList(ingredients))
+fun MojangShapedRecipe.clientsideCopy(): MojangShapedRecipe {
+    val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
+    val ingredients = NonNullList(ingredients.map { it.clientsideCopy() })
+    return MojangShapedRecipe(id, group, width, height, ingredients, result)
 }
 
-fun MojangFurnaceRecipe.copy(newResult: MojangStack): MojangFurnaceRecipe {
-    return MojangFurnaceRecipe(id, "", ingredients.first(), newResult, experience, cookingTime)
+fun MojangShapelessRecipe.clientsideCopy(): MojangShapelessRecipe {
+    val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
+    val ingredients = NonNullList(ingredients.map { it.clientsideCopy() })
+    return MojangShapelessRecipe(id, group, result, ingredients)
 }
 
-fun StonecuttingRecipe.copy(newResult: MojangStack): MojangStonecuttingRecipe {
-    return MojangStonecuttingRecipe(key.resourceLocation, "", inputChoice.nmsIngredient, newResult)
+fun MojangFurnaceRecipe.clientsideCopy(): MojangFurnaceRecipe {
+    val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
+    val ingredient = ingredients.first().clientsideCopy()
+    return MojangFurnaceRecipe(id, group, ingredient, result, experience, cookingTime)
+}
+
+fun StonecuttingRecipe.clientsideCopy(): MojangStonecuttingRecipe {
+    val serverResult = result.nmsStack
+    val result = if (PacketItems.isNovaItem(serverResult)) PacketItems.getFakeItem(null, serverResult) else serverResult
+    return MojangStonecuttingRecipe(key.resourceLocation, group, inputChoice.nmsIngredient.clientsideCopy(), result)
 }

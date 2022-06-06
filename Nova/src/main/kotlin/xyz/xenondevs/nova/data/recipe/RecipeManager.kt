@@ -19,10 +19,9 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.data.copy
+import xyz.xenondevs.nova.util.data.clientsideCopy
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
@@ -101,11 +100,11 @@ object RecipeManager : Initializable(), Listener {
     private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
     private val furnaceRecipes = HashMap<NamespacedKey, FurnaceRecipe>()
     private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
-    private val _fakeRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
+    private val _clientsideRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
     private val _novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
     
-    val fakeRecipes: Map<NamespacedKey, MojangRecipe<*>>
-        get() = _fakeRecipes
+    internal val clientsideRecipes: Map<NamespacedKey, MojangRecipe<*>>
+        get() = _clientsideRecipes
     val novaRecipes: Map<RecipeType<*>, Map<NamespacedKey, NovaRecipe>>
         get() = _novaRecipes
     
@@ -133,9 +132,7 @@ object RecipeManager : Initializable(), Listener {
                             val nmsRecipe = NovaShapedRecipe(optimizedRecipe)
                             minecraftServer.recipeManager.addRecipe(nmsRecipe)
                             
-                            val result = nmsRecipe.resultItem
-                            if (PacketItems.isNovaItem(result))
-                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(null, result))
+                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                         }
                         
                         is ShapelessRecipe -> {
@@ -144,9 +141,7 @@ object RecipeManager : Initializable(), Listener {
                             val nmsRecipe = NovaShapelessRecipe(recipe)
                             minecraftServer.recipeManager.addRecipe(nmsRecipe)
                             
-                            val result = nmsRecipe.resultItem
-                            if (PacketItems.isNovaItem(result))
-                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(null, result))
+                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                         }
                         
                         is FurnaceRecipe -> {
@@ -155,16 +150,13 @@ object RecipeManager : Initializable(), Listener {
                             val nmsRecipe = NovaFurnaceRecipe(recipe)
                             minecraftServer.recipeManager.addRecipe(nmsRecipe)
                             
-                            val result = nmsRecipe.resultItem
-                            if (PacketItems.isNovaItem(result))
-                                _fakeRecipes[key] = nmsRecipe.copy(PacketItems.getFakeItem(null, result))
+                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                         }
                         
                         is StonecuttingRecipe -> {
                             Bukkit.addRecipe(recipe)
-                            val novaMaterial = recipe.result.novaMaterial
-                            if (novaMaterial != null)
-                                _fakeRecipes[key] = recipe.copy(novaMaterial.clientsideProvider.get().nmsStack)
+                            
+                            _clientsideRecipes[key] = recipe.clientsideCopy()
                         }
                         
                         else -> Bukkit.addRecipe(recipe)
@@ -187,7 +179,7 @@ object RecipeManager : Initializable(), Listener {
         shapelessRecipes.clear()
         furnaceRecipes.clear()
         vanillaRegisteredRecipeKeys.clear()
-        _fakeRecipes.clear()
+        _clientsideRecipes.clear()
         _novaRecipes.clear()
         
         loadRecipes()

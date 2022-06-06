@@ -15,20 +15,18 @@ class ModelData(val material: Material, val dataArray: IntArray, val id: String)
     
     fun createItemBuilder(subId: Int = 0): ItemBuilder =
         ItemBuilder(PacketItems.SERVER_SIDE_MATERIAL)
-            .addModifier { modifyNBT(it, subId, false) }
+            .addModifier { modifyNBT(it, subId) }
     
     fun createClientsideItemBuilder(name: Array<BaseComponent>? = null, lore: List<Array<BaseComponent>>? = null, subId: Int = 0): ItemBuilder =
         ItemBuilder(material)
             .setDisplayName(*name ?: emptyArray())
             .setCustomModelData(dataArray[subId])
-            .addModifier { modifyNBT(it, subId, true) }
             .apply { lore?.forEach { addLoreLines(it.withoutPreFormatting()) } }
     
-    private fun modifyNBT(itemStack: ItemStack, subId: Int, clientside: Boolean): ItemStack {
+    private fun modifyNBT(itemStack: ItemStack, subId: Int): ItemStack {
         val novaCompound = CompoundTag()
         novaCompound.putString("id", id)
         novaCompound.putInt("subId", subId)
-        if (clientside) novaCompound.putBoolean("clientside", true)
         
         val meta = itemStack.itemMeta!!
         meta.unhandledTags["nova"] = novaCompound
