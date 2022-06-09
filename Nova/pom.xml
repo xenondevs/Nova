@@ -14,7 +14,7 @@
     <artifactId>Nova</artifactId>
 
     <properties>
-        <particlelib.version>1.7.1</particlelib.version>
+        <particlelib.version>1.8</particlelib.version>
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
         <zip4j.version>2.10.0</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
