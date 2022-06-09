@@ -17,9 +17,9 @@ import xyz.xenondevs.nova.util.data.toComponent
 import java.util.logging.Level
 
 val CommandContext<CommandSourceStack>.player: Player
-    get() = source.player
+    get() = source.bukkitPlayer
 
-val CommandSourceStack.player: Player
+val CommandSourceStack.bukkitPlayer: Player
     get() = playerOrException.bukkitEntity
 
 fun CommandSourceStack.sendSuccess(message: Array<BaseComponent>) {
@@ -60,10 +60,10 @@ fun <CommandSourceStack, T : ArgumentBuilder<CommandSourceStack, T>> ArgumentBui
 }
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresPlayerPermission(permission: String): LiteralArgumentBuilder<CommandSourceStack> =
-    this.requires { it.source.isPlayer() && it.player.hasPermission(permission) }
+    this.requires { it.source.isPlayer() && it.bukkitPlayer.hasPermission(permission) }
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresPermission(permission: String): LiteralArgumentBuilder<CommandSourceStack> =
-    this.requires { !it.source.isPlayer() || it.player.hasPermission(permission) }
+    this.requires { !it.source.isPlayer() || it.bukkitPlayer.hasPermission(permission) }
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresConsole(): LiteralArgumentBuilder<CommandSourceStack> =
     this.requires { it.source.isConsole() }

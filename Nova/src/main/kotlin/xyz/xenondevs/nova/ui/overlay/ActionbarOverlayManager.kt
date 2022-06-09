@@ -1,8 +1,7 @@
 package xyz.xenondevs.nova.ui.overlay
 
 import net.md_5.bungee.api.chat.BaseComponent
-import net.minecraft.network.chat.ChatType
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -13,7 +12,7 @@ import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.network.event.clientbound.ActionBarPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.ChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.SystemChatPacketEvent
 import xyz.xenondevs.nova.util.data.forceDefaultFont
 import xyz.xenondevs.nova.util.data.toPlainText
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -24,7 +23,7 @@ object ActionbarOverlayManager : Listener {
     
     private var tickTask: BukkitTask? = null
     
-    private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(TextComponent(""))
+    private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(Component.empty())
     private val overlays = HashMap<UUID, HashSet<ActionbarOverlay>>()
     private val interceptedActionbars = HashMap<UUID, Pair<ArrayList<BaseComponent>, Long>>()
     
@@ -75,13 +74,13 @@ object ActionbarOverlayManager : Listener {
     }
     
     @EventHandler
-    private fun handleChatPacket(event: ChatPacketEvent) {
-        if (event.chatType == ChatType.GAME_INFO) {
+    private fun handleChatPacket(event: SystemChatPacketEvent) {
+        if (event.typeId == 2) {
             val player = event.player
             val uuid = player.uniqueId
             if (overlays.containsKey(uuid)) {
                 val message = event.message
-                if (message != null)
+                if (message.isNotEmpty())
                     saveInterceptedComponent(player, message)
                 else interceptedActionbars -= uuid
                 

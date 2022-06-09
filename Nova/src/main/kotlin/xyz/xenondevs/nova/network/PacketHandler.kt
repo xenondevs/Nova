@@ -30,7 +30,7 @@ class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
     
     override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
         if (msg is ServerboundHelloPacket) {
-            PacketManager.playerHandlers[msg.gameProfile.name] = this
+            PacketManager.playerHandlers[msg.name] = this
             super.channelRead(ctx, msg)
         } else {
             val packet = callEvent(msg) ?: return

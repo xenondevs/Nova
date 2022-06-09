@@ -7,13 +7,12 @@ import net.md_5.bungee.api.chat.*
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.network.chat.Component
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftChatMessage
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage
 import org.bukkit.entity.Entity
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.util.localizedName
 import xyz.xenondevs.nova.util.removeMinecraftFormatting
-import net.minecraft.network.chat.TextComponent as NMSTextComponent
 
 private val DEFAULT_FONT_TEMPLATE = ComponentBuilder("").font("default").create()[0]
 
@@ -70,7 +69,7 @@ fun Component.toBaseComponentArray(): Array<BaseComponent> {
 }
 
 fun Array<out BaseComponent>.toComponent(): Component {
-    if (isEmpty()) return NMSTextComponent("")
+    if (isEmpty()) return Component.empty()
     
     try {
         return CraftChatMessage.fromJSON(ComponentSerializer.toString(this))

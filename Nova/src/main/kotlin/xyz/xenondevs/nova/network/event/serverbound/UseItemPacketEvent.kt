@@ -28,9 +28,10 @@ class UseItemPacketEvent(
     
     override val packet: ServerboundUseItemPacket
         get() = if (changed) {
-            ServerboundUseItemPacket(hand)
+            ServerboundUseItemPacket(hand, sequence)
         } else super.packet
     
     var hand by MutableLazy<InteractionHand>({ changed = true }) { packet.hand }
+    var sequence by MutableLazy<Int>({changed = true}) {packet.sequence}
     
 }

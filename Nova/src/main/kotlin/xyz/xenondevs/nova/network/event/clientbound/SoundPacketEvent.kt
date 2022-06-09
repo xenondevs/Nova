@@ -30,7 +30,7 @@ class SoundPacketEvent(
     
     override val packet: ClientboundSoundPacket
         get() = if (changed) {
-            ClientboundSoundPacket(sound, source, x, y, z, volume, pitch)
+            ClientboundSoundPacket(sound, source, x, y, z, volume, pitch, seed)
         } else super.packet
     
     var sound by MutableLazy<SoundEvent>({ changed = true }) { packet.sound }
@@ -40,5 +40,6 @@ class SoundPacketEvent(
     var z by MutableLazy<Double>({ changed = true }) { packet.z }
     var volume by MutableLazy<Float>({ changed = true }) { packet.volume }
     var pitch by MutableLazy<Float>({ changed = true }) { packet.pitch }
+    var seed by MutableLazy<Long>({changed = true}) { packet.seed }
     
 }

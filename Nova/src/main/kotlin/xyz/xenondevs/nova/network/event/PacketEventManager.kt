@@ -18,7 +18,7 @@ object PacketEventManager {
     private val playerEvents = HashMap<KClass<out Packet<*>>, (Player, Packet<*>) -> PlayerPacketEvent<Packet<*>>>()
     
     init {
-        registerPlayerEventType(ClientboundChatPacket::class, ::ChatPacketEvent)
+        registerPlayerEventType(ClientboundSystemChatPacket::class, ::SystemChatPacketEvent)
         registerPlayerEventType(ClientboundSetActionBarTextPacket::class, ::ActionBarPacketEvent)
         registerPlayerEventType(ClientboundContainerSetContentPacket::class, ::ContainerSetContentPacketEvent)
         registerPlayerEventType(ClientboundContainerSetSlotPacket::class, ::ContainerSetSlotPacketEvent)

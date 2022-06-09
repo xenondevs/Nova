@@ -11,9 +11,9 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer
-import org.bukkit.craftbukkit.v1_18_R2.CraftWorld
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -209,7 +209,7 @@ object EntityUtils {
         val server = (Bukkit.getServer() as CraftServer).server
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
-        val serverPlayer = object : ServerPlayer(server, world, gameProfile) {
+        val serverPlayer = object : ServerPlayer(server, world, gameProfile, null) {
             override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: NMSEntity?) = Unit
         }
         serverPlayer.advancements.stopListening()

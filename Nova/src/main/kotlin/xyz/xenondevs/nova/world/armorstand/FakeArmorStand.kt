@@ -4,7 +4,7 @@ import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.chunkPos
@@ -204,16 +204,17 @@ class FakeArmorStand(
         val buf = FriendlyByteBuf(Unpooled.buffer())
         
         val packedYaw = expectedLocation.yaw.toPackedByte().toInt()
-        buf.writeVarInt(0x02)
+        buf.writeVarInt(0x00)
         buf.writeVarInt(entityId)
         buf.writeUUID(uuid)
-        buf.writeVarInt(1)
+        buf.writeVarInt(2)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)
         buf.writeDouble(location.z)
-        buf.writeByte(packedYaw)
         buf.writeByte(location.pitch.toPackedByte().toInt())
         buf.writeByte(packedYaw)
+        buf.writeByte(packedYaw)
+        buf.writeVarInt(0)
         buf.writeShort(0)
         buf.writeShort(0)
         buf.writeShort(0)
@@ -223,7 +224,7 @@ class FakeArmorStand(
     
     private fun createDespawnDataBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x3A)
+        buf.writeVarInt(0x38)
         buf.writeVarIntArray(intArrayOf(entityId))
         
         return buf
@@ -243,7 +244,7 @@ class FakeArmorStand(
     
     private fun createPosBuf(x: Short, y: Short, z: Short): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x29)
+        buf.writeVarInt(0x26)
         buf.writeVarInt(entityId)
         buf.writeShort(x.toInt())
         buf.writeShort(y.toInt())
@@ -254,7 +255,7 @@ class FakeArmorStand(
     
     private fun createPosRotBuf(x: Short, y: Short, z: Short, yaw: Float, pitch: Float): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x2A)
+        buf.writeVarInt(0x27)
         buf.writeVarInt(entityId)
         buf.writeShort(x.toInt())
         buf.writeShort(y.toInt())
@@ -267,7 +268,7 @@ class FakeArmorStand(
     
     private fun createRotBuf(location: Location): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x2B)
+        buf.writeVarInt(0x28)
         buf.writeVarInt(entityId)
         buf.writeByte(location.yaw.toPackedByte().toInt())
         buf.writeByte(location.pitch.toPackedByte().toInt())
@@ -277,7 +278,7 @@ class FakeArmorStand(
     
     private fun createTeleportBuf(location: Location): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x62)
+        buf.writeVarInt(0x63)
         buf.writeVarInt(entityId)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)

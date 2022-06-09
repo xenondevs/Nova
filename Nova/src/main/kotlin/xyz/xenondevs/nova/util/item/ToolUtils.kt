@@ -4,8 +4,8 @@ import org.bukkit.Material
 import org.bukkit.Material.*
 import org.bukkit.Tag
 import org.bukkit.block.Block
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot

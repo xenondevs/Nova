@@ -18,7 +18,7 @@
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
         <zip4j.version>2.10.0</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
-        <invui.version>0.6-SNAPSHOT</invui.version>
+        <invui.version>0.7-SNAPSHOT</invui.version>
         <ktor.version>2.0.1</ktor.version>
         <maven-resolver-provider.version>3.8.5</maven-resolver-provider.version>
         <maven-resolver-connector-basic.version>1.8.0</maven-resolver-connector-basic.version>
@@ -86,12 +86,12 @@
             <dependencies>
                 <dependency>
                     <groupId>de.studiocode.invui</groupId>
-                    <artifactId>IA-R9</artifactId>
+                    <artifactId>IA-R10</artifactId>
                     <version>${invui.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>xyz.xenondevs.kadvancements</groupId>
-                    <artifactId>kadvancements-adapter-r1</artifactId>
+                    <artifactId>kadvancements-adapter-r2</artifactId>
                     <version>0.1-SNAPSHOT</version>
                 </dependency>
             </dependencies>
@@ -141,13 +141,13 @@
             <dependencies>
                 <dependency>
                     <groupId>de.studiocode.invui</groupId>
-                    <artifactId>IA-R9</artifactId>
+                    <artifactId>IA-R10</artifactId>
                     <version>${invui.version}</version>
                     <classifier>remapped-mojang</classifier>
                 </dependency>
                 <dependency>
                     <groupId>xyz.xenondevs.kadvancements</groupId>
-                    <artifactId>kadvancements-adapter-r1</artifactId>
+                    <artifactId>kadvancements-adapter-r2</artifactId>
                     <classifier>remapped-mojang</classifier>
                     <version>0.1-SNAPSHOT</version>
                 </dependency>
@@ -516,6 +516,10 @@
                 <exclusion>
                     <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R9</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.studiocode.invui</groupId>
+                    <artifactId>IA-R10</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
