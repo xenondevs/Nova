@@ -1,6 +1,9 @@
 package xyz.xenondevs.nova.initialize
 
+import org.bstats.bukkit.Metrics
+import org.bstats.charts.DrilldownPie
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -70,6 +73,7 @@ object Initializer {
             runTask {
                 setGlobalIngredients()
                 AddonManager.enableAddons()
+                setupMetrics()
                 LOGGER.info("Done loading")
             }
         }
@@ -83,6 +87,19 @@ object Initializer {
                 LOGGER.log(Level.SEVERE, "An exception occurred trying to disable $it", e)
             }
         }
+    }
+    
+    private fun setupMetrics() {
+        val metrics = Metrics(NOVA, 11927)
+        metrics.addCustomChart(DrilldownPie("addons") {
+            val map = HashMap<String, Map<String, Int>>()
+            
+            AddonManager.addons.values.forEach {
+                map[it.description.name] = mapOf(it.description.version to 1)
+            }
+            
+            return@DrilldownPie map
+        })
     }
     
 }
