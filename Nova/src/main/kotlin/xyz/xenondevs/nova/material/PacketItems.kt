@@ -10,7 +10,7 @@ import net.minecraft.network.syncher.SynchedEntityData.DataItem
 import net.minecraft.world.item.Items
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
