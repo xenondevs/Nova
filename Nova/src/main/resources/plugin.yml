@@ -3,7 +3,7 @@ version: ${project.version}
 authors: [ "StudioCode", "ByteZ1337", "Javahase" ]
 website: "https://github.com/xenondevs/Nova/"
 main: xyz.xenondevs.nova.Nova
-api-version: 1.18
+api-version: 1.19
 
 libraries:
   - org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin.version}

@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerLoginEvent.Result
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.PLUGIN_MANAGER
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.channels
 import xyz.xenondevs.nova.util.minecraftServer
@@ -31,7 +30,7 @@ object PacketManager : Initializable(), Listener {
     
     override fun init() {
         LOGGER.info("Registering packet handlers")
-        PLUGIN_MANAGER.registerEvents(this, NOVA)
+        Bukkit.getPluginManager().registerEvents(this, NOVA)
         registerHandlers()
     }
     

@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.util
 
+import org.bukkit.Bukkit
 import org.bukkit.event.Event
 import org.bukkit.event.Event.Result
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.PLUGIN_MANAGER
 
 fun Action.isRightClick() = this == Action.RIGHT_CLICK_BLOCK || this == Action.RIGHT_CLICK_AIR
 
@@ -20,4 +20,4 @@ val PlayerInteractEvent.handItems: Array<ItemStack>
 val PlayerInteractEvent.hands: Array<Pair<EquipmentSlot, ItemStack>>
     get() = arrayOf(EquipmentSlot.HAND to player.inventory.itemInMainHand, EquipmentSlot.OFF_HAND to player.inventory.itemInOffHand)
 
-fun callEvent(event: Event) = PLUGIN_MANAGER.callEvent(event)
+fun callEvent(event: Event) = Bukkit.getPluginManager().callEvent(event)

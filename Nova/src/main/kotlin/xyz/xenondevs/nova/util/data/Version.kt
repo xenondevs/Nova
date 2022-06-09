@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
+import org.bukkit.Bukkit
+
 class Version : Comparable<Version> {
     
     val major: Int
@@ -46,6 +48,17 @@ class Version : Comparable<Version> {
         result = 31 * result + minor
         result = 31 * result + patch
         return result
+    }
+    
+    companion object {
+        
+        val SERVER_VERSION: Version
+        
+        init {
+            val versionPattern = Regex("""(1\.\d{1,2}(\.\d{1,2})?)""")
+            SERVER_VERSION = Version(versionPattern.find(Bukkit.getVersion())!!.groupValues[1])
+        }
+        
     }
     
 }
