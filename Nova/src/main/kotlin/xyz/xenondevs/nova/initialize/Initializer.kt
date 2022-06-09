@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.initialize
 
+import de.studiocode.invui.util.InventoryUtils
+import de.studiocode.invui.virtualinventory.StackSizeProvider
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
 import xyz.xenondevs.nova.LOGGER
@@ -31,6 +33,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
+import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
@@ -72,6 +75,7 @@ object Initializer {
             
             runTask {
                 setGlobalIngredients()
+                InventoryUtils.stackSizeProvider = StackSizeProvider { it.novaMaxStackSize }
                 AddonManager.enableAddons()
                 setupMetrics()
                 LOGGER.info("Done loading")

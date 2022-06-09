@@ -72,6 +72,9 @@ val ItemStack.namelessCopyOrSelf: ItemStack
         return itemStack
     }
 
+val ItemStack.novaMaxStackSize: Int
+    get() = novaMaterial?.maxStackSize ?: type.maxStackSize
+
 @Suppress("UNCHECKED_CAST")
 val ItemMeta.unhandledTags: MutableMap<String, Tag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, Tag>
@@ -146,7 +149,7 @@ object ItemUtils {
                 "nova" -> NovaMaterialRegistry.getNonNamespaced(nid.name).isNotEmpty()
                 else -> NovaMaterialRegistry.getOrNull(id) != null || CustomItemServiceManager.getItemByName(id) != null
             }
-        } catch(ignored: Exception) {
+        } catch (ignored: Exception) {
         }
         
         return false

@@ -21,6 +21,8 @@ open class ItemNovaMaterial internal constructor(
     
     val novaItem = novaItem ?: NovaItem()
     val item: ModelData by lazy { Resources.getModelData(id).first!! }
+    val maxStackSize: Int
+        get() = item.material.maxStackSize
     
     val itemProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { ItemWrapper(this.novaItem.modifyItemBuilder(item.createItemBuilder(it)).get()) }

@@ -51,29 +51,7 @@ fun VirtualInventory.hasEmptySlot(): Boolean =
  *
  * @return The amount of items that did not fit.
  */
-fun Inventory.addItemCorrectly(itemStack: ItemStack): Int {
-    val typeMaxStackSize = itemStack.type.maxStackSize
-    var amountLeft = itemStack.amount
-    
-    // add to partial slots
-    while (amountLeft > 0) {
-        val partialStack = getFirstPartialStack(itemStack) ?: break
-        val partialAmount = partialStack.amount
-        val addableAmount = minOf(amountLeft, maxStackSize - partialAmount, typeMaxStackSize - partialAmount).coerceAtLeast(0)
-        partialStack.amount += addableAmount
-        amountLeft -= addableAmount
-    }
-    
-    // add to full slots
-    while (amountLeft > 0) {
-        val emptySlot = getFirstEmptySlot() ?: break
-        val addableAmount = minOf(amountLeft, maxStackSize, typeMaxStackSize)
-        setItem(emptySlot, itemStack.clone().apply { amount = addableAmount })
-        amountLeft -= addableAmount
-    }
-    
-    return amountLeft
-}
+fun Inventory.addItemCorrectly(itemStack: ItemStack) = InventoryUtils.addItemCorrectly(this, itemStack)
 
 /**
  * Adds [items] to the [Player's][Player] inventory or drops them on
@@ -135,30 +113,13 @@ fun Inventory.takeFirstOccurrence(choice: RecipeChoice): ItemStack? {
  * Gets the first [ItemStack] in the [Inventory.getStorageContents]
  * that is similar to [type] and not a full stack.
  */
-fun Inventory.getFirstPartialStack(type: ItemStack): ItemStack? {
-    val maxStackSize = type.type.maxStackSize
-    for (item in storageContents) {
-        if (type.isSimilar(item)) {
-            val amount = item.amount
-            if (amount < item.type.maxStackSize && amount < maxStackSize)
-                return item
-        }
-    }
-    
-    return null
-}
+fun Inventory.getFirstPartialStack(type: ItemStack) = InventoryUtils.getFirstPartialStack(this, type)
 
 /**
  * Gets the first slot index of the [Inventory.getStorageContents]
  * that is completely empty.
  */
-fun Inventory.getFirstEmptySlot(): Int? {
-    for ((slot, item) in storageContents.withIndex()) {
-        if (item == null) return slot
-    }
-    
-    return null
-}
+fun Inventory.getFirstEmptySlot(): Int? = InventoryUtils.getFirstEmptySlot(this).takeUnless { it == -1 }
 
 /**
  * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory][PlayerInventory]

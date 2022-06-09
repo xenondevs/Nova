@@ -13,7 +13,11 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.recipe.RecipeManager
@@ -21,9 +25,13 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.network.event.clientbound.*
 import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
+import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.namespacedKey
 import com.mojang.datafixers.util.Pair as MojangPair
@@ -55,8 +63,66 @@ object PacketItems : Initializable(), Listener {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }
     
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private fun handleClick(event: InventoryClickEvent) {
+        val view = event.view
+        val rawSlot = event.rawSlot
+        val clicked = event.currentItem ?: return
+        
+        val novaMaterial = clicked.novaMaterial
+        if (novaMaterial != null && novaMaterial.maxStackSize < SERVER_SIDE_MATERIAL.maxStackSize) {
+            when (event.click) {
+                
+                ClickType.MIDDLE -> {
+                    event.isCancelled = true
+                    event.cursor = novaMaterial.createItemStack(novaMaterial.maxStackSize)
+                }
+                
+                ClickType.LEFT -> {
+                    val cursor = event.cursor ?: return
+                    if (clicked.isSimilar(cursor)) {
+                        event.isCancelled = true
+                        
+                        val currentAmount = clicked.amount
+                        val newAmount = minOf(currentAmount + cursor.amount, novaMaterial.maxStackSize)
+                        if (newAmount > currentAmount) {
+                            clicked.amount = newAmount
+                            cursor.amount -= newAmount - currentAmount
+                        } else {
+                            view.setItem(event.rawSlot, cursor)
+                            event.cursor = clicked
+                        }
+                    }
+                }
+                
+                ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
+                    event.isCancelled = true
+                    
+                    view.setItem(rawSlot, null)
+                    if (event.view.isPlayerView()) {
+                        view.bottomInventory.addItemCorrectly(clicked)
+                    } else {
+                        val toInv = if (event.clickedInventory == view.topInventory)
+                            view.bottomInventory else view.topInventory
+                        
+                        toInv.addItemCorrectly(clicked)
+                    }
+                }
+                
+                else -> Unit
+            }
+            
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private fun handleDrag(event: InventoryDragEvent) {
+        if (event.newItems.values.any { it.amount > it.novaMaxStackSize })
+            event.isCancelled = true
+    }
+    
     @EventHandler
-    fun handleSetContentPacket(event: ContainerSetContentPacketEvent) {
+    private fun handleSetContentPacket(event: ContainerSetContentPacketEvent) {
         val player = event.player
         val packet = event.packet
         val items = packet.items
