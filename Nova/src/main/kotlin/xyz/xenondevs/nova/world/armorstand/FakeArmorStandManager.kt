@@ -27,8 +27,10 @@ import java.util.concurrent.CopyOnWriteArrayList
 var Player.armorStandRenderDistance: Int
     get() = (persistentDataContainer.get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER) ?: DEFAULT_RENDER_DISTANCE)
         .coerceIn(MIN_RENDER_DISTANCE..MAX_RENDER_DISTANCE)
-    set(value) =
+    set(value) {
         persistentDataContainer.set(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER, value)
+        FakeArmorStandManager.updateRenderDistance(this)
+    }
 
 object FakeArmorStandManager : Initializable(), Listener {
     
@@ -37,6 +39,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     val MIN_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.min") }
     val MAX_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.max") }
     
+    private val renderDistance = HashMap<Player, Int>()
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
     private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
@@ -109,7 +112,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     @Synchronized
     private fun handleChunksChange(player: Player, newChunk: ChunkPos) {
         val currentChunks = visibleChunks[player] ?: emptySet()
-        val newChunks = newChunk.getInRange(player.armorStandRenderDistance)
+        val newChunks = newChunk.getInRange(renderDistance[player] ?: 0)
         
         // look for all chunks that are no longer visible
         currentChunks.asSequence()
@@ -140,6 +143,16 @@ object FakeArmorStandManager : Initializable(), Listener {
         
         // update visible chunks map
         visibleChunks[player] = newChunks
+    }
+    
+    @Synchronized
+    internal fun updateRenderDistance(player: Player) {
+        renderDistance[player] = player.armorStandRenderDistance
+    }
+    
+    @Synchronized
+    private fun discardRenderDistance(player: Player) {
+        renderDistance -= player
     }
     
     @Synchronized
@@ -183,12 +196,14 @@ object FakeArmorStandManager : Initializable(), Listener {
     fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
         val chunk = player.location.chunkPos
+        updateRenderDistance(player)
         runAsyncTask { handleChunksChange(player, chunk) }
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleQuit(event: PlayerQuitEvent) {
         val player = event.player
+        discardRenderDistance(player)
         runAsyncTask { removeViewer(player) }
     }
     
