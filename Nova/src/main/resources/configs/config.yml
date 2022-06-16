@@ -1,6 +1,7 @@
 # Configuration options for the resource pack
 resource_pack:
-  # TODO
+  # The auto uploader automatically uploads the resource pack after generation.
+  # Configuration of the auto uploader is explained on the wiki: https://xenondevs.xyz/docs/nova/admin/setup/#step-2-resourcepack-hosting
   auto_upload:
     enabled: false
     # We host the most common resource packs ourselves. If your resource pack is already hosted by us, our service will be used.
