@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
@@ -42,7 +41,7 @@ internal object WorldDataManager : Initializable(), Listener {
         thread(name = "Nova WorldDataManager", isDaemon = true) { // TODO: Use Phaser instead of Thread.sleep
             while (NOVA.isEnabled) {
                 while (tasks.isNotEmpty()) {
-                    when(val task = tasks.poll()) {
+                    when (val task = tasks.poll()) {
                         is ChunkLoadTask -> loadChunk(task.pos)
                         is ChunkUnloadTask -> unloadChunk(task.pos)
                         is SaveWorldTask -> saveWorld(task.world)
@@ -60,14 +59,13 @@ internal object WorldDataManager : Initializable(), Listener {
             
             runTask {
                 if (pos.isLoaded()) {
-                    blockStates.removeIf { (_, blockState) ->
+                    ArrayList(blockStates.values).forEach { blockState ->
                         try {
                             blockState.handleInitialized(false)
                         } catch (e: Exception) {
                             LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", e)
-                            return@removeIf true
+                            blockStates -= blockState.pos
                         }
-                        return@removeIf false
                     }
                     
                     val event = NovaChunkLoadedEvent(pos, blockStates)
