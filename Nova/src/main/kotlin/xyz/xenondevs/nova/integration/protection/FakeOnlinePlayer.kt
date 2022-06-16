@@ -809,6 +809,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun setLastDeathLocation(p0: Location?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getEyeHeight(): Double {
         throw UnsupportedOperationException("Player is not online")
     }
