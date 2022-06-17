@@ -1435,11 +1435,11 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun <T : Projectile?> launchProjectile(projectile: Class<out T?>): T {
+    override fun <T : Projectile> launchProjectile(projectile: Class<out T?>): T {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun <T : Projectile?> launchProjectile(projectile: Class<out T?>, velocity: Vector?): T {
+    override fun <T : Projectile> launchProjectile(projectile: Class<out T?>, velocity: Vector?): T {
         throw UnsupportedOperationException("Player is not online")
     }
     
