@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
@@ -18,8 +18,8 @@ fun NovaItemHolder(
     endPoint: NetworkedTileEntity,
     defaultInventory: Pair<VirtualInventory, NetworkConnectionType>,
     vararg otherInventories: Pair<VirtualInventory, NetworkConnectionType>,
-    defaultInvConfig: (() -> MutableMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first.uuid } },
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)? = null
+    defaultInvConfig: (() -> EnumMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first.uuid } },
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
 ): NovaItemHolder {
     val virtualInventories = arrayListOf(defaultInventory).apply { addAll(otherInventories) }
     val networkedInventories: Map<VirtualInventory, NetworkedInventory> = virtualInventories.associate { (vi, _) -> vi to NetworkedVirtualInventory(vi) }
@@ -40,8 +40,8 @@ fun NovaItemHolder(
     endPoint: NetworkedTileEntity,
     defaultInventory: Pair<UUID, Pair<NetworkedInventory, NetworkConnectionType>>,
     vararg otherInventories: Pair<UUID, Pair<NetworkedInventory, NetworkConnectionType>>,
-    defaultInvConfig: (() -> MutableMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first } },
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)? = null
+    defaultInvConfig: (() -> EnumMap<BlockFace, UUID>) = { CUBE_FACES.associateWithToEnumMap { defaultInventory.first } },
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
 ): NovaItemHolder {
     val allInventories = hashMapOf(defaultInventory).apply { putAll(otherInventories) }
     val networkedInventories = allInventories.mapValuesTo(HashMap()) { (_, pair) -> pair.first }
@@ -60,34 +60,34 @@ class NovaItemHolder(
     override val endPoint: NetworkedTileEntity,
     private val availableInventories: MutableMap<UUID, out NetworkedInventory>,
     override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType>,
-    defaultInvConfig: () -> MutableMap<BlockFace, UUID>,
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)?
+    defaultInvConfig: () -> EnumMap<BlockFace, UUID>,
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)?
 ) : ItemHolder {
     
     override val inventories: MutableMap<BlockFace, NetworkedInventory> =
-        (endPoint.retrieveEnumMapOrNull<BlockFace, UUID>("inventories") ?: defaultInvConfig())
+        (endPoint.retrieveOrNull<EnumMap<BlockFace, UUID>>("inventories") ?: defaultInvConfig())
             .mapValuesTo(enumMapOf()) { availableInventories[it.value]!! }
     
-    override val itemConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        endPoint.retrieveDoubleEnumMap("itemConfig", defaultConnectionConfig
+    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
+        endPoint.retrieveData("itemConfig", defaultConnectionConfig
             ?: { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.NONE } })
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveEnumMap<BlockFace, CompoundElement>("insertFilters") { emptyEnumMap() }
+        endPoint.retrieveData<EnumMap<BlockFace, Compound>>("insertFilters") { emptyEnumMap() }
             .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
     
     override val extractFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveEnumMap<BlockFace, CompoundElement>("extractFilters") { emptyEnumMap() }
+        endPoint.retrieveData<EnumMap<BlockFace, Compound>>("extractFilters") { emptyEnumMap() }
             .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
     
     override val insertPriorities: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("insertPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
+        endPoint.retrieveData("insertPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
     
     override val extractPriorities: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("extractPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
+        endPoint.retrieveData("extractPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
     
     override val channels: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("channels") { CUBE_FACES.associateWithToEnumMap { 0 } }
+        endPoint.retrieveData("channels") { CUBE_FACES.associateWithToEnumMap { 0 } }
     
     fun getNetworkedInventory(virtualInventory: VirtualInventory) =
         availableInventories[virtualInventory.uuid]!!
@@ -99,15 +99,15 @@ class NovaItemHolder(
         availableInventories.firstNotNullOfOrNull { if (it.value == networkedInventory) it.key else null }
     
     override fun saveData() {
-        endPoint.storeEnumMap("itemConfig", itemConfig)
-        endPoint.storeEnumMap("insertFilters", insertFilters) { it.compound }
-        endPoint.storeEnumMap("extractFilters", extractFilters) { it.compound }
-        endPoint.storeEnumMap("channels", channels)
-        endPoint.storeEnumMap("insertPriorities", insertPriorities)
-        endPoint.storeEnumMap("extractPriorities", extractPriorities)
+        endPoint.storeData("itemConfig", connectionConfig)
+        endPoint.storeData("insertFilters", insertFilters.mapValuesTo(emptyEnumMap()) { it.value.compound })
+        endPoint.storeData("extractFilters", extractFilters.mapValuesTo(emptyEnumMap()) { it.value.compound })
+        endPoint.storeData("channels", channels)
+        endPoint.storeData("insertPriorities", insertPriorities)
+        endPoint.storeData("extractPriorities", extractPriorities)
         
         if (availableInventories.isNotEmpty())
-            endPoint.storeEnumMap("inventories", inventories.mapValues { findUUID(it.value) })
+            endPoint.storeData("inventories", inventories.mapValuesTo(emptyEnumMap()) { findUUID(it.value)!! })
     }
     
 }

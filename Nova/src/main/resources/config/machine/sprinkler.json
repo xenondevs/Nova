@@ -1,9 +1,0 @@
-{
-  "water_capacity": 1000,
-  "water_per_moisture_level": 5,
-  "range": {
-    "min": 1,
-    "max": 5,
-    "default": 5
-  }
-}

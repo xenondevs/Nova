@@ -26,6 +26,8 @@ enum class ArmorType(val equipmentSlot: EquipmentSlot, val rawSlot: Int, nameSuf
         
         fun of(rawSlot: Int) = values().firstOrNull { it.rawSlot == rawSlot }
         
+        fun fitsOnSlot(itemStack: ItemStack?, rawSlot: Int) = of(itemStack)?.rawSlot == rawSlot
+        
     }
     
 }

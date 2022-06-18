@@ -1,6 +1,0 @@
-{
-  "input": "minecraft:nether_gold_ore",
-  "result": "nova:gold_dust",
-  "amount": 1,
-  "time": 200
-}

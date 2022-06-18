@@ -1,27 +1,33 @@
 package xyz.xenondevs.nova.initialize
 
+import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.runTask
 import java.util.concurrent.CountDownLatch
 
-abstract class Initializable : Comparable<Initializable> {
+abstract class Initializable internal constructor() : Comparable<Initializable> {
     
-    val latch = CountDownLatch(1)
+    internal val latch = CountDownLatch(1)
+    internal var isInitialized = false
     
-    abstract val inMainThread: Boolean
+    internal abstract val inMainThread: Boolean
     
-    abstract val dependsOn: Initializable?
+    internal abstract val dependsOn: Set<Initializable>
     
-    abstract fun init()
+    internal abstract fun init()
     
-    open fun initialize(parentLatch: CountDownLatch) {
+    open fun disable() = Unit
+    
+    fun initialize(parentLatch: CountDownLatch) {
         if (inMainThread) {
             runTask {
                 init()
+                isInitialized = true
                 this.latch.countDown()
                 parentLatch.countDown()
             }
         } else {
             init()
+            isInitialized = true
             this.latch.countDown()
             parentLatch.countDown()
         }
@@ -31,17 +37,17 @@ abstract class Initializable : Comparable<Initializable> {
         val o1DependsOn = dependsOn
         val o2DependsOn = other.dependsOn
         
-        if (o1DependsOn == null && o2DependsOn == null)
+        if (o1DependsOn.isEmpty() && o2DependsOn.isEmpty())
             return 0 // Both depend on nothing
-        if (o1DependsOn == null)
+        if (o1DependsOn.isEmpty())
             return -1 // This depends on nothing, but other does
-        if (o2DependsOn == null)
+        if (o2DependsOn.isEmpty())
             return 1 // Other depends on nothing, but this does
-        if (o1DependsOn == o2DependsOn)
+        if (o1DependsOn.contentEquals(o2DependsOn))
             return 0 // Both depend on the same thing
-        if (o1DependsOn == other)
+        if (o1DependsOn.contains(other))
             return 1 // This depends on other
-        if (o2DependsOn == this)
+        if (o2DependsOn.contains(this))
             return -1 // Other depends on this
         return 0 // Both depend on different things
     }

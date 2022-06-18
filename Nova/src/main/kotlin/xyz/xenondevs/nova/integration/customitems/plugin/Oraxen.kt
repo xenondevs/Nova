@@ -6,12 +6,14 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.ItemTest
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
-import xyz.xenondevs.nova.util.customModelData
+import xyz.xenondevs.nova.integration.customitems.CustomItemType
+import xyz.xenondevs.nova.util.item.customModelData
 
-object Oraxen : CustomItemService {
+internal object Oraxen : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Oraxen") != null
     override val requiresLoadDelay = false
@@ -36,11 +38,20 @@ object Oraxen : CustomItemService {
         return true
     }
     
+    override fun getItemType(item: ItemStack): CustomItemType? {
+        return if (MMOItems.getId(item) != null) CustomItemType.NORMAL else null
+    }
+    
+    override fun getBlockType(block: Block): CustomBlockType? {
+        // Missing API feature
+        return null
+    }
+    
     override fun getItemByName(name: String): ItemStack? {
         return OraxenItems.getItemById(name.removePrefix("oraxen:")).build()
     }
     
-    override fun getItemTest(name: String): ItemTest? {
+    override fun getItemTest(name: String): SingleItemTest? {
         return ItemsAdder.getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     

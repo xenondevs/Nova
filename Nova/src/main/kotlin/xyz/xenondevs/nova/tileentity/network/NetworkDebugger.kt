@@ -11,14 +11,12 @@ import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
 import java.util.*
 
-object NetworkDebugger {
+internal object NetworkDebugger {
     
-    private val energyDebuggers = ArrayList<UUID>()
-    private val itemDebuggers = ArrayList<UUID>()
-    private val fluidDebuggers = ArrayList<UUID>()
+    private val debuggers = HashMap<NetworkType, ArrayList<UUID>>()
     
     init {
-        runTaskTimer(0, 1) { NetworkManager.runIfFree(::handleTick) }
+        runTaskTimer(0, 1) { NetworkManager.tryExecute(::handleTick) }
     }
     
     fun toggleDebugger(type: NetworkType, player: Player) {
@@ -28,21 +26,17 @@ object NetworkDebugger {
     }
     
     private fun getViewerList(type: NetworkType): ArrayList<UUID> =
-        when (type) {
-            NetworkType.ENERGY -> energyDebuggers
-            NetworkType.ITEMS -> itemDebuggers
-            NetworkType.FLUID -> fluidDebuggers
-        }
+        debuggers.getOrPut(type, ::ArrayList)
     
     private fun handleTick(manager: NetworkManager) {
-        if (energyDebuggers.isEmpty() && itemDebuggers.isEmpty()) return
+        if (debuggers.isEmpty() || debuggers.all { it.value.isEmpty() }) return
         
         manager.networks
             .forEach { network ->
                 val players = getViewerList(network.type).mapNotNull(Bukkit::getPlayer)
                 if (players.isEmpty()) return@forEach
                 
-                val color = Color(network.hashCode())
+                val color = Color(network.uuid.hashCode())
                 
                 network.nodes.forEach { node ->
                     if (node is NetworkBridge) {

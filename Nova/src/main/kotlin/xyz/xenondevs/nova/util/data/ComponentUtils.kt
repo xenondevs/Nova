@@ -1,20 +1,18 @@
 package xyz.xenondevs.nova.util.data
 
 import de.studiocode.invui.item.builder.ItemBuilder
+import de.studiocode.invui.util.ComponentUtils
 import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TextComponent
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.md_5.bungee.api.chat.*
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.network.chat.Component
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftChatMessage
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage
 import org.bukkit.entity.Entity
 import xyz.xenondevs.nova.i18n.LocaleManager
+import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.util.localizedName
 import xyz.xenondevs.nova.util.removeMinecraftFormatting
-import net.minecraft.network.chat.TextComponent as NMSTextComponent
 
 private val DEFAULT_FONT_TEMPLATE = ComponentBuilder("").font("default").create()[0]
 
@@ -71,7 +69,7 @@ fun Component.toBaseComponentArray(): Array<BaseComponent> {
 }
 
 fun Array<out BaseComponent>.toComponent(): Component {
-    if (isEmpty()) return NMSTextComponent("")
+    if (isEmpty()) return Component.empty()
     
     try {
         return CraftChatMessage.fromJSON(ComponentSerializer.toString(this))
@@ -102,7 +100,7 @@ fun TranslatableComponent.toPlainText(locale: String): String {
     return text.removeMinecraftFormatting()
 }
 
-fun Array<out BaseComponent>.forceDefaultFont(): Array<out BaseComponent> {
+fun Array<BaseComponent>.forceDefaultFont(): Array<BaseComponent> {
     var previousComponent = DEFAULT_FONT_TEMPLATE
     for (component in this) {
         component.copyFormatting(previousComponent, false)
@@ -110,4 +108,24 @@ fun Array<out BaseComponent>.forceDefaultFont(): Array<out BaseComponent> {
     }
     
     return this
+}
+
+fun Array<BaseComponent>.withoutPreFormatting(): Array<BaseComponent> =
+    ComponentUtils.withoutPreFormatting(*this)
+
+fun BaseComponent.withoutPreFormatting(): Array<BaseComponent> =
+    ComponentUtils.withoutPreFormatting(this)
+
+fun Array<BaseComponent>.serialize(): String =
+    ComponentSerializer.toString(this)
+
+object ComponentUtils {
+    
+    fun createLinkComponent(url: String): BaseComponent {
+        return ComponentBuilder(url)
+            .color(ChatColor.AQUA)
+            .event(ClickEvent(ClickEvent.Action.OPEN_URL, url))
+            .create()[0]
+    }
+    
 }

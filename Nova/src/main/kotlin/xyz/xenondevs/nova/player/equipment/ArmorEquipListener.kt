@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.player.equipment
 
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -12,17 +13,15 @@ import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType.SlotType
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.inventory.CraftingInventory
-import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
+import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.runTask
 
@@ -30,12 +29,10 @@ private fun ItemStack?.getNullIfAir(): ItemStack? {
     return if (this?.type != Material.AIR) this else null
 }
 
-private fun InventoryView.isPlayerView() = topInventory is CraftingInventory && topInventory.size == 5
-
-object ArmorEquipListener : Initializable(), Listener {
+internal object ArmorEquipListener : Initializable(), Listener {
     
     override val inMainThread = false
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
         LOGGER.info("Initializing ArmorEquipListener")
@@ -43,9 +40,10 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleInventoryClick(event: InventoryClickEvent) {
+    private fun handleInventoryClick(event: InventoryClickEvent) {
         val view = event.view
         val player = event.whoClicked as Player
+        val creative = player.gameMode == GameMode.CREATIVE
         val currentItem = event.currentItem.getNullIfAir()
         val cursorItem = event.cursor.getNullIfAir()
         val slotType = event.slotType
@@ -56,11 +54,16 @@ object ArmorEquipListener : Initializable(), Listener {
             InventoryAction.PICKUP_ALL,
             InventoryAction.PICKUP_SOME,
             InventoryAction.PICKUP_HALF,
-            InventoryAction.PICKUP_ONE,
+            InventoryAction.PICKUP_ONE -> {
+                if (slotType == SlotType.ARMOR) {
+                    equipEvent = ArmorEquipEvent(player, EquipMethod.NORMAL_CLICK, currentItem, cursorItem)
+                }
+            }
+            
             InventoryAction.PLACE_ALL,
             InventoryAction.PLACE_SOME,
             InventoryAction.PLACE_ONE -> {
-                if (slotType == SlotType.ARMOR) {
+                if (slotType == SlotType.ARMOR && (creative || ArmorType.fitsOnSlot(cursorItem, event.rawSlot))) {
                     equipEvent = ArmorEquipEvent(player, EquipMethod.NORMAL_CLICK, currentItem, cursorItem)
                 }
             }
@@ -73,7 +76,7 @@ object ArmorEquipListener : Initializable(), Listener {
             }
             
             InventoryAction.SWAP_WITH_CURSOR -> {
-                if (slotType == SlotType.ARMOR) {
+                if (slotType == SlotType.ARMOR && (creative || ArmorType.fitsOnSlot(cursorItem, event.rawSlot))) {
                     equipEvent = ArmorEquipEvent(player, EquipMethod.SWAP, currentItem, cursorItem)
                 }
             }
@@ -81,7 +84,9 @@ object ArmorEquipListener : Initializable(), Listener {
             InventoryAction.HOTBAR_SWAP -> {
                 if (slotType == SlotType.ARMOR) {
                     val hotbarItem = player.inventory.getItem(event.hotbarButton)
-                    equipEvent = ArmorEquipEvent(player, EquipMethod.HOTBAR_SWAP, currentItem, hotbarItem)
+                    if (creative || ArmorType.fitsOnSlot(hotbarItem, event.rawSlot)) {
+                        equipEvent = ArmorEquipEvent(player, EquipMethod.HOTBAR_SWAP, currentItem, hotbarItem)
+                    }
                 }
             }
             
@@ -117,7 +122,8 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
-    fun handleInteract(event: PlayerInteractEvent) {
+    private fun handleInteract(e: WrappedPlayerInteractEvent) {
+        val event = e.event
         if (event.isCompletelyDenied()) return
         
         val item = event.item
@@ -135,7 +141,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleInventoryDrag(event: InventoryDragEvent) {
+    private fun handleInventoryDrag(event: InventoryDragEvent) {
         if (event.view.isPlayerView()) {
             var equipEvent: ArmorEquipEvent? = null
             
@@ -159,7 +165,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handlePlayerDeath(event: PlayerDeathEvent) {
+    private fun handlePlayerDeath(event: PlayerDeathEvent) {
         if (!event.keepInventory) {
             val player = event.entity
             val equipment = player.equipment
@@ -174,7 +180,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleItemBreak(event: PlayerItemBreakEvent) {
+    private fun handleItemBreak(event: PlayerItemBreakEvent) {
         val armorItem = event.brokenItem
         val armorType = ArmorType.of(armorItem)
         if (armorType != null) {
@@ -194,7 +200,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleArmorDispense(event: BlockDispenseArmorEvent) {
+    private fun handleArmorDispense(event: BlockDispenseArmorEvent) {
         val entity = event.targetEntity
         if (entity is Player) {
             val equipEvent = ArmorEquipEvent(entity, EquipMethod.DISPENSER, null, event.item)

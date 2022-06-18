@@ -8,11 +8,13 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
+import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 
-object MMOItems : CustomItemService {
+internal object MMOItems : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("MMOItems") != null
     override val requiresLoadDelay = false
@@ -61,6 +63,14 @@ object MMOItems : CustomItemService {
         return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.let(::listOf)
     }
     
+    override fun getItemType(item: ItemStack): CustomItemType? {
+        return if (getId(item) != null) CustomItemType.NORMAL else null
+    }
+    
+    override fun getBlockType(block: Block): CustomBlockType? {
+        return if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) null else CustomBlockType.NORMAL
+    }
+    
     override fun getItemByName(name: String): ItemStack? {
         if (name.startsWith("mmoitems:")) {
             val itemName = name.removePrefix("mmoitems:").uppercase()
@@ -70,7 +80,7 @@ object MMOItems : CustomItemService {
         return null
     }
     
-    override fun getItemTest(name: String): ItemTest? {
+    override fun getItemTest(name: String): SingleItemTest? {
         return getItemByName(name)?.let { MMOItemTest(name, it) }
     }
     
@@ -85,7 +95,7 @@ object MMOItems : CustomItemService {
     
 }
 
-private class MMOItemTest(private val id: String, override val example: ItemStack) : ItemTest {
+private class MMOItemTest(private val id: String, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
         return id.equals(MMOItems.getId(item), true)

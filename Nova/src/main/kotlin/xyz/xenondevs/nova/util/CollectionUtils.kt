@@ -8,6 +8,8 @@ fun <E> List<E>.contentEquals(other: List<E>) = size == other.size && containsAl
 
 fun <E> Set<E>.contentEquals(other: Set<E>) = size == other.size && containsAll(other)
 
+fun <E> Collection<E>.takeUnlessEmpty(): Collection<E>? = ifEmpty { null }
+
 fun <E> MutableIterable<E>.removeFirstWhere(test: (E) -> Boolean): Boolean {
     val iterator = iterator()
     while (iterator.hasNext()) {
@@ -33,9 +35,30 @@ fun <E> MutableIterable<E>.pollFirstWhere(test: (E) -> Boolean): E? {
     return null
 }
 
+fun <E> MutableIterable<E>.pollFirst(): E? {
+    val iterator = iterator()
+    return if (iterator.hasNext()) {
+        val element = iterator.next()
+        iterator.remove()
+        element
+    } else null
+}
+
 inline fun <K, V> Iterable<K>.associateWithNotNull(valueSelector: (K) -> V?): Map<K, V> {
     val destination = LinkedHashMap<K, V>()
     return associateWithNotNullTo(destination, valueSelector)
+}
+
+inline fun <reified R> Iterable<*>.firstInstanceOfOrNull(): R? {
+    val iterator = iterator()
+    while (iterator.hasNext()) {
+        val element = iterator.next()
+        
+        if (element is R)
+            return element
+    }
+    
+    return null
 }
 
 fun <E> Collection<E>.searchFor(query: String, getString: (E) -> String): List<E> {
@@ -53,7 +76,7 @@ fun <E> Collection<E>.searchFor(query: String, getString: (E) -> String): List<E
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun List<Item>.notifyWindows() = forEach(Item::notifyWindows)
+inline fun List<Item>.notifyWindows(): Unit = forEach(Item::notifyWindows)
 
 fun <T> Array<T?>.getOrSet(index: Int, lazyValue: () -> T): T {
     var value = get(index)
@@ -102,6 +125,24 @@ inline fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Bool
     return this
 }
 
+inline fun <K, V, R, M : MutableMap<K, R>> Map<K, V>.mapValuesNotNullTo(destination: M, valueSelector: (Map.Entry<K, V>) -> R?): M {
+    for (entry in this.entries) {
+        val value = valueSelector(entry)
+        if (value != null) destination[entry.key] = value
+    }
+    
+    return destination
+}
+
+inline fun <K, V, R, M : MutableMap<R, V>> Map<K, V>.mapKeysNotNullTo(destination: M, keySelector: (Map.Entry<K, V>) -> R?): M {
+    for (entry in this.entries) {
+        val key = keySelector(entry)
+        if (key != null) destination[key] = entry.value
+    }
+    
+    return destination
+}
+
 inline fun <K, V, M : MutableMap<K, V>> Iterable<K>.associateWithNotNullTo(destination: M, valueSelector: (K) -> V?): M {
     for (element in this) {
         val value = valueSelector(element)
@@ -129,6 +170,16 @@ fun <T> MutableList<T>.rotateLeft() {
     add(first)
 }
 
+fun <K, V> LinkedHashMap<K, V>.poll(): Map.Entry<K, V>? {
+    return entries.pollFirst()
+}
+
 inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { transform(get(it)) }
 }
+
+inline fun <T> List<T>.mapToIntArray(transform: (T) -> Int): IntArray {
+    return IntArray(size) { transform(get(it)) }
+}
+
+fun <K, V> treeMapOf(vararg pairs: Pair<K, V>) = TreeMap<K, V>().apply { putAll(pairs) }

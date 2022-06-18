@@ -8,7 +8,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.util.playItemPickupSound
 
 open class ChangeNumberItem(
@@ -40,7 +40,7 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     
     override fun getItemProvider(): ItemProvider {
         val number = getNumber().coerceIn(0..999)
-        val builder = NovaMaterialRegistry.NUMBER.item.createItemBuilder(number)
+        val builder = CoreGUIMaterial.NUMBER.item.createItemBuilder(number)
         if (localizedName != null)
             builder.setDisplayName(TranslatableComponent(localizedName, number))
         
@@ -61,8 +61,8 @@ class AddNumberItem(
     getRange,
     getNumber,
     setNumber,
-    NovaMaterialRegistry.PLUS_ON_BUTTON.createBasicItemBuilder(),
-    NovaMaterialRegistry.PLUS_OFF_BUTTON.createBasicItemBuilder()
+    CoreGUIMaterial.PLUS_BTN_ON.createBasicItemBuilder(),
+    CoreGUIMaterial.PLUS_BTN_OFF.createBasicItemBuilder()
 )
 
 class RemoveNumberItem(
@@ -75,8 +75,8 @@ class RemoveNumberItem(
     getRange,
     getNumber,
     setNumber,
-    NovaMaterialRegistry.MINUS_ON_BUTTON.createBasicItemBuilder(),
-    NovaMaterialRegistry.MINUS_OFF_BUTTON.createBasicItemBuilder()
+    CoreGUIMaterial.MINUS_BTN_ON.createBasicItemBuilder(),
+    CoreGUIMaterial.MINUS_BTN_OFF.createBasicItemBuilder()
 )
 
 open class AioNumberItem(

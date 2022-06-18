@@ -7,7 +7,7 @@ import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import java.util.function.Supplier
 import kotlin.math.max
 import kotlin.math.min
@@ -15,7 +15,7 @@ import kotlin.math.round
 
 abstract class VerticalBar(height: Int) : Supplier<Item> {
     
-    abstract val barMaterial: NovaMaterial
+    abstract val barMaterial: ItemNovaMaterial
     
     private val barItems = Array(height) { createBarItem(it, height) }
     private var i = 0
@@ -44,7 +44,7 @@ abstract class VerticalBar(height: Int) : Supplier<Item> {
             val displayPercentage = max(min((percentage - displayPercentageStart) * totalSections, 1.0), 0.0)
             val state = round(displayPercentage * 16).toInt()
             
-            return modifyItemBuilder(barMaterial.item.createItemBuilder(state))
+            return modifyItemBuilder(barMaterial.item.createClientsideItemBuilder(subId = state))
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit

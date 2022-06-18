@@ -5,7 +5,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.*
 
-object EnumMapInstanceCreator : InstanceCreator<EnumMap<*, *>> {
+internal object EnumMapInstanceCreator : InstanceCreator<EnumMap<*, *>> {
     
     private val ENUM_MAP_CONSTRUCTOR = EnumMap::class.java.getConstructor(Class::class.java)
     

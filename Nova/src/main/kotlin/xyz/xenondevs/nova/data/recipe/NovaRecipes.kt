@@ -3,8 +3,6 @@ package xyz.xenondevs.nova.data.recipe
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import org.bukkit.potion.PotionEffectType
-import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 
 /**
  * The interface for all recipes for Nova blocks.
@@ -52,61 +50,3 @@ abstract class ConversionNovaRecipe(
     override val result: ItemStack,
     val time: Int
 ) : NovaRecipe, ResultingRecipe, SingleInputChoiceRecipe
-
-class PulverizerRecipe(
-    key: NamespacedKey,
-    input: RecipeChoice,
-    result: ItemStack,
-    time: Int,
-) : ConversionNovaRecipe(key, input, result, time) {
-    override val type = RecipeType.PULVERIZER
-}
-
-class PlatePressRecipe(
-    key: NamespacedKey,
-    input: RecipeChoice,
-    result: ItemStack,
-    time: Int
-) : ConversionNovaRecipe(key, input, result, time) {
-    override val type = RecipeType.PLATE_PRESS
-}
-
-class GearPressRecipe(
-    key: NamespacedKey,
-    input: RecipeChoice,
-    result: ItemStack,
-    time: Int
-) : ConversionNovaRecipe(key, input, result, time) {
-    override val type = RecipeType.GEAR_PRESS
-}
-
-class FluidInfuserRecipe(
-    override val key: NamespacedKey,
-    val mode: InfuserMode,
-    val fluidType: FluidType,
-    val fluidAmount: Long,
-    input: RecipeChoice,
-    result: ItemStack,
-    time: Int
-) : ConversionNovaRecipe(key, input, result, time) {
-    override val type = RecipeType.FLUID_INFUSER
-    
-    enum class InfuserMode {
-        INSERT,
-        EXTRACT
-    }
-    
-}
-
-class ElectricBrewingStandRecipe(
-    override val key: NamespacedKey,
-    override val inputs: List<RecipeChoice>,
-    val result: PotionEffectType,
-    val defaultTime: Int,
-    val redstoneMultiplier: Double,
-    val glowstoneMultiplier: Double,
-    val maxDurationLevel: Int,
-    val maxAmplifierLevel: Int
-) : NovaRecipe, MultiInputChoiceRecipe {
-    override val type = RecipeType.ELECTRIC_BREWING_STAND
-}

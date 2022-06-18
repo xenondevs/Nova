@@ -1,27 +1,16 @@
 package xyz.xenondevs.nova.data.recipe
 
-import com.google.gson.JsonParser
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.inventory.*
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.command.CommandManager
-import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
-import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.ui.menu.item.recipes.group.hardcoded.HardcodedRecipes
-import xyz.xenondevs.nova.util.ItemUtils.getId
 import xyz.xenondevs.nova.util.data.getInputStacks
-import xyz.xenondevs.nova.util.data.getResourceAsStream
-import xyz.xenondevs.nova.util.runTask
+import xyz.xenondevs.nova.util.item.ItemUtils.getId
 
 object RecipeRegistry : Initializable() {
-    
-    private val ITEM_INFO = JsonParser.parseReader(getResourceAsStream("item_info.json")!!.reader()).asJsonObject
-    val CREATION_INFO = ITEM_INFO.get("creation").asJsonObject.entrySet().associate { it.key to it.value.asString }
-    val USAGE_INFO = ITEM_INFO.get("usage").asJsonObject.entrySet().associate { it.key to it.value.asString }
     
     private var BUKKIT_RECIPES: List<Recipe> = ArrayList()
     
@@ -32,15 +21,32 @@ object RecipeRegistry : Initializable() {
     var RECIPES_BY_TYPE: Map<RecipeGroup, List<RecipeContainer>> = HashMap()
     
     override val inMainThread = false
-    override val dependsOn = RecipeManager
+    override val dependsOn = setOf(RecipeManager)
+    
+    private val hardcodedRecipes = ArrayList<NovaRecipe>()
+    val creationInfo = HashMap<String, String>()
+    val usageInfo = HashMap<String, String>()
+    
+    fun addHardcodedRecipes(recipes: List<NovaRecipe>) {
+        check(!isInitialized) { "Recipes are already initialized" }
+        hardcodedRecipes += recipes
+    }
+    
+    fun addCreationInfo(info: Map<String, String>) {
+        creationInfo += info
+    }
+    
+    fun addUsageInfo(info: Map<String, String>) {
+        usageInfo += info
+    }
     
     override fun init() {
-        LOGGER.info("Initializing recipe registry")
+        LOGGER.info("Initializing RecipeRegistry")
         BUKKIT_RECIPES = loadBukkitRecipes()
         CREATION_RECIPES = loadCreationRecipes()
         USAGE_RECIPES = loadUsageRecipes()
         RECIPES_BY_TYPE = loadRecipesByGroup()
-        LOGGER.info("Finished initializing recipe registry")
+        LOGGER.info("Finished initializing RecipeRegistry")
     }
     
     private fun loadBukkitRecipes(): List<Recipe> {
@@ -54,7 +60,7 @@ object RecipeRegistry : Initializable() {
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach {
-            val group = RecipeType.of(it).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(it).group ?: return@forEach
             val itemKey = getId(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(group) { mutableListOf() }
@@ -63,7 +69,7 @@ object RecipeRegistry : Initializable() {
         
         // add all nova machine recipes
         getCreationNovaRecipeSequence().forEach {
-            val group = RecipeType.of(it).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(it).group ?: return@forEach
             val itemKey = getId(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(group) { mutableListOf() }
@@ -78,7 +84,7 @@ object RecipeRegistry : Initializable() {
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach { recipe ->
-            val group = RecipeType.of(recipe).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(recipe).group ?: return@forEach
             recipe.getInputStacks().forEach { inputStack ->
                 val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
@@ -89,7 +95,7 @@ object RecipeRegistry : Initializable() {
         
         // add all nova machine recipes
         getUsageNovaRecipeSequence().forEach { recipe ->
-            val group = RecipeType.of(recipe).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(recipe).group ?: return@forEach
             recipe.getAllInputs().flatMap { it.getInputStacks() }.forEach { inputStack ->
                 val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
@@ -104,7 +110,7 @@ object RecipeRegistry : Initializable() {
     private fun loadRecipesByGroup(): Map<RecipeGroup, List<RecipeContainer>> {
         val map = HashMap<RecipeGroup, MutableList<RecipeContainer>>()
         (getBukkitRecipeSequence() + getAllNovaRecipes()).forEach {
-            val group = RecipeType.of(it).group ?: return@forEach
+            val group = RecipeTypeRegistry.getType(it).group ?: return@forEach
             map.getOrPut(group) { ArrayList() } += RecipeContainer(it)
         }
         return map
@@ -122,7 +128,7 @@ object RecipeRegistry : Initializable() {
     }
     
     private fun getAllNovaRecipes(): Sequence<NovaRecipe> {
-        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + HardcodedRecipes.recipes.asSequence()
+        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + hardcodedRecipes.asSequence()
     }
     
     private fun getCreationNovaRecipeSequence(): Sequence<ResultingRecipe> {

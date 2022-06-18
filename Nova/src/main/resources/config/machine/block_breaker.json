@@ -1,6 +1,0 @@
-{
-  "capacity": 10000,
-  "energy_per_tick": 20,
-  "break_speed_multiplier": 0.1,
-  "break_speed_clamp": 0.5
-}

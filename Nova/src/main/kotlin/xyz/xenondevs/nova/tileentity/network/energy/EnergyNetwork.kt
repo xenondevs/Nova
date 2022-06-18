@@ -2,22 +2,22 @@ package xyz.xenondevs.nova.tileentity.network.energy
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.tileentity.network.*
-import xyz.xenondevs.nova.tileentity.network.energy.EnergyConnectionType.*
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.sumOfNoOverflow
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
-private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.energy.default_transfer_rate")!!
+private val DEFAULT_TRANSFER_RATE by configReloadable { DEFAULT_CONFIG.getLong("network.energy.default_transfer_rate") }
 
 /**
  * An EnergyNetwork consists of [NetworkBridge] that connect [NetworkEndPoint]
  * and their [EnergyHolder].<br>
  * [EnergyHolders][EnergyHolder] can provide, consume or buffer energy.
  */
-class EnergyNetwork : Network {
+class EnergyNetwork(override val uuid: UUID) : Network {
     
     override val type = NetworkType.ENERGY
     
@@ -49,6 +49,13 @@ class EnergyNetwork : Network {
         buffers += network.buffers
     }
     
+    override fun addAll(nodes: Iterable<Pair<BlockFace?, NetworkNode>>) {
+        nodes.forEach { (face, node) ->
+            if (node is NetworkBridge) addBridge(node)
+            else if (node is NetworkEndPoint && face != null) addEndPoint(node, face)
+        }
+    }
+    
     override fun addBridge(bridge: NetworkBridge) {
         require(bridge is EnergyBridge) { "Illegal Bridge Type" }
         _nodes += bridge
@@ -59,9 +66,9 @@ class EnergyNetwork : Network {
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
         val holder = endPoint.holders[NetworkType.ENERGY] as EnergyHolder
         
-        when (val connectionType = holder.energyConfig[face]!!) {
+        when (val connectionType = holder.connectionConfig[face]!!) {
             
-            PROVIDE -> {
+            NetworkConnectionType.EXTRACT -> {
                 if (!buffers.contains(holder)) {
                     if (consumers.contains(holder)) {
                         consumers -= holder
@@ -72,7 +79,7 @@ class EnergyNetwork : Network {
                 }
             }
             
-            CONSUME -> {
+            NetworkConnectionType.INSERT -> {
                 if (!buffers.contains(holder)) {
                     if (providers.contains(holder)) {
                         providers -= holder
@@ -83,7 +90,7 @@ class EnergyNetwork : Network {
                 }
             }
             
-            BUFFER -> {
+            NetworkConnectionType.BUFFER -> {
                 removeNode(endPoint) // remove from provider / consumer set
                 buffers += holder
             }
@@ -107,9 +114,17 @@ class EnergyNetwork : Network {
         }
     }
     
+    override fun removeAll(nodes: List<NetworkNode>) {
+        nodes.forEach { removeNode(it) }
+    }
+    
     override fun isEmpty() = _nodes.isEmpty()
     
     override fun isValid() = bridges.isNotEmpty() || ((providers.isNotEmpty() && consumers.isNotEmpty()) || (buffers.isNotEmpty() && (providers.isNotEmpty() || consumers.isNotEmpty())))
+    
+    override fun reload() {
+        transferRate = bridges.firstOrNull()?.energyTransferRate ?: DEFAULT_TRANSFER_RATE
+    }
     
     /**
      * Called every tick to transfer energy.
@@ -145,31 +160,14 @@ class EnergyNetwork : Network {
         while (availableEnergy != 0L && consumerMap.isNotEmpty()) {
             val distribution = availableEnergy / consumerMap.size
             if (distribution == 0L) break
-            if (distribution != 0L) {
-                for ((consumer, requestedAmount) in consumerMap) {
-                    val energyToGive = min(distribution, requestedAmount)
-                    consumer.energy += energyToGive
-                    if (energyToGive == requestedAmount) consumerMap -= consumer // consumer is satisfied
-                    else consumerMap[consumer] = requestedAmount - energyToGive // consumer is not satisfied
-                    availableEnergy -= energyToGive
-                }
-            } else {
-                // can't split up equally
-                return giveFirst(availableEnergy, consumers)
-            }
-        }
-        
-        return availableEnergy
-    }
-    
-    private fun giveFirst(energy: Long, consumers: Iterable<EnergyHolder>): Long {
-        var availableEnergy = energy
-        for (consumer in consumers) {
-            val energyToGive = min(availableEnergy, consumer.requestedEnergy)
-            availableEnergy -= energyToGive
-            consumer.energy += energyToGive
             
-            if (availableEnergy == 0L) break
+            for ((consumer, requestedAmount) in consumerMap) {
+                val energyToGive = min(distribution, requestedAmount)
+                consumer.energy += energyToGive
+                if (energyToGive == requestedAmount) consumerMap -= consumer // consumer is satisfied
+                else consumerMap[consumer] = requestedAmount - energyToGive // consumer is not satisfied
+                availableEnergy -= energyToGive
+            }
         }
         
         return availableEnergy

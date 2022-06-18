@@ -1,12 +1,14 @@
 package xyz.xenondevs.nova.integration.customitems.plugin
 
 import dev.lone.itemsadder.api.CustomBlock
+import dev.lone.itemsadder.api.CustomCrop
 import dev.lone.itemsadder.api.CustomStack
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent.Cause
 import dev.lone.itemsadder.api.ItemsAdder
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
@@ -14,14 +16,17 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.recipe.ItemTest
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.customModelData
-import xyz.xenondevs.nova.util.runAsyncTask
+import xyz.xenondevs.nova.integration.customitems.CustomItemType
+import xyz.xenondevs.nova.util.item.customModelData
+import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
+import xyz.xenondevs.nova.util.playBreakEffects
 
-object ItemsAdder : CustomItemService {
+internal object ItemsAdder : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null
     override val requiresLoadDelay = true
@@ -53,22 +58,57 @@ object ItemsAdder : CustomItemService {
             return loot
         }
         
+        val customCrop = CustomCrop.byAlreadyPlaced(block)
+        if (customCrop != null) {
+            val loot = customCrop.getLoot(tool)
+            if (playEffects) block.playBreakEffects()
+            block.type = Material.AIR
+            return loot
+        }
+        
         return null
     }
     
     override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
-        return customBlock?.getLoot(tool, true)
+        if (customBlock != null)
+            return customBlock.getLoot(tool, true)
+        
+        // Note: ItemsAdder throws an exception if the block is not a custom crop
+        val customCrop = runCatching { CustomCrop.byAlreadyPlaced(block) }.getOrNull()
+        if (customCrop != null)
+            return customCrop.getLoot(tool)
+        
+        return null
     }
     
     override fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
         // Note: CustomBlock.byItemStack(item) can't be used because of an illegal cast in the ItemsAdder API
-        val customItem = CustomStack.byItemStack(item)
-        if (customItem == null || !customItem.isBlock)
-            return false
-        CustomBlock.place(customItem.namespacedID, location)
-        // TODO: play sound effect
+        val customItem = CustomStack.byItemStack(item) ?: return false
+        
+        if (customItem.isBlock) {
+            CustomBlock.place(customItem.namespacedID, location)?.playPlaceSound()
+        } else if (CustomCrop.isSeed(item)) {
+            CustomCrop.place(customItem.namespacedID, location)
+            location.block.type.playPlaceSoundEffect(location)
+        } else return false
+        
         return true
+    }
+    
+    override fun getItemType(item: ItemStack): CustomItemType? {
+        CustomStack.byItemStack(item) ?: return null
+        
+        return if (CustomCrop.isSeed(item)) CustomItemType.SEED
+        else CustomItemType.NORMAL
+    }
+    
+    override fun getBlockType(block: Block): CustomBlockType? {
+        return when {
+            CustomBlock.byAlreadyPlaced(block) != null -> CustomBlockType.NORMAL
+            runCatching { CustomCrop.byAlreadyPlaced(block) }.getOrNull() != null -> CustomBlockType.CROP
+            else -> null
+        }
     }
     
     override fun getItemByName(name: String): ItemStack? {
@@ -76,7 +116,7 @@ object ItemsAdder : CustomItemService {
         return customItem?.itemStack
     }
     
-    override fun getItemTest(name: String): ItemTest? {
+    override fun getItemTest(name: String): SingleItemTest? {
         return getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     

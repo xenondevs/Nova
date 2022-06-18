@@ -112,7 +112,8 @@ object FoodUtils {
             EntityType.AXOLOTL to listOf(
                 Material.TROPICAL_FISH,
                 Material.TROPICAL_FISH_BUCKET
-            )
+            ),
+            EntityType.FROG to listOf(Material.SLIME_BALL)
         )
         
         val foodTypes = HashSet<Material>()

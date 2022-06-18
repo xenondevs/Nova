@@ -4,10 +4,10 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.ItemTest
-import xyz.xenondevs.nova.integration.Integration
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.integration.InternalIntegration
 
-interface CustomItemService : Integration {
+internal interface CustomItemService : InternalIntegration {
     
     /**
      * If this [CustomItemService] requires the Nova initialization to be delayed
@@ -41,14 +41,26 @@ interface CustomItemService : Integration {
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>?
     
     /**
+     * Gets the [CustomItemType] of this [ItemStack] or null if the [ItemStack] is not
+     * from this [CustomItemService]
+     */
+    fun getItemType(item: ItemStack): CustomItemType?
+    
+    /**
+     * Gets the [CustomBlockType] of this [Block] or null if the [Block] is not
+     * from this [CustomItemService]
+     */
+    fun getBlockType(block: Block): CustomBlockType?
+    
+    /**
      * Gets an [ItemStack] from a namespaced name
      */
     fun getItemByName(name: String): ItemStack?
     
     /**
-     * Gets an [ItemTest] from a namespaced name
+     * Gets an [SingleItemTest] from a namespaced name
      */
-    fun getItemTest(name: String): ItemTest?
+    fun getItemTest(name: String): SingleItemTest?
     
     /**
      * Gets a namespaced name from an [ItemStack]

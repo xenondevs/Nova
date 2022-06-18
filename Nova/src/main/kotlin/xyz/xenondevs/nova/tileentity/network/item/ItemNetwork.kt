@@ -2,12 +2,14 @@ package xyz.xenondevs.nova.tileentity.network.item
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.item.channel.ItemNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.getOrSet
+import java.util.*
 
-class ItemNetwork : Network {
+class ItemNetwork(override val uuid: UUID) : Network {
     
     override val type = NetworkType.ITEMS
     
@@ -36,6 +38,17 @@ class ItemNetwork : Network {
         }
     }
     
+    override fun addAll(nodes: Iterable<Pair<BlockFace?, NetworkNode>>) {
+        nodes.mapNotNull { (face, node) ->
+            if (node is NetworkBridge) {
+                addBridge(node)
+            } else if (node is NetworkEndPoint && face != null) {
+                return@mapNotNull addEndPoint(node, face, false)
+            }
+            return@mapNotNull null
+        }.forEach { it.createDistributor() }
+    }
+    
     override fun addBridge(bridge: NetworkBridge) {
         if (bridge in _nodes) return
         require(bridge is ItemBridge) { "Illegal Bridge Type" }
@@ -46,31 +59,66 @@ class ItemNetwork : Network {
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
-        if (endPoint in _nodes) return
+        addEndPoint(endPoint, face, true)
+    }
+    
+    private fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace, createDistributor: Boolean): ItemNetworkChannel? {
         val itemHolder = endPoint.holders[NetworkType.ITEMS]
         require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
         
         val channel = channels.getOrSet(itemHolder.channels[face]!!) { ItemNetworkChannel() }
-        channel.addHolder(itemHolder, face)
+        channel.addHolder(itemHolder, face, createDistributor)
         
         _nodes += endPoint
+        
+        return channel
     }
     
     override fun removeNode(node: NetworkNode) {
         _nodes -= node
         if (node is NetworkEndPoint) {
-            val itemHolder = node.holders[NetworkType.ITEMS] as ItemHolder
+            val itemHolder = node.holders[NetworkType.ITEMS]
+            require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
+            
             itemHolder.channels.values.toSet().asSequence()
                 .mapNotNull { channels[it]?.to(it) }
-                .onEach { it.first.removeHolder(itemHolder) }
+                .onEach { it.first.removeHolder(itemHolder, true) }
                 .filter { it.first.isEmpty() }
                 .forEach { channels[it.second] = null }
         } else if (node is ItemBridge) bridges -= node
     }
     
+    override fun removeAll(nodes: List<NetworkNode>) {
+        val channelsToUpdate = ArrayList<ItemNetworkChannel>()
+        
+        nodes.forEach { node ->
+            _nodes -= node
+            if (node is NetworkEndPoint) {
+                val itemHolder = node.holders[NetworkType.ITEMS]
+                require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
+                
+                itemHolder.channels.values.toSet().asSequence()
+                    .mapNotNull { channels[it]?.to(it) }
+                    .onEach {
+                        val channel = it.first
+                        channel.removeHolder(itemHolder, false)
+                        channelsToUpdate += channel
+                    }
+                    .filter { it.first.isEmpty() }
+                    .forEach { channels[it.second] = null }
+            } else if (node is ItemBridge) bridges -= node
+        }
+        
+        channelsToUpdate.forEach { it.createDistributor() }
+    }
+    
     override fun isEmpty() = _nodes.isEmpty()
     
     override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
+    
+    override fun reload() {
+        bridges.firstOrNull()?.itemTransferRate ?: DEFAULT_TRANSFER_RATE
+    }
     
     override fun handleTick() {
         val startingChannel = nextChannel
@@ -86,7 +134,7 @@ class ItemNetwork : Network {
     companion object {
         
         const val CHANNEL_AMOUNT = 4
-        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getInt("network.item.default_transfer_rate")!!
+        private val DEFAULT_TRANSFER_RATE by configReloadable { DEFAULT_CONFIG.getInt("network.item.default_transfer_rate") }
         
     }
     

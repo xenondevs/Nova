@@ -11,7 +11,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
@@ -19,13 +19,13 @@ import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.enumMapOf
 
 val BUTTON_COLORS = listOf(
-    NovaMaterialRegistry.RED_BUTTON,
-    NovaMaterialRegistry.ORANGE_BUTTON,
-    NovaMaterialRegistry.YELLOW_BUTTON,
-    NovaMaterialRegistry.GREEN_BUTTON,
-    NovaMaterialRegistry.BLUE_BUTTON,
-    NovaMaterialRegistry.PINK_BUTTON,
-    NovaMaterialRegistry.WHITE_BUTTON
+    CoreGUIMaterial.RED_BTN,
+    CoreGUIMaterial.ORANGE_BTN,
+    CoreGUIMaterial.YELLOW_BTN,
+    CoreGUIMaterial.GREEN_BTN,
+    CoreGUIMaterial.BLUE_BTN,
+    CoreGUIMaterial.PINK_BTN,
+    CoreGUIMaterial.WHITE_BTN
 )
 
 abstract class InventorySideConfigGUI : SimpleGUI(9, 3) {
@@ -76,13 +76,13 @@ abstract class InventorySideConfigGUI : SimpleGUI(9, 3) {
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (getConnectionType(blockFace)) {
                 NetworkConnectionType.NONE ->
-                    NovaMaterialRegistry.GRAY_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
+                    CoreGUIMaterial.GRAY_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
                 NetworkConnectionType.EXTRACT ->
-                    NovaMaterialRegistry.ORANGE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
+                    CoreGUIMaterial.ORANGE_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
                 NetworkConnectionType.INSERT ->
-                    NovaMaterialRegistry.BLUE_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
+                    CoreGUIMaterial.BLUE_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
                 NetworkConnectionType.BUFFER ->
-                    NovaMaterialRegistry.GREEN_BUTTON.createItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
+                    CoreGUIMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
             }.setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
         }
         

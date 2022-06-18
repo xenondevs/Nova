@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
 import java.io.File
 
-object PermanentStorage {
+internal object PermanentStorage {
     
     private val file: File = File("${NOVA.dataFolder}/storage.do-not-edit").also { it.parentFile.mkdirs() }
     val mainObj: JsonObject
@@ -22,9 +22,16 @@ object PermanentStorage {
         else JsonObject()
     }
     
-    fun store(key: String, data: Any) {
-        mainObj.add(key, GSON.toJsonTree(data))
+    fun store(key: String, data: Any?) {
+        if (data != null)
+            mainObj.add(key, GSON.toJsonTree(data))
+        else mainObj.remove(key)
+        
         file.writeText(GSON.toJson(mainObj))
+    }
+    
+    fun has(key: String): Boolean {
+        return mainObj.has(key)
     }
     
     fun remove(key: String) {

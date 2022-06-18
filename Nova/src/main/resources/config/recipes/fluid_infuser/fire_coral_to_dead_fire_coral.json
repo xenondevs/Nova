@@ -1,8 +1,0 @@
-{
-  "mode": "EXTRACT",
-  "fluid_type": "WATER",
-  "fluid_amount": 100,
-  "input": "minecraft:fire_coral",
-  "result": "minecraft:dead_fire_coral",
-  "time": 10
-}

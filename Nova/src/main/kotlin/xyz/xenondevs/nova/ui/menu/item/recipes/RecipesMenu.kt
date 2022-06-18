@@ -8,11 +8,12 @@ import de.studiocode.invui.gui.impl.SimplePagedNestedGUI
 import de.studiocode.invui.gui.impl.SimpleTabGUI
 import de.studiocode.invui.gui.impl.TabGUI
 import de.studiocode.invui.gui.structure.Structure
+import de.studiocode.invui.item.ItemProvider
+import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import de.studiocode.invui.item.impl.controlitem.ControlItem
 import de.studiocode.invui.item.impl.controlitem.TabItem
-import de.studiocode.invui.resourcepack.Icon
 import de.studiocode.invui.window.Window
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.ChatColor
@@ -27,18 +28,18 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
-import xyz.xenondevs.nova.util.ItemUtils
+import xyz.xenondevs.nova.ui.overlay.MoveCharacters
+import xyz.xenondevs.nova.util.item.ItemUtils
 import java.util.*
 
 fun Player.showRecipes(item: ItemStack) = showRecipes(ItemUtils.getId(item))
 
 fun Player.showRecipes(id: String): Boolean {
     val recipes = RecipeRegistry.CREATION_RECIPES[id]
-    val info = RecipeRegistry.CREATION_INFO[id]
+    val info = RecipeRegistry.creationInfo[id]
     if (recipes != null) {
         RecipesWindow(this, recipes, info).show()
         return true
@@ -54,7 +55,7 @@ fun Player.showUsages(item: ItemStack) = showUsages(ItemUtils.getId(item))
 
 fun Player.showUsages(id: String): Boolean {
     val recipes = RecipeRegistry.USAGE_RECIPES[id]
-    val info = RecipeRegistry.USAGE_INFO[id]
+    val info = RecipeRegistry.usageInfo[id]
     if (recipes != null) {
         RecipesWindow(this, recipes, info).show()
         return true
@@ -71,10 +72,10 @@ fun Player.showUsages(id: String): Boolean {
  */
 private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeContainer>>, info: String? = null) : ItemMenu {
     
-    private val recipesGuiStructure = Structure("" +
-        "< . . . . . . . >" +
-        "x x x x x x x x x" +
-        "x x x x x x x x x" +
+    private val recipesGuiStructure = Structure(
+        "< . . . . . . . >",
+        "x x x x x x x x x",
+        "x x x x x x x x x",
         "x x x x x x x x x")
         .addIngredient('<', ::PageBackItem)
         .addIngredient('>', ::PageForwardItem)
@@ -92,14 +93,15 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
             .map { it.key to it.value }
             .sortedBy { it.first }
         
-        mainGUI = GUIBuilder(GUIType.TAB, 9, 6)
-            .setStructure("" +
-                "b . . . . . . . ." +
-                "x x x x x x x x x" +
-                "x x x x x x x x x" +
-                "x x x x x x x x x" +
-                "x x x x x x x x x" +
-                ". . . . . . . . .")
+        mainGUI = GUIBuilder(GUIType.TAB)
+            .setStructure(
+                "b . . . . . . . .",
+                "x x x x x x x x x",
+                "x x x x x x x x x",
+                "x x x x x x x x x",
+                "x x x x x x x x x",
+                ". . . . . . . . ."
+            )
             .setGUIs(craftingTabs.map { it.second })
             .addIngredient('b', LastRecipeItem(viewerUUID))
             .build()
@@ -127,11 +129,11 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
         val pageNumberString = "${currentTab.currentPageIndex + 1} / ${currentTab.pageAmount}"
         
         return ComponentBuilder()
-            .append(CustomCharacters.getMovingComponent(-8)) // move to side to place overlay
-            .append(currentType.overlay.component)
-            .append(CustomCharacters.getMovingComponent(-84)) // move back to the middle
-            .append(CustomCharacters.getMovingComponent((
-                CustomCharacters.getStringLength(pageNumberString) // this would be the string length in the default font
+            .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
+            .append(currentType.texture.component)
+            .append(MoveCharacters.getMovingComponent(-84)) // move back to the middle
+            .append(MoveCharacters.getMovingComponent((
+                MoveCharacters.getStringLength(pageNumberString) // this would be the string length in the default font
                     + pageNumberString.replace(" ", "").length // non-space characters are generally one pixel bigger in this font
                 ) / -2 // divided by -2 to center it
             ))
@@ -178,7 +180,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
     private inner class PageBackItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
-            (if (gui.hasPageBefore()) NovaMaterialRegistry.ARROW_LEFT_ON_BUTTON else NovaMaterialRegistry.ARROW_LEFT_OFF_BUTTON)
+            (if (gui.hasPageBefore()) CoreGUIMaterial.TP_ARROW_LEFT_BTN_ON else CoreGUIMaterial.TP_ARROW_LEFT_BTN_OFF)
                 .createBasicItemBuilder()
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -194,7 +196,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
     private inner class PageForwardItem : ControlItem<PagedGUI>() {
         
         override fun getItemProvider(gui: PagedGUI) =
-            (if (gui.hasNextPage()) NovaMaterialRegistry.ARROW_RIGHT_ON_BUTTON else NovaMaterialRegistry.ARROW_RIGHT_OFF_BUTTON)
+            (if (gui.hasNextPage()) CoreGUIMaterial.TP_ARROW_RIGHT_BTN_ON else CoreGUIMaterial.TP_ARROW_RIGHT_BTN_OFF)
                 .createBasicItemBuilder()
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -209,7 +211,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
     
     private inner class PagedRecipesGUI(recipes: List<GUI>) {
         
-        val gui: GUI = GUIBuilder(GUIType.PAGED_GUIs, 9, 4)
+        val gui: GUI = GUIBuilder(GUIType.PAGED_GUIs)
             .setStructure(recipesGuiStructure)
             .setGUIs(recipes)
             .build()
@@ -220,10 +222,10 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
 
 private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
     
-    override fun getItemProvider(): ItemBuilder {
+    override fun getItemProvider(): ItemProvider {
         return if (ItemMenu.hasHistory(viewerUUID)) {
-            Icon.LIGHT_ARROW_1_LEFT.itemBuilder
-        } else ItemBuilder(Material.AIR)
+            CoreGUIMaterial.LIGHT_ARROW_1_LEFT.itemProvider
+        } else ItemWrapper(ItemStack(Material.AIR))
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

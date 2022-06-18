@@ -1,48 +1,53 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.EFFICIENCY_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.EFFICIENCY_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.ENERGY_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.ENERGY_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.FLUID_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.FLUID_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.RANGE_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.SPEED_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_EFFICIENCY_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_ENERGY_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_FLUID_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_RANGE_UPGRADE_ICON
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.TRANSLUCENT_SPEED_UPGRADE_ICON
-import xyz.xenondevs.nova.util.data.getAllDoubles
+import xyz.xenondevs.nova.data.config.Reloadable
+import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.material.CoreItems
+import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry.register
+import xyz.xenondevs.nova.util.data.getListOrNull
 
-enum class UpgradeType(val material: NovaMaterial, val icon: NovaMaterial, val grayIcon: NovaMaterial) {
+class UpgradeType<T> internal constructor(
+    val id: NamespacedId,
+    val item: ItemNovaMaterial,
+    val icon: ItemNovaMaterial,
+    private val configLoader: (Any) -> T
+) : Reloadable {
     
-    SPEED(SPEED_UPGRADE, SPEED_UPGRADE_ICON, TRANSLUCENT_SPEED_UPGRADE_ICON),
-    EFFICIENCY(EFFICIENCY_UPGRADE, EFFICIENCY_UPGRADE_ICON, TRANSLUCENT_EFFICIENCY_UPGRADE_ICON),
-    ENERGY(ENERGY_UPGRADE, ENERGY_UPGRADE_ICON, TRANSLUCENT_ENERGY_UPGRADE_ICON),
-    FLUID(FLUID_UPGRADE, FLUID_UPGRADE_ICON, TRANSLUCENT_FLUID_UPGRADE_ICON),
-    RANGE(RANGE_UPGRADE, RANGE_UPGRADE_ICON, TRANSLUCENT_RANGE_UPGRADE_ICON);
+    private val modifierCache = HashMap<ItemNovaMaterial, List<T>>()
+    private val defaultConfig by configReloadable { NovaConfig["${id.namespace}:upgrade_values"] }
     
-    private val modifierCache = HashMap<NovaMaterial, DoubleArray>()
+    fun getValue(material: ItemNovaMaterial, level: Int): T {
+        val values = getUpgradeValues(material)
+        return values[level.coerceIn(0..values.lastIndex)]
+    }
     
-    operator fun get(material: NovaMaterial): DoubleArray {
+    fun getUpgradeValues(material: ItemNovaMaterial): List<T> {
         return modifierCache.getOrPut(material) {
             val specificConfig = NovaConfig[material]
-            return@getOrPut readConfiguredModifier(specificConfig) ?: readConfiguredModifier(DEFAULT_CONFIG)!!
+            
+            val configValues: List<Any>? = specificConfig.getListOrNull("upgrade_values.${id.name}")
+                ?: defaultConfig.getListOrNull(id.name)
+            checkNotNull(configValues) { "No upgrade values present for $id" }
+            
+            return@getOrPut configValues.map(configLoader)
         }
     }
     
-    private fun readConfiguredModifier(config: NovaConfig): DoubleArray? =
-        config.getArray("upgrade_modifiers.${name.lowercase()}")?.getAllDoubles()?.toDoubleArray()
+    override fun reload() {
+        modifierCache.clear()
+    }
     
     companion object {
-        val ALL_ENERGY = arrayOf(SPEED, EFFICIENCY, ENERGY)
-        val ENERGY_AND_RANGE = arrayOf(SPEED, EFFICIENCY, ENERGY, RANGE)
+        val SPEED = register<Double>("speed", CoreItems.SPEED_UPGRADE, CoreGUIMaterial.SPEED_UPGRADE)
+        val EFFICIENCY = register<Double>("efficiency", CoreItems.EFFICIENCY_UPGRADE, CoreGUIMaterial.EFFICIENCY_UPGRADE)
+        val ENERGY = register<Double>("energy", CoreItems.ENERGY_UPGRADE, CoreGUIMaterial.ENERGY_UPGRADE)
+        val FLUID = register<Double>("fluid", CoreItems.FLUID_UPGRADE, CoreGUIMaterial.FLUID_UPGRADE)
+        val RANGE = register<Int>("range", CoreItems.RANGE_UPGRADE, CoreGUIMaterial.RANGE_UPGRADE)
     }
+    
     
 }

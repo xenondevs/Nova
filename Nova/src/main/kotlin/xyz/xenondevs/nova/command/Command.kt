@@ -12,12 +12,14 @@ import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.rcon.RconConsoleSource
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.util.data.toComponent
+import java.util.logging.Level
 
 val CommandContext<CommandSourceStack>.player: Player
-    get() = source.player
+    get() = source.bukkitPlayer
 
-val CommandSourceStack.player: Player
+val CommandSourceStack.bukkitPlayer: Player
     get() = playerOrException.bukkitEntity
 
 fun CommandSourceStack.sendSuccess(message: Array<BaseComponent>) {
@@ -50,8 +52,7 @@ fun <CommandSourceStack, T : ArgumentBuilder<CommandSourceStack, T>> ArgumentBui
         try {
             run(it)
         } catch (e: Exception) {
-            e.printStackTrace()
-            throw e
+            LOGGER.log(Level.SEVERE, "An exception occurred while running a command", e)
         }
         
         0
@@ -59,10 +60,10 @@ fun <CommandSourceStack, T : ArgumentBuilder<CommandSourceStack, T>> ArgumentBui
 }
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresPlayerPermission(permission: String): LiteralArgumentBuilder<CommandSourceStack> =
-    this.requires { it.source.isPlayer() && it.player.hasPermission(permission) }
+    this.requires { it.source.isPlayer() && it.bukkitPlayer.hasPermission(permission) }
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresPermission(permission: String): LiteralArgumentBuilder<CommandSourceStack> =
-    this.requires { !it.source.isPlayer() || it.player.hasPermission(permission) }
+    this.requires { !it.source.isPlayer() || it.bukkitPlayer.hasPermission(permission) }
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresConsole(): LiteralArgumentBuilder<CommandSourceStack> =
     this.requires { it.source.isConsole() }

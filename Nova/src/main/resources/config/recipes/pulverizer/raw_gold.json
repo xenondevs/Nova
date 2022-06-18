@@ -1,6 +1,0 @@
-{
-  "input": "minecraft:raw_gold",
-  "result": "nova:gold_dust",
-  "amount": 2,
-  "time": 200
-}

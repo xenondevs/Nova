@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
+import xyz.xenondevs.nova.util.item.isTraversable
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -57,17 +58,30 @@ val BlockFace.rotationValues: Pair<Int, Int>
         else -> throw IllegalArgumentException("Illegal facing")
     }
 
-val Location.facing: BlockFace
-    get() {
-        val yawMod = yaw.mod(360f)
-        return when {
-            yawMod >= 315 -> SOUTH
-            yawMod >= 225 -> EAST
-            yawMod >= 135 -> NORTH
-            yawMod >= 45 -> WEST
-            else -> SOUTH
-        }
+val BlockFace.yaw: Float
+    get() = when (this) {
+        SOUTH -> 0f
+        WEST -> 90f
+        NORTH -> 180f
+        EAST -> 270f
+        UP -> 0f
+        DOWN -> 0f
+        
+        else -> throw UnsupportedOperationException("Unsupported facing")
     }
+
+val BlockFace.pitch: Float
+    get() = when (this) {
+        UP -> 90f
+        DOWN -> 270f
+        else -> 0f
+    }
+
+fun BlockFace.getYaw(default: BlockFace): Float =
+    (yaw + default.yaw) % 360
+
+val Location.facing: BlockFace
+    get() = BlockFaceUtils.getDirection(yaw)
 
 fun Axis.toBlockFace(positive: Boolean): BlockFace =
     when (this) {
@@ -89,6 +103,33 @@ object BlockFaceUtils {
         ).sortedByDescending { it.second.absoluteValue }[0]
         
         return result.first.toBlockFace(result.second >= 0)
+    }
+    
+    fun determineBlockFaceLookingAt(location: Location, maxDistance: Double, stepSize: Double): BlockFace? {
+        var previous = location
+        
+        location.castRay(stepSize, maxDistance) { rayLocation ->
+            val block = rayLocation.block
+            if (block.type.isTraversable() && !block.boundingBox.contains(rayLocation.x, rayLocation.y, rayLocation.z)) {
+                previous = rayLocation.clone()
+                return@castRay true
+            } else {
+                return determineBlockFace(rayLocation.block, previous)
+            }
+        }
+        
+        return null
+    }
+    
+    fun getDirection(yaw: Float): BlockFace {
+        val yawMod = yaw.mod(360f)
+        return when {
+            yawMod >= 315 -> SOUTH
+            yawMod >= 225 -> EAST
+            yawMod >= 135 -> NORTH
+            yawMod >= 45 -> WEST
+            else -> SOUTH
+        }
     }
     
 }

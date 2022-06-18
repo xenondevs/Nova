@@ -11,8 +11,9 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.util.ItemUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.novaMaterial
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
     val itemProviders = if (recipeChoice is RecipeChoice.MaterialChoice) recipeChoice.choices.map { ItemWrapper(ItemStack(it)) }
@@ -40,7 +41,10 @@ fun handleRecipeChoiceItemClick(player: Player, clickType: ClickType, event: Inv
     } else if (clickType == ClickType.RIGHT) {
         player.showUsages(id)
     } else if (player.gameMode == GameMode.CREATIVE) {
-        val itemStack = itemProvider.get().clone().apply { amount = type.maxStackSize }
+        val itemStack = itemProvider.get().clone().apply { 
+            amount = novaMaterial?.item?.material?.maxStackSize ?: type.maxStackSize
+        }
+        
         if (clickType == ClickType.MIDDLE) {
             player.setItemOnCursor(itemStack)
         } else if (clickType.isShiftClick) {

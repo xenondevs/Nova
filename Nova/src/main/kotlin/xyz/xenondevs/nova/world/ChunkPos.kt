@@ -2,11 +2,19 @@ package xyz.xenondevs.nova.world
 
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
+import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.block.Block
 import java.util.*
 
 val Chunk.pos: ChunkPos
     get() = ChunkPos(world.uid, x, z)
+
+val Location.chunkPos: ChunkPos
+    get() = ChunkPos(world!!.uid, x.toInt() shr 4, z.toInt() shr 4)
+
+val Block.chunkPos: ChunkPos
+    get() = ChunkPos(world.uid, x shr 4, z shr 4)
 
 data class ChunkPos(val worldUUID: UUID, val x: Int, val z: Int) {
     

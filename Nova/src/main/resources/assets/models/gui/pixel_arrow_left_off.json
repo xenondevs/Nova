@@ -1,0 +1,11 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "nova:gui/pixel_arrow_left_off"
+  },
+  "display": {
+		"gui": {
+			"translation": [0, -1, 0]
+		}
+	}
+}

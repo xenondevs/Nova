@@ -1,20 +1,24 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.world.Container
 import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
+import net.minecraft.world.item.crafting.SmeltingRecipe
 import net.minecraft.world.level.Level
+import org.bukkit.inventory.Recipe
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.nmsIngredient
+import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
 
-class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : ShapedRecipe(
+internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : ShapedRecipe(
     optimizedRecipe.recipe.key.resourceLocation,
     "",
     3,
     3,
-    NonNullList(optimizedRecipe.choices.map { it.nmsIngredient }),
+    NonNullList(optimizedRecipe.choiceMatrix.map { it.nmsIngredient }),
     optimizedRecipe.recipe.result.nmsStack
 ) {
     
@@ -25,7 +29,7 @@ class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : Sha
         return container.width == width && container.height == height &&
             container.contents.withIndex().all { (index, matrixStack) ->
                 // check if the item stack matches with the given recipe choice
-                val choice = optimizedRecipe.choices[index] ?: return@all matrixStack.isEmpty
+                val choice = optimizedRecipe.choiceMatrix[index] ?: return@all matrixStack.isEmpty
                 return@all matrixStack != null && choice.test(matrixStack.bukkitStack)
             }
     }
@@ -36,7 +40,7 @@ class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : Sha
     
 }
 
-class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
+internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
     bukkitRecipe.key.resourceLocation,
     "",
     bukkitRecipe.result.nmsStack,
@@ -55,6 +59,27 @@ class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : Sha
     }
     
     override fun toBukkitRecipe(): org.bukkit.inventory.ShapelessRecipe {
+        return bukkitRecipe
+    }
+    
+}
+
+internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) : SmeltingRecipe(
+    bukkitRecipe.key.resourceLocation,
+    "",
+    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.result.nmsStack,
+    bukkitRecipe.experience,
+    bukkitRecipe.cookingTime
+) {
+    
+    private val choice = bukkitRecipe.inputChoice
+    
+    override fun matches(container: Container, level: Level): Boolean {
+        return choice.test(container.getItem(0).bukkitStack)
+    }
+    
+    override fun toBukkitRecipe(): Recipe {
         return bukkitRecipe
     }
     

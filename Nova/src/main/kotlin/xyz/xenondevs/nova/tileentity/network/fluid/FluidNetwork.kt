@@ -2,12 +2,14 @@ package xyz.xenondevs.nova.tileentity.network.fluid
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.fluid.channel.FluidNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.util.getOrSet
+import java.util.*
 
-class FluidNetwork : Network {
+class FluidNetwork(override val uuid: UUID) : Network {
     
     override val type = NetworkType.FLUID
     
@@ -36,6 +38,17 @@ class FluidNetwork : Network {
         }
     }
     
+    override fun addAll(nodes: Iterable<Pair<BlockFace?, NetworkNode>>) {
+        nodes.asSequence().mapNotNull { (face, node) ->
+            if (node is NetworkBridge)
+                addBridge(node)
+            else if (node is NetworkEndPoint && face != null)
+                return@mapNotNull addEndPoint(node, face, false)
+            
+            return@mapNotNull null
+        }.forEach { it.createDistributor() }
+    }
+    
     override fun addBridge(bridge: NetworkBridge) {
         if (bridge in _nodes) return
         require(bridge is FluidBridge) { "Illegal Bridge Type" }
@@ -46,31 +59,67 @@ class FluidNetwork : Network {
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
-        if (endPoint in _nodes) return
+        addEndPoint(endPoint, face, true)
+    }
+    
+    private fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace, createDistributor: Boolean): FluidNetworkChannel? {
+        if (endPoint in _nodes) return null
+        
         val fluidHolder = endPoint.holders[NetworkType.FLUID]
         require(fluidHolder is FluidHolder) { "Illegal NetworkEndPoint Type" }
         
         val channel = channels.getOrSet(fluidHolder.channels[face]!!) { FluidNetworkChannel() }
-        channel.addHolder(fluidHolder, face)
+        channel.addHolder(fluidHolder, face, createDistributor)
         
         _nodes += endPoint
+        
+        return channel
     }
     
     override fun removeNode(node: NetworkNode) {
         _nodes -= node
         if (node is NetworkEndPoint) {
-            val fluidHolder = node.holders[NetworkType.FLUID] as FluidHolder
+            val fluidHolder = node.holders[NetworkType.FLUID]
+            require(fluidHolder is FluidHolder) { "Illegal NetworkEndPoint Type" }
+            
             fluidHolder.channels.values.toSet().asSequence()
                 .mapNotNull { channels[it]?.to(it) }
-                .onEach { it.first.removeHolder(fluidHolder) }
+                .onEach { it.first.removeHolder(fluidHolder, true) }
                 .filter { it.first.isEmpty() }
                 .forEach { channels[it.second] = null }
         } else if (node is FluidBridge) bridges -= node
     }
     
+    override fun removeAll(nodes: List<NetworkNode>) {
+        val nodeChannels = ArrayList<FluidNetworkChannel>()
+        
+        nodes.forEach { node ->
+            _nodes -= node
+            if (node is NetworkEndPoint) {
+                val fluidHolder = node.holders[NetworkType.FLUID]
+                require(fluidHolder is FluidHolder) { "Illegal NetworkEndPoint Type" }
+    
+                fluidHolder.channels.values.toSet().asSequence()
+                    .mapNotNull { channels[it]?.to(it) }
+                    .onEach {
+                        it.first.removeHolder(fluidHolder, false)
+                        nodeChannels += it.first
+                    }
+                    .filter { it.first.isEmpty() }
+                    .forEach { channels[it.second] = null }
+            } else if (node is FluidBridge) bridges -= node
+        }
+        
+        nodeChannels.forEach { it.createDistributor() }
+    }
+    
     override fun isEmpty() = _nodes.isEmpty()
     
     override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
+    
+    override fun reload() {
+        transferRate = bridges.firstOrNull()?.fluidTransferRate ?: DEFAULT_TRANSFER_RATE
+    }
     
     override fun handleTick() {
         val startingChannel = nextChannel
@@ -86,7 +135,7 @@ class FluidNetwork : Network {
     companion object {
         
         const val CHANNEL_AMOUNT = 4
-        private val DEFAULT_TRANSFER_RATE = DEFAULT_CONFIG.getLong("network.fluid.default_transfer_rate")!!
+        private val DEFAULT_TRANSFER_RATE by configReloadable { DEFAULT_CONFIG.getLong("network.fluid.default_transfer_rate") }
         
     }
     

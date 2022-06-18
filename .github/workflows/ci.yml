@@ -19,11 +19,14 @@ jobs:
         with:
           java-version: 17
           distribution: adopt
+          server-id: xenondevs
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       - name: Run BuildTools
         run: . .github/scripts/buildtools.sh
 
-      - name: Build With Maven
+      - name: Build Spigot-Mapped
         run: mvn -B clean test package "-Ddir=artifacts/" --file pom.xml
 
       - name: Upload Artifacts
@@ -33,10 +36,16 @@ jobs:
           name: Artifacts
           path: ./Nova/artifacts/*.jar
 
-      - name: Publish Artifacts
+      - name: Attach Artifacts
         if: github.event_name == 'release'
         uses: skx/github-action-publish-binaries@release-2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: ./Nova/artifacts/*.jar
+
+      - name: Build & Deploy Mojang-Mapped
+        run: mvn -B clean deploy -P mojang-mapped "-Ddir=artifacts/" --file pom.xml
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}

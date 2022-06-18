@@ -1,0 +1,15 @@
+{
+  "result": "nova:efficiency_upgrade",
+  "shape": [
+    "lnl",
+    "nin",
+    "aga"
+  ],
+  "ingredients": {
+    "l": "nova:lapis_dust; minecraft:lapis_lazuli",
+    "n": "minecraft:iron_ingot",
+    "i": "nova:iron_plate; minecraft:paper",
+    "g": "nova:emerald_gear; minecraft:lapis_lazuli",
+    "a": "minecraft:amethyst_shard"
+  }
+}

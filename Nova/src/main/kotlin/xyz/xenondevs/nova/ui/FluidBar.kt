@@ -7,26 +7,26 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
-import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
+import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
 
 class FluidBar(
     height: Int,
-    fluidHolder: NovaFluidHolder,
+    fluidHolder: FluidHolder,
     private val fluidContainer: FluidContainer
 ) : VerticalBar(height) {
     
     private val allowedConnectionType = fluidHolder.allowedConnectionTypes[fluidContainer]!!
     
-    override val barMaterial: NovaMaterial
+    override val barMaterial: ItemNovaMaterial
         get() = when (fluidContainer.type) {
-            FluidType.WATER -> NovaMaterialRegistry.BLUE_BAR
-            else -> NovaMaterialRegistry.ORANGE_BAR
+            FluidType.WATER -> CoreGUIMaterial.BAR_BLUE
+            else -> CoreGUIMaterial.BAR_ORANGE
         }
     
     private var amount = 0L
@@ -96,10 +96,10 @@ class StaticFluidBar(
     height: Int
 ) : VerticalBar(height) {
     
-    override val barMaterial: NovaMaterial
+    override val barMaterial: ItemNovaMaterial
         get() = when (type) {
-            FluidType.WATER -> NovaMaterialRegistry.BLUE_BAR_TRANSPARENT
-            else -> NovaMaterialRegistry.ORANGE_BAR_TRANSPARENT
+            FluidType.WATER -> CoreGUIMaterial.TP_BAR_BLUE
+            else -> CoreGUIMaterial.TP_BAR_ORANGE
         }
     
     init {

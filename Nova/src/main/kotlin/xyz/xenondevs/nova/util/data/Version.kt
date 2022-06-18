@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
+import org.bukkit.Bukkit
+
 class Version : Comparable<Version> {
     
     val major: Int
@@ -13,10 +15,10 @@ class Version : Comparable<Version> {
     }
     
     constructor(version: String) {
-        val split = version.split('.')
-        this.major = split.getOrNull(0)?.toInt() ?: 0
-        this.minor = split.getOrNull(1)?.toInt() ?: 0
-        this.patch = split.getOrNull(2)?.toInt() ?: 0
+        val split = version.removeSuffix("-SNAPSHOT").split('.')
+        this.major = split.getOrNull(0)?.toIntOrNull() ?: 0
+        this.minor = split.getOrNull(1)?.toIntOrNull() ?: 0
+        this.patch = split.getOrNull(2)?.toIntOrNull() ?: 0
     }
     
     override fun toString() = "$major.$minor.$patch"
@@ -46,6 +48,17 @@ class Version : Comparable<Version> {
         result = 31 * result + minor
         result = 31 * result + patch
         return result
+    }
+    
+    companion object {
+        
+        val SERVER_VERSION: Version
+        
+        init {
+            val versionPattern = Regex("""(1\.\d{1,2}(\.\d{1,2})?)""")
+            SERVER_VERSION = Version(versionPattern.find(Bukkit.getVersion())!!.groupValues[1])
+        }
+        
     }
     
 }

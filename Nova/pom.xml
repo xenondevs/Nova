@@ -7,19 +7,22 @@
     <parent>
         <groupId>xyz.xenondevs.nova</groupId>
         <artifactId>Nova-Parent</artifactId>
-        <version>0.8.13</version>
+        <version>0.9-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>Nova</artifactId>
 
     <properties>
-        <exposed.version>0.37.3</exposed.version>
-        <hikaricp.version>5.0.1</hikaricp.version>
-        <particlelib.version>1.7.1</particlelib.version>
+        <particlelib.version>1.8</particlelib.version>
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
+        <zip4j.version>2.10.0</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
-        <invui.version>0.5-SNAPSHOT</invui.version>
+        <invui.version>0.7-SNAPSHOT</invui.version>
+        <ktor.version>2.0.1</ktor.version>
+        <maven-resolver-provider.version>3.8.5</maven-resolver-provider.version>
+        <maven-resolver-connector-basic.version>1.8.0</maven-resolver-connector-basic.version>
+        <maven-resolver-transport-http.version>1.8.0</maven-resolver-transport-http.version>
         <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>
 
@@ -36,6 +39,10 @@
             <url>https://repo.xenondevs.xyz/releases</url>
         </repository>
         <repository>
+            <id>xenondevs-third-party</id>
+            <url>https://repo.xenondevs.xyz/third-party-releases</url>
+        </repository>
+        <repository>
             <id>jitpack</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -44,16 +51,8 @@
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
         <repository>
-            <id>panda-lang</id>
-            <url>https://repo.panda-lang.org/releases</url>
-        </repository>
-        <repository>
             <id>glaremasters</id>
             <url>https://repo.glaremasters.me/repository/bloodshot</url>
-        </repository>
-        <repository>
-            <id>papermc</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
             <id>Lumine</id>
@@ -83,16 +82,21 @@
             <dependencies>
                 <dependency>
                     <groupId>de.studiocode.invui</groupId>
-                    <artifactId>IA-R9</artifactId>
+                    <artifactId>IA-R10</artifactId>
                     <version>${invui.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>xyz.xenondevs.kadvancements</groupId>
+                    <artifactId>kadvancements-adapter-r2</artifactId>
+                    <version>0.1-SNAPSHOT</version>
                 </dependency>
             </dependencies>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>net.md-5</groupId>
+                        <groupId>xyz.xenondevs</groupId>
                         <artifactId>specialsource-maven-plugin</artifactId>
-                        <version>1.2.2</version>
+                        <version>1.2.4</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -133,9 +137,15 @@
             <dependencies>
                 <dependency>
                     <groupId>de.studiocode.invui</groupId>
-                    <artifactId>IA-R9</artifactId>
+                    <artifactId>IA-R10</artifactId>
                     <version>${invui.version}</version>
                     <classifier>remapped-mojang</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>xyz.xenondevs.kadvancements</groupId>
+                    <artifactId>kadvancements-adapter-r2</artifactId>
+                    <classifier>remapped-mojang</classifier>
+                    <version>0.1-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -146,7 +156,7 @@
         <dependency>
             <groupId>xyz.xenondevs.nova</groupId>
             <artifactId>Nova-API</artifactId>
-            <version>0.8.13</version>
+            <version>0.9-SNAPSHOT</version>
         </dependency>
 
         <!-- Spigot -->
@@ -155,56 +165,82 @@
             <artifactId>spigot</artifactId>
             <classifier>remapped-mojang</classifier>
             <version>${spigot.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Provided through library loader -->
+        <!-- Not using the provided scope, so they're transitive for addons -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-core</artifactId>
-            <version>${exposed.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-dao</artifactId>
-            <version>${exposed.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-jdbc</artifactId>
-            <version>${exposed.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>${annotations.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>xyz.xenondevs</groupId>
             <artifactId>particle</artifactId>
             <version>${particlelib.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.xdrop</groupId>
             <artifactId>fuzzywuzzy</artifactId>
             <version>${fuzzywuzzy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.lingala.zip4j</groupId>
+            <artifactId>zip4j</artifactId>
+            <version>${zip4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-core-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-netty-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-core-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-cio-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-content-negotiation-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-serialization-gson-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <!-- Provided through library loader, not transitive -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-resolver-provider</artifactId>
+            <version>3.8.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-connector-basic</artifactId>
+            <version>${maven-resolver-connector-basic.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-transport-http</artifactId>
+            <version>${maven-resolver-transport-http.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -292,7 +328,7 @@
         <dependency>
             <groupId>com.plotsquared</groupId>
             <artifactId>PlotSquared-Bukkit</artifactId>
-            <version>6.4.0</version>
+            <version>6.6.3</version>
             <scope>provided</scope>
             <exclusions>
                 <!-- PS Bukkit Deps -->
@@ -385,8 +421,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.LoneDev6</groupId>
-            <artifactId>api-itemsadder</artifactId>
-            <version>2.5.4-beta1</version>
+            <artifactId>API-ItemsAdder</artifactId>
+            <version>3.1.0b</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -416,11 +452,22 @@
         <dependency>
             <groupId>dev.espi</groupId>
             <artifactId>protectionstones</artifactId>
-            <version>2.9.0</version>
+            <version>2.10.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.maxgamer</groupId>
+            <artifactId>QuickShop</artifactId>
+            <version>5.1.0.7</version>
             <scope>provided</scope>
         </dependency>
 
         <!-- Not provided -->
+        <dependency>
+            <groupId>xyz.xenondevs.kadvancements</groupId>
+            <artifactId>kadvancements-core</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>de.studiocode.invui</groupId>
             <artifactId>InvUI</artifactId>
@@ -466,6 +513,10 @@
                     <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R9</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>de.studiocode.invui</groupId>
+                    <artifactId>IA-R10</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -477,11 +528,6 @@
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.dzikoysk</groupId>
-            <artifactId>exposed-upsert</artifactId>
-            <version>1.0.3</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -504,7 +550,7 @@
             <plugin>
                 <groupId>xyz.xenondevs</groupId>
                 <artifactId>string-remapper-maven-plugin</artifactId>
-                <version>0.2-SNAPSHOT</version>
+                <version>0.6</version>
 
                 <executions>
                     <execution>
@@ -514,56 +560,36 @@
                         </goals>
                         <configuration>
                             <remapGoal>${string.remapper.remap.goal}</remapGoal>
-                            <srcIn>${project.basedir}/src/main/kotlin</srcIn>
-                            <srcOut>string-remapper-sources/</srcOut>
+                            <classesIn>${project.build.directory}/classes</classesIn>
+                            <classesOut>${project.build.directory}/classes-${string.remapper.remap.goal}</classesOut>
                             <mapsMojang>org.spigotmc:minecraft-server:txt:maps-mojang:${spigot.version}</mapsMojang>
                             <mapsSpigot>
                                 <classes>org.spigotmc:minecraft-server:csrg:maps-spigot:${spigot.version}</classes>
                                 <members>org.spigotmc:minecraft-server:csrg:maps-spigot-members:${spigot.version}</members>
                             </mapsSpigot>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>remove-remapper-sources</id>
-                        <goals>
-                            <goal>cleanup</goal>
-                        </goals>
-                        <configuration>
-                            <srcOut>string-remapper-sources/</srcOut>
+                            <classes>
+                                <class>xyz.xenondevs.nova.util.reflection.ReflectionRegistry</class>
+                                <class>xyz.xenondevs.nova.util.NMSUtils</class>
+                            </classes>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>compile-spigot</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.build.directory}/string-remapper-sources/</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <classesDirectory>${project.build.directory}/classes-${string.remapper.remap.goal}</classesDirectory>
+                </configuration>
             </plugin>
 
             <!-- re-declare to change execution order -->
             <plugin>
-                <groupId>net.md-5</groupId>
+                <groupId>xyz.xenondevs</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.2</version>
+                <version>1.2.4</version>
             </plugin>
 
             <plugin>
@@ -595,6 +621,14 @@
                             </excludes>
                         </filter>
                     </filters>
+                    <artifactSet>
+                        <includes>
+                            <include>xyz.xenondevs.nova:Nova-API</include>
+                            <include>de.studiocode.invui:*</include>
+                            <include>org.bstats:*</include>
+                            <include>xyz.xenondevs.kadvancements:*</include>
+                        </includes>
+                    </artifactSet>
                 </configuration>
                 <executions>
                     <execution>

@@ -4,26 +4,31 @@ import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.json.*
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.player.attachment.Attachment
-import xyz.xenondevs.nova.world.loot.LootInfo
+import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.world.loot.LootItem
+import xyz.xenondevs.nova.world.loot.LootTable
 import java.io.File
+import java.io.Reader
 import java.lang.reflect.Type
 import java.util.*
-import kotlin.reflect.KProperty
 
 val GSON: Gson =
     GsonBuilder()
         .setPrettyPrinting()
         .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
+        .registerTypeHierarchyAdapter<NamespacedId>(NamespacedIdTypeAdapter)
         .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerialization)
         .registerTypeHierarchyAdapter<Location>(LocationSerialization)
-        .registerTypeHierarchyAdapter<Attachment>(AttachmentSerialization)
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
-        .registerTypeHierarchyAdapter<NovaMaterial>(NovaMaterialSerialization)
-        .registerTypeHierarchyAdapter<LootInfo>(LootInfoDeserializer)
+        .registerTypeHierarchyAdapter<ItemNovaMaterial>(NovaMaterialSerialization)
+        .registerTypeHierarchyAdapter<YamlConfiguration>(YamlConfigurationTypeAdapter)
+        .registerTypeHierarchyAdapter<IntRange>(IntRangeSerialization)
+        .registerTypeHierarchyAdapter<LootTable>(LootTableSerialization)
+        .registerTypeHierarchyAdapter<LootItem>(LootItemSerialization)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()
         .create()
@@ -95,60 +100,97 @@ fun JsonArray.addAll(vararg booleans: Boolean) =
 fun JsonArray.addAll(vararg chars: Char) =
     chars.forEach(this::add)
 
+fun JsonArray.addAll(vararg strings: String) =
+    strings.forEach(this::add)
+
 fun JsonArray.addAll(vararg elements: JsonElement) =
     elements.forEach(this::add)
+
+fun JsonArray.addAll(intArray: IntArray) =
+    intArray.forEach(this::add)
+
+fun JsonArray.addAll(longArray: LongArray) =
+    longArray.forEach(this::add)
+
+fun JsonArray.addAll(floatArray: FloatArray) =
+    floatArray.forEach(this::add)
 
 fun JsonArray.addAll(doubleArray: DoubleArray) =
     doubleArray.forEach(this::add)
 
+@JvmName("addAllBooleanArray")
+fun JsonArray.addAll(booleanArray: BooleanArray) =
+    booleanArray.forEach(this::add)
+
+@JvmName("addAllCharArray")
+fun JsonArray.addAll(charArray: CharArray) =
+    charArray.forEach(this::add)
+
+@JvmName("addAllStringArray")
 fun JsonArray.addAll(stringArray: Array<String>) =
     stringArray.forEach(this::add)
+
+@JvmName("addAllElementsArray")
+fun JsonArray.addAll(elementArray: Array<JsonElement>) =
+    elementArray.forEach(this::add)
+
+@JvmName("addAllNumbers")
+fun JsonArray.addAll(numbers: Iterable<Number>) =
+    numbers.forEach(this::add)
+
+@JvmName("addAllBooleans")
+fun JsonArray.addAll(booleans: Iterable<Boolean>) =
+    booleans.forEach(this::add)
+
+@JvmName("addAllChars")
+fun JsonArray.addAll(chars: Iterable<Char>) =
+    chars.forEach(this::add)
+
+@JvmName("addAllStrings")
+fun JsonArray.addAll(strings: Iterable<String>) =
+    strings.forEach(this::add)
+
+@JvmName("addAllElements")
+fun JsonArray.addAll(elements: Iterable<JsonElement>) =
+    elements.forEach(this::add)
 
 fun JsonArray.getAllStrings() =
     filter(JsonElement::isString).map { it.asString }
 
+fun <T : MutableCollection<String>> JsonArray.getAllStringsTo(destination: T) =
+    filter(JsonElement::isString).mapTo(destination) { it.asString }
+
 fun JsonArray.getAllDoubles() =
     filter(JsonElement::isNumber).map { it.asDouble }
 
+fun JsonArray.getAllInts() =
+    filter(JsonElement::isNumber).map { it.asInt }
+
+fun JsonArray.getAllJsonObjects() =
+    filterIsInstance<JsonObject>()
+
 fun <T> JsonArray.toStringList(consumer: (List<String>) -> T) =
     consumer(this.filter(JsonElement::isString).map(JsonElement::getAsString))
+
+fun JsonObject.addAll(other: JsonObject) {
+    other.entrySet().forEach { (property, value) -> add(property, value) }
+}
+
+inline fun <reified T> Gson.fromJson(json: String?): T? {
+    if (json == null) return null
+    return fromJson(json, type<T>())
+}
 
 inline fun <reified T> Gson.fromJson(jsonElement: JsonElement?): T? {
     if (jsonElement == null) return null
     return fromJson(jsonElement, type<T>())
 }
 
+inline fun <reified T> Gson.fromJson(reader: Reader): T? {
+    return fromJson(reader, type<T>())
+}
+
 inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: Any): GsonBuilder =
     registerTypeHierarchyAdapter(T::class.java, typeAdapter)
 
 inline fun <reified T> type(): Type = object : TypeToken<T>() {}.type
-
-open class MemberAccessor<T>(
-    private val jsonObject: JsonObject,
-    private val memberName: String,
-    private val toType: (JsonElement) -> T,
-    private val fromType: (T) -> JsonElement
-) {
-    
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
-        val element = jsonObject.get(memberName)
-        return if (element != null) toType(element) else null
-    }
-    
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
-        if (value != null) {
-            jsonObject.add(memberName, fromType(value))
-        } else {
-            jsonObject.remove(memberName)
-        }
-    }
-    
-}
-
-class IntAccessor(jsonObject: JsonObject, memberName: String) :
-    MemberAccessor<Int>(
-        jsonObject,
-        memberName,
-        { it.asInt },
-        { JsonPrimitive(it) }
-    )

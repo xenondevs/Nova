@@ -1,16 +1,12 @@
 package xyz.xenondevs.nova.tileentity.network.fluid.holder
 
-import de.studiocode.invui.item.builder.ItemBuilder
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.associateWithToEnumMap
 import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
@@ -19,13 +15,13 @@ private val DEFAULT_CONNECTION_CONFIG = { CUBE_FACES.associateWithToEnumMap { Ne
 private val DEFAULT_CHANNEL_CONFIG = { CUBE_FACES.associateWithToEnumMap { 0 } }
 private val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithToEnumMap { 50 } }
 
-fun NovaFluidHolder(
-    endPoint: NetworkedTileEntity,
+fun <T> NovaFluidHolder(
+    endPoint: T,
     defaultContainer: Pair<FluidContainer, NetworkConnectionType>,
     vararg otherContainers: Pair<FluidContainer, NetworkConnectionType>,
     defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer> = { CUBE_FACES.associateWithToEnumMap { defaultContainer.first } },
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)? = null
-): NovaFluidHolder {
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
+): NovaFluidHolder where T : NetworkEndPoint, T : DataHolder {
     val containers = hashMapOf(defaultContainer).also { it.putAll(otherContainers) }
     val availableContainers = containers.keys.associateByTo(HashMap()) { it.uuid }
     
@@ -38,71 +34,61 @@ fun NovaFluidHolder(
     )
 }
 
+fun <T> NovaFluidHolder(
+    endPoint: T,
+    availableContainers: Map<UUID, FluidContainer>,
+    allowedConnectionTypes: Map<FluidContainer, NetworkConnectionType>,
+    defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer>,
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)?
+): NovaFluidHolder where T : NetworkEndPoint, T : DataHolder =
+    NovaFluidHolder(
+        endPoint,
+        endPoint,
+        availableContainers,
+        allowedConnectionTypes,
+        defaultContainerConfig,
+        defaultConnectionConfig
+    )
+
 class NovaFluidHolder(
-    override val endPoint: NetworkedTileEntity,
+    override val endPoint: NetworkEndPoint,
+    private val dataHolder: DataHolder,
     val availableContainers: Map<UUID, FluidContainer>,
     override val allowedConnectionTypes: Map<FluidContainer, NetworkConnectionType>,
     defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer>,
-    defaultConnectionConfig: (() -> MutableMap<BlockFace, NetworkConnectionType>)?
+    defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)?
 ) : FluidHolder {
     
     override val containerConfig: MutableMap<BlockFace, FluidContainer> =
-        (endPoint.retrieveEnumMapOrNull<BlockFace, UUID>("fluidContainerConfig")
+        (dataHolder.retrieveOrNull<EnumMap<BlockFace, UUID>>("fluidContainerConfig")
             ?.mapValuesTo(emptyEnumMap()) { availableContainers[it.value] })
             ?: defaultContainerConfig()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        endPoint.retrieveDoubleEnumMap("fluidConnectionConfig", defaultConnectionConfig ?: DEFAULT_CONNECTION_CONFIG)
+        dataHolder.retrieveData("fluidConnectionConfig", defaultConnectionConfig ?: DEFAULT_CONNECTION_CONFIG)
     
     override val channels: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("fluidChannels", DEFAULT_CHANNEL_CONFIG)
+        dataHolder.retrieveData("fluidChannels", DEFAULT_CHANNEL_CONFIG)
     
     override val insertPriorities: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("fluidInsertPriorities", DEFAULT_PRIORITIES)
+        dataHolder.retrieveData("fluidInsertPriorities", DEFAULT_PRIORITIES)
     
     override val extractPriorities: MutableMap<BlockFace, Int> =
-        endPoint.retrieveEnumMap("fluidExtractPriorities", DEFAULT_PRIORITIES)
+        dataHolder.retrieveData("fluidExtractPriorities", DEFAULT_PRIORITIES)
     
-    override fun saveData() {
-        endPoint.storeEnumMap("channels", channels)
-        endPoint.storeEnumMap("fluidConnectionConfig", connectionConfig)
-        endPoint.storeEnumMap("fluidInsertPriorities", insertPriorities)
-        endPoint.storeEnumMap("fluidExtractPriorities", extractPriorities)
-        
-        if (availableContainers.isNotEmpty()) {
-            endPoint.storeEnumMap("fluidContainerConfig", containerConfig.mapValues { it.value.uuid })
-        }
+    override fun reload() {
+        availableContainers.forEach { (_, container) -> if (container is NovaFluidContainer) container.reload() }
     }
     
-    companion object {
+    override fun saveData() {
+        dataHolder.storeData("channels", channels)
+        dataHolder.storeData("fluidConnectionConfig", connectionConfig)
+        dataHolder.storeData("fluidInsertPriorities", insertPriorities)
+        dataHolder.storeData("fluidExtractPriorities", extractPriorities)
         
-        fun modifyItemBuilder(builder: ItemBuilder, tileEntity: TileEntity?): ItemBuilder {
-            if (tileEntity is NetworkedTileEntity) {
-                val fluidHolder = tileEntity.fluidHolder as NovaFluidHolder
-                fluidHolder.availableContainers.values.forEach { container ->
-                    if (container.hasFluid()) {
-                        val amount = container.amount
-                        val capacity = container.capacity
-                        
-                        val amountStr = if (amount != Long.MAX_VALUE) {
-                            if (capacity == Long.MAX_VALUE) NumberFormatUtils.getFluidString(amount) + " / ∞ mB"
-                            else NumberFormatUtils.getFluidString(amount, capacity)
-                        } else "∞ mB / ∞ mB"
-                        
-                        builder.addLoreLines(
-                            ComponentBuilder()
-                                .color(ChatColor.GRAY)
-                                .append(TranslatableComponent(container.type!!.localizedName))
-                                .append(": $amountStr")
-                                .create()
-                        )
-                    }
-                }
-            }
-            
-            return builder
+        if (availableContainers.isNotEmpty()) {
+            dataHolder.storeData("fluidContainerConfig", containerConfig.mapValuesTo(emptyEnumMap()) { it.value.uuid })
         }
-        
     }
     
 }

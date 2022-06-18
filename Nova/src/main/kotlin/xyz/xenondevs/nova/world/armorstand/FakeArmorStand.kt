@@ -1,16 +1,15 @@
 package xyz.xenondevs.nova.world.armorstand
 
-import com.mojang.datafixers.util.Pair
-import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.*
-import net.minecraft.world.entity.EntityType
+import io.netty.buffer.Unpooled
+import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.decoration.ArmorStand
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.util.*
-import net.minecraft.world.item.ItemStack as MItemStack
+import xyz.xenondevs.nova.world.chunkPos
+import java.util.*
+import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BItemStack
 
 /**
@@ -20,28 +19,35 @@ import org.bukkit.inventory.ItemStack as BItemStack
 class FakeArmorStand(
     location: Location,
     autoRegister: Boolean = true,
-    beforeSpawn: ((FakeArmorStand) -> Unit)? = null
-) : ArmorStand(EntityType.ARMOR_STAND, location.world!!.serverLevel) {
-    
-    private var spawnPacket: ClientboundAddMobPacket? = null
-    private var dataPacket: ClientboundSetEntityDataPacket? = null
-    private var equipmentPacket: ClientboundSetEquipmentPacket? = null
-    private val despawnPacket = ClientboundRemoveEntitiesPacket(id)
+    beforeSpawn: ((FakeArmorStand, ArmorStandDataHolder) -> Unit)? = null
+) {
     
     private var registered = false
+    val viewers: List<Player>
+        get() = FakeArmorStandManager.getChunkViewers(chunk)
+    
+    val entityId = NMSUtils.ENTITY_COUNTER.incrementAndGet()
+    private val uuid = UUID.randomUUID()
+    
+    private var spawnBuf: FriendlyByteBuf? = null
+    private var dataBuf: FriendlyByteBuf? = null
+    private var equipmentBuf: FriendlyByteBuf? = null
+    private var despawnBuf: FriendlyByteBuf = createDespawnDataBuf()
+    
     private var expectedLocation: Location = location.clone()
     private var actualLocation: Location = location.clone()
     private var chunk = location.chunkPos
-    private val equipment = HashMap<EquipmentSlot, MItemStack>()
-    
-    private val viewers: List<Player>
-        get() = FakeArmorStandManager.getChunkViewers(chunk)
     val location: Location
         get() = expectedLocation.clone()
     
+    private val equipment = Array<MojangStack>(6) { MojangStack.EMPTY }
+    private val entityDataHolder = ArmorStandDataHolder(entityId)
+    
+    var spawnHandler: ((Player) -> Unit)? = null
+    var despawnHandler: ((Player) -> Unit)? = null
+    
     init {
-        EquipmentSlot.values().forEach { equipment[it] = MItemStack.EMPTY }
-        beforeSpawn?.invoke(this)
+        beforeSpawn?.invoke(this, entityDataHolder)
         if (autoRegister) register()
     }
     
@@ -69,17 +75,58 @@ class FakeArmorStand(
      * Also sends entity data and equipment.
      */
     fun spawn(player: Player) {
-        if (spawnPacket == null) spawnPacket = NMSUtils.createAddMobPacket(id, uuid, EntityType.ARMOR_STAND, actualLocation)
-        if (equipmentPacket == null) equipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
-        if (dataPacket == null) dataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
-        player.send(spawnPacket!!, dataPacket!!, equipmentPacket!!)
+        val spawnBuf = this.spawnBuf ?: createSpawnBuf().also { this.spawnBuf = it }
+        val equipmentBuf = this.equipmentBuf ?: createEquipmentBuf().also { this.equipmentBuf = it }
+        val dataBuf = this.dataBuf ?: entityDataHolder.createCompleteDataBuf().also { this.dataBuf = it }
+        
+        player.send(spawnBuf, equipmentBuf, dataBuf)
+        
+        spawnHandler?.invoke(player)
     }
     
     /**
      * Despawns the [FakeArmorStand] for a specific [Player].
      */
     fun despawn(player: Player) {
-        player.send(despawnPacket)
+        player.send(despawnBuf)
+        despawnHandler?.invoke(player)
+    }
+    
+    /**
+     * Updates the entity data of this [FakeArmorStand]
+     */
+    fun updateEntityData(sendPacket: Boolean, update: ArmorStandDataHolder.() -> Unit) {
+        // release the dataBuf as it will change
+        dataBuf?.release()
+        dataBuf = null
+        
+        // update the entity data
+        entityDataHolder.update()
+        
+        // rebuild buf and send packet if requested
+        if (sendPacket) {
+            val buf = entityDataHolder.createPartialDataBuf()
+            viewers.forEach { it.send(buf) }
+            buf.release() // partial buf is no longer needed
+        }
+    }
+    
+    /**
+     * Sets the equipment for a specific [EquipmentSlot].
+     */
+    fun setEquipment(slot: EquipmentSlot, bukkitStack: BItemStack?, sendPacket: Boolean) {
+        // release the equipment buf as it will change
+        equipmentBuf?.release()
+        equipmentBuf = null
+        
+        // update the equipment array
+        equipment[slot.ordinal] = CraftItemStack.asNMSCopy(bukkitStack)
+        
+        // rebuild buf and send packet if requested
+        if (sendPacket) {
+            equipmentBuf = createEquipmentBuf()
+            viewers.forEach { it.send(equipmentBuf!!) }
+        }
     }
     
     /**
@@ -94,28 +141,27 @@ class FakeArmorStand(
     }
     
     /**
-     * Teleports the [FakeArmorStand] to a different location. (Different worlds aren't supported)
+     * Teleports the [FakeArmorStand] to a different location.
      *
      * This function automatically chooses which packet (Teleport / Pos / PosRot / Rot) to send.
      */
     fun teleport(newLocation: Location) {
-        if (newLocation.world != actualLocation.world) throw UnsupportedOperationException("Teleporting to different worlds is not supported.")
-        
-        // invalidate the spawn packet as the location has changed
-        spawnPacket = null
+        // release the spawn buf as the location has changed
+        spawnBuf?.release()
+        spawnBuf = null
         
         val viewers = viewers
-        if (viewers.isNotEmpty()) {
-            var packet: Packet<ClientGamePacketListener>? = null
+        if (newLocation.world == actualLocation.world && viewers.isNotEmpty()) {
+            var buf: FriendlyByteBuf? = null
             
             // get the correct packet for this kind of movement
             if (actualLocation.positionEquals(newLocation)) {
-                if (newLocation.yaw != bukkitYaw || newLocation.pitch != xRot) {
-                    packet = ClientboundMoveEntityPacket.Rot(id, newLocation.yaw.toPackedByte(), newLocation.pitch.toPackedByte(), true)
+                if (newLocation.yaw != actualLocation.yaw || newLocation.pitch != actualLocation.pitch) {
+                    buf = createRotBuf(newLocation)
                     actualLocation = newLocation.clone() // position won't be changed, exact rotation is not necessary
                 }
             } else if (actualLocation.distance(newLocation) > 8) {
-                packet = NMSUtils.createTeleportPacket(id, newLocation)
+                buf = createTeleportBuf(newLocation)
                 actualLocation = newLocation.clone() // exact position will be displayed to user
             } else {
                 val deltaX = (newLocation.x - actualLocation.x).toFixedPoint()
@@ -125,19 +171,22 @@ class FakeArmorStand(
                 // removes precision that cannot be displayed to players to prevent desyncing
                 actualLocation.add(deltaX.fromFixedPoint(), deltaY.fromFixedPoint(), deltaZ.fromFixedPoint())
                 
-                if (newLocation.yaw != bukkitYaw || newLocation.pitch != xRot) {
+                if (newLocation.yaw != actualLocation.yaw || newLocation.pitch != actualLocation.pitch) {
                     // rotation also loses precision (a lot actually) but it isn't necessary to reflect that in the
                     // armor stand location as no rotation deltas are sent
                     actualLocation.yaw = newLocation.yaw
                     actualLocation.pitch = newLocation.pitch
                     
-                    packet = ClientboundMoveEntityPacket.PosRot(id, deltaX, deltaY, deltaZ, newLocation.yaw.toPackedByte(), newLocation.pitch.toPackedByte(), true)
+                    buf = createPosRotBuf(deltaX, deltaY, deltaZ, newLocation.yaw, newLocation.pitch)
                 } else {
-                    packet = ClientboundMoveEntityPacket.Pos(id, deltaX, deltaY, deltaZ, true)
+                    buf = createPosBuf(deltaX, deltaY, deltaZ)
                 }
             }
             
-            if (packet != null) viewers.forEach { it.send(packet) }
+            if (buf != null) {
+                viewers.forEach { it.send(buf) }
+                buf.release() // no longer required
+            }
         } else {
             actualLocation = newLocation.clone()
         }
@@ -151,56 +200,93 @@ class FakeArmorStand(
         if (previousChunk != newChunk) FakeArmorStandManager.changeArmorStandChunk(this, previousChunk, newChunk)
     }
     
-    /**
-     * Sends a teleport packet to the current position.
-     */
-    fun syncPosition() {
-        val teleportPacket = NMSUtils.createTeleportPacket(id, actualLocation)
-        viewers.forEach { it.send(teleportPacket) }
+    private fun createSpawnBuf(): FriendlyByteBuf {
+        val buf = FriendlyByteBuf(Unpooled.buffer())
+        
+        val packedYaw = expectedLocation.yaw.toPackedByte().toInt()
+        buf.writeVarInt(0x00)
+        buf.writeVarInt(entityId)
+        buf.writeUUID(uuid)
+        buf.writeVarInt(2)
+        buf.writeDouble(location.x)
+        buf.writeDouble(location.y)
+        buf.writeDouble(location.z)
+        buf.writeByte(location.pitch.toPackedByte().toInt())
+        buf.writeByte(packedYaw)
+        buf.writeByte(packedYaw)
+        buf.writeVarInt(0)
+        buf.writeShort(0)
+        buf.writeShort(0)
+        buf.writeShort(0)
+        
+        return buf
     }
     
-    /**
-     * Sends a packet updating the equipment to all viewers.
-     */
-    fun updateEquipment() {
-        equipmentPacket = ClientboundSetEquipmentPacket(id, equipment.map { (slot, stack) -> Pair(slot, stack) })
-        viewers.forEach { it.send(equipmentPacket!!) }
+    private fun createDespawnDataBuf(): FriendlyByteBuf {
+        val buf = FriendlyByteBuf(Unpooled.buffer())
+        buf.writeVarInt(0x38)
+        buf.writeVarIntArray(intArrayOf(entityId))
+        
+        return buf
     }
     
-    /**
-     * Sends a packet updating the entity data to all viewers.
-     */
-    fun updateEntityData() {
-        dataPacket = ClientboundSetEntityDataPacket(id, entityData, true)
-        viewers.forEach { it.send(dataPacket!!) }
+    private fun createEquipmentBuf(): FriendlyByteBuf {
+        val buf = FriendlyByteBuf(Unpooled.buffer())
+        buf.writeVarInt(0x50)
+        buf.writeVarInt(entityId)
+        equipment.forEachIndexed { index, item ->
+            buf.writeByte(if (index != 5) index or -128 else index)
+            buf.writeItem(item)
+        }
+        
+        return buf
     }
     
-    /**
-     * Sets the equipment for a specific [EquipmentSlot].
-     */
-    fun setEquipment(slot: EquipmentSlot, bukkitStack: BItemStack?) {
-        equipment[slot] = CraftItemStack.asNMSCopy(bukkitStack)
+    private fun createPosBuf(x: Short, y: Short, z: Short): FriendlyByteBuf {
+        val buf = FriendlyByteBuf(Unpooled.buffer())
+        buf.writeVarInt(0x26)
+        buf.writeVarInt(entityId)
+        buf.writeShort(x.toInt())
+        buf.writeShort(y.toInt())
+        buf.writeShort(z.toInt())
+        buf.writeBoolean(true)
+        return buf
     }
     
-    @Deprecated("", ReplaceWith("setEquipment(slot, bukkitStack)"))
-    override fun setItemSlot(enumitemslot: EquipmentSlot?, itemstack: net.minecraft.world.item.ItemStack?) {
-        throw UnsupportedOperationException()
+    private fun createPosRotBuf(x: Short, y: Short, z: Short, yaw: Float, pitch: Float): FriendlyByteBuf {
+        val buf = FriendlyByteBuf(Unpooled.buffer())
+        buf.writeVarInt(0x27)
+        buf.writeVarInt(entityId)
+        buf.writeShort(x.toInt())
+        buf.writeShort(y.toInt())
+        buf.writeShort(z.toInt())
+        buf.writeByte(yaw.toPackedByte().toInt())
+        buf.writeByte(pitch.toPackedByte().toInt())
+        buf.writeBoolean(true)
+        return buf
     }
     
-    override fun tick() {
-        // empty
+    private fun createRotBuf(location: Location): FriendlyByteBuf {
+        val buf = FriendlyByteBuf(Unpooled.buffer())
+        buf.writeVarInt(0x28)
+        buf.writeVarInt(entityId)
+        buf.writeByte(location.yaw.toPackedByte().toInt())
+        buf.writeByte(location.pitch.toPackedByte().toInt())
+        buf.writeBoolean(true)
+        return buf
     }
     
-    override fun inactiveTick() {
-        // empty
-    }
-    
-    override fun aiStep() {
-        // empty
-    }
-    
-    override fun serverAiStep() {
-        // empty
+    private fun createTeleportBuf(location: Location): FriendlyByteBuf {
+        val buf = FriendlyByteBuf(Unpooled.buffer())
+        buf.writeVarInt(0x63)
+        buf.writeVarInt(entityId)
+        buf.writeDouble(location.x)
+        buf.writeDouble(location.y)
+        buf.writeDouble(location.z)
+        buf.writeByte(location.yaw.toPackedByte().toInt())
+        buf.writeByte(location.pitch.toPackedByte().toInt())
+        buf.writeBoolean(true)
+        return buf
     }
     
 }

@@ -1,9 +1,0 @@
-{
-  "input": [
-    "minecraft:emerald_ore",
-    "minecraft:deepslate_emerald_ore"
-  ],
-  "result": "nova:emerald_dust",
-  "amount": 2,
-  "time": 200
-}

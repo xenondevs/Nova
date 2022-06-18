@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.util
 
-class RoundRobinCounter(val maxExclusive: Int) {
+internal class RoundRobinCounter(val maxExclusive: Int) {
     
     private var i = 0
     

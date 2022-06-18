@@ -1,95 +1,146 @@
 package xyz.xenondevs.nova.data.config
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import xyz.xenondevs.nova.IS_VERSION_CHANGE
+import org.bukkit.configuration.file.YamlConfiguration
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.material.NovaMaterial
+import xyz.xenondevs.nova.UpdateReminder
+import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.addon.AddonsLoader
+import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.player.ability.AbilityManager
+import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry
+import xyz.xenondevs.nova.ui.overlay.ActionbarOverlayManager
 import xyz.xenondevs.nova.util.data.getResourceAsStream
-import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.data.getResources
-import xyz.xenondevs.nova.util.data.set
-import java.io.File
+import xyz.xenondevs.nova.world.ChunkReloadWatcher
+import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
+import kotlin.reflect.KProperty
 
-val DEFAULT_CONFIG = NovaConfig["config"]
+val DEFAULT_CONFIG by configReloadable { NovaConfig["config"] }
 
-class NovaConfig(private val configPath: String) : JsonConfig(File("${NOVA.dataFolder}/$configPath"), false) {
+object NovaConfig : Initializable() {
     
-    private val defaults: JsonConfig
-    private val internalConfig = JsonConfig(JsonParser.parseReader(getResourceAsStream(configPath)!!.reader()).asJsonObject)
+    override val inMainThread = false
+    override val dependsOn = setOf(AddonsLoader)
+    
+    private val configs = HashMap<String, YamlConfiguration>()
+    internal val configReloadables = arrayListOf<Reloadable>()
+    
+    fun loadDefaultConfig() {
+        LOGGER.info("Loading default config")
+        
+        configs["config"] = ConfigExtractor.extract(
+            "configs/config.yml",
+            getResourceAsStream("configs/config.yml")!!.readAllBytes()
+        )
+    }
+    
+    override fun init() {
+        LOGGER.info("Loading configs")
+        
+        getResources("configs/nova/")
+            .filter { it.endsWith(".yml", true) }
+            .forEach {
+                val path = it.substringAfter("configs/nova/")
+                val configName = "nova:${path.substringBeforeLast('.')}"
+                configs[configName] = ConfigExtractor.extract(
+                    "configs/nova/$path",
+                    getResourceAsStream(it)!!.readAllBytes()
+                )
+            }
+        
+        AddonManager.loaders.forEach { (id, loader) ->
+            getResources(loader.file, "configs/")
+                .filter { it.endsWith(".yml", true) }
+                .forEach {
+                    val path = it.substringAfter("configs/")
+                    val configName = "$id:${path.substringBeforeLast('.')}"
+                    configs[configName] = ConfigExtractor.extract(
+                        "configs/$id/$path",
+                        getResourceAsStream(loader.file, it)!!.readAllBytes()
+                    )
+                }
+        }
+    }
+    
+    internal fun reload() {
+        loadDefaultConfig()
+        init()
+        UpgradeTypeRegistry.types.forEach(Reloadable::reload)
+        configReloadables.sorted().forEach(Reloadable::reload)
+        TileEntityManager.tileEntities.forEach(Reloadable::reload)
+        NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
+        AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)
+        AutoUploadManager.reload()
+        ActionbarOverlayManager.reload()
+        TileEntityLimits.reload()
+        ChunkReloadWatcher.reload()
+        UpdateReminder.reload()
+    }
+    
+    operator fun get(name: String): YamlConfiguration =
+        configs[name]!!
+    
+    operator fun get(material: ItemNovaMaterial): YamlConfiguration =
+        configs[material.id.toString()]!!
+    
+}
+
+fun <T : Any> configReloadable(initializer: () -> T): ConfigReloadable<T> {
+    return ConfigReloadable(initializer)
+}
+
+fun <T : Any> notReloadable(value: T): StaticReloadable<T> = StaticReloadable(value)
+
+class ConfigReloadable<T : Any> internal constructor(val initializer: () -> T) : ValueReloadable<T> {
+    
+    private var shouldReload = true
+    private var _value: T? = null
+    override val value: T
+        get() {
+            if (shouldReload) {
+                _value = initializer()
+                shouldReload = false
+            }
+            
+            return _value!!
+        }
     
     init {
-        extractConfigFiles()
-        reload()
-        
-        val defaultsElement = configDefaults.get(configPath)
-            ?: JsonParser.parseReader(file!!.reader()).also { configDefaults.add(configPath, it) }
-        defaults = JsonConfig(defaultsElement as JsonObject)
-        
-        updateUnchangedConfigValues()
+        NovaConfig.configReloadables += this
     }
     
-    private fun extractConfigFiles() {
-        file!!.parentFile.mkdirs()
-        if (!file.exists()) file.writeBytes(getResourceData(configPath))
+    override fun reload() {
+        shouldReload = true
     }
     
-    private fun updateUnchangedConfigValues() {
-        // loop over all elements of the internal config
-        for ((key, internalElement) in internalConfig.config.entrySet()) {
-            // get what's configured in the user config under that key
-            val userConfiguredElement = config.get(key)
-            
-            // check if the configured element is different from the internal one
-            if (internalElement != userConfiguredElement) {
-                
-                // if this key doesn't exist or doesn't differ from the originally extracted value
-                // it's safe to replace it with the internal value
-                if (userConfiguredElement == null || (defaults.config.get(key) == userConfiguredElement)) {
-                    config[key] = internalElement
-                    
-                    // also write it to the default config as this is now a default value
-                    defaults.config[key] = internalElement
-                }
-            }
+}
+
+class StaticReloadable<T : Any> internal constructor(override val value: T) : ValueReloadable<T>
+
+interface ValueReloadable<T : Any> : Reloadable {
+    
+    val value: T
+    
+    operator fun getValue(ref: Any?, property: KProperty<*>): T = value
+    
+}
+
+interface Reloadable : Comparable<Reloadable> {
+    
+    fun reload() = Unit
+    
+    override fun compareTo(other: Reloadable): Int =
+        when {
+            other !is ConfigReloadable<*> -> -1
+            this is ConfigReloadable<*> -> 0
+            else -> 1
         }
-        
-        // save changes
-        save(true)
-    }
-    
-    override fun get(path: List<String>) =
-        super.get(path) ?: internalConfig.get(path)
-    
-    companion object {
-        
-        private val configs = HashMap<String, NovaConfig>()
-        private var configDefaults = PermanentStorage.retrieve("configDefaults") { JsonObject() }
-        
-        fun init() {
-            LOGGER.info("Loading configs")
-            
-            getResources("config/")
-                .filterNot { it.startsWith("config/recipes/") }
-                .forEach {
-                    val configName = it.substring(7).substringBeforeLast('.')
-                    configs[configName] = NovaConfig(it)
-                }
-            
-            if (IS_VERSION_CHANGE) {
-                val defaultConfig = configs["config"]!!
-                defaultConfig["resource_pack.url"] = defaultConfig.internalConfig.getString("resource_pack.url")!!
-                defaultConfig.save(true)
-            }
-            
-            PermanentStorage.store("configDefaults", configDefaults)
-        }
-        
-        operator fun get(name: String) = configs[name]!!
-        
-        operator fun get(material: NovaMaterial) = configs["machine/${material.typeName.lowercase()}"]!!
-        
-    }
     
 }

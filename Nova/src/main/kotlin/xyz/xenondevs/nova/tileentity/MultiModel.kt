@@ -4,7 +4,9 @@ import net.minecraft.core.Rotations
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import java.util.logging.Level
 
 class MultiModel {
     
@@ -38,17 +40,17 @@ class MultiModel {
     @Synchronized
     fun addModels(models: Iterable<Model>): List<FakeArmorStand> {
         if (closed) {
-            UnsupportedOperationException("MultiModel is closed").printStackTrace()
+            LOGGER.log(Level.INFO, "MultiModel is closed", Exception())
             return emptyList()
         }
         
         return models.map { model ->
             val location = model.location
-            val armorStand = FakeArmorStand(location) {
-                it.setEquipment(EquipmentSlot.HEAD, model.itemStack)
-                it.isInvisible = true
-                it.isMarker = true
-                it.setHeadPose(model.headPose)
+            val armorStand = FakeArmorStand(location) { ast, data ->
+                ast.setEquipment(EquipmentSlot.HEAD, model.itemStack, false)
+                data.invisible = true
+                data.marker = true
+                data.headRotation = model.headPose
             }
             
             currentModels[armorStand] = model

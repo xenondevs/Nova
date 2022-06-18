@@ -1,27 +1,38 @@
 package xyz.xenondevs.nova.material
 
 import de.studiocode.invui.item.builder.ItemBuilder
+import net.md_5.bungee.api.chat.BaseComponent
+import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.util.data.setLocalizedName
+import xyz.xenondevs.nova.util.data.withoutPreFormatting
+import xyz.xenondevs.nova.util.item.unhandledTags
 
-class ModelData(val material: Material, val dataArray: IntArray) {
+class ModelData(val material: Material, val dataArray: IntArray, val id: String) {
     
     val data: Int
         get() = dataArray[0]
     
-    fun createItemStack(localizedName: String, dataIndex: Int = 0): ItemStack =
-        createItemBuilder(localizedName, dataIndex).get().apply { maxStackSize }
+    fun createItemBuilder(subId: Int = 0): ItemBuilder =
+        ItemBuilder(PacketItems.SERVER_SIDE_MATERIAL)
+            .addModifier { modifyNBT(it, subId) }
     
-    fun createItemStack(dataIndex: Int = 0): ItemStack =
-        createItemStack("", dataIndex)
-    
-    fun createItemBuilder(localizedName: String, dataIndex: Int = 0): ItemBuilder =
+    fun createClientsideItemBuilder(name: Array<BaseComponent>? = null, lore: List<Array<BaseComponent>>? = null, subId: Int = 0): ItemBuilder =
         ItemBuilder(material)
-            .setLocalizedName(localizedName)
-            .setCustomModelData(dataArray[dataIndex]) as ItemBuilder
+            .setDisplayName(*name ?: emptyArray())
+            .setCustomModelData(dataArray[subId])
+            .apply { lore?.forEach { addLoreLines(it.withoutPreFormatting()) } }
     
-    fun createItemBuilder(dataIndex: Int = 0): ItemBuilder =
-        createItemBuilder("", dataIndex)
+    private fun modifyNBT(itemStack: ItemStack, subId: Int): ItemStack {
+        val novaCompound = CompoundTag()
+        novaCompound.putString("id", id)
+        novaCompound.putInt("subId", subId)
+        
+        val meta = itemStack.itemMeta!!
+        meta.unhandledTags["nova"] = novaCompound
+        itemStack.itemMeta = meta
+        
+        return itemStack
+    }
     
 }

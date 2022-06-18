@@ -1,64 +1,68 @@
 package xyz.xenondevs.nova.data.recipe
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.addon.loader.AddonLoader
+import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
+import java.util.logging.Level
 
-object RecipesLoader {
+internal object RecipesLoader {
     
-    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve("recipeFileHashes") { HashMap() }
+    private val RECIPE_FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
+    
+    private val recipesDir = File(NOVA.dataFolder, "recipes/")
     
     init {
         extractRecipes()
-        PermanentStorage.store("recipeFileHashes", fileHashes)
     }
     
     private fun extractRecipes() {
-        getResources("config/recipes").forEach { entry ->
-            val recipeFile = File(NOVA.dataFolder, "recipes/${entry.substring(14)}")
-            val savedHash = getFileHash(recipeFile)
-            
-            if (recipeFile.exists() && savedHash != null) {
-                val recipeFileHash = HashUtils.getFileHash(recipeFile, "MD5")
-                if (recipeFileHash.contentEquals(savedHash)) {
-                    recipeFile.writeBytes(getResourceData(entry))
-                    storeFileHash(recipeFile)
-                }
-            } else if (savedHash == null) {
-                recipeFile.parentFile.mkdirs()
-                recipeFile.writeBytes(getResourceData(entry))
-                storeFileHash(recipeFile)
-            }
+        val existingPaths = ArrayList<String>()
+        
+        // Extract core recipes
+        existingPaths += getResources("recipes/").mapNotNull(::extractRecipe)
+        
+        // Extract recipes from addons
+        AddonManager.loaders.values.forEach { loader ->
+            existingPaths += getResources(loader.file, "recipes/").mapNotNull { extractRecipe(it, loader) }
         }
         
         // find unedited recipe files that are no longer default and remove them
-        val recipesDirectory = File(NOVA.dataFolder, "recipes/")
-        recipesDirectory.walkTopDown().forEach { file ->
-            if (file.isDirectory) return@forEach
+        recipesDir.walkTopDown().forEach { file ->
+            if (file.isDirectory || file.extension != "json") return@forEach
             
-            val pathInZip = "config/recipes/" + file.absolutePath.substring(recipesDirectory.absolutePath.length + 1).replace(File.separatorChar, '/') // TODO: clean up
-            if (!hasResource(pathInZip)
-                && HashUtils.getFileHash(file, "MD5").contentEquals(getFileHash(file))) {
+            val relativePath = NOVA.dataFolder.toURI().relativize(file.toURI()).path
+            
+            if (!existingPaths.contains(relativePath)
+                && HashUtils.getFileHash(file, "MD5").contentEquals(UpdatableFile.getStoredHash(file))) {
                 
-                fileHashes.remove(file.absolutePath)
+                UpdatableFile.removeStoredHash(file)
                 file.delete()
             }
         }
     }
     
-    private fun storeFileHash(originalFile: File) {
-        fileHashes[originalFile.absolutePath] = HashUtils.getFileHash(originalFile, "MD5").encodeWithBase64()
+    private fun extractRecipe(path: String, addon: AddonLoader? = null): String? {
+        val namespace = addon?.description?.id ?: "nova"
+        val file = File(NOVA.dataFolder, path).let { File(it.parent, namespace + "_" + it.name) }
+        if (file.name.matches(RECIPE_FILE_PATTERN)) {
+            UpdatableFile.load(file) { if (addon != null) getResourceAsStream(addon.file, path)!! else getResourceAsStream(path)!! }
+            return NOVA.dataFolder.toURI().relativize(file.toURI()).path
+        }
+        
+        LOGGER.severe("Could not load recipe file $path: Invalid file name")
+        return null
     }
     
-    private fun getFileHash(originalFile: File): ByteArray? =
-        fileHashes[originalFile.absolutePath]?.decodeWithBase64()
-    
     fun loadRecipes(): List<Any> {
-        return RecipeType.values.flatMap {
+        return RecipeTypeRegistry.types.flatMap {
             val dirName = it.dirName
             val deserializer = it.deserializer
             if (dirName != null && deserializer != null) {
@@ -67,29 +71,47 @@ object RecipesLoader {
         }
     }
     
-    private fun loadRecipes(folder: String, deserializer: RecipeDeserializer<out Any>): List<Any> {
-        val recipes = ArrayList<Any>()
-        
+    private fun <T : Any> loadRecipes(folder: String, deserializer: RecipeDeserializer<T>): List<T> {
         val recipesDirectory = File("plugins/Nova/recipes/$folder")
-        recipesDirectory.walkTopDown()
-            .filter { it.isFile && it.name.endsWith(".json") }
-            .forEach { file ->
+        return recipesDirectory.walkTopDown()
+            .filter { it.isFile && it.name.matches(RECIPE_FILE_PATTERN) }
+            .mapNotNullTo(ArrayList()) { loadRecipe(it, deserializer) }
+    }
+    
+    private fun <T : Any> loadRecipe(file: File, deserializer: RecipeDeserializer<T>): T? {
+        var failSilently = false
+        val fallbacks = when (val element = file.reader().use(JsonParser::parseReader)) {
+            is JsonArray -> element.getAllJsonObjects()
+            is JsonObject -> if (element.hasArray("recipes")) {
+                failSilently = element.getBoolean("failSilently", false)
+                element.getAsJsonArray("recipes").getAllJsonObjects()
+            } else {
+                failSilently = element.getBoolean("failSilently", false)
+                listOf(element)
+            }
+            else -> null
+        }
+        
+        if (fallbacks != null && fallbacks.isNotEmpty()) {
+            // store exceptions in case no fallback works
+            val exceptions = ArrayList<Exception>()
+            
+            fallbacks.forEach { obj ->
                 try {
-                    val element = file.reader().use { JsonParser.parseReader(it) }
-                    if (element !is JsonObject)
-                        throw IllegalStateException("Invalid recipe in file ${file.name}.")
-                    
-                    if (!element.getBoolean("enabled", default = true))
-                        return@forEach
-                    
-                    val recipe = deserializer.deserialize(element, file)
-                    recipes += recipe
-                } catch (ex: Exception) {
-                    throw IllegalStateException("Invalid recipe in file ${file.name}.", ex)
+                    return deserializer.deserialize(obj, file)
+                } catch (e: Exception) {
+                    exceptions += e
                 }
             }
+            
+            // Log exceptions if all fallbacks failed
+            if (!failSilently)
+                exceptions.forEachIndexed { i, e -> LOGGER.log(Level.SEVERE, "Could not load recipe in file $file (recipe fallback $i)", e) }
+        } else {
+            LOGGER.log(Level.SEVERE, "Invalid recipe file $file: Recipe is neither a json object nor an array of json objects")
+        }
         
-        return recipes
+        return null
     }
     
 }

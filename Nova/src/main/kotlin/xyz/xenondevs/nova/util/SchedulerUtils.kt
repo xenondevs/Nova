@@ -4,11 +4,17 @@ package xyz.xenondevs.nova.util
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bukkit.Bukkit
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.util.concurrent.ObservableLock
+import xyz.xenondevs.nova.util.concurrent.lockAndRun
+import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
 import java.util.concurrent.*
+import java.util.logging.Level
 
-val USE_NOVA_SCHEDULER = DEFAULT_CONFIG.getBoolean("nova_executor.enabled")
+val USE_NOVA_SCHEDULER by configReloadable { DEFAULT_CONFIG.getBoolean("performance.nova_executor.enabled") }
 
 inline fun runTaskLater(delay: Long, noinline run: () -> Unit) =
     Bukkit.getScheduler().runTaskLater(NOVA, run, delay)
@@ -62,7 +68,7 @@ inline fun runAsyncTaskTimer(delay: Long, period: Long, noinline run: () -> Unit
 
 object AsyncExecutor {
     
-    private val THREADS = DEFAULT_CONFIG.getInt("nova_executor.threads")!!
+    private val THREADS = DEFAULT_CONFIG.getInt("performance.nova_executor.threads")
     
     private lateinit var threadFactory: ThreadFactory
     private lateinit var executorService: ScheduledExecutorService
@@ -71,6 +77,8 @@ object AsyncExecutor {
         if (USE_NOVA_SCHEDULER) {
             threadFactory = ThreadFactoryBuilder().setNameFormat("Async Nova Worker - %d").build()
             executorService = ScheduledThreadPoolExecutor(THREADS, threadFactory)
+            
+            NOVA.disableHandlers += executorService::shutdown
         }
     }
     
@@ -79,7 +87,7 @@ object AsyncExecutor {
             try {
                 task()
             } catch (t: Throwable) {
-                t.printStackTrace()
+                LOGGER.log(Level.SEVERE, "An exception occurred running a task", t)
             }
         }
     
@@ -88,14 +96,8 @@ object AsyncExecutor {
             try {
                 task()
             } catch (t: Throwable) {
-                t.printStackTrace()
+                LOGGER.log(Level.SEVERE, "An exception occurred running a task", t)
             }
         }, delay, TimeUnit.MILLISECONDS)
-    
-    fun shutdown() {
-        if (USE_NOVA_SCHEDULER) {
-            executorService.shutdown()
-        }
-    }
     
 }

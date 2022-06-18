@@ -9,9 +9,9 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import java.util.*
 import kotlin.math.max
 
-typealias ItemFilterList = ArrayList<ItemFilter>
+internal typealias ItemFilterList = ArrayList<ItemFilter>
 
-class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, type: NetworkConnectionType) {
+internal class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, type: NetworkConnectionType) {
     
     val inventory: NetworkedInventory = itemHolder.inventories[face]!!
     
@@ -33,7 +33,7 @@ class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, ty
     
 }
 
-class FilteredNetworkedInventory(
+internal class FilteredNetworkedInventory(
     private val inventory: NetworkedInventory,
     private val filters: ItemFilterList
 ) : NetworkedInventory by inventory {
@@ -46,7 +46,7 @@ class FilteredNetworkedInventory(
     
 }
 
-class ItemNetworkChannel {
+internal class ItemNetworkChannel {
     
     private val consumers = HashMap<ItemHolder, ArrayList<AttachedInventoryConfiguration>>()
     private val providers = HashMap<ItemHolder, ArrayList<AttachedInventoryConfiguration>>()
@@ -70,8 +70,8 @@ class ItemNetworkChannel {
         createDistributor()
     }
     
-    fun addHolder(holder: ItemHolder, face: BlockFace) {
-        when (holder.itemConfig[face]!!) {
+    fun addHolder(holder: ItemHolder, face: BlockFace, createDistributor: Boolean) {
+        when (holder.connectionConfig[face]!!) {
             NetworkConnectionType.INSERT -> addConsumer(holder, face)
             NetworkConnectionType.EXTRACT -> addProvider(holder, face)
             NetworkConnectionType.BUFFER -> {
@@ -81,17 +81,17 @@ class ItemNetworkChannel {
             else -> throw UnsupportedOperationException()
         }
         
-        createDistributor()
+        if (createDistributor) createDistributor()
     }
     
-    fun removeHolder(holder: ItemHolder) {
+    fun removeHolder(holder: ItemHolder, createDistributor: Boolean) {
         consumers[holder]?.forEach { consumerConfigurations -= it }
         providers[holder]?.forEach { providerConfigurations -= it }
         
         consumers -= holder
         providers -= holder
         
-        createDistributor()
+        if (createDistributor) createDistributor()
     }
     
     fun isEmpty() = consumers.isEmpty() && providers.isEmpty()
@@ -108,7 +108,7 @@ class ItemNetworkChannel {
         providerConfigurations += configuration
     }
     
-    private fun createDistributor() {
+    fun createDistributor() {
         itemDistributor = if (consumerConfigurations.isNotEmpty() && providerConfigurations.isNotEmpty()) {
             val (consumers, providers) = computeAvailableInventories()
             ItemDistributor(consumers, providers)

@@ -1,7 +1,10 @@
 package xyz.xenondevs.nova.tileentity.network.fluid.container
 
+import xyz.xenondevs.nova.data.config.Reloadable
+import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import java.util.*
 
 class NovaFluidContainer(
@@ -9,17 +12,18 @@ class NovaFluidContainer(
     allowedTypes: Set<FluidType>,
     type: FluidType?,
     amount: Long,
-    private val baseCapacity: Long,
+    baseCapacity: ValueReloadable<Long>,
     private val upgradeHolder: UpgradeHolder? = null
-) : FluidContainer(uuid, allowedTypes, type, amount, baseCapacity) {
+) : FluidContainer(uuid, allowedTypes, type, amount, baseCapacity.value), Reloadable {
+    
+    private val baseCapacity by baseCapacity
     
     init {
-        upgradeHolder?.upgradeUpdateHandlers?.add(::handleUpgradeUpdates)
-        if (upgradeHolder != null) handleUpgradeUpdates()
+        if (upgradeHolder != null) reload()
     }
     
-    private fun handleUpgradeUpdates() {
-        capacity = (baseCapacity * upgradeHolder!!.getFluidModifier()).toLong()
+    override fun reload() {
+        capacity = (baseCapacity * upgradeHolder!!.getValue(UpgradeType.FLUID)).toLong()
     }
     
 }

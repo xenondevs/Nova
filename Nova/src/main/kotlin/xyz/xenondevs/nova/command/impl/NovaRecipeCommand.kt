@@ -8,13 +8,13 @@ import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.showRecipes
 import xyz.xenondevs.nova.util.data.localized
 
-object NovaRecipeCommand : Command("nvrecipe") {
+internal object NovaRecipeCommand : Command("nvrecipe") {
     
     init {
         builder = builder
             .requiresPlayerPermission("nova.command.nvrecipe")
             .apply {
-                (RecipeRegistry.CREATION_RECIPES.keys + RecipeRegistry.CREATION_INFO.keys).forEach { id ->
+                (RecipeRegistry.CREATION_RECIPES.keys + RecipeRegistry.creationInfo.keys).forEach { id ->
                     then(literal(id).executesCatching { it.player.showRecipes(id) })
                 }
             }

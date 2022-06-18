@@ -7,12 +7,13 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.util.item.isTraversable
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
@@ -27,9 +28,6 @@ fun Location(world: World?, x: Int, y: Int, z: Int): Location =
 
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
-
-val Location.chunkPos: ChunkPos
-    get() = ChunkPos(world!!.uid, x.toInt() shr 4, z.toInt() shr 4)
 
 fun Location.dropItems(items: Iterable<ItemStack>) {
     val world = world!!
@@ -87,7 +85,7 @@ fun Location.getNeighboringTileEntities(additionalHitboxes: Boolean): Map<BlockF
     return getNeighboringTileEntitiesOfType(additionalHitboxes)
 }
 
-inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitboxes: Boolean): Map<BlockFace, T> {
+internal inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitboxes: Boolean): Map<BlockFace, T> {
     val tileEntities = HashMap<BlockFace, T>()
     CUBE_FACES.forEach {
         val location = blockLocation.advance(it)
@@ -99,13 +97,7 @@ inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitbo
     return tileEntities
 }
 
-fun Location.getNearbyTileEntity(face: BlockFace, additionalHitboxes: Boolean): Any? {
-    val location = blockLocation.advance(face)
-    return TileEntityManager.getTileEntityAt(location, additionalHitboxes)
-        ?: VanillaTileEntityManager.getTileEntityAt(location)
-}
-
-fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
+inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
     val vector = direction.multiply(stepSize)
     val location = clone()
     var distance = 0.0
@@ -289,6 +281,22 @@ fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double =
     return locations
 }
 
+fun Location.getFullCuboid(other: Location): List<Location> {
+    Preconditions.checkArgument(world != null && other.world == world)
+    
+    val list = ArrayList<Location>()
+    val (min, max) = LocationUtils.sort(this, other)
+    for (x in min.blockX..max.blockX) {
+        for (y in min.blockY..max.blockY) {
+            for (z in min.blockZ..max.blockZ) {
+                list += Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+            }
+        }
+    }
+    
+    return list
+}
+
 fun Location.createColoredParticle(color: Color): Any = ParticleBuilder(ParticleEffect.REDSTONE, this).setColor(color).toPacket()
 
 fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Location? {
@@ -302,6 +310,12 @@ fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Loca
     
     return null
 }
+
+fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Sequence<Player> =
+    world!!.players
+        .asSequence()
+        .filter { it !in excluded }
+        .filter { distance(it.location) <= maxDistance }
 
 object LocationUtils {
     

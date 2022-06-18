@@ -1,7 +1,0 @@
-{
-  "energy_capacity": 10000,
-  "energy_per_tick": 250,
-  "fluid_capacity": 10000,
-  "brew_time": 400,
-  "duration_amplifier_mixing": false
-}

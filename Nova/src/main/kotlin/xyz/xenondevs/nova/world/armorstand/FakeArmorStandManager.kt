@@ -11,51 +11,58 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.chunkPos
+import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
+import xyz.xenondevs.nova.world.chunkPos
 import java.util.concurrent.CopyOnWriteArrayList
 
 var Player.armorStandRenderDistance: Int
-    get() = persistentDataContainer
-        .get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER)
-        ?: DEFAULT_RENDER_DISTANCE
-    set(value) =
+    get() = (persistentDataContainer.get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER) ?: DEFAULT_RENDER_DISTANCE)
+        .coerceIn(MIN_RENDER_DISTANCE..MAX_RENDER_DISTANCE)
+    set(value) {
         persistentDataContainer.set(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER, value)
+        FakeArmorStandManager.updateRenderDistance(this)
+    }
 
-object FakeArmorStandManager : Initializable(), Listener {
+internal object FakeArmorStandManager : Initializable(), Listener {
     
     val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "armor_stand_render_distance")
-    val DEFAULT_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.default")!!
-    val MIN_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.min")!!
-    val MAX_RENDER_DISTANCE = DEFAULT_CONFIG.getInt("armor_stand_render_distance.max")!!
+    val DEFAULT_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.default") }
+    val MIN_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.min") }
+    val MAX_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.max") }
     
+    private val renderDistance = HashMap<Player, Int>()
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
     private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
     
     override val inMainThread = false
-    override val dependsOn = CustomItemServiceManager
+    override val dependsOn = setOf(PacketManager)
     
     override fun init() {
         LOGGER.info("Initializing FakeArmorStandManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         
         Bukkit.getOnlinePlayers().forEach { player ->
+            updateRenderDistance(player)
             handleChunksChange(player, player.location.chunkPos)
         }
-        
-        NOVA.disableHandlers += {
-            synchronized(FakeArmorStandManager) {
-                chunkArmorStands.forEach { (chunk, armorStands) ->
-                    val viewers = chunkViewers[chunk] ?: return@forEach
-                    armorStands.forEach { armorStand -> viewers.forEach { viewer -> armorStand.despawn(viewer) } }
-                }
+    }
+    
+    override fun disable() {
+        LOGGER.info("Despawning fake armor stands")
+        synchronized(FakeArmorStandManager) {
+            chunkArmorStands.forEach { (chunk, armorStands) ->
+                val viewers = chunkViewers[chunk] ?: return@forEach
+                armorStands.forEach { armorStand -> viewers.forEach { viewer -> armorStand.despawn(viewer) } }
             }
         }
     }
@@ -106,7 +113,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     @Synchronized
     private fun handleChunksChange(player: Player, newChunk: ChunkPos) {
         val currentChunks = visibleChunks[player] ?: emptySet()
-        val newChunks = newChunk.getInRange(player.armorStandRenderDistance)
+        val newChunks = newChunk.getInRange(renderDistance[player] ?: 0)
         
         // look for all chunks that are no longer visible
         currentChunks.asSequence()
@@ -140,6 +147,16 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @Synchronized
+    internal fun updateRenderDistance(player: Player) {
+        renderDistance[player] = player.armorStandRenderDistance
+    }
+    
+    @Synchronized
+    private fun discardRenderDistance(player: Player) {
+        renderDistance -= player
+    }
+    
+    @Synchronized
     private fun removeViewer(player: Player) {
         val currentChunks = visibleChunks[player]!!
         currentChunks.forEach {
@@ -150,7 +167,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun handleMove(event: PlayerMoveEvent) {
+    private fun handleMove(event: PlayerMoveEvent) {
         val newChunk = event.to!!.chunkPos
         if (event.from.chunkPos != newChunk) {
             val player = event.player
@@ -159,7 +176,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun handleTeleport(event: PlayerTeleportEvent) {
+    private fun handleTeleport(event: PlayerTeleportEvent) {
         val newChunk = event.to!!.chunkPos
         if (event.from.chunkPos != newChunk) {
             val player = event.player
@@ -168,7 +185,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
-    fun handleSpawn(event: PlayerRespawnEvent) {
+    private fun handleSpawn(event: PlayerRespawnEvent) {
         val player = event.player
         val newChunk = event.respawnLocation.chunkPos
         if (player.location.chunkPos != newChunk) {
@@ -177,15 +194,17 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
-    fun handleJoin(event: PlayerJoinEvent) {
+    private fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
         val chunk = player.location.chunkPos
+        updateRenderDistance(player)
         runAsyncTask { handleChunksChange(player, chunk) }
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
-    fun handleQuit(event: PlayerQuitEvent) {
+    private fun handleQuit(event: PlayerQuitEvent) {
         val player = event.player
+        discardRenderDistance(player)
         runAsyncTask { removeViewer(player) }
     }
     

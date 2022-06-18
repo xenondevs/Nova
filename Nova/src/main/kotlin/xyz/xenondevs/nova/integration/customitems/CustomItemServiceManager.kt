@@ -4,10 +4,9 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.database.DatabaseManager
-import xyz.xenondevs.nova.data.recipe.ItemTest
+import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.integration.Integration
+import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.customitems.plugin.ItemsAdder
 import xyz.xenondevs.nova.integration.customitems.plugin.MMOItems
 import xyz.xenondevs.nova.integration.customitems.plugin.Oraxen
@@ -18,19 +17,19 @@ import java.util.concurrent.CountDownLatch
 object CustomItemServiceManager : Initializable() {
     
     private val PLUGINS: List<CustomItemService> = listOf(ItemsAdder, Oraxen, MMOItems)
-        .filter(Integration::isInstalled)
+        .filter(InternalIntegration::isInstalled)
     
     private val LOAD_DELAYING_PLUGINS_AMOUNT = PLUGINS.count(CustomItemService::requiresLoadDelay)
-    val READY_LATCH = CountDownLatch(LOAD_DELAYING_PLUGINS_AMOUNT)
+    internal val READY_LATCH = CountDownLatch(LOAD_DELAYING_PLUGINS_AMOUNT)
     
     override val inMainThread = false
-    override val dependsOn = DatabaseManager
+    override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
         READY_LATCH.await()
     }
     
-    fun placeItem(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
+    fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
         return PLUGINS.any { it.placeBlock(item, location, playEffects) }
     }
     
@@ -46,11 +45,19 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.firstNotNullOfOrNull { it.getDrops(block, tool) }
     }
     
+    fun getItemType(item: ItemStack): CustomItemType? {
+        return PLUGINS.firstNotNullOfOrNull { it.getItemType(item) }
+    }
+    
+    fun getBlockType(block: Block): CustomBlockType? {
+        return PLUGINS.firstNotNullOfOrNull { it.getBlockType(block) }
+    }
+    
     fun getItemByName(name: String): ItemStack? {
         return PLUGINS.firstNotNullOfOrNull { it.getItemByName(name) }
     }
     
-    fun getItemTest(name: String): ItemTest? {
+    fun getItemTest(name: String): SingleItemTest? {
         return PLUGINS.firstNotNullOfOrNull { it.getItemTest(name) }
     }
     

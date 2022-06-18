@@ -14,9 +14,9 @@ import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeType
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.CustomCharacters
+import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import xyz.xenondevs.nova.util.data.getInputStacks
 
 abstract class ConversionRecipeGroup : RecipeGroup() {
@@ -44,17 +44,18 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
         createConversionRecipeGUI(createRecipeChoiceItem(input), result, time)
     
     private fun createConversionRecipeGUI(inputUIItem: Item, outputItem: ItemStack, time: Int): GUI {
-        val builder = GUIBuilder(GUIType.NORMAL, 9, 3)
-            .setStructure("" +
-                ". . t . . . . . ." +
-                ". . i . . . r . ." +
-                ". . . . . . . . .")
+        val builder = GUIBuilder(GUIType.NORMAL)
+            .setStructure(
+                ". . t . . . . . .",
+                ". . i . . . r . .",
+                ". . . . . . . . ."
+            )
             .addIngredient('i', inputUIItem)
             .addIngredient('r', createRecipeChoiceItem(listOf(outputItem)))
         
         if (time != 0) {
             builder.addIngredient(
-                't', NovaMaterialRegistry.STOPWATCH_ICON
+                't', CoreGUIMaterial.TP_STOPWATCH
                 .createBasicItemBuilder()
                 .setDisplayName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
             )
@@ -65,26 +66,14 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
     
 }
 
-object SmeltingRecipeGroup : ConversionRecipeGroup() {
+internal object SmeltingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.FURNACE))
-    override val overlay = CustomCharacters.FURNACE_RECIPE
+    override val texture = CoreGUITexture.RECIPE_SMELTING
 }
 
-object StonecutterRecipeGroup : ConversionRecipeGroup() {
+internal object StonecutterRecipeGroup : ConversionRecipeGroup() {
     override val priority = 2
     override val icon = ItemWrapper(ItemStack(Material.STONECUTTER))
-    override val overlay = CustomCharacters.CONVERSION_RECIPE
-}
-
-object PulverizingRecipeGroup : ConversionRecipeGroup() {
-    override val priority = 4
-    override val icon = NovaMaterialRegistry.PULVERIZER.basicItemProvider
-    override val overlay = CustomCharacters.PULVERIZER_RECIPE
-}
-
-object PressingRecipeGroup : ConversionRecipeGroup() {
-    override val priority = 5
-    override val icon = NovaMaterialRegistry.MECHANICAL_PRESS.basicItemProvider
-    override val overlay = CustomCharacters.PRESS_RECIPE
+    override val texture = CoreGUITexture.RECIPE_CONVERSION
 }

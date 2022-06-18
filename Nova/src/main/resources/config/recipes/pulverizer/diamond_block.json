@@ -1,6 +1,0 @@
-{
-  "input": "minecraft:diamond_block",
-  "result": "nova:diamond_dust",
-  "amount": 9,
-  "time": 200
-}

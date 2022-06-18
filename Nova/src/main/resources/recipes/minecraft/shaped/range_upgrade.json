@@ -1,0 +1,15 @@
+{
+  "result": "nova:range_upgrade",
+  "shape": [
+    "rnr",
+    "nin",
+    "pcp"
+  ],
+  "ingredients": {
+    "r": "minecraft:redstone",
+    "n": "minecraft:iron_ingot",
+    "i": "nova:iron_plate; minecraft:paper",
+    "p": "minecraft:piston",
+    "c": "nova:copper_gear; minecraft:redstone"
+  }
+}

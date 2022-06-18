@@ -1,31 +1,54 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
+import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.serialization.cbf.element.CompoundElement
-import xyz.xenondevs.nova.data.serialization.cbf.element.other.ListElement
-import xyz.xenondevs.nova.item.impl.saveFilterConfig
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.serialization.cbf.Compound
+import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.serialization.persistentdata.set
+import xyz.xenondevs.nova.util.item.novaMaterial
+
+private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
+
+fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
+    val container = itemMeta!!.persistentDataContainer
+    return container.get<Compound>(ITEM_FILTER_KEY)?.let(::ItemFilter)
+}
+
+fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter = getFilterConfigOrNull() ?: ItemFilter(size)
+
+fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
+    val itemMeta = itemMeta!!
+    
+    itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, itemFilter.compound)
+    setItemMeta(itemMeta)
+}
+
+fun ItemFilter(compound: Compound): ItemFilter {
+    val items: Array<ItemStack?> = compound.get<List<ItemStack>>("items")!!.toTypedArray()
+    return ItemFilter(
+        compound["whitelist"]!!,
+        compound["nbt"] ?: false,
+        items.size,
+        items
+    )
+}
 
 class ItemFilter(
     var whitelist: Boolean,
     var nbt: Boolean,
+    val size: Int,
     var items: Array<ItemStack?>
 ) {
     
-    constructor(compound: CompoundElement) :
-        this(compound.getAsserted("whitelist"), compound.get("nbt")
-            ?: false, compound.getAssertedElement<ListElement>("items").toTypedArray())
+    constructor(size: Int) : this(true, false, size, arrayOfNulls(size))
     
-    constructor() : this(true, false, arrayOfNulls(7))
-    
-    val compound: CompoundElement
-        get() = CompoundElement().also {
-            val itemList = ListElement()
-            items.forEach { itemStack -> itemList.add(itemStack) }
-            it.put("items", itemList)
-            it.put("nbt", nbt)
-            it.put("whitelist", whitelist)
+    val compound: Compound
+        get() = Compound().also {
+            val itemList = items.toList()
+            it["items"] = itemList
+            it["nbt"] = nbt
+            it["whitelist"] = whitelist
         }
     
     fun allowsItem(itemStack: ItemStack): Boolean {
@@ -42,7 +65,11 @@ class ItemFilter(
     }
     
     fun createFilterItem(): ItemStack {
-        return NovaMaterialRegistry.ITEM_FILTER.createItemStack().apply { saveFilterConfig(this@ItemFilter) }
+        return creatorFun(this)
+    }
+    
+    companion object {
+        lateinit var creatorFun: (ItemFilter) -> ItemStack
     }
     
 }

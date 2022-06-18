@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.getValues
 import xyz.xenondevs.nova.util.pollFirstWhere
 import java.util.*
 
-sealed interface FluidConfiguration {
+internal sealed interface FluidConfiguration {
     
     val fluidHolder: FluidHolder
     val faces: Set<BlockFace>
@@ -123,7 +123,7 @@ private fun mergeFluidConfigurations(
 
 private fun Iterable<FluidConfiguration>.mapToContainer(): List<FluidContainer> = map { it.container }
 
-class FluidNetworkChannel {
+internal class FluidNetworkChannel {
     
     private val holders = HashMap<FluidHolder, HashSet<FluidConfiguration>>()
     
@@ -146,7 +146,7 @@ class FluidNetworkChannel {
         createDistributor()
     }
     
-    fun addHolder(holder: FluidHolder, face: BlockFace) {
+    fun addHolder(holder: FluidHolder, face: BlockFace, createDistributor: Boolean) {
         val config = createOrMergeConfiguration(holder, face)
         
         val configSet = when (config.type) {
@@ -159,10 +159,10 @@ class FluidNetworkChannel {
         getConfigurations(holder) += config
         configSet += config
         
-        createDistributor()
+        if (createDistributor) createDistributor()
     }
     
-    fun removeHolder(holder: FluidHolder) {
+    fun removeHolder(holder: FluidHolder, createDistributor: Boolean) {
         holders[holder]?.forEach {
             consumerConfigurations -= it
             providerConfigurations -= it
@@ -171,7 +171,7 @@ class FluidNetworkChannel {
         
         holders -= holder
         
-        createDistributor()
+        if (createDistributor) createDistributor()
     }
     
     fun isEmpty() = holders.isEmpty()
@@ -194,7 +194,7 @@ class FluidNetworkChannel {
         return config
     }
     
-    private fun createDistributor() {
+    fun createDistributor() {
         val providers = providerConfigurations.isNotEmpty()
         val consumers = consumerConfigurations.isNotEmpty()
         val buffers = bufferConfigurations.isNotEmpty()

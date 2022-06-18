@@ -1,11 +1,13 @@
 package xyz.xenondevs.nova.api.material
 
+import xyz.xenondevs.nova.api.data.NamespacedId
+
 interface NovaMaterial {
     
     /**
-     * Gets the id of this [NovaMaterial] in the format of nova:name
+     * Gets the [NamespacedId] of this [NovaMaterial]
      */
-    val id: String
+    val id: NamespacedId
     
     /**
      * Gets the localized name for this [NovaMaterial].

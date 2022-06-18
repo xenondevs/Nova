@@ -1,9 +1,10 @@
 package xyz.xenondevs.nova.tileentity.network.item.channel
 
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.RoundRobinCounter
 import kotlin.math.min
 
-class ItemDistributor(
+internal class ItemDistributor(
     private val consumers: List<List<FilteredNetworkedInventory>>,
     private val providers: List<List<FilteredNetworkedInventory>>
 ) {
@@ -73,57 +74,63 @@ class ItemDistributor(
         
         var transfersLeft = transferAmount
         
+        val consumerFailCache = Array<ArrayList<ItemStack>>(consumersInScope.size, ::ArrayList) // caches which items cannot be added to this consumer
         val ignoredConsumers = BooleanArray(consumersInScope.size) // represents which consumers should be skipped
         while (ignoredConsumers.any { !it } && transfersLeft > 0) {
             
             // check that this consumer is not ignored, else skip
             if (!ignoredConsumers[consumerRRCounter.get()]) {
                 val consumer = consumersInScope[consumerRRCounter.get()]
-                var didConsume = false
+                val consumerFailList = consumerFailCache[consumerRRCounter.get()]
+                var ignoreConsumer = true
                 
-                val providerRRCounter = providerRRCounters.getOrPut(consumer) { RoundRobinCounter(providersInScope.size) }
-                val ignoredProviders = BooleanArray(providersInScope.size) // represents which provider should be skipped
-                while (ignoredProviders.any { !it } && transfersLeft > 0) {
-                    
-                    // check that this provider is not ignored, else skip
-                    if (!ignoredProviders[providerRRCounter.get()]) {
-                        var didProvide = false
-                        val provider = providersInScope[providerRRCounter.get()]
+                if (!consumer.isFull()) {
+                    val providerRRCounter = providerRRCounters.getOrPut(consumer) { RoundRobinCounter(providersInScope.size) }
+                    val ignoredProviders = BooleanArray(providersInScope.size) // represents which provider should be skipped
+                    while (ignoredProviders.any { !it } && transfersLeft > 0) {
                         
-                        // prevent providers from providing to themselves
-                        if (!provider.isSameInventory(consumer)) {
-                            val providerContent = providerContentMap[provider]!!
+                        // check that this provider is not ignored, else skip
+                        if (!ignoredProviders[providerRRCounter.get()]) {
+                            var ignoreProvider = true
+                            val provider = providersInScope[providerRRCounter.get()]
                             
-                            // find the first item that can be extracted into the current consumer and perform the extraction
-                            for ((slot, itemStack) in providerContent.withIndex()) {
-                                if (itemStack == null || provider.deniesItem(itemStack) || consumer.deniesItem(itemStack)) continue
+                            // prevent providers from providing to themselves
+                            if (!provider.isSameInventory(consumer)) {
+                                val providerContent = providerContentMap[provider]!!
                                 
-                                val singleStack = itemStack.clone().apply { amount = 1 }
-                                if (consumer.addItem(singleStack) == 0) {
-                                    // decrease amount by one for the provider
-                                    provider.decrementByOne(slot)
-                                    // decrease amount by one for the providerContent array
-                                    if (itemStack.amount <= 1) providerContent[slot] = null
-                                    else itemStack.amount -= 1
+                                // find the first item that can be extracted into the current consumer and perform the extraction
+                                for ((slot, itemStack) in providerContent.withIndex()) {
+                                    if (itemStack == null || provider.deniesItem(itemStack) || consumerFailList.any { it.isSimilar(itemStack) }) continue
                                     
-                                    didProvide = true
-                                    didConsume = true
-                                    transfersLeft -= 1
-                                    
-                                    break
+                                    if (!consumer.deniesItem(itemStack)) {
+                                        val singleStack = itemStack.clone().apply { amount = 1 }
+                                        if (consumer.addItem(singleStack) == 0) {
+                                            // decrease amount by one for the provider
+                                            provider.decrementByOne(slot)
+                                            // decrease amount by one for the providerContent array
+                                            if (itemStack.amount <= 1) providerContent[slot] = null
+                                            else itemStack.amount -= 1
+                                            
+                                            ignoreProvider = false
+                                            ignoreConsumer = false
+                                            transfersLeft -= 1
+                                            
+                                            break
+                                        } else consumerFailList += singleStack
+                                    } else consumerFailList += itemStack.clone()
                                 }
                             }
+                            
+                            // this provider can be ignored in the future if it can't supply this consumer
+                            if (ignoreProvider) ignoredProviders[providerRRCounter.get()] = true
                         }
                         
-                        // this provider can be ignored in the future if it can't supply this consumer
-                        if (!didProvide) ignoredProviders[providerRRCounter.get()] = true
+                        providerRRCounter.increment()
                     }
-                    
-                    providerRRCounter.increment()
                 }
                 
                 // this consumer can be ignored in the future if it cannot be supplied by any providers
-                if (!didConsume) ignoredConsumers[consumerRRCounter.get()] = true
+                if (ignoreConsumer) ignoredConsumers[consumerRRCounter.get()] = true
             }
             
             consumerRRCounter.increment()

@@ -7,13 +7,9 @@
     <parent>
         <artifactId>Nova-Parent</artifactId>
         <groupId>xyz.xenondevs.nova</groupId>
-        <version>0.8.13</version>
+        <version>0.9-SNAPSHOT</version>
     </parent>
 
     <artifactId>Nova-API</artifactId>
-
-    <properties>
-        <maven.deploy.skip>false</maven.deploy.skip>
-    </properties>
-
+    
 </project>

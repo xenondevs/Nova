@@ -1,17 +1,18 @@
 package xyz.xenondevs.nova.ui.overlay
 
 import net.md_5.bungee.api.chat.BaseComponent
-import net.minecraft.network.chat.ChatType
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.network.event.impl.ClientboundActionBarPacketEvent
-import xyz.xenondevs.nova.network.event.impl.ClientboundChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ActionBarPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.SystemChatPacketEvent
 import xyz.xenondevs.nova.util.data.forceDefaultFont
 import xyz.xenondevs.nova.util.data.toPlainText
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -20,14 +21,26 @@ import java.util.*
 
 object ActionbarOverlayManager : Listener {
     
-    private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(TextComponent(""))
+    private var tickTask: BukkitTask? = null
+    
+    private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(Component.empty())
     private val overlays = HashMap<UUID, HashSet<ActionbarOverlay>>()
     private val interceptedActionbars = HashMap<UUID, Pair<ArrayList<BaseComponent>, Long>>()
     
     init {
-        if (DEFAULT_CONFIG.getBoolean("actionbar_overlay")) {
+        reload()
+    }
+    
+    fun reload() {
+        if (tickTask != null) {
+            tickTask?.cancel()
+            HandlerList.unregisterAll(this)
+            tickTask = null
+        }
+        
+        if (DEFAULT_CONFIG.getBoolean("actionbar_overlay.enabled")) {
             Bukkit.getPluginManager().registerEvents(this, NOVA)
-            runTaskTimer(0, 1, ::handleTick)
+            tickTask = runTaskTimer(0, 1, ::handleTick)
         }
     }
     
@@ -61,13 +74,13 @@ object ActionbarOverlayManager : Listener {
     }
     
     @EventHandler
-    private fun handleChatPacket(event: ClientboundChatPacketEvent) {
-        if (event.chatType == ChatType.GAME_INFO) {
+    private fun handleChatPacket(event: SystemChatPacketEvent) {
+        if (event.typeId == 2) {
             val player = event.player
             val uuid = player.uniqueId
             if (overlays.containsKey(uuid)) {
                 val message = event.message
-                if (message != null)
+                if (message.isNotEmpty())
                     saveInterceptedComponent(player, message)
                 else interceptedActionbars -= uuid
                 
@@ -77,7 +90,7 @@ object ActionbarOverlayManager : Listener {
     }
     
     @EventHandler
-    private fun handleChatPacket(event: ClientboundActionBarPacketEvent) {
+    private fun handleChatPacket(event: ActionBarPacketEvent) {
         val player = event.player
         val uuid = player.uniqueId
         if (overlays.containsKey(uuid)) {
@@ -96,13 +109,13 @@ object ActionbarOverlayManager : Listener {
         val components = ArrayList<BaseComponent>()
         
         // calculate the length (in pixels) of the intercepted message
-        val textLength = CustomCharacters.getStringLength(text.toPlainText(player.locale))
+        val textLength = MoveCharacters.getStringLength(text.toPlainText(player.locale))
         // to center, move the cursor to the right by half of the length
-        components.add(CustomCharacters.getMovingComponent(textLength / -2))
+        components.add(MoveCharacters.getMovingComponent(textLength / -2))
         // append the text while explicitly setting it to the default font (required because of the moving component)
         components.addAll(text.forceDefaultFont())
         // move half of the text length back so the cursor is in the middle of the screen again (prevents clientside centering)
-        components.add(CustomCharacters.getMovingComponent(textLength / -2))
+        components.add(MoveCharacters.getMovingComponent(textLength / -2))
         
         interceptedActionbars[player.uniqueId] = components to System.currentTimeMillis()
     }
@@ -115,7 +128,7 @@ object ActionbarOverlayManager : Listener {
             // add text
             componentList.addAll(it.text)
             // move back
-            componentList.add(CustomCharacters.getMovingComponent(-it.width))
+            componentList.add(MoveCharacters.getMovingComponent(-it.width))
         }
         
         val interceptedActionbar = interceptedActionbars[uuid]

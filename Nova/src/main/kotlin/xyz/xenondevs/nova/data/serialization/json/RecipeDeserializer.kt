@@ -5,34 +5,38 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
-import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.recipe.*
-import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
-import xyz.xenondevs.nova.util.ItemUtils
-import xyz.xenondevs.nova.util.ItemUtils.getItemBuilder
 import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.ItemUtils.getItemBuilder
 import java.io.File
-
-private fun getRecipeKey(file: File): NamespacedKey =
-    NamespacedKey(NOVA, "${file.parentFile.name}.${file.nameWithoutExtension}")
 
 interface RecipeDeserializer<T> {
     
     fun deserialize(json: JsonObject, file: File): T
     
-}
-
-private fun parseRecipeChoice(element: JsonElement): RecipeChoice {
-    val nameList = when {
-        element is JsonArray -> element.getAllStrings()
-        element.isString() -> listOf(element.asString)
-        else -> throw IllegalArgumentException()
+    fun parseRecipeChoice(element: JsonElement): RecipeChoice {
+        val nameList = when {
+            element is JsonArray -> element.getAllStrings()
+            element.isString() -> listOf(element.asString)
+            else -> throw IllegalArgumentException()
+        }.map { ids ->
+            // Id fallbacks
+            ids.replace(" ", "")
+                .split(';')
+                .firstOrNull { ItemUtils.isIdRegistered(it.substringBefore('{'))}
+                ?: throw IllegalArgumentException("Invalid item id(s): $ids")
+        }
+        
+        return ItemUtils.getRecipeChoice(nameList)
     }
-    return ItemUtils.getRecipeChoice(nameList)
+    
+    fun getRecipeKey(file: File): NamespacedKey =
+        NamespacedKey(NOVA, "${file.parentFile.name}.${file.nameWithoutExtension}")
+    
 }
 
-object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
+internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): ShapedRecipe {
         val resultKey = json.getString("result")!!
@@ -66,7 +70,7 @@ object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
     
 }
 
-object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
+internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): ShapelessRecipe {
         val resultKey = json.getString("result")!!
@@ -105,7 +109,7 @@ object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
     
 }
 
-object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingRecipe> {
+internal object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): StonecuttingRecipe {
         val input = parseRecipeChoice(json.get("input"))
@@ -116,7 +120,7 @@ object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingRecipe> {
     
 }
 
-object SmithingRecipeDeserializer : RecipeDeserializer<SmithingRecipe> {
+internal object SmithingRecipeDeserializer : RecipeDeserializer<SmithingRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): SmithingRecipe {
         val base = parseRecipeChoice(json.get("base"))
@@ -145,69 +149,11 @@ abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
     
 }
 
-object FurnaceRecipeDeserializer : ConversionRecipeDeserializer<FurnaceRecipe>() {
+internal object FurnaceRecipeDeserializer : ConversionRecipeDeserializer<FurnaceRecipe>() {
     
     override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): FurnaceRecipe {
         val experience = json.getFloat("experience")!!
         return FurnaceRecipe(key, result, input, experience, time)
-    }
-    
-}
-
-object PulverizerRecipeDeserializer : ConversionRecipeDeserializer<PulverizerRecipe>() {
-    override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int) =
-        PulverizerRecipe(key, input, result, time)
-}
-
-object PlatePressRecipeDeserializer : ConversionRecipeDeserializer<PlatePressRecipe>() {
-    override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int) =
-        PlatePressRecipe(key, input, result, time)
-}
-
-object GearPressRecipeDeserializer : ConversionRecipeDeserializer<GearPressRecipe>() {
-    override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int) =
-        GearPressRecipe(key, input, result, time)
-}
-
-object FluidInfuserRecipeDeserializer : RecipeDeserializer<FluidInfuserRecipe> {
-    
-    override fun deserialize(json: JsonObject, file: File): FluidInfuserRecipe {
-        val mode = json.getDeserialized<FluidInfuserRecipe.InfuserMode>("mode")!!
-        val fluidType = json.getDeserialized<FluidType>("fluid_type")!!
-        val fluidAmount = json.getLong("fluid_amount")!!
-        val input = parseRecipeChoice(json.get("input"))
-        val time = json.getInt("time")!!
-        val result = getItemBuilder(json.getString("result")!!).get()
-        
-        return FluidInfuserRecipe(getRecipeKey(file), mode, fluidType, fluidAmount, input, result, time)
-    }
-    
-}
-
-object ElectricBrewingStandRecipeDeserializer : RecipeDeserializer<ElectricBrewingStandRecipe> {
-    
-    override fun deserialize(json: JsonObject, file: File): ElectricBrewingStandRecipe {
-        val inputs = json.getAsJsonArray("inputs").map { ItemUtils.getRecipeChoice(listOf(it.asString)) }
-        require(inputs.all { it.getInputStacks().size == 1 })
-        
-        val resultName = json.getString("result")
-            ?: throw IllegalArgumentException("No result provided")
-        val result = PotionEffectType.getByKey(NamespacedKey.fromString(resultName))
-            ?: throw IllegalArgumentException("Invalid result")
-        
-        val defaultTime = json.getInt("default_time", 0)
-        val redstoneMultiplier = json.getDouble("redstone_multiplier", 0.0)
-        val glowstoneMultiplier = json.getDouble("glowstone_multiplier", 0.0)
-        val maxDurationLevel = json.getInt("max_duration_level", 0)
-        val maxAmplifierLevel = json.getInt("max_amplifier_level", 0)
-        
-        return ElectricBrewingStandRecipe(
-            getRecipeKey(file),
-            inputs, result,
-            defaultTime,
-            redstoneMultiplier, glowstoneMultiplier,
-            maxDurationLevel, maxAmplifierLevel
-        )
     }
     
 }

@@ -1,11 +1,12 @@
 package xyz.xenondevs.nova.player.ability
 
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.data.config.Reloadable
 
-internal abstract class Ability(val player: Player) {
+abstract class Ability(val player: Player) : Reloadable {
     
     abstract fun handleRemove()
     
-    abstract fun handleTick(tick: Int)
+    abstract fun handleTick()
     
 }

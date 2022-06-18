@@ -10,12 +10,12 @@ import java.util.zip.Inflater
 
 fun ByteBuf.writeByte(byte: Byte): ByteBuf = writeByte(byte.toInt())
 
-fun ByteBuf.writeString(string: String): ByteBuf {
+fun ByteBuf.writeString(string: String): Int {
     val encoded = string.encodeToByteArray()
     require(encoded.size <= 65535) { "String is too large!" }
     writeShort(encoded.size)
     writeBytes(encoded)
-    return this
+    return 2 + encoded.size
 }
 
 fun ByteBuf.readString(): String {
@@ -71,3 +71,22 @@ fun ByteArray.decompress(): ByteArray {
 fun ByteArray.encodeWithBase64(): String = Base64.getEncoder().encodeToString(this)
 
 fun String.decodeWithBase64(): ByteArray = Base64.getDecoder().decode(this)
+
+fun ByteBuf.writeStringList(array: List<String>): Int {
+    var size = 4
+    writeInt(array.size)
+    array.forEach { size += writeString(it) }
+    return size
+}
+
+fun ByteBuf.readStringList(): List<String> {
+    return Array(readInt()) { readString() }.asList()
+}
+
+fun ByteBuf.writeUUID(uuid: UUID) {
+    writeLong(uuid.mostSignificantBits)
+    writeLong(uuid.leastSignificantBits)
+}
+
+fun ByteBuf.readUUID(): UUID =
+    UUID(readLong(), readLong())

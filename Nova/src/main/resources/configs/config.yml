@@ -1,0 +1,92 @@
+# Configuration options for the resource pack
+resource_pack:
+  # The auto uploader automatically uploads the resource pack after generation.
+  # Configuration of the auto uploader is explained on the wiki: https://xenondevs.xyz/docs/nova/admin/setup/#step-2-resourcepack-hosting
+  auto_upload:
+    enabled: false
+    # We host the most common resource packs ourselves. If your resource pack is already hosted by us, our service will be used.
+    # If the pack is not hosted by us, your configured auto uploader will be used.
+    use_common_packs: true
+  # Configures which materials are used for custom items. Can be changed to mitigate conflicts with other plugins that use custom resource packs.
+  # These values can be changed at any time, existing items in the world will use the new material and adjusted model data.
+  # When changing the material type, please make sure to select another material with the same abilities.
+  # A resource pack rebuild is required for changes to take effect.
+  materials:
+    # The default material to be used if no specific ability is needed.
+    default:
+      type: shulker_shell
+      modelDataStart: 1
+    # The material for damageable items.
+    damageable:
+      type: fishing_rod
+      modelDataStart: 1
+    # The material for items which can be rendered translucent by the client.
+    translucent:
+      type: shulker_shell
+      modelDataStart: 1
+    # The material for consumable items.
+    consumable:
+      type: apple
+      modelDataStart: 1
+    # The material for items that can always be consumed, regardless of the current food level.
+    always_consumable:
+      type: golden_apple
+      modelDataStart: 1
+    # The material for items which can be consumed fast.
+    fast_consumable:
+      type: dried_kelp
+      modelDataStart: 1
+    # Some items require a specific material that cannot be changed (for example armor pieces).
+    # The property below adjusts the model data start for all of them.
+    custom:
+      modelDataStart: 1
+
+# The render distance for armor stands from Nova, in chunks.
+# Note that the render distance is limited by the entity render distance of the client.
+armor_stand_render_distance:
+  min: 1
+  max: 6
+  default: 4
+
+# The actionbar overlay used for custom UIs
+actionbar_overlay:
+  enabled: true
+
+# Default transfer rates for networks when tile entities are directly connected.
+network:
+  energy:
+    default_transfer_rate: 9223372036854775807
+  item:
+    default_transfer_rate: 2147483647
+  fluid:
+    default_transfer_rate: 9223372036854775807
+
+# Performance options
+performance:
+  # Nova's executor caps the amount of threads that are allowed to run simultaneously in order to prevent OutOfMemoryErrors.
+  nova_executor:
+    # If enabled, Nova's own executor will be used. Otherwise, Bukkit's scheduler system is used.
+    enabled: true
+    # The amount of threads to be started.
+    threads: 200
+  # If backup files should be created while saving nova regions
+  region_backups: true
+  # If excess items should be dropped on the ground.
+  drop_excess_on_ground: true
+  # If block break effects such as particles and sounds should be played.
+  block_break_effects: true
+
+debug:
+  # The chunk reload watcher will print stack traces if repeated chunk loads and unloads are detected.
+  watch_chunk_reloads: false
+  # If other plugins should be allowed to overwrite the results of Nova recipes.
+  allow_craft_result_overwrite: false
+
+# If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
+use_metric_prefixes: false
+
+update_reminder:
+  # If update reminders should be shown.
+  enabled: true
+  # The amount of ticks passed between update checks.
+  interval: 12000

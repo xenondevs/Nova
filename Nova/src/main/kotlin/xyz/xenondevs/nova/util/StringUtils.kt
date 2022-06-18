@@ -36,3 +36,32 @@ fun String.Companion.formatSafely(format: String, vararg args: Any?): String {
 fun String.removeMinecraftFormatting(): String {
     return replace(FORMATTING_FILTER_REGEX, "")
 }
+
+fun String.addPrefix(prefix: String): String =
+    if (startsWith(prefix)) this else "$prefix$this"
+
+fun String.addNamespace(namespace: String): String =
+    addPrefix("$namespace:")
+
+fun String.removeNamespace(namespace: String): String =
+    removePrefix("$namespace:")
+
+fun String.startsWithAny(vararg prefixes: String): Boolean {
+    for (prefix in prefixes)
+        if (startsWith(prefix)) return true
+    return false
+}
+
+operator fun Any.plus(other: String) = this.toString() + other
+
+object StringUtils {
+    
+    private val ALPHABET = ('a'..'z') + ('A'..'Z')
+    
+    fun randomString(length: Int, dict: List<Char> = ALPHABET) =
+        buildString {
+            repeat(length) {
+                append(dict.random())
+            }
+        }
+}

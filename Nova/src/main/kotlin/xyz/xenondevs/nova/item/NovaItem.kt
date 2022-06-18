@@ -1,63 +1,56 @@
 package xyz.xenondevs.nova.item
 
 import de.studiocode.invui.item.builder.ItemBuilder
-import org.bukkit.NamespacedKey
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.data.serialization.persistentdata.get
-import xyz.xenondevs.nova.data.serialization.persistentdata.set
-import xyz.xenondevs.nova.material.NovaMaterial
-import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.util.data.withoutPreFormatting
+import kotlin.reflect.KClass
+import kotlin.reflect.full.superclasses
 
 /**
- * Handles actions performed on [ItemStack]s of a [NovaMaterial]
+ * Handles actions performed on [ItemStack]s of a [ItemNovaMaterial]
  */
-abstract class NovaItem {
+class NovaItem(val behaviors: List<ItemBehavior>) {
     
-    open fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {}
+    private lateinit var material: ItemNovaMaterial
+    private lateinit var name: Array<BaseComponent>
     
-    open fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {}
+    constructor(vararg behaviors: ItemBehavior) : this(behaviors.toList())
     
-    open fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) {}
-    
-    open fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {}
-    
-    open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
-    
-    inline fun <reified K> retrieveData(itemStack: ItemStack, key: NamespacedKey): K? {
-        return itemStack.itemMeta?.persistentDataContainer?.get(key)
+    internal fun setMaterial(material: ItemNovaMaterial) {
+        if (::material.isInitialized)
+            throw IllegalStateException("NovaItems cannot be used for multiple materials")
+        
+        this.material = material
+        this.name = TranslatableComponent(material.localizedName).withoutPreFormatting()
     }
     
-    fun <T> retrieveData(itemStack: ItemStack, key: NamespacedKey, persistentDataType: PersistentDataType<*, T>): T? {
-        return itemStack.itemMeta?.persistentDataContainer?.get(key, persistentDataType)
+    fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+        var builder = itemBuilder
+        behaviors.forEach { builder = it.modifyItemBuilder(builder) }
+        return builder
     }
     
-    inline fun <reified T> storeData(itemStack: ItemStack, key: NamespacedKey, data: T?) {
-        val itemMeta = itemStack.itemMeta
-        val dataContainer = itemMeta?.persistentDataContainer
-        if (dataContainer != null) {
-            if (data != null) dataContainer.set(key, data)
-            else dataContainer.remove(key)
-            
-            itemStack.itemMeta = itemMeta
-        }
+    fun getName(itemStack: ItemStack): Array<BaseComponent> {
+        return behaviors.firstNotNullOfOrNull { it.getName(itemStack) } ?: name
     }
     
-    fun <T> storeData(itemStack: ItemStack, key: NamespacedKey, dataType: PersistentDataType<*, T>, data: T?) {
-        val itemMeta = itemStack.itemMeta
-        val dataContainer = itemMeta?.persistentDataContainer
-        if (dataContainer != null) {
-            if (data != null) dataContainer.set(key, dataType, data)
-            else dataContainer.remove(key)
-            
-            itemStack.itemMeta = itemMeta
-        }
+    fun getLore(itemStack: ItemStack): List<Array<BaseComponent>> {
+        val lore = ArrayList<Array<BaseComponent>>()
+        behaviors.forEach { it.getLore(itemStack)?.also(lore::addAll) }
+        return lore
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    fun <T : ItemBehavior> getBehavior(type: KClass<T>): T? {
+        return behaviors.firstOrNull { type == it::class || type in it::class.superclasses } as T?
+    }
+    
+    fun hasBehavior(type: KClass<out ItemBehavior>): Boolean {
+        return behaviors.any { it::class == type }
     }
     
 }
