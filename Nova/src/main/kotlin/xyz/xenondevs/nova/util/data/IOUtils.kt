@@ -158,8 +158,7 @@ object IOUtils {
         val zout = ZipOutputStream(temp.outputStream())
         
         use(zin, zout) {
-            while (true) {
-                val entry = zin.nextEntry ?: break
+            generateSequence(zin::getNextEntry).forEach { entry ->
                 entry.lastAccessTime = zero
                 entry.lastModifiedTime = zero
                 entry.creationTime = zero

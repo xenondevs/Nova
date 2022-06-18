@@ -82,6 +82,7 @@
                     <jvmTarget>17</jvmTarget>
                     <args>
                         <arg>-Xjvm-default=all</arg>
+                        <arg>-Xskip-prerelease-check</arg>
                     </args>
                 </configuration>
             </plugin>

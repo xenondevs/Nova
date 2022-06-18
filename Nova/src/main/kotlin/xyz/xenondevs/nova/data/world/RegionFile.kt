@@ -60,7 +60,6 @@ private fun ByteBuf.writeBooleanArray(booleans: BooleanArray) {
  * ```
  * TODO
  * - remove unused types from pool
- * - delete empty chunks
  * - Instead of storing chunk size, get distance to next chunk in file
  */
 class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, val regionZ: Int) {
@@ -96,6 +95,10 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
         val packedCoords = chunk.packedCoords
         var pos = chunkPositions[packedCoords.toInt()]?.get()
         if (pos != null) {
+            if (!chunk.hasData()) {
+                delete(chunk, pos)
+                return
+            }
             raf.seek(pos)
             val length = raf.readInt()
             val buf = Unpooled.buffer()
@@ -106,7 +109,7 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
             raf.writeInt(newLength)
             raf.append(pos + 4, pos + 4 + length, newData)
             adjustHeader(pos, (newLength - length).toLong(), poolChanged)
-        } else {
+        } else if (chunk.hasData()) {
             raf.seek(raf.length())
             pos = raf.filePointer
             val buf = Unpooled.buffer()
@@ -119,11 +122,18 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
         }
     }
     
+    private fun delete(chunk: RegionChunk, pos: Long) {
+        raf.seek(pos)
+        val length = raf.readInt() + 4
+        chunkPositions.remove(chunk.packedCoords.toInt())
+        raf.append(pos, pos + length, byteArrayOf())
+        adjustHeader(pos, -length.toLong())
+    }
+    
     private fun adjustHeader(from: Long, offset: Long, rewritePool: Boolean = false) {
         chunkPositions.asSequence()
             .filter { it.value.get() > from }
             .forEach { (_, idx) -> idx.addAndGet(offset) }
-        val pos = chunkPositions.values.firstOrNull { it.get() > 10000 }
         writeHeader(rewritePool)
     }
     
