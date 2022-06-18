@@ -52,6 +52,7 @@ object FakeArmorStandManager : Initializable(), Listener {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         
         Bukkit.getOnlinePlayers().forEach { player ->
+            updateRenderDistance(player)
             handleChunksChange(player, player.location.chunkPos)
         }
     }
