@@ -23,7 +23,7 @@ If you would like to help translate Nova, you can do so [here](https://translate
 
 # Patrons
 
-* Ashwin | DarktubeNL - €10  
 * mrakavin - €10
+* ClimbersGroove - €5
 
 Want to donate as well? Check out our [Patreon](https://www.patreon.com/xenondevs) page.
