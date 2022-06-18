@@ -69,6 +69,8 @@ performance:
     enabled: true
     # The amount of threads to be started.
     threads: 200
+  # If backup files should be created while saving nova regions
+  region_backups: true
   # If excess items should be dropped on the ground.
   drop_excess_on_ground: true
   # If block break effects such as particles and sounds should be played.
