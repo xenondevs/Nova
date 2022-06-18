@@ -18,7 +18,7 @@ class WorldDataStorage(val world: World) {
         val rx = pos.x shr 5
         val rz = pos.z shr 5
         
-        val rid = (rx.toLong() shl 32) or rz.toLong()
+        val rid = (rx.toLong() shl 32) or (rz.toLong() and 0xFFFFFFFF)
         
         return regionFiles.getOrPut(rid) {
             val file = File(regionsFolder, "r.$rx.$rz.nvr")

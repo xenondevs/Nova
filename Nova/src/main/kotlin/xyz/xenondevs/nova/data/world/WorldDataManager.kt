@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
+import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.nova.LOGGER
@@ -42,6 +43,7 @@ internal object WorldDataManager : Initializable(), Listener {
                 while (tasks.isNotEmpty()) {
                     when (val task = tasks.poll()) {
                         is ChunkLoadTask -> loadChunk(task.pos)
+                        is ChunkUnloadTask -> unloadChunk(task.pos)
                         is SaveWorldTask -> saveWorld(task.world)
                     }
                 }
@@ -71,6 +73,15 @@ internal object WorldDataManager : Initializable(), Listener {
                 }
             }
         }
+    }
+    
+    @Synchronized
+    private fun unloadChunk(pos: ChunkPos) {
+        val region = getRegion(pos)
+        val chunk = region.getChunk(pos)
+        region.save(chunk)
+        chunk.blockStates.values.forEach { it.handleRemoved(false) }
+        region.chunks[chunk.packedCoords.toInt()] = null
     }
     
     @Synchronized
@@ -116,6 +127,11 @@ internal object WorldDataManager : Initializable(), Listener {
     @EventHandler
     private fun handleChunkLoad(event: ChunkLoadEvent) {
         tasks += ChunkLoadTask(event.chunk.pos)
+    }
+    
+    @EventHandler
+    private fun handleChunkUnload(event: ChunkUnloadEvent) {
+        tasks += ChunkUnloadTask(event.chunk.pos)
     }
     
     @Synchronized

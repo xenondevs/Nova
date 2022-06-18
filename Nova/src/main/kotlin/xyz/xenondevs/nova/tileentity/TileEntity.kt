@@ -48,8 +48,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid
     val ownerUUID: UUID = blockState.ownerUUID
-    override val data: Compound = blockState.data
-    override val material: TileEntityNovaMaterial = blockState.material
+    final override val data: Compound = blockState.data
+    final override val material: TileEntityNovaMaterial = blockState.material
     
     override val owner: OfflinePlayer by lazy { Bukkit.getOfflinePlayer(ownerUUID) }
     
