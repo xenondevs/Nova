@@ -19,7 +19,7 @@ Visit our [spigot page](https://www.spigotmc.org/resources/93648/) for a more de
 
 # Translating
 
-If you would like to help translate Nova, you can do so [here](https://translate.xenondevs.xyz/projects/nova).
+If you would like to help translate Nova, you can do so [here](https://translate.xenondevs.xyz/).
 
 # Patrons
 
