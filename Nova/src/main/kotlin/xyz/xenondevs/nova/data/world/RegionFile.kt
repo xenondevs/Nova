@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.data.world
 
-import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.util.data.append
 import xyz.xenondevs.nova.util.data.readStringList
 import xyz.xenondevs.nova.util.data.toByteArray
@@ -15,25 +17,7 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 
-private fun ByteBuf.readBooleanArray(size: Int): BooleanArray {
-    val booleans = BooleanArray(size)
-    val bytes = ByteArray(size / 8).also { readBytes(it) }
-    for (i in bytes.indices) {
-        val byte = bytes[i]
-        repeat(8) { booleans[i * 8 + it] = byte.toInt() shr (7 - it) and 1 == 1 }
-    }
-    
-    return booleans
-}
-
-private fun ByteBuf.writeBooleanArray(booleans: BooleanArray) {
-    val bytes = ByteArray(booleans.size / 8)
-    for (i in booleans.indices) {
-        val bit = if (booleans[i]) 1 else 0
-        bytes[i / 8] = (bytes[i / 8].toInt() shl 1 or bit).toByte()
-    }
-    writeBytes(bytes)
-}
+private val CREATE_BACKUPS by configReloadable { DEFAULT_CONFIG.getBoolean("performance.region_backups") }
 
 /**
  * A binary region file.
@@ -65,14 +49,24 @@ private fun ByteBuf.writeBooleanArray(booleans: BooleanArray) {
 class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, val regionZ: Int) {
     
     val chunks = arrayOfNulls<RegionChunk?>(1024)
+    private val backupFile = File(file.parentFile, file.name + ".backup")
     
     /**
      * Position of chunk data in the file
      */
-    val chunkPositions = LinkedHashMap<Int, AtomicLong>()
-    val typePool = ArrayList<String>()
+    private val chunkPositions = LinkedHashMap<Int, AtomicLong>()
+    private val typePool = ArrayList<String>()
+    private val raf: RandomAccessFile
     
-    val raf = RandomAccessFile(file, "rw")
+    init {
+        if (backupFile.exists()) {
+            LOGGER.warning("Restoring region file $file from backup $backupFile")
+            backupFile.copyTo(file, true)
+            backupFile.delete()
+        }
+        
+        raf = RandomAccessFile(file, "rw")
+    }
     
     fun init() {
         if (raf.length() == 0L) {
@@ -161,12 +155,18 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
     }
     
     fun saveAll() {
+        if (CREATE_BACKUPS)
+            file.copyTo(backupFile)
+        
         chunks.forEachIndexed { idx, chunk ->
             if (chunk == null) return@forEachIndexed
             
             save(chunk)
             if (!chunk.pos.isLoaded()) chunks[idx] = null
         }
+        
+        if (CREATE_BACKUPS)
+            backupFile.delete()
     }
     
     //</editor-fold>
