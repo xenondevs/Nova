@@ -29,7 +29,7 @@ class WorldDataStorage(val world: World) {
     fun saveAll() {
         regionFiles.removeIf { (_, regionFile) ->
             regionFile.saveAll()
-            return@removeIf !regionFile.isAnyChunkLoaded()
+            return@removeIf regionFile.chunks.all { it == null }
         }
     }
     

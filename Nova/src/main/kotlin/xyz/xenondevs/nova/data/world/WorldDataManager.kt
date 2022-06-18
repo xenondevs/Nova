@@ -79,9 +79,7 @@ internal object WorldDataManager : Initializable(), Listener {
     private fun unloadChunk(pos: ChunkPos) {
         val region = getRegion(pos)
         val chunk = region.getChunk(pos)
-        region.save(chunk)
         chunk.blockStates.values.forEach { it.handleRemoved(false) }
-        region.chunks[chunk.packedCoords.toInt()] = null
     }
     
     @Synchronized

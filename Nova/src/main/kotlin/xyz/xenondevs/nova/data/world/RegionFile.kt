@@ -151,7 +151,12 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
     }
     
     fun saveAll() {
-        chunks.filterNotNull().forEach(::save)
+        chunks.forEachIndexed { idx, chunk ->
+            if (chunk == null) return@forEachIndexed
+            
+            save(chunk)
+            if (!chunk.pos.isLoaded()) chunks[idx] = null
+        }
     }
     
     //</editor-fold>
@@ -187,20 +192,6 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
         val dz = pos.z and 0x1F
         val packedCoords = dx shl 5 or dz
         return chunks.getOrSet(packedCoords) { read(packedCoords) }
-    }
-    
-    fun isAnyChunkLoaded(): Boolean {
-        val minChunkX = regionX shl 5
-        val minChunkZ = regionZ shl 5
-        
-        for (chunkX in minChunkX until (minChunkX + 32)) {
-            for (chunkZ in minChunkZ until (minChunkZ + 32)) {
-                if (world.world.isChunkLoaded(chunkX, chunkZ))
-                    return true
-            }
-        }
-        
-        return false
     }
     
 }
