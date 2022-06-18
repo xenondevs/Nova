@@ -29,7 +29,7 @@ import xyz.xenondevs.nova.util.PermissionUtils
 import java.util.*
 import org.bukkit.World as BWorld
 
-object WorldGuard : ProtectionIntegration, InternalIntegration {
+internal object WorldGuard : ProtectionIntegration, InternalIntegration {
     
     private val PLUGIN: WorldGuardPlugin?
     private val PLATFORM: WorldGuardPlatform?

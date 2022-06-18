@@ -37,10 +37,9 @@ class Nova : JavaPlugin(), INova {
     
     val version = Version(description.version)
     val isDevBuild = description.version.contains("SNAPSHOT")
-    val disableHandlers = ArrayList<() -> Unit>()
+    internal val disableHandlers = ArrayList<() -> Unit>()
     val pluginFile
         get() = file
-    var isUninstalled = false
     
     override val tileEntityManager: TileEntityManager
         get() = TileEntityManager

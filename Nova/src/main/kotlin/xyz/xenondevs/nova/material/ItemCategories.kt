@@ -24,7 +24,7 @@ import java.io.File
 import java.io.InputStream
 import java.util.logging.Level
 
-object ItemCategories : Initializable() {
+internal object ItemCategories : Initializable() {
     
     private const val PATH_IN_JAR = "item_categories.yml"
     private val CATEGORIES_FILE = File(NOVA.dataFolder, "configs/item_categories.yml").apply { parentFile.mkdirs() }
@@ -95,7 +95,7 @@ object ItemCategories : Initializable() {
     
 }
 
-data class CategoryPriority(val addonId: String, val preferredPosition: Int?) : Comparable<CategoryPriority> {
+internal data class CategoryPriority(val addonId: String, val preferredPosition: Int?) : Comparable<CategoryPriority> {
     
     override fun compareTo(other: CategoryPriority): Int {
         val otherPreferredPosition = other.preferredPosition
@@ -108,7 +108,7 @@ data class CategoryPriority(val addonId: String, val preferredPosition: Int?) : 
     
 }
 
-data class ItemCategory(val name: String, val icon: ItemProvider, val items: List<CategorizedItem>) {
+internal data class ItemCategory(val name: String, val icon: ItemProvider, val items: List<CategorizedItem>) {
     
     companion object {
         fun deserialize(element: ConfigurationSection): ItemCategory? {
@@ -130,7 +130,7 @@ data class ItemCategory(val name: String, val icon: ItemProvider, val items: Lis
     
 }
 
-class CategorizedItem(val id: String) : BaseItem() {
+internal class CategorizedItem(val id: String) : BaseItem() {
     
     val localizedName: String
     val itemStack: ItemStack

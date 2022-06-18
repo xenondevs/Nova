@@ -32,7 +32,7 @@ var Player.armorStandRenderDistance: Int
         FakeArmorStandManager.updateRenderDistance(this)
     }
 
-object FakeArmorStandManager : Initializable(), Listener {
+internal object FakeArmorStandManager : Initializable(), Listener {
     
     val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "armor_stand_render_distance")
     val DEFAULT_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.default") }
@@ -167,7 +167,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun handleMove(event: PlayerMoveEvent) {
+    private fun handleMove(event: PlayerMoveEvent) {
         val newChunk = event.to!!.chunkPos
         if (event.from.chunkPos != newChunk) {
             val player = event.player
@@ -176,7 +176,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun handleTeleport(event: PlayerTeleportEvent) {
+    private fun handleTeleport(event: PlayerTeleportEvent) {
         val newChunk = event.to!!.chunkPos
         if (event.from.chunkPos != newChunk) {
             val player = event.player
@@ -185,7 +185,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
-    fun handleSpawn(event: PlayerRespawnEvent) {
+    private fun handleSpawn(event: PlayerRespawnEvent) {
         val player = event.player
         val newChunk = event.respawnLocation.chunkPos
         if (player.location.chunkPos != newChunk) {
@@ -194,7 +194,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
-    fun handleJoin(event: PlayerJoinEvent) {
+    private fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
         val chunk = player.location.chunkPos
         updateRenderDistance(player)
@@ -202,7 +202,7 @@ object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
-    fun handleQuit(event: PlayerQuitEvent) {
+    private fun handleQuit(event: PlayerQuitEvent) {
         val player = event.player
         discardRenderDistance(player)
         runAsyncTask { removeViewer(player) }

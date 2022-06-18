@@ -11,7 +11,7 @@ import org.maxgamer.quickshop.api.shop.AbstractDisplayItem
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.integration.InternalIntegration
 
-object QuickShop : ProtectionIntegration, InternalIntegration {
+internal object QuickShop : ProtectionIntegration, InternalIntegration {
     
     private val QUICK_SHOP = Bukkit.getPluginManager().getPlugin("QuickShop") as? QuickShop
     override val isInstalled = QUICK_SHOP != null

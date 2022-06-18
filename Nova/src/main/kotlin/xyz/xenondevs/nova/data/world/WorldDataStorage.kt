@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.world.ChunkPos
 import java.io.File
 
-class WorldDataStorage(val world: World) {
+internal class WorldDataStorage(val world: World) {
     
     private val regionsFolder = File(world.worldFolder, "nova_region")
     private val regionFiles = HashMap<Long, RegionFile>()

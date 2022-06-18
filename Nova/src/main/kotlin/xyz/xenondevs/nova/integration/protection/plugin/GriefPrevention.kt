@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.protection.FakeOnlinePlayer
 
-object GriefPrevention : ProtectionIntegration, InternalIntegration {
+internal object GriefPrevention : ProtectionIntegration, InternalIntegration {
     
     private val GRIEF_PREVENTION = if (Bukkit.getPluginManager().getPlugin("GriefPrevention") != null) GriefPrevention.instance else null
     override val isInstalled = GRIEF_PREVENTION != null

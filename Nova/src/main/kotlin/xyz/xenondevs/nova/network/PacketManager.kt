@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.util.channels
 import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.serverPlayer
 
-object PacketManager : Initializable(), Listener {
+internal object PacketManager : Initializable(), Listener {
     
     override val inMainThread = true
     override val dependsOn = emptySet<Initializable>()

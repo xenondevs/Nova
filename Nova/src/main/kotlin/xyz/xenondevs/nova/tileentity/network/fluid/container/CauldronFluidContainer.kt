@@ -65,7 +65,7 @@ private val Block.fluidAmount: Long
         return 0L
     }
 
-class CauldronFluidContainer(
+internal class CauldronFluidContainer(
     uuid: UUID,
     private val cauldron: Block,
 ) : FluidContainer(

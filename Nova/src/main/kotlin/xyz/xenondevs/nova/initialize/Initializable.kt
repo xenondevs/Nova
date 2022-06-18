@@ -4,7 +4,7 @@ import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.runTask
 import java.util.concurrent.CountDownLatch
 
-abstract class Initializable : Comparable<Initializable> {
+abstract class Initializable internal constructor() : Comparable<Initializable> {
     
     internal val latch = CountDownLatch(1)
     internal var isInitialized = false
@@ -13,7 +13,7 @@ abstract class Initializable : Comparable<Initializable> {
     
     internal abstract val dependsOn: Set<Initializable>
     
-    abstract fun init()
+    internal abstract fun init()
     
     open fun disable() = Unit
     

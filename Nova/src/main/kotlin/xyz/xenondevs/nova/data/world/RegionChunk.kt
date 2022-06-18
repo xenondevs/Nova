@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.logging.Level
 
-class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
+internal class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int) {
     
     private val chunkX = (file.regionX shl 5) + relChunkX
     private val chunkZ = (file.regionZ shl 5) + relChunkZ

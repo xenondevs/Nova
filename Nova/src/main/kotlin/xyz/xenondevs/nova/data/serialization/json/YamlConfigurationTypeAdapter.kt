@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonWriter
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.StringReader
 
-object YamlConfigurationTypeAdapter : TypeAdapter<YamlConfiguration>() {
+internal object YamlConfigurationTypeAdapter : TypeAdapter<YamlConfiguration>() {
     
     override fun write(writer: JsonWriter, value: YamlConfiguration) {
         writer.value(value.saveToString())

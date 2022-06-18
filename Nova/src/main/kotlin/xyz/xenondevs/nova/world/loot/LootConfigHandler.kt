@@ -10,11 +10,10 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.data.*
 import java.io.File
 
-val LOOT_DIRECTORY = File(NOVA.dataFolder, "loot")
-
+private val LOOT_DIRECTORY = File(NOVA.dataFolder, "loot")
 private val LOOT_FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
 
-object LootConfigHandler : Initializable() {
+internal object LootConfigHandler : Initializable() {
     
     override val inMainThread = true
     override val dependsOn = setOf(AddonsInitializer)

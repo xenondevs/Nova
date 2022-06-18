@@ -26,7 +26,7 @@ import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.playBreakEffects
 
-object ItemsAdder : CustomItemService {
+internal object ItemsAdder : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null
     override val requiresLoadDelay = true

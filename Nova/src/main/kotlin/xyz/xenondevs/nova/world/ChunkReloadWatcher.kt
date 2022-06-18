@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import java.util.logging.Level
 
-object ChunkReloadWatcher : Initializable(), Listener {
+internal object ChunkReloadWatcher : Initializable(), Listener {
     
     private const val RELOAD_TIME_LIMIT = 500
     private const val RELOAD_LIMIT = 2

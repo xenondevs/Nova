@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.block.model
 
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 
-interface BlockModelProvider {
+sealed interface BlockModelProvider {
     
     fun load(placed: Boolean)
     
@@ -12,7 +12,7 @@ interface BlockModelProvider {
     
 }
 
-interface BlockModelProviderType<T : BlockModelProvider> {
+sealed interface BlockModelProviderType<T : BlockModelProvider> {
     
     fun create(blockState: NovaBlockState): T
     

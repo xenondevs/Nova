@@ -42,10 +42,15 @@ permissions:
       - nova.command.give
       - nova.command.debug
       - nova.command.items
+      - nova.command.advancedTooltips
       - nova.command.render_distance
       - nova.command.nvrecipe
       - nova.command.nvusage
-      - nova.command.modeldata
+      - nova.misc.updateReminder
+      - nova.misc.bypassTileEntityLimits
+      - nova.command.addons
+      - nova.command.resourcePack
+      - nova.command.reload
   nova.command.give:
     description: Allows players to cheat nova items using /nova give.
   nova.command.debug:
@@ -69,8 +74,6 @@ permissions:
     description: Players with this permission will be reminded if a new version is available
   nova.misc.bypassTileEntityLimits:
     description: Players with this permission will be able to bypass the tile entity limits set in the config.
-  nova.command.modeldata:
-    description: Allows players to use the /nvmodeldata command.
   nova.command.addons:
     description: Allows players to use the /nova addons command.
   nova.command.resourcePack:

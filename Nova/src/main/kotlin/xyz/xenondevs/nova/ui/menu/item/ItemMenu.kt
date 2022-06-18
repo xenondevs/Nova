@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.menu.item
 
 import java.util.*
 
-interface ItemMenu {
+internal interface ItemMenu {
     
     fun show()
     

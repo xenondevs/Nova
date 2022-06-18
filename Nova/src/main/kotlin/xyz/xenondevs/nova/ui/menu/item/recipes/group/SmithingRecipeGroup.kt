@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 
-object SmithingRecipeGroup : RecipeGroup() {
+internal object SmithingRecipeGroup : RecipeGroup() {
     
     override val priority = 3
     override val texture = CoreGUITexture.RECIPE_SMITHING

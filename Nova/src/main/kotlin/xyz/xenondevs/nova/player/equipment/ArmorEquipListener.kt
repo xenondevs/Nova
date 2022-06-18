@@ -29,7 +29,7 @@ private fun ItemStack?.getNullIfAir(): ItemStack? {
     return if (this?.type != Material.AIR) this else null
 }
 
-object ArmorEquipListener : Initializable(), Listener {
+internal object ArmorEquipListener : Initializable(), Listener {
     
     override val inMainThread = false
     override val dependsOn = emptySet<Initializable>()
@@ -40,7 +40,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleInventoryClick(event: InventoryClickEvent) {
+    private fun handleInventoryClick(event: InventoryClickEvent) {
         val view = event.view
         val player = event.whoClicked as Player
         val creative = player.gameMode == GameMode.CREATIVE
@@ -122,7 +122,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
-    fun handleInteract(e: WrappedPlayerInteractEvent) {
+    private fun handleInteract(e: WrappedPlayerInteractEvent) {
         val event = e.event
         if (event.isCompletelyDenied()) return
         
@@ -141,7 +141,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleInventoryDrag(event: InventoryDragEvent) {
+    private fun handleInventoryDrag(event: InventoryDragEvent) {
         if (event.view.isPlayerView()) {
             var equipEvent: ArmorEquipEvent? = null
             
@@ -165,7 +165,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handlePlayerDeath(event: PlayerDeathEvent) {
+    private fun handlePlayerDeath(event: PlayerDeathEvent) {
         if (!event.keepInventory) {
             val player = event.entity
             val equipment = player.equipment
@@ -180,7 +180,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleItemBreak(event: PlayerItemBreakEvent) {
+    private fun handleItemBreak(event: PlayerItemBreakEvent) {
         val armorItem = event.brokenItem
         val armorType = ArmorType.of(armorItem)
         if (armorType != null) {
@@ -200,7 +200,7 @@ object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleArmorDispense(event: BlockDispenseArmorEvent) {
+    private fun handleArmorDispense(event: BlockDispenseArmorEvent) {
         val entity = event.targetEntity
         if (entity is Player) {
             val equipEvent = ArmorEquipEvent(entity, EquipMethod.DISPENSER, null, event.item)

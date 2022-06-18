@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import java.lang.reflect.Type
 
-object NovaMaterialSerialization : JsonSerializer<ItemNovaMaterial>, JsonDeserializer<ItemNovaMaterial> {
+internal object NovaMaterialSerialization : JsonSerializer<ItemNovaMaterial>, JsonDeserializer<ItemNovaMaterial> {
     
     override fun serialize(src: ItemNovaMaterial, typeOfSrc: Type, context: JsonSerializationContext) =
         JsonPrimitive(src.id.toString())

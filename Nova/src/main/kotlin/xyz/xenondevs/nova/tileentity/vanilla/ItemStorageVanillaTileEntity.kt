@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 
-abstract class ItemStorageVanillaTileEntity internal constructor(
+internal abstract class ItemStorageVanillaTileEntity internal constructor(
     blockState: VanillaTileEntityState
 ) : NetworkedVanillaTileEntity(blockState) {
     

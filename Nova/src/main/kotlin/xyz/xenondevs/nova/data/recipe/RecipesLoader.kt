@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.util.data.*
 import java.io.File
 import java.util.logging.Level
 
-object RecipesLoader {
+internal object RecipesLoader {
     
     private val RECIPE_FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
     

@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 
-object Oraxen : CustomItemService {
+internal object Oraxen : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Oraxen") != null
     override val requiresLoadDelay = false

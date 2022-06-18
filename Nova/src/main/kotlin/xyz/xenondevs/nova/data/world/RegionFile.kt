@@ -45,7 +45,7 @@ private val CREATE_BACKUPS by configReloadable { DEFAULT_CONFIG.getBoolean("perf
  * - remove unused types from pool
  * - Instead of storing chunk size, get distance to next chunk in file
  */
-class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, val regionZ: Int) {
+internal class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, val regionZ: Int) {
     
     val chunks = arrayOfNulls<RegionChunk?>(1024)
     private val backupFile = File(file.parentFile, file.name + ".backup")

@@ -7,7 +7,6 @@ import org.bukkit.craftbukkit.v1_19_R1.CraftServer
 import org.bukkit.craftbukkit.v1_19_R1.command.VanillaCommandWrapper
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.impl.NovaCommand
-import xyz.xenondevs.nova.command.impl.NovaModelDataCommand
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
@@ -15,7 +14,7 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
-val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher
+private val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher
 
 object CommandManager : Initializable() {
     
@@ -35,7 +34,6 @@ object CommandManager : Initializable() {
     
     private fun registerCommands() {
         registerCommand(NovaCommand)
-        registerCommand(NovaModelDataCommand)
         registerCommand(NovaRecipeCommand)
         registerCommand(NovaUsageCommand)
     }

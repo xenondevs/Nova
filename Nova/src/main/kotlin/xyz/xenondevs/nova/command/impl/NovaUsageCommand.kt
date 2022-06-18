@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.showUsages
 import xyz.xenondevs.nova.util.data.localized
 
-object NovaUsageCommand : Command("nvusage") {
+internal object NovaUsageCommand : Command("nvusage") {
     
     init {
         builder = builder

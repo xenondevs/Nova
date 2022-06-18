@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
 
-class VanillaCauldronTileEntity internal constructor(
+internal class VanillaCauldronTileEntity internal constructor(
     blockState: VanillaTileEntityState
 ) : NetworkedVanillaTileEntity(blockState) {
     

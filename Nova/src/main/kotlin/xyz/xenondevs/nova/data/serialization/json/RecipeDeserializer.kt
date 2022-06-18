@@ -36,7 +36,7 @@ interface RecipeDeserializer<T> {
     
 }
 
-object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
+internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): ShapedRecipe {
         val resultKey = json.getString("result")!!
@@ -70,7 +70,7 @@ object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
     
 }
 
-object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
+internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): ShapelessRecipe {
         val resultKey = json.getString("result")!!
@@ -109,7 +109,7 @@ object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
     
 }
 
-object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingRecipe> {
+internal object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): StonecuttingRecipe {
         val input = parseRecipeChoice(json.get("input"))
@@ -120,7 +120,7 @@ object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingRecipe> {
     
 }
 
-object SmithingRecipeDeserializer : RecipeDeserializer<SmithingRecipe> {
+internal object SmithingRecipeDeserializer : RecipeDeserializer<SmithingRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): SmithingRecipe {
         val base = parseRecipeChoice(json.get("base"))
@@ -149,7 +149,7 @@ abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
     
 }
 
-object FurnaceRecipeDeserializer : ConversionRecipeDeserializer<FurnaceRecipe>() {
+internal object FurnaceRecipeDeserializer : ConversionRecipeDeserializer<FurnaceRecipe>() {
     
     override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): FurnaceRecipe {
         val experience = json.getFloat("experience")!!

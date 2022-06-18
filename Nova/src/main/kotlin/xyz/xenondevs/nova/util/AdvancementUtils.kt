@@ -2,6 +2,9 @@ package xyz.xenondevs.nova.util
 
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.nbt.CompoundTag
+import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
+import org.bukkit.entity.Player
 import xyz.xenondevs.kadvancements.*
 import xyz.xenondevs.kadvancements.predicate.ItemPredicate
 import xyz.xenondevs.kadvancements.predicate.NbtPredicate
@@ -92,5 +95,13 @@ fun obtainNovaItemsAdvancement(
             }
         }
         
+    }
+}
+
+fun Player.awardAdvancement(key: NamespacedKey) {
+    val advancement = Bukkit.getAdvancement(key)
+    if (advancement != null) {
+        val progress = getAdvancementProgress(advancement)
+        advancement.criteria.forEach { progress.awardCriteria(it) }
     }
 }

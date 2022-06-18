@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.network.event.PacketEventManager
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.logging.Level
 
-class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
+internal class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
     
     val queue = ConcurrentLinkedQueue<FriendlyByteBuf>()
     var player: Player? = null

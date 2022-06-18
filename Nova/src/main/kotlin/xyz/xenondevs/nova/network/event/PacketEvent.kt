@@ -4,7 +4,7 @@ import net.minecraft.network.protocol.Packet
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 
-abstract class PacketEvent<P : Packet<*>>(open val packet: P) : Event(true), Cancellable {
+abstract class PacketEvent<P : Packet<*>> internal constructor(open val packet: P) : Event(true), Cancellable {
     
     private var _cancelled = false
     

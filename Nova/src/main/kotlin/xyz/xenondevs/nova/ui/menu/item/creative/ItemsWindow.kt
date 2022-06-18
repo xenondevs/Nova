@@ -44,7 +44,7 @@ private val TAB_BUTTON_TEXTURES = arrayOf(
     CoreGUITexture.ITEMS_4
 )
 
-class ItemsWindow(val player: Player) : ItemMenu {
+internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private var currentWindow: Window? = null
     

@@ -43,7 +43,7 @@ import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.pos
 
-object NovaCommand : Command("nova") {
+internal object NovaCommand : Command("nova") {
     
     init {
         builder = builder

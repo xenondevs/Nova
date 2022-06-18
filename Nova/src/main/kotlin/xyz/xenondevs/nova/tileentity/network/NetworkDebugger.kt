@@ -11,7 +11,7 @@ import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
 import java.util.*
 
-object NetworkDebugger {
+internal object NetworkDebugger {
     
     private val debuggers = HashMap<NetworkType, ArrayList<UUID>>()
     

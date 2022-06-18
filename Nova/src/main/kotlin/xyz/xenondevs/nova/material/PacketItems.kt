@@ -51,7 +51,7 @@ var ItemStack.clientsideDurability: Double
     }
 
 @Suppress("DEPRECATION")
-object PacketItems : Initializable(), Listener {
+internal object PacketItems : Initializable(), Listener {
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!

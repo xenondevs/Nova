@@ -38,7 +38,7 @@ data class AddonDescription internal constructor(
         return 0 // Both depend on different things
     }
     
-    companion object {
+    internal companion object {
         
         fun deserialize(reader: Reader): AddonDescription {
             val cfg = YamlConfiguration.loadConfiguration(reader)

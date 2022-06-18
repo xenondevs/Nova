@@ -13,7 +13,7 @@ import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
 
-class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : ShapedRecipe(
+internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : ShapedRecipe(
     optimizedRecipe.recipe.key.resourceLocation,
     "",
     3,
@@ -40,7 +40,7 @@ class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : Sha
     
 }
 
-class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
+internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
     bukkitRecipe.key.resourceLocation,
     "",
     bukkitRecipe.result.nmsStack,
@@ -64,7 +64,7 @@ class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : Sha
     
 }
 
-class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) : SmeltingRecipe(
+internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) : SmeltingRecipe(
     bukkitRecipe.key.resourceLocation,
     "",
     bukkitRecipe.inputChoice.nmsIngredient,

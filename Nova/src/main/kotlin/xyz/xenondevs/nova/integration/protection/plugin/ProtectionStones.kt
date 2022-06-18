@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.integration.InternalIntegration
 import dev.espi.protectionstones.ProtectionStones as ProtectionStonesAPI
 
 // ProtectionStones uses WorldGuard for regions, this integration is only preventing tile entities from breaking the protection stone.
-object ProtectionStones : ProtectionIntegration, InternalIntegration {
+internal object ProtectionStones : ProtectionIntegration, InternalIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("ProtectionStones") != null
     

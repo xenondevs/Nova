@@ -44,7 +44,7 @@ import xyz.xenondevs.nova.world.loot.LootGeneration
 import java.util.concurrent.CountDownLatch
 import java.util.logging.Level
 
-object Initializer {
+internal object Initializer {
     
     private val toInit = listOf(
         UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, Resources,

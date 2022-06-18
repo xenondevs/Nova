@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 
-object ItemManager : Initializable(), Listener {
+internal object ItemManager : Initializable(), Listener {
     
     override val inMainThread = false
     override val dependsOn = emptySet<Initializable>()
@@ -38,7 +38,7 @@ object ItemManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.LOW)
-    fun handleInteract(e: WrappedPlayerInteractEvent) {
+    private fun handleInteract(e: WrappedPlayerInteractEvent) {
         val event = e.event
         if (event.isCompletelyDenied()) return
         
@@ -46,18 +46,18 @@ object ItemManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
+    private fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
         val item = event.player.inventory.getItem(event.hand)
         findBehaviors(item)?.forEach { it.handleEntityInteract(event.player, item!!, event.rightClicked, event) }
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    fun handleBreak(event: PlayerItemBreakEvent) {
+    private fun handleBreak(event: PlayerItemBreakEvent) {
         findBehaviors(event.brokenItem)?.forEach { it.handleBreak(event.player, event.brokenItem, event) }
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleEquip(event: ArmorEquipEvent) {
+    private fun handleEquip(event: ArmorEquipEvent) {
         val player = event.player
         val unequippedItem = event.previousArmorItem
         val equippedItem = event.newArmorItem
@@ -67,7 +67,7 @@ object ItemManager : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleInteract(event: InventoryClickEvent) {
+    private fun handleInteract(event: InventoryClickEvent) {
         val player = event.whoClicked as Player
         val clickedItem = event.currentItem
         val cursorItem = event.cursor
@@ -83,7 +83,7 @@ object ItemManager : Initializable(), Listener {
     
     // This method stores the last used item for the RELEASE_USE_ITEM action below
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleUseItem(event: UseItemPacketEvent) {
+    private fun handleUseItem(event: UseItemPacketEvent) {
         val player = event.player
         val item = player.inventory.getItem(event.hand.bukkitSlot)?.takeUnlessAir()
         if (item != null)
@@ -92,12 +92,12 @@ object ItemManager : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handlePlayerQuit(event: PlayerQuitEvent) {
+    private fun handlePlayerQuit(event: PlayerQuitEvent) {
         usedItems -= event.player
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun handleAction(event: PlayerActionPacketEvent) {
+    private fun handleAction(event: PlayerActionPacketEvent) {
         if (event.action == ServerboundPlayerActionPacket.Action.RELEASE_USE_ITEM) {
             val player = event.player
             val item = usedItems[player]

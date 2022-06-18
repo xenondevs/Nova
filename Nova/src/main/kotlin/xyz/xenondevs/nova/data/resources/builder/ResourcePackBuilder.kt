@@ -155,7 +155,7 @@ internal class ResourcePackBuilder(private val packs: List<AssetPack>) {
     
 }
 
-enum class MaterialType {
+internal enum class MaterialType {
     
     DEFAULT,
     DAMAGEABLE,

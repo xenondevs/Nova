@@ -13,7 +13,7 @@ import java.util.*
 private val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(emptyEnumMap()) { 50 } }
 private val DEFAULT_CHANNELS = { CUBE_FACES.associateWithTo(emptyEnumMap()) { 0 } }
 
-abstract class VanillaItemHolder(
+internal abstract class VanillaItemHolder(
     final override val endPoint: ItemStorageVanillaTileEntity
 ) : ItemHolder {
     
@@ -52,12 +52,12 @@ abstract class VanillaItemHolder(
     
 }
 
-class StaticVanillaItemHolder(
+internal class StaticVanillaItemHolder(
     endPoint: ItemStorageVanillaTileEntity,
     override val inventories: MutableMap<BlockFace, NetworkedInventory>
 ) : VanillaItemHolder(endPoint)
 
-class DynamicVanillaItemHolder(
+internal class DynamicVanillaItemHolder(
     endPoint: ItemStorageVanillaTileEntity,
     val inventoriesGetter: () -> MutableMap<BlockFace, NetworkedInventory>,
     val allowedConnectionTypesGetter: () -> Map<NetworkedInventory, NetworkConnectionType>

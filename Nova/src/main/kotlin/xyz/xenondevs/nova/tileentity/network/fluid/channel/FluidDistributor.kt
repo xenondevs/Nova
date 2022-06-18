@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.util.sumOfNoOverflow
 import kotlin.math.min
 
-class FluidDistributor(
+internal class FluidDistributor(
     private val priorityLevels: List<Triple<List<FluidContainer>, List<FluidContainer>, List<FluidContainer>>>
 ) {
     

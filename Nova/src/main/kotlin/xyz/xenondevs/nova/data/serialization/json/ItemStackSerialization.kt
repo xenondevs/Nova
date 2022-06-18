@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack
 import java.lang.reflect.Type
 import java.util.*
 
-object ItemStackSerialization : JsonSerializer<ItemStack>, JsonDeserializer<ItemStack> {
+internal object ItemStackSerialization : JsonSerializer<ItemStack>, JsonDeserializer<ItemStack> {
     
     override fun serialize(src: ItemStack, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         return JsonPrimitive(Base64.getEncoder().encodeToString(InventoryAccess.getItemUtils().serializeItemStack(src, true)))

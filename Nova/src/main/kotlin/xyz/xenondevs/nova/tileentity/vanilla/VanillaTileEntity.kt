@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.item.isCauldron
 
 private typealias VanillaTileEntityConstructor = (VanillaTileEntityState) -> VanillaTileEntity
 
-abstract class VanillaTileEntity internal constructor(val blockState: VanillaTileEntityState) : DataHolder(false) {
+internal abstract class VanillaTileEntity internal constructor(val blockState: VanillaTileEntityState) : DataHolder(false) {
     
     override val data = blockState.data
     val block = blockState.pos.block

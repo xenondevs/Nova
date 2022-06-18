@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.ui.item.PageForwardItem
 import xyz.xenondevs.nova.ui.item.ScrollDownItem
 import xyz.xenondevs.nova.ui.item.ScrollUpItem
 
-fun setGlobalIngredients() {
+internal fun setGlobalIngredients() {
     addGlobalIngredient('x', Markers.ITEM_LIST_SLOT_HORIZONTAL)
     addGlobalIngredient('#', CoreGUIMaterial.INVENTORY_PART.itemProvider)
     addGlobalIngredient('-', CoreGUIMaterial.LIGHT_HORIZONTAL_LINE.itemProvider)

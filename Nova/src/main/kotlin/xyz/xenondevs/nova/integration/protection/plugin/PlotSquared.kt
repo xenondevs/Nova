@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.integration.InternalIntegration
 import com.plotsquared.core.location.Location as PlotLocation
 
-object PlotSquared : ProtectionIntegration, InternalIntegration {
+internal object PlotSquared : ProtectionIntegration, InternalIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("PlotSquared") != null
     

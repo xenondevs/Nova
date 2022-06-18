@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.removeIf
@@ -25,8 +24,7 @@ object ChunkLoadManager : Initializable() {
     
     override fun disable() {
         LOGGER.info("Saving force-loaded chunks")
-        if (!NOVA.isUninstalled)
-            PermanentStorage.store("forceLoadedChunks", forceLoadedChunks)
+        PermanentStorage.store("forceLoadedChunks", forceLoadedChunks)
     }
     
     fun submitChunkLoadRequest(chunk: ChunkPos, uuid: UUID) {

@@ -4,7 +4,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.RoundRobinCounter
 import kotlin.math.min
 
-class ItemDistributor(
+internal class ItemDistributor(
     private val consumers: List<List<FilteredNetworkedInventory>>,
     private val providers: List<List<FilteredNetworkedInventory>>
 ) {

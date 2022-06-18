@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.getValues
 import xyz.xenondevs.nova.util.pollFirstWhere
 import java.util.*
 
-sealed interface FluidConfiguration {
+internal sealed interface FluidConfiguration {
     
     val fluidHolder: FluidHolder
     val faces: Set<BlockFace>
@@ -123,7 +123,7 @@ private fun mergeFluidConfigurations(
 
 private fun Iterable<FluidConfiguration>.mapToContainer(): List<FluidContainer> = map { it.container }
 
-class FluidNetworkChannel {
+internal class FluidNetworkChannel {
     
     private val holders = HashMap<FluidHolder, HashSet<FluidConfiguration>>()
     

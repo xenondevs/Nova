@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.util.data.HashUtils
 import java.util.*
 
-abstract class NetworkedVanillaTileEntity internal constructor(state: VanillaTileEntityState) : VanillaTileEntity(state), NetworkEndPoint {
+internal abstract class NetworkedVanillaTileEntity internal constructor(state: VanillaTileEntityState) : VanillaTileEntity(state), NetworkEndPoint {
     
     override val location = blockState.pos.location
     override val uuid = HashUtils.getUUID(blockState.pos)

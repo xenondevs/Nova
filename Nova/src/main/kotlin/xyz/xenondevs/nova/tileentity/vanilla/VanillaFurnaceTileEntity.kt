@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
 
-class VanillaFurnaceTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
+internal class VanillaFurnaceTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
     
     override val itemHolder = StaticVanillaItemHolder(this, getInventories(block.state as Furnace))
     

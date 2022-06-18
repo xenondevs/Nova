@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.integration.InternalIntegration
 
-interface CustomItemService : InternalIntegration {
+internal interface CustomItemService : InternalIntegration {
     
     /**
      * If this [CustomItemService] requires the Nova initialization to be delayed

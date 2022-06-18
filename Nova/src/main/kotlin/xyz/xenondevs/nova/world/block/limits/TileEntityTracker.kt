@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.lang.Integer.max
 import java.util.*
 
-object TileEntityTracker {
+internal object TileEntityTracker {
     
     private val BLOCK_COUNTER: HashMap<UUID, HashMap<NamespacedId, Int>> =
         PermanentStorage.retrieve("block_counter", ::HashMap)

@@ -9,9 +9,9 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import java.util.*
 import kotlin.math.max
 
-typealias ItemFilterList = ArrayList<ItemFilter>
+internal typealias ItemFilterList = ArrayList<ItemFilter>
 
-class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, type: NetworkConnectionType) {
+internal class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, type: NetworkConnectionType) {
     
     val inventory: NetworkedInventory = itemHolder.inventories[face]!!
     
@@ -33,7 +33,7 @@ class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, ty
     
 }
 
-class FilteredNetworkedInventory(
+internal class FilteredNetworkedInventory(
     private val inventory: NetworkedInventory,
     private val filters: ItemFilterList
 ) : NetworkedInventory by inventory {
@@ -46,7 +46,7 @@ class FilteredNetworkedInventory(
     
 }
 
-class ItemNetworkChannel {
+internal class ItemNetworkChannel {
     
     private val consumers = HashMap<ItemHolder, ArrayList<AttachedInventoryConfiguration>>()
     private val providers = HashMap<ItemHolder, ArrayList<AttachedInventoryConfiguration>>()

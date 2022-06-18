@@ -20,7 +20,7 @@ object CustomItemServiceManager : Initializable() {
         .filter(InternalIntegration::isInstalled)
     
     private val LOAD_DELAYING_PLUGINS_AMOUNT = PLUGINS.count(CustomItemService::requiresLoadDelay)
-    val READY_LATCH = CountDownLatch(LOAD_DELAYING_PLUGINS_AMOUNT)
+    internal val READY_LATCH = CountDownLatch(LOAD_DELAYING_PLUGINS_AMOUNT)
     
     override val inMainThread = false
     override val dependsOn = emptySet<Initializable>()

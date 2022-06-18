@@ -4,7 +4,7 @@ import com.google.gson.*
 import xyz.xenondevs.nova.util.data.isNumber
 import java.lang.reflect.Type
 
-object IntRangeSerialization : JsonSerializer<IntRange>, JsonDeserializer<IntRange> {
+internal object IntRangeSerialization : JsonSerializer<IntRange>, JsonDeserializer<IntRange> {
     
     override fun serialize(src: IntRange, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         if (src.first == src.last) return JsonPrimitive(src.first)

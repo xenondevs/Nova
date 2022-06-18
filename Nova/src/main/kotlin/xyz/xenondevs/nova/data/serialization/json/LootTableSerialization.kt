@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.world.loot.LootItem
 import xyz.xenondevs.nova.world.loot.LootTable
 import java.lang.reflect.Type
 
-object LootTableSerialization : JsonDeserializer<LootTable> {
+internal object LootTableSerialization : JsonDeserializer<LootTable> {
     
     override fun deserialize(json: JsonElement, typeOfT: Type, ctx: JsonDeserializationContext): LootTable {
         val obj = json.asJsonObject
@@ -24,7 +24,7 @@ object LootTableSerialization : JsonDeserializer<LootTable> {
     
 }
 
-object LootItemSerialization : JsonDeserializer<LootItem> {
+internal object LootItemSerialization : JsonDeserializer<LootItem> {
     
     override fun deserialize(json: JsonElement, typeOfT: Type, ctx: JsonDeserializationContext): LootItem {
         val obj = json.asJsonObject

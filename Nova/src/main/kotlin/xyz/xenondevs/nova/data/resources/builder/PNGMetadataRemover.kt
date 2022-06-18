@@ -6,7 +6,7 @@ import java.io.DataOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
-object PNGMetadataRemover {
+internal object PNGMetadataRemover {
     
     private const val IDAT_TYPE = 0x49444154
     

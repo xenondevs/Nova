@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.authlib.GameProfile
-import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.server.level.ServerPlayer
@@ -10,37 +9,18 @@ import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
-import org.bukkit.World
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataContainer
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.data.NBTUtils
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
-import net.minecraft.world.entity.Entity as NMSEntity
+import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EntityType as NMSEntityType
-import net.minecraft.world.entity.decoration.ArmorStand as NMSArmorStand
-import net.minecraft.world.item.ItemStack as NMSItemStack
-
-fun Player.awardAdvancement(key: NamespacedKey) {
-    val advancement = Bukkit.getAdvancement(key)
-    if (advancement != null) {
-        val progress = getAdvancementProgress(advancement)
-        advancement.criteria.forEach { progress.awardCriteria(it) }
-    }
-}
 
 fun Player.swingHand(hand: EquipmentSlot) {
     when (hand) {
@@ -56,17 +36,6 @@ fun Entity.teleport(modifyLocation: Location.() -> Unit) {
     teleport(location)
 }
 
-fun PersistentDataContainer.hasNovaData(): Boolean {
-    val novaNameSpace = NOVA.name.lowercase()
-    return keys.any { it.namespace == novaNameSpace }
-}
-
-@Suppress("UNCHECKED_CAST")
-fun ArmorStand.setHeadItemSilently(headStack: ItemStack) {
-    val armorItems = ReflectionRegistry.ARMOR_STAND_ARMOR_ITEMS_FIELD.get(nmsEntity) as NonNullList<NMSItemStack>
-    armorItems[3] = headStack.nmsStack
-}
-
 val Entity.localizedName: String?
     get() = (this as CraftEntity).handle.type.descriptionId
 
@@ -74,36 +43,6 @@ val Entity.eyeInWater: Boolean
     get() = (this as CraftEntity).handle.isEyeInFluid(FluidTags.WATER)
 
 object EntityUtils {
-    
-    @Suppress("UNCHECKED_CAST")
-    fun spawnArmorStandSilently(
-        location: Location,
-        headStack: ItemStack,
-        light: Boolean = true,
-        modify: (ArmorStand.() -> Unit)? = null
-    ): ArmorStand {
-        val world = location.world!!
-        
-        // create EntityArmorStand
-        val nmsArmorStand = createNMSEntity(world, location, EntityType.ARMOR_STAND) as NMSArmorStand
-        
-        // get CraftArmorStand
-        val armorStand = nmsArmorStand.bukkitEntity as ArmorStand
-        
-        // set other properties
-        armorStand.isMarker = true
-        armorStand.isVisible = false
-        armorStand.equipment?.setHelmet(headStack, true)
-        if (light) armorStand.fireTicks = Int.MAX_VALUE
-        
-        // set data
-        if (modify != null) armorStand.modify()
-        
-        // add ArmorStand to world
-        addNMSEntityToWorld(world, nmsArmorStand)
-        
-        return armorStand
-    }
     
     /**
      * Gets a list of all passengers of this [Entity], including passengers of passengers.
@@ -169,7 +108,7 @@ object EntityUtils {
         data: ByteArray,
         location: Location,
         nbtModifier: ((CompoundTag) -> CompoundTag)? = null
-    ): net.minecraft.world.entity.Entity {
+    ): MojangEntity {
         // get world
         val world = location.world!!
         val level = world.serverLevel
@@ -197,20 +136,12 @@ object EntityUtils {
         }!!
     }
     
-    fun createNMSEntity(world: World, location: Location, entityType: EntityType): Any {
-        return (world as CraftWorld).createEntity(location, entityType.entityClass)
-    }
-    
-    fun addNMSEntityToWorld(world: World, entity: NMSEntity): Entity {
-        return (world as CraftWorld).addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)
-    }
-    
     fun createFakePlayer(location: Location, uuid: UUID, name: String): ServerPlayer {
         val server = (Bukkit.getServer() as CraftServer).server
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
         val serverPlayer = object : ServerPlayer(server, world, gameProfile, null) {
-            override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: NMSEntity?) = Unit
+            override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: MojangEntity?) = Unit
         }
         serverPlayer.advancements.stopListening()
         return serverPlayer

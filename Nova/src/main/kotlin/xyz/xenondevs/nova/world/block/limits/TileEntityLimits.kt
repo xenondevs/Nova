@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.logging.Level
 
-object TileEntityLimits {
+internal object TileEntityLimits {
     
     private lateinit var limiters: List<BlockLimiter>
     

@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.data.copy
 import java.io.ByteArrayInputStream
 import java.io.File
 
-object ConfigExtractor {
+internal object ConfigExtractor {
     
     private val storedConfigs: HashMap<String, YamlConfiguration> = PermanentStorage.retrieve("storedConfigs", ::HashMap)
     

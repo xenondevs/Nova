@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import xyz.xenondevs.nova.util.intValue
 
-object TableRecipeGroup : RecipeGroup() {
+internal object TableRecipeGroup : RecipeGroup() {
     
     override val priority = 0
     override val texture = CoreGUITexture.RECIPE_CRAFTING

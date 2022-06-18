@@ -7,7 +7,7 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
 import java.io.InputStream
 
-class BinaryBufferedBody(val stream: InputStream, override val contentType: ContentType = OctetStream) : WriteChannelContent() {
+internal class BinaryBufferedBody(val stream: InputStream, override val contentType: ContentType = OctetStream) : WriteChannelContent() {
     
     override suspend fun writeTo(channel: ByteWriteChannel) {
         stream.copyTo(channel)

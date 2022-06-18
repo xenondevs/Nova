@@ -24,7 +24,7 @@ private fun FriendlyByteBuf.writeMetadataRotation(index: Int, rotations: Rotatio
 private fun BitSet.toInt(): Int =
     toLongArray().firstOrNull()?.toInt() ?: 0
 
-class ArmorStandDataHolder(private val entityId: Int) {
+class ArmorStandDataHolder internal constructor(private val entityId: Int) {
     
     private val changedDataTypes = HashSet<ChangedDataType>()
     

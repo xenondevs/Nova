@@ -10,7 +10,7 @@ import org.bukkit.event.world.LootGenerateEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 
-object LootGeneration : Initializable(), Listener {
+internal object LootGeneration : Initializable(), Listener {
     
     private val entityKeys by lazy { EntityType.values().associateWith { NamespacedKey.minecraft("entities/${it.name.lowercase()}") } }
     private val lootTables = ArrayList<LootTable>()
@@ -23,7 +23,7 @@ object LootGeneration : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleLootGenerationEvent(event: LootGenerateEvent) {
+    private fun handleLootGenerationEvent(event: LootGenerateEvent) {
         lootTables.forEach { loot ->
             if (loot.isWhitelisted(event.lootTable.key))
                 event.loot.addAll(loot.getRandomItems())
@@ -31,7 +31,7 @@ object LootGeneration : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleEntityDeath(event: EntityDeathEvent) {
+    private fun handleEntityDeath(event: EntityDeathEvent) {
         val key = entityKeys[event.entityType] ?: return
         lootTables.forEach { loot ->
             if (loot.isWhitelisted(key))

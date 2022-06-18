@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.callEvent
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
-object PacketEventManager {
+internal object PacketEventManager {
     
     private val events = HashMap<KClass<out Packet<*>>, (Packet<*>) -> PacketEvent<Packet<*>>>()
     private val playerEvents = HashMap<KClass<out Packet<*>>, (Player, Packet<*>) -> PlayerPacketEvent<Packet<*>>>()

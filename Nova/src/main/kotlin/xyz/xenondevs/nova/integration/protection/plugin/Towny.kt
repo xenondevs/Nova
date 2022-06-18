@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
 import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.protection.FakeOnlinePlayer
 
-object Towny : ProtectionIntegration, InternalIntegration {
+internal object Towny : ProtectionIntegration, InternalIntegration {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Towny") != null
     

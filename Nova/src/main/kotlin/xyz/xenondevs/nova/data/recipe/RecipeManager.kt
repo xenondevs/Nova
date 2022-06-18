@@ -172,7 +172,7 @@ object RecipeManager : Initializable(), Listener {
         }
     }
     
-    fun reload() {
+    internal fun reload() {
         vanillaRegisteredRecipeKeys.forEach { minecraftServer.recipeManager.removeRecipe(it.resourceLocation) }
         
         shapedRecipes.clear()
@@ -198,12 +198,12 @@ object RecipeManager : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleJoin(event: PlayerJoinEvent) {
+    private fun handleJoin(event: PlayerJoinEvent) {
         vanillaRegisteredRecipeKeys.forEach(event.player::discoverRecipe)
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
-    fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
+    private fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
         val recipe = event.recipe ?: return
         
         var requiresContainer = recipe.key in vanillaRegisteredRecipeKeys
@@ -220,7 +220,7 @@ object RecipeManager : Initializable(), Listener {
     }
     
     @EventHandler
-    fun handleRecipePlace(event: PlaceRecipePacketEvent) {
+    private fun handleRecipePlace(event: PlaceRecipePacketEvent) {
         val key = NamespacedKey.fromString(event.packet.recipe.toString())
         if (key in shapedRecipes) {
             runTask { fillCraftingInventory(event.player, shapedRecipes[key]!!) }
@@ -291,7 +291,7 @@ object RecipeManager : Initializable(), Listener {
  * Optimizes the recipe matching algorithm by already saving an array of recipe choices in the
  * layout of a crafting inventory.
  */
-class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
+internal class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
     
     val requiredChoices: List<RecipeChoice>
     val choiceMatrix: Array<RecipeChoice?>
@@ -310,7 +310,7 @@ class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
  * A crafting inventory that is set to display the new recipe and prevent subsequent
  * changes to the resulting item.
  */
-class NovaCraftingInventory(
+internal class NovaCraftingInventory(
     val result: Recipe?,
     val inventory: CraftingInventory
 ) : CraftingInventory by inventory {

@@ -66,13 +66,13 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
     
 }
 
-object SmeltingRecipeGroup : ConversionRecipeGroup() {
+internal object SmeltingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.FURNACE))
     override val texture = CoreGUITexture.RECIPE_SMELTING
 }
 
-object StonecutterRecipeGroup : ConversionRecipeGroup() {
+internal object StonecutterRecipeGroup : ConversionRecipeGroup() {
     override val priority = 2
     override val icon = ItemWrapper(ItemStack(Material.STONECUTTER))
     override val texture = CoreGUITexture.RECIPE_CONVERSION

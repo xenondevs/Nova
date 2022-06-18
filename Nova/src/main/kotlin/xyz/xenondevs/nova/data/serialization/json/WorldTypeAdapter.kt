@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonWriter
 import org.bukkit.Bukkit
 import org.bukkit.World
 
-object WorldTypeAdapter : TypeAdapter<World>() {
+internal object WorldTypeAdapter : TypeAdapter<World>() {
     
     override fun write(writer: JsonWriter, src: World) {
         writer.value(src.name)

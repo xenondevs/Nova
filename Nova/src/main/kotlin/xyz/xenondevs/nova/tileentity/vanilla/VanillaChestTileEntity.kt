@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.runTaskLaterSynchronized
 import java.util.*
 
-class VanillaChestTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
+internal class VanillaChestTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
     
     private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
     private lateinit var allowedConnectionTypes: HashMap<NetworkedInventory, NetworkConnectionType>

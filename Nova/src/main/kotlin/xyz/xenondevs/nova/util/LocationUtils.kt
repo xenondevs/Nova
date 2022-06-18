@@ -85,7 +85,7 @@ fun Location.getNeighboringTileEntities(additionalHitboxes: Boolean): Map<BlockF
     return getNeighboringTileEntitiesOfType(additionalHitboxes)
 }
 
-inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitboxes: Boolean): Map<BlockFace, T> {
+internal inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitboxes: Boolean): Map<BlockFace, T> {
     val tileEntities = HashMap<BlockFace, T>()
     CUBE_FACES.forEach {
         val location = blockLocation.advance(it)
@@ -95,12 +95,6 @@ inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitbo
     }
     
     return tileEntities
-}
-
-fun Location.getNearbyTileEntity(face: BlockFace, additionalHitboxes: Boolean): Any? {
-    val location = blockLocation.advance(face)
-    return TileEntityManager.getTileEntityAt(location, additionalHitboxes)
-        ?: VanillaTileEntityManager.getTileEntityAt(location)
 }
 
 inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {

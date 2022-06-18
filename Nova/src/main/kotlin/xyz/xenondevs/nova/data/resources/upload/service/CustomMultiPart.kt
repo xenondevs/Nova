@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.HTTP_CLIENT
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import java.io.File
 
-object CustomMultiPart : UploadService {
+internal object CustomMultiPart : UploadService {
     
     override val name = "CustomMultiPart"
     

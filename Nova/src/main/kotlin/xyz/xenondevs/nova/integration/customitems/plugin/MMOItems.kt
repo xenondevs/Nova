@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 
-object MMOItems : CustomItemService {
+internal object MMOItems : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("MMOItems") != null
     override val requiresLoadDelay = false

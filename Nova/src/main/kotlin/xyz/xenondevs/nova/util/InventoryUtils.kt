@@ -14,7 +14,6 @@ import xyz.xenondevs.nova.util.item.takeUnlessAir
 fun VirtualInventory.addAll(reason: UpdateReason?, items: List<ItemStack>) =
     items.forEach { addItem(reason, it) }
 
-
 /**
  * Checks if a [VirtualInventory] is full.
  */

@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.world.pos
 /**
  * Manages wrappers for vanilla TileEntities
  */
-object VanillaTileEntityManager : Initializable(), Listener {
+internal object VanillaTileEntityManager : Initializable(), Listener {
     
     override val inMainThread = true
     override val dependsOn = setOf(AddonsInitializer)

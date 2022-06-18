@@ -5,7 +5,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import java.lang.reflect.Type
 
-object LocationSerialization : JsonSerializer<Location>, JsonDeserializer<Location> {
+internal object LocationSerialization : JsonSerializer<Location>, JsonDeserializer<Location> {
     
     override fun serialize(src: Location, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         val obj = JsonObject()

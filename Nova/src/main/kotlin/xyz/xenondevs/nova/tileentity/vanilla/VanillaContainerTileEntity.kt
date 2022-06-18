@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedShulkerBoxI
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.emptyEnumMap
 
-class VanillaContainerTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
+internal class VanillaContainerTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
     
     override val itemHolder: StaticVanillaItemHolder
     

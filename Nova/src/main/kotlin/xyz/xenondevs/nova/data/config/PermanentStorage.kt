@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
 import java.io.File
 
-object PermanentStorage {
+internal object PermanentStorage {
     
     private val file: File = File("${NOVA.dataFolder}/storage.do-not-edit").also { it.parentFile.mkdirs() }
     val mainObj: JsonObject
