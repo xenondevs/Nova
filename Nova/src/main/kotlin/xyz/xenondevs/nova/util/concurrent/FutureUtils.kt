@@ -4,7 +4,6 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.runTask
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Semaphore
 import java.util.logging.Level
 
 fun CompletableFuture<Boolean>.runIfTrue(run: () -> Unit) {
@@ -34,8 +33,3 @@ fun <T> Iterable<T>.mapToAllFuture(transform: (T) -> CompletableFuture<*>?): Com
 
 fun <T> Array<T>.mapToAllFuture(transform: (T) -> CompletableFuture<*>?): CompletableFuture<Void> =
     CompletableFuture.allOf(*mapNotNull(transform).toTypedArray())
-
-fun Semaphore.wait() {
-    acquire()
-    release()
-}
