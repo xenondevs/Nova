@@ -100,14 +100,14 @@ class NovaItemHolder(
     
     override fun saveData() {
         endPoint.storeData("itemConfig", connectionConfig)
-        endPoint.storeData("insertFilters", insertFilters.mapValues { it.value.compound })
-        endPoint.storeData("extractFilters", extractFilters.mapValues { it.value.compound })
+        endPoint.storeData("insertFilters", insertFilters.mapValuesTo(emptyEnumMap()) { it.value.compound })
+        endPoint.storeData("extractFilters", extractFilters.mapValuesTo(emptyEnumMap()) { it.value.compound })
         endPoint.storeData("channels", channels)
         endPoint.storeData("insertPriorities", insertPriorities)
         endPoint.storeData("extractPriorities", extractPriorities)
         
         if (availableInventories.isNotEmpty())
-            endPoint.storeData("inventories", inventories.mapValues { findUUID(it.value)!! })
+            endPoint.storeData("inventories", inventories.mapValuesTo(emptyEnumMap()) { findUUID(it.value)!! })
     }
     
 }
