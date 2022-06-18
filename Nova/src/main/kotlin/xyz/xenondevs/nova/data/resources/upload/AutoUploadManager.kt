@@ -14,8 +14,10 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.fromJson
+import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import java.io.File
 import java.net.URL
+import java.util.logging.Level
 
 private val LIST_COMMON_URL = URL("https://api.xenondevs.xyz/nova/rp/common/list")
 private const val COMMON_DOWNLOAD_URL = "https://api.xenondevs.xyz/nova/rp/common/%s/download"
@@ -27,7 +29,9 @@ internal object AutoUploadManager : Initializable() {
     
     private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost, CustomMultiPart)
     
-    private val commonPacks: Set<String> by lazy { GSON.fromJson<HashSet<String>>(LIST_COMMON_URL.readText()) ?: emptySet() }
+    private val commonPacks: Set<String> by lazy {
+        GSON.fromJson<HashSet<String>>(LIST_COMMON_URL.readText()) ?: emptySet()
+    }
     
     var enabled = false
         private set
@@ -41,9 +45,20 @@ internal object AutoUploadManager : Initializable() {
         }
     
     override fun init() {
-        val config = DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!!
+        val packConfig = DEFAULT_CONFIG.getConfigurationSection("resource_pack")!!
+        val config = packConfig.getConfigurationSection("auto_upload")!!
         enabled = config.getBoolean("enabled")
         useCommonPacks = config.getBoolean("use_common_packs")
+        
+        if (packConfig.contains("url")) {
+            url = packConfig.getString("url")
+            if (!url.isNullOrEmpty()) {
+                if (enabled)
+                    LOGGER.warning("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
+                forceResourcePack()
+                return
+            }
+        }
         
         if (!enabled)
             return
@@ -90,12 +105,31 @@ internal object AutoUploadManager : Initializable() {
         return url
     }
     
-    private fun forceResourcePack() {
-        ForceResourcePack.getInstance().setResourcePack(
-            url,
-            ComponentBuilder("Nova Resource Pack").create(),
-            true
-        )
+    fun forceResourcePack() {
+        val url = url
+        if (url != null && !ConnectionUtils.isURL(url)) {
+            if (selectedService == CustomMultiPart) {
+                LOGGER.log(Level.SEVERE, "Invalid resource pack URL: $url. Please check your CustomMultiPart config!")
+                if (CustomMultiPart.urlRegex != null)
+                    LOGGER.log(Level.SEVERE, "Your urlRegex might be wrong: ${CustomMultiPart.urlRegex}")
+            } else if (enabled) {
+                LOGGER.log(Level.SEVERE, "Server responded with an invalid pack URL: $url")
+            } else {
+                LOGGER.log(Level.SEVERE, "Invalid resource pack URL: $url")
+            }
+            this.url = null
+            return
+        }
+        try {
+            ForceResourcePack.getInstance().setResourcePack(
+                url,
+                ComponentBuilder("Nova Resource Pack").create(),
+                true
+            )
+        } catch (ex: Exception) {
+            LOGGER.log(Level.SEVERE, "Failed to download resourcepack! Is the server down?", ex)
+            LOGGER.severe("If this keeps happening delete the \"url\" field in plugins/Nova/storage.do-not-edit and reupload the pack.")
+        }
     }
     
 }

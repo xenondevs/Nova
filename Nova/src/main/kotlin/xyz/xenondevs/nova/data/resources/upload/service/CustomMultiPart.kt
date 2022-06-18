@@ -14,7 +14,7 @@ object CustomMultiPart : UploadService {
     
     private lateinit var url: String
     private lateinit var filePartName: String
-    private var urlRegex: Regex? = null
+    var urlRegex: Regex? = null
     private val extraParams = HashMap<String, String>()
     
     override fun loadConfig(cfg: ConfigurationSection) {

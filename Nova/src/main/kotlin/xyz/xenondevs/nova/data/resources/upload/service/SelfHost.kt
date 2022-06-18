@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.util.startsWithAny
 import java.io.File
 import kotlin.concurrent.thread
 
+@Suppress("HttpUrlsUsage")
 internal object SelfHost : UploadService {
     
     private val selfHostDir = File(NOVA.dataFolder, "ResourcePack/autohost")
