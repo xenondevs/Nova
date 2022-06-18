@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.util.data.getIntOrNull
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import xyz.xenondevs.nova.util.startsWithAny
 import java.io.File
+import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
 
 @Suppress("HttpUrlsUsage")
@@ -22,6 +23,7 @@ internal object SelfHost : UploadService {
     private val selfHostDir = File(NOVA.dataFolder, "ResourcePack/autohost")
     private val packFile = File(selfHostDir, "pack.zip")
     private lateinit var server: NettyApplicationEngine
+    internal val startedSemaphore = Semaphore(1)
     
     override val name = "SelfHost"
     
@@ -39,6 +41,7 @@ internal object SelfHost : UploadService {
         }
     
     override fun loadConfig(cfg: ConfigurationSection) {
+        startedSemaphore.acquire()
         val configuredHost = cfg.getString("host")
         this.host = configuredHost ?: ConnectionUtils.SERVER_IP
         
@@ -52,6 +55,12 @@ internal object SelfHost : UploadService {
                     get {
                         if (packFile.exists()) call.respondFile(packFile)
                         else call.respond(HttpStatusCode.NotFound)
+                    }
+                }
+                environment.monitor.subscribe(ApplicationStarted) {
+                    thread(isDaemon = true) {
+                        Thread.sleep(1000) // https://youtrack.jetbrains.com/issue/KTOR-4259
+                        startedSemaphore.release()
                     }
                 }
             }

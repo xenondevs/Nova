@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.util.concurrent.wait
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.fromJson
@@ -89,6 +90,9 @@ internal object AutoUploadManager : Initializable() {
     }
     
     suspend fun uploadPack(pack: File): String? {
+        if (selectedService == SelfHost)
+            SelfHost.startedSemaphore.wait()
+        
         require(pack.exists()) { pack.absolutePath + " not found!" }
         
         var url: String? = null
@@ -107,6 +111,9 @@ internal object AutoUploadManager : Initializable() {
     }
     
     private fun forceResourcePack() {
+        if (selectedService == SelfHost)
+            SelfHost.startedSemaphore.wait()
+        
         val url = url
         if (url != null && !ConnectionUtils.isURL(url)) {
             if (selectedService == CustomMultiPart) {
