@@ -51,10 +51,11 @@ internal object AutoUploadManager : Initializable() {
         useCommonPacks = config.getBoolean("use_common_packs")
         
         if (packConfig.contains("url")) {
-            url = packConfig.getString("url")
+            val url = packConfig.getString("url")
             if (!url.isNullOrEmpty()) {
                 if (enabled)
                     LOGGER.warning("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
+                this.url = url
                 forceResourcePack()
                 return
             }
@@ -105,7 +106,7 @@ internal object AutoUploadManager : Initializable() {
         return url
     }
     
-    fun forceResourcePack() {
+    private fun forceResourcePack() {
         val url = url
         if (url != null && !ConnectionUtils.isURL(url)) {
             if (selectedService == CustomMultiPart) {
