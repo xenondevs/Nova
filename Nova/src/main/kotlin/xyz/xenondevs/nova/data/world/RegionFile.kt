@@ -4,12 +4,11 @@ import io.netty.buffer.Unpooled
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.util.data.append
-import xyz.xenondevs.nova.util.data.readStringList
-import xyz.xenondevs.nova.util.data.toByteArray
-import xyz.xenondevs.nova.util.data.writeStringList
+import xyz.xenondevs.nova.util.data.*
 import xyz.xenondevs.nova.util.getOrSet
 import xyz.xenondevs.nova.world.ChunkPos
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.io.File
 import java.io.RandomAccessFile
 import java.util.concurrent.atomic.AtomicLong
@@ -61,7 +60,15 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
     init {
         if (backupFile.exists()) {
             LOGGER.warning("Restoring region file $file from backup $backupFile")
-            backupFile.copyTo(file, true)
+            val ins = DataInputStream(backupFile.inputStream())
+            val out = file.outputStream()
+            
+            use(ins, out) {
+                val length = ins.readLong()
+                if (length == backupFile.length() - 8) {
+                    ins.copyTo(out)
+                } else LOGGER.warning("Backup file $backupFile is corrupted")
+            }
             backupFile.delete()
         }
         
@@ -155,8 +162,14 @@ class RegionFile(val world: WorldDataStorage, val file: File, val regionX: Int, 
     }
     
     fun saveAll() {
-        if (CREATE_BACKUPS)
-            file.copyTo(backupFile)
+        if (CREATE_BACKUPS) {
+            val ins = file.inputStream()
+            val out = DataOutputStream(backupFile.outputStream())
+            use(ins, out) {
+                out.writeLong(file.length())
+                ins.copyTo(out)
+            }
+        }
         
         chunks.forEachIndexed { idx, chunk ->
             if (chunk == null) return@forEachIndexed
