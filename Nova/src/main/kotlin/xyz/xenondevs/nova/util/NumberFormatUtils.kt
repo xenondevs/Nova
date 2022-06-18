@@ -107,7 +107,7 @@ object NumberFormatUtils {
         val l = ROMAN_NUMERALS.floorKey(number)
         if (number == l)
             return ROMAN_NUMERALS[number]!!
-        return   ROMAN_NUMERALS[l]!! + getRomanNumeral(number - l)
+        return ROMAN_NUMERALS[l]!! + getRomanNumeral(number - l)
     }
     
 }
