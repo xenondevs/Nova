@@ -65,7 +65,7 @@ interface NetworkBridge : NetworkNode {
     /**
      * Converts the [networks] map to a serializable version.
      */
-    fun serializeNetworks(): HashMap<String, UUID> =
-        networks.entries.associateTo(HashMap()) { it.key.id.toString() to it.value.uuid }
+    fun serializeNetworks(): HashMap<NetworkType, UUID> =
+        networks.entries.associateTo(HashMap()) { it.key to it.value.uuid }
     
 }

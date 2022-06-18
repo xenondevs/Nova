@@ -87,7 +87,7 @@ class NovaFluidHolder(
         dataHolder.storeData("fluidExtractPriorities", extractPriorities)
         
         if (availableContainers.isNotEmpty()) {
-            dataHolder.storeData("fluidContainerConfig", containerConfig.mapValues { it.value.uuid })
+            dataHolder.storeData("fluidContainerConfig", containerConfig.mapValuesTo(emptyEnumMap()) { it.value.uuid })
         }
     }
     

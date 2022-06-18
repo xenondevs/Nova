@@ -21,10 +21,13 @@ class NovaTileEntityState : NovaBlockState {
     lateinit var ownerUUID: UUID
     lateinit var data: Compound
     
-    lateinit var tileEntity: TileEntity
+    private var _tileEntity: TileEntity? = null
+    
+    val tileEntity: TileEntity
+        get() = _tileEntity ?: throw IllegalStateException("TileEntity is not initialized")
     
     val isInitialized: Boolean
-        get() = ::tileEntity.isInitialized
+        get() = _tileEntity != null
     
     constructor(pos: BlockPos, material: TileEntityNovaMaterial) : super(pos, material) {
         this.material = material
@@ -43,7 +46,7 @@ class NovaTileEntityState : NovaBlockState {
     override fun handleInitialized(placed: Boolean) {
         super.handleInitialized(placed)
         
-        tileEntity = material.tileEntityConstructor(this)
+        _tileEntity = material.tileEntityConstructor(this)
         tileEntity.handleInitialized(placed)
         
         TileEntityManager.registerTileEntity(this)
@@ -51,8 +54,10 @@ class NovaTileEntityState : NovaBlockState {
     
     override fun handleRemoved(broken: Boolean) {
         super.handleRemoved(broken)
+        tileEntity.saveData()
         tileEntity.handleRemoved(!broken)
         TileEntityManager.unregisterTileEntity(this)
+        _tileEntity = null
     }
     
     override fun read(buf: ByteBuf) {
@@ -63,8 +68,6 @@ class NovaTileEntityState : NovaBlockState {
     }
     
     override fun write(buf: ByteBuf) {
-        tileEntity.saveData()
-        
         super.write(buf)
         buf.writeUUID(uuid)
         buf.writeUUID(ownerUUID)
