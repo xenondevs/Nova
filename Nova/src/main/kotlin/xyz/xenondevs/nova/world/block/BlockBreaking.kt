@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.BlockNovaMaterial
@@ -31,6 +32,7 @@ import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.concurrent.ConcurrentHashMap
+import java.util.logging.Level
 import kotlin.random.Random
 import net.minecraft.world.entity.EquipmentSlot as MojangSlot
 
@@ -76,7 +78,12 @@ internal object BlockBreaking : Listener {
     
     private fun handleTick() {
         playerBreakers.removeIf { (_, breaker) ->
-            breaker.handleTick()
+            try {
+                breaker.handleTick()
+            } catch (e: Exception) {
+                LOGGER.log(Level.SEVERE, "An exception occurred in BlockBreaker tick", e)
+            }
+            
             return@removeIf breaker.isDone()
         }
     }
