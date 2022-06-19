@@ -71,6 +71,10 @@ class NovaTileEntityState : NovaBlockState {
         super.write(buf)
         buf.writeUUID(uuid)
         buf.writeUUID(ownerUUID)
+        
+        if (_tileEntity != null)
+            tileEntity.saveData()
+        
         CBF.write(data, buf)
     }
     
