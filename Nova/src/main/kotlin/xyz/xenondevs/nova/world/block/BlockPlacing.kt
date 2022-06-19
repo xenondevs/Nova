@@ -11,6 +11,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.WorldDataManager
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
@@ -35,7 +36,7 @@ internal object BlockPlacing : Listener {
     private fun handleBlockPlace(event: BlockPlaceEvent) {
         // Prevent players from placing blocks where there are actually already blocks form Nova
         // This can happen when the hitbox material is replaceable, like as structure void
-        if (WorldDataManager.getBlockState(event.block.pos) != null)
+        if (WorldDataManager.getBlockState(event.block.pos) is NovaBlockState)
             event.isCancelled = true
     }
     
