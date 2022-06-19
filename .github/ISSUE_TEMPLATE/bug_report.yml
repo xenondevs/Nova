@@ -30,6 +30,13 @@ body:
       placeholder: "Nova: 0.4.1, Spigot: 3241-Spigot-6c1c1b2-1492826 (MC: 1.17.1)"
     validations:
       required: true
+  - type: input
+    attributes:
+      label: Nova Addons and Versions
+      description: "Please provide a list of all Nova addons running on your server."
+      placeholder: "Logistics v0.1, Machines v0.1, Jetpacks v0.1"
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Expected behavior
@@ -47,6 +54,12 @@ body:
       label: Steps to reproduce
       description: Steps to reproduce this behavior. Provide a minimal reproducible example.
       placeholder: "1. Place [...]\n2. Attach [...]\n3. Click on [...] then [...]"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Full server log
+      description: Please provide the complete server log. You can use Pastebin or similar sites to upload it, then link to it here.
     validations:
       required: true
   - type: textarea
