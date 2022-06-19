@@ -28,13 +28,16 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
     override fun handleInitialized(placed: Boolean) {
         modelProvider.load(placed)
         
-        material.multiBlockLoader?.invoke(pos)?.forEach { 
+        material.multiBlockLoader?.invoke(pos)?.forEach {
             WorldDataManager.setBlockState(it, LinkedBlockState(it, this))
         }
     }
     
     override fun handleRemoved(broken: Boolean) {
-        material.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeBlock(BlockBreakContext(it)) }
+        if (broken) {
+            material.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlock(BlockBreakContext(it)) }
+        }
+        
         modelProvider.remove(broken)
     }
     
