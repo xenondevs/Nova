@@ -84,7 +84,6 @@ internal object WorldDataManager : Initializable(), Listener {
     
     @Synchronized
     private fun saveWorld(world: World) {
-        LOGGER.info("Saving world ${world.name}...")
         worlds[world]?.saveAll()
     }
     
