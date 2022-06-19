@@ -125,7 +125,7 @@ internal object AddonManager {
         "${description.name} [${description.id}] v${description.version}"
     
     private fun generateAddonsHashCode() {
-        var result = 0
+        var result = NOVA.version.hashCode()
         loaders.values.forEach {
             val description = it.description
             result = result * 31 + description.id.hashCode()
