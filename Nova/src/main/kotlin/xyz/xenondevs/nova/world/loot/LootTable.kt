@@ -4,15 +4,15 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 
 class LootTable(
-    val items: List<LootItem>,
-    val whitelisted: List<NamespacedKey>,
-    val blacklisted: List<NamespacedKey>
+    private val items: List<LootItem>,
+    private val whitelist: List<NamespacedKey>,
+    private val blacklist: List<NamespacedKey>
 ) {
     
-    fun isWhitelisted(key: NamespacedKey): Boolean {
-        if (blacklisted.isNotEmpty())
-            return key !in blacklisted
-        return whitelisted.isEmpty() || key in whitelisted
+    fun isAllowed(key: NamespacedKey): Boolean {
+        if (blacklist.isNotEmpty())
+            return key !in blacklist
+        return whitelist.isEmpty() || key in whitelist
     }
     
     fun getRandomItems(): List<ItemStack> {

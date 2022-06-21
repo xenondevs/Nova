@@ -16,11 +16,10 @@ internal object LootTableSerialization : JsonDeserializer<LootTable> {
     override fun deserialize(json: JsonElement, typeOfT: Type, ctx: JsonDeserializationContext): LootTable {
         val obj = json.asJsonObject
         val items = GSON.fromJson<ArrayList<LootItem>>(obj.get("items"))!!
-        val blacklisted = if (obj.has("blacklisted")) GSON.fromJson<ArrayList<NamespacedKey>>(obj.get("blacklisted"))!! else ArrayList()
-        val whitelisted = if (obj.has("whitelisted")) GSON.fromJson<ArrayList<NamespacedKey>>(obj.get("whitelisted"))!! else ArrayList()
-        return LootTable(items, blacklisted, whitelisted)
+        val whitelist = if (obj.has("whitelist")) GSON.fromJson<ArrayList<NamespacedKey>>(obj.get("whitelist"))!! else ArrayList()
+        val blacklist = if (obj.has("blacklist")) GSON.fromJson<ArrayList<NamespacedKey>>(obj.get("blacklist"))!! else ArrayList()
+        return LootTable(items, whitelist, blacklist)
     }
-    
     
 }
 

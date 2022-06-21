@@ -25,7 +25,7 @@ internal object LootGeneration : Initializable(), Listener {
     @EventHandler
     private fun handleLootGenerationEvent(event: LootGenerateEvent) {
         lootTables.forEach { loot ->
-            if (loot.isWhitelisted(event.lootTable.key))
+            if (loot.isAllowed(event.lootTable.key))
                 event.loot.addAll(loot.getRandomItems())
         }
     }
@@ -34,7 +34,7 @@ internal object LootGeneration : Initializable(), Listener {
     private fun handleEntityDeath(event: EntityDeathEvent) {
         val key = entityKeys[event.entityType] ?: return
         lootTables.forEach { loot ->
-            if (loot.isWhitelisted(key))
+            if (loot.isAllowed(key))
                 event.drops.addAll(loot.getRandomItems())
         }
     }

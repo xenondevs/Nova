@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.data
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import org.bukkit.Location
+import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
@@ -21,6 +22,7 @@ val GSON: Gson =
         .setPrettyPrinting()
         .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
         .registerTypeHierarchyAdapter<NamespacedId>(NamespacedIdTypeAdapter)
+        .registerTypeHierarchyAdapter<NamespacedKey>(NamespacedKeyTypeAdapter)
         .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerialization)
         .registerTypeHierarchyAdapter<Location>(LocationSerialization)
         .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
