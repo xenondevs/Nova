@@ -9,6 +9,7 @@ import io.ktor.server.routing.*
 import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.upload.UploadService
+import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.concurrent.Latch
 import xyz.xenondevs.nova.util.data.getBooleanOrNull
 import xyz.xenondevs.nova.util.data.getIntOrNull
@@ -20,7 +21,7 @@ import kotlin.concurrent.thread
 @Suppress("HttpUrlsUsage")
 internal object SelfHost : UploadService {
     
-    private val selfHostDir = File(NOVA.dataFolder, "ResourcePack/autohost")
+    private val selfHostDir = File(NOVA.dataFolder, "resource_pack/self_host")
     private val packFile = File(selfHostDir, "pack.zip")
     private lateinit var server: NettyApplicationEngine
     internal val startedLatch = Latch()

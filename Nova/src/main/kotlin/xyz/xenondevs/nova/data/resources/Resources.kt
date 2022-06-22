@@ -1,22 +1,16 @@
 package xyz.xenondevs.nova.data.resources
 
 import kotlinx.coroutines.runBlocking
-import net.lingala.zip4j.ZipFile
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
-import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
-import xyz.xenondevs.nova.data.resources.builder.PNGMetadataRemover
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ModelData
-import xyz.xenondevs.nova.util.data.write
-import java.io.File
 
 internal object Resources : Initializable() {
     
@@ -48,8 +42,7 @@ internal object Resources : Initializable() {
     }
     
     fun createResourcePack() {
-        val assetPacks = extractAssetPacks()
-        val file = ResourcePackBuilder(assetPacks).create()
+        val file = ResourcePackBuilder.buildPack()
         
         if (AutoUploadManager.enabled) {
             runBlocking {
@@ -58,29 +51,6 @@ internal object Resources : Initializable() {
                     LOGGER.warning("The resource pack was not uploaded. (Misconfigured auto uploader?)")
             }
         }
-    }
-    
-    private fun extractAssetPacks(): List<AssetPack> {
-        val assetPacksDir = File(NOVA.dataFolder, "ResourcePack/AssetPacks/")
-        assetPacksDir.deleteRecursively()
-        return (AddonManager.loaders.asSequence().map { (id, loader) -> loader.file to id } + (NOVA.pluginFile to "nova"))
-            .mapTo(ArrayList()) { (addonFile, namespace) ->
-                val assetPackDir = File(assetPacksDir, namespace)
-                
-                val zip = ZipFile(addonFile)
-                zip.fileHeaders.forEach { header ->
-                    if (!header.isDirectory && header.fileName.startsWith("assets/")) {
-                        val file = File(assetPackDir, header.fileName.substringAfter("assets/"))
-                        val inputStream = zip.getInputStream(header)
-                        if (header.fileName.endsWith(".png")) {
-                            file.parentFile.mkdirs()
-                            PNGMetadataRemover.remove(inputStream, file.outputStream())
-                        } else file.write(inputStream)
-                    }
-                }
-                
-                return@mapTo AssetPack(assetPackDir, namespace)
-            }
     }
     
     internal fun updateModelDataLookup(modelDataLookup: Map<String, Pair<ModelData?, ModelData?>>) {

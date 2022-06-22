@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.data.GSON
 import java.io.File
 
-internal class LanguageContent(private val builder: ResourcePackBuilder) : PackContent {
+internal class LanguageContent : PackContent {
     
     private val languageLookup = HashMap<String, HashMap<String, String>>()
     

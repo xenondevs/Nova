@@ -10,7 +10,7 @@ import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 
-internal class GUIContent(private val builder: ResourcePackBuilder) : PackContent {
+internal class GUIContent : PackContent {
     
     private val guiLookup = HashMap<String, GUIData>()
     private var char = '\uF000'

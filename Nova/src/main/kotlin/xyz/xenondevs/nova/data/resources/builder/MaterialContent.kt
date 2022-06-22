@@ -2,78 +2,118 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import org.bukkit.Material
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.addon.assets.ModelInformation
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.builder.basepack.ModelFileMerger
 import xyz.xenondevs.nova.material.ModelData
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.mapToIntArray
 import java.io.File
-import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
-internal class MaterialContent(private val builder: ResourcePackBuilder) : PackContent {
+internal class MaterialContent(private val occupiedModelData: Map<Material, Set<Int>>) : PackContent {
     
-    private val modelOverrides = HashMap<Material, TreeSet<String>>()
-    private val toLookup = HashMap<String, Pair<ModelInformation?, ModelInformation?>>()
+    private val novaMaterials = HashMap<String, Pair<ModelInformation?, ModelInformation?>>()
+    private val modelDataPosition = HashMap<Material, Int>()
     
     override fun addFromPack(pack: AssetPack) {
         val materialsIndex = pack.materialsIndex ?: return
         
-        // load all used models into the overrides map
         materialsIndex.forEach { mat ->
             val itemInfo = mat.itemInfo
             val blockInfo = mat.blockInfo
             
-            if (itemInfo != null) loadInfo(itemInfo, pack.namespace)
-            if (blockInfo != null) loadInfo(blockInfo, pack.namespace)
-        }
-        
-        // fill the ModelData lookup map
-        materialsIndex.forEach { mat ->
-            val itemInfo = mat.itemInfo
-            val blockInfo = mat.blockInfo
+            novaMaterials[mat.id] = itemInfo to blockInfo
             
-            toLookup[mat.id] = itemInfo to blockInfo
+            itemInfo?.let { createDefaultModelFiles(pack, it) }
+            blockInfo?.let { createDefaultModelFiles(pack, it) }
         }
     }
     
-    private fun loadInfo(info: ModelInformation, namespace: String) {
-        val material = info.material
-        val modelList = modelOverrides.getOrPut(material) { TreeSet() }
+    private fun createDefaultModelFiles(pack: AssetPack, info: ModelInformation) {
         info.models.forEach {
-            modelList += it
-            
-            // Create default item model file if no model file is present
+            val namespace = pack.namespace
             val file = File(ResourcePackBuilder.ASSETS_DIR, "$namespace/models/${it.removePrefix("$namespace:")}.json")
-            if (!file.exists()) {
-                val modelObj = JsonObject()
-                modelObj.addProperty("parent", "item/generated")
-                modelObj.add("textures", JsonObject().apply { addProperty("layer0", it) })
-                
-                file.parentFile.mkdirs()
-                file.writeText(GSON.toJson(modelObj))
-            }
+            if (!file.exists())
+                createDefaultModelFile(file, it)
         }
     }
     
-    private fun createModelData(info: ModelInformation): ModelData {
-        val material = info.material
-        val modelDataStart = calculateModelDataStart(material)
-        val sortedModelSet = modelOverrides[material]!!
-        val dataArray = info.models.mapToIntArray { sortedModelSet.indexOf(it) + modelDataStart }
+    private fun createDefaultModelFile(file: File, texturePath: String) {
+        val modelObj = JsonObject()
+        modelObj.addProperty("parent", "item/generated")
+        modelObj.add("textures", JsonObject().apply { addProperty("layer0", texturePath) })
         
-        return ModelData(info.material, dataArray, info.id)
+        file.parentFile.mkdirs()
+        file.writeText(GSON.toJson(modelObj))
     }
     
     override fun write() {
-        val modelDataLookup = toLookup.mapValuesTo(HashMap()) {
-            it.value.first?.let(::createModelData) to it.value.second?.let(::createModelData)
+        val modelDataLookup = HashMap<String, Pair<ModelData?, ModelData?>>()
+        val registeredMaterialModels = HashMap<Material, HashMap<String, Int>>()
+        
+        novaMaterials.forEach { (id, pair) ->
+            val (itemInfo, blockInfo) = pair
+            
+            fun registerModels(info: ModelInformation): ModelData {
+                val material = info.material
+                val registeredModels = registeredMaterialModels.getOrPut(material, ::HashMap)
+                
+                val dataArray = info.models.mapToIntArray { model ->
+                    registeredModels.getOrPut(model) { getNextModelData(material) }
+                }
+                
+                return ModelData(material, dataArray, info.id)
+            }
+            
+            val itemModelData = itemInfo?.let(::registerModels)
+            val blockModelData = blockInfo?.let(::registerModels)
+            
+            modelDataLookup[id] = itemModelData to blockModelData
         }
+        
         Resources.updateModelDataLookup(modelDataLookup)
         
-        modelOverrides.forEach { (material, models) ->
-            val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/models/item/${material.name.lowercase()}.json")
+        registeredMaterialModels.forEach { (material, registeredModels) ->
+            val (file, modelObj, overrides) = getModelFile(material)
+            
+            registeredModels
+                .toList()
+                .sortedBy { it.second }
+                .forEach { (path, customModelData) ->
+                    overrides.add(ModelFileMerger.createModelDataEntry(customModelData, path))
+                }
+            
+            modelObj.add("overrides", ModelFileMerger.sortOverrides(overrides))
+            
+            file.parentFile.mkdirs()
+            file.writeText(GSON.toJson(modelObj))
+        }
+    }
+    
+    private fun getNextModelData(material: Material): Int {
+        var pos = modelDataPosition.getOrPut(material) { 0 } + 1
+        
+        val occupiedSet = occupiedModelData[material]
+        if (occupiedSet != null) {
+            while (pos in occupiedSet) {
+                pos++
+            }
+        }
+        
+        modelDataPosition[material] = pos
+        
+        return pos
+    }
+    
+    private fun getModelFile(material: Material): Triple<File, JsonObject, JsonArray> {
+        val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/models/item/${material.name.lowercase()}.json")
+        if (!file.exists()) {
             val modelObj = JsonObject()
             
             // fixme: This does not cover all cases
@@ -85,25 +125,15 @@ internal class MaterialContent(private val builder: ResourcePackBuilder) : PackC
                 modelObj.add("textures", textures)
             }
             
-            val overridesArr = JsonArray().also { modelObj.add("overrides", it) }
+            val overrides = JsonArray().also { modelObj.add("overrides", it) }
             
-            var customModelData = calculateModelDataStart(material)
-            models.forEach {
-                val overrideObj = JsonObject().apply(overridesArr::add)
-                overrideObj.add("predicate", JsonObject().apply { addProperty("custom_model_data", customModelData) })
-                overrideObj.addProperty("model", it)
-                
-                customModelData++
-            }
+            return Triple(file, modelObj, overrides)
+        } else {
+            val modelObj = JsonParser.parseReader(file.reader()) as JsonObject
+            val overrides = (modelObj.get("overrides") as? JsonArray) ?: JsonArray().also { modelObj.add("overrides", it) }
             
-            file.parentFile.mkdirs()
-            file.writeText(GSON.toJson(modelObj))
+            return Triple(file, modelObj, overrides)
         }
     }
-    
-    private fun calculateModelDataStart(material: Material): Int =
-        MaterialType.values()
-            .filter { it.material == material }
-            .maxOfOrNull { it.modelDataStart } ?: MaterialType.CUSTOM_DATA_START
     
 }

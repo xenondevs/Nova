@@ -16,9 +16,6 @@ internal class AssetPack(val directory: File, val namespace: String) {
     val langDir = File(directory, "lang").takeIf(File::exists)
     val guisDir = File(directory, "guis").takeIf(File::exists)
     
-    /**
-     * A map containing all nova materials as keys with their corresponding item and block modeldata
-     */
     val materialsIndex: List<RegisteredMaterial>? = if (materialsFile.exists())
         MaterialsIndexDeserializer.deserialize(namespace, JsonParser.parseReader(materialsFile.reader()))
     else null

@@ -45,6 +45,12 @@ internal object AutoUploadManager : Initializable() {
         }
     
     override fun init() {
+        enable()
+        
+        if (url != null) forceResourcePack()
+    }
+    
+    private fun enable() {
         val packConfig = DEFAULT_CONFIG.getConfigurationSection("resource_pack")!!
         val config = packConfig.getConfigurationSection("auto_upload")!!
         enabled = config.getBoolean("enabled")
@@ -74,8 +80,6 @@ internal object AutoUploadManager : Initializable() {
         } else {
             LOGGER.warning("No uploading service specified! Available: " + SERVICES.joinToString(transform = UploadService::name))
         }
-        
-        if (url != null) forceResourcePack()
     }
     
     override fun disable() {
@@ -85,7 +89,7 @@ internal object AutoUploadManager : Initializable() {
     
     fun reload() {
         disable()
-        init()
+        enable()
     }
     
     suspend fun uploadPack(pack: File): String? {
