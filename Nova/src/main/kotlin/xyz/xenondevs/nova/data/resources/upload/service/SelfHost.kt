@@ -53,7 +53,7 @@ internal object SelfHost : UploadService {
         thread(name = "ResourcePack Server", isDaemon = true) {
             server = embeddedServer(Netty, port = this.port) {
                 routing {
-                    get {
+                    get("*") {
                         if (packFile.exists()) call.respondFile(packFile)
                         else call.respond(HttpStatusCode.NotFound)
                     }
@@ -75,7 +75,7 @@ internal object SelfHost : UploadService {
     
     override suspend fun upload(file: File): String {
         file.copyTo(packFile, overwrite = true)
-        return url
+        return url + "/" + StringUtils.randomString(5) // https://bugs.mojang.com/browse/MC-251126
     }
     
 }
