@@ -16,7 +16,7 @@
     <properties>
         <particlelib.version>1.8</particlelib.version>
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
-        <zip4j.version>2.11.0</zip4j.version>
+        <zip4j.version>2.10.0</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
         <invui.version>0.7-SNAPSHOT</invui.version>
         <ktor.version>2.0.1</ktor.version>
