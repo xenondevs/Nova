@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.IOUtils
 import xyz.xenondevs.nova.util.data.write
 import java.io.File
 
@@ -109,10 +108,12 @@ internal object ResourcePackBuilder {
     
     private fun createZip(): File {
         LOGGER.info("Packing zip")
-        val parameters = ZipParameters().apply { isIncludeRootFolder = false }
+        val parameters = ZipParameters().apply {
+            isIncludeRootFolder = false
+            lastModifiedFileTime = 1
+        }
         val zip = ZipFile(RESOURCE_PACK_FILE)
         zip.addFolder(PACK_DIR, parameters)
-        IOUtils.removeZipTimestamps(RESOURCE_PACK_FILE)
         
         return RESOURCE_PACK_FILE
     }
