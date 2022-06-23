@@ -36,6 +36,7 @@ internal object Resources : Initializable() {
         } else {
             // Create ResourcePack
             ResourcePackBuilder.buildPack()
+            AutoUploadManager.wasRegenerated = true
             // Store addonsHashCode
             PermanentStorage.store("addonsHashCode", AddonManager.addonsHashCode)
         }

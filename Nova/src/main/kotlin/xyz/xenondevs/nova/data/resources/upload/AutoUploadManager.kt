@@ -30,6 +30,7 @@ internal object AutoUploadManager : Initializable() {
     
     var enabled = false
         private set
+    var wasRegenerated = false
     private var explicitUrl = false
     private var selectedService: UploadService? = null
     
@@ -88,7 +89,8 @@ internal object AutoUploadManager : Initializable() {
         }
         
         val configHash = config.hash()
-        if (lastConfig != configHash) {
+        if (wasRegenerated || lastConfig != configHash) {
+            wasRegenerated = false
             runBlocking {
                 val url = uploadPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
                 if (url == null)
