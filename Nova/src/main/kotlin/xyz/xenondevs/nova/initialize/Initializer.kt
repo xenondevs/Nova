@@ -59,17 +59,14 @@ internal object Initializer {
     
     fun init() {
         runAsyncTask {
+            
             toInit.forEach {
                 runAsyncTask {
-                    try {
-                        it.dependsOn.forEach { it.latch.await() }
-                        it.initialize(latch)
-                    } catch (e: Exception) {
-                        LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $it", e)
-                        latch.countDown()
-                    }
+                    it.dependsOn.forEach { it.latch.await() }
+                    it.initialize(latch)
                 }
             }
+            
             latch.await()
             callEvent(NovaLoadDataEvent())
             

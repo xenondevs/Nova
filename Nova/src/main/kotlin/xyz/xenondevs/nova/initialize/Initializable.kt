@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.initialize
 
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.runTask
 import java.util.concurrent.CountDownLatch
+import java.util.logging.Level
 
 abstract class Initializable internal constructor() : Comparable<Initializable> {
     
@@ -18,19 +20,21 @@ abstract class Initializable internal constructor() : Comparable<Initializable> 
     open fun disable() = Unit
     
     fun initialize(parentLatch: CountDownLatch) {
-        if (inMainThread) {
-            runTask {
+        fun performInitialization() {
+            try {
                 init()
                 isInitialized = true
-                this.latch.countDown()
-                parentLatch.countDown()
+            } catch (e: Exception) {
+                LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $this", e)
             }
-        } else {
-            init()
-            isInitialized = true
+            
             this.latch.countDown()
             parentLatch.countDown()
         }
+        
+        if (inMainThread)
+            runTask(::performInitialization)
+        else performInitialization()
     }
     
     override fun compareTo(other: Initializable): Int {
