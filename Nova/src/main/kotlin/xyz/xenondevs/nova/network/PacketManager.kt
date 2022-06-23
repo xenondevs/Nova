@@ -23,7 +23,7 @@ internal object PacketManager : Initializable(), Listener {
     override val inMainThread = true
     override val dependsOn = emptySet<Initializable>()
     
-    private val serverChannels = ArrayList<Channel>()
+    private lateinit var serverChannel: Channel
     private val connectionsList = minecraftServer.connection!!.connections
     
     val playerHandlers = HashMap<String, PacketHandler>()
@@ -37,22 +37,22 @@ internal object PacketManager : Initializable(), Listener {
     override fun disable() {
         LOGGER.info("Unregistering packet handlers")
         Bukkit.getOnlinePlayers().forEach(::unregisterHandler)
-        serverChannels.forEach { channel ->
-            channel.eventLoop().submit {
-                val pipeline = channel.pipeline()
+        
+        if (::serverChannel.isInitialized) {
+            serverChannel.eventLoop().submit {
+                val pipeline = serverChannel.pipeline()
                 pipeline.context("nova_pipeline_adapter")?.handler()?.run(pipeline::remove)
             }
         }
     }
     
     private fun registerHandlers() {
-        minecraftServer.channels.forEach { future ->
-            val channel = future.channel()
-            serverChannels.add(channel)
-            val pipeline = channel.pipeline()
-            pipeline.context("nova_pipeline_adapter")?.handler()?.run(pipeline::remove)
-            pipeline.addFirst("nova_pipeline_adapter", PipelineAdapter)
-        }
+        serverChannel = minecraftServer.channels.first().channel()
+        
+        val pipeline = serverChannel.pipeline()
+        pipeline.context("nova_pipeline_adapter")?.handler()?.run(pipeline::remove)
+        pipeline.addFirst("nova_pipeline_adapter", PipelineAdapter)
+        
         Bukkit.getOnlinePlayers().forEach { unregisterHandler(it); registerHandler(it) }
     }
     
