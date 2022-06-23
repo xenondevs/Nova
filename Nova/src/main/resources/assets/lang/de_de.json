@@ -67,7 +67,6 @@
   "command.nova.usage.no-usage": "Dieses Item kommt nicht in anderen Crafting-Rezepten vor.",
   "nova.tile_entity_limits.amount.deny": "Du hast das Limit für diesen Block-Typ erreicht.",
   "menu.nova.energy_per_tick": "%s / tick",
-  "menu.nova.items.searched": "Items §8(%s§7...§8)",
   "menu.nova.creative": "Items",
   "menu.nova.side_config.items": "Items",
   "container.nova.lava_tank": "Lavatank",
