@@ -19,11 +19,10 @@
         <zip4j.version>2.11.1</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
         <invui.version>0.7-SNAPSHOT</invui.version>
-        <ktor.version>2.0.1</ktor.version>
+        <ktor.version>2.0.2</ktor.version>
         <maven-resolver-provider.version>3.8.5</maven-resolver-provider.version>
         <maven-resolver-connector-basic.version>1.8.0</maven-resolver-connector-basic.version>
         <maven-resolver-transport-http.version>1.8.0</maven-resolver-transport-http.version>
-        <shadePath>xyz.xenondevs.nova.lib</shadePath>
     </properties>
 
     <pluginRepositories>
@@ -228,7 +227,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-resolver-provider</artifactId>
-            <version>3.8.5</version>
+            <version>${maven-resolver-provider.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -328,7 +327,7 @@
         <dependency>
             <groupId>com.plotsquared</groupId>
             <artifactId>PlotSquared-Bukkit</artifactId>
-            <version>6.6.3</version>
+            <version>6.9.0</version>
             <scope>provided</scope>
             <exclusions>
                 <!-- PS Bukkit Deps -->
@@ -452,7 +451,7 @@
         <dependency>
             <groupId>dev.espi</groupId>
             <artifactId>protectionstones</artifactId>
-            <version>2.10.1</version>
+            <version>2.10.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -603,7 +602,7 @@
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>${shadePath}.org.bstats</shadedPattern>
+                            <shadedPattern>xyz.xenondevs.nova.bstats</shadedPattern>
                         </relocation>
                     </relocations>
 
