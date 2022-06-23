@@ -74,7 +74,7 @@
   "command.nova.show_tile_entity_data.success": "%sは次のデータを持っています:\n%s",
   "command.nova.show_tile_entity_data.failure": "タイルエンティティを見てもう一度試してください。",
   "command.nova.modeldata.item": "アイテム %s は %s を使用しており、次のカスタムモデルデータを持っています: %s",
-  "command.nova.modeldata.block": "ブロック %s は %s を使用しており、次のカスタムモデルデータを持っています: %s",
+  "command.nova.modeldata.block": "ブロック %s は %s を使用しており、次のカスタムモデルデータを持っています: %s。",
   "command.nova.modeldata.no-nova-item": "Novaのアイテムを手にもってもう一度試してください。",
   "command.nova.recipe.no-recipe": "このアイテムにはレシピがありません。",
   "command.nova.usage.no-usage": "このアイテムには使用法がありません。",
