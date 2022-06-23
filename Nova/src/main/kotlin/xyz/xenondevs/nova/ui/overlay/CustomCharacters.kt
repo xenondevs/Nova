@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.GUIData
 import xyz.xenondevs.nova.util.addNamespace
+import xyz.xenondevs.nova.util.data.formatWithTemplate
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import kotlin.math.abs
 
@@ -28,6 +29,11 @@ object CoreGUITexture {
     
 }
 
+private val TITLE_TEMPLATE = ComponentBuilder("")
+    .color(ChatColor.DARK_GRAY)
+    .font("default")
+    .create()[0]
+
 class GUITexture(private val data: GUIData) {
     
     val component: BaseComponent = ComponentBuilder(data.char.toString())
@@ -39,18 +45,19 @@ class GUITexture(private val data: GUIData) {
         return getTitle(TranslatableComponent(translate))
     }
     
-    fun getTitle(title: TranslatableComponent): Array<BaseComponent> {
+    fun getTitle(title: BaseComponent): Array<BaseComponent> {
+        return getTitle(arrayOf(title))
+    }
+    
+    fun getTitle(title: Array<BaseComponent>): Array<BaseComponent> {
         return ComponentBuilder()
             .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
             .append(data.char.toString())
             .font("nova:gui")
             .color(ChatColor.WHITE)
             .append(MoveCharacters.getMovingComponent(-data.width + 7)) // move back to start
-            .append(title)
-            .font("default")
-            .color(ChatColor.DARK_GRAY)
+            .append(title.formatWithTemplate(TITLE_TEMPLATE))
             .create()
-        
     }
     
     companion object {

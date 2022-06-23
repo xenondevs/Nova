@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.util.localizedName
+import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.removeMinecraftFormatting
 
 private val DEFAULT_FONT_TEMPLATE = ComponentBuilder("").font("default").create()[0]
@@ -53,7 +54,11 @@ fun ItemBuilder.setLocalizedName(chatColor: ChatColor, name: String): ItemBuilde
 }
 
 fun ItemBuilder.addLocalizedLoreLines(vararg lines: String): ItemBuilder {
-    return addLoreLines(*lines.map { arrayOf(TranslatableComponent(it)) }.toTypedArray())
+    return addLoreLines(*lines.mapToArray { arrayOf(TranslatableComponent(it)) })
+}
+
+fun ItemBuilder.addLocalizedLoreLines(chatColor: ChatColor, vararg lines: String): ItemBuilder {
+    return addLoreLines(*lines.mapToArray { arrayOf(localized(chatColor, it)) })
 }
 
 fun ItemBuilder.addLoreLines(vararg lines: BaseComponent): ItemBuilder {
@@ -101,7 +106,11 @@ fun TranslatableComponent.toPlainText(locale: String): String {
 }
 
 fun Array<BaseComponent>.forceDefaultFont(): Array<BaseComponent> {
-    var previousComponent = DEFAULT_FONT_TEMPLATE
+    return formatWithTemplate(DEFAULT_FONT_TEMPLATE)
+}
+
+fun Array<BaseComponent>.formatWithTemplate(template: BaseComponent): Array<BaseComponent> {
+    var previousComponent = template
     for (component in this) {
         component.copyFormatting(previousComponent, false)
         previousComponent = component

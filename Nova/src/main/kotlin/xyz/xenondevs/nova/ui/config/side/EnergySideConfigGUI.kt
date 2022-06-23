@@ -4,6 +4,7 @@ import de.studiocode.invui.gui.impl.SimpleGUI
 import de.studiocode.invui.gui.structure.Structure
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
@@ -63,14 +64,14 @@ class EnergySideConfigGUI(
             val blockSide = blockSide.name[0] + blockSide.name.substring(1).lowercase()
             return when (energyHolder.connectionConfig[blockFace]!!) {
                 NetworkConnectionType.NONE ->
-                    CoreGUIMaterial.GRAY_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.none")
+                    CoreGUIMaterial.GRAY_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GRAY, "menu.nova.side_config.none")
                 NetworkConnectionType.EXTRACT ->
-                    CoreGUIMaterial.ORANGE_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.output")
+                    CoreGUIMaterial.ORANGE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GOLD, "menu.nova.side_config.output")
                 NetworkConnectionType.INSERT ->
-                    CoreGUIMaterial.BLUE_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input")
+                    CoreGUIMaterial.BLUE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.AQUA, "menu.nova.side_config.input")
                 NetworkConnectionType.BUFFER ->
-                    CoreGUIMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines("menu.nova.side_config.input_output")
-            }.setLocalizedName("menu.nova.side_config.${blockSide.lowercase()}")
+                    CoreGUIMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GREEN, "menu.nova.side_config.input_output")
+            }.setLocalizedName(ChatColor.GRAY, "menu.nova.side_config.${blockSide.lowercase()}")
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

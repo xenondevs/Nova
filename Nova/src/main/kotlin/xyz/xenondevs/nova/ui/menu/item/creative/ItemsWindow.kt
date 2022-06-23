@@ -30,7 +30,6 @@ import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
-import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.runTask
@@ -142,8 +141,13 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
                 .append(TAB_BUTTON_TEXTURES[mainGUI.currentTab % 5].component)
                 .create()
         } else {
-            val title = TranslatableComponent("menu.nova.items.searched")
-            title.addWith(coloredText(ChatColor.GRAY, filter))
+            val title = ComponentBuilder()
+                .append(TranslatableComponent("menu.nova.items"))
+                .append(" (").color(ChatColor.DARK_GRAY)
+                .append(filter).color(ChatColor.GRAY)
+                .append(")").color(ChatColor.DARK_GRAY)
+                .create()
+            
             CoreGUITexture.EMPTY_GUI.getTitle(title)
         }
     }
