@@ -1,15 +1,20 @@
 package xyz.xenondevs.nova.data.resources.upload
 
 import de.studiocode.invui.resourcepack.ForceResourcePack
+import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.chat.ComponentBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.util.data.hash
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import java.io.File
 import java.util.logging.Level
@@ -17,29 +22,37 @@ import java.util.logging.Level
 internal object AutoUploadManager : Initializable() {
     
     override val inMainThread = false
-    override val dependsOn = setOf(NovaConfig)
+    override val dependsOn = setOf(NovaConfig, Resources)
     
     private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost, CustomMultiPart)
     
+    private val config by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!! }
+    
     var enabled = false
         private set
-    
+    private var explicitUrl = false
     private var selectedService: UploadService? = null
+    
     private var url: String? = PermanentStorage.retrieveOrNull("resourcePackURL")
         set(value) {
             field = value
             PermanentStorage.store("resourcePackURL", value)
         }
+    private var lastConfig: Int? = PermanentStorage.retrieveOrNull("lastUploadConfig")
+        set(value) {
+            field = value
+            PermanentStorage.store("lastUploadConfig", value)
+        }
     
     override fun init() {
-        enable()
+        enable(fromReload = false)
         
-        if (url != null) forceResourcePack()
+        if (url != null)
+            forceResourcePack()
     }
     
-    private fun enable() {
+    private fun enable(fromReload: Boolean) {
         val packConfig = DEFAULT_CONFIG.getConfigurationSection("resource_pack")!!
-        val config = packConfig.getConfigurationSection("auto_upload")!!
         enabled = config.getBoolean("enabled")
         
         if (packConfig.contains("url")) {
@@ -47,14 +60,20 @@ internal object AutoUploadManager : Initializable() {
             if (!url.isNullOrEmpty()) {
                 if (enabled)
                     LOGGER.warning("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
-                this.url = url
-                forceResourcePack()
+                explicitUrl = true
+                if (this.url != url) {
+                    this.url = url
+                    if (fromReload)
+                        forceResourcePack()
+                }
                 return
             }
         }
         
-        if (!enabled)
+        if (!enabled) {
+            this.url = null
             return
+        }
         
         val serviceName = config.getString("service")
         if (serviceName != null) {
@@ -65,7 +84,21 @@ internal object AutoUploadManager : Initializable() {
             selectedService = service
         } else {
             LOGGER.warning("No uploading service specified! Available: " + SERVICES.joinToString(transform = UploadService::name))
+            return
         }
+        
+        val configHash = config.hash()
+        if (lastConfig != configHash) {
+            runBlocking {
+                val url = uploadPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
+                if (url == null)
+                    LOGGER.warning("The resource pack was not uploaded. (Misconfigured auto uploader?)")
+            }
+            lastConfig = configHash
+        }
+        
+        if (fromReload)
+            forceResourcePack()
     }
     
     override fun disable() {
@@ -75,7 +108,7 @@ internal object AutoUploadManager : Initializable() {
     
     fun reload() {
         disable()
-        enable()
+        enable(fromReload = true)
     }
     
     suspend fun uploadPack(pack: File): String? {

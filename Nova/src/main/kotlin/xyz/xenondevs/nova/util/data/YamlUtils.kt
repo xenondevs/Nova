@@ -24,6 +24,10 @@ fun ConfigurationSection.saveToString(includeComments: Boolean): String {
     return cfg.saveToString()
 }
 
+fun ConfigurationSection.hash(): Int {
+    return saveToString(false).hashCode()
+}
+
 fun ConfigurationSection.contentEquals(other: ConfigurationSection): Boolean {
     val keys = getKeys(true)
     val otherKeys = other.getKeys(true)

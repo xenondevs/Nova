@@ -35,7 +35,7 @@ internal object Resources : Initializable() {
             guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, GUIData>>("guiDataLookup")!!
         } else {
             // Create ResourcePack
-            createResourcePack()
+            ResourcePackBuilder.buildPack()
             // Store addonsHashCode
             PermanentStorage.store("addonsHashCode", AddonManager.addonsHashCode)
         }
