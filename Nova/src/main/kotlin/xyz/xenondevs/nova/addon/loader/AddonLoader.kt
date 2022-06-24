@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.addon.AddonDescription
 import xyz.xenondevs.nova.addon.AddonLogger
 import xyz.xenondevs.nova.addon.AddonManager
 import java.io.File
+import kotlin.reflect.jvm.jvmName
 
 internal class AddonLoader(val file: File) {
     
@@ -31,7 +32,7 @@ internal class AddonLoader(val file: File) {
         val mainClass = classLoader.loadClass(description.main).kotlin
         
         val instance = mainClass.objectInstance ?: throw IllegalStateException("Main class is not a singleton object")
-        addon = instance as? Addon ?: throw IllegalStateException("Main class does not a subclass of Addon")
+        addon = instance as? Addon ?: throw IllegalStateException("Main class is not a subclass of ${Addon::class.jvmName}")
         
         addon.addonFile = file
         addon.description = description
