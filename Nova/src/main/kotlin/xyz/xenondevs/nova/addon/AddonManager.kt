@@ -34,15 +34,15 @@ internal object AddonsInitializer : Initializable() {
     
 }
 
-internal object AddonManager {
+object AddonManager {
     
     private val DISALLOWED_IDS = hashSetOf("nova", "minecraft", "itemsadder", "oraxen", "mmoitems")
     
-    val addonsDir = File(NOVA.dataFolder, "addons/")
-    val loaders = HashMap<String, AddonLoader>()
-    val addons = LinkedHashMap<String, Addon>()
+    internal val addonsDir = File(NOVA.dataFolder, "addons/")
+    internal val loaders = HashMap<String, AddonLoader>()
+    internal val addons = LinkedHashMap<String, Addon>()
     
-    var addonsHashCode = -1
+    internal var addonsHashCode = -1
         private set
     
     init {
@@ -51,7 +51,9 @@ internal object AddonManager {
     
     fun hasAddon(id: String) = id in addons
     
-    fun loadAddons() {
+    fun getAddon(id: String) = addons[id]
+    
+    internal fun loadAddons() {
         addonsDir.listFiles()!!.forEach {
             try {
                 if (it.isFile && it.extension == "jar") {
@@ -75,7 +77,7 @@ internal object AddonManager {
         generateAddonsHashCode()
     }
     
-    fun initializeAddons() {
+    internal fun initializeAddons() {
         loaders.values.sortedBy { it.description }.forEach { loader ->
             val description = loader.description
             loader.logger.info("Initializing ${getAddonString(description)}")
@@ -98,7 +100,7 @@ internal object AddonManager {
         }
     }
     
-    fun enableAddons() {
+    internal fun enableAddons() {
         addons.values.forEach { addon ->
             addon.logger.info("Enabling ${getAddonString(addon.description)}")
             
@@ -110,7 +112,7 @@ internal object AddonManager {
         }
     }
     
-    fun disableAddons() {
+    internal fun disableAddons() {
         addons.values.forEach { addon ->
             try {
                 addon.logger.info("Disabling ${getAddonString(addon.description)}")
