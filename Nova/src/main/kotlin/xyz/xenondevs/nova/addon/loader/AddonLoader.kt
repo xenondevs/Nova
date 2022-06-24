@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.addon.loader
 
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonDescription
 import xyz.xenondevs.nova.addon.AddonLogger
@@ -19,6 +20,11 @@ internal class AddonLoader(val file: File) {
         
         description = AddonDescription.deserialize(descriptionFile.reader())
         logger = AddonLogger(description.name)
+        
+        check(description.novaVersion <= NOVA.version) {
+            "This addon is made for a newer version of Nova " +
+                "(v${description.novaVersion}). This server is running Nova v${NOVA.version}"
+        }
     }
     
     fun load(): Addon {

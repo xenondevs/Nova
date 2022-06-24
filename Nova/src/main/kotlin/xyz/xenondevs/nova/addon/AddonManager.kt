@@ -70,7 +70,7 @@ object AddonManager {
                     loaders[id] = AddonLoader(it)
                 }
             } catch (t: Throwable) {
-                LOGGER.log(Level.SEVERE, "An exception occurred trying to load ${it.name}", t)
+                LOGGER.log(Level.SEVERE, "An exception occurred trying to load ${it.name} (Is it up to date?)", t)
             }
         }
         
@@ -95,7 +95,7 @@ object AddonManager {
                 addons[addon.description.id] = addon
                 addon.init()
             } catch (t: Throwable) {
-                loader.logger.log(Level.SEVERE, "An exception occurred trying to initialize ${getAddonString(description)}", t)
+                loader.logger.log(Level.SEVERE, "An exception occurred trying to initialize ${getAddonString(description)} (Is it up to date?)", t)
             }
         }
     }
@@ -107,7 +107,7 @@ object AddonManager {
             try {
                 addon.onEnable()
             } catch (t: Throwable) {
-                addon.logger.log(Level.SEVERE, "An exception occurred trying to enable ${getAddonString(addon.description)}", t)
+                addon.logger.log(Level.SEVERE, "An exception occurred trying to enable ${getAddonString(addon.description)} (Is it up to date?)", t)
             }
         }
     }
