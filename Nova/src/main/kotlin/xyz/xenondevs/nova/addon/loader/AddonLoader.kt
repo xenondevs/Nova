@@ -28,12 +28,16 @@ internal class AddonLoader(val file: File) {
     }
     
     fun load(): Addon {
-        val mainClass = classLoader.loadClass(description.main)
-        addon = mainClass.constructors.first { it.parameterCount == 0 }.newInstance() as Addon
+        val mainClass = classLoader.loadClass(description.main).kotlin
+        
+        val instance = mainClass.objectInstance ?: throw IllegalStateException("Main class is not a singleton object")
+        addon = instance as? Addon ?: throw IllegalStateException("Main class does not a subclass of Addon")
+        
         addon.addonFile = file
         addon.description = description
         addon.logger = logger
         addon.dataFolder = File(AddonManager.addonsDir, description.id)
+        
         return addon
     }
     
