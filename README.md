@@ -1,4 +1,4 @@
-[![Banner](https://i.imgur.com/AAVQkMQ.jpeg)](https://www.spigotmc.org/resources/93648/)
+[![Banner](https://i.imgur.com/HiDAPmf.png)](https://www.spigotmc.org/resources/93648/)
 
 <p align="center">
   <a href="https://www.spigotmc.org/resources/93648/reviews">
@@ -14,8 +14,35 @@
 
 # Nova
 
-Nova is a spigot plugin aimed to provide the experience of a modpack.<br>
-Visit our [spigot page](https://www.spigotmc.org/resources/93648/) for a more detailed explanation.
+Nova is a framework for developers to add custom items, blocks, guis and more to Spigot servers.  
+With Nova, developers don't have to deal with resource pack tricks, data serialization or world formats and can instead
+just focus in adding content to the game.
+
+## Features
+
+* Custom items
+  * Custom wearables
+  * Custom food
+* Custom GUIs
+* Custom blocks
+  * Customizable break time, particles and sounds
+  * Block break effect even on barrier blocks
+* TileEntity system
+* Attachment system
+* Ability system
+* Recipe system
+  * Custom recipe types possible
+* Cable network system
+  * Custom cables and network types possible
+* Built-in items GUI
+  * Recipe Explorer
+* Built-in compatibility with the most popular custom item and protection plugins
+
+## Planned features
+
+* Non-ArmorStand blocks
+* Armor with custom textures
+* Custom entities
 
 # Translating
 
