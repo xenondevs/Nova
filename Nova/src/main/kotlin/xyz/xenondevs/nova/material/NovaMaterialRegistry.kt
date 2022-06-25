@@ -27,20 +27,6 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     override fun get(item: ItemStack): ItemNovaMaterial = getOrNull(item)!!
     override fun getNonNamespaced(name: String): List<ItemNovaMaterial> = materialsByName[name.lowercase()] ?: emptyList()
     
-    fun registerEnergyTileEntity(
-        addon: Addon,
-        name: String,
-        options: BlockOptions,
-        tileEntityConstructor: TileEntityConstructor,
-        placeCheck: PlaceCheckFun? = null,
-        multiBlockLoader: MultiBlockLoader? = null,
-        isInteractive: Boolean = true,
-        properties: List<BlockPropertyType<*>> = listOf(Directional)
-    ): TileEntityNovaMaterial {
-        return registerTileEntity(addon, name, options, tileEntityConstructor,
-            placeCheck, multiBlockLoader, isInteractive, properties)
-    }
-    
     fun registerTileEntity(
         addon: Addon,
         name: String,
