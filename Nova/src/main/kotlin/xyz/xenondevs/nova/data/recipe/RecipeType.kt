@@ -19,7 +19,7 @@ object RecipeTypeRegistry {
         RecipeType.init() // Loads the default recipe types
     }
     
-    fun <T : Any> register(addon: Addon, dirName: String?, recipeClass: KClass<T>, group: RecipeGroup?, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
+    fun <T : NovaRecipe> register(addon: Addon, dirName: String?, recipeClass: KClass<T>, group: RecipeGroup?, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
         val name = "${addon.description.id}/$dirName"
         return register(name, recipeClass, group, deserializer)
     }
