@@ -7,7 +7,7 @@
     <parent>
         <groupId>xyz.xenondevs.nova</groupId>
         <artifactId>Nova-Parent</artifactId>
-        <version>0.9.6</version>
+        <version>0.9.7</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -155,7 +155,7 @@
         <dependency>
             <groupId>xyz.xenondevs.nova</groupId>
             <artifactId>Nova-API</artifactId>
-            <version>0.9.6</version>
+            <version>0.9.7</version>
         </dependency>
 
         <!-- Spigot -->
