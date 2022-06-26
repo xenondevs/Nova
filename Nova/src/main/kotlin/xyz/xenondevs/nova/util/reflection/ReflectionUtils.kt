@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CALLABLE_REFERENCE_
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.K_PROPERTY_1_GET_DELEGATE_METHOD
 import java.lang.reflect.*
+import java.lang.reflect.Array
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty0
@@ -52,6 +53,7 @@ val Type.representedClass: Class<*>
     get() = when (this) {
         is ParameterizedType -> rawType as Class<*>
         is WildcardType -> upperBounds[0] as Class<*>
+        is GenericArrayType -> Array.newInstance(genericComponentType.representedClass, 0)::class.java
         is Class<*> -> this
         else -> throw IllegalStateException("Type $this is not a class")
     }
