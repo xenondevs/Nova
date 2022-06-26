@@ -80,20 +80,22 @@ interface Network : Reloadable {
     
 }
 
+private typealias NetworkConstructor = (UUID, Boolean) -> Network
+
 object NetworkTypeRegistry {
     
     private val _types = HashMap<String, NetworkType>()
     val types: List<NetworkType>
         get() = _types.values.toList()
     
-    fun register(addon: Addon, name: String, networkConstructor: (UUID) -> Network): NetworkType {
+    fun register(addon: Addon, name: String, networkConstructor: NetworkConstructor): NetworkType {
         val id = NamespacedId.of(name, addon.description.id)
         val type = NetworkType(id, networkConstructor)
         _types[id.toString()] = type
         return type
     }
     
-    internal fun register(name: String, networkConstructor: (UUID) -> Network): NetworkType {
+    internal fun register(name: String, networkConstructor: NetworkConstructor): NetworkType {
         val id = NamespacedId.of(name, "nova")
         val type = NetworkType(id, networkConstructor)
         _types[id.toString()] = type
@@ -106,7 +108,7 @@ object NetworkTypeRegistry {
     
 }
 
-class NetworkType internal constructor(val id: NamespacedId, val networkConstructor: (UUID) -> Network) {
+class NetworkType internal constructor(val id: NamespacedId, val networkConstructor: NetworkConstructor) {
     
     override fun toString(): String {
         return id.toString()
@@ -121,9 +123,9 @@ class NetworkType internal constructor(val id: NamespacedId, val networkConstruc
     }
     
     companion object {
-        val ENERGY = register("energy", ::EnergyNetwork)
+        val ENERGY = register("energy") { uuid, _ -> EnergyNetwork(uuid) }
         val ITEMS = register("item", ::ItemNetwork)
-        val FLUID = register("fluid", ::FluidNetwork)
+        val FLUID = register("fluid") { uuid, _ -> FluidNetwork(uuid)}
     }
     
 }

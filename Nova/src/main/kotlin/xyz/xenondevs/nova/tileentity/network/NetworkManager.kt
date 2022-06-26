@@ -211,8 +211,8 @@ private class NetworkManagerImpl : NetworkManager {
         return nodes
     }
     
-    private fun getNetwork(type: NetworkType, uuid: UUID = UUID.randomUUID()): Network {
-        return networksById.getOrPut(uuid) { type.networkConstructor(uuid).also(networks::add) }
+    private fun getNetwork(type: NetworkType, uuid: UUID = UUID.randomUUID(), local: Boolean = false): Network {
+        return networksById.getOrPut(uuid) { type.networkConstructor(uuid, local).also(networks::add) }
     }
     
     private fun removeNetwork(network: Network) {
@@ -466,7 +466,7 @@ private class NetworkManagerImpl : NetworkManager {
             && neighborNode.getConnectedNode(networkType, oppositeFace) == null // does not already connect to something there
         ) {
             // create a new "local" network
-            val network = getNetwork(networkType)
+            val network = getNetwork(networkType, local = true)
             network.addEndPoint(endPoint, face)
             network.addEndPoint(neighborNode, face.oppositeFace)
             

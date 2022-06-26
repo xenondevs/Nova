@@ -6,10 +6,11 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.item.channel.ItemNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
+import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.getOrSet
 import java.util.*
 
-class ItemNetwork(override val uuid: UUID) : Network {
+class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network {
     
     override val type = NetworkType.ITEMS
     
@@ -66,8 +67,12 @@ class ItemNetwork(override val uuid: UUID) : Network {
         val itemHolder = endPoint.holders[NetworkType.ITEMS]
         require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
         
+        val connectionType = if (local && endPoint is VanillaTileEntity)
+            NetworkConnectionType.BUFFER
+        else itemHolder.connectionConfig[face]!!
+        
         val channel = channels.getOrSet(itemHolder.channels[face]!!) { ItemNetworkChannel() }
-        channel.addHolder(itemHolder, face, createDistributor)
+        channel.addHolder(itemHolder, face, connectionType, createDistributor)
         
         _nodes += endPoint
         
