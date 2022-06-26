@@ -54,5 +54,6 @@ If you would like to help translate Nova, you can do so [here](https://translate
 * Ashwin | DarktubeNL - €10
 * ClimbersGroove - €5
 * ThantiK - €5
+* Doodles - €5
 
 Want to donate as well? Check out our [Patreon](https://www.patreon.com/xenondevs) page.
