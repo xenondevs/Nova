@@ -69,7 +69,6 @@ object CBF {
         
         // binary adapters for bukkit / nova
         registerBinaryAdapter(Color::class, ColorBinaryAdapter)
-        registerBinaryAdapter(ItemStack::class, ItemStackBinaryAdapter)
         registerBinaryAdapter(Location::class, LocationBinaryAdapter)
         registerBinaryAdapter(NamespacedKey::class, NamespacedKeyBinaryAdapter)
         registerBinaryAdapter(NamespacedId::class, NamespacedIdBinaryAdapter)
@@ -81,6 +80,9 @@ object CBF {
         registerBinaryHierarchyAdapter(Collection::class, CollectionBinaryAdapter)
         registerBinaryHierarchyAdapter(Map::class, MapBinaryAdapter)
         
+        // binary hierarchy adapters for bukkit / nova
+        registerBinaryHierarchyAdapter(ItemStack::class, ItemStackBinaryAdapter)
+    
         // instance creators
         registerInstanceCreator(EnumMap::class, EnumMapInstanceCreator)
     }
