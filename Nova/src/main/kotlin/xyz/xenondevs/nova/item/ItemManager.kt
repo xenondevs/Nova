@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.UseItemPacketEvent
@@ -40,7 +41,11 @@ internal object ItemManager : Initializable(), Listener {
     @EventHandler(priority = EventPriority.LOW)
     private fun handleInteract(e: WrappedPlayerInteractEvent) {
         val event = e.event
-        if (event.isCompletelyDenied()) return
+        val player = event.player
+        val item = event.item
+        
+        if (event.isCompletelyDenied() || item == null || !ProtectionManager.canUseItem(player, item, player.location).get())
+            return
         
         findBehaviors(event.item)?.forEach { it.handleInteract(event.player, event.item!!, event.action, event) }
     }

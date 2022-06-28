@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.castRay
-import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.isTraversable
 import xyz.xenondevs.nova.world.ChunkPos
@@ -61,14 +60,14 @@ object HitboxManager : Listener {
                     }
                     
                     var continueRay = true
-                    surroundingHitboxes!!.stream()
+                    surroundingHitboxes!!.asSequence()
                         .filter { it.isInHitbox(location) }
-                        .findFirst()
-                        .ifPresent {
+                        .firstOrNull()
+                        ?.also {
                             continueRay = false
                             
-                            ProtectionManager.canUseBlock(player, event.item, location)
-                                .runIfTrue { it.handleHit(event) }
+                            if (ProtectionManager.canUseBlock(player, event.item, location).get())
+                                it.handleHit(event)
                         }
                     
                     return@castRay continueRay

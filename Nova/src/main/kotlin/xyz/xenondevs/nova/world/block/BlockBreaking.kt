@@ -19,10 +19,13 @@ import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.CoreBlockOverlay
 import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.concurrent.runIfTrue
+import xyz.xenondevs.nova.util.concurrent.runInServerThread
 import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.takeUnlessAir
@@ -93,7 +96,11 @@ internal object BlockBreaking : Listener {
         if (blockState != null) {
             val material = blockState.material
             if (material.hardness >= 0) {
-                playerBreakers[player] = Breaker(player, pos.location.block, blockState)
+                ProtectionManager.canBreak(player, player.inventory.itemInMainHand.takeUnlessAir(), pos.location).runIfTrue {
+                    // initiate block breaker in server thread as block states are accessed
+                    runInServerThread { playerBreakers[player] = Breaker(player, pos.location.block, blockState) }
+                }
+                
                 return true
             }
         }

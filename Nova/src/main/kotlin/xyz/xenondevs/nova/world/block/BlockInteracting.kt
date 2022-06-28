@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
@@ -36,7 +37,7 @@ internal object BlockInteracting : Listener {
             val pos = event.clickedBlock!!.pos
             
             val blockState = BlockManager.getBlock(pos)
-            if (blockState != null) {
+            if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos.location).get()) {
                 val material = blockState.material
                 val ctx = BlockInteractContext(pos, player, player.location, event.blockFace, event.item, event.hand)
                 val cancelled = material.novaBlock.handleInteract(blockState, ctx)
