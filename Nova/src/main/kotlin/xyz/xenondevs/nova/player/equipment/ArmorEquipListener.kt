@@ -13,13 +13,13 @@ import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType.SlotType
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.isRightClick
@@ -84,7 +84,7 @@ internal object ArmorEquipListener : Initializable(), Listener {
             InventoryAction.HOTBAR_SWAP -> {
                 if (slotType == SlotType.ARMOR) {
                     val hotbarItem = player.inventory.getItem(event.hotbarButton)
-                    if (creative || ArmorType.fitsOnSlot(hotbarItem, event.rawSlot)) {
+                    if (creative || (hotbarItem == null || ArmorType.fitsOnSlot(hotbarItem, event.rawSlot))) {
                         equipEvent = ArmorEquipEvent(player, EquipMethod.HOTBAR_SWAP, currentItem, hotbarItem)
                     }
                 }
@@ -122,8 +122,7 @@ internal object ArmorEquipListener : Initializable(), Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
-    private fun handleInteract(e: WrappedPlayerInteractEvent) {
-        val event = e.event
+    private fun handleInteract(event: PlayerInteractEvent) {
         if (event.isCompletelyDenied()) return
         
         val item = event.item
