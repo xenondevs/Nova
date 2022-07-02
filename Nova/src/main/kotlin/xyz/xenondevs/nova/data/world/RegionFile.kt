@@ -90,6 +90,10 @@ internal class RegionFile(val world: WorldDataStorage, val file: File, val regio
         }
     }
     
+    fun close() {
+        raf.close()
+    }
+    
     //<editor-fold desc="Writing">
     
     fun save(chunk: RegionChunk) {

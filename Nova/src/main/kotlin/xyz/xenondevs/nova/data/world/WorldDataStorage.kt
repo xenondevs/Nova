@@ -29,8 +29,14 @@ internal class WorldDataStorage(val world: World) {
     fun saveAll() {
         regionFiles.removeIf { (_, regionFile) ->
             regionFile.saveAll()
-            return@removeIf regionFile.chunks.all { it == null }
+            val remove = regionFile.chunks.all { it == null }
+            if (remove) regionFile.close()
+            return@removeIf remove
         }
+    }
+    
+    fun closeAll() {
+        regionFiles.values.forEach(RegionFile::close)
     }
     
 }

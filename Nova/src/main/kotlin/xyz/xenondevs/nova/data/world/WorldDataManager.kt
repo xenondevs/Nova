@@ -52,6 +52,10 @@ internal object WorldDataManager : Initializable(), Listener {
         }
     }
     
+    override fun disable() {
+        worlds.values.forEach(WorldDataStorage::closeAll)
+    }
+    
     @Synchronized
     private fun loadChunk(pos: ChunkPos) {
         if (pos.isLoaded()) {
