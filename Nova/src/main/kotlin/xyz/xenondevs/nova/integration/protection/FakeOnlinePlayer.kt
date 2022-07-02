@@ -239,6 +239,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun stopSound(sound: SoundCategory) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun stopAllSounds() {
         throw UnsupportedOperationException("Player is not online")
     }
