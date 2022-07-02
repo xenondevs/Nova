@@ -33,6 +33,8 @@ class Version : Comparable<Version> {
         return 0
     }
     
+    operator fun rangeTo(other: Version): VersionRange = VersionRange(this, other)
+    
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
@@ -59,6 +61,16 @@ class Version : Comparable<Version> {
             SERVER_VERSION = Version(versionPattern.find(Bukkit.getVersion())!!.groupValues[1])
         }
         
+    }
+    
+}
+
+class VersionRange(val min: Version, val max: Version) : Comparable<VersionRange> {
+    
+    operator fun contains(version: Version) = version >= min && version <= max
+    
+    override fun compareTo(other: VersionRange): Int {
+        return this.min.compareTo(other.min)
     }
     
 }
