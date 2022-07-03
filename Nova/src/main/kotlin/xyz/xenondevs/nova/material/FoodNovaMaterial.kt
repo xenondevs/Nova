@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.material
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.resources.builder.MaterialType
+import xyz.xenondevs.nova.data.resources.builder.ItemModelType
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Consumable
 
@@ -18,9 +18,9 @@ import xyz.xenondevs.nova.item.behavior.Consumable
  * @property effects A list of effects to apply to the player when this food is consumed.
  * @property custom A custom lambda that is run when the food is consumed.
  * @property alwaysConsumable If the food can always be consumed, even if the player is not hungry.
- * For this to work properly clientside, [MaterialType.ALWAYS_CONSUMABLE] is required.
+ * For this to work properly clientside, [ItemModelType.ALWAYS_CONSUMABLE] is required.
  * @property fast If the food eating sounds should start playing immediately, as this food is consumed fast.
- * For this to work properly clientside, [MaterialType.FAST_CONSUMABLE] is required.
+ * For this to work properly clientside, [ItemModelType.FAST_CONSUMABLE] is required.
  * @property
  */
 data class FoodOptions(

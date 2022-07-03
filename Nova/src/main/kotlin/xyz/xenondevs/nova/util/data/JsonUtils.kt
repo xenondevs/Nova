@@ -8,6 +8,7 @@ import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.world.loot.LootItem
@@ -31,6 +32,7 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter<IntRange>(IntRangeSerialization)
         .registerTypeHierarchyAdapter<LootTable>(LootTableSerialization)
         .registerTypeHierarchyAdapter<LootItem>(LootItemSerialization)
+        .registerTypeHierarchyAdapter<BlockModelData>(BlockModelDataSerialization)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()
         .create()

@@ -41,7 +41,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         val material = TileEntityNovaMaterial(
             NamespacedId(namespace, name), "block.$namespace.$name", NovaItem(TileEntityItemBehavior),
             if (isInteractive) TileEntityBlock.INTERACTIVE else TileEntityBlock.NON_INTERACTIVE,
-            options, tileEntityConstructor, ArmorStandModelProvider, properties, placeCheck, multiBlockLoader
+            options, tileEntityConstructor, properties, placeCheck, multiBlockLoader
         )
         return register(material)
     }

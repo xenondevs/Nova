@@ -1,0 +1,68 @@
+package xyz.xenondevs.nova.data.resources.builder.basepack.merger
+
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
+import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.addAll
+import java.io.File
+import java.util.logging.Level
+
+internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/blockstates") {
+    
+    override fun merge(source: File, destination: File) {
+        val configType = BlockStateConfigType.fromFileName(source.nameWithoutExtension)
+        if (configType != null) {
+            val variants = getVariants(source)
+            if (destination.exists())
+                variants.addAll(getVariants(destination))
+            
+            processVariants(configType, variants)
+            
+            val blockStateObj = JsonObject()
+            blockStateObj.add("variants", variants)
+            destination.writeText(GSON.toJson(blockStateObj))
+            return
+        }
+        
+        source.copyTo(destination)
+    }
+    
+    private fun getVariants(file: File): JsonObject {
+        val sourceObj = JsonParser.parseReader(file.reader()) as JsonObject
+        return sourceObj.get("variants") as? JsonObject
+            ?: (sourceObj.get("multipart") as? JsonArray)?.let(::convertMultipartToVariants)
+            ?: JsonObject()
+    }
+    
+    private fun convertMultipartToVariants(array: JsonArray): JsonObject {
+        val variants = JsonObject()
+        
+        try {
+            array.forEach { obj ->
+                obj as JsonObject
+                val whenObj = obj.get("when") as JsonObject
+                val apply = obj.get("apply")
+                val model = (if (apply is JsonObject) apply.get("model") else apply.asJsonArray.first().asJsonObject.get("model")).asString
+                
+                val variantString = whenObj.entrySet().joinToString(",") { "${it.key}=${it.value.asString}" }
+                variants.add(variantString, JsonObject().apply { addProperty("model", model) })
+            }
+        } catch (e: Exception) {
+            LOGGER.log(Level.SEVERE, "Failed to convert multipart to variants, some block states might be missing", e)
+        }
+        
+        return variants
+    }
+    
+    private fun processVariants(configType: BlockStateConfigType<*>, obj: JsonObject) {
+        val occupied = basePacks.occupiedSolidIds.getOrPut(configType, ::HashSet)
+        obj.entrySet().forEach { (variant, _) ->
+            occupied += configType.of(variant).id
+        }
+    }
+    
+}

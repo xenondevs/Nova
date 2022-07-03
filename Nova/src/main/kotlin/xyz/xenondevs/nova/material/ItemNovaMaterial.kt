@@ -6,6 +6,7 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -19,8 +20,8 @@ open class ItemNovaMaterial internal constructor(
     novaItem: NovaItem? = null,
 ) : INovaMaterial {
     
-    val novaItem = novaItem ?: NovaItem()
-    val item: ModelData by lazy { Resources.getModelData(id).first!! }
+    val novaItem: NovaItem = novaItem ?: NovaItem()
+    val item: ItemModelData by lazy { Resources.getModelData(id).first!! }
     val maxStackSize: Int
         get() = item.material.maxStackSize
     

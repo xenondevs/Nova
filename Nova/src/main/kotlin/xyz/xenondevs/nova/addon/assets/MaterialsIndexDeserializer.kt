@@ -4,11 +4,12 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
-import xyz.xenondevs.nova.data.resources.builder.MaterialType
+import xyz.xenondevs.nova.data.resources.builder.BlockModelType
+import xyz.xenondevs.nova.data.resources.builder.ItemModelType
 import xyz.xenondevs.nova.util.addNamespace
-import xyz.xenondevs.nova.util.data.getAllInts
-import xyz.xenondevs.nova.util.data.getAllStrings
-import xyz.xenondevs.nova.util.data.isString
+import xyz.xenondevs.nova.util.data.*
+
+private fun String.toMaterial(): Material? = Material.getMaterial(uppercase())
 
 internal object MaterialsIndexDeserializer {
     
@@ -18,45 +19,34 @@ internal object MaterialsIndexDeserializer {
         val index = ArrayList<RegisteredMaterial>()
         
         json.entrySet().forEach { (name, element) ->
-            val itemInfo: ModelInformation?
-            val blockInfo: ModelInformation?
+            val itemInfo: ItemModelInformation?
+            val blockInfo: BlockModelInformation?
             val id = name.addNamespace(namespace)
             
             if (element is JsonObject) {
-                itemInfo = deserializeModelList(element, "item")
+                val itemModelList = deserializeModelList(element, "item")
+                itemInfo = itemModelList
                     ?.map { it.addNamespace(namespace) }
-                    ?.let { ModelInformation(deserializeMaterialType(element, "item"), it, id) }
-                blockInfo = deserializeModelList(element, "block")
+                    ?.let { ItemModelInformation(id, deserializeItemModelType(element), it) }
+                    ?: ItemModelInformation(id, ItemModelType.DEFAULT.material, emptyList())
+                
+                blockInfo = (deserializeModelList(element, "block") ?: itemModelList)
                     ?.map { it.addNamespace(namespace) }
-                    ?.let { ModelInformation(deserializeMaterialType(element, "block"), it, id) }
+                    ?.let {
+                        val priority = element.getInt("block_priority", 0)
+                        val hitboxType = element.getString("block_hitbox")?.toMaterial()
+                        val blockType = element.getString("block_type")?.uppercase()?.let(BlockModelType::valueOf) ?: BlockModelType.DEFAULT
+                        BlockModelInformation(id, blockType, hitboxType, it, priority)
+                    }
             } else {
-                itemInfo = ModelInformation(MaterialType.DEFAULT.material, listOf(element.asString.addNamespace(namespace)), id)
+                itemInfo = ItemModelInformation(id, ItemModelType.DEFAULT.material, listOf(element.asString.addNamespace(namespace)))
                 blockInfo = null
             }
             
-            index += RegisteredMaterial(id, itemInfo ?: blockInfo, blockInfo ?: itemInfo)
+            index += RegisteredMaterial(id, itemInfo, blockInfo ?: itemInfo.toBlockInfo())
         }
         
         return index
-    }
-    
-    private fun deserializeMaterialType(json: JsonObject, path: String): Material {
-        val material = json.get(path + "_material")
-            ?.takeUnless(JsonElement::isJsonNull)
-            ?.asString?.uppercase()
-            ?.let(Material::valueOf)
-        
-        if (material != null) {
-            return material
-        }
-        
-        val materialType = json.get(path + "_type")
-            ?.takeUnless(JsonElement::isJsonNull)
-            ?.asString?.uppercase()
-            ?.let(MaterialType::valueOf)
-            ?: MaterialType.DEFAULT
-        
-        return materialType.material
     }
     
     private fun deserializeModelList(json: JsonObject, path: String): List<String>? {
@@ -85,8 +75,60 @@ internal object MaterialsIndexDeserializer {
         throw IllegalArgumentException("Could not deserialize model list: $json")
     }
     
+    private fun deserializeItemModelType(json: JsonObject): Material {
+        val material = json.get("item_material")
+            ?.takeUnless(JsonElement::isJsonNull)
+            ?.asString?.uppercase()
+            ?.let(Material::valueOf)
+        
+        if (material != null) {
+            return material
+        }
+        
+        val itemModelType = json.get("item_type")
+            ?.takeUnless(JsonElement::isJsonNull)
+            ?.asString?.uppercase()
+            ?.let(ItemModelType::valueOf)
+            ?: ItemModelType.DEFAULT
+        
+        return itemModelType.material
+    }
+    
 }
 
-internal data class RegisteredMaterial(val id: String, val itemInfo: ModelInformation?, val blockInfo: ModelInformation?)
+internal class RegisteredMaterial(
+    val id: String,
+    val itemInfo: ItemModelInformation,
+    val blockInfo: BlockModelInformation
+)
 
-internal data class ModelInformation(val material: Material, val models: List<String>, val id: String)
+internal interface ModelInformation {
+    val id: String
+    val models: List<String>
+}
+
+internal class ItemModelInformation(
+    override val id: String,
+    val material: Material,
+    override val models: List<String>
+) : ModelInformation {
+    
+    fun toBlockInfo() = BlockModelInformation(id, BlockModelType.DEFAULT, null, models, 0)
+    
+}
+
+internal class BlockModelInformation(
+    override val id: String,
+    val type: BlockModelType,
+    hitboxType: Material?,
+    override val models: List<String>,
+    val priority: Int
+) : ModelInformation {
+    
+    val hitboxType = hitboxType ?: DEFAULT_HITBOX_TYPE
+    
+    companion object {
+        val DEFAULT_HITBOX_TYPE = Material.BARRIER
+    }
+    
+}

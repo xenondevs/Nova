@@ -1,14 +1,15 @@
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.data.resources.model.data
 
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.unhandledTags
 
-class ModelData(val material: Material, val dataArray: IntArray, val id: String) {
+open class ItemModelData(val id: String, val material: Material, val dataArray: IntArray) {
     
     val data: Int
         get() = dataArray[0]

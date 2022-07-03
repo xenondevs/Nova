@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.material
 
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig.Companion.modelProvider
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
@@ -9,7 +10,6 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
-import xyz.xenondevs.nova.world.block.model.BlockModelProviderType
 
 typealias TileEntityConstructor = ((NovaTileEntityState) -> TileEntity)
 
@@ -21,7 +21,6 @@ class TileEntityNovaMaterial internal constructor(
     novaBlock: NovaBlock<NovaTileEntityState>,
     options: BlockOptions,
     internal val tileEntityConstructor: TileEntityConstructor,
-    modelProvider: BlockModelProviderType<*>,
     properties: List<BlockPropertyType<*>>,
     placeCheck: PlaceCheckFun?,
     multiBlockLoader: MultiBlockLoader?
@@ -31,7 +30,6 @@ class TileEntityNovaMaterial internal constructor(
     novaItem,
     novaBlock as NovaBlock<NovaBlockState>, // fixme: users could cast to BlockNovaMaterial and then call methods on the NovaBlock with a BlockState that is not a NovaTileEntityState
     options,
-    modelProvider,
     properties,
     placeCheck,
     multiBlockLoader

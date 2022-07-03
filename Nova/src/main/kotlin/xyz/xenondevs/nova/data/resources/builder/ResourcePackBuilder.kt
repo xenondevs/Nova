@@ -9,6 +9,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
+import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.write
 import java.io.File
@@ -42,7 +44,7 @@ internal object ResourcePackBuilder {
         
         // init content
         val contents = listOf(
-            MaterialContent(basePacks.occupiedModelData),
+            MaterialContent(basePacks),
             GUIContent(),
             LanguageContent()
         )
@@ -120,13 +122,19 @@ internal object ResourcePackBuilder {
     
 }
 
-internal enum class MaterialType(val material: Material) {
+internal enum class ItemModelType(val material: Material) {
     
     DEFAULT(Material.SHULKER_SHELL),
     DAMAGEABLE(Material.FISHING_ROD),
-    TRANSLUCENT(Material.SHULKER_SHELL),
     CONSUMABLE(Material.APPLE),
     ALWAYS_CONSUMABLE(Material.GOLDEN_APPLE),
     FAST_CONSUMABLE(Material.DRIED_KELP);
+    
+}
+
+internal enum class BlockModelType(vararg val configTypes: BlockStateConfigType<*>?) {
+    
+    DEFAULT(null),
+    SOLID(NoteBlockStateConfig, null);
     
 }

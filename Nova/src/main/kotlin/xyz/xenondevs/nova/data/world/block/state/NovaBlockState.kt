@@ -15,7 +15,7 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
     
     override val id = material.id
     open val material = material
-    val modelProvider by lazy { material.modelProvider.create(this) }
+    val modelProvider by lazy { material.block.modelProviderType.create(this) }
     private val properties = material.properties.associateWithTo(LinkedHashMap(), BlockPropertyType<*>::create)
     
     constructor(material: BlockNovaMaterial, ctx: BlockPlaceContext) : this(ctx.pos, material) {

@@ -1,25 +1,17 @@
-package xyz.xenondevs.nova.data.resources.builder.basepack
+package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.bukkit.Material
+import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.getInt
 import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.data.set
 import java.io.File
-import java.nio.file.Path
 import java.util.*
-
-internal abstract class FileMerger(protected val basePacks: BasePacks, val path: Path) {
-    
-    constructor(basePacks: BasePacks, path: String) : this(basePacks, Path.of(path))
-    
-    abstract fun merge(source: File, destination: File)
-    
-}
 
 internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/models") {
     
@@ -107,44 +99,6 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "as
             return entry
         }
         
-    }
-    
-}
-
-internal class LangFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/lang") {
-    
-    override fun merge(source: File, destination: File) {
-        if (!destination.exists()) {
-            source.copyTo(destination)
-            return
-        }
-        
-        val sourceObj = JsonParser.parseReader(source.reader()) as? JsonObject ?: return
-        val destObj = JsonParser.parseReader(destination.reader()) as? JsonObject ?: return
-        
-        sourceObj.entrySet().forEach { (key, value) -> if (!destObj.has(key)) destObj[key] = value }
-        
-        destination.writeText(GSON.toJson(destObj))
-    }
-    
-}
-
-internal class FontFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/lang") {
-    
-    override fun merge(source: File, destination: File) {
-        if (!destination.exists()) {
-            source.copyTo(destination)
-            return
-        }
-        
-        val sourceObj = JsonParser.parseReader(source.reader()) as? JsonObject ?: return
-        val destObj = JsonParser.parseReader(destination.reader()) as? JsonObject ?: return
-        val sourceProviders = sourceObj.get("providers") as? JsonArray ?: return
-        val destProviders = destObj.get("providers") as? JsonArray ?: return
-        
-        destProviders.addAll(sourceProviders)
-        
-        destination.writeText(GSON.toJson(destObj))
     }
     
 }

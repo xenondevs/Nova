@@ -6,6 +6,8 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
+import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
 import java.io.File
 import java.nio.file.Path
@@ -19,13 +21,10 @@ private val BASE_PACKS by configReloadable { DEFAULT_CONFIG.getStringList("resou
 
 internal class BasePacks {
     
-    private val mergers = listOf(
-        ModelFileMerger(this),
-        LangFileMerger(this),
-        FontFileMerger(this)
-    )
+    private val mergers = FileMerger.createMergers(this)
     
     val occupiedModelData = HashMap<Material, HashSet<Int>>()
+    val occupiedSolidIds = HashMap<BlockStateConfigType<*>, HashSet<Int>>()
     
     fun include() {
         BASE_PACKS.map {
