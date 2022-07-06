@@ -12,7 +12,7 @@ import xyz.xenondevs.nmsutils.util.removeIf
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
 
-data class ListenerConfig(val ref: Any, val method: Method, val priority: EventPriority, val ignoreIfCancelled: Boolean)
+private data class Listener(val instance: Any, val method: Method, val priority: EventPriority, val ignoreIfCancelled: Boolean)
 
 @Suppress("UNCHECKED_CAST")
 object PacketEventManager {
@@ -22,8 +22,8 @@ object PacketEventManager {
     private val eventConstructors = HashMap<KClass<out Packet<*>>, (Packet<*>) -> PacketEvent<Packet<*>>>()
     private val playerEventConstructors = HashMap<KClass<out Packet<*>>, (Player, Packet<*>) -> PlayerPacketEvent<Packet<*>>>()
     
-    private val listeners = HashMap<KClass<out PacketEvent<*>>, MutableList<ListenerConfig>>()
-    private val listenerInstances = HashMap<Any, List<ListenerConfig>>()
+    private val listeners = HashMap<KClass<out PacketEvent<*>>, MutableList<Listener>>()
+    private val listenerInstances = HashMap<Any, List<Listener>>()
     
     init {
         // clientbound - player
@@ -76,42 +76,41 @@ object PacketEventManager {
     
     @Synchronized
     private fun callEvent(event: PacketEvent<*>) {
-        listeners[event::class]?.forEach { (ref, method, _, ignoreIfCancelled) ->
+        listeners[event::class]?.forEach { (instance, method, _, ignoreIfCancelled) ->
             if (!ignoreIfCancelled || !event.isCancelled) {
-                method.invoke(ref, event)
+                method.invoke(instance, event)
             }
         }
     }
     
     @Synchronized
-    fun registerListener(listener: Any) {
-        val classListeners = ArrayList<ListenerConfig>()
+    fun registerListener(listenerInstance: Any) {
+        val instanceListeners = ArrayList<Listener>()
         
-        listener::class.java.declaredMethods.forEach { method ->
+        listenerInstance::class.java.declaredMethods.forEach { method ->
             if (method.isAnnotationPresent(PacketHandler::class.java) && method.parameters.size == 1) {
                 val param = method.parameters.first().type.kotlin
                 if (param in eventTypes.values) {
                     param as KClass<out PacketEvent<*>>
+                    method.isAccessible = true
                     
                     val priority = method.getAnnotation(PacketHandler::class.java).priority
                     val ignoreIfCancelled = method.getAnnotation(PacketHandler::class.java).ignoreIfCancelled
                     
-                    val cfg = ListenerConfig(listener, method, priority, ignoreIfCancelled)
-                    classListeners += cfg
+                    val listener = Listener(listenerInstance, method, priority, ignoreIfCancelled)
+                    instanceListeners += listener
                     
                     val list = listeners[param]?.let(::ArrayList) ?: ArrayList()
-                    list += cfg
+                    list += listener
                     list.sortBy { it.priority }
                     
                     listeners[param] = list
-                    
-                    method.isAccessible = true
                 }
             }
         }
         
-        if (classListeners.isNotEmpty())
-            listenerInstances[listener] = classListeners
+        if (instanceListeners.isNotEmpty())
+            listenerInstances[listenerInstance] = instanceListeners
     }
     
     @Synchronized
