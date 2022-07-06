@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
@@ -45,7 +44,7 @@ internal object FakeArmorStandManager : Initializable(), Listener {
     private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
     
     override val inMainThread = false
-    override val dependsOn = setOf(PacketManager)
+    override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
         LOGGER.info("Initializing FakeArmorStandManager")

@@ -12,13 +12,15 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nmsutils.network.event.PacketEventManager
+import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
+import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
-import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
-import xyz.xenondevs.nova.network.event.serverbound.UseItemPacketEvent
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.bukkitSlot
@@ -36,6 +38,7 @@ internal object ItemManager : Initializable(), Listener {
     override fun init() {
         LOGGER.info("Initializing ItemManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
+        PacketEventManager.registerListener(this)
     }
     
     @EventHandler(priority = EventPriority.LOW)
@@ -87,8 +90,8 @@ internal object ItemManager : Initializable(), Listener {
     }
     
     // This method stores the last used item for the RELEASE_USE_ITEM action below
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun handleUseItem(event: UseItemPacketEvent) {
+    @PacketHandler(priority = EventPriority.HIGHEST, ignoreIfCancelled = true)
+    private fun handleUseItem(event: ServerboundUseItemPacketEvent) {
         val player = event.player
         val item = player.inventory.getItem(event.hand.bukkitSlot)?.takeUnlessAir()
         if (item != null)
@@ -101,8 +104,8 @@ internal object ItemManager : Initializable(), Listener {
         usedItems -= event.player
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun handleAction(event: PlayerActionPacketEvent) {
+    @PacketHandler(priority = EventPriority.HIGHEST, ignoreIfCancelled = true)
+    private fun handleAction(event: ServerboundPlayerActionPacketEvent) {
         if (event.action == ServerboundPlayerActionPacket.Action.RELEASE_USE_ITEM) {
             val player = event.player
             val item = usedItems[player]

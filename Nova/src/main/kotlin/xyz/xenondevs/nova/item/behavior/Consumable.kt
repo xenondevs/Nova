@@ -10,8 +10,9 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
+import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.material.FoodOptions
-import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.item.genericMaxHealth
 import kotlin.math.min
@@ -52,7 +53,7 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
         beginEating(player, itemStack, event.hand!!)
     }
     
-    override fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerActionPacketEvent) {
+    override fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) {
         runTask {
             val eater = eaters.remove(player)
             if (eater != null)

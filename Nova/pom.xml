@@ -20,6 +20,7 @@
         <annotations.version>23.0.0</annotations.version>
         <invui.version>0.7-SNAPSHOT</invui.version>
         <ktor.version>2.0.2</ktor.version>
+        <nms-utilities.version>0.1-SNAPSHOT</nms-utilities.version>
         <maven-resolver-provider.version>3.8.5</maven-resolver-provider.version>
         <maven-resolver-connector-basic.version>1.8.0</maven-resolver-connector-basic.version>
         <maven-resolver-transport-http.version>1.8.0</maven-resolver-transport-http.version>
@@ -85,9 +86,9 @@
                     <version>${invui.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>xyz.xenondevs.kadvancements</groupId>
-                    <artifactId>kadvancements-adapter-r2</artifactId>
-                    <version>0.1-SNAPSHOT</version>
+                    <groupId>xyz.xenondevs</groupId>
+                    <artifactId>nms-utilities</artifactId>
+                    <version>${nms-utilities.version}</version>
                 </dependency>
             </dependencies>
             <build>
@@ -141,10 +142,10 @@
                     <classifier>remapped-mojang</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>xyz.xenondevs.kadvancements</groupId>
-                    <artifactId>kadvancements-adapter-r2</artifactId>
+                    <groupId>xyz.xenondevs</groupId>
+                    <artifactId>nms-utilities</artifactId>
                     <classifier>remapped-mojang</classifier>
-                    <version>0.1-SNAPSHOT</version>
+                    <version>${nms-utilities.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -463,11 +464,6 @@
 
         <!-- Not provided -->
         <dependency>
-            <groupId>xyz.xenondevs.kadvancements</groupId>
-            <artifactId>kadvancements-core</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>de.studiocode.invui</groupId>
             <artifactId>InvUI</artifactId>
             <version>${invui.version}</version>
@@ -625,7 +621,7 @@
                             <include>xyz.xenondevs.nova:Nova-API</include>
                             <include>de.studiocode.invui:*</include>
                             <include>org.bstats:*</include>
-                            <include>xyz.xenondevs.kadvancements:*</include>
+                            <include>xyz.xenondevs:nms-utilities</include>
                         </includes>
                     </artifactSet>
                 </configuration>

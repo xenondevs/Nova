@@ -5,14 +5,15 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.scheduler.BukkitTask
+import xyz.xenondevs.nmsutils.network.event.PacketEventManager
+import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundActionBarPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.network.event.clientbound.ActionBarPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.SystemChatPacketEvent
 import xyz.xenondevs.nova.util.data.forceDefaultFont
 import xyz.xenondevs.nova.util.data.toPlainText
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -35,11 +36,13 @@ object ActionbarOverlayManager : Listener {
         if (tickTask != null) {
             tickTask?.cancel()
             HandlerList.unregisterAll(this)
+            PacketEventManager.unregisterListener(this)
             tickTask = null
         }
         
         if (DEFAULT_CONFIG.getBoolean("actionbar_overlay.enabled")) {
             Bukkit.getPluginManager().registerEvents(this, NOVA)
+            PacketEventManager.registerListener(this)
             tickTask = runTaskTimer(0, 1, ::handleTick)
         }
     }
@@ -73,8 +76,8 @@ object ActionbarOverlayManager : Listener {
             .forEach { it.send(EMPTY_ACTION_BAR_PACKET) }
     }
     
-    @EventHandler
-    private fun handleChatPacket(event: SystemChatPacketEvent) {
+    @PacketHandler
+    private fun handleChatPacket(event: ClientboundSystemChatPacketEvent) {
         if (event.typeId == 2) {
             val player = event.player
             val uuid = player.uniqueId
@@ -89,8 +92,8 @@ object ActionbarOverlayManager : Listener {
         }
     }
     
-    @EventHandler
-    private fun handleChatPacket(event: ActionBarPacketEvent) {
+    @PacketHandler
+    private fun handleChatPacket(event: ClientboundActionBarPacketEvent) {
         val player = event.player
         val uuid = player.uniqueId
         if (overlays.containsKey(uuid)) {

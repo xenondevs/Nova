@@ -4,6 +4,7 @@ import de.studiocode.invui.util.InventoryUtils
 import de.studiocode.invui.virtualinventory.StackSizeProvider
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
+import xyz.xenondevs.nmsutils.NMSUtilities
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.UpdateReminder
@@ -23,7 +24,6 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.ItemManager
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.PacketItems
-import xyz.xenondevs.nova.network.PacketManager
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.player.attachment.AttachmentManager
 import xyz.xenondevs.nova.player.equipment.ArmorEquipListener
@@ -51,15 +51,16 @@ internal object Initializer {
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeArmorStandManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
-        AbilityManager, PacketManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
+        AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager
     ).sorted()
     
     private val latch = CountDownLatch(toInit.size)
     
     fun init() {
+        NMSUtilities.init(NOVA)
+        
         runAsyncTask {
-            
             toInit.forEach {
                 runAsyncTask {
                     it.dependsOn.forEach { it.latch.await() }
@@ -88,6 +89,8 @@ internal object Initializer {
                 LOGGER.log(Level.SEVERE, "An exception occurred trying to disable $it", e)
             }
         }
+        
+        NMSUtilities.disable()
     }
     
     private fun setupMetrics() {

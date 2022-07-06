@@ -6,23 +6,21 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Axis
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
+import xyz.xenondevs.nmsutils.network.event.PacketEventManager
+import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.CoreBlockOverlay
-import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.concurrent.runInServerThread
@@ -39,13 +37,13 @@ import java.util.logging.Level
 import kotlin.random.Random
 import net.minecraft.world.entity.EquipmentSlot as MojangSlot
 
-internal object BlockBreaking : Listener {
+internal object BlockBreaking {
     
     private val playerBreakers = ConcurrentHashMap<Player, Breaker>()
     private val internalBreakers = HashMap<Int, BreakMethod>()
     
     fun init() {
-        Bukkit.getPluginManager().registerEvents(this, NOVA)
+        PacketEventManager.registerListener(this)
         runTaskTimer(0, 1, ::handleTick)
     }
     
@@ -117,8 +115,8 @@ internal object BlockBreaking : Listener {
         return false
     }
     
-    @EventHandler
-    private fun handlePlayerAction(event: PlayerActionPacketEvent) {
+    @PacketHandler
+    private fun handlePlayerAction(event: ServerboundPlayerActionPacketEvent) {
         val player = event.player
         val pos = event.pos
         val blockPos = BlockPos(event.player.world, pos.x, pos.y, pos.z)

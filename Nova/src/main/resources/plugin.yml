@@ -6,7 +6,7 @@ main: xyz.xenondevs.nova.Nova
 api-version: 1.19
 
 libraries:
-  - org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin.version}
+  - org.jetbrains.kotlin:kotlin-stdlib:${kotlin.version}
   - org.jetbrains.kotlin:kotlin-reflect:${kotlin.version}
   - org.jetbrains:annotations:${annotations.version}
   - xyz.xenondevs:particle:${particlelib.version}
