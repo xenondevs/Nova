@@ -191,4 +191,11 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>xenondevs</id>
+            <url>https://repo.xenondevs.xyz/releases</url>
+        </repository>
+    </distributionManagement>
+
 </project>
