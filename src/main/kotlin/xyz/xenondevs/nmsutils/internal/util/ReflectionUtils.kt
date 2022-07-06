@@ -1,4 +1,4 @@
-package xyz.xenondevs.nmsutils.util
+package xyz.xenondevs.nmsutils.internal.util
 
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field

@@ -11,6 +11,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
         <kotlin.version>1.7.0</kotlin.version>
         <spigot.version>1.19-R0.1-SNAPSHOT</spigot.version>
@@ -34,6 +36,11 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
@@ -95,9 +102,6 @@
                                 <classes>org.spigotmc:minecraft-server:csrg:maps-spigot:${spigot.version}</classes>
                                 <members>org.spigotmc:minecraft-server:csrg:maps-spigot-members:${spigot.version}</members>
                             </mapsSpigot>
-                            <classes>
-                                <class>xyz.xenondevs.nmsutils.advancement.adapter.r1.util.ReflectionRegistry</class>
-                            </classes>
                         </configuration>
                     </execution>
 

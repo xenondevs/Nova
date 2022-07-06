@@ -6,7 +6,7 @@ import org.bukkit.Keyed
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.Recipe
 import xyz.xenondevs.nmsutils.adapter.Adapter
-import xyz.xenondevs.nmsutils.util.resourceLocation
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
 
 class Rewards(
     val recipes: List<String>,

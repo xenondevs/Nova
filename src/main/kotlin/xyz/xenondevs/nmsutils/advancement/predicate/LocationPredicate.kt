@@ -7,8 +7,8 @@ import org.bukkit.World
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.adapter.impl.DoubleBoundsAdapter
 import xyz.xenondevs.nmsutils.advancement.AdvancementDsl
-import xyz.xenondevs.nmsutils.util.resourceKey
-import xyz.xenondevs.nmsutils.util.resourceLocation
+import xyz.xenondevs.nmsutils.internal.util.resourceKey
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
 import net.minecraft.advancements.critereon.LocationPredicate as MojangLocationPredicate
 
 /**

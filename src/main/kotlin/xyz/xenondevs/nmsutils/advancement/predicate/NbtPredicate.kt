@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.TagParser
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
-import xyz.xenondevs.nmsutils.util.nmsStack
+import xyz.xenondevs.nmsutils.internal.util.nmsStack
 import net.minecraft.advancements.critereon.NbtPredicate as MojangNbtPredicate
 
 class NbtPredicate(

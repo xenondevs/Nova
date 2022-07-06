@@ -5,7 +5,7 @@ import org.bukkit.enchantments.Enchantment
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.adapter.impl.IntBoundsAdapter
 import xyz.xenondevs.nmsutils.advancement.AdvancementDsl
-import xyz.xenondevs.nmsutils.util.resourceLocation
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
 import net.minecraft.advancements.critereon.EnchantmentPredicate as MojangEnchantmentPredicate
 
 class EnchantmentPredicate(

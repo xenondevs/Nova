@@ -3,9 +3,9 @@ package xyz.xenondevs.nmsutils.advancement
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nmsutils.adapter.Adapter
-import xyz.xenondevs.nmsutils.util.ReflectionRegistry.ADVANCEMENT_BUILDER_CONSTRUCTOR
+import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry.ADVANCEMENT_BUILDER_CONSTRUCTOR
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
 import xyz.xenondevs.nmsutils.util.mapToArray
-import xyz.xenondevs.nmsutils.util.resourceLocation
 
 @DslMarker
 internal annotation class AdvancementDsl

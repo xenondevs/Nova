@@ -5,7 +5,7 @@ import net.minecraft.advancements.critereon.LighthingBoltPredicate
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.adapter.impl.IntBoundsAdapter
 import xyz.xenondevs.nmsutils.advancement.AdvancementDsl
-import xyz.xenondevs.nmsutils.util.ReflectionRegistry
+import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry
 
 class LightningBoltPredicate(
     val blocksOnFire: IntRange?,

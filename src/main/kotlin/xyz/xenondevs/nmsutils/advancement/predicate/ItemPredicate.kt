@@ -9,8 +9,8 @@ import org.bukkit.potion.PotionEffect
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.adapter.impl.IntBoundsAdapter
 import xyz.xenondevs.nmsutils.advancement.AdvancementDsl
+import xyz.xenondevs.nmsutils.internal.util.potion
 import xyz.xenondevs.nmsutils.util.mapToArray
-import xyz.xenondevs.nmsutils.util.potion
 import net.minecraft.advancements.critereon.EnchantmentPredicate as MojangEnchantmentPredicate
 import net.minecraft.advancements.critereon.ItemPredicate as MojangItemPredicate
 

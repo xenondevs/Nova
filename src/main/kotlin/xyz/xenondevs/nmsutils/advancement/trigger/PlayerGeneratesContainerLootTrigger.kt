@@ -4,7 +4,7 @@ import net.minecraft.advancements.critereon.LootTableTrigger
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nmsutils.adapter.Adapter
 import xyz.xenondevs.nmsutils.advancement.predicate.EntityPredicate
-import xyz.xenondevs.nmsutils.util.resourceLocation
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
 
 class PlayerGeneratesContainerLootTrigger(
     val player: EntityPredicate?,

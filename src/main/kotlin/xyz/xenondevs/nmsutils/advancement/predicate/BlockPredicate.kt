@@ -6,8 +6,8 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.advancement.AdvancementDsl
-import xyz.xenondevs.nmsutils.util.nmsBlock
-import xyz.xenondevs.nmsutils.util.tagKey
+import xyz.xenondevs.nmsutils.internal.util.nmsBlock
+import xyz.xenondevs.nmsutils.internal.util.tagKey
 import net.minecraft.advancements.critereon.BlockPredicate as MojangBlockPredicate
 
 class BlockPredicate(

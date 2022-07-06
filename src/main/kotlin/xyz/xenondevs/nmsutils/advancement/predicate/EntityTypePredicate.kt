@@ -4,8 +4,8 @@ import net.minecraft.tags.TagKey
 import org.bukkit.Tag
 import org.bukkit.entity.EntityType
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
-import xyz.xenondevs.nmsutils.util.nmsType
-import xyz.xenondevs.nmsutils.util.tagKey
+import xyz.xenondevs.nmsutils.internal.util.nmsType
+import xyz.xenondevs.nmsutils.internal.util.tagKey
 import net.minecraft.advancements.critereon.EntityTypePredicate as MojangEntityTypePredicate
 import net.minecraft.world.entity.EntityType as MojangEntityType
 

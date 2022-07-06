@@ -5,9 +5,9 @@ import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.advancements.DisplayInfo
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.adapter.Adapter
-import xyz.xenondevs.nmsutils.util.nmsStack
-import xyz.xenondevs.nmsutils.util.resourceLocation
-import xyz.xenondevs.nmsutils.util.toComponent
+import xyz.xenondevs.nmsutils.internal.util.nmsStack
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
+import xyz.xenondevs.nmsutils.internal.util.toComponent
 
 enum class FrameType {
     TASK,

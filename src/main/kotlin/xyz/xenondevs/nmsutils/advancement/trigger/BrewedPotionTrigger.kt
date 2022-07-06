@@ -3,7 +3,7 @@ package xyz.xenondevs.nmsutils.advancement.trigger
 import net.minecraft.core.Registry
 import xyz.xenondevs.nmsutils.adapter.Adapter
 import xyz.xenondevs.nmsutils.advancement.predicate.EntityPredicate
-import xyz.xenondevs.nmsutils.util.resourceLocation
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
 import net.minecraft.advancements.critereon.BrewedPotionTrigger as MojangBrewedPotionTrigger
 
 class BrewedPotionTrigger(

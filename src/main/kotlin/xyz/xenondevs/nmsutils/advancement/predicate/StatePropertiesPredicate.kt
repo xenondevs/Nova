@@ -2,9 +2,9 @@ package xyz.xenondevs.nmsutils.advancement.predicate
 
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.advancement.AdvancementDsl
-import xyz.xenondevs.nmsutils.util.ReflectionRegistry.EXACT_PROPERTY_MATCHER_CONSTRUCTOR
-import xyz.xenondevs.nmsutils.util.ReflectionRegistry.RANGED_PROPERTY_MATCHER_CONSTRUCTOR
-import xyz.xenondevs.nmsutils.util.ReflectionRegistry.STATE_PROPERTIES_PREDICATE_CONSTRUCTOR
+import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry.EXACT_PROPERTY_MATCHER_CONSTRUCTOR
+import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry.RANGED_PROPERTY_MATCHER_CONSTRUCTOR
+import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry.STATE_PROPERTIES_PREDICATE_CONSTRUCTOR
 import net.minecraft.advancements.critereon.StatePropertiesPredicate as MojangStatePropertiesPredicate
 
 class StatePropertiesPredicate(

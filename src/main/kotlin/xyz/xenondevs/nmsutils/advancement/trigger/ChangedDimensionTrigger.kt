@@ -4,7 +4,7 @@ import net.minecraft.advancements.critereon.ChangeDimensionTrigger
 import org.bukkit.World
 import xyz.xenondevs.nmsutils.adapter.Adapter
 import xyz.xenondevs.nmsutils.advancement.predicate.EntityPredicate
-import xyz.xenondevs.nmsutils.util.resourceKey
+import xyz.xenondevs.nmsutils.internal.util.resourceKey
 
 class ChangedDimensionTrigger(
     val player: EntityPredicate?,

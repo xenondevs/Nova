@@ -1,10 +1,9 @@
-package xyz.xenondevs.nmsutils
+package xyz.xenondevs.nmsutils.advancement
 
 import net.minecraft.advancements.TreeNodePosition
 import org.spigotmc.SpigotConfig
-import xyz.xenondevs.nmsutils.advancement.Advancement
-import xyz.xenondevs.nmsutils.util.DEDICATED_SERVER
-import xyz.xenondevs.nmsutils.util.resourceLocation
+import xyz.xenondevs.nmsutils.internal.util.DEDICATED_SERVER
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
 
 object AdvancementLoader {
     

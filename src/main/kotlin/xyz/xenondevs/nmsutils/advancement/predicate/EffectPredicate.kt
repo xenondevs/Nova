@@ -6,7 +6,7 @@ import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.adapter.impl.IntBoundsAdapter
 import xyz.xenondevs.nmsutils.advancement.AdvancementDsl
-import xyz.xenondevs.nmsutils.util.mobEffect
+import xyz.xenondevs.nmsutils.internal.util.mobEffect
 
 class EffectPredicate(
     val type: PotionEffectType,

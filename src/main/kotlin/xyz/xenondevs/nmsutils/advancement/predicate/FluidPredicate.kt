@@ -6,8 +6,8 @@ import org.bukkit.Fluid
 import org.bukkit.Tag
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.advancement.AdvancementDsl
-import xyz.xenondevs.nmsutils.util.resourceLocation
-import xyz.xenondevs.nmsutils.util.tagKey
+import xyz.xenondevs.nmsutils.internal.util.resourceLocation
+import xyz.xenondevs.nmsutils.internal.util.tagKey
 import net.minecraft.advancements.critereon.FluidPredicate as MojangFluidPredicate
 
 class FluidPredicate(
