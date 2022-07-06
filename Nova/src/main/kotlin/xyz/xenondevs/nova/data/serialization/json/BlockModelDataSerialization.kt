@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.data.getAllInts
 import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.mapToArray
 import java.lang.reflect.Type
-import kotlin.reflect.full.companionObject
+import kotlin.reflect.jvm.jvmName
 
 // TODO: find a better solution
 internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, JsonDeserializer<BlockModelData> {
@@ -28,7 +28,7 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
             }
             
             is SolidBlockModelData<*> -> {
-                result.addProperty("type", src.modelProviderType::class.java.name)
+                result.addProperty("type", src.type::class.jvmName)
                 result.addProperty("id", src.id)
                 result.add("dataArray", GSON.toJsonTree(src.dataArray.map(BlockStateConfig::id)))
             }
@@ -42,7 +42,7 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
         json as JsonObject
         
         if (json.has("type")) {
-            val type = Class.forName(json.getString("type")).kotlin.companionObject!! as BlockStateConfigType<BlockStateConfig>
+            val type = Class.forName(json.getString("type")).kotlin.objectInstance!! as BlockStateConfigType<BlockStateConfig>
             val id = json.getString("id")!!
             val dataArray = json.getAsJsonArray("dataArray").getAllInts().mapToArray(type::of)
             

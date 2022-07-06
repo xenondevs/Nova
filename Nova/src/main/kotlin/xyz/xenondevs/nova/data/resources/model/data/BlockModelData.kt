@@ -34,7 +34,7 @@ class ArmorStandBlockModelData(
 }
 
 class SolidBlockModelData<T : BlockStateConfig>(
-    type: BlockStateConfigType<T>,
+    val type: BlockStateConfigType<T>,
     override val id: String,
     val dataArray: Array<T>
 ) : BlockModelData {
