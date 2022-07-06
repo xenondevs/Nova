@@ -17,11 +17,11 @@ open class ChangeNumberItem(
     private val getRange: () -> IntRange,
     private val getNumber: () -> Int,
     private val setNumber: (Int) -> Unit,
-    private val onBuilder: ItemBuilder,
-    private val offBuilder: ItemBuilder
+    private val onProvider: ItemProvider,
+    private val offProvider: ItemProvider
 ) : BaseItem() {
     
-    override fun getItemProvider(): ItemProvider = if (canModify()) onBuilder else offBuilder
+    override fun getItemProvider(): ItemProvider = if (canModify()) onProvider else offProvider
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         if (canModify()) {
@@ -61,8 +61,8 @@ class AddNumberItem(
     getRange,
     getNumber,
     setNumber,
-    CoreGUIMaterial.PLUS_BTN_ON.createBasicItemBuilder(),
-    CoreGUIMaterial.PLUS_BTN_OFF.createBasicItemBuilder()
+    CoreGUIMaterial.PLUS_BTN_ON.clientsideProvider,
+    CoreGUIMaterial.PLUS_BTN_OFF.clientsideProvider
 )
 
 class RemoveNumberItem(
@@ -75,8 +75,8 @@ class RemoveNumberItem(
     getRange,
     getNumber,
     setNumber,
-    CoreGUIMaterial.MINUS_BTN_ON.createBasicItemBuilder(),
-    CoreGUIMaterial.MINUS_BTN_OFF.createBasicItemBuilder()
+    CoreGUIMaterial.MINUS_BTN_ON.clientsideProvider,
+    CoreGUIMaterial.MINUS_BTN_OFF.clientsideProvider
 )
 
 open class AioNumberItem(

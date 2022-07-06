@@ -170,13 +170,13 @@ object ItemUtils {
                         val name = id.substringAfter(':')
                         val novaMaterials = NovaMaterialRegistry.getNonNamespaced(name)
                         if (novaMaterials.isNotEmpty()) {
-                            return@map NovaNameTest(name, novaMaterials.map { it.itemProvider.get() })
+                            return@map NovaNameTest(name, novaMaterials.map { it.clientsideProvider.get() })
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     else -> {
                         val novaMaterial = NovaMaterialRegistry.getOrNull(id)
                         if (novaMaterial != null) {
-                            return@map NovaIdTest(id, novaMaterial.itemProvider.get())
+                            return@map NovaIdTest(id, novaMaterial.clientsideProvider.get())
                         } else {
                             return@map CustomItemServiceManager.getItemTest(id)!!
                         }
@@ -215,7 +215,7 @@ object ItemUtils {
         }
     }
     
-    fun getItemAndLocalizedName(id: String, basic: Boolean = false): Pair<ItemStack, String> {
+    fun getItemAndLocalizedName(id: String): Pair<ItemStack, String> {
         val itemStack: ItemStack
         val localizedName: String
         
@@ -235,7 +235,7 @@ object ItemUtils {
                     val novaMaterial = NovaMaterialRegistry.getOrNull(id)
                     if (novaMaterial != null) {
                         localizedName = novaMaterial.localizedName
-                        itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
+                        itemStack = novaMaterial.createItemStack()
                     } else {
                         itemStack = CustomItemServiceManager.getItemByName(id)!!
                         localizedName = itemStack.displayName ?: ""

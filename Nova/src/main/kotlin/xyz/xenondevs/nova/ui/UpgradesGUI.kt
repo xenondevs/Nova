@@ -38,7 +38,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         .addIngredient('<', ScrollLeftItem())
         .addIngredient('>', ScrollRightItem())
         .addIngredient('x', Markers.ITEM_LIST_SLOT_VERTICAL)
-        .setBackground(CoreGUIMaterial.INVENTORY_PART.itemProvider)
+        .setBackground(CoreGUIMaterial.INVENTORY_PART.clientsideProvider)
         .setItems(createUpgradeItemList())
         .build()
     
@@ -82,7 +82,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         }
         
         override fun getItemProvider(): ItemProvider {
-            val builder = type.icon.createBasicItemBuilder()
+            val builder = type.icon.createClientsideItemBuilder()
             val typeId = type.id
             builder.setDisplayName(localized(
                 ChatColor.GRAY,
@@ -112,8 +112,8 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         
         override fun getItemProvider(): ItemProvider {
             return if (type in upgradeHolder.allowed)
-                CoreGUIMaterial.NUMBER.item.createItemBuilder(upgradeHolder.upgrades[type] ?: 0)
-            else CoreGUIMaterial.MINUS.createBasicItemBuilder()
+                CoreGUIMaterial.NUMBER.item.createClientsideItemBuilder(subId = upgradeHolder.upgrades[type] ?: 0)
+            else CoreGUIMaterial.MINUS.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
@@ -122,7 +122,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     
 }
 
-class OpenUpgradesItem(private val upgradeHolder: UpgradeHolder) : SimpleItem(CoreGUIMaterial.UPGRADES_BTN.itemProvider) {
+class OpenUpgradesItem(private val upgradeHolder: UpgradeHolder) : SimpleItem(CoreGUIMaterial.UPGRADES_BTN.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
