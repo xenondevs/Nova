@@ -28,9 +28,11 @@ softdepend:
   - PlotSquared
   - GriefDefender
   - ProtectionStones
+  - Towny
+  - QuickShop
+  - Residence
   - Vault
   - ItemsAdder
-  - Towny
   - Oraxen
   - MMOItems
   - AuthMe
