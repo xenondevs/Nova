@@ -12,7 +12,6 @@ class Directional(private val upDown: Boolean = false) : BlockProperty {
     
     override fun init(ctx: BlockPlaceContext) {
         facing = ctx.sourceLocation?.let(::getFacing) ?: BlockFace.NORTH
-        println(facing)
     }
     
     override fun read(buf: ByteBuf) {
