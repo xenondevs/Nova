@@ -95,42 +95,58 @@
     "gui_tp_pixel_arrow_right_on": "gui/pixel_arrow_right_on",
     "gui_bar_blue": {
         "item": {
-            "gui/bar/blue/%s": [0, 16]
+            "models": {
+                "gui/bar/blue/%s": [0, 16]
+            }
         }
     },
     "gui_bar_green": {
         "item": {
-            "gui/bar/green/%s": [0, 16]
+            "models": {
+                "gui/bar/green/%s": [0, 16]
+            }
         }
     },
     "gui_bar_red": {
         "item": {
-            "gui/bar/red/%s": [0, 16]
+            "models": {
+                "gui/bar/red/%s": [0, 16]
+            }
         }
     },
     "gui_bar_orange": {
         "item": {
-            "gui/bar/orange/%s": [0, 16]
+            "models": {
+                "gui/bar/orange/%s": [0, 16]
+            }
         }
     },
     "gui_tp_bar_blue": {
         "item": {
-            "gui/bar/tp_blue/%s": [0, 16]
+            "models": {
+                "gui/bar/tp_blue/%s": [0, 16]
+            }
         }
     },
     "gui_tp_bar_orange": {
         "item": {
-            "gui/bar/tp_orange/%s": [0, 16]
+            "models": {
+                "gui/bar/tp_orange/%s": [0, 16]
+            }
         }
     },
     "gui_number": {
         "item": {
-            "gui/number/%s": [0, 999]
+            "models": {
+                "gui/number/%s": [0, 999]
+            }
         }
     },
     "break_stage_overlay": {
         "item": {
-            "block/break_stage/%s": [0, 9]
+            "models": {
+                "block/break_stage/%s": [0, 9]
+            }
         }
     },
     "wrench": "item/wrench",

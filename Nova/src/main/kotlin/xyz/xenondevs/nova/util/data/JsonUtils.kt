@@ -76,6 +76,8 @@ fun JsonObject.getFloat(property: String, default: Float) = if (hasNumber(proper
 
 fun JsonObject.getBoolean(property: String, default: Boolean = false) = if (hasBoolean(property)) get(property).asBoolean else default
 
+fun JsonObject.getOrNull(property: String) = if (has(property)) get(property) else null
+
 inline fun <reified T> JsonObject.getDeserialized(property: String) = GSON.fromJson<T>(get(property))
 
 inline fun <reified T> JsonObject.getDeserialized(property: String, default: () -> T) = getDeserialized(property)

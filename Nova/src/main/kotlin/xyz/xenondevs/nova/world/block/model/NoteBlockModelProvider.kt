@@ -5,6 +5,7 @@ import org.bukkit.Note
 import org.bukkit.block.data.type.NoteBlock
 import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.data.SolidBlockModelData
+import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 
 @Suppress("UNCHECKED_CAST")
@@ -24,7 +25,11 @@ internal class NoteBlockModelProvider(val blockState: NovaBlockState) : BlockMod
     
     override fun update(subId: Int) {
         val block = pos.block
-        val config = modelData[subId]
+        
+        val directional = blockState.getProperty(Directional::class)
+        val config = if (directional != null)
+            modelData[directional.facing, subId]
+        else modelData[subId]
         
         block.type = Material.NOTE_BLOCK
         

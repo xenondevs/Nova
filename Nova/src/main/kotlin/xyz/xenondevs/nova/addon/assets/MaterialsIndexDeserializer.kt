@@ -4,8 +4,9 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
-import xyz.xenondevs.nova.data.resources.builder.BlockModelType
-import xyz.xenondevs.nova.data.resources.builder.ItemModelType
+import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
+import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
 import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.data.*
 
@@ -24,24 +25,39 @@ internal object MaterialsIndexDeserializer {
             val id = name.addNamespace(namespace)
             
             if (element is JsonObject) {
-                val itemModelList = deserializeModelList(element, "item")
+                val item = element.get("item")
+                var modelType = ItemModelType.DEFAULT.material
+                var itemModelList: List<String>? = null
+                if (item is JsonObject) {
+                    modelType = deserializeItemModelType(item)
+                    if (item.has("models"))
+                        itemModelList = deserializeModelList(item.get("models"))
+                } else if (item.isString()) {
+                    itemModelList = deserializeModelList(item)
+                }
+                
                 itemInfo = itemModelList
                     ?.map { it.addNamespace(namespace) }
-                    ?.let { ItemModelInformation(id, deserializeItemModelType(element), it) }
+                    ?.let { ItemModelInformation(id, modelType, it) }
                     ?: ItemModelInformation(id, ItemModelType.DEFAULT.material, emptyList())
                 
-                blockInfo = (deserializeModelList(element, "block") ?: itemModelList)
-                    ?.map { it.addNamespace(namespace) }
-                    ?.let {
-                        val priority = element.getInt("block_priority", 0)
-                        val hitboxType = element.getString("block_hitbox")?.toMaterial()
-                        val blockType = element.getString("block_type")?.uppercase()?.let(BlockModelType::valueOf) ?: BlockModelType.DEFAULT
-                        BlockModelInformation(id, blockType, hitboxType, it, priority)
-                    }
-            } else {
+                val block = element.getOrNull("block")
+                blockInfo = if (block is JsonObject) {
+                    (block.getOrNull("models")?.let(::deserializeModelList) ?: itemModelList)
+                        ?.map { it.addNamespace(namespace) }
+                        ?.let {
+                            val blockType = block.getString("type")?.uppercase()?.let(BlockModelType::valueOf)
+                            val hitboxType = block.getString("hitbox")?.toMaterial()
+                            val directions = block.getString("directions")?.let(BlockDirection::of)
+                            val priority = block.getInt("priority", 0)
+                            BlockModelInformation(id, blockType, hitboxType, it, directions, priority)
+                        }
+                } else null
+                
+            } else if (element.isString()) {
                 itemInfo = ItemModelInformation(id, ItemModelType.DEFAULT.material, listOf(element.asString.addNamespace(namespace)))
                 blockInfo = null
-            }
+            } else throw UnsupportedOperationException()
             
             index += RegisteredMaterial(id, itemInfo, blockInfo ?: itemInfo.toBlockInfo())
         }
@@ -49,9 +65,7 @@ internal object MaterialsIndexDeserializer {
         return index
     }
     
-    private fun deserializeModelList(json: JsonObject, path: String): List<String>? {
-        val element = json.get(path)?.takeUnless(JsonElement::isJsonNull) ?: return null
-        
+    private fun deserializeModelList(element: JsonElement): List<String> {
         if (element.isString()) return listOf(element.asString)
         if (element is JsonArray) return element.getAllStrings()
         
@@ -72,7 +86,7 @@ internal object MaterialsIndexDeserializer {
             return models
         }
         
-        throw IllegalArgumentException("Could not deserialize model list: $json")
+        throw IllegalArgumentException("Could not deserialize model list: $element")
     }
     
     private fun deserializeItemModelType(json: JsonObject): Material {
@@ -113,22 +127,66 @@ internal class ItemModelInformation(
     override val models: List<String>
 ) : ModelInformation {
     
-    fun toBlockInfo() = BlockModelInformation(id, BlockModelType.DEFAULT, null, models, 0)
+    fun toBlockInfo() = BlockModelInformation(id, BlockModelType.DEFAULT, null, models, BlockDirection.values().toList(), 0)
     
 }
 
 internal class BlockModelInformation(
     override val id: String,
-    val type: BlockModelType,
+    type: BlockModelType?,
     hitboxType: Material?,
     override val models: List<String>,
+    directions: List<BlockDirection>?,
     val priority: Int
 ) : ModelInformation {
     
+    val type = type ?: BlockModelType.DEFAULT
     val hitboxType = hitboxType ?: DEFAULT_HITBOX_TYPE
+    val directions = directions ?: listOf(BlockDirection.NORTH)
     
     companion object {
         val DEFAULT_HITBOX_TYPE = Material.BARRIER
+    }
+    
+}
+
+internal enum class ItemModelType(val material: Material) {
+    
+    DEFAULT(Material.SHULKER_SHELL),
+    DAMAGEABLE(Material.FISHING_ROD),
+    CONSUMABLE(Material.APPLE),
+    ALWAYS_CONSUMABLE(Material.GOLDEN_APPLE),
+    FAST_CONSUMABLE(Material.DRIED_KELP);
+    
+}
+
+internal enum class BlockModelType(vararg val configTypes: BlockStateConfigType<*>?) {
+    
+    DEFAULT(null),
+    SOLID(NoteBlockStateConfig, null);
+    
+}
+
+internal enum class BlockDirection(val char: Char, val x: Int, val y: Int) {
+    
+    NORTH('n', 0, 0),
+    EAST('e', 0, 90),
+    SOUTH('s', 0, 180),
+    WEST('w', 0, 270),
+    UP('u', -90, 0),
+    DOWN('d', 90, 0);
+    
+    val blockFace = BlockFace.valueOf(name)
+    
+    companion object {
+        
+        fun of(s: String): List<BlockDirection> {
+            if (s.equals("all", true))
+                return values().toList()
+            
+            return s.toCharArray().map { c -> BlockDirection.values().first { it.char == c } }
+        }
+        
     }
     
 }

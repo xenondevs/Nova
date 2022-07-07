@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.model.data
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import org.bukkit.Material
+import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
 import xyz.xenondevs.nova.util.data.LazyArray
@@ -36,11 +37,13 @@ class ArmorStandBlockModelData(
 class SolidBlockModelData<T : BlockStateConfig>(
     val type: BlockStateConfigType<T>,
     override val id: String,
-    val dataArray: Array<T>
+    val data: Map<BlockFace, List<T>>
 ) : BlockModelData {
     
     override val modelProviderType = type.modelProvider
     
-    operator fun get(index: Int): T = dataArray[index]
+    operator fun get(face: BlockFace, index: Int): T = data[face]!![index]
+    
+    operator fun get(index: Int): T = data.values.first()[index]
     
 }

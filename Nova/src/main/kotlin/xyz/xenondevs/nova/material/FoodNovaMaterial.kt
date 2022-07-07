@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.material
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.resources.builder.ItemModelType
+import xyz.xenondevs.nova.addon.assets.ItemModelType
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Consumable
 

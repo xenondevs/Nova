@@ -4,13 +4,11 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
-import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.TileEntityBlock
-import xyz.xenondevs.nova.world.block.model.ArmorStandModelProvider
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
 
 object NovaMaterialRegistry : INovaMaterialRegistry {
@@ -35,7 +33,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         placeCheck: PlaceCheckFun? = null,
         multiBlockLoader: MultiBlockLoader? = null,
         isInteractive: Boolean = true,
-        properties: List<BlockPropertyType<*>> = listOf(Directional)
+        properties: List<BlockPropertyType<*>> = emptyList()
     ): TileEntityNovaMaterial {
         val namespace = addon.description.id
         val material = TileEntityNovaMaterial(

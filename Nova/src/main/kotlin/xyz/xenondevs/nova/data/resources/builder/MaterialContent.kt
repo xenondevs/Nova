@@ -4,10 +4,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.bukkit.Material
-import xyz.xenondevs.nova.addon.assets.AssetPack
-import xyz.xenondevs.nova.addon.assets.BlockModelInformation
-import xyz.xenondevs.nova.addon.assets.ItemModelInformation
-import xyz.xenondevs.nova.addon.assets.ModelInformation
+import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.addon.assets.*
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
@@ -18,7 +16,6 @@ import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.resources.model.data.SolidBlockModelData
 import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.mapToIntArray
 import java.io.File
 import kotlin.collections.component1
@@ -70,7 +67,7 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
         val modelDataLookup = HashMap<String, Pair<ItemModelData?, BlockModelData?>>()
         
         val customItemModels = HashMap<Material, HashMap<String, Int>>()
-        val blockStateModels = HashMap<BlockStateConfigType<*>, HashMap<String, BlockStateConfig>>()
+        val blockStateModels = HashMap<BlockStateConfigType<*>, HashMap<Pair<String, BlockDirection>, BlockStateConfig>>()
         
         novaMaterials.forEach { (id, pair) ->
             val info = pair.first
@@ -96,8 +93,15 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
                     ArmorStandBlockModelData(id, info.hitboxType, material, dataArray)
                 } else {
                     val registeredModels = blockStateModels.getOrPut(configType, ::HashMap)
-                    val dataArray = info.models.mapToArray { registeredModels.getOrPut(it) { getNextBlockConfig(configType) } }
-                    SolidBlockModelData(configType as BlockStateConfigType<BlockStateConfig>, id, dataArray)
+                    val configs = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
+                    info.models.forEach { model ->
+                        info.directions.forEach { direction ->
+                            configs.getOrPut(direction.blockFace, ::ArrayList) +=
+                                registeredModels.getOrPut(model to direction) { getNextBlockConfig(configType) }
+                        }
+                    }
+                    
+                    SolidBlockModelData(configType as BlockStateConfigType<BlockStateConfig>, id, configs)
                 }
                 
                 modelDataLookup[id] = itemModelData to blockModelData
@@ -124,8 +128,13 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
         blockStateModels.forEach { (type, registeredModels) ->
             val (file, mainObj, variants) = getBlockStateFile(type)
             
-            registeredModels.forEach { (path, cfg) ->
-                variants.add(cfg.variantString, JsonObject().apply { addProperty("model", path) })
+            registeredModels.forEach { (pair, cfg) ->
+                val (path, direction) = pair
+                val variant = JsonObject()
+                variant.addProperty("model", path)
+                variant.addProperty("x", direction.x)
+                variant.addProperty("y", direction.y)
+                variants.add(cfg.variantString, variant)
             }
             
             file.parentFile.mkdirs()
@@ -167,10 +176,10 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
     private fun getRemainingBlockStateIdAmount(type: BlockStateConfigType<*>): Int {
         return remainingBlockStates.getOrPut(type) {
             var count = 0
-    
+            
             val occupiedSet = basePacks.occupiedSolidIds[type]
             val blockedSet = type.blockedIds
-    
+            
             for (pos in 0..type.maxId) {
                 if (pos in blockedSet || (occupiedSet != null && pos in occupiedSet)) continue
                 count++

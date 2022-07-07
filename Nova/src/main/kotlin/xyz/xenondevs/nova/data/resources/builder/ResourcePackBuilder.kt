@@ -3,14 +3,11 @@ package xyz.xenondevs.nova.data.resources.builder
 import com.google.gson.JsonObject
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.model.ZipParameters
-import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.write
 import java.io.File
@@ -119,22 +116,5 @@ internal object ResourcePackBuilder {
         
         return RESOURCE_PACK_FILE
     }
-    
-}
-
-internal enum class ItemModelType(val material: Material) {
-    
-    DEFAULT(Material.SHULKER_SHELL),
-    DAMAGEABLE(Material.FISHING_ROD),
-    CONSUMABLE(Material.APPLE),
-    ALWAYS_CONSUMABLE(Material.GOLDEN_APPLE),
-    FAST_CONSUMABLE(Material.DRIED_KELP);
-    
-}
-
-internal enum class BlockModelType(vararg val configTypes: BlockStateConfigType<*>?) {
-    
-    DEFAULT(null),
-    SOLID(NoteBlockStateConfig, null);
     
 }

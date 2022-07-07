@@ -9,8 +9,10 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import kotlin.reflect.KClass
+import kotlin.reflect.full.superclasses
 
-@Suppress("CanBePrimaryConstructorProperty")
+@Suppress("CanBePrimaryConstructorProperty", "UNCHECKED_CAST")
 open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMaterial) : BlockState {
     
     override val id = material.id
@@ -22,8 +24,11 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
         properties.values.forEach { it.init(ctx) }
     }
     
-    @Suppress("UNCHECKED_CAST")
-    fun <T : BlockProperty> getProperty(type: BlockPropertyType<T>): T? = properties[type] as? T
+    fun <T : BlockProperty> getProperty(type: BlockPropertyType<T>): T? =
+        properties[type] as? T
+    
+    fun <T : BlockProperty> getProperty(clazz: KClass<T>): T? =
+         properties.values.firstOrNull { it::class == clazz || clazz in it::class.superclasses } as T?
     
     override fun handleInitialized(placed: Boolean) {
         modelProvider.load(placed)

@@ -64,7 +64,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val chunkPos: ChunkPos
         get() = pos.chunkPos
     val facing: BlockFace
-        get() = blockState.getProperty(Directional)?.facing ?: BlockFace.NORTH
+        get() = blockState.getProperty(Directional::class)?.facing ?: BlockFace.NORTH
     
     @Volatile
     var isValid: Boolean = true

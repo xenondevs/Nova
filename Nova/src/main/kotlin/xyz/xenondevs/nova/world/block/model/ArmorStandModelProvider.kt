@@ -23,7 +23,7 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
     init {
         val location = pos.location.center()
         
-        val directional = blockState.getProperty(Directional)
+        val directional = blockState.getProperty(Directional::class)
         location.yaw = directional?.facing?.yaw ?: 180f // by default, look north (180°)
         
         armorStands += FakeArmorStand(location, false, ::setArmorStandValues)
