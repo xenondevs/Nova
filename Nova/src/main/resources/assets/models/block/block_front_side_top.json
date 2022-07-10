@@ -1,5 +1,8 @@
 {
 	"parent": "nova:block/base",
+	"textures": {
+		"particle": "#side"
+	},
 	"elements": [
 		{
 			"from": [0, 0, 0],
