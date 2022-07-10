@@ -531,13 +531,11 @@
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>3.0.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>xyz.xenondevs.bytebase</groupId>
             <artifactId>ByteBase-Runtime</artifactId>
             <version>0.3-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->
@@ -622,13 +620,7 @@
                         <filter>
                             <artifact>*:*</artifact>
                             <excludes>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                                <exclude>META-INF/*.MF</exclude>
-                                <exclude>META-INF/DEPENDENCIES</exclude>
-                                <exclude>META-INF/**/module-info.class</exclude>
+                                <exclude>META-INF/*</exclude>
                             </excludes>
                         </filter>
                     </filters>
