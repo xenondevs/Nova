@@ -67,11 +67,6 @@ internal object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @Synchronized
-    fun getViewersOf(chunk: ChunkPos): List<Player> {
-        return chunkViewers[chunk] ?: emptyList()
-    }
-    
-    @Synchronized
     fun addArmorStand(chunk: ChunkPos, armorStand: FakeArmorStand) {
         val armorStands = chunkArmorStands.getOrPut(chunk) { mutableListOf() }
         armorStands.add(armorStand)

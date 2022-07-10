@@ -2,11 +2,10 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.server.network.ServerConnectionListener
-import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.item.crafting.RecipeManager
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
+import org.bukkit.event.HandlerList
+import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCBClass
@@ -19,7 +18,7 @@ import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty1
 
 @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
-object ReflectionRegistry {
+internal object ReflectionRegistry {
     
     // Paths
     val CB_PACKAGE_PATH = getCB()
@@ -39,14 +38,14 @@ object ReflectionRegistry {
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
-    val ARMOR_STAND_ARMOR_ITEMS_FIELD = getField(ArmorStand::class.java, true, "SRF(net.minecraft.world.entity.decoration.ArmorStand armorItems)")
-    val SERVER_CONNECTION_LISTENER_CHANNELS_FIELD = getField(ServerConnectionListener::class.java, true, "SRF(net.minecraft.server.network.ServerConnectionListener channels)")
-    val RECIPE_MANAGER_BY_NAME_FIELD = getField(RecipeManager::class.java, true, "SRF(net.minecraft.world.item.crafting.RecipeManager byName)")
     val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class.java, true, "children")
     val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class.java, true, "literals")
     val COMMAND_NODE_ARGUMENTS_FIELD = getField(CommandNode::class.java, true, "arguments")
     val CALLABLE_REFERENCE_RECEIVER_FIELD = getField(CallableReference::class.java, true, "receiver")
     val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = getField(PrepareItemCraftEvent::class.java, true, "matrix")
     val MEMORY_SECTION_MAP_FIELD = getField(MemorySection::class.java, true, "map")
+    val HANDLER_LIST_HANDLERS_FIELD = getField(HandlerList::class.java, true, "handlers")
+    val HANDLER_LIST_HANDLER_SLOTS_FIELD = getField(HandlerList::class.java, true, "handlerslots")
+    val BLOCK_PHYSICS_EVENT_CHANGED_FIELD = getField(BlockPhysicsEvent::class.java, true, "changed")
     
 }

@@ -21,6 +21,11 @@ libraries:
   - org.apache.maven:maven-resolver-provider:${maven-resolver-provider.version}
   - org.apache.maven.resolver:maven-resolver-connector-basic:${maven-resolver-connector-basic.version}
   - org.apache.maven.resolver:maven-resolver-transport-http:${maven-resolver-transport-http.version}
+  - net.bytebuddy:byte-buddy-agent:${byte-buddy.version}
+  - org.ow2.asm:asm:${asm.version}
+  - org.ow2.asm:asm-commons:${asm.version}
+  - org.ow2.asm:asm-tree:${asm.version}
+  - org.ow2.asm:asm-util:${asm.version}
 
 softdepend:
   - WorldGuard

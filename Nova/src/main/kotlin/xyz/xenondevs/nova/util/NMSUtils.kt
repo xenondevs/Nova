@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.util
 
-import net.minecraft.core.BlockPos
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Rotations
 import net.minecraft.network.protocol.Packet
@@ -12,6 +11,8 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.Property
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -26,7 +27,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
+import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.item.ItemStack as NMSItemStack
 
@@ -42,8 +45,11 @@ val ItemStack.nmsStack: NMSItemStack
 val NMSItemStack.bukkitStack: ItemStack
     get() = CraftItemStack.asBukkitCopy(this)
 
-val Location.blockPos: BlockPos
-    get() = BlockPos(blockX, blockY, blockZ)
+val Location.blockPos: MojangBlockPos
+    get() = MojangBlockPos(blockX, blockY, blockZ)
+
+val BlockPos.nmsPos: MojangBlockPos
+    get() = MojangBlockPos(x, y, z)
 
 val World.serverLevel: ServerLevel
     get() = (this as CraftWorld).handle
@@ -63,6 +69,9 @@ val InteractionHand.bukkitSlot: EquipmentSlot
         InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
         InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
     }
+
+fun MojangBlockPos.toNovaPos(world: World): BlockPos =
+    BlockPos(world, x, y, z)
 
 fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
@@ -91,6 +100,10 @@ fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
     }
     
     return nonNullList
+}
+
+fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T): Boolean {
+    return hasProperty(property) && values[property] == value
 }
 
 object NMSUtils {

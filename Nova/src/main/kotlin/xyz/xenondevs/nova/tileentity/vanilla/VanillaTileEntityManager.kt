@@ -79,6 +79,9 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
         val block = pos.block
         val type = VanillaTileEntity.Type.of(block) ?: return null
         
+        // prevents vanilla tile entities for hitbox blocks / solid blocks
+        if (WorldDataManager.getBlockState(pos) != null) return null
+        
         val blockState = VanillaTileEntityState(pos, type.id)
         WorldDataManager.setBlockState(pos, blockState)
         blockState.handleInitialized(true)

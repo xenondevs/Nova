@@ -288,7 +288,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      * visible for.
      */
     fun getViewers(): List<Player> =
-        FakeArmorStandManager.getViewersOf(chunkPos)
+        FakeArmorStandManager.getChunkViewers(chunkPos)
     
     /**
      * Gets the correct direction a block side.

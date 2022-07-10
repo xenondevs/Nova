@@ -6,6 +6,9 @@ resource_pack:
   auto_upload:
     enabled: false
 
+# If Nova should use a java agent to self-attach and redefine methods
+use_agent: true
+
 # The render distance for armor stands from Nova, in chunks.
 # Note that the render distance is limited by the entity render distance of the client.
 armor_stand_render_distance:

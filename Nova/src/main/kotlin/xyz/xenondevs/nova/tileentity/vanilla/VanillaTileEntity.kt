@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.Chest
 import org.bukkit.block.Container
@@ -13,11 +14,12 @@ private typealias VanillaTileEntityConstructor = (VanillaTileEntityState) -> Van
 internal abstract class VanillaTileEntity internal constructor(val blockState: VanillaTileEntityState) : DataHolder(false) {
     
     override val data = blockState.data
-    val block = blockState.pos.block
-    
-    internal abstract fun handleRemoved(unload: Boolean)
+    val pos = blockState.pos
+    val block = pos.block
     
     internal abstract fun handleInitialized()
+    
+    internal abstract fun handleRemoved(unload: Boolean)
     
     internal abstract fun saveData()
     
@@ -28,7 +30,8 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
         CHEST("minecraft:chest", ::VanillaChestTileEntity),
         FURNACE("minecraft:furnace", ::VanillaFurnaceTileEntity),
         CONTAINER("minecraft:container", ::VanillaContainerTileEntity),
-        CAULDRON("minecraft:cauldron", ::VanillaCauldronTileEntity);
+        CAULDRON("minecraft:cauldron", ::VanillaCauldronTileEntity),
+        NOTE_BLOCK("minecraft:note_block", ::VanillaNoteBlockTileEntity);
         
         companion object {
             fun of(block: Block): Type? {
@@ -39,6 +42,7 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
                     state is Furnace -> FURNACE
                     state is Container -> CONTAINER
                     type.isCauldron() -> CAULDRON
+                    type == Material.NOTE_BLOCK -> NOTE_BLOCK
                     else -> null
                 }
             }
