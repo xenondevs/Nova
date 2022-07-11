@@ -20,6 +20,9 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
     private val armorStands = ArrayList<FakeArmorStand>()
     private val multiBlockPositions = material.multiBlockLoader?.invoke(pos)
     
+    override var currentSubId = 0
+        private set
+    
     init {
         val location = pos.location.center()
         
@@ -59,6 +62,7 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
     }
     
     override fun update(subId: Int) {
+        currentSubId = subId
         armorStands[0].setEquipment(EquipmentSlot.HEAD, modelData[subId].get(), true)
     }
     

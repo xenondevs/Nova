@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.RegisteredListener
+import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HANDLER_LIST_HANDLERS_FIELD
@@ -40,6 +41,10 @@ val BlockPhysicsEvent.changed: BlockData
     get() = ReflectionRegistry.BLOCK_PHYSICS_EVENT_CHANGED_FIELD.get(this) as BlockData
 
 fun callEvent(event: Event) = Bukkit.getPluginManager().callEvent(event)
+
+fun Any.registerPacketListener() {
+    PacketEventManager.registerListener(this)
+}
 
 fun Listener.registerEvents() {
     Bukkit.getPluginManager().registerEvents(this, NOVA)

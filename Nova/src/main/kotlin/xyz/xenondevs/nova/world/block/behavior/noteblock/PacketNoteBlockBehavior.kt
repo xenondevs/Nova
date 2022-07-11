@@ -12,23 +12,19 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.NotePlayEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBlockEventPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaNoteBlockTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.util.registerEventFirst
-import xyz.xenondevs.nova.util.registerEventsExcept
-import xyz.xenondevs.nova.util.send
-import xyz.xenondevs.nova.util.toNovaPos
+import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.pos
 
 internal object PacketNoteBlockBehavior : Listener {
     
     fun init() {
-        PacketEventManager.registerListener(this)
+        registerPacketListener()
         registerEventsExcept(NotePlayEvent::class)
         registerEventFirst(NotePlayEvent::class)
     }

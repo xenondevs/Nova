@@ -1,5 +1,8 @@
 package xyz.xenondevs.nova.data.resources.model.config
 
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.NoteBlock
+import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.world.block.model.NoteBlockModelProvider
@@ -12,6 +15,10 @@ internal data class NoteBlockStateConfig(
     
     override val id = getIdOf(instrument, note, powered)
     override val variantString = "instrument=${instrument.name.lowercase()},note=$note,powered=$powered"
+    override val blockState: BlockState = Blocks.NOTE_BLOCK.defaultBlockState()
+        .setValue(NoteBlock.INSTRUMENT, instrument.nmsInstrument)
+        .setValue(NoteBlock.NOTE, note)
+        .setValue(NoteBlock.POWERED, powered)
     
     init {
         require(note in 0..24)

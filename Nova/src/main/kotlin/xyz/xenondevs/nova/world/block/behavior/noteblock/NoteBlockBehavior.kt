@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.block.behavior.noteblock
 
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.bukkit.Material
 import org.bukkit.Note
 import org.bukkit.block.data.type.NoteBlock
@@ -14,24 +13,28 @@ import org.bukkit.event.block.NotePlayEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
+import xyz.xenondevs.nova.data.world.WorldDataManager
+import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaNoteBlockTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import xyz.xenondevs.nova.world.block.model.SolidBlockModelProvider
 import xyz.xenondevs.nova.world.pos
-import net.minecraft.world.level.block.Block as MojangBlock
+import net.minecraft.world.level.block.NoteBlock as MojangNoteBlock
 
 internal object NoteBlockBehavior : Initializable(), Listener {
     
     val DEFAULT_STATE_CONFIG = NoteBlockStateConfig.of(0) // TODO
     
-    val DEFAULT_STATE: BlockState = MojangBlock.BLOCK_STATE_REGISTRY.first {
-        it.`is`(Blocks.NOTE_BLOCK)
-            && it.hasProperty(BlockStateProperties.NOTEBLOCK_INSTRUMENT, DEFAULT_STATE_CONFIG.instrument.nmsInstrument)
-            && it.hasProperty(BlockStateProperties.NOTE, DEFAULT_STATE_CONFIG.note)
-            && it.hasProperty(BlockStateProperties.POWERED, DEFAULT_STATE_CONFIG.powered)
-    }
+    val DEFAULT_STATE: BlockState = Blocks.NOTE_BLOCK.defaultBlockState()
+        .setValue(MojangNoteBlock.INSTRUMENT, DEFAULT_STATE_CONFIG.instrument.nmsInstrument)
+        .setValue(MojangNoteBlock.NOTE, DEFAULT_STATE_CONFIG.note)
+        .setValue(MojangNoteBlock.POWERED, DEFAULT_STATE_CONFIG.powered)
     
     override val inMainThread = true
     override val dependsOn = emptySet<Initializable>()
@@ -39,6 +42,7 @@ internal object NoteBlockBehavior : Initializable(), Listener {
     override fun init() {
         LOGGER.info("Initializing NoteBlockBehavior")
         
+        registerPacketListener()
         registerEvents()
         
         if (DEFAULT_CONFIG.getBoolean("use_agent")) {
@@ -72,6 +76,19 @@ internal object NoteBlockBehavior : Initializable(), Listener {
         }
     }
     
+    private fun getCorrectBlockState(pos: BlockPos): BlockState? {
+        var state = WorldDataManager.getBlockState(pos) ?: return null
+        
+        if (state is LinkedBlockState)
+            state = state.blockState
+        
+        return when (state) {
+            is NovaBlockState -> (state.modelProvider as? SolidBlockModelProvider)?.currentBlockState
+            is VanillaTileEntityState -> DEFAULT_STATE
+            else -> throw UnsupportedOperationException()
+        }
+    }
+    
     /**
      * Handles changes to the note bock data.
      */
@@ -82,8 +99,8 @@ internal object NoteBlockBehavior : Initializable(), Listener {
         val changed = event.changed
         
         if (changed is NoteBlock) {
-            // set to default state (cancelling does not work)
-            pos.world.serverLevel.setBlock(pos.nmsPos, DEFAULT_STATE, 1024)
+            // set to the correct state (cancelling does not work)
+            getCorrectBlockState(pos)?.apply(pos::setBlockStateSilently)
         } else {
             val above = pos.copy(y = pos.y + 1)
             if (above.block.type == Material.NOTE_BLOCK) {

@@ -106,6 +106,10 @@ fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T):
     return hasProperty(property) && values[property] == value
 }
 
+fun BlockPos.setBlockStateSilently(blockState: BlockState) {
+    world.serverLevel.setBlock(nmsPos, blockState, 1024)
+}
+
 object NMSUtils {
     
     val ENTITY_COUNTER = ReflectionUtils.getField(
