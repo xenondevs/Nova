@@ -101,15 +101,15 @@ internal object NoteBlockBehavior : Initializable(), Listener {
         if (changed is NoteBlock) {
             // set to the correct state (cancelling does not work)
             getCorrectBlockState(pos)?.apply(pos::setBlockStateSilently)
-        } else {
-            val above = pos.copy(y = pos.y + 1)
-            if (above.block.type == Material.NOTE_BLOCK) {
-                // is this actually a vanilla note block?
-                val vnb = VanillaTileEntityManager.getTileEntityAt(above) as? VanillaNoteBlockTileEntity ?: return
-                
-                // update instrument
-                vnb.instrument = Instrument.byBlockType(pos)
-            }
+        }
+        
+        val above = pos.copy(y = pos.y + 1)
+        if (above.block.type == Material.NOTE_BLOCK) {
+            // is this actually a vanilla note block?
+            val vnb = VanillaTileEntityManager.getTileEntityAt(above) as? VanillaNoteBlockTileEntity ?: return
+            
+            // update instrument
+            vnb.instrument = Instrument.byBlockType(pos)
         }
     }
     
