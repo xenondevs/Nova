@@ -24,9 +24,14 @@ class ServerboundPlayerActionPacketEvent(
             field = value
             changed = true
         }
+    var sequence = packet.sequence
+        set(value) {
+            field = value
+            changed = true
+        }
     
     override fun buildChangedPacket(): ServerboundPlayerActionPacket {
-        return ServerboundPlayerActionPacket(action, pos, direction)
+        return ServerboundPlayerActionPacket(action, pos, direction, sequence)
     }
     
 }
