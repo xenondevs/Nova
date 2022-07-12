@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block
 
+import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
@@ -22,7 +23,6 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.CoreBlockOverlay
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.concurrent.runInServerThread
 import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolUtils
@@ -89,14 +89,21 @@ internal object BlockBreaking {
         }
     }
     
-    private fun handleDestroyStart(player: Player, pos: BlockPos): Boolean {
+    private fun handleDestroyStart(player: Player, pos: BlockPos, sequence: Int): Boolean {
         val blockState = BlockManager.getBlock(pos)
         if (blockState != null) {
             val material = blockState.material
             if (material.hardness >= 0) {
-                ProtectionManager.canBreak(player, player.inventory.itemInMainHand.takeUnlessAir(), pos.location).runIfTrue {
-                    // initiate block breaker in server thread as block states are accessed
-                    runInServerThread { playerBreakers[player] = Breaker(player, pos.location.block, blockState) }
+                val future = ProtectionManager.canBreak(player, player.inventory.itemInMainHand.takeUnlessAir(), pos.location)
+                future.thenRun {
+                    val result = future.get()
+                    if (result) {
+                        // initiate block breaker in server thread as block states are accessed
+                        runInServerThread { playerBreakers[player] = Breaker(player, pos.location.block, blockState, sequence) }
+                    } else {
+                        // The ack packet removes client-predicted block states and shows those sent by the server
+                        player.send(ClientboundBlockChangedAckPacket(sequence))
+                    }
                 }
                 
                 return true
@@ -122,7 +129,7 @@ internal object BlockBreaking {
         val blockPos = BlockPos(event.player.world, pos.x, pos.y, pos.z)
         
         event.isCancelled = when (event.action) {
-            START_DESTROY_BLOCK -> handleDestroyStart(player, blockPos)
+            START_DESTROY_BLOCK -> handleDestroyStart(player, blockPos, event.sequence)
             STOP_DESTROY_BLOCK, ABORT_DESTROY_BLOCK -> handleDestroyStop(player)
             else -> false
         }
@@ -138,7 +145,7 @@ private fun getBreakMethod(block: Block, material: BlockNovaMaterial, entityId: 
 
 private val MINING_FATIGUE = MobEffectInstance(MobEffect.byId(4), Integer.MAX_VALUE, 255, false, false, false)
 
-private class Breaker(val player: Player, val block: Block, val blockState: NovaBlockState) {
+private class Breaker(val player: Player, val block: Block, val blockState: NovaBlockState, val sequence: Int) {
     
     private val material = blockState.material
     private val tool: ItemStack = player.inventory.itemInMainHand
@@ -173,6 +180,8 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
                 blockState.pos.location.dropItems(material.novaBlock.getDrops(blockState, ctx))
             // If the block broke instantaneously for the client, the effects will also be played clientside
             block.remove(ctx, calculateClientsideDamage() < 1)
+            // The ack packet removes client-predicted block states and shows those sent by the server
+            player.send(ClientboundBlockChangedAckPacket(sequence))
         } else {
             // spawn hit particles if not rendered clientside
             if (block.type == Material.BARRIER) spawnHitParticles()
