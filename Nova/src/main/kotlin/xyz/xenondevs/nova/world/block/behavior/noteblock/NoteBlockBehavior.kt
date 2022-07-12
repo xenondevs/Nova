@@ -42,7 +42,6 @@ internal object NoteBlockBehavior : Initializable(), Listener {
     override fun init() {
         LOGGER.info("Initializing NoteBlockBehavior")
         
-        registerPacketListener()
         registerEvents()
         
         if (DEFAULT_CONFIG.getBoolean("use_agent")) {
