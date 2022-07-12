@@ -38,6 +38,8 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundSoundPacketEvent)
         registerPlayerEventType(::ClientboundSetPassengersPacketEvent)
         registerPlayerEventType(::ClientboundLevelChunkWithLightPacketEvent)
+        registerPlayerEventType(::ClientboundBlockUpdatePacketEvent)
+        registerPlayerEventType(::ClientboundBlockEventPacketEvent)
         
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)
