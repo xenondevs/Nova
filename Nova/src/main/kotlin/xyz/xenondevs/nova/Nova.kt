@@ -16,13 +16,14 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
 
-private const val REQUIRED_SERVER_VERSION = "1.19.0"
+private val REQUIRED_SERVER_VERSION = Version("1.19.0")
 
 lateinit var NOVA: Nova
 internal var IS_VERSION_CHANGE: Boolean = false
@@ -53,7 +54,7 @@ class Nova : JavaPlugin(), INova {
         ReflectionUtils.setPlugin(this)
         
         // prevent execution on unsupported minecraft versions
-        if (Version.SERVER_VERSION != Version(REQUIRED_SERVER_VERSION)) {
+        if (Version.SERVER_VERSION != REQUIRED_SERVER_VERSION) {
             LOGGER.severe("Nova is not compatible with this version of Minecraft!")
             LOGGER.severe("Nova only runs on $REQUIRED_SERVER_VERSION.")
             Bukkit.getPluginManager().disablePlugin(this)
@@ -67,6 +68,17 @@ class Nova : JavaPlugin(), INova {
             LOGGER.severe("Please erase all data related to Nova and try again.")
             Bukkit.getPluginManager().disablePlugin(this)
             return
+        }
+        
+        if (ServerUtils.isReload) {
+            LOGGER.severe("Reloading is not supported. Please restart the server instead.")
+            if (IS_VERSION_CHANGE) {
+                LOGGER.severe("===========================================================")
+                LOGGER.severe("!ESPECIALLY UPDATING/INSTALLING NOVA WHEN RELOADING WILL CAUSE MAJOR ISSUES!")
+                LOGGER.severe("===========================================================")
+                Bukkit.getPluginManager().disablePlugin(this)
+                return
+            }
         }
         
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
