@@ -5,8 +5,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.config.*
 import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.data.*
 
@@ -163,7 +162,7 @@ internal enum class ItemModelType(val material: Material) {
 internal enum class BlockModelType(vararg val configTypes: BlockStateConfigType<*>?) {
     
     DEFAULT(null),
-    SOLID(NoteBlockStateConfig, null);
+    SOLID(RedMushroomBlockStateConfig, BrownMushroomBlockStateConfig, MushroomStemBlockStateConfig, NoteBlockStateConfig, null);
     
 }
 

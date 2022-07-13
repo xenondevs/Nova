@@ -174,16 +174,28 @@ fun <K, V> LinkedHashMap<K, V>.poll(): Map.Entry<K, V>? {
     return entries.pollFirst()
 }
 
-inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
+inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { transform(get(it)) }
 }
 
-inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R): Array<R> {
+inline fun <T> Array<T>.mapToIntArray(transform: (T) -> Int): IntArray {
+    return IntArray(size) { transform(get(it)) }
+}
+
+inline fun <T> Array<T>.mapToBooleanArray(transform: (T) -> Boolean): BooleanArray {
+    return BooleanArray(size) { transform(get(it)) }
+}
+
+inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { transform(get(it)) }
 }
 
 inline fun <T> List<T>.mapToIntArray(transform: (T) -> Int): IntArray {
     return IntArray(size) { transform(get(it)) }
+}
+
+inline fun <T> List<T>.mapToBooleanArray(transform: (T) -> Boolean): BooleanArray {
+    return BooleanArray(size) { transform(get(it)) }
 }
 
 fun <K, V> treeMapOf(vararg pairs: Pair<K, V>) = TreeMap<K, V>().apply { putAll(pairs) }

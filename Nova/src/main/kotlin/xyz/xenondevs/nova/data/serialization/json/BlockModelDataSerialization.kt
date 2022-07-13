@@ -7,12 +7,10 @@ import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
-import xyz.xenondevs.nova.data.resources.model.data.SolidBlockModelData
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.getAllInts
-import xyz.xenondevs.nova.util.data.getDeserialized
-import xyz.xenondevs.nova.util.data.getString
+import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
+import xyz.xenondevs.nova.util.data.*
 import java.lang.reflect.Type
+import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.jvm.jvmName
 
 // TODO: find a better solution
@@ -28,10 +26,18 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
                 result.add("dataArray", GSON.toJsonTree(src.dataArray))
             }
             
-            is SolidBlockModelData<*> -> {
-                result.addProperty("type", src.type::class.jvmName)
+            is BlockStateBlockModelData -> {
                 result.addProperty("id", src.id)
-                result.add("data", GSON.toJsonTree(src.data.mapValues { it.value.map(BlockStateConfig::id) }))
+                
+                val data = JsonArray().also { result.add("data", it) }
+                src.data.forEach { (face, blockStateConfigs) ->
+                    blockStateConfigs.forEach { blockStateConfig ->
+                        val obj = JsonObject().also { data.add(it) }
+                        obj.addProperty("face", face.name)
+                        obj.addProperty("type", blockStateConfig::class.jvmName)
+                        obj.addProperty("id", blockStateConfig.id)
+                    }
+                }
             }
         }
         
@@ -42,12 +48,21 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): BlockModelData {
         json as JsonObject
         
-        if (json.has("type")) {
-            val type = Class.forName(json.getString("type")).kotlin.objectInstance!! as BlockStateConfigType<BlockStateConfig>
+        if (json.has("data")) {
             val id = json.getString("id")!!
-            val data = json.getDeserialized<Map<BlockFace, List<Int>>>("data")!!.mapValues { it.value.map(type::of) }
+            val data = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
             
-            return SolidBlockModelData(type, id, data)
+            json.getAsJsonArray("data").forEach { obj ->
+                obj as JsonObject
+                
+                val face: BlockFace = obj.getDeserialized("face")!!
+                val type = Class.forName(obj.getString("type")).kotlin.companionObjectInstance as BlockStateConfigType<BlockStateConfig>
+                val blockStateId = obj.getInt("id")!!
+                
+                data.getOrPut(face, ::ArrayList) += type.of(blockStateId)
+            }
+            
+            return BlockStateBlockModelData(id, data)
         } else {
             val id = json.getString("id")!!
             val hitboxType = Material.valueOf(json.getString("hitboxType")!!)

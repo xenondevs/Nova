@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.data.resources.model.config
 
 import net.minecraft.world.level.block.state.BlockState
-import xyz.xenondevs.nova.world.block.model.BlockModelProviderType
 
 sealed interface BlockStateConfig {
+    val type: BlockStateConfigType<*>
     val id: Int
     val variantString: String
     val blockState: BlockState
@@ -14,7 +14,6 @@ sealed interface BlockStateConfigType<T : BlockStateConfig> {
     val maxId: Int
     val blockedIds: Set<Int>
     val fileName: String
-    val modelProvider: BlockModelProviderType<*>
     
     fun of(id: Int): T
     

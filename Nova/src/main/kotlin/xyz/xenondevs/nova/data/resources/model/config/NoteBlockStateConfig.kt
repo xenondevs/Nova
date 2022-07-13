@@ -5,7 +5,6 @@ import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.intValue
-import xyz.xenondevs.nova.world.block.model.NoteBlockModelProvider
 
 internal data class NoteBlockStateConfig(
     val instrument: Instrument,
@@ -13,6 +12,7 @@ internal data class NoteBlockStateConfig(
     val powered: Boolean
 ) : BlockStateConfig {
     
+    override val type = NoteBlockStateConfig
     override val id = getIdOf(instrument, note, powered)
     override val variantString = "instrument=${instrument.name.lowercase()},note=$note,powered=$powered"
     override val blockState: BlockState = Blocks.NOTE_BLOCK.defaultBlockState()
@@ -29,7 +29,6 @@ internal data class NoteBlockStateConfig(
         override val maxId = 799
         override val blockedIds = hashSetOf(0)
         override val fileName = "note_block"
-        override val modelProvider = NoteBlockModelProvider
         
         fun getIdOf(instrument: Instrument, note: Int, powered: Boolean): Int {
             return (note shl 5) or (instrument.ordinal shl 1) or powered.intValue

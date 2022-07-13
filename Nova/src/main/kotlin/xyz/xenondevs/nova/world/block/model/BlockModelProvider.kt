@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.block.model
 
-import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 
 sealed interface BlockModelProvider {
@@ -12,12 +11,6 @@ sealed interface BlockModelProvider {
     fun remove(broken: Boolean)
     
     fun update(subId: Int = 0)
-    
-}
-
-sealed interface SolidBlockModelProvider : BlockModelProvider {
-    
-    val currentBlockState: BlockState
     
 }
 

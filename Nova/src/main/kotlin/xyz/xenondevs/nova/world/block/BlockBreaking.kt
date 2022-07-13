@@ -12,6 +12,7 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
@@ -248,7 +249,7 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
     
     private fun calculateClientsideDamage(): Double {
         if (player.gameMode == GameMode.CREATIVE) return 1.0
-        return ToolUtils.calculateDamage(player, tool, toolCategory, block.type.hardness.toDouble(), correctCategory, drops)
+        return ToolUtils.calculateDamage(player, EquipmentSlot.HAND, block)
     }
     
 }

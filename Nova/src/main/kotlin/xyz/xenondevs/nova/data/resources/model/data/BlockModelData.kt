@@ -5,10 +5,10 @@ import de.studiocode.invui.item.ItemWrapper
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
 import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.world.block.model.ArmorStandModelProvider
 import xyz.xenondevs.nova.world.block.model.BlockModelProviderType
+import xyz.xenondevs.nova.world.block.model.BlockStateBlockModelProvider
 
 sealed interface BlockModelData {
     val id: String
@@ -34,16 +34,15 @@ class ArmorStandBlockModelData(
     
 }
 
-class SolidBlockModelData<T : BlockStateConfig>(
-    val type: BlockStateConfigType<T>,
+class BlockStateBlockModelData(
     override val id: String,
-    val data: Map<BlockFace, List<T>>
+    val data: Map<BlockFace, List<BlockStateConfig>>
 ) : BlockModelData {
     
-    override val modelProviderType = type.modelProvider
+    override val modelProviderType = BlockStateBlockModelProvider
     
-    operator fun get(face: BlockFace, index: Int): T = data[face]!![index]
+    operator fun get(face: BlockFace, index: Int): BlockStateConfig = data[face]!![index]
     
-    operator fun get(index: Int): T = data.values.first()[index]
+    operator fun get(index: Int): BlockStateConfig = data.values.first()[index]
     
 }

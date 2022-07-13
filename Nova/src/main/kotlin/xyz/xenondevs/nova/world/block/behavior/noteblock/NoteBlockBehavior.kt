@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
-import xyz.xenondevs.nova.world.block.model.SolidBlockModelProvider
+import xyz.xenondevs.nova.world.block.model.BlockStateBlockModelProvider
 import xyz.xenondevs.nova.world.pos
 import net.minecraft.world.level.block.NoteBlock as MojangNoteBlock
 
@@ -80,7 +80,7 @@ internal object NoteBlockBehavior : Initializable(), Listener {
             state = state.blockState
         
         return when (state) {
-            is NovaBlockState -> (state.modelProvider as? SolidBlockModelProvider)?.currentBlockState
+            is NovaBlockState -> (state.modelProvider as? BlockStateBlockModelProvider)?.currentBlockState
             is VanillaTileEntityState -> DEFAULT_STATE
             else -> throw UnsupportedOperationException()
         }

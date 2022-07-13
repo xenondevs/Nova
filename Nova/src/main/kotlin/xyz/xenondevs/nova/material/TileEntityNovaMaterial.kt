@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.material
 
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig.Companion.modelProvider
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState

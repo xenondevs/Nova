@@ -13,8 +13,8 @@ import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
-import xyz.xenondevs.nova.data.resources.model.data.SolidBlockModelData
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.mapToIntArray
 import java.io.File
@@ -67,7 +67,8 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
         val modelDataLookup = HashMap<String, Pair<ItemModelData?, BlockModelData?>>()
         
         val customItemModels = HashMap<Material, HashMap<String, Int>>()
-        val blockStateModels = HashMap<BlockStateConfigType<*>, HashMap<Pair<String, BlockDirection>, BlockStateConfig>>()
+        val blockStateModelsByName = HashMap<Pair<String, BlockDirection>, BlockStateConfig>()
+        val blockStateModelsByType = HashMap<BlockStateConfigType<*>, HashMap<Pair<String, BlockDirection>, BlockStateConfig>>()
         
         novaMaterials.forEach { (id, pair) ->
             val info = pair.first
@@ -84,24 +85,28 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
                 val info = pair.second
                 val itemModelData = modelDataLookup[id]!!.first
                 
-                val configType = info.type.configTypes.first { it == null || getRemainingBlockStateIdAmount(it) >= info.models.size }
-                
-                val blockModelData = if (configType == null) {
+                val blockModelData: BlockModelData
+                if (getRemainingBlockStateIdAmount(info.type) < info.models.size) {
                     val material = ItemModelType.DEFAULT.material
                     val registeredModels = customItemModels.getOrPut(material, ::HashMap)
                     val dataArray = info.models.mapToIntArray { registeredModels.getOrPut(it) { getNextCustomModelData(material) } }
-                    ArmorStandBlockModelData(id, info.hitboxType, material, dataArray)
+                    
+                    blockModelData = ArmorStandBlockModelData(id, info.hitboxType, material, dataArray)
                 } else {
-                    val registeredModels = blockStateModels.getOrPut(configType, ::HashMap)
                     val configs = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
                     info.models.forEach { model ->
                         info.directions.forEach { direction ->
-                            configs.getOrPut(direction.blockFace, ::ArrayList) +=
-                                registeredModels.getOrPut(model to direction) { getNextBlockConfig(configType) }
+                            val faceList = configs.getOrPut(direction.blockFace, ::ArrayList)
+                            
+                            val modelDirectionPair = model to direction
+                            val blockConfig = blockStateModelsByName.getOrPut(modelDirectionPair) { getNextBlockConfig(info.type) }
+                            blockStateModelsByType.getOrPut(blockConfig.type, ::HashMap)[modelDirectionPair] = blockConfig
+                            
+                            faceList += blockConfig
                         }
                     }
                     
-                    SolidBlockModelData(configType as BlockStateConfigType<BlockStateConfig>, id, configs)
+                    blockModelData = BlockStateBlockModelData(id, configs)
                 }
                 
                 modelDataLookup[id] = itemModelData to blockModelData
@@ -125,7 +130,7 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
             file.writeText(GSON.toJson(modelObj))
         }
         
-        blockStateModels.forEach { (type, registeredModels) ->
+        blockStateModelsByType.forEach { (type, registeredModels) ->
             val (file, mainObj, variants) = getBlockStateFile(type)
             
             registeredModels.forEach { (pair, cfg) ->
@@ -157,7 +162,12 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
         return pos
     }
     
-    private fun <T : BlockStateConfig> getNextBlockConfig(type: BlockStateConfigType<T>): T {
+    private fun getNextBlockConfig(type: BlockModelType): BlockStateConfig {
+        val configType = type.configTypes.first { it != null && getRemainingBlockStateIdAmount(it) > 0 }!!
+        return getNextBlockConfig(configType)
+    }
+    
+    private fun getNextBlockConfig(type: BlockStateConfigType<*>): BlockStateConfig {
         var pos = blockStatePosition.getOrPut(type) { -1 } + 1
         
         val occupiedSet = basePacks.occupiedSolidIds[type]
@@ -170,7 +180,12 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
         blockStatePosition[type] = pos
         remainingBlockStates[type] = remainingBlockStates[type]!! - 1
         
+        check(pos < type.maxId) { "Id limit exceeded" }
         return type.of(pos)
+    }
+    
+    private fun getRemainingBlockStateIdAmount(type: BlockModelType): Int {
+        return type.configTypes.sumOf { if (it != null) getRemainingBlockStateIdAmount(it) else 0 }
     }
     
     private fun getRemainingBlockStateIdAmount(type: BlockStateConfigType<*>): Int {
