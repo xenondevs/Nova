@@ -578,7 +578,7 @@
                             <classes>
                                 <class>xyz.xenondevs.nova.util.reflection.ReflectionRegistry</class>
                                 <class>xyz.xenondevs.nova.util.NMSUtils</class>
-                                <class>xyz.xenondevs.nova.world.block.behavior.noteblock.AgentNoteBlockBehavior</class>
+                                <class>xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch</class>
                             </classes>
                         </configuration>
                     </execution>

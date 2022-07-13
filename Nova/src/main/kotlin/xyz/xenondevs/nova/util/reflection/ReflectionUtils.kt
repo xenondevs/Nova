@@ -95,6 +95,12 @@ object ReflectionUtils {
         return method
     }
     
+    fun getMethodByName(clazz: Class<*>, declared: Boolean, methodName: String): Method {
+        val method = if (declared) clazz.declaredMethods.first { it.name == methodName } else clazz.methods.first { it.name == methodName }
+        if (declared) method.isAccessible = true
+        return method
+    }
+    
     fun <C> getConstructor(clazz: Class<C>, declared: Boolean, vararg args: Class<*>): Constructor<C> {
         val constructor = if (declared) clazz.getDeclaredConstructor(*args) else clazz.getConstructor(*args)
         if (declared) constructor.isAccessible = true

@@ -43,10 +43,8 @@ internal object NoteBlockBehavior : Initializable(), Listener {
         LOGGER.info("Initializing NoteBlockBehavior")
         
         registerEvents()
-        
-        if (DEFAULT_CONFIG.getBoolean("use_agent")) {
-            AgentNoteBlockBehavior.init()
-        } else {
+    
+        if (!DEFAULT_CONFIG.getBoolean("use_agent")) {
             PacketNoteBlockBehavior.init()
         }
     }

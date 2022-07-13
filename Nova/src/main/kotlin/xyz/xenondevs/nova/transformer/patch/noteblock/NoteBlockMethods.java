@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.block.behavior.noteblock;
+package xyz.xenondevs.nova.transformer.patch.noteblock;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
