@@ -12,19 +12,19 @@ internal object NoteBlockPatch : ClassTransformer(NoteBlock::class, computeFrame
         val patchesClass = NoteBlockMethods::class.java
         
         val neighborChangedMethod = ReflectionUtils.getMethodByName(patchesClass, true, "neighborChanged")
-        classWrapper.getMethod("SRM(net.minecraft.world.level.block.NoteBlock neighborChanged)", Type.getType(neighborChangedMethod).descriptor)!!
+        classWrapper.getMethod("SRM(net.minecraft.world.level.block.NoteBlock neighborChanged)", Type.getMethodDescriptor(neighborChangedMethod))!!
             .instructions = VirtualClassPath.getInstructions(neighborChangedMethod)
         
         val useMethod = ReflectionUtils.getMethodByName(patchesClass, true, "use")
-        classWrapper.getMethod("SRM(net.minecraft.world.level.block.NoteBlock use)", Type.getType(useMethod).descriptor)!!
+        classWrapper.getMethod("SRM(net.minecraft.world.level.block.NoteBlock use)", Type.getMethodDescriptor(useMethod))!!
             .instructions = VirtualClassPath.getInstructions(useMethod)
         
         val attackMethod = ReflectionUtils.getMethodByName(patchesClass, true, "attack")
-        classWrapper.getMethod("SRM(net.minecraft.world.level.block.NoteBlock attack)", Type.getType(attackMethod).descriptor)!!
+        classWrapper.getMethod("SRM(net.minecraft.world.level.block.NoteBlock attack)", Type.getMethodDescriptor(attackMethod))!!
             .instructions = VirtualClassPath.getInstructions(attackMethod)
         
         val triggerEventMethod = ReflectionUtils.getMethodByName(patchesClass, true, "triggerEvent")
-        classWrapper.getMethod("SRM(net.minecraft.world.level.block.NoteBlock triggerEvent)", Type.getType(triggerEventMethod).descriptor)!!
+        classWrapper.getMethod("SRM(net.minecraft.world.level.block.NoteBlock triggerEvent)", Type.getMethodDescriptor(triggerEventMethod))!!
             .instructions = VirtualClassPath.getInstructions(triggerEventMethod)
     }
     
