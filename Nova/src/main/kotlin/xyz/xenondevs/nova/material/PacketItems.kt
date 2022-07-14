@@ -193,11 +193,9 @@ internal object PacketItems : Initializable(), Listener {
     private fun handleRecipes(event: ClientboundUpdateRecipesPacketEvent) {
         val packet = event.packet
         packet.recipes.forEachIndexed { i, recipe ->
-            if (isNovaItem(recipe.resultItem)) {
-                val id = recipe.id.namespacedKey
-                if (id in RecipeManager.clientsideRecipes)
-                    packet.recipes[i] = RecipeManager.clientsideRecipes[id]!!
-            }
+            val id = recipe.id.namespacedKey
+            if (id in RecipeManager.clientsideRecipes)
+                packet.recipes[i] = RecipeManager.clientsideRecipes[id]!!
         }
     }
     

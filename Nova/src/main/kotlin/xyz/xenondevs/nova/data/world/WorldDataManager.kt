@@ -36,7 +36,6 @@ internal object WorldDataManager : Initializable(), Listener {
     override fun init() {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         tasks += Bukkit.getWorlds().flatMap { world -> world.loadedChunks.map { ChunkLoadTask(it.pos) } }
-        NOVA.disableHandlers += { Bukkit.getWorlds().forEach(::saveWorld) }
         
         thread(name = "Nova WorldDataManager", isDaemon = true) { // TODO: Use Phaser instead of Thread.sleep
             while (NOVA.isEnabled) {
@@ -53,6 +52,7 @@ internal object WorldDataManager : Initializable(), Listener {
     }
     
     override fun disable() {
+        Bukkit.getWorlds().forEach(::saveWorld)
         worlds.values.forEach(WorldDataStorage::closeAll)
     }
     
