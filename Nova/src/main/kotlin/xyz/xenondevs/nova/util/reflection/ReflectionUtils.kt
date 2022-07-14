@@ -115,18 +115,14 @@ object ReflectionUtils {
         return field
     }
     
-    internal fun obtainUnsafe(): Any {
-        return getField(Unsafe::class.java, true, "theUnsafe").get(null)
-    }
-    
     internal fun setFinalField(field: Field, obj: Any, value: Any?) {
-        val unsafe = obtainUnsafe() as Unsafe
+        val unsafe = Unsafe.getUnsafe()
         val offset = unsafe.objectFieldOffset(field)
         unsafe.putReference(obj, offset, value)
     }
     
     internal fun setStaticFinalField(field: Field, value: Any?) {
-        val unsafe = obtainUnsafe() as Unsafe
+        val unsafe = Unsafe.getUnsafe()
         val base = unsafe.staticFieldBase(field)
         val offset = unsafe.staticFieldOffset(field)
         unsafe.putReference(base, offset, value)
