@@ -6,7 +6,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
-import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -84,7 +83,6 @@ class Nova : JavaPlugin(), INova {
         IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
         PermanentStorage.store("last_version", description.version)
         
-        VirtualClassPath.classLoaders += classLoader.parent
         NovaConfig.loadDefaultConfig()
         CoreItems.init()
         Initializer.init()

@@ -46,7 +46,4 @@ internal object AgentNoteBlockBehavior {
         player.awardStat(Stats.PLAY_NOTEBLOCK)
     }
     
-    @JvmStatic
-    fun triggerEvent(state: BlockState, level: Level, pos: BlockPos, i: Int, j: Int) = true
-    
 }
