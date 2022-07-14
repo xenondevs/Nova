@@ -34,7 +34,7 @@ internal class VanillaNoteBlockTileEntity constructor(blockState: VanillaTileEnt
             }
         }
     
-    var instrument: Instrument = retrieveData("instrument") { Instrument.HARP }
+    var instrument: Instrument = retrieveData("instrument") { Instrument.byBlockType(pos.add(0, -1, 0)) }
         set(value) {
             if (field != value) {
                 field = value
