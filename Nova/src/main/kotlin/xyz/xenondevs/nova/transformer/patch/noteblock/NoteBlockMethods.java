@@ -15,7 +15,7 @@ class NoteBlockMethods {
     private void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean flag) {
         try {
             var loader = Bukkit.getPluginManager().getPlugin("Nova").getClass().getClassLoader();
-            var clazz = loader.loadClass("xyz.xenondevs.nova.world.block.behavior.noteblock.AgentNoteBlockBehavior");
+            var clazz = loader.loadClass("xyz.xenondevs.nova.world.block.behavior.impl.noteblock.AgentNoteBlockBehavior");
             var neighborChanged = clazz.getMethod("neighborChanged", BlockState.class, Level.class, BlockPos.class, Block.class, BlockPos.class, boolean.class);
             neighborChanged.invoke(null, state, level, pos, block, neighborPos, flag);
         } catch (Exception e) {
@@ -26,7 +26,7 @@ class NoteBlockMethods {
     private InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
         try {
             var loader = Bukkit.getPluginManager().getPlugin("Nova").getClass().getClassLoader();
-            var clazz = loader.loadClass("xyz.xenondevs.nova.world.block.behavior.noteblock.AgentNoteBlockBehavior");
+            var clazz = loader.loadClass("xyz.xenondevs.nova.world.block.behavior.impl.noteblock.AgentNoteBlockBehavior");
             var neighborChanged = clazz.getMethod("use", BlockState.class, Level.class, BlockPos.class, Player.class, InteractionHand.class, BlockHitResult.class);
             return (InteractionResult) neighborChanged.invoke(null, state, level, pos, player, hand, result);
         } catch (Exception e) {
@@ -39,7 +39,7 @@ class NoteBlockMethods {
     private void attack(BlockState state, Level level, BlockPos pos, Player player) {
         try {
             var loader = Bukkit.getPluginManager().getPlugin("Nova").getClass().getClassLoader();
-            var clazz = loader.loadClass("xyz.xenondevs.nova.world.block.behavior.noteblock.AgentNoteBlockBehavior");
+            var clazz = loader.loadClass("xyz.xenondevs.nova.world.block.behavior.impl.noteblock.AgentNoteBlockBehavior");
             var neighborChanged = clazz.getMethod("attack", BlockState.class, Level.class, BlockPos.class, Player.class);
             neighborChanged.invoke(null, state, level, pos, player);
         } catch (Exception e) {

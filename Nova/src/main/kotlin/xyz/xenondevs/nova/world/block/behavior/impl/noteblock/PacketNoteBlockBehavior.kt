@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package xyz.xenondevs.nova.world.block.behavior.noteblock
+package xyz.xenondevs.nova.world.block.behavior.impl.noteblock
 
 import net.minecraft.network.protocol.game.ClientboundBlockEventPacket
 import net.minecraft.world.level.block.Blocks

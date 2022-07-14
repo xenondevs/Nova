@@ -17,6 +17,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
+import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
@@ -70,6 +71,9 @@ val InteractionHand.bukkitSlot: EquipmentSlot
         InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
     }
 
+val Block.nmsState: BlockState
+    get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))
+
 fun MojangBlockPos.toNovaPos(world: World): BlockPos =
     BlockPos(world, x, y, z)
 
@@ -107,7 +111,9 @@ fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T):
 }
 
 fun BlockPos.setBlockStateSilently(blockState: BlockState) {
-    world.serverLevel.setBlock(nmsPos, blockState, 1024)
+    val chunk = world.serverLevel.getChunk(x shr 4, z shr 4)
+    val section = chunk.getSection(chunk.getSectionIndex(y))
+    section.setBlockState(x and 0xF, y and 0xF, z and 0xF, blockState)
 }
 
 object NMSUtils {

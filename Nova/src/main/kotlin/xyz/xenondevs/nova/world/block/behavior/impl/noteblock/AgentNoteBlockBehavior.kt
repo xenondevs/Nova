@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.block.behavior.noteblock
+package xyz.xenondevs.nova.world.block.behavior.impl.noteblock
 
 import net.minecraft.core.BlockPos
 import net.minecraft.stats.Stats
@@ -9,7 +9,6 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
-import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaNoteBlockTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.toNovaPos
