@@ -6,7 +6,8 @@ resource_pack:
   auto_upload:
     enabled: false
 
-# If Nova should use a java agent to self-attach and redefine methods
+# If Nova should use a java agent to self-attach and redefine methods.
+# This allows Nova to change spigot's behavior and thus improve performance.
 use_agent: true
 
 # The render distance for armor stands from Nova, in chunks.

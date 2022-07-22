@@ -6,6 +6,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPhysicsEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
@@ -19,7 +20,7 @@ import xyz.xenondevs.nova.world.pos
 internal object BlockBehaviorManager : Initializable(), Listener {
     
     override val inMainThread = true
-    override val dependsOn = emptySet<Initializable>()
+    override val dependsOn = setOf(Patcher)
     
     private val behaviors: List<BlockBehavior> = listOf(
         NoteBlockBehavior,

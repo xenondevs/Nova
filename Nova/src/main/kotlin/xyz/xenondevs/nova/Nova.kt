@@ -8,6 +8,7 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
@@ -17,15 +18,16 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
+import xyz.xenondevs.particle.utils.ReflectionUtils as ParticleLibReflectionUtils
 
 private val REQUIRED_SERVER_VERSION = Version("1.19.0")
 
 lateinit var NOVA: Nova
 internal var IS_VERSION_CHANGE: Boolean = false
+internal var IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal val HTTP_CLIENT = HttpClient(CIO) {
     install(ContentNegotiation) { gson() }
     expectSuccess = false
@@ -50,14 +52,29 @@ class Nova : JavaPlugin(), INova {
     override fun onEnable() {
         NOVA = this
         LOGGER = logger
-        ReflectionUtils.setPlugin(this)
+        if (IS_DEV_SERVER)
+            LOGGER.warning("Running in dev mode! Never use this in a production server!")
         
+        ParticleLibReflectionUtils.setPlugin(this)
+        IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
+        PermanentStorage.store("last_version", description.version)
+        
+        NovaConfig.loadDefaultConfig()
+        if (!checkStartup())
+            return
+        CoreItems.init()
+        Initializer.init()
+        
+        fullyEnabled = true
+    }
+    
+    private fun checkStartup(): Boolean {
         // prevent execution on unsupported minecraft versions
         if (Version.SERVER_VERSION != REQUIRED_SERVER_VERSION) {
             LOGGER.severe("Nova is not compatible with this version of Minecraft!")
             LOGGER.severe("Nova only runs on $REQUIRED_SERVER_VERSION.")
             Bukkit.getPluginManager().disablePlugin(this)
-            return
+            return false
         }
         
         // prevent execution if the previously installed version is not compatible with this version
@@ -66,28 +83,18 @@ class Nova : JavaPlugin(), INova {
             LOGGER.severe("This version of Nova is not compatible with the version that was previously installed.")
             LOGGER.severe("Please erase all data related to Nova and try again.")
             Bukkit.getPluginManager().disablePlugin(this)
-            return
+            return false
         }
         
-        if (ServerUtils.isReload) {
-            LOGGER.severe("Reloading is not supported. Please restart the server instead.")
-            if (IS_VERSION_CHANGE) {
-                LOGGER.severe("===========================================================")
-                LOGGER.severe("!ESPECIALLY UPDATING/INSTALLING NOVA WHEN RELOADING WILL CAUSE MAJOR ISSUES!")
-                LOGGER.severe("===========================================================")
-                Bukkit.getPluginManager().disablePlugin(this)
-                return
-            }
+        if (!IS_DEV_SERVER && ServerUtils.isReload && (DEFAULT_CONFIG.getBoolean("use_agent") || (lastVersion != version))) {
+            LOGGER.severe("========================================================================================")
+            LOGGER.severe("!RELOADING IS NOT SUPPORTED WHEN USING AN AGENT OR UPDATING. PLEASE RESTART YOUR SERVER!")
+            LOGGER.severe("========================================================================================")
+            
+            Bukkit.getPluginManager().disablePlugin(this)
+            return false
         }
-        
-        IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
-        PermanentStorage.store("last_version", description.version)
-        
-        NovaConfig.loadDefaultConfig()
-        CoreItems.init()
-        Initializer.init()
-        
-        fullyEnabled = true
+        return true
     }
     
     override fun onDisable() {

@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.config
 
 import org.bukkit.configuration.file.YamlConfiguration
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
@@ -17,6 +18,7 @@ import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
+import java.io.File
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -89,6 +91,10 @@ object NovaConfig : Initializable() {
     
     operator fun get(material: ItemNovaMaterial): YamlConfiguration =
         configs[material.id.toString()]!!
+    
+    fun save(name: String) {
+        configs[name]!!.save(File(NOVA.dataFolder, "configs/$name.yml"))
+    }
     
 }
 

@@ -5,10 +5,10 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
-import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
 import java.lang.reflect.Field
@@ -25,16 +25,23 @@ internal object Patcher : Initializable() {
         if (!DEFAULT_CONFIG.getBoolean("use_agent"))
             return
         
+        if (runCatching { INSTRUMENTATION }.isFailure) {
+            LOGGER.warning("Java agents aren't supported on this server! Disabling...")
+            DEFAULT_CONFIG["use_agent"] = false
+            NovaConfig.save("config")
+            return
+        }
+        
         LOGGER.info("Performing patches...")
         VirtualClassPath.classLoaders += Nova::class.java.classLoader.parent
         redefineModule()
-        if (!ServerUtils.isReload)
-            runTransformers()
+        runTransformers()
         insertPatchedLoader()
     }
     
     override fun disable() {
-        removePatchedLoader()
+        if (DEFAULT_CONFIG.getBoolean("use_agent"))
+            removePatchedLoader()
     }
     
     private fun redefineModule() {
