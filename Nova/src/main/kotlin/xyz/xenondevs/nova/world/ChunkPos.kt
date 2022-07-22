@@ -6,12 +6,13 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
 import java.util.*
+import kotlin.math.floor
 
 val Chunk.pos: ChunkPos
     get() = ChunkPos(world.uid, x, z)
 
 val Location.chunkPos: ChunkPos
-    get() = ChunkPos(world!!.uid, x.toInt() shr 4, z.toInt() shr 4)
+    get() = ChunkPos(world!!.uid, floor(x).toInt() shr 4, floor(z).toInt() shr 4)
 
 val Block.chunkPos: ChunkPos
     get() = ChunkPos(world.uid, x shr 4, z shr 4)
