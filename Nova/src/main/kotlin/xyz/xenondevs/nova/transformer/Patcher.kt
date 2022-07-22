@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
+import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
 import java.lang.reflect.Field
@@ -27,7 +28,8 @@ internal object Patcher : Initializable() {
         LOGGER.info("Performing patches...")
         VirtualClassPath.classLoaders += Nova::class.java.classLoader.parent
         redefineModule()
-        runTransformers()
+        if (!ServerUtils.isReload)
+            runTransformers()
         insertPatchedLoader()
     }
     
