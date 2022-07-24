@@ -52,7 +52,6 @@ If you would like to help translate Nova, you can do so [here](https://translate
 
 * mrakavin - €10
 * Ashwin | DarktubeNL - €10
-* ClimbersGroove - €5
 * ThantiK - €5
 * Doodles - €5
 
