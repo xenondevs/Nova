@@ -27,7 +27,7 @@ internal object LegacyFileConverter : Initializable() {
     
     override fun init() {
         registerConverters()
-        runConversions()
+//        runConversions()
     }
     
     private fun registerConverters() {
