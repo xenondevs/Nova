@@ -1,10 +1,12 @@
 package xyz.xenondevs.nova.data.resources
 
 import kotlinx.coroutines.runBlocking
+import org.bukkit.event.HandlerList
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -12,6 +14,7 @@ import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.util.registerEventsFirst
 
 internal object Resources : Initializable() {
     
@@ -23,6 +26,8 @@ internal object Resources : Initializable() {
     internal lateinit var languageLookup: Map<String, Map<String, String>>
     
     override fun init() {
+        if (DEFAULT_CONFIG.getBoolean("resource_pack.freeze_loading_players"))
+            registerEventsFirst(PlayerFreezer)
         LOGGER.info("Loading resources")
         if (
             PermanentStorage.retrieveOrNull<Int>("addonsHashCode") == AddonManager.addonsHashCode
@@ -41,6 +46,22 @@ internal object Resources : Initializable() {
             // Store addonsHashCode
             PermanentStorage.store("addonsHashCode", AddonManager.addonsHashCode)
         }
+    }
+    
+    fun reload() {
+        val freezerEnabled = DEFAULT_CONFIG.getBoolean("resource_pack.freeze_loading_players")
+        if (freezerEnabled && !PlayerFreezer.enabled) {
+            PlayerFreezer.enabled = true
+            registerEventsFirst(PlayerFreezer)
+        } else if (!freezerEnabled && PlayerFreezer.enabled) {
+            PlayerFreezer.enabled = false
+            PlayerFreezer.clearPlayers()
+            HandlerList.unregisterAll(PlayerFreezer)
+        }
+    }
+    
+    override fun disable() {
+        PlayerFreezer.clearPlayers()
     }
     
     fun createResourcePack() {

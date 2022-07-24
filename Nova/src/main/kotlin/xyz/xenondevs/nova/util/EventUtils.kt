@@ -83,6 +83,15 @@ fun registerEvents(listener: Listener) {
 @Suppress("UNCHECKED_CAST")
 fun registerEventFirst(listener: Listener, event: Class<out Event>) {
     val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA)[event]!!
+    registerRegisteredListenerFirst(registeredListeners, event)
+}
+
+fun registerEventsFirst(listener: Listener) {
+    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA)
+    registeredListeners.forEach { registerRegisteredListenerFirst(it.value, it.key) }
+}
+
+private fun registerRegisteredListenerFirst(registeredListeners: Set<RegisteredListener>, event: Class<out Event>) {
     val handlerList = event.getMethod("getHandlerList").invoke(null) as HandlerList
     val handlerSlots = HANDLER_LIST_HANDLER_SLOTS_FIELD.get(handlerList) as EnumMap<EventPriority, ArrayList<RegisteredListener>>
     

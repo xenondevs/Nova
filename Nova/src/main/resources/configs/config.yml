@@ -5,6 +5,8 @@ resource_pack:
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:
     enabled: false
+  # This will freeze players that are currently loading the resource pack.
+  freeze_loading_players: false
 
 # If Nova should use a java agent to self-attach and redefine methods.
 # This allows Nova to change spigot's behavior and thus improve performance.
