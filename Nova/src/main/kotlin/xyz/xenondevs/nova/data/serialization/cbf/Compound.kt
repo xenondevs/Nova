@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.data.serialization.cbf
 
 import io.netty.buffer.ByteBuf
-import xyz.xenondevs.nova.util.data.readString
-import xyz.xenondevs.nova.util.data.writeString
+import xyz.xenondevs.nova.util.data.readStringLegacy
+import xyz.xenondevs.nova.util.data.writeStringLegacy
 import xyz.xenondevs.nova.util.reflection.type
 import java.lang.reflect.Type
 
@@ -78,13 +78,13 @@ class Compound internal constructor(
             buf.writeInt(obj.binMap.size + obj.map.size)
             
             obj.binMap.forEach { (key, binData) ->
-                buf.writeString(key)
+                buf.writeStringLegacy(key)
                 buf.writeInt(binData.size)
                 buf.writeBytes(binData)
             }
             
             obj.map.forEach { (key, data) ->
-                buf.writeString(key)
+                buf.writeStringLegacy(key)
                 val binData = CBF.write(data)
                 buf.writeInt(binData.size)
                 buf.writeBytes(binData)
@@ -96,7 +96,7 @@ class Compound internal constructor(
             val map = HashMap<String, ByteArray>(mapSize)
             
             repeat(mapSize) {
-                val key = buf.readString()
+                val key = buf.readStringLegacy()
                 val arraySize = buf.readInt()
                 val array = ByteArray(arraySize)
                 buf.readBytes(array)

@@ -120,14 +120,84 @@ internal fun RandomAccessFile.append(pos: Long, appendAt: Long, bytes: ByteArray
     }
 }
 
-internal fun RandomAccessFile.readString(): String {
-    val bytes = ByteArray(readUnsignedShort())
-    read(bytes)
-    return bytes.decodeToString()
+
+/**
+ * Writes a variable length integer to the file and returns the amount of bytes written.
+ */
+internal fun RandomAccessFile.writeVarInt(value: Int): Int {
+    var currentValue = value
+    var count = 1
+    while ((currentValue and -128) != 0) {
+        this.writeByte(((currentValue and 127) or 128))
+        currentValue = currentValue ushr 7
+        ++count
+    }
+    
+    this.writeByte(currentValue)
+    return count
 }
 
-internal fun RandomAccessFile.readStringList(): List<String> {
-    return Array(readInt()) { readString() }.asList()
+/**
+ * Writes a variable length long to the file and returns the amount of bytes written.
+ */
+internal fun RandomAccessFile.writeVarLong(value: Long): Int {
+    var currentValue = value
+    var count = 1
+    while ((currentValue and -128L) != 0.toLong()) {
+        this.writeByte(((currentValue and 127) or 128).toInt())
+        currentValue = currentValue ushr 7
+        ++count
+    }
+    
+    this.writeByte(currentValue.toInt())
+    return count
+}
+
+/**
+ * Writes a string to the file and returns the amount of bytes written.
+ */
+internal fun RandomAccessFile.writeString(string: String): Int {
+    val encoded = string.toByteArray()
+    val size = writeVarInt(encoded.size) + encoded.size
+    write(encoded)
+    return size
+}
+
+/**
+ * Writes a string list to the file and returns the amount of bytes written.
+ */
+internal fun RandomAccessFile.writeStringList(list: List<String>): Int {
+    var size = writeVarInt(list.size)
+    list.forEach { size += writeString(it) }
+    return size
+}
+
+internal fun RandomAccessFile.readVarInt(): Int {
+    var value = 0
+    var currentByte: Byte
+    var byteIdx = 0
+    
+    do {
+        currentByte = readByte()
+        value = value or ((currentByte.toInt() and 127) shl byteIdx++ * 7)
+        check(byteIdx < 6) { "VarInt is too big" }
+    } while (currentByte.countLeadingZeroBits() == 0)
+    
+    return value
+}
+
+internal fun RandomAccessFile.readVarLong(): Long {
+    var value = 0L
+    var currentByte: Byte
+    var byteIdx = 0
+    
+    do {
+        currentByte = readByte()
+        value = value or ((currentByte.toLong() and 127) shl byteIdx++ * 7)
+        check(byteIdx < 10) { "VarLong is too big" }
+    } while (currentByte.countLeadingZeroBits() == 0)
+    
+    return value
 }
 
 inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
@@ -142,3 +212,17 @@ inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
         }
     }
 }
+
+//<editor-fold desc="Legacy functions" defaultstate="collapsed">
+
+internal fun RandomAccessFile.readStringLegacy(): String {
+    val bytes = ByteArray(readUnsignedShort())
+    read(bytes)
+    return bytes.decodeToString()
+}
+
+internal fun RandomAccessFile.readStringListLegacy(): List<String> {
+    return Array(readInt()) { readStringLegacy() }.asList()
+}
+
+//</editor-fold>

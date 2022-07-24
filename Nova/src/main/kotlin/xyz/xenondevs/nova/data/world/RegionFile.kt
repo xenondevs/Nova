@@ -152,7 +152,7 @@ internal class RegionFile(val world: WorldDataStorage, val file: File, val regio
         var delta = (newSize - currentSize).toLong()
         val out = Unpooled.buffer()
         if (rewritePool) {
-            val poolBytesCount = out.writeStringList(typePool)
+            val poolBytesCount = out.writeStringListLegacy(typePool)
             raf.seek(1)
             raf.writeInt(poolBytesCount)
             delta += (poolBytesCount - currentTypeLength).toLong()
@@ -192,7 +192,7 @@ internal class RegionFile(val world: WorldDataStorage, val file: File, val regio
     
     private fun readHeader() {
         raf.seek(5)
-        typePool.addAll(raf.readStringList())
+        typePool.addAll(raf.readStringListLegacy())
         repeat(raf.readInt() / 12) {
             chunkPositions[raf.readInt()] = AtomicLong(raf.readLong())
         }

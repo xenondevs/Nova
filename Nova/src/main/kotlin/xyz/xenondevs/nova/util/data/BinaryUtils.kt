@@ -10,20 +10,6 @@ import java.util.zip.Inflater
 
 fun ByteBuf.writeByte(byte: Byte): ByteBuf = writeByte(byte.toInt())
 
-fun ByteBuf.writeString(string: String): Int {
-    val encoded = string.encodeToByteArray()
-    require(encoded.size <= 65535) { "String is too large!" }
-    writeShort(encoded.size)
-    writeBytes(encoded)
-    return 2 + encoded.size
-}
-
-fun ByteBuf.readString(): String {
-    val bytes = ByteArray(readUnsignedShort())
-    readBytes(bytes)
-    return bytes.decodeToString()
-}
-
 fun ByteBuf.toByteArray(): ByteArray {
     markReaderIndex()
     readerIndex(0)
@@ -72,17 +58,6 @@ fun ByteArray.encodeWithBase64(): String = Base64.getEncoder().encodeToString(th
 
 fun String.decodeWithBase64(): ByteArray = Base64.getDecoder().decode(this)
 
-fun ByteBuf.writeStringList(array: List<String>): Int {
-    var size = 4
-    writeInt(array.size)
-    array.forEach { size += writeString(it) }
-    return size
-}
-
-fun ByteBuf.readStringList(): List<String> {
-    return Array(readInt()) { readString() }.asList()
-}
-
 fun ByteBuf.writeUUID(uuid: UUID) {
     writeLong(uuid.mostSignificantBits)
     writeLong(uuid.leastSignificantBits)
@@ -90,3 +65,32 @@ fun ByteBuf.writeUUID(uuid: UUID) {
 
 fun ByteBuf.readUUID(): UUID =
     UUID(readLong(), readLong())
+
+//<editor-fold desc="Legacy functions" defaultstate="collapsed">
+
+fun ByteBuf.writeStringLegacy(string: String): Int {
+    val encoded = string.encodeToByteArray()
+    require(encoded.size <= 65535) { "String is too large!" }
+    writeShort(encoded.size)
+    writeBytes(encoded)
+    return 2 + encoded.size
+}
+
+fun ByteBuf.writeStringListLegacy(array: List<String>): Int {
+    var size = 4
+    writeInt(array.size)
+    array.forEach { size += writeStringLegacy(it) }
+    return size
+}
+
+fun ByteBuf.readStringLegacy(): String {
+    val bytes = ByteArray(readUnsignedShort())
+    readBytes(bytes)
+    return bytes.decodeToString()
+}
+
+fun ByteBuf.readStringListLegacy(): List<String> {
+    return Array(readInt()) { readStringLegacy() }.asList()
+}
+
+//</editor-fold>
