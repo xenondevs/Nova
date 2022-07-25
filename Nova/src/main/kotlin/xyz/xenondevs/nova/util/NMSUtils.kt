@@ -13,6 +13,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
+import net.minecraft.world.level.chunk.LevelChunkSection
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -110,10 +111,21 @@ fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T):
     return hasProperty(property) && values[property] == value
 }
 
-fun BlockPos.setBlockStateSilently(blockState: BlockState) {
-    val chunk = world.serverLevel.getChunk(x shr 4, z shr 4)
-    val section = chunk.getSection(chunk.getSectionIndex(y))
-    section.setBlockState(x and 0xF, y and 0xF, z and 0xF, blockState)
+fun BlockPos.setBlockStateSilently(state: BlockState) {
+    val section = chunkSection
+    section.acquire()
+    section.setBlockStateSilently(this, state)
+    section.release()
+}
+
+val BlockPos.chunkSection: LevelChunkSection
+    get() {
+        val chunk = world.serverLevel.getChunk(x shr 4, z shr 4)
+        return chunk.getSection(chunk.getSectionIndex(y))
+    }
+
+fun LevelChunkSection.setBlockStateSilently(pos: BlockPos, state: BlockState) {
+    setBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF, state)
 }
 
 object NMSUtils {

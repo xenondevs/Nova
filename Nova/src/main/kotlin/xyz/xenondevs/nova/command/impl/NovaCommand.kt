@@ -40,6 +40,7 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DIST
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
 import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.pos
 
@@ -67,6 +68,8 @@ internal object NovaCommand : Command("nova") {
                     .executesCatching(::showTileEntityData))
                 .then(literal("reloadNetworks")
                     .executesCatching(::reloadNetworks))
+                .then(literal("updateChunkSearchId")
+                    .executesCatching(::updateChunkSearchId))
                 .then(literal("energyNet")
                     .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
                 .then(literal("itemNet")
@@ -98,6 +101,11 @@ internal object NovaCommand : Command("nova") {
                     .executesCatching(::reloadConfigs))
                 .then(literal("recipes")
                     .executesCatching(::reloadRecipes)))
+    }
+    
+    private fun updateChunkSearchId(ctx: CommandContext<CommandSourceStack>) {
+        BlockBehaviorManager.updateChunkSearchId()
+        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.update_chunk_search_id.success"))
     }
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {

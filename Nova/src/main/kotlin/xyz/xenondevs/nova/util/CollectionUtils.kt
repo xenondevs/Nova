@@ -199,3 +199,15 @@ inline fun <T> List<T>.mapToBooleanArray(transform: (T) -> Boolean): BooleanArra
 }
 
 fun <K, V> treeMapOf(vararg pairs: Pair<K, V>) = TreeMap<K, V>().apply { putAll(pairs) }
+
+inline fun <T, R> Iterable<T>.flatMap(transform: (T) -> Array<R>): List<R> {
+    return flatMapTo(ArrayList<R>(), transform)
+}
+
+inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(destination: C, transform: (T) -> Array<R>): C {
+    for (element in this) {
+        val list = transform(element)
+        destination.addAll(list)
+    }
+    return destination
+}

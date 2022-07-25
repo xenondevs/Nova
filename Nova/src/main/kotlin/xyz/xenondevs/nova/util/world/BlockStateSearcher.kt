@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package xyz.xenondevs.nova.world.chunk
+package xyz.xenondevs.nova.util.world
 
 import it.unimi.dsi.fastutil.ints.IntArraySet
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
@@ -10,6 +10,7 @@ import net.minecraft.util.ZeroBitStorage
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.*
+import xyz.xenondevs.nova.util.getOrSet
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HASH_MAP_PALETTE_VALUES_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.LINEAR_PALETTE_VALUES_FIELD
@@ -22,15 +23,15 @@ import kotlin.reflect.jvm.jvmName
 private val ZERO_SET = IntArraySet(intArrayOf(0))
 typealias ChunkSearchQuery = Predicate<BlockState>
 
-object ChunkStateSearcher {
+object BlockStateSearcher {
     
     private val globalPaletteCache = HashMap<ChunkSearchQuery, Set<Int>>()
     
-    fun searchChunk(pos: ChunkPos, queries: List<ChunkSearchQuery>): Map<ChunkSearchQuery, List<BlockPos>> {
+    fun searchChunk(pos: ChunkPos, queries: List<ChunkSearchQuery>): Array<ArrayList<BlockPos>?> {
         val world = pos.world
         require(world != null) { "World does not exist" }
         
-        val result = HashMap<ChunkSearchQuery, ArrayList<BlockPos>>()
+        val result: Array<ArrayList<BlockPos>?> = arrayOfNulls(queries.size)
         for (section in world.serverLevel.getChunk(pos.x, pos.z).sections) {
             val container = section.states
             container.acquire()
@@ -40,24 +41,24 @@ object ChunkStateSearcher {
                 val data = ReflectionRegistry.PALETTED_CONTAINER_DATA_FIELD.get(container)
                 val palette = ReflectionRegistry.PALETTED_CONTAINER_DATA_PALETTE_FIELD.get(data) as Palette<BlockState>
                 var storage: BitStorage? = null
-    
-                for (query in queries) {
+                
+                for ((queryIdx, query) in queries.withIndex()) {
                     val ids = palette.findIds(query)
                     if (ids.isEmpty())
                         continue
-        
+                    
                     if (storage == null)
                         storage = ReflectionRegistry.PALETTED_CONTAINER_DATA_STORAGE_FIELD.get(data) as BitStorage
-        
+                    
                     if (storage is ZeroBitStorage)
                         break
-        
-                    val resultList = result.getOrPut(query, ::ArrayList)
+                    
+                    val resultList = result.getOrSet(queryIdx, ::ArrayList)
                     storage.runOnIds(ids) { idx ->
                         val x = idx and 0xF
                         val z = (idx shr 4) and 0xF
                         val y = idx shr 8
-            
+                        
                         resultList += BlockPos(world, (pos.x shl 4) + x, y + bottomY, (pos.z shl 4) + z)
                     }
                 }
