@@ -25,7 +25,7 @@ internal class RegionChunk(val file: RegionFile, relChunkX: Int, relChunkZ: Int)
             val relPos = buf.readUnsignedByte().toInt()
             val relX = relPos shr 4
             val relZ = relPos and 0xF
-            val y = buf.readUnsignedShort()
+            val y = buf.readShort().toInt()
             val pos = BlockPos(file.world.world, (chunkX shl 4) + relX, y, (chunkZ shl 4) + relZ)
             val type = palette[buf.readInt()]
             
