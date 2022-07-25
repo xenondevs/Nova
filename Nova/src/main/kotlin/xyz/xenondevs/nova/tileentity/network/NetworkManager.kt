@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
+import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -118,10 +119,10 @@ interface NetworkManager {
             NETWORK_MANAGER.init()
             Bukkit.getPluginManager().registerEvents(this, NOVA)
         }
-    
+        
         override fun disable() {
             LOGGER.info("Unloading networks")
-            Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach { unloadChunk(it.pos) }
+            Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach { unloadChunk(it.pos) }
         }
         
         @EventHandler(priority = EventPriority.HIGHEST)
@@ -225,7 +226,7 @@ private class NetworkManagerImpl : NetworkManager {
     }
     
     override fun reloadNetworks() {
-        val chunks = Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.map(Chunk::pos)
+        val chunks = Bukkit.getWorlds().flatMap(World::getLoadedChunks).map(Chunk::pos)
         chunks.forEach { unloadChunk(it, true) }
         networks.clear()
         chunks.forEach { loadChunk(it, true) }
@@ -758,7 +759,7 @@ private class NetworkManagerImpl : NetworkManager {
                 
                 unexploredNodes = newUnexploredNodes
             }
-    
+            
             // prevent networks that are only made up of one end point and nothing else
             if (connectedNodeFaces.size > 1 || connectedNodeFaces.first().second is NetworkBridge) {
                 previouslyExploredBridges += exploredBridges

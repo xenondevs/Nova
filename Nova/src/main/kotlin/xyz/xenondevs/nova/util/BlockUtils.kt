@@ -10,6 +10,7 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -316,7 +317,7 @@ fun Block.sendDestructionPacket(entityId: Int, stage: Int) {
     val packet = ClientboundBlockDestructionPacket(entityId, location.blockPos, stage)
     
     chunk.getSurroundingChunks(1, true)
-        .flatMap { it.entities.toList() }
+        .flatMap(Chunk::getEntities)
         .filterIsInstance<Player>()
         .forEach { it.send(packet) }
 }

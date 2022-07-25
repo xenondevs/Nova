@@ -31,6 +31,7 @@ import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import kotlin.collections.flatMap
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 
 interface ItemTest {
