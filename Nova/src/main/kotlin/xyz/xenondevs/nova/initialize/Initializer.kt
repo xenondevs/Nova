@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.command.CommandManager
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.player.PlayerFreezer
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -55,7 +56,7 @@ internal object Initializer {
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
-        BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher
+        BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer
     ).sorted()
     
     private val latch = CountDownLatch(toInit.size)

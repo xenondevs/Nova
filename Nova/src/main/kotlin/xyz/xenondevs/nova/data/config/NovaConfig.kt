@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.player.PlayerFreezer
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -80,12 +80,12 @@ object NovaConfig : Initializable() {
         TileEntityManager.tileEntities.forEach(Reloadable::reload)
         NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
         AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)
-        Resources.reload()
         AutoUploadManager.reload()
         ActionbarOverlayManager.reload()
         TileEntityLimits.reload()
         ChunkReloadWatcher.reload()
         UpdateReminder.reload()
+        PlayerFreezer.reload()
     }
     
     operator fun get(name: String): YamlConfiguration =

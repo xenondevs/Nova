@@ -1,7 +1,8 @@
-package xyz.xenondevs.nova.data.resources
+package xyz.xenondevs.nova.player
 
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -10,19 +11,36 @@ import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.player.*
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status.*
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.util.removeIf
+import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.util.registerEventsFirst
 
-internal object PlayerFreezer : Listener {
+internal object PlayerFreezer : Initializable(), Listener {
     
-    var enabled = DEFAULT_CONFIG.getBoolean("resource_pack.freeze_loading_players")
+    override val inMainThread = true
+    override val dependsOn = emptySet<Initializable>()
     
-    val frozenPlayers = HashMap<Player, Boolean>() // Player -> prevAllowFlight
+    private val frozenPlayers = HashMap<Player, Boolean>() // Player -> prevAllowFlight
     
-    fun clearPlayers() {
-        frozenPlayers.removeIf {
-            it.key.allowFlight = it.value
-            true
+    override fun init() {
+        reload()
+    }
+    
+    internal fun reload() {
+        HandlerList.unregisterAll(this)
+        if (DEFAULT_CONFIG.getBoolean("resource_pack.freeze_loading_players")) {
+            registerEventsFirst()
+        } else {
+            clearPlayers()
         }
+    }
+    
+    override fun disable() {
+        clearPlayers()
+    }
+    
+    private fun clearPlayers() {
+        frozenPlayers.forEach { (player, prevAllowFlight) -> player.allowFlight = prevAllowFlight }
+        frozenPlayers.clear()
     }
     
     @EventHandler

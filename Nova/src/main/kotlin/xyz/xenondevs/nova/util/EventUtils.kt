@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
@@ -74,18 +76,22 @@ fun Listener.registerEventFirst(eventClass: Class<out Event>) {
     registerEventFirst(this, eventClass)
 }
 
+fun Listener.registerEventsFirst() {
+    registerEventsFirst(this)
+}
+
 @JvmName("registerEvents1")
 fun registerEvents(listener: Listener) {
     Bukkit.getPluginManager().registerEvents(listener, NOVA)
 }
 
 @JvmName("registerEventFirst1")
-@Suppress("UNCHECKED_CAST")
 fun registerEventFirst(listener: Listener, event: Class<out Event>) {
     val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA)[event]!!
     registerRegisteredListenerFirst(registeredListeners, event)
 }
 
+@JvmName("registerEventsFirst1")
 fun registerEventsFirst(listener: Listener) {
     val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA)
     registeredListeners.forEach { registerRegisteredListenerFirst(it.value, it.key) }
