@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.util.data.ComponentUtils
@@ -70,12 +71,14 @@ internal object NovaCommand : Command("nova") {
                     .executesCatching(::reloadNetworks))
                 .then(literal("updateChunkSearchId")
                     .executesCatching(::updateChunkSearchId))
-                .then(literal("energyNet")
-                    .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
-                .then(literal("itemNet")
-                    .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) })
-                .then(literal("fluidNet")
-                    .executesCatching { toggleNetworkDebugging(NetworkType.FLUID, it) }))
+                .then(literal("showNetwork")
+                    .apply {
+                        NetworkTypeRegistry.types.forEach { type ->
+                            then(literal(type.id.toString())
+                                .executesCatching { toggleNetworkDebugging(it, type) })
+                        }
+                    }
+                ))
             .then(literal("items")
                 .requiresPlayerPermission("nova.command.items")
                 .executesCatching(::openItemInventory))
@@ -219,7 +222,7 @@ internal object NovaCommand : Command("nova") {
         
     }
     
-    private fun toggleNetworkDebugging(type: NetworkType, ctx: CommandContext<CommandSourceStack>) {
+    private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType) {
         val player = ctx.player
         NetworkDebugger.toggleDebugger(type, player)
         
