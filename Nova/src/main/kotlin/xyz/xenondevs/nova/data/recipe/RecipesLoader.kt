@@ -72,7 +72,7 @@ internal object RecipesLoader {
     }
     
     private fun <T : Any> loadRecipes(folder: String, deserializer: RecipeDeserializer<T>): List<T> {
-        val recipesDirectory = File("plugins/Nova/recipes/$folder")
+        val recipesDirectory = File("${NOVA.dataFolder}/recipes/$folder")
         return recipesDirectory.walkTopDown()
             .filter { it.isFile && it.name.matches(RECIPE_FILE_PATTERN) }
             .mapNotNullTo(ArrayList()) { loadRecipe(it, deserializer) }
