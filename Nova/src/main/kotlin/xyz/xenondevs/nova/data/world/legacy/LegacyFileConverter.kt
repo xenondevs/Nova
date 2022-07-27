@@ -2,9 +2,8 @@ package xyz.xenondevs.nova.data.world.legacy
 
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
 import java.io.File
 import java.nio.file.Files
@@ -16,7 +15,6 @@ internal object LegacyFileConverter : Initializable() {
     override val inMainThread = false
     override val dependsOn = emptySet<Initializable>()
     
-    private val lastVersion = Version(PermanentStorage.retrieve("last_version") { "0.1" })
     private val regionFileDirectories by lazy {
         Bukkit.getWorlds().mapNotNull { world ->
             File(world.worldFolder, "nova_region").takeIf { it.exists() && it.isDirectory }
@@ -39,11 +37,13 @@ internal object LegacyFileConverter : Initializable() {
     }
     
     private fun runConversions() {
+        if (!NOVA.isVersionChange)
+            return
         var minReached = false
         val toRun = ArrayList<VersionConverter>()
         converters.forEach { (versionRange, converter) ->
             if (!minReached)
-                minReached = lastVersion in versionRange
+                minReached = NOVA.lastVersion!! in versionRange
             if (minReached)
                 toRun.add(converter)
         }

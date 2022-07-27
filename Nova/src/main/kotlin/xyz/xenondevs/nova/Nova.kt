@@ -26,7 +26,6 @@ import xyz.xenondevs.particle.utils.ReflectionUtils as ParticleLibReflectionUtil
 private val REQUIRED_SERVER_VERSION = Version("1.19.0")
 
 lateinit var NOVA: Nova
-internal var IS_VERSION_CHANGE: Boolean = false
 internal var IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal val HTTP_CLIENT = HttpClient(CIO) {
     install(ContentNegotiation) { gson() }
@@ -36,36 +35,38 @@ internal lateinit var LOGGER: Logger
 
 class Nova : JavaPlugin(), INova {
     
-    private var fullyEnabled = false
-    
     val version = Version(description.version)
-    val isDevBuild = description.version.contains("SNAPSHOT")
-    internal val disableHandlers = ArrayList<() -> Unit>()
+    val lastVersion = PermanentStorage.retrieveOrNull<String>("last_version")?.let(::Version)
+    val isVersionChange = lastVersion != null && lastVersion != version
+    val isDevServer = IS_DEV_SERVER
+    
     val pluginFile
         get() = file
-    
     override val tileEntityManager: TileEntityManager
         get() = TileEntityManager
     override val materialRegistry: NovaMaterialRegistry
         get() = NovaMaterialRegistry
     
+    internal val disableHandlers = ArrayList<() -> Unit>()
+    private var fullyEnabled = false
+    
     override fun onEnable() {
         NOVA = this
         LOGGER = logger
+        
         if (IS_DEV_SERVER)
             LOGGER.warning("Running in dev mode! Never use this in a production server!")
         
         ParticleLibReflectionUtils.setPlugin(this)
-        IS_VERSION_CHANGE = PermanentStorage.retrieve("last_version") { "0.1" } != description.version
-        PermanentStorage.store("last_version", description.version)
-        
         NovaConfig.loadDefaultConfig()
-        if (!checkStartup())
-            return
-        CoreItems.init()
-        Initializer.init()
         
-        fullyEnabled = true
+        if (checkStartup()) {
+            CoreItems.init()
+            Initializer.init()
+            
+            PermanentStorage.store("last_version", description.version)
+            fullyEnabled = true
+        }
     }
     
     private fun checkStartup(): Boolean {
@@ -78,7 +79,6 @@ class Nova : JavaPlugin(), INova {
         }
         
         // prevent execution if the previously installed version is not compatible with this version
-        val lastVersion = PermanentStorage.retrieveOrNull<String>("last_version")?.let(::Version)
         if (lastVersion != null && lastVersion < Version("0.9")) {
             LOGGER.severe("This version of Nova is not compatible with the version that was previously installed.")
             LOGGER.severe("Please erase all data related to Nova and try again.")
@@ -86,14 +86,15 @@ class Nova : JavaPlugin(), INova {
             return false
         }
         
+        // prevent reloading if this server is using an agent or Nova was updated
         if (!IS_DEV_SERVER && ServerUtils.isReload && (DEFAULT_CONFIG.getBoolean("use_agent") || (lastVersion != version))) {
             LOGGER.severe("========================================================================================")
             LOGGER.severe("!RELOADING IS NOT SUPPORTED WHEN USING AN AGENT OR UPDATING. PLEASE RESTART YOUR SERVER!")
             LOGGER.severe("========================================================================================")
-            
             Bukkit.getPluginManager().disablePlugin(this)
             return false
         }
+        
         return true
     }
     
