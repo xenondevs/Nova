@@ -18,12 +18,12 @@ internal object Oraxen : CustomItemService {
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Oraxen") != null
     override val requiresLoadDelay = false
     
-    override fun removeBlock(block: Block, playEffects: Boolean): Boolean {
+    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
         // Missing API feature
         return false
     }
     
-    override fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
+    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
         // Missing API feature
         return null
     }
@@ -33,7 +33,7 @@ internal object Oraxen : CustomItemService {
         return null
     }
     
-    override fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
+    override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
         // API for that is broken
         return true
     }

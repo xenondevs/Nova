@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.Version
+import xyz.xenondevs.nova.world.block.BlockManager
 import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
@@ -40,12 +41,10 @@ class Nova : JavaPlugin(), INova {
     val isVersionChange = lastVersion != null && lastVersion != version
     val isDevServer = IS_DEV_SERVER
     
-    val pluginFile
-        get() = file
-    override val tileEntityManager: TileEntityManager
-        get() = TileEntityManager
-    override val materialRegistry: NovaMaterialRegistry
-        get() = NovaMaterialRegistry
+    val pluginFile = file
+    override val blockManager = BlockManager
+    override val tileEntityManager = TileEntityManager
+    override val materialRegistry = NovaMaterialRegistry
     
     internal val disableHandlers = ArrayList<() -> Unit>()
     private var fullyEnabled = false

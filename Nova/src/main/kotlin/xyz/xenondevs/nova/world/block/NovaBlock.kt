@@ -15,7 +15,9 @@ abstract class NovaBlock<T : NovaBlockState> {
     
     abstract fun handleBreak(state: T, ctx: BlockBreakContext)
     
-    abstract fun playBreakEffects(state: T, ctx: BlockBreakContext)
+    abstract fun playBreakSound(state: T, ctx: BlockBreakContext)
+    
+    abstract fun showBreakParticles(state: T, ctx: BlockBreakContext)
     
     abstract fun getDrops(state: T, ctx: BlockBreakContext): List<ItemStack>
     
@@ -26,10 +28,12 @@ abstract class NovaBlock<T : NovaBlockState> {
         override fun handleBreak(state: T, ctx: BlockBreakContext) = Unit
         override fun getDrops(state: T, ctx: BlockBreakContext) = emptyList<ItemStack>()
         
-        override fun playBreakEffects(state: T, ctx: BlockBreakContext) {
-            val material = state.material
-            material.breakSound?.play(ctx.pos)
-            material.breakParticles?.showBreakParticles(ctx.pos.location)
+        override fun playBreakSound(state: T, ctx: BlockBreakContext) {
+            state.material.breakSound?.play(ctx.pos)
+        }
+        
+        override fun showBreakParticles(state: T, ctx: BlockBreakContext) {
+            state.material.breakParticles?.showBreakParticles(ctx.pos.location)
         }
         
     }

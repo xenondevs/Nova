@@ -13,8 +13,9 @@ import xyz.xenondevs.nova.util.data.writeUUID
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
+import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 
-class NovaTileEntityState : NovaBlockState {
+class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     
     override val material: TileEntityNovaMaterial
     lateinit var uuid: UUID
@@ -23,7 +24,7 @@ class NovaTileEntityState : NovaBlockState {
     
     private var _tileEntity: TileEntity? = null
     
-    val tileEntity: TileEntity
+    override val tileEntity: TileEntity
         get() = _tileEntity ?: throw IllegalStateException("TileEntity is not initialized")
     
     val isInitialized: Boolean

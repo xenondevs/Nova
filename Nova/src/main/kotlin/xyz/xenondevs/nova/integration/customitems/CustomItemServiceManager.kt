@@ -29,16 +29,16 @@ object CustomItemServiceManager : Initializable() {
         READY_LATCH.await()
     }
     
-    fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
-        return PLUGINS.any { it.placeBlock(item, location, playEffects) }
+    fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
+        return PLUGINS.any { it.placeBlock(item, location, playSound) }
     }
     
-    fun removeBlock(block: Block, playEffects: Boolean): Boolean {
-        return PLUGINS.any { it.removeBlock(block, playEffects) }
+    fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
+        return PLUGINS.any { it.removeBlock(block, playSound, showParticles) }
     }
     
-    fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
-        return PLUGINS.firstNotNullOfOrNull { it.breakBlock(block, tool, playEffects) }
+    fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
+        return PLUGINS.firstNotNullOfOrNull { it.breakBlock(block, tool, playSound, showParticles) }
     }
     
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {

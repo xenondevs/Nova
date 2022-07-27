@@ -44,7 +44,7 @@ performance:
   region_backups: true
   # If excess items should be dropped on the ground.
   drop_excess_on_ground: true
-  # If block break effects such as particles and sounds should be played.
+  # If block break particles should be displayed.
   block_break_effects: true
 
 debug:

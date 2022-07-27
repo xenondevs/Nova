@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.api
 
 import org.bukkit.Bukkit
+import xyz.xenondevs.nova.api.block.BlockManager
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager
@@ -18,6 +19,11 @@ interface Nova {
      * Used for managing tile-entities
      */
     val tileEntityManager: TileEntityManager
+    
+    /**
+     * Used for managing blocks
+     */
+    val blockManager: BlockManager
     
     /**
      * To look up nova materials
