@@ -87,5 +87,11 @@
   "command.nova.advanced_tooltips.false": "Расширенные подсказки отключены.",
   "command.nova.advanced_tooltips.true": "Расширенные подсказки включены.",
   "nova.tile_entity_limits.amount_per_world.deny": "Вы не можете разместить больше блоков этого типа в этом мире.",
-  "nova.outdated_version": "У вас установлена устаревшая версия %s.\nПожалуйста, скачайте последнюю версию на %s"
+  "nova.outdated_version": "У вас установлена устаревшая версия %s.\nПожалуйста, скачайте последнюю версию на %s",
+  "nova.tile_entity_limits.world_blacklist.deny": "Вам не разрешается размещать какие-либо блоки из Nova в этом мире.",
+  "nova.tile_entity_limits.type_world_blacklist.deny": "Вам не разрешено размещать этот блок в этом мире.",
+  "item.nova.wrench.mode.nova.energy": "Режим: Энергия",
+  "item.nova.wrench.mode.nova.items": "Режим: Предметы",
+  "command.nova.network_reload.success": "Все активные сети были перезагружены.",
+  "command.nova.resource_pack.create.start": "Создание ресурс-пака... Пожалуйста подождите"
 }
