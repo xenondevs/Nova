@@ -79,7 +79,7 @@
   "nova.tile_entity_limits.world_blacklist.deny": "Nemáš dovoleno pokládat Nova bloky v tomto světě.",
   "nova.tile_entity_limits.type_world_blacklist.deny": "Nemáš dovoleno položit tento blok v tomto světě.",
   "nova.tile_entity_limits.amount_per_world.deny": "Nemáš dovoleno položit více bloků tohoto typu v tomto světě.",
-  "nova.outdated_version": "Používáte zastaralou verzi %s.\nProsím stáhněte si nejnovější verzi na %s",
+  "nova.outdated_version": "Používáte zastaralou verzi %s.\nProsím stáhněte si nejnovější verzi na %s.",
   "item.nova.wrench.mode.nova.energy": "Režim: Energie",
   "item.nova.wrench.mode.nova.items": "Režim: Předměty",
   "item.nova.wrench.mode.nova.fluid": "Režím: Kapaliny",
