@@ -69,5 +69,6 @@
   "command.nova.modeldata.no-nova-item": "Nova'dan gelen bir eşyayı elinde tutup bir daha dene.",
   "command.nova.recipe.no-recipe": "Bu eşyanın bir tarifi yok.",
   "command.nova.usage.no-usage": "Bu ürünün bir özelliği yok.",
-  "nova.tile_entity_limits.amount.deny": "Bundan daha fazla yerleştiremezsin."
+  "nova.tile_entity_limits.amount.deny": "Bundan daha fazla yerleştiremezsin.",
+  "item.nova.wrench.mode.nova.energy": "Mod: Enerji"
 }
