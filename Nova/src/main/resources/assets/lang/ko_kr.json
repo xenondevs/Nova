@@ -36,6 +36,6 @@
   "item.nova.fluid_upgrade": "유체 업그레이드",
   "menu.nova.side_config.input": "입력",
   "menu.nova.paged.go_infinite": "%s 페이지로 이동",
-  "menu.nova.paged.limit_min": "§8더는 갈 수 없습니다",
+  "menu.nova.paged.limit_min": "더는 갈 수 없습니다",
   "menu.nova.paged.limit_max": "§8더는 갈 수 없습니다."
 }
