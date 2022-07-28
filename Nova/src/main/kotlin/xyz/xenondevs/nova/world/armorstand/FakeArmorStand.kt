@@ -224,7 +224,7 @@ class FakeArmorStand(
     
     private fun createDespawnDataBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x38)
+        buf.writeVarInt(0x3B)
         buf.writeVarIntArray(intArrayOf(entityId))
         
         return buf
@@ -232,7 +232,7 @@ class FakeArmorStand(
     
     private fun createEquipmentBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x50)
+        buf.writeVarInt(0x53)
         buf.writeVarInt(entityId)
         equipment.forEachIndexed { index, item ->
             buf.writeByte(if (index != 5) index or -128 else index)
@@ -244,7 +244,7 @@ class FakeArmorStand(
     
     private fun createPosBuf(x: Short, y: Short, z: Short): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x26)
+        buf.writeVarInt(0x28)
         buf.writeVarInt(entityId)
         buf.writeShort(x.toInt())
         buf.writeShort(y.toInt())
@@ -255,7 +255,7 @@ class FakeArmorStand(
     
     private fun createPosRotBuf(x: Short, y: Short, z: Short, yaw: Float, pitch: Float): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x27)
+        buf.writeVarInt(0x29)
         buf.writeVarInt(entityId)
         buf.writeShort(x.toInt())
         buf.writeShort(y.toInt())
@@ -268,7 +268,7 @@ class FakeArmorStand(
     
     private fun createRotBuf(location: Location): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x28)
+        buf.writeVarInt(0x2A)
         buf.writeVarInt(entityId)
         buf.writeByte(location.yaw.toPackedByte().toInt())
         buf.writeByte(location.pitch.toPackedByte().toInt())
@@ -278,7 +278,7 @@ class FakeArmorStand(
     
     private fun createTeleportBuf(location: Location): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x63)
+        buf.writeVarInt(0x66)
         buf.writeVarInt(entityId)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)

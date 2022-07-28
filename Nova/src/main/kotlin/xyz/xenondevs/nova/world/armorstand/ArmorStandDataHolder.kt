@@ -105,7 +105,7 @@ class ArmorStandDataHolder internal constructor(private val entityId: Int) {
     
     fun createPartialDataBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x4D)
+        buf.writeVarInt(0x50)
         buf.writeVarInt(entityId)
         
         changedDataTypes.forEach { it.writeFun(this, buf) }
@@ -116,7 +116,7 @@ class ArmorStandDataHolder internal constructor(private val entityId: Int) {
     
     fun createCompleteDataBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x4D)
+        buf.writeVarInt(0x50)
         buf.writeVarInt(entityId)
         
         ChangedDataType.values().forEach { it.writeFun(this, buf) }

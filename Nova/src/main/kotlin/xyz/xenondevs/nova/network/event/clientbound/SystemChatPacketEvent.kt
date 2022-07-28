@@ -27,7 +27,7 @@ class SystemChatPacketEvent(
     override val packet: ClientboundSystemChatPacket
         get() {
             return if (changed)
-                ClientboundSystemChatPacket(message.toComponent(), typeId)
+                ClientboundSystemChatPacket(message.toComponent(), overlay)
             else super.packet
         }
     
@@ -35,7 +35,7 @@ class SystemChatPacketEvent(
         ComponentSerializer.parse(packet.content)
     }
     
-    var typeId by MutableLazy({changed = true}) { packet.typeId }
+    var overlay by MutableLazy({changed = true}) { packet.overlay }
     
     override fun getHandlers(): HandlerList {
         return Companion.handlers

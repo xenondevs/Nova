@@ -21,7 +21,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
 
-private const val REQUIRED_SERVER_VERSION = "1.19.0"
+private const val REQUIRED_SERVER_VERSION = "1.19.1"
 
 lateinit var NOVA: Nova
 internal var IS_VERSION_CHANGE: Boolean = false
