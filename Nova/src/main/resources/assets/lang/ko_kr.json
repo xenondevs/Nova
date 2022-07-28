@@ -37,7 +37,7 @@
   "menu.nova.side_config.input": "입력",
   "menu.nova.paged.go_infinite": "%s 페이지로 이동",
   "menu.nova.paged.limit_min": "더는 갈 수 없습니다",
-  "menu.nova.paged.limit_max": "§8더는 갈 수 없습니다.",
+  "menu.nova.paged.limit_max": "더는 갈 수 없습니다.",
   "container.nova.fluid_tank": "유체 탱크",
   "command.nova.no-item-in-hand": "아이템을 손에 들고 다시 시도하십시오.",
   "command.nova.list_nearby.success": "청크에 있는 %s 갑옷 거치대 중 %s은(는) 타일 엔티티의 일부입니다.",
