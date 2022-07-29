@@ -13,7 +13,7 @@ class ClientboundSystemChatPacketEvent(
     packet: ClientboundSystemChatPacket
 ) : PlayerPacketEvent<ClientboundSystemChatPacket>(player, packet) {
     
-    var typeId = packet.typeId
+    var overlay = packet.overlay
         set(value) {
             field = value
             changed = true
@@ -23,7 +23,7 @@ class ClientboundSystemChatPacketEvent(
     }
     
     override fun buildChangedPacket(): ClientboundSystemChatPacket {
-        return ClientboundSystemChatPacket(message.toComponent(), typeId)
+        return ClientboundSystemChatPacket(message.toComponent(), overlay)
     }
     
 }
