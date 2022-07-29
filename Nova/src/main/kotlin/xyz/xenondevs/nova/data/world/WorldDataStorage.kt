@@ -22,21 +22,15 @@ internal class WorldDataStorage(val world: World) {
         
         return regionFiles.getOrPut(rid) {
             val file = File(regionsFolder, "r.$rx.$rz.nvr")
-            return@getOrPut RegionFile(this, file, rx, rz).apply(RegionFile::init)
+            return@getOrPut RegionFile(this.world, file, rx, rz).apply(RegionFile::init)
         }
     }
     
     fun saveAll() {
         regionFiles.removeIf { (_, regionFile) ->
-            regionFile.saveAll()
-            val remove = regionFile.chunks.all { it == null }
-            if (remove) regionFile.close()
-            return@removeIf remove
+            regionFile.save()
+            return@removeIf regionFile.chunks.all { it == null }
         }
-    }
-    
-    fun closeAll() {
-        regionFiles.values.forEach(RegionFile::close)
     }
     
 }

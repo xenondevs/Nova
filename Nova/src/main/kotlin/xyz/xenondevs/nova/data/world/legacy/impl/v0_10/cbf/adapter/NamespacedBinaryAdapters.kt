@@ -1,14 +1,14 @@
-package xyz.xenondevs.nova.data.serialization.cbf.adapter
+package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter
 
 import io.netty.buffer.ByteBuf
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.serialization.cbf.BinaryAdapter
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.BinaryAdapterLegacy
 import xyz.xenondevs.nova.util.data.readStringLegacy
 import xyz.xenondevs.nova.util.data.writeStringLegacy
 import java.lang.reflect.Type
 
-internal object NamespacedKeyBinaryAdapter : BinaryAdapter<NamespacedKey> {
+internal object NamespacedKeyBinaryAdapterLegacy : BinaryAdapterLegacy<NamespacedKey> {
     
     override fun write(obj: NamespacedKey, buf: ByteBuf) {
         buf.writeStringLegacy(obj.toString())
@@ -20,7 +20,7 @@ internal object NamespacedKeyBinaryAdapter : BinaryAdapter<NamespacedKey> {
     
 }
 
-internal object NamespacedIdBinaryAdapter : BinaryAdapter<NamespacedId> {
+internal object NamespacedIdBinaryAdapterLegacy : BinaryAdapterLegacy<NamespacedId> {
     
     override fun write(obj: NamespacedId, buf: ByteBuf) {
         buf.writeStringLegacy(obj.toString())

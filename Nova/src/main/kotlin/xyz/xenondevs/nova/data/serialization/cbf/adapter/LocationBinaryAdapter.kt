@@ -1,18 +1,24 @@
 package xyz.xenondevs.nova.data.serialization.cbf.adapter
 
-import io.netty.buffer.ByteBuf
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import xyz.xenondevs.nova.data.serialization.cbf.BinaryAdapter
-import xyz.xenondevs.nova.util.data.readUUID
-import xyz.xenondevs.nova.util.data.writeUUID
+import xyz.xenondevs.cbf.adapter.BinaryAdapter
+import xyz.xenondevs.cbf.buffer.ByteBuffer
 import java.lang.reflect.Type
 
 internal object LocationBinaryAdapter : BinaryAdapter<Location> {
     
-    override fun write(obj: Location, buf: ByteBuf) {
+    override fun read(type: Type, buf: ByteBuffer): Location {
+        return Location(
+            if (buf.readBoolean()) buf.readUUID().let(Bukkit::getWorld) else null,
+            buf.readDouble(), buf.readDouble(), buf.readDouble(),
+            buf.readFloat(), buf.readFloat()
+        )
+    }
+    
+    override fun write(obj: Location, buf: ByteBuffer) {
         val world = obj.world
-        if (world != null) {
+        if(world != null) {
             buf.writeBoolean(true)
             buf.writeUUID(world.uid)
         } else buf.writeBoolean(false)
@@ -22,14 +28,6 @@ internal object LocationBinaryAdapter : BinaryAdapter<Location> {
         buf.writeDouble(obj.z)
         buf.writeFloat(obj.yaw)
         buf.writeFloat(obj.pitch)
-    }
-    
-    override fun read(type: Type, buf: ByteBuf): Location {
-        return Location(
-            if (buf.readBoolean()) buf.readUUID().let(Bukkit::getWorld) else null,
-            buf.readDouble(), buf.readDouble(), buf.readDouble(),
-            buf.readFloat(), buf.readFloat()
-        )
     }
     
 }

@@ -53,7 +53,6 @@ internal object WorldDataManager : Initializable(), Listener {
     
     override fun disable() {
         Bukkit.getWorlds().forEach(::saveWorld)
-        worlds.values.forEach(WorldDataStorage::closeAll)
     }
     
     @Synchronized

@@ -1,10 +1,10 @@
-package xyz.xenondevs.nova.data.serialization.cbf.adapter
+package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter
 
 import io.netty.buffer.ByteBuf
-import xyz.xenondevs.nova.data.serialization.cbf.BinaryAdapter
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.BinaryAdapterLegacy
 import java.lang.reflect.Type
 
-internal object ByteBinaryAdapter : BinaryAdapter<Byte> {
+internal object ByteBinaryAdapterLegacy : BinaryAdapterLegacy<Byte> {
     
     override fun write(obj: Byte, buf: ByteBuf) {
         buf.writeByte(obj.toInt())
@@ -16,7 +16,7 @@ internal object ByteBinaryAdapter : BinaryAdapter<Byte> {
     
 }
 
-internal object ByteArrayBinaryAdapter : BinaryAdapter<ByteArray> {
+internal object ByteArrayBinaryAdapterLegacy : BinaryAdapterLegacy<ByteArray> {
     
     override fun write(obj: ByteArray, buf: ByteBuf) {
         buf.writeInt(obj.size)
@@ -29,7 +29,7 @@ internal object ByteArrayBinaryAdapter : BinaryAdapter<ByteArray> {
     
 }
 
-internal object ShortBinaryAdapter : BinaryAdapter<Short> {
+internal object ShortBinaryAdapterLegacy : BinaryAdapterLegacy<Short> {
     
     override fun write(obj: Short, buf: ByteBuf) {
         buf.writeShort(obj.toInt())
@@ -41,7 +41,7 @@ internal object ShortBinaryAdapter : BinaryAdapter<Short> {
     
 }
 
-internal object ShortArrayBinaryAdapter : BinaryAdapter<ShortArray> {
+internal object ShortArrayBinaryAdapterLegacy : BinaryAdapterLegacy<ShortArray> {
     
     override fun write(obj: ShortArray, buf: ByteBuf) {
         buf.writeInt(obj.size)
@@ -54,7 +54,7 @@ internal object ShortArrayBinaryAdapter : BinaryAdapter<ShortArray> {
     
 }
 
-internal object IntBinaryAdapter : BinaryAdapter<Int> {
+internal object IntBinaryAdapterLegacy : BinaryAdapterLegacy<Int> {
     
     override fun write(obj: Int, buf: ByteBuf) {
         buf.writeInt(obj)
@@ -66,7 +66,7 @@ internal object IntBinaryAdapter : BinaryAdapter<Int> {
     
 }
 
-internal object IntArrayBinaryAdapter : BinaryAdapter<IntArray> {
+internal object IntArrayBinaryAdapterLegacy : BinaryAdapterLegacy<IntArray> {
     
     override fun write(obj: IntArray, buf: ByteBuf) {
         buf.writeInt(obj.size)
@@ -79,7 +79,7 @@ internal object IntArrayBinaryAdapter : BinaryAdapter<IntArray> {
     
 }
 
-internal object LongBinaryAdapter : BinaryAdapter<Long> {
+internal object LongBinaryAdapterLegacy : BinaryAdapterLegacy<Long> {
     
     override fun write(obj: Long, buf: ByteBuf) {
         buf.writeLong(obj)
@@ -91,7 +91,7 @@ internal object LongBinaryAdapter : BinaryAdapter<Long> {
     
 }
 
-internal object LongArrayBinaryAdapter : BinaryAdapter<LongArray> {
+internal object LongArrayBinaryAdapterLegacy : BinaryAdapterLegacy<LongArray> {
     
     override fun write(obj: LongArray, buf: ByteBuf) {
         buf.writeInt(obj.size)
@@ -104,7 +104,7 @@ internal object LongArrayBinaryAdapter : BinaryAdapter<LongArray> {
     
 }
 
-internal object FloatBinaryAdapter : BinaryAdapter<Float> {
+internal object FloatBinaryAdapterLegacy : BinaryAdapterLegacy<Float> {
     
     override fun write(obj: Float, buf: ByteBuf) {
         buf.writeFloat(obj)
@@ -116,7 +116,7 @@ internal object FloatBinaryAdapter : BinaryAdapter<Float> {
     
 }
 
-internal object FloatArrayBinaryAdapter : BinaryAdapter<FloatArray> {
+internal object FloatArrayBinaryAdapterLegacy : BinaryAdapterLegacy<FloatArray> {
     
     override fun write(obj: FloatArray, buf: ByteBuf) {
         buf.writeInt(obj.size)
@@ -129,7 +129,7 @@ internal object FloatArrayBinaryAdapter : BinaryAdapter<FloatArray> {
     
 }
 
-internal object DoubleBinaryAdapter : BinaryAdapter<Double> {
+internal object DoubleBinaryAdapterLegacy : BinaryAdapterLegacy<Double> {
     
     override fun write(obj: Double, buf: ByteBuf) {
         buf.writeDouble(obj)
@@ -141,7 +141,7 @@ internal object DoubleBinaryAdapter : BinaryAdapter<Double> {
     
 }
 
-internal object DoubleArrayBinaryAdapter : BinaryAdapter<DoubleArray> {
+internal object DoubleArrayBinaryAdapterLegacy : BinaryAdapterLegacy<DoubleArray> {
     
     override fun write(obj: DoubleArray, buf: ByteBuf) {
         buf.writeInt(obj.size)
@@ -154,7 +154,7 @@ internal object DoubleArrayBinaryAdapter : BinaryAdapter<DoubleArray> {
     
 }
 
-internal object BooleanBinaryAdapter : BinaryAdapter<Boolean> {
+internal object BooleanBinaryAdapterLegacy : BinaryAdapterLegacy<Boolean> {
     
     override fun write(obj: Boolean, buf: ByteBuf) {
         buf.writeBoolean(obj)
@@ -166,7 +166,7 @@ internal object BooleanBinaryAdapter : BinaryAdapter<Boolean> {
     
 }
 
-internal object BooleanArrayBinaryAdapter : BinaryAdapter<BooleanArray> {
+internal object BooleanArrayBinaryAdapterLegacy : BinaryAdapterLegacy<BooleanArray> {
     
     override fun write(obj: BooleanArray, buf: ByteBuf) {
         buf.writeInt(obj.size)
@@ -179,7 +179,7 @@ internal object BooleanArrayBinaryAdapter : BinaryAdapter<BooleanArray> {
     
 }
 
-internal object CharBinaryAdapter : BinaryAdapter<Char> {
+internal object CharBinaryAdapterLegacy : BinaryAdapterLegacy<Char> {
     
     override fun write(obj: Char, buf: ByteBuf) {
         buf.writeChar(obj.code)
@@ -191,7 +191,7 @@ internal object CharBinaryAdapter : BinaryAdapter<Char> {
     
 }
 
-internal object CharArrayBinaryAdapter : BinaryAdapter<CharArray> {
+internal object CharArrayBinaryAdapterLegacy : BinaryAdapterLegacy<CharArray> {
     
     override fun write(obj: CharArray, buf: ByteBuf) {
         buf.writeInt(obj.size)

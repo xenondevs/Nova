@@ -1,18 +1,18 @@
-package xyz.xenondevs.nova.data.serialization.cbf.adapter
+package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter
 
 import io.netty.buffer.ByteBuf
-import xyz.xenondevs.nova.data.serialization.cbf.BinaryAdapter
-import xyz.xenondevs.nova.data.serialization.cbf.CBF
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.BinaryAdapterLegacy
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.CBFLegacy
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-internal object MapBinaryAdapter : BinaryAdapter<Map<*, *>> {
+internal object MapBinaryAdapterLegacy : BinaryAdapterLegacy<Map<*, *>> {
     
     override fun write(obj: Map<*, *>, buf: ByteBuf) {
         buf.writeInt(obj.size)
         obj.forEach { (key, value) -> 
-            CBF.write(key, buf)
-            CBF.write(value, buf)
+            CBFLegacy.write(key, buf)
+            CBFLegacy.write(value, buf)
         }
     }
     
@@ -22,8 +22,8 @@ internal object MapBinaryAdapter : BinaryAdapter<Map<*, *>> {
         val keyType = typeArguments[0]
         val valueType = typeArguments[1]
         
-        val map = CBF.createInstance<MutableMap<Any?, Any?>>(type) ?: HashMap()
-        repeat(size) { map[CBF.read(keyType, buf)] = CBF.read(valueType, buf) }
+        val map = CBFLegacy.createInstance<MutableMap<Any?, Any?>>(type) ?: HashMap()
+        repeat(size) { map[CBFLegacy.read(keyType, buf)] = CBFLegacy.read(valueType, buf) }
         
         return map
     }

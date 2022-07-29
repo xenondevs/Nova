@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.serialization.persistentdata
 import org.bukkit.NamespacedKey
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.data.serialization.cbf.CBF
+import xyz.xenondevs.cbf.CBF
 
 fun PersistentDataContainer.set(key: NamespacedKey, obj: Any?) =
     set(key, PersistentDataType.BYTE_ARRAY, CBF.write(obj))

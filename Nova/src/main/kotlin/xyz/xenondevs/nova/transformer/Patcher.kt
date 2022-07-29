@@ -32,7 +32,7 @@ internal object Patcher : Initializable() {
             return
         }
         
-        LOGGER.info("Performing patches...")
+        LOGGER.info("Applying patches...")
         VirtualClassPath.classLoaders += Nova::class.java.classLoader.parent
         redefineModule()
         runTransformers()

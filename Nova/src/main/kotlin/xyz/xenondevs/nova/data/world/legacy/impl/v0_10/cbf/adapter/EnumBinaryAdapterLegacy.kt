@@ -1,14 +1,14 @@
-package xyz.xenondevs.nova.data.serialization.cbf.adapter
+package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter
 
 import io.netty.buffer.ByteBuf
-import xyz.xenondevs.nova.data.serialization.cbf.BinaryAdapter
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.BinaryAdapterLegacy
 import xyz.xenondevs.nova.util.data.readStringLegacy
 import xyz.xenondevs.nova.util.data.writeStringLegacy
 import xyz.xenondevs.nova.util.reflection.representedClass
 import java.lang.reflect.Type
 
 @Suppress("UNCHECKED_CAST")
-internal object EnumBinaryAdapter : BinaryAdapter<Enum<*>> {
+internal object EnumBinaryAdapterLegacy : BinaryAdapterLegacy<Enum<*>> {
     
     override fun write(obj: Enum<*>, buf: ByteBuf) {
         buf.writeStringLegacy(obj.name)

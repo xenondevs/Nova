@@ -120,15 +120,11 @@ internal fun RandomAccessFile.append(pos: Long, appendAt: Long, bytes: ByteArray
     }
 }
 
-
-/**
- * Writes a variable length integer to the file and returns the amount of bytes written.
- */
-internal fun RandomAccessFile.writeVarInt(value: Int): Int {
+internal fun DataOutputStream.writeVarInt(value: Int): Int {
     var currentValue = value
     var count = 1
     while ((currentValue and -128) != 0) {
-        this.writeByte(((currentValue and 127) or 128))
+        writeByte(((currentValue and 127) or 128))
         currentValue = currentValue ushr 7
         ++count
     }
@@ -137,10 +133,7 @@ internal fun RandomAccessFile.writeVarInt(value: Int): Int {
     return count
 }
 
-/**
- * Writes a variable length long to the file and returns the amount of bytes written.
- */
-internal fun RandomAccessFile.writeVarLong(value: Long): Int {
+internal fun DataOutputStream.writeVarLong(value: Long): Int {
     var currentValue = value
     var count = 1
     while ((currentValue and -128L) != 0.toLong()) {
@@ -153,26 +146,20 @@ internal fun RandomAccessFile.writeVarLong(value: Long): Int {
     return count
 }
 
-/**
- * Writes a string to the file and returns the amount of bytes written.
- */
-internal fun RandomAccessFile.writeString(string: String): Int {
+internal fun DataOutputStream.writeString(string: String): Int {
     val encoded = string.toByteArray()
     val size = writeVarInt(encoded.size) + encoded.size
     write(encoded)
     return size
 }
 
-/**
- * Writes a string list to the file and returns the amount of bytes written.
- */
-internal fun RandomAccessFile.writeStringList(list: List<String>): Int {
+internal fun DataOutputStream.writeStringList(list: List<String>): Int {
     var size = writeVarInt(list.size)
     list.forEach { size += writeString(it) }
     return size
 }
 
-internal fun RandomAccessFile.readVarInt(): Int {
+internal fun DataInputStream.readVarInt(): Int {
     var value = 0
     var currentByte: Byte
     var byteIdx = 0
@@ -186,7 +173,7 @@ internal fun RandomAccessFile.readVarInt(): Int {
     return value
 }
 
-internal fun RandomAccessFile.readVarLong(): Long {
+internal fun DataInputStream.readVarLong(): Long {
     var value = 0L
     var currentByte: Byte
     var byteIdx = 0
@@ -198,6 +185,20 @@ internal fun RandomAccessFile.readVarLong(): Long {
     } while (currentByte.countLeadingZeroBits() == 0)
     
     return value
+}
+
+internal fun DataInputStream.readString(): String {
+    val size = readVarInt()
+    val bytes = ByteArray(size)
+    readFully(bytes)
+    return String(bytes)
+}
+
+internal fun DataInputStream.readStringList(): List<String> {
+    val size = readVarInt()
+    val list = mutableListOf<String>()
+    repeat(size) { list.add(readString()) }
+    return list
 }
 
 inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {

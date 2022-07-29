@@ -3,7 +3,10 @@ package xyz.xenondevs.nova.data.world.legacy
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.PreVarIntConverter
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
 import java.io.File
 import java.nio.file.Files
@@ -13,7 +16,7 @@ import java.util.*
 internal object LegacyFileConverter : Initializable() {
     
     override val inMainThread = false
-    override val dependsOn = emptySet<Initializable>()
+    override val dependsOn = setOf(AddonsInitializer)
     
     private val regionFileDirectories by lazy {
         Bukkit.getWorlds().mapNotNull { world ->
@@ -25,11 +28,11 @@ internal object LegacyFileConverter : Initializable() {
     
     override fun init() {
         registerConverters()
-//        runConversions()
+        runConversions()
     }
     
     private fun registerConverters() {
-        //register(Version("0.9")..Version("0.9.9"), PreVarIntConverter)
+        register(Version("0.9")..Version("0.9.11"), PreVarIntConverter)
     }
     
     private fun register(versionRange: VersionRange, converter: VersionConverter) {

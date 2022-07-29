@@ -2,9 +2,14 @@ package xyz.xenondevs.nova.data.world.block.state
 
 import io.netty.buffer.ByteBuf
 import org.bukkit.Location
+import org.bukkit.block.BlockFace
+import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.cbf.buffer.ByteBuffer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.property.BlockProperty
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
+import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -20,7 +25,7 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
     override val id = material.id
     override val material = material
     val modelProvider by lazy { material.block.modelProviderType.create(this) }
-    private val properties = material.properties.associateWithTo(LinkedHashMap(), BlockPropertyType<*>::create)
+    internal val properties = material.properties.associateWithTo(LinkedHashMap(), BlockPropertyType<*>::create)
     
     override val location: Location
         get() = pos.location
@@ -33,7 +38,7 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
         properties[type] as? T
     
     fun <T : BlockProperty> getProperty(clazz: KClass<T>): T? =
-         properties.values.firstOrNull { it::class == clazz || clazz in it::class.superclasses } as T?
+        properties.values.firstOrNull { it::class == clazz || clazz in it::class.superclasses } as T?
     
     override fun handleInitialized(placed: Boolean) {
         modelProvider.load(placed)
@@ -51,12 +56,23 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
         modelProvider.remove(broken)
     }
     
-    override fun read(buf: ByteBuf) {
-        properties.values.forEach { it.read(buf) }
+    override fun read(buf: ByteBuffer) {
+        val compound = CBF.read<Compound>(buf)!!
+        properties.values.forEach { it.read(compound) }
     }
     
-    override fun write(buf: ByteBuf) {
-        properties.values.forEach { it.write(buf) }
+    override fun write(buf: ByteBuffer) {
+        val compound = Compound()
+        properties.values.forEach { it.write(compound) }
+        CBF.write(compound, buf)
     }
     
+    //<editor-fold desc="Legacy" defaultstate="collapsed">
+    
+    internal fun readPropertiesLegacy(buf: ByteBuf) {
+        val property = properties.values.firstOrNull() as? Directional ?: return
+        property.facing = BlockFace.values()[buf.readByte().toInt()]
+    }
+
+    //</editor-fold>
 }

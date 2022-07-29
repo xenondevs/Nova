@@ -2,17 +2,18 @@ package xyz.xenondevs.nova.tileentity.network.item
 
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.util.item.novaMaterial
 
 private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
 
 fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
     val container = itemMeta!!.persistentDataContainer
-    return container.get<Compound>(ITEM_FILTER_KEY)?.let(::ItemFilter)
+    return container.get<LegacyCompound>(ITEM_FILTER_KEY)?.let(::ItemFilter)
 }
 
 fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter = getFilterConfigOrNull() ?: ItemFilter(size)
@@ -24,7 +25,7 @@ fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     setItemMeta(itemMeta)
 }
 
-fun ItemFilter(compound: Compound): ItemFilter {
+fun ItemFilter(compound: LegacyCompound): ItemFilter {
     val items: Array<ItemStack?> = compound.get<List<ItemStack>>("items")!!.toTypedArray()
     return ItemFilter(
         compound["whitelist"]!!,

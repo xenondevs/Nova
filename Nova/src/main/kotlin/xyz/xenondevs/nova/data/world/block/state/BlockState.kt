@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.world.block.state
 
-import io.netty.buffer.ByteBuf
+import xyz.xenondevs.cbf.buffer.ByteBuffer
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.world.BlockPos
 
@@ -13,8 +13,8 @@ sealed interface BlockState {
     
     fun handleRemoved(broken: Boolean)
     
-    fun read(buf: ByteBuf)
+    fun read(buf: ByteBuffer)
     
-    fun write(buf: ByteBuf)
+    fun write(buf: ByteBuffer)
     
 }

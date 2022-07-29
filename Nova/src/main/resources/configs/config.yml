@@ -64,3 +64,7 @@ update_reminder:
   enabled: true
   # The amount of ticks passed between update checks.
   interval: 12000
+
+world:
+  # If unknown blocks (e.g. blocks of addons that couldn't be loaded) should be deleted.
+  delete_unknown_blocks: false
