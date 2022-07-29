@@ -25,14 +25,24 @@ object ServerUtils {
 }
 
 
-enum class ServerSoftware {
-    CRAFT_BUKKIT,
-    SPIGOT,
-    PAPER,
-    TUINITY,
-    PURPUR,
-    AIRPLANE,
-    UNKNOWN;
+enum class ServerSoftware(private val superSoftware: ServerSoftware?) {
+    
+    CRAFT_BUKKIT(null),
+    SPIGOT(CRAFT_BUKKIT),
+    PAPER(SPIGOT),
+    TUINITY(PAPER),
+    PURPUR(TUINITY),
+    AIRPLANE(PURPUR),
+    UNKNOWN(null);
+    
+    val tree = buildList<ServerSoftware> { 
+        var software: ServerSoftware? = this@ServerSoftware
+        while (software != null) {
+            add(software)
+            software = software.superSoftware
+        }
+    }
+    
     fun <K, V> getCorrectMap(): MutableMap<K, V> = if (this == PURPUR) ConcurrentHashMap() else HashMap()
     
 }
