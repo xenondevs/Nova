@@ -11,14 +11,15 @@ import org.bukkit.*
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -42,8 +43,10 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     companion object {
         val SELF_UPDATE_REASON = object : UpdateReason {}
-        val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
+        val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntityData")
     }
+    
+    override var legacyData: LegacyCompound? = blockState.legacyData
     
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid

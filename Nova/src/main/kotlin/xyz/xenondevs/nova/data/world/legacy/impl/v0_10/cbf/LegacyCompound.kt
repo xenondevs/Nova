@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.serialization.cbf
+package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf
 
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.util.data.readStringLegacy
@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.util.reflection.type
 import java.lang.reflect.Type
 
 @Suppress("UNCHECKED_CAST")
-class Compound internal constructor(
+class LegacyCompound internal constructor(
     private val binMap: HashMap<String, ByteArray>,
     private val map: HashMap<String, Any?>
 ) {
@@ -26,7 +26,7 @@ class Compound internal constructor(
         map[key]?.let { return it as? T }
         
         val bytes = binMap[key] ?: return null
-        val value = CBF.read<T>(type, bytes)
+        val value = CBFLegacy.read<T>(type, bytes)
         
         map[key] = value
         binMap -= key
@@ -67,14 +67,14 @@ class Compound internal constructor(
     
     companion object {
         
-        fun of(map: HashMap<String, Any?>): Compound =
-            Compound(HashMap(), map.mapValuesTo(HashMap()) { CBF.write(it.value) })
+        fun of(map: HashMap<String, Any?>): LegacyCompound =
+            LegacyCompound(HashMap(), map.mapValuesTo(HashMap()) { CBFLegacy.write(it.value) })
         
     }
     
-    internal object CompoundBinaryAdapter : BinaryAdapter<Compound> {
+    internal object CompoundBinaryAdapterLegacy : BinaryAdapterLegacy<LegacyCompound> {
         
-        override fun write(obj: Compound, buf: ByteBuf) {
+        override fun write(obj: LegacyCompound, buf: ByteBuf) {
             buf.writeInt(obj.binMap.size + obj.map.size)
             
             obj.binMap.forEach { (key, binData) ->
@@ -85,13 +85,13 @@ class Compound internal constructor(
             
             obj.map.forEach { (key, data) ->
                 buf.writeStringLegacy(key)
-                val binData = CBF.write(data)
+                val binData = CBFLegacy.write(data)
                 buf.writeInt(binData.size)
                 buf.writeBytes(binData)
             }
         }
         
-        override fun read(type: Type, buf: ByteBuf): Compound {
+        override fun read(type: Type, buf: ByteBuf): LegacyCompound {
             val mapSize = buf.readInt()
             val map = HashMap<String, ByteArray>(mapSize)
             
@@ -103,7 +103,7 @@ class Compound internal constructor(
                 map[key] = array
             }
             
-            return Compound(map, HashMap())
+            return LegacyCompound(map, HashMap())
         }
         
     }

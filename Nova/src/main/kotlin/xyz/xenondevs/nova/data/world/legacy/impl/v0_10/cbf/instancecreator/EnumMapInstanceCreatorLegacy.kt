@@ -1,11 +1,11 @@
-package xyz.xenondevs.nova.data.serialization.cbf.instancecreator
+package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.instancecreator
 
-import xyz.xenondevs.nova.data.serialization.cbf.InstanceCreator
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.InstanceCreatorLegacy
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.*
 
-internal object EnumMapInstanceCreator : InstanceCreator<EnumMap<*, *>> {
+internal object EnumMapInstanceCreatorLegacy : InstanceCreatorLegacy<EnumMap<*, *>> {
     
     private val ENUM_MAP_CONSTRUCTOR = EnumMap::class.java.getConstructor(Class::class.java)
     

@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.data.serialization
 
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
+import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.TileEntity
 
 abstract class DataHolder(includeGlobal: Boolean) {
@@ -12,8 +13,15 @@ abstract class DataHolder(includeGlobal: Boolean) {
         global ?: Compound().also { if (includeGlobal) data["global"] = it }
     }
     
+    open var legacyData: LegacyCompound? = null
+        internal set
+    val legacyGlobalData: LegacyCompound by lazy {
+        val global = legacyData?.get<LegacyCompound>("global")
+        global ?: LegacyCompound().also { if (includeGlobal) legacyData?.set("global", it) }
+    }
+    
     /**
-     * Retrieves data from the data [Compound] of this TileEntity.
+     * Retrieves data from the data [LegacyCompound] of this TileEntity.
      * If it can't find anything under the given key, the result of the
      * [getAlternative] lambda is returned.
      */
@@ -22,10 +30,12 @@ abstract class DataHolder(includeGlobal: Boolean) {
     }
     
     /**
-     * Retrieves data using CBF deserialization from the data [Compound].
+     * Retrieves data using CBF deserialization from the data [LegacyCompound].
      * If neither [data] nor [globalData] contains the given key, ``null`` is returned
      */
     inline fun <reified T> retrieveOrNull(key: String): T? {
+        if (legacyData != null)
+            return legacyData!!.get<T>(key) ?: legacyGlobalData.get<T>(key)
         return data[key] ?: globalData[key]
     }
     

@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
@@ -73,11 +73,11 @@ class NovaItemHolder(
             ?: { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.NONE } })
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveData<EnumMap<BlockFace, Compound>>("insertFilters") { emptyEnumMap() }
+        endPoint.retrieveData<EnumMap<BlockFace, LegacyCompound>>("insertFilters") { emptyEnumMap() }
             .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
     
     override val extractFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveData<EnumMap<BlockFace, Compound>>("extractFilters") { emptyEnumMap() }
+        endPoint.retrieveData<EnumMap<BlockFace, LegacyCompound>>("extractFilters") { emptyEnumMap() }
             .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
     
     override val insertPriorities: MutableMap<BlockFace, Int> =

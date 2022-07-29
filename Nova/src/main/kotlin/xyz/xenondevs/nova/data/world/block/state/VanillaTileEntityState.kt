@@ -1,9 +1,10 @@
 package xyz.xenondevs.nova.data.world.block.state
 
-import io.netty.buffer.ByteBuf
+import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.cbf.buffer.ByteBuffer
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.serialization.cbf.CBF
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.world.BlockPos
@@ -12,6 +13,7 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
     
     lateinit var data: Compound
     lateinit var tileEntity: VanillaTileEntity
+    var legacyData: LegacyCompound? = null
     
     constructor(pos: BlockPos, id: String) : this(pos, NamespacedId.of(id))
     
@@ -27,11 +29,11 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
         VanillaTileEntityManager.unregisterTileEntity(this)
     }
     
-    override fun read(buf: ByteBuf) {
+    override fun read(buf: ByteBuffer) {
         data = CBF.read(buf)!!
     }
     
-    override fun write(buf: ByteBuf) {
+    override fun write(buf: ByteBuffer) {
         tileEntity.saveData()
         CBF.write(data, buf)
     }

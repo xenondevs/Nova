@@ -7,6 +7,7 @@ import org.bukkit.block.Container
 import org.bukkit.block.Furnace
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.util.item.isCauldron
 
 private typealias VanillaTileEntityConstructor = (VanillaTileEntityState) -> VanillaTileEntity
@@ -16,6 +17,8 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
     override val data = blockState.data
     val pos = blockState.pos
     val block = pos.block
+    
+    override var legacyData: LegacyCompound? = blockState.legacyData
     
     internal abstract fun handleInitialized()
     

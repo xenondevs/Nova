@@ -1,15 +1,14 @@
 package xyz.xenondevs.nova.data.world.block.state
 
-import io.netty.buffer.ByteBuf
-import xyz.xenondevs.nova.data.serialization.cbf.CBF
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
+import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.cbf.buffer.ByteBuffer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.util.data.readUUID
-import xyz.xenondevs.nova.util.data.writeUUID
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
@@ -21,8 +20,9 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     lateinit var uuid: UUID
     lateinit var ownerUUID: UUID
     lateinit var data: Compound
+    internal var legacyData: LegacyCompound? = null
     
-    private var _tileEntity: TileEntity? = null
+    internal var _tileEntity: TileEntity? = null
     
     override val tileEntity: TileEntity
         get() = _tileEntity ?: throw IllegalStateException("TileEntity is not initialized")
@@ -61,21 +61,21 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
         _tileEntity = null
     }
     
-    override fun read(buf: ByteBuf) {
+    override fun read(buf: ByteBuffer) {
         super.read(buf)
         uuid = buf.readUUID()
         ownerUUID = buf.readUUID()
         data = CBF.read(buf)!!
     }
     
-    override fun write(buf: ByteBuf) {
+    override fun write(buf: ByteBuffer) {
         super.write(buf)
         buf.writeUUID(uuid)
         buf.writeUUID(ownerUUID)
-        
+    
         if (_tileEntity != null)
             tileEntity.saveData()
-        
+    
         CBF.write(data, buf)
     }
     

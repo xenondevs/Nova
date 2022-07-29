@@ -537,6 +537,16 @@
             <artifactId>ByteBase-Runtime</artifactId>
             <version>0.3-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs.cbf</groupId>
+            <artifactId>cosmic-binary-format</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs.cbf</groupId>
+            <artifactId>cosmic-binary-format-netty-adapter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -631,6 +641,7 @@
                             <include>org.bstats:*</include>
                             <include>xyz.xenondevs:nms-utilities</include>
                             <include>xyz.xenondevs.bytebase:*</include>
+                            <include>xyz.xenondevs.cbf</include>
                         </includes>
                     </artifactSet>
                 </configuration>

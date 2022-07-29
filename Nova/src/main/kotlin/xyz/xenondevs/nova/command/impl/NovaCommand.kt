@@ -12,6 +12,7 @@ import net.md_5.bungee.api.chat.hover.content.Text
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -19,7 +20,6 @@ import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.AdvancedTooltips
