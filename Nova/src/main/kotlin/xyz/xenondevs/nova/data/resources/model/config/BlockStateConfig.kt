@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.data.resources.model.config
 
 import net.minecraft.world.level.block.state.BlockState
+import xyz.xenondevs.nova.data.config.PermanentStorage
+import kotlin.reflect.jvm.jvmName
 
 sealed interface BlockStateConfig {
     val type: BlockStateConfigType<*>
@@ -9,23 +11,38 @@ sealed interface BlockStateConfig {
     val blockState: BlockState
 }
 
-sealed interface BlockStateConfigType<T : BlockStateConfig> {
+abstract class BlockStateConfigType<T : BlockStateConfig> internal constructor() {
     
-    val maxId: Int
-    val blockedIds: Set<Int>
-    val fileName: String
+    abstract val maxId: Int
+    abstract val blockedIds: Set<Int>
+    abstract val fileName: String
     
-    fun of(id: Int): T
+    abstract fun of(id: Int): T
+    abstract fun of(variantString: String): T
+    internal open fun handleMerged(occupiedIds: Set<Int>) = Unit
     
-    fun of(variantString: String): T
+}
+
+abstract class DefaultingBlockStateConfigType<T : BlockStateConfig> internal constructor() : BlockStateConfigType<T>() {
+    abstract val defaultStateConfig: T
+}
+
+abstract class DynamicDefaultingBlockStateConfigType<T : BlockStateConfig> internal constructor() : DefaultingBlockStateConfigType<T>() {
     
-    companion object {
-        
-        private val values = listOf(NoteBlockStateConfig)
-        
-        fun fromFileName(name: String): BlockStateConfigType<*>? =
-            values.firstOrNull { it.fileName == name }
-        
+    override val defaultStateConfig: T
+        get() = of(defaultId)
+    
+    override val blockedIds: Set<Int>
+        get() = hashSetOf(defaultId)
+    
+    private var defaultId: Int = PermanentStorage.retrieve("defaultBlockStateConfig_${this::class.jvmName}") { 0 }
+        private set(value) {
+            field = value
+            PermanentStorage.store("defaultBlockStateConfig_${this::class.jvmName}", value)
+        }
+    
+    override fun handleMerged(occupiedIds: Set<Int>) {
+        defaultId = (0..maxId).first { it !in occupiedIds }
     }
     
 }

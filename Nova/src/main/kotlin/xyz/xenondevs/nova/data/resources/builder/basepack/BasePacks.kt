@@ -54,6 +54,7 @@ internal class BasePacks {
                 val relPath = Path.of(relStr)
                 val packFile = File(ResourcePackBuilder.PACK_DIR, relStr)
                 
+                packFile.parentFile.mkdirs()
                 val fileMerger = mergers.firstOrNull { relPath.startsWith(it.path) }
                 if (fileMerger != null) {
                     fileMerger.merge(file, packFile)

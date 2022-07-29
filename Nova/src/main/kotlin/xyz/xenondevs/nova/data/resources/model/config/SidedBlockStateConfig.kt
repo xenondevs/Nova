@@ -31,12 +31,13 @@ internal abstract class SidedBlockStateConfig(val faces: List<BlockFace>, block:
 
 internal abstract class SidedBlockStateConfigType<T : SidedBlockStateConfig>(
     private val constructor: (List<BlockFace>) -> T
-) : BlockStateConfigType<T> {
+) : DefaultingBlockStateConfigType<T>() {
     
     override val maxId = 63
     override val blockedIds = setOf(63)
+    override val defaultStateConfig = of(63)
     
-    override fun of(id: Int): T {
+    final override fun of(id: Int): T {
         var i = id
         val faces = ArrayList<BlockFace>()
         repeat(POSSIBLE_FACES.size) {
@@ -49,7 +50,7 @@ internal abstract class SidedBlockStateConfigType<T : SidedBlockStateConfig>(
         return constructor(faces)
     }
     
-    override fun of(variantString: String): T {
+    final override fun of(variantString: String): T {
         val faces = variantString.split(',').mapNotNull {
             val s = it.split('=')
             if (s[1].toBoolean())

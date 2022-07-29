@@ -5,16 +5,23 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
+import xyz.xenondevs.nova.data.resources.model.config.*
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.addAll
 import java.io.File
 import java.util.logging.Level
 
+private val MERGEABLE_STATE_CONFIGS = listOf(
+    NoteBlockStateConfig,
+    RedMushroomBlockStateConfig,
+    BrownMushroomBlockStateConfig,
+    MushroomStemBlockStateConfig
+)
+
 internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/blockstates") {
     
     override fun merge(source: File, destination: File) {
-        val configType = BlockStateConfigType.fromFileName(source.nameWithoutExtension)
+        val configType = MERGEABLE_STATE_CONFIGS.firstOrNull { it.fileName == source.nameWithoutExtension }
         if (configType != null) {
             val variants = getVariants(source)
             if (destination.exists())
@@ -63,6 +70,8 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks
         obj.entrySet().forEach { (variant, _) ->
             occupied += configType.of(variant).id
         }
+        
+        configType.handleMerged(occupied)
     }
     
 }

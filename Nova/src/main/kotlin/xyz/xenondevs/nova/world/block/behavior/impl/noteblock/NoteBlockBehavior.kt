@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.pos
 
-internal object NoteBlockBehavior : BlockBehavior(NoteBlockStateConfig.of(0), false), Listener {
+internal object NoteBlockBehavior : BlockBehavior(NoteBlockStateConfig, false), Listener {
     
     override fun init() {
         registerEvents()

@@ -24,10 +24,9 @@ internal data class NoteBlockStateConfig(
         require(note in 0..24)
     }
     
-    companion object : BlockStateConfigType<NoteBlockStateConfig> {
+    companion object : DynamicDefaultingBlockStateConfigType<NoteBlockStateConfig>() {
         
         override val maxId = 799
-        override val blockedIds = hashSetOf(0)
         override val fileName = "note_block"
         
         fun getIdOf(instrument: Instrument, note: Int, powered: Boolean): Int {
