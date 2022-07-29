@@ -19,7 +19,7 @@ internal object Patcher : Initializable() {
     override val dependsOn = emptySet<Initializable>()
     
     private val extraOpens = setOf("java.lang", "jdk.internal.misc", "jdk.internal.reflect")
-    private val transformers by lazy { setOf(NoteBlockPatch, FieldFilterPatch) }
+    private val transformers by lazy { sequenceOf(NoteBlockPatch, FieldFilterPatch).filter(ClassTransformer::shouldTransform).toSet() }
     
     override fun init() {
         if (!DEFAULT_CONFIG.getBoolean("use_agent"))

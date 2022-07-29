@@ -3,10 +3,14 @@ package xyz.xenondevs.nova.transformer.patch.noteblock
 import net.minecraft.world.level.block.NoteBlock
 import org.objectweb.asm.Type
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.transformer.ClassTransformer
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 
 internal object NoteBlockPatch : ClassTransformer(NoteBlock::class, computeFrames = true) {
+    
+    override fun shouldTransform(): Boolean =
+        DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks")
     
     override fun transform() {
         val patchesClass = NoteBlockMethods::class.java

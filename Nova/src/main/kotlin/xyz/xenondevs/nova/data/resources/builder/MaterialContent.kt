@@ -6,6 +6,8 @@ import com.google.gson.JsonParser
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.addon.assets.*
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
@@ -21,6 +23,8 @@ import java.io.File
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+
+private val USE_SOLID_BLOCKS by configReloadable {  DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks") }
 
 internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
     
@@ -185,6 +189,7 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
     }
     
     private fun getRemainingBlockStateIdAmount(type: BlockModelType): Int {
+        if (!USE_SOLID_BLOCKS) return 0
         return type.configTypes.sumOf { if (it != null) getRemainingBlockStateIdAmount(it) else 0 }
     }
     

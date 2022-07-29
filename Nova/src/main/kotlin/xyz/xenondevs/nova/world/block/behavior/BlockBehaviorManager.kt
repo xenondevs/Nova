@@ -12,6 +12,7 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.transformer.Patcher
@@ -55,6 +56,9 @@ internal object BlockBehaviorManager : Initializable(), Listener {
         behaviors.map { it.blockStatePredicate }
     
     override fun init() {
+        if (!DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks"))
+            return
+        
         LOGGER.info("Initializing block behaviors")
         
         if (chunkSearchId == -1)
@@ -109,6 +113,7 @@ internal object BlockBehaviorManager : Initializable(), Listener {
     }
     
     private fun handleChunkLoad(chunk: Chunk) {
+        chunk.persistentDataContainer.remove(CHUNK_SEARCH_ID_KEY)
         if (chunk.persistentDataContainer.get(CHUNK_SEARCH_ID_KEY, PersistentDataType.INTEGER) != chunkSearchId) {
             chunkSearchQueue += chunk.pos
         }

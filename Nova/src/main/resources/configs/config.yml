@@ -5,7 +5,10 @@ resource_pack:
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:
     enabled: false
-  # This will freeze players that are currently loading the resource pack.
+  # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
+  # Please read the following documentation page before change this value:  https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
+  use_solid_blocks: true
+  # If players currently loading the resource pack should be frozen.
   freeze_loading_players: false
 
 # If Nova should use a java agent to self-attach and redefine methods.

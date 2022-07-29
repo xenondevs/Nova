@@ -5,6 +5,7 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.util.getBlockState
 import xyz.xenondevs.nova.util.setBlockStateSilently
 
 class BlockStateBlockModelProvider(val blockState: NovaBlockState) : BlockModelProvider {
@@ -19,7 +20,7 @@ class BlockStateBlockModelProvider(val blockState: NovaBlockState) : BlockModelP
         private set
     
     override fun load(placed: Boolean) {
-        if (placed) update(0)
+        if (placed || pos.getBlockState() != currentBlockState) update(0)
     }
     
     override fun remove(broken: Boolean) {

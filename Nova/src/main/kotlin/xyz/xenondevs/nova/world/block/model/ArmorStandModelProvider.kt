@@ -47,6 +47,7 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
     
     override fun load(placed: Boolean) {
         if (placed) {
+            // cannot be moved out of this if as it would break blocks that change their hitbox type such as cables
             pos.block.type = modelData.hitboxType
             multiBlockPositions?.forEach { it.block.type = modelData.hitboxType }
         }

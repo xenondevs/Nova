@@ -118,6 +118,14 @@ fun BlockPos.setBlockStateSilently(state: BlockState) {
     section.release()
 }
 
+fun BlockPos.getBlockState(): BlockState {
+    val section = chunkSection
+    section.acquire()
+    val blockState = section.getBlockState(this)
+    section.release()
+    return blockState
+}
+
 val BlockPos.chunkSection: LevelChunkSection
     get() {
         val chunk = world.serverLevel.getChunk(x shr 4, z shr 4)
@@ -126,6 +134,10 @@ val BlockPos.chunkSection: LevelChunkSection
 
 fun LevelChunkSection.setBlockStateSilently(pos: BlockPos, state: BlockState) {
     setBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF, state)
+}
+
+fun LevelChunkSection.getBlockState(pos: BlockPos): BlockState {
+    return getBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF)
 }
 
 object NMSUtils {

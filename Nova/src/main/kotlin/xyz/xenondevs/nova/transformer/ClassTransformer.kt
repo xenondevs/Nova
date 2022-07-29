@@ -9,4 +9,6 @@ internal abstract class ClassTransformer(val clazz: KClass<*>, val computeFrames
     
     abstract fun transform()
     
+    open fun shouldTransform(): Boolean = true
+    
 }
