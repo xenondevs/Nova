@@ -7,6 +7,14 @@ import xyz.xenondevs.nova.api.material.NovaMaterial
 interface BlockManager {
     
     /**
+     * Checks if there is a [NovaBlockState] at that [location].
+     * 
+     * @param location The location to check.
+     * @return If there is a [NovaBlockState] at that location.
+     */
+    fun hasBlock(location: Location): Boolean
+    
+    /**
      * Gets the [NovaBlockState] at that [location].
      *
      * @param location The location of the block.

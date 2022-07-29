@@ -47,6 +47,10 @@ object BlockManager : Initializable(), IBlockManager {
         return null
     }
     
+    fun hasBlock(pos: BlockPos, useLinkedStates: Boolean = true): Boolean {
+        return getBlock(pos, useLinkedStates) != null
+    }
+    
     fun placeBlock(material: BlockNovaMaterial, ctx: BlockPlaceContext, playSound: Boolean = true) {
         val state = material.createNewBlockState(ctx)
         WorldDataManager.setBlockState(ctx.pos, state)
@@ -119,6 +123,10 @@ object BlockManager : Initializable(), IBlockManager {
     }
     
     //<editor-fold desc="NovaAPI methods">
+    
+    override fun hasBlock(location: Location): Boolean {
+        return hasBlock(location.pos, true)
+    }
     
     override fun getBlock(location: Location): NovaBlockState? {
         return getBlock(location.pos, true)
