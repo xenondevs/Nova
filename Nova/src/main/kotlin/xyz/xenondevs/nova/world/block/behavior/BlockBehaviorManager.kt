@@ -113,7 +113,6 @@ internal object BlockBehaviorManager : Initializable(), Listener {
     }
     
     private fun handleChunkLoad(chunk: Chunk) {
-        chunk.persistentDataContainer.remove(CHUNK_SEARCH_ID_KEY)
         if (chunk.persistentDataContainer.get(CHUNK_SEARCH_ID_KEY, PersistentDataType.INTEGER) != chunkSearchId) {
             chunkSearchQueue += chunk.pos
         }
