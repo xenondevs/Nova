@@ -24,7 +24,7 @@ typealias MultiBlockLoader = (BlockPos) -> List<BlockPos>
 open class BlockNovaMaterial internal constructor(
     id: NamespacedId,
     localizedName: String,
-    novaItem: NovaItem?,
+    novaItem: NovaItem,
     val novaBlock: NovaBlock<NovaBlockState>,
     options: BlockOptions,
     val properties: List<BlockPropertyType<*>>,

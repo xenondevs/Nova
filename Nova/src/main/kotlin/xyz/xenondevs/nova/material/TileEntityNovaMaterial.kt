@@ -16,7 +16,7 @@ typealias TileEntityConstructor = ((NovaTileEntityState) -> TileEntity)
 class TileEntityNovaMaterial internal constructor(
     id: NamespacedId,
     localizedName: String,
-    novaItem: NovaItem?,
+    novaItem: NovaItem,
     novaBlock: NovaBlock<NovaTileEntityState>,
     options: BlockOptions,
     internal val tileEntityConstructor: TileEntityConstructor,

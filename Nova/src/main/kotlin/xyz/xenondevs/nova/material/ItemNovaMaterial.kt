@@ -16,10 +16,9 @@ import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 open class ItemNovaMaterial internal constructor(
     final override val id: NamespacedId,
     val localizedName: String,
-    novaItem: NovaItem? = null,
+    val novaItem: NovaItem,
 ) : INovaMaterial {
     
-    val novaItem: NovaItem = novaItem ?: NovaItem()
     val item: ItemModelData by lazy { Resources.getModelData(id).first!! }
     val maxStackSize: Int
         get() = item.material.maxStackSize
