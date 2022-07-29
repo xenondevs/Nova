@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.addon
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.loader.AddonLoader
+import xyz.xenondevs.nova.addon.loader.LibraryLoaderPools
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.Resources
@@ -67,7 +68,7 @@ object AddonManager {
                     }
                     
                     loader.logger.info("Loaded ${getAddonString(description)}")
-                    loaders[id] = AddonLoader(it)
+                    loaders[id] = loader
                 }
             } catch (t: Throwable) {
                 LOGGER.log(Level.SEVERE, "An exception occurred trying to load ${it.name} (Is it up to date?)", t)
@@ -78,6 +79,7 @@ object AddonManager {
     }
     
     internal fun initializeAddons() {
+        LibraryLoaderPools.init(loaders.values)
         loaders.values.sortedBy { it.description }.forEach { loader ->
             val description = loader.description
             loader.logger.info("Initializing ${getAddonString(description)}")

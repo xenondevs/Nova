@@ -9,7 +9,7 @@ internal class AddonClassLoader(private val loader: AddonLoader, parent: ClassLo
     private var addonDependencies: List<AddonClassLoader>? = null
     
     fun setDependencyClassLoaders() {
-        libraryLoader = AddonLibraryLoader(loader).createClassLoader()
+        libraryLoader = LibraryLoaderPools[loader]
         addonDependencies = (loader.description.depend + loader.description.softdepend)
             .mapNotNull { AddonManager.loaders[it]?.classLoader }
             .takeUnless(List<*>::isEmpty)
@@ -20,14 +20,19 @@ internal class AddonClassLoader(private val loader: AddonLoader, parent: ClassLo
             // check if class is already loaded
             var c: Class<*>? = findLoadedClass(name)
             
-            // Load class from this addon or its libraries
+            // Load class from this addon
             if (c == null) {
                 c = loadAddonClass(name)
             }
             
-            // Load class from addon dependencies / their libraries
+            // Load class from libraries (includes dependency libraries)
             if (c == null) {
-                c = addonDependencies?.firstNotNullOfOrNull { it.loadAddonClass(name) }
+                c = loadLibraryClass(name)
+            }
+            
+            // Load class from addon dependencies
+            if (c == null) {
+                c = addonDependencies?.firstNotNullOfOrNull { it.loadClass(name, true) }
             }
             
             // load class from parent (nova classloader)
@@ -45,18 +50,16 @@ internal class AddonClassLoader(private val loader: AddonLoader, parent: ClassLo
     }
     
     private fun loadAddonClass(name: String): Class<*>? {
-        var c: Class<*>? = null
-        
+        return runCatching { findClass(name) }.getOrNull()
+    }
+    
+    private fun loadLibraryClass(name: String): Class<*>? {
         val libraryLoader = libraryLoader
         if (libraryLoader != null) {
-            c = libraryLoader.runCatching { this.loadClass(name, false) }.getOrNull()
+            return libraryLoader.runCatching { this.loadClass(name, false) }.getOrNull()
         }
         
-        if (c == null) {
-            c = runCatching { findClass(name) }.getOrNull()
-        }
-        
-        return c
+        return null
     }
     
 }
