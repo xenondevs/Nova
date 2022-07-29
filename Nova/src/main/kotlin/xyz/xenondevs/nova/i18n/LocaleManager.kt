@@ -4,7 +4,6 @@ import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -18,7 +17,6 @@ object LocaleManager : Initializable() {
     private lateinit var translationProviders: Map<String, Map<String, String>>
     
     override fun init() {
-        LOGGER.info("Injecting translations")
         translationProviders = Resources.languageLookup
         Language.inject(NovaLanguage)
     }

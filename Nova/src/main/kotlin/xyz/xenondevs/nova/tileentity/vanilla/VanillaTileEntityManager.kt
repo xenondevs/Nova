@@ -9,7 +9,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -31,7 +30,6 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
     private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, VanillaTileEntity>>()
     
     override fun init() {
-        LOGGER.info("Initializing VanillaTileEntityManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
     }
     

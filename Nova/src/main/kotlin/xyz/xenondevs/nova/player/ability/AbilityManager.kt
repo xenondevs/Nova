@@ -28,7 +28,6 @@ object AbilityManager : Initializable(), Listener {
     override val dependsOn = setOf(AddonsInitializer)
     
     override fun init() {
-        LOGGER.info("Initializing AbilityManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerJoin)
         runTaskTimer(0, 1) { activeAbilities.values.flatMap(Map<*, Ability>::values).forEach(Ability::handleTick) }

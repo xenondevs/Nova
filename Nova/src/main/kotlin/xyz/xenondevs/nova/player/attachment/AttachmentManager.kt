@@ -30,7 +30,6 @@ object AttachmentManager : Initializable(), Listener {
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()
     
     override fun init() {
-        LOGGER.info("Initializing AttachmentManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         PacketEventManager.registerListener(this)
         Bukkit.getOnlinePlayers().forEach(::loadAttachments)

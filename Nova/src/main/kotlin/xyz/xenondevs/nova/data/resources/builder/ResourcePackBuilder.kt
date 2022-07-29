@@ -31,6 +31,8 @@ internal object ResourcePackBuilder {
     }
     
     fun buildPack(): File {
+        LOGGER.info("Building resource pack")
+        
         // Delete existing files
         RESOURCE_PACK_DIR.deleteRecursively()
         PACK_DIR.mkdirs()

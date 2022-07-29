@@ -115,7 +115,6 @@ interface NetworkManager {
         override val dependsOn = emptySet<Initializable>()
         
         override fun init() {
-            LOGGER.info("Initializing NetworkManager")
             NETWORK_MANAGER.init()
             Bukkit.getPluginManager().registerEvents(this, NOVA)
         }

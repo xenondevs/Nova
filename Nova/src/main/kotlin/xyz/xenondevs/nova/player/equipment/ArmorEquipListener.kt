@@ -17,7 +17,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.isCompletelyDenied
@@ -35,7 +34,6 @@ internal object ArmorEquipListener : Initializable(), Listener {
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
-        LOGGER.info("Initializing ArmorEquipListener")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
     }
     

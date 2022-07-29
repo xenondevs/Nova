@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.block
 
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.api.material.NovaMaterial
 import xyz.xenondevs.nova.data.config.GlobalValues
@@ -28,8 +27,6 @@ object BlockManager : Initializable(), IBlockManager {
     override val dependsOn = setOf(AddonsInitializer, WorldDataManager)
     
     override fun init() {
-        LOGGER.info("Initializing BlockManager")
-        
         BlockPlacing.init()
         BlockBreaking.init()
         BlockInteracting.init()

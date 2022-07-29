@@ -59,7 +59,7 @@ internal object BlockBehaviorManager : Initializable(), Listener {
         if (!DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks"))
             return
         
-        LOGGER.info("Initializing block behaviors")
+        LOGGER.info("Using block behaviors: ${behaviors.joinToString { it::class.simpleName!! }}")
         
         if (chunkSearchId == -1)
             updateChunkSearchId()

@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.Bukkit
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.removeIf
@@ -16,8 +15,6 @@ object ChunkLoadManager : Initializable() {
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
-        LOGGER.info("Initializing ChunkLoadManager")
-        
         Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false }
         forceLoadedChunks.removeIf { it.key.chunk?.apply { isForceLoaded = true } == null }
     }

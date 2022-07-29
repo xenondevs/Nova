@@ -23,7 +23,6 @@ internal object Resources : Initializable() {
     internal lateinit var languageLookup: Map<String, Map<String, String>>
     
     override fun init() {
-        LOGGER.info("Loading resources")
         if (
             PermanentStorage.retrieveOrNull<Int>("addonsHashCode") == AddonManager.addonsHashCode
             && PermanentStorage.has("modelDataLookup")

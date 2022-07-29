@@ -16,7 +16,6 @@ import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -36,7 +35,6 @@ internal object ItemManager : Initializable(), Listener {
     private val usedItems = HashMap<Player, ItemStack>()
     
     override fun init() {
-        LOGGER.info("Initializing ItemManager")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
         PacketEventManager.registerListener(this)
     }

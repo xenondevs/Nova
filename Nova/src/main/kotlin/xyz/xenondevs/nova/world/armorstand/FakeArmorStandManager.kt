@@ -47,7 +47,6 @@ internal object FakeArmorStandManager : Initializable(), Listener {
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
-        LOGGER.info("Initializing FakeArmorStandManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         
         Bukkit.getOnlinePlayers().forEach { player ->
