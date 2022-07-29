@@ -24,7 +24,7 @@ import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
 import xyz.xenondevs.particle.utils.ReflectionUtils as ParticleLibReflectionUtils
 
-private val REQUIRED_SERVER_VERSION = Version("1.19.0")
+private val REQUIRED_SERVER_VERSION = Version("1.19.1")
 
 lateinit var NOVA: Nova
 internal var IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null

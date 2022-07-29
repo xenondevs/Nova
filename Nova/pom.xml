@@ -18,7 +18,7 @@
         <fuzzywuzzy.version>1.4.0</fuzzywuzzy.version>
         <zip4j.version>2.11.1</zip4j.version>
         <annotations.version>23.0.0</annotations.version>
-        <invui.version>0.7-SNAPSHOT</invui.version>
+        <invui.version>0.8-SNAPSHOT</invui.version>
         <ktor.version>2.0.2</ktor.version>
         <nms-utilities.version>0.1-SNAPSHOT</nms-utilities.version>
         <maven-resolver-provider.version>3.8.5</maven-resolver-provider.version>
@@ -84,7 +84,7 @@
             <dependencies>
                 <dependency>
                     <groupId>de.studiocode.invui</groupId>
-                    <artifactId>IA-R10</artifactId>
+                    <artifactId>IA-R11</artifactId>
                     <version>${invui.version}</version>
                 </dependency>
                 <dependency>
@@ -139,7 +139,7 @@
             <dependencies>
                 <dependency>
                     <groupId>de.studiocode.invui</groupId>
-                    <artifactId>IA-R10</artifactId>
+                    <artifactId>IA-R11</artifactId>
                     <version>${invui.version}</version>
                     <classifier>remapped-mojang</classifier>
                 </dependency>
