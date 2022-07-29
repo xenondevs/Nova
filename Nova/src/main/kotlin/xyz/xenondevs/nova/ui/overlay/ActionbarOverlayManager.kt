@@ -78,7 +78,7 @@ object ActionbarOverlayManager : Listener {
     
     @PacketHandler
     private fun handleChatPacket(event: ClientboundSystemChatPacketEvent) {
-        if (event.typeId == 2) {
+        if (event.overlay) {
             val player = event.player
             val uuid = player.uniqueId
             if (overlays.containsKey(uuid)) {
