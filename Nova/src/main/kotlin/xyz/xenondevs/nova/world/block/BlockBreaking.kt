@@ -180,7 +180,8 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
             if (player.gameMode == GameMode.CREATIVE || drops)
                 blockState.pos.location.dropItems(material.novaBlock.getDrops(blockState, ctx))
             // If the block broke instantaneously for the client, the effects will also be played clientside
-            block.remove(ctx, calculateClientsideDamage() < 1)
+            val effects = calculateClientsideDamage() < 1
+            block.remove(ctx, effects, effects)
             // The ack packet removes client-predicted block states and shows those sent by the server
             player.send(ClientboundBlockChangedAckPacket(sequence))
         } else {
