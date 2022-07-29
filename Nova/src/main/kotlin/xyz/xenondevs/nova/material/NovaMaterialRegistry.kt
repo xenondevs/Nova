@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.behavior.Consumable
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.util.item.novaMaterial
@@ -108,12 +109,12 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         ))
     }
     
-    fun registerFood(addon: Addon, name: String, options: FoodOptions): FoodNovaMaterial {
+    fun registerFood(addon: Addon, name: String, options: FoodOptions): ItemNovaMaterial {
         val namespace = addon.description.id
-        return register(FoodNovaMaterial(
+        return register(ItemNovaMaterial(
             NamespacedId(namespace, name),
             "item.$namespace.$name",
-            options
+            NovaItem(Consumable(options))
         ))
     }
     
