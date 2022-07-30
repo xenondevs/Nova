@@ -22,14 +22,16 @@ private val BASE_PACKS by configReloadable { DEFAULT_CONFIG.getStringList("resou
 internal class BasePacks {
     
     private val mergers = FileMerger.createMergers(this)
+    private val packs = BASE_PACKS + (ResourcePackBuilder.BASE_PACKS_DIR.listFiles() ?: emptyArray())
     
+    val packAmount = packs.size
     val occupiedModelData = HashMap<Material, HashSet<Int>>()
     val occupiedSolidIds = HashMap<BlockStateConfigType<*>, HashSet<Int>>()
     
     fun include() {
-        BASE_PACKS.map {
-            if (it.isFile) {
-                val dir = File(ResourcePackBuilder.BASE_PACKS_DIR, it.nameWithoutExtension + StringUtils.randomString(10))
+        packs.map {
+            if (it.isFile && it.extension.equals("zip", true)) {
+                val dir = File(ResourcePackBuilder.TEMP_BASE_PACKS_DIR, it.nameWithoutExtension + StringUtils.randomString(10))
                 dir.mkdirs()
                 ZipFile(it).extractAll(dir.absolutePath)
                 
