@@ -2,12 +2,12 @@ package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.model.config.*
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.addAll
+import xyz.xenondevs.nova.util.data.parseJson
 import java.io.File
 import java.util.logging.Level
 
@@ -39,7 +39,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks
     }
     
     private fun getVariants(file: File): JsonObject {
-        val sourceObj = JsonParser.parseReader(file.reader()) as JsonObject
+        val sourceObj = file.parseJson() as JsonObject
         return sourceObj.get("variants") as? JsonObject
             ?: (sourceObj.get("multipart") as? JsonArray)?.let(::convertMultipartToVariants)
             ?: JsonObject()

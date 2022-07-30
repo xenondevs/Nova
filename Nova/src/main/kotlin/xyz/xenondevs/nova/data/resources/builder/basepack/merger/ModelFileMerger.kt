@@ -3,13 +3,9 @@ package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.set
+import xyz.xenondevs.nova.util.data.*
 import java.io.File
 import java.util.*
 
@@ -17,10 +13,10 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "as
     
     override fun merge(source: File, destination: File) {
         if (destination.exists()) {
-            val sourceObj = JsonParser.parseReader(source.reader()) as? JsonObject ?: return
+            val sourceObj = source.parseJson() as? JsonObject ?: return
             val sourceOverrides = sourceObj.get("overrides") as? JsonArray ?: return
             
-            val destObj = JsonParser.parseReader(destination.reader()) as? JsonObject
+            val destObj = destination.parseJson() as? JsonObject
             val destOverrides = destObj?.get("overrides") as? JsonArray
             
             if (destOverrides != null) {
@@ -38,7 +34,7 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "as
     }
     
     private fun processOverrides(file: File) {
-        val obj = JsonParser.parseReader(file.reader()) as? JsonObject ?: return
+        val obj = file.parseJson() as? JsonObject ?: return
         val array = obj.get("overrides") as? JsonArray ?: return
         processOverrides(file, array)
     }

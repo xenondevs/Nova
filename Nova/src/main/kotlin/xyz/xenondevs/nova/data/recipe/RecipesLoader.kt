@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.recipe
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -80,7 +79,7 @@ internal object RecipesLoader {
     
     private fun <T : Any> loadRecipe(file: File, deserializer: RecipeDeserializer<T>): T? {
         var failSilently = false
-        val fallbacks = when (val element = file.reader().use(JsonParser::parseReader)) {
+        val fallbacks = when (val element = file.parseJson()) {
             is JsonArray -> element.getAllJsonObjects()
             is JsonObject -> if (element.hasArray("recipes")) {
                 failSilently = element.getBoolean("failSilently", false)

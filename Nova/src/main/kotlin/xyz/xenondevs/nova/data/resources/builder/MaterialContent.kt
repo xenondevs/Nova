@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.addon.assets.*
@@ -18,6 +17,7 @@ import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.mapToIntArray
 import java.io.File
 import kotlin.collections.component1
@@ -227,7 +227,7 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
             
             return Triple(file, modelObj, overrides)
         } else {
-            val modelObj = JsonParser.parseReader(file.reader()) as JsonObject
+            val modelObj = file.parseJson() as JsonObject
             val overrides = (modelObj.get("overrides") as? JsonArray) ?: JsonArray().also { modelObj.add("overrides", it) }
             
             return Triple(file, modelObj, overrides)
@@ -241,7 +241,7 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
         val variants: JsonObject
         
         if (file.exists()) {
-            mainObj = JsonParser.parseReader(file.reader()) as JsonObject
+            mainObj = file.parseJson() as JsonObject
             variants = mainObj.getAsJsonObject("variants")
         } else {
             mainObj = JsonObject()

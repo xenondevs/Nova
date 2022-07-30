@@ -37,6 +37,8 @@ val GSON: Gson =
         .enableComplexMapKeySerialization()
         .create()
 
+fun File.parseJson(): JsonElement = reader().use(JsonParser::parseReader)
+
 fun JsonObject.hasString(property: String) =
     has(property) && this[property].isString()
 

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.addon.assets
 
-import com.google.gson.JsonParser
+import xyz.xenondevs.nova.util.data.parseJson
 import java.io.File
 
 internal class AssetPack(val directory: File, val namespace: String) {
@@ -17,11 +17,11 @@ internal class AssetPack(val directory: File, val namespace: String) {
     val guisDir = File(directory, "guis").takeIf(File::exists)
     
     val materialsIndex: List<RegisteredMaterial>? = if (materialsFile.exists())
-        MaterialsIndexDeserializer.deserialize(namespace, JsonParser.parseReader(materialsFile.reader()))
+        MaterialsIndexDeserializer.deserialize(namespace, materialsFile.parseJson())
     else null
     
     val guisIndex: Map<String, String>? = if (guisFile.exists())
-        GUIsIndexDeserializer.deserialize(namespace, JsonParser.parseReader(guisFile.reader()))
+        GUIsIndexDeserializer.deserialize(namespace, guisFile.parseJson())
     else null
     
 }

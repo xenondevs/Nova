@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.parseJson
 import java.io.File
 
 internal class FontFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/lang") {
@@ -15,8 +15,8 @@ internal class FontFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "ass
             return
         }
         
-        val sourceObj = JsonParser.parseReader(source.reader()) as? JsonObject ?: return
-        val destObj = JsonParser.parseReader(destination.reader()) as? JsonObject ?: return
+        val sourceObj = source.parseJson() as? JsonObject ?: return
+        val destObj = destination.parseJson() as? JsonObject ?: return
         val sourceProviders = sourceObj.get("providers") as? JsonArray ?: return
         val destProviders = destObj.get("providers") as? JsonArray ?: return
         
