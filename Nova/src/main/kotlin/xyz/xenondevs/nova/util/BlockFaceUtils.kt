@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.util.item.isTraversable
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-enum class BlockSide(private val rotation: Int, private val blockFace: BlockFace) {
+enum class BlockSide(private val rotation: Int, val blockFace: BlockFace) {
     
     FRONT(0, SOUTH),
     LEFT(1, WEST),

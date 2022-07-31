@@ -4,18 +4,16 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.data.addLoreLines
 
-class ItemSideConfigGUI(
+internal class ItemSideConfigGUI(
     val itemHolder: ItemHolder,
     inventories: List<Pair<NetworkedInventory, String>>
-) : InventorySideConfigGUI() {
+) : InventorySideConfigGUI(itemHolder) {
     
     private val inventories = inventories.map { it.first }
     private val allowedTypes = itemHolder.allowedConnectionTypes.mapValues { (_, type) -> type.included }
@@ -73,10 +71,6 @@ class ItemSideConfigGUI(
         }
         
         return true
-    }
-    
-    override fun getBlockFace(blockSide: BlockSide): BlockFace {
-        return (itemHolder.endPoint as TileEntity).getFace(blockSide)
     }
     
     override fun getConnectionType(blockFace: BlockFace): NetworkConnectionType {
