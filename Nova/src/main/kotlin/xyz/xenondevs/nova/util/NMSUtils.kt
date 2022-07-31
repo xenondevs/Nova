@@ -111,6 +111,15 @@ fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T):
     return hasProperty(property) && values[property] == value
 }
 
+fun BlockPos.setBlockStateNoUpdate(state: BlockState) {
+    val section = chunkSection
+    section.acquire()
+    val old = section.getBlockState(this)
+    section.setBlockStateSilently(this, state)
+    section.release()
+    world.serverLevel.sendBlockUpdated(nmsPos, old, state, 3)
+}
+
 fun BlockPos.setBlockStateSilently(state: BlockState) {
     val section = chunkSection
     section.acquire()

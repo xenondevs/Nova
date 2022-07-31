@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.util.getBlockState
-import xyz.xenondevs.nova.util.setBlockStateSilently
+import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 
 class BlockStateBlockModelProvider(val blockState: NovaBlockState) : BlockModelProvider {
     
@@ -33,7 +33,7 @@ class BlockStateBlockModelProvider(val blockState: NovaBlockState) : BlockModelP
             currentBlockState = getBlockState(subId)
         }
         
-        pos.setBlockStateSilently(currentBlockState)
+        pos.setBlockStateNoUpdate(currentBlockState)
     }
     
     private fun getBlockState(subId: Int): BlockState {
