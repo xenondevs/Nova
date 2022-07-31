@@ -4,6 +4,7 @@
         <option name="ARRAY_WRAPPING" value="0"/>
     </JSON>
     <JetCodeStyleSettings>
+        <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647"/>
         <option name="CONTINUATION_INDENT_IN_PARAMETER_LISTS" value="true"/>
         <option name="CONTINUATION_INDENT_IN_ARGUMENT_LISTS" value="true"/>
         <option name="CONTINUATION_INDENT_FOR_EXPRESSION_BODIES" value="true"/>
@@ -11,6 +12,7 @@
         <option name="CONTINUATION_INDENT_IN_IF_CONDITIONS" value="true"/>
         <option name="CONTINUATION_INDENT_IN_ELVIS" value="true"/>
         <option name="WRAP_EXPRESSION_BODY_FUNCTIONS" value="0"/>
+        <option name="WRAP_ELVIS_EXPRESSIONS" value="0"/>
         <option name="IF_RPAREN_ON_NEW_LINE" value="false"/>
         <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL"/>
     </JetCodeStyleSettings>
@@ -25,6 +27,11 @@
         <indentOptions>
             <option name="CONTINUATION_INDENT_SIZE" value="4"/>
             <option name="KEEP_INDENTS_ON_EMPTY_LINES" value="true"/>
+        </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="JSON">
+        <indentOptions>
+            <option name="INDENT_SIZE" value="4"/>
         </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="kotlin">
