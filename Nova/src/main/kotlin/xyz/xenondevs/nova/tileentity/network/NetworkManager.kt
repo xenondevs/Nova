@@ -10,7 +10,9 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
+import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -112,7 +114,7 @@ interface NetworkManager {
         }
         
         override val inMainThread = true
-        override val dependsOn = emptySet<Initializable>()
+        override val dependsOn = setOf(LegacyFileConverter)
         
         override fun init() {
             NETWORK_MANAGER.init()
@@ -121,6 +123,7 @@ interface NetworkManager {
         
         override fun disable() {
             LOGGER.info("Unloading networks")
+            PermanentStorage.store("legacyNetworkChunks", NETWORK_MANAGER.legacyNetworkChunks)
             Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach { unloadChunk(it.pos) }
         }
         
@@ -151,6 +154,8 @@ private class NetworkManagerImpl : NetworkManager {
     override val networks = ArrayList<Network>()
     val networksById = HashMap<UUID, Network>()
     val nodesById = HashMap<UUID, NetworkNode>()
+    
+    val legacyNetworkChunks: HashSet<ChunkPos> = PermanentStorage.retrieve("legacyNetworkChunks") { hashSetOf() }
     
     fun init() {
         runTaskTimer(0, 1) {
@@ -234,8 +239,9 @@ private class NetworkManagerImpl : NetworkManager {
     private fun loadChunk(pos: ChunkPos, loadNodesIndividually: Boolean = false) {
         val nodes = getNodesInChunk(pos)
         
-        if (loadNodesIndividually) {
+        if (loadNodesIndividually || pos in legacyNetworkChunks) {
             loadNodesIndividually(nodes)
+            legacyNetworkChunks -= pos
             return
         }
         
