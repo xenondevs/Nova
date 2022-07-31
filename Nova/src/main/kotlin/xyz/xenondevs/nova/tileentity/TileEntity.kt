@@ -237,12 +237,22 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): FluidContainer {
         val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
         
-        val fluidData = retrieveOrNull<Compound>("fluidContainer.$uuid")
-        val storedAmount = fluidData?.get<Long>("amount")
-        val storedType = fluidData?.get<FluidType>("type")
+        val storedAmount: Long?
+        val storedType: FluidType?
+        
+        if (legacyData != null) {
+            val fluidData = retrieveOrNull<LegacyCompound>("fluidContainer.$uuid")
+            storedAmount = fluidData?.get<Long>("amount")
+            storedType = fluidData?.get<FluidType>("type")
+        } else {
+            val fluidData = retrieveOrNull<Compound>("fluidContainer.$uuid")
+            storedAmount = fluidData?.get<Long>("amount")
+            storedType = fluidData?.get<FluidType>("type")
+        }
         
         val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, storedAmount
             ?: defaultAmount, capacity, upgradeHolder)
+        
         updateHandler?.apply(container.updateHandlers::add)
         _fluidContainers[container] = global
         return container
