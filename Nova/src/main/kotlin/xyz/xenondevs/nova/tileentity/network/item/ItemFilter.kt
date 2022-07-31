@@ -2,37 +2,36 @@ package xyz.xenondevs.nova.tileentity.network.item
 
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.serialization.persistentdata.getLegacy
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.util.item.novaMaterial
 
-private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
+private val LEGACY_ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
+private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter1")
 
 fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
-    val container = itemMeta!!.persistentDataContainer
-    return container.get<LegacyCompound>(ITEM_FILTER_KEY)?.let(::ItemFilter)
+    val itemMeta = itemMeta!!
+    val container = itemMeta.persistentDataContainer
+    
+    val legacyFilter = container.getLegacy<ItemFilter>(LEGACY_ITEM_FILTER_KEY)
+    if (legacyFilter != null) {
+        container.remove(LEGACY_ITEM_FILTER_KEY)
+        setItemMeta(itemMeta)
+        saveFilterConfig(legacyFilter)
+        return legacyFilter
+    }
+    
+    return container.get(ITEM_FILTER_KEY)
 }
 
 fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter = getFilterConfigOrNull() ?: ItemFilter(size)
 
 fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
     val itemMeta = itemMeta!!
-    
-    itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, itemFilter.compound)
+    itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, itemFilter)
     setItemMeta(itemMeta)
-}
-
-fun ItemFilter(compound: LegacyCompound): ItemFilter {
-    val items: Array<ItemStack?> = compound.get<List<ItemStack>>("items")!!.toTypedArray()
-    return ItemFilter(
-        compound["whitelist"]!!,
-        compound["nbt"] ?: false,
-        items.size,
-        items
-    )
 }
 
 class ItemFilter(
@@ -43,14 +42,6 @@ class ItemFilter(
 ) {
     
     constructor(size: Int) : this(true, false, size, arrayOfNulls(size))
-    
-    val compound: Compound
-        get() = Compound().also {
-            val itemList = items.toList()
-            it["items"] = itemList
-            it["nbt"] = nbt
-            it["whitelist"] = whitelist
-        }
     
     fun allowsItem(itemStack: ItemStack): Boolean {
         return if (whitelist) items.any { it?.checkFilterSimilarity(itemStack) ?: false }

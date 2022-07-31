@@ -8,27 +8,10 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound.CompoundBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.instancecreator.EnumMapInstanceCreatorLegacy
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.*
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.BooleanArrayBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.BooleanBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.ByteArrayBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.ByteBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.CharArrayBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.CharBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.DoubleArrayBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.DoubleBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.FloatArrayBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.FloatBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.IntArrayBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.IntBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.LongArrayBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.LongBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.NamespacedIdBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.NamespacedKeyBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.ShortArrayBinaryAdapterLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.ShortBinaryAdapterLegacy
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.instancecreator.EnumMapInstanceCreatorLegacy
 import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.util.data.toByteArray
 import xyz.xenondevs.nova.util.reflection.representedKClass
 import xyz.xenondevs.nova.util.reflection.type
@@ -92,6 +75,7 @@ object CBFLegacy {
         registerBinaryAdapter(NamespacedId::class, NamespacedIdBinaryAdapterLegacy)
         registerBinaryAdapter(VirtualInventory::class, VirtualInventoryBinaryAdapterLegacy)
         registerBinaryAdapter(NetworkType::class, NetworkTypeBinaryAdapterLegacy)
+        registerBinaryAdapter(ItemFilter::class, ItemFilterBinaryAdapterLegacy)
         
         // binary hierarchy adapters
         registerBinaryHierarchyAdapter(Enum::class, EnumBinaryAdapterLegacy)

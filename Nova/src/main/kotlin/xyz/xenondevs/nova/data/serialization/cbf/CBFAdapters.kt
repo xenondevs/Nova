@@ -6,23 +6,30 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.CBF.registerBinaryAdapter
+import xyz.xenondevs.cbf.CBF.registerBinaryHierarchyAdapter
 import xyz.xenondevs.cbf.adapter.NettyBufferProvider
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.*
 import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import java.awt.Color
 
 internal object CBFAdapters {
     
     fun registerExtraAdapters() {
         CBF.defaultBufferProvider = NettyBufferProvider
+        
+        // binary adapters
         registerBinaryAdapter(Color::class, ColorBinaryAdapter)
-        registerBinaryAdapter(ItemStack::class, ItemStackBinaryAdapter)
         registerBinaryAdapter(Location::class, LocationBinaryAdapter)
         registerBinaryAdapter(NamespacedKey::class, NamespacedKeyBinaryAdapter)
         registerBinaryAdapter(NamespacedId::class, NamespacedIdBinaryAdapter)
         registerBinaryAdapter(NetworkType::class, NetworkTypeBinaryAdapter)
         registerBinaryAdapter(VirtualInventory::class, VirtualInventoryBinaryAdapter)
+        registerBinaryAdapter(ItemFilter::class, ItemFilterBinaryAdapter)
+        
+        // binary hierarchy adapters
+        registerBinaryHierarchyAdapter(ItemStack::class, ItemStackBinaryAdapter)
     }
     
 }
