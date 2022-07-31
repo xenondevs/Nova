@@ -16,7 +16,9 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 
+private const val MAGIC = 0xB7E21337.toInt()
 private const val FILE_VERSION = 1
+
 private val CREATE_BACKUPS by configReloadable { DEFAULT_CONFIG.getBoolean("performance.region_backups") }
 
 /**
@@ -26,6 +28,7 @@ private val CREATE_BACKUPS by configReloadable { DEFAULT_CONFIG.getBoolean("perf
  *
  * ```
  * RegionFile {
+ *   in32   magic;
  *   int8   version;
  *   chunks[n]; {
  *     int16    packed_world_pos
@@ -66,7 +69,7 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
     }
     
     private fun readFile(dis: DataInputStream) {
-        if (dis.readByte() != FILE_VERSION.toByte())
+        if (dis.readInt() != MAGIC || dis.readByte() != FILE_VERSION.toByte())
             throw IllegalStateException(file.absolutePath + " is not a valid region file")
         while (dis.readByte() == 1.toByte()) {
             val packedPos = dis.readUnsignedShort()
@@ -102,6 +105,7 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
         }
         
         DataOutputStream(file.outputStream()).use { dos ->
+            dos.writeInt(MAGIC)
             dos.writeByte(FILE_VERSION)
             chunks.asSequence().filterNotNull().filterNot(RegionChunk::isEmpty).forEach {
                 dos.writeByte(1)
