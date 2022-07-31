@@ -45,6 +45,7 @@ internal object WorldDataManager : Initializable(), Listener {
                         is ChunkLoadTask -> loadChunk(task.pos)
                         is ChunkUnloadTask -> unloadChunk(task.pos)
                         is SaveWorldTask -> saveWorld(task.world)
+                        is WorldUnloadTask -> unloadWorld(task.world)
                     }
                 }
                 Thread.sleep(50)
@@ -92,6 +93,14 @@ internal object WorldDataManager : Initializable(), Listener {
     }
     
     @Synchronized
+    private fun unloadWorld(world: World) {
+        if (world in worlds) { // TODO: is this if always true?
+            world.loadedChunks.forEach { unloadChunk(it.pos) }
+            worlds -= world
+        }
+    }
+    
+    @Synchronized
     fun getBlockStates(pos: ChunkPos): MutableMap<BlockPos, BlockState> = getChunk(pos).blockStates
     
     @Synchronized
@@ -122,7 +131,7 @@ internal object WorldDataManager : Initializable(), Listener {
     @Synchronized
     @EventHandler
     private fun handleWorldUnload(event: WorldUnloadEvent) {
-        worlds -= event.world
+        tasks += WorldUnloadTask(event.world)
     }
     
     @EventHandler
