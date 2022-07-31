@@ -21,9 +21,9 @@ internal class PreVarIntRegionConverter(old: File, new: File) : RegionFileConver
         val regionX = regexGroups[1].toInt()
         val regionZ = regexGroups[2].toInt()
         val legacyRegion = LegacyRegionFile(old, regionX, regionZ).apply(LegacyRegionFile::init)
-        val chunks = legacyRegion.readAllChunks()
+        legacyRegion.readAllChunks()
         val newRegion = RegionFile(Bukkit.getWorlds()[0], new, regionX, regionZ)
-        System.arraycopy(legacyRegion.chunks, 0, newRegion.chunks, 0, chunks.size)
+        System.arraycopy(legacyRegion.chunks, 0, newRegion.chunks, 0, legacyRegion.chunks.size)
         newRegion.save()
         legacyRegion.close()
     }

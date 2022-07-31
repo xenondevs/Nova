@@ -118,14 +118,14 @@ internal class LegacyRegionFile(val world: WorldDataStorage?, val file: File, va
         val bytes = ByteArray(raf.readInt())
         raf.read(bytes)
         chunk.readLegacy(Unpooled.wrappedBuffer(bytes), typePool)
+        chunks[packedCoords] = chunk
         return chunk
     }
     
     //</editor-fold>
     
-    fun readAllChunks(): List<RegionChunk> {
+    fun readAllChunks() {
         chunkPositions.keys.forEach(::read)
-        return chunks.filterNotNull()
     }
 }
 

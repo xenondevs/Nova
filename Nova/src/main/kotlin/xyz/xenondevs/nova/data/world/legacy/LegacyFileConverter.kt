@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.PreVarIntConverter
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
 import java.io.File
@@ -16,7 +17,7 @@ import java.util.*
 internal object LegacyFileConverter : Initializable() {
     
     override val inMainThread = false
-    override val dependsOn = setOf(AddonsInitializer)
+    override val dependsOn = setOf(AddonsInitializer, VanillaTileEntityManager)
     
     private val regionFileDirectories by lazy {
         Bukkit.getWorlds().mapNotNull { world ->
@@ -63,7 +64,7 @@ internal object LegacyFileConverter : Initializable() {
                     new.renameTo(old)
             }
         }
-        LOGGER.info("Converted $regionFiles region files.")
+        LOGGER.info("Converted ${regionFiles.size} region files.")
     }
     
     private fun prepareRegionFiles(): Map<File, File> { // old -> new
