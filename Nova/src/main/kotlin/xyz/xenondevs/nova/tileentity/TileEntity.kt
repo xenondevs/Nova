@@ -43,6 +43,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     companion object {
         val SELF_UPDATE_REASON = object : UpdateReason {}
+        internal val LEGACY_TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
         val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntityData")
     }
     

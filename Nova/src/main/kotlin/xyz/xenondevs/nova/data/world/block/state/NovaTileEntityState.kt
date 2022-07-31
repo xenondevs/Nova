@@ -4,9 +4,11 @@ import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.buffer.ByteBuffer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.serialization.persistentdata.getLegacy
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.tileentity.TileEntity.Companion.LEGACY_TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.world.BlockPos
@@ -40,8 +42,18 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
         this.ownerUUID = ctx.ownerUUID
         this.data = Compound()
         
-        val globalData = ctx.item.itemMeta?.persistentDataContainer?.get<Compound>(TILE_ENTITY_KEY)
-        if (globalData != null) data["global"] = globalData
+        val item = ctx.item
+        val itemMeta = item.itemMeta!!
+        val dataContainer = itemMeta.persistentDataContainer
+        
+        val legacyGlobalData = dataContainer.getLegacy<LegacyCompound>(LEGACY_TILE_ENTITY_KEY)
+        if (legacyGlobalData != null) {
+            legacyData = LegacyCompound()
+            legacyData!!["global"] = legacyGlobalData
+        } else {
+            val globalData = ctx.item.itemMeta?.persistentDataContainer?.get<Compound>(TILE_ENTITY_KEY)
+            if (globalData != null) data["global"] = globalData
+        }
     }
     
     override fun handleInitialized(placed: Boolean) {
@@ -72,10 +84,10 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
         super.write(buf)
         buf.writeUUID(uuid)
         buf.writeUUID(ownerUUID)
-    
+        
         if (_tileEntity != null)
             tileEntity.saveData()
-    
+        
         CBF.write(data, buf)
     }
     
