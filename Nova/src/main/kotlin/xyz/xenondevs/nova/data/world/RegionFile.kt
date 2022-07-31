@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.util.data.readVarInt
 import xyz.xenondevs.nova.util.data.use
 import xyz.xenondevs.nova.util.data.writeVarInt
 import xyz.xenondevs.nova.util.getOrSet
+import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.ChunkPos
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -114,9 +115,18 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
             }
             dos.writeByte(0)
         }
-    
+        
         if (CREATE_BACKUPS && backupFile.exists())
             backupFile.delete()
+    }
+    
+    fun isAnyChunkLoaded(): Boolean {
+        val chunkSource = world.serverLevel.chunkSource
+        repeat(1024) {
+            if (chunkSource.isChunkLoaded(it shr 5, it and 0x1F))
+                return true
+        }
+        return false
     }
     
 }
