@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.*
@@ -35,7 +36,7 @@ private val CHUNK_SEARCH_ID_KEY = NamespacedKey(NOVA, "chunkSearchId")
 internal object BlockBehaviorManager : Initializable(), Listener {
     
     override val inMainThread = true
-    override val dependsOn = setOf(Patcher)
+    override val dependsOn = setOf(WorldDataManager, Patcher)
     
     private val chunkSearchQueue = ConcurrentLinkedQueue<ChunkPos>()
     

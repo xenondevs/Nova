@@ -129,6 +129,7 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
                 } else {
                     state = VanillaTileEntityState(pos, type)
                     val legacyCompound = CBFLegacy.read<LegacyCompound>(buf)
+                    state.data = Compound()
                     state.legacyData = legacyCompound!!
                     val tileEntity = VanillaTileEntity.of(state)!!
                     if (tileEntity is ItemStorageVanillaTileEntity)
