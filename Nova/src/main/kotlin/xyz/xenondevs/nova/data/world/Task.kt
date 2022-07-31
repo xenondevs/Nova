@@ -11,4 +11,8 @@ internal class ChunkLoadTask(pos: ChunkPos) : ChunkTask(pos)
 
 internal class ChunkUnloadTask(pos: ChunkPos) : ChunkTask(pos)
 
-internal class SaveWorldTask(val world: World) : Task
+internal open class WorldTask(val world: World) : Task
+
+internal class SaveWorldTask(world: World) : WorldTask(world)
+
+internal class WorldUnloadTask(world: World) : WorldTask(world)
