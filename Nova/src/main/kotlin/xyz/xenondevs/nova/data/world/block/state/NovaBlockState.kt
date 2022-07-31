@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.property.BlockProperty
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.property.Directional
+import xyz.xenondevs.nova.data.world.block.property.LegacyDirectional
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -70,9 +71,14 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
     //<editor-fold desc="Legacy" defaultstate="collapsed">
     
     internal fun readPropertiesLegacy(buf: ByteBuf) {
-        val property = properties.values.firstOrNull() as? Directional ?: return
-        property.facing = BlockFace.values()[buf.readByte().toInt()]
+        properties.forEach { (_, property) ->
+            if (property is LegacyDirectional) {
+                buf.readByte()
+            } else if (property is Directional) {
+                property.facing = BlockFace.values()[buf.readByte().toInt()]
+            }
+        }
     }
-
+    
     //</editor-fold>
 }
