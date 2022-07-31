@@ -21,6 +21,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
 
 private val WORLD_VERSION_KEY = NamespacedKey(NOVA, "regionVersion")
@@ -30,7 +31,9 @@ internal object LegacyFileConverter : Initializable(), Listener {
     override val inMainThread = false
     override val dependsOn = setOf(AddonsInitializer, VanillaTileEntityManager)
     
-    val converters = TreeMap<VersionRange, VersionConverter>()
+    private val converters = TreeMap<VersionRange, VersionConverter>()
+    
+    private val futures = HashMap<World, CompletableFuture<Unit>>()
     
     override fun init() {
         registerEvents()
@@ -79,7 +82,11 @@ internal object LegacyFileConverter : Initializable(), Listener {
                 }
             }
         }
-        worlds.forEach { it.persistentDataContainer.set(WORLD_VERSION_KEY, PersistentDataType.STRING, NOVA.version.toString()) }
+        
+        worlds.forEach {
+            futures.getOrPut(it) { CompletableFuture.completedFuture(Unit) }.complete(Unit)
+            it.persistentDataContainer.set(WORLD_VERSION_KEY, PersistentDataType.STRING, NOVA.version.toString())
+        }
     }
     
     private fun prepareRegionFiles(worlds: List<World>): List<Triple<World, File, File>> { // (world, old, new)
@@ -101,6 +108,10 @@ internal object LegacyFileConverter : Initializable(), Listener {
     @EventHandler
     private fun handleWorldLoad(event: WorldLoadEvent) {
         runConversions(listOf(event.world))
+    }
+    
+    fun addConversionListener(world: World, run: () -> Unit) {
+        futures.getOrPut(world) { CompletableFuture() }.thenRun(run)
     }
     
 }

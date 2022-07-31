@@ -136,18 +136,24 @@ internal object WorldDataManager : Initializable(), Listener {
     
     @EventHandler
     private fun handleChunkLoad(event: ChunkLoadEvent) {
-        tasks += ChunkLoadTask(event.chunk.pos)
+        LegacyFileConverter.addConversionListener(event.world) {
+            tasks += ChunkLoadTask(event.chunk.pos)
+        }
     }
     
     @EventHandler
     private fun handleChunkUnload(event: ChunkUnloadEvent) {
-        tasks += ChunkUnloadTask(event.chunk.pos)
+        LegacyFileConverter.addConversionListener(event.world) {
+            tasks += ChunkUnloadTask(event.chunk.pos)
+        }
     }
     
     @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handleWorldSave(event: WorldSaveEvent) {
-        tasks += SaveWorldTask(event.world)
+        LegacyFileConverter.addConversionListener(event.world) {
+            tasks += SaveWorldTask(event.world)
+        }
     }
     
 }
