@@ -1,15 +1,23 @@
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10
 
 import org.bukkit.World
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.RegionFile
 import xyz.xenondevs.nova.data.world.legacy.RegionFileConverter
 import xyz.xenondevs.nova.data.world.legacy.VersionConverter
+import xyz.xenondevs.nova.world.ChunkPos
 import java.io.File
 
 private val REGION_COORDS_REGEX = """r\.(-?\d+)\.(-?\d+)\.nvr""".toRegex()
 
 internal object PreVarIntConverter : VersionConverter() {
+    
+    val legacyNetworkChunks: MutableList<ChunkPos> = PermanentStorage.retrieve("legacyNetworkChunks", ::ArrayList)
+    
+    init {
+        NOVA.disableHandlers += { PermanentStorage.store("legacyNetworkChunks", legacyNetworkChunks) }
+    }
     
     override fun getRegionFileConverter(world: World, old: File, new: File): RegionFileConverter = PreVarIntRegionConverter(world, old, new)
     
@@ -25,7 +33,7 @@ internal class PreVarIntRegionConverter(world: World, old: File, new: File) : Re
         legacyRegion.readAllChunks()
         val newRegion = RegionFile(world, new, regionX, regionZ)
         System.arraycopy(legacyRegion.chunks, 0, newRegion.chunks, 0, legacyRegion.chunks.size)
-        PermanentStorage.store("legacyNetworkChunks", legacyRegion.chunks.mapNotNull { it?.pos })
+        PreVarIntConverter.legacyNetworkChunks += legacyRegion.chunks.mapNotNull { it?.pos }
         newRegion.save()
         legacyRegion.close()
     }
