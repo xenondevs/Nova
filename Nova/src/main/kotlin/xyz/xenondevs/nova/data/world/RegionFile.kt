@@ -126,8 +126,10 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
     
     fun isAnyChunkLoaded(): Boolean {
         val chunkSource = world.serverLevel.chunkSource
+        val offsetX = regionX shl 5
+        val offsetZ = regionZ shl 5
         repeat(1024) {
-            if (chunkSource.isChunkLoaded(it shr 5, it and 0x1F))
+            if (chunkSource.isChunkLoaded(offsetX or (it shr 5), offsetZ or (it and 0x1F)))
                 return true
         }
         return false
