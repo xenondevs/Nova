@@ -12,5 +12,5 @@ fun PersistentDataContainer.set(key: NamespacedKey, obj: Any?) =
 inline fun <reified T : Any> PersistentDataContainer.get(key: NamespacedKey): T? =
     get(key, PersistentDataType.BYTE_ARRAY)?.let(CBF::read)
 
-internal inline fun <reified T : Any> PersistentDataContainer.getLegacy(key: NamespacedKey): T? =
+inline fun <reified T : Any> PersistentDataContainer.getLegacy(key: NamespacedKey): T? =
     get(key, PersistentDataType.BYTE_ARRAY)?.let(CBFLegacy::read)
