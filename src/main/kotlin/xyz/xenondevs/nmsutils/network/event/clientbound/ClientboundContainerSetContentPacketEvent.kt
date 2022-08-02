@@ -16,6 +16,11 @@ class ClientboundContainerSetContentPacketEvent(
             field = value
             changed = true
         }
+    var stateId = packet.stateId
+        set(value) {
+            field = value
+            changed = true
+        }
     var items = packet.items
         set(value) {
             field = value
@@ -28,10 +33,9 @@ class ClientboundContainerSetContentPacketEvent(
         }
     
     override fun buildChangedPacket(): ClientboundContainerSetContentPacket {
-        val original = super.packet
         return ClientboundContainerSetContentPacket(
-            original.containerId,
-            original.stateId,
+            containerId,
+            stateId,
             NonNullList(items, MojangStack.EMPTY),
             carriedItem
         )
