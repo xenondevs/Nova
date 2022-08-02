@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
+import xyz.xenondevs.nova.ui.item.BUTTON_COLORS
 import xyz.xenondevs.nova.util.data.addLoreLines
 
 internal class FluidSideConfigGUI(

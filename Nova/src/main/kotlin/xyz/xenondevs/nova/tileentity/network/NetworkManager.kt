@@ -20,8 +20,17 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.concurrent.*
+import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
+import xyz.xenondevs.nova.util.concurrent.ObservableLock
+import xyz.xenondevs.nova.util.concurrent.lockAndRun
+import xyz.xenondevs.nova.util.concurrent.mapToAllFuture
+import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
+import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.filterIsInstanceValues
+import xyz.xenondevs.nova.util.flatMap
+import xyz.xenondevs.nova.util.pollFirst
+import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
@@ -117,6 +126,7 @@ interface NetworkManager {
         override val dependsOn = setOf(LegacyFileConverter)
         
         override fun init() {
+            LOGGER.info("Starting network threads")
             NETWORK_MANAGER.init()
             Bukkit.getPluginManager().registerEvents(this, NOVA)
         }
@@ -155,7 +165,7 @@ private class NetworkManagerImpl : NetworkManager {
     val networksById = HashMap<UUID, Network>()
     val nodesById = HashMap<UUID, NetworkNode>()
     
-    val legacyNetworkChunks: HashSet<ChunkPos> = PermanentStorage.retrieve("legacyNetworkChunks") { hashSetOf() }
+    val legacyNetworkChunks: HashSet<ChunkPos> by lazy { PermanentStorage.retrieve("legacyNetworkChunks") { hashSetOf() } }
     
     fun init() {
         runTaskTimer(0, 1) {

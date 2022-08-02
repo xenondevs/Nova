@@ -17,6 +17,8 @@ import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.nova.tileentity.MultiModel
+import xyz.xenondevs.nova.tileentity.TileEntityParticleTask
 import xyz.xenondevs.nova.tileentity.vanilla.ItemStorageVanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.data.readUUID
@@ -125,13 +127,16 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
                     state.data = Compound()
                     state.legacyData = legacyCompound
                     val tileEntity = (material as TileEntityNovaMaterial).tileEntityConstructor(state)
-                    state._tileEntity = tileEntity
+                    state.tileEntity = tileEntity
+                    tileEntity.multiModels.forEach(MultiModel::close)
+                    tileEntity.particleTasks.forEach(TileEntityParticleTask::stop)
                 } else {
                     state = VanillaTileEntityState(pos, type)
                     val legacyCompound = CBFLegacy.read<LegacyCompound>(buf)
                     state.data = Compound()
                     state.legacyData = legacyCompound!!
                     val tileEntity = VanillaTileEntity.of(state)!!
+                    state.tileEntity = tileEntity
                     if (tileEntity is ItemStorageVanillaTileEntity)
                         tileEntity.holders
                 }

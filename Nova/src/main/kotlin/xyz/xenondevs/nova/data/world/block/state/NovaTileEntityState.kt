@@ -24,10 +24,12 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     lateinit var data: Compound
     internal var legacyData: LegacyCompound? = null
     
-    internal var _tileEntity: TileEntity? = null
-    
-    override val tileEntity: TileEntity
+    private var _tileEntity: TileEntity? = null
+    override var tileEntity: TileEntity
         get() = _tileEntity ?: throw IllegalStateException("TileEntity is not initialized")
+        internal set(value) {
+            _tileEntity = value
+        }
     
     val isInitialized: Boolean
         get() = _tileEntity != null
@@ -67,10 +69,14 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     
     override fun handleRemoved(broken: Boolean) {
         super.handleRemoved(broken)
-        tileEntity.saveData()
-        tileEntity.handleRemoved(!broken)
-        TileEntityManager.unregisterTileEntity(this)
-        _tileEntity = null
+        
+        // The tile entity could be null when the chunk was unloaded before the WorldDataManager could call handleInitialized
+        if (_tileEntity != null) {
+            tileEntity.saveData()
+            tileEntity.handleRemoved(!broken)
+            TileEntityManager.unregisterTileEntity(this)
+            _tileEntity = null
+        }
     }
     
     override fun read(buf: ByteBuffer) {

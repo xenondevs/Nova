@@ -54,7 +54,7 @@ class Nova : JavaPlugin(), INova {
         LOGGER = logger
         
         if (IS_DEV_SERVER)
-            LOGGER.warning("Running in dev mode! Never use this in a production server!")
+            LOGGER.warning("Running in dev mode! Never use this on a production server!")
         
         ParticleLibReflectionUtils.setPlugin(this)
         NovaConfig.loadDefaultConfig()

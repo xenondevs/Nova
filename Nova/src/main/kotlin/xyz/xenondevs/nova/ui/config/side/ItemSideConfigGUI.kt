@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.ui.item.BUTTON_COLORS
 import xyz.xenondevs.nova.util.data.addLoreLines
 
 internal class ItemSideConfigGUI(

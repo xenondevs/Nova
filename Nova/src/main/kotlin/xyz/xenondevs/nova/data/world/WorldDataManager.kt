@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
@@ -29,12 +29,13 @@ import kotlin.concurrent.thread
 internal object WorldDataManager : Initializable(), Listener {
     
     override val inMainThread = true
-    override val dependsOn: Set<Initializable> = setOf(VanillaTileEntityManager, NetworkManager, AddonsInitializer, LegacyFileConverter)
+    override val dependsOn = setOf(AddonsInitializer, LegacyFileConverter, TileEntityManager, VanillaTileEntityManager)
     
     private val worlds = HashMap<World, WorldDataStorage>()
     private val tasks = ConcurrentLinkedQueue<Task>() // TODO: Map RegionFile -> Queue
     
     override fun init() {
+        LOGGER.info("Initializing WorldDataManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
         tasks += Bukkit.getWorlds().flatMap { world -> world.loadedChunks.map { ChunkLoadTask(it.pos) } }
         
@@ -82,9 +83,12 @@ internal object WorldDataManager : Initializable(), Listener {
     
     @Synchronized
     private fun unloadChunk(pos: ChunkPos) {
-        val region = getRegion(pos)
-        val chunk = region.getChunk(pos)
-        chunk.blockStates.values.forEach { it.handleRemoved(false) }
+        val worldStorage = getWorldStorage(pos.world!!)
+        // The chunk might not be loaded if it was unloaded before Nova could load it
+        worldStorage.getRegionOrNull(pos)
+            ?.getChunkOrNull(pos)
+            ?.blockStates?.values
+            ?.forEach { it.handleRemoved(false) }
     }
     
     @Synchronized

@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10
 
 import org.bukkit.World
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.RegionFile
 import xyz.xenondevs.nova.data.world.legacy.RegionFileConverter
@@ -15,11 +14,11 @@ internal object PreVarIntConverter : VersionConverter() {
     
     val legacyNetworkChunks: MutableList<ChunkPos> = PermanentStorage.retrieve("legacyNetworkChunks", ::ArrayList)
     
-    init {
-        NOVA.disableHandlers += { PermanentStorage.store("legacyNetworkChunks", legacyNetworkChunks) }
-    }
-    
     override fun getRegionFileConverter(world: World, old: File, new: File): RegionFileConverter = PreVarIntRegionConverter(world, old, new)
+    
+    override fun handleRegionFilesConverted() {
+        PermanentStorage.store("legacyNetworkChunks", legacyNetworkChunks)
+    }
     
 }
 

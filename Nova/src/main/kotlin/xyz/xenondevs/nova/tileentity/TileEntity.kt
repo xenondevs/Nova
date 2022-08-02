@@ -7,7 +7,13 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.Chunk
+import org.bukkit.Location
+import org.bukkit.NamespacedKey
+import org.bukkit.OfflinePlayer
+import org.bukkit.Sound
+import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -29,7 +35,16 @@ import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.overlay.GUITexture
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.LocationUtils
+import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.center
+import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.getYaw
+import xyz.xenondevs.nova.util.hasInventoryOpen
+import xyz.xenondevs.nova.util.salt
+import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
@@ -76,8 +91,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     abstract val gui: Lazy<TileEntityGUI>?
     
-    private val multiModels = ArrayList<MultiModel>()
-    private val particleTasks = ArrayList<TileEntityParticleTask>()
+    internal val multiModels = ArrayList<MultiModel>()
+    internal val particleTasks = ArrayList<TileEntityParticleTask>()
     
     private val _inventories = HashMap<VirtualInventory, Boolean>()
     private val _fluidContainers = HashMap<NovaFluidContainer, Boolean>()

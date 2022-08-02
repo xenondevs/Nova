@@ -87,6 +87,13 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
         }
     }
     
+    fun getChunkOrNull(pos: ChunkPos): RegionChunk? {
+        val dx = pos.x and 0x1F
+        val dz = pos.z and 0x1F
+        val packedCoords = dx shl 5 or dz
+        return chunks[packedCoords]
+    }
+    
     fun getChunk(pos: ChunkPos): RegionChunk {
         val dx = pos.x and 0x1F
         val dz = pos.z and 0x1F

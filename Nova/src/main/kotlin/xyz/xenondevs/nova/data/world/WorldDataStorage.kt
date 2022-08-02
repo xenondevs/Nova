@@ -17,13 +17,20 @@ internal class WorldDataStorage(val world: World) {
     fun getRegion(pos: ChunkPos): RegionFile {
         val rx = pos.x shr 5
         val rz = pos.z shr 5
-        
         val rid = (rx.toLong() shl 32) or (rz.toLong() and 0xFFFFFFFF)
         
         return regionFiles.getOrPut(rid) {
             val file = File(regionsFolder, "r.$rx.$rz.nvr")
             return@getOrPut RegionFile(this.world, file, rx, rz).apply(RegionFile::init)
         }
+    }
+    
+    fun getRegionOrNull(pos: ChunkPos): RegionFile? {
+        val rx = pos.x shr 5
+        val rz = pos.z shr 5
+        val rid = (rx.toLong() shl 32) or (rz.toLong() and 0xFFFFFFFF)
+    
+        return regionFiles[rid]
     }
     
     fun saveAll() {

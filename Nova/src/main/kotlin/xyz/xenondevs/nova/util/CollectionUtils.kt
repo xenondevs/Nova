@@ -78,7 +78,7 @@ fun <E> Collection<E>.searchFor(query: String, getString: (E) -> String): List<E
 @Suppress("NOTHING_TO_INLINE")
 inline fun List<Item>.notifyWindows(): Unit = forEach(Item::notifyWindows)
 
-fun <T> Array<T?>.getOrSet(index: Int, lazyValue: () -> T): T {
+inline fun <T> Array<T?>.getOrSet(index: Int, lazyValue: () -> T): T {
     var value = get(index)
     if (value == null) {
         value = lazyValue()

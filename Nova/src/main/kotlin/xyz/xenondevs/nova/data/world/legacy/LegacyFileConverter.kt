@@ -28,7 +28,7 @@ private val WORLD_VERSION_KEY = NamespacedKey(NOVA, "regionVersion")
 
 internal object LegacyFileConverter : Initializable(), Listener {
     
-    override val inMainThread = false
+    override val inMainThread = true
     override val dependsOn = setOf(AddonsInitializer, VanillaTileEntityManager)
     
     private val converters = TreeMap<VersionRange, VersionConverter>()
@@ -80,6 +80,7 @@ internal object LegacyFileConverter : Initializable(), Listener {
                         LOGGER.log(Level.SEVERE, "Failed to convert world ${world.name}", e)
                     }
                 }
+                converter.handleRegionFilesConverted()
             }
         }
         

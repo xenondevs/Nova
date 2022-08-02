@@ -47,10 +47,12 @@ object TileEntityManager : Initializable(), ITileEntityManager {
         }
     }
     
+    @Synchronized
     internal fun registerTileEntity(state: NovaTileEntityState) {
         tileEntityMap.getOrPut(state.pos.chunkPos) { HashMap() }[state.pos] = state.tileEntity
     }
     
+    @Synchronized
     internal fun unregisterTileEntity(state: NovaTileEntityState) {
         tileEntityMap[state.pos.chunkPos]?.remove(state.pos)
     }

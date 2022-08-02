@@ -8,16 +8,6 @@ import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.util.BlockSide
 
-internal val BUTTON_COLORS = listOf(
-    CoreGUIMaterial.RED_BTN,
-    CoreGUIMaterial.ORANGE_BTN,
-    CoreGUIMaterial.YELLOW_BTN,
-    CoreGUIMaterial.GREEN_BTN,
-    CoreGUIMaterial.BLUE_BTN,
-    CoreGUIMaterial.PINK_BTN,
-    CoreGUIMaterial.WHITE_BTN
-)
-
 internal abstract class InventorySideConfigGUI(
     holder: EndPointDataHolder
 ) : BaseSideConfigGUI(holder) {
