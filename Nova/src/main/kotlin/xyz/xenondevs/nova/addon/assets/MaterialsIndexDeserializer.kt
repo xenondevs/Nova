@@ -5,9 +5,18 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.resources.model.config.*
+import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
+import xyz.xenondevs.nova.data.resources.model.config.BrownMushroomBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.config.MushroomStemBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.config.RedMushroomBlockStateConfig
 import xyz.xenondevs.nova.util.addNamespace
-import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.data.getAllInts
+import xyz.xenondevs.nova.util.data.getAllStrings
+import xyz.xenondevs.nova.util.data.getInt
+import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.getString
+import xyz.xenondevs.nova.util.data.isString
 
 private fun String.toMaterial(): Material? = Material.getMaterial(uppercase())
 
@@ -29,8 +38,9 @@ internal object MaterialsIndexDeserializer {
                 var itemModelList: List<String>? = null
                 if (item is JsonObject) {
                     modelType = deserializeItemModelType(item)
-                    if (item.has("models"))
-                        itemModelList = deserializeModelList(item.get("models"))
+                    val models = item.get("model") ?: item.get("models")
+                    if (models != null)
+                        itemModelList = deserializeModelList(models)
                 } else if (item.isString()) {
                     itemModelList = deserializeModelList(item)
                 }
@@ -89,7 +99,7 @@ internal object MaterialsIndexDeserializer {
     }
     
     private fun deserializeItemModelType(json: JsonObject): Material {
-        val material = json.get("item_material")
+        val material = json.get("material")
             ?.takeUnless(JsonElement::isJsonNull)
             ?.asString?.uppercase()
             ?.let(Material::valueOf)
@@ -98,7 +108,7 @@ internal object MaterialsIndexDeserializer {
             return material
         }
         
-        val itemModelType = json.get("item_type")
+        val itemModelType = json.get("type")
             ?.takeUnless(JsonElement::isJsonNull)
             ?.asString?.uppercase()
             ?.let(ItemModelType::valueOf)
