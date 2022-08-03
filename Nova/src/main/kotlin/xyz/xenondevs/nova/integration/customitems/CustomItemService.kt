@@ -10,9 +10,9 @@ import xyz.xenondevs.nova.integration.InternalIntegration
 internal interface CustomItemService : InternalIntegration {
     
     /**
-     * If this [CustomItemService] requires the Nova initialization to be delayed
+     * Blocks the thread until this [CustomItemService] has been loaded.
      */
-    val requiresLoadDelay: Boolean
+    fun awaitLoad() = Unit
     
     /**
      * Remove a block from the world without handling drops

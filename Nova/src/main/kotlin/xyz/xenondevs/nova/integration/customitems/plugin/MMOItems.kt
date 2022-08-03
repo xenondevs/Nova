@@ -17,7 +17,6 @@ import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 internal object MMOItems : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("MMOItems") != null
-    override val requiresLoadDelay = false
     
     private lateinit var mmoItems: MMOItemsPlugin
     private lateinit var itemTypes: Collection<Type>

@@ -20,26 +20,33 @@ import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.playBreakEffects
+import java.util.concurrent.CompletableFuture
 
 internal object ItemsAdder : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null
-    override val requiresLoadDelay = true
+    private val loaded = CompletableFuture<Unit>()
     
     init {
         if (isInstalled) {
-            Bukkit.getPluginManager().registerEvents(
-                ItemsAdderLoadListener {
-                    CustomItemServiceManager.READY_LATCH.countDown()
-                },
-                NOVA
-            )
+            @Suppress("DEPRECATION")
+            if (ItemsAdder.areItemsLoaded()) {
+                loaded.complete(Unit)
+            } else {
+                Bukkit.getPluginManager().registerEvents(
+                    ItemsAdderLoadListener { loaded.complete(Unit) },
+                    NOVA
+                )
+            }
         }
+    }
+    
+    override fun awaitLoad() {
+        loaded.get()
     }
     
     override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {

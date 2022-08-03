@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.util.item.customModelData
 internal object Oraxen : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Oraxen") != null
-    override val requiresLoadDelay = false
     
     override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
         // Missing API feature
