@@ -5,6 +5,7 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonDescription
 import xyz.xenondevs.nova.addon.AddonLogger
 import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.initialize.InitializationException
 import java.io.File
 import kotlin.reflect.jvm.jvmName
 
@@ -22,10 +23,10 @@ internal class AddonLoader(val file: File) {
         description = AddonDescription.deserialize(descriptionFile.reader())
         logger = AddonLogger(description.name)
         
-        check(description.novaVersion <= NOVA.version) {
-            "This addon is made for a newer version of Nova " +
-                "(v${description.novaVersion}). This server is running Nova v${NOVA.version}"
-        }
+        if (description.novaVersion > NOVA.version)
+            throw InitializationException("This addon is made for a newer version of Nova (v${description.novaVersion})")
+        if (description.novaVersion < NOVA.version.copy(patch = 0))
+            throw InitializationException("This addon is made for an older version of Nova (v${description.novaVersion})")
     }
     
     fun load(): Addon {
