@@ -7,6 +7,8 @@ import xyz.xenondevs.nova.data.resources.model.config.DefaultingBlockStateConfig
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -23,7 +25,16 @@ internal abstract class BlockBehavior(configType: DefaultingBlockStateConfigType
     open fun init() = Unit
     
     fun handleQueryResult(positions: List<BlockPos>) {
-        positions.forEach { if (!BlockManager.hasBlock(it)) it.setBlockStateSilently(defaultState) }
+        if (CustomItemServiceManager.PLUGINS.isEmpty()) {
+            positions.forEach { if (!BlockManager.hasBlock(it)) it.setBlockStateSilently(defaultState) }
+        } else {
+            runTask {
+                positions.forEach {
+                    if (!BlockManager.hasBlock(it) && CustomItemServiceManager.getBlockType(it.block) == null)
+                        it.setBlockStateSilently(defaultState)
+                }
+            }
+        }
     }
     
     fun getCorrectBlockState(pos: BlockPos): BlockState? {

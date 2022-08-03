@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.integration.customitems.plugin.Oraxen
 
 object CustomItemServiceManager : Initializable() {
     
-    private val PLUGINS: List<CustomItemService> by lazy { listOf(ItemsAdder, Oraxen, MMOItems).filter(InternalIntegration::isInstalled) }
+    internal val PLUGINS: List<CustomItemService> by lazy { listOf(ItemsAdder, Oraxen, MMOItems).filter(InternalIntegration::isInstalled) }
     
     override val inMainThread = false
     override val dependsOn = emptySet<Initializable>()
