@@ -20,7 +20,7 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
-private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments")
+private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments1")
 
 object AttachmentManager : Initializable(), Listener {
     

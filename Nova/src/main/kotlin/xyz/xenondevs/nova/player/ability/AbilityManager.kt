@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
-private val ABILITIES_KEY = NamespacedKey(NOVA, "abilities_0.9")
+private val ABILITIES_KEY = NamespacedKey(NOVA, "abilities1")
 
 object AbilityManager : Initializable(), Listener {
     
