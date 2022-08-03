@@ -9,11 +9,9 @@ import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.ServerUtils
@@ -22,7 +20,6 @@ import xyz.xenondevs.nova.world.block.BlockManager
 import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
-import xyz.xenondevs.particle.utils.ReflectionUtils as ParticleLibReflectionUtils
 
 private val REQUIRED_SERVER_VERSION = Version("1.19.1")
 
@@ -47,7 +44,6 @@ class Nova : JavaPlugin(), INova {
     override val materialRegistry = NovaMaterialRegistry
     
     internal val disableHandlers = ArrayList<() -> Unit>()
-    private var fullyEnabled = false
     
     override fun onEnable() {
         NOVA = this
@@ -56,15 +52,8 @@ class Nova : JavaPlugin(), INova {
         if (IS_DEV_SERVER)
             LOGGER.warning("Running in dev mode! Never use this on a production server!")
         
-        ParticleLibReflectionUtils.setPlugin(this)
-        NovaConfig.loadDefaultConfig()
-        
         if (checkStartup()) {
-            CoreItems.init()
             Initializer.init()
-            
-            PermanentStorage.store("last_version", description.version)
-            fullyEnabled = true
         }
     }
     
@@ -98,7 +87,7 @@ class Nova : JavaPlugin(), INova {
     }
     
     override fun onDisable() {
-        if (fullyEnabled) {
+        if (Initializer.isDone) {
             AddonManager.disableAddons()
             Initializer.disable()
             disableHandlers.forEach {

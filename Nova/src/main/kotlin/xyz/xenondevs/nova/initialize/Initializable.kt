@@ -3,33 +3,34 @@ package xyz.xenondevs.nova.initialize
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.runTask
-import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
 
 abstract class Initializable internal constructor() : Comparable<Initializable> {
     
-    internal val latch = CountDownLatch(1)
+    internal val initialization = CompletableFuture<Boolean>()
     internal var isInitialized = false
     
     internal abstract val inMainThread: Boolean
-    
     internal abstract val dependsOn: Set<Initializable>
-    
     internal abstract fun init()
+    internal open fun disable() = Unit
     
-    open fun disable() = Unit
-    
-    fun initialize(parentLatch: CountDownLatch) {
+    fun initialize() {
         fun performInitialization() {
             try {
                 init()
                 isInitialized = true
+                initialization.complete(true)
+                
+                Initializer.initialized += this
+            } catch (e: InitializationException) {
+                LOGGER.severe(e.message)
             } catch (e: Exception) {
                 LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $this", e)
             }
             
-            this.latch.countDown()
-            parentLatch.countDown()
+            initialization.complete(false)
         }
         
         if (inMainThread)
