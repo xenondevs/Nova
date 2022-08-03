@@ -61,7 +61,7 @@
   "command.nova.remove_obsolete_models.success": "Removido %s suportes de armadura.",
   "command.nova.remove_tile_entities.success": "Removido %s entidades de tile.",
   "command.nova.render_distance": "Sua distância de renderização foi definida para %s.",
-  "command.nova.show_tile_entity_data.success": "Está %s possui os seguintes dados: %s",
+  "command.nova.show_tile_entity_data.success": "Está %s possui os seguintes dados:\n%s",
   "command.nova.show_tile_entity_data.failure": "Por favor, olhe para um bloco válido e tente novamente.",
   "command.nova.modeldata.item": "O item %s usa %s e tem os seguintes dados de modelo personalizado: %s.",
   "command.nova.modeldata.block": "O bloco %s usa %s e tem os seguintes dados de modelo personalizado: %s.",
