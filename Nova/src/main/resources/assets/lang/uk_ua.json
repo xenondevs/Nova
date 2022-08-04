@@ -48,5 +48,15 @@
   "command.nova.give.success": "Дати %s %s до %s",
   "command.nova.list_nearby.success": "З %s броні стоящій у твоему чанку, %s є частиной з сущностей",
   "command.nova.get_nearest_data.failed": "Неможе знайти плітка сущностей поблизи",
-  "command.nova.remove_tile_entities.success": "Пробрано %s сущностей"
+  "command.nova.remove_tile_entities.success": "Пробрано %s сущностей",
+  "command.nova.reload_configs.start": "Перезавантаженя конфігурацій...",
+  "command.nova.reload_recipes.start": "Перезавантаженя рецептів...",
+  "menu.nova.items.search": "Пошук предмета",
+  "menu.nova.items.search.back": "поверненя у головне меню",
+  "menu.nova.items.search.clear": "очистити пошук",
+  "menu.nova.recipe.item_info": "Інформація предмета",
+  "command.nova.network_debug.nova.energy": "Переключити режим налагодження для Сітки - Енергій",
+  "command.nova.resource_pack.create.success": "Ресурс пак создан. Сервер перезапустити рекомдовано",
+  "command.nova.resource_pack.reupload.start": "Завантаженя ресурс пака... будь ласка зачекайте",
+  "nova.outdated_version": "Ви використовуєте застарілу версію %s.\nБудь ласка, завантажте останню версію на %s"
 }
