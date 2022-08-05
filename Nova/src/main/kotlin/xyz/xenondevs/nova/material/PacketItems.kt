@@ -19,12 +19,14 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nmsutils.network.event.PacketEventManager
+import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.clientbound.*
+import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.network.event.clientbound.*
-import xyz.xenondevs.nova.network.event.serverbound.SetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.*
@@ -61,6 +63,7 @@ internal object PacketItems : Initializable(), Listener {
     
     override fun init() {
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
+        PacketEventManager.registerListener(this)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -121,8 +124,8 @@ internal object PacketItems : Initializable(), Listener {
             event.isCancelled = true
     }
     
-    @EventHandler
-    private fun handleSetContentPacket(event: ContainerSetContentPacketEvent) {
+    @PacketHandler
+    private fun handleSetContentPacket(event: ClientboundContainerSetContentPacketEvent) {
         val player = event.player
         val packet = event.packet
         val items = packet.items
@@ -139,8 +142,8 @@ internal object PacketItems : Initializable(), Listener {
             event.carriedItem = getFakeItem(player, carriedItem)
     }
     
-    @EventHandler
-    private fun handleSetSlotPacket(event: ContainerSetSlotPacketEvent) {
+    @PacketHandler
+    private fun handleSetSlotPacket(event: ClientboundContainerSetSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
         if (isContainerItem(item))
@@ -149,8 +152,8 @@ internal object PacketItems : Initializable(), Listener {
             event.item = getFakeItem(event.player, item)
     }
     
-    @EventHandler
-    private fun handleEntityData(event: SetEntityDataPacketEvent) {
+    @PacketHandler
+    private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val player = event.player
         val packet = event.packet
         val data = packet.unpackedData ?: return
@@ -164,8 +167,8 @@ internal object PacketItems : Initializable(), Listener {
         }
     }
     
-    @EventHandler
-    private fun handleSetEquipment(event: SetEquipmentPacketEvent) {
+    @PacketHandler
+    private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
         val player = event.player
         val packet = event.packet
         val slots = packet.slots
@@ -176,8 +179,8 @@ internal object PacketItems : Initializable(), Listener {
         }
     }
     
-    @EventHandler
-    private fun handleCreativeSetItem(event: SetCreativeModeSlotPacketEvent) {
+    @PacketHandler
+    private fun handleCreativeSetItem(event: ServerboundSetCreativeModeSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
         if (isContainerItem(item))
@@ -186,8 +189,8 @@ internal object PacketItems : Initializable(), Listener {
             event.item = getNovaItem(item)
     }
     
-    @EventHandler
-    private fun handleRecipes(event: UpdateRecipesPacketEvent) {
+    @PacketHandler
+    private fun handleRecipes(event: ClientboundUpdateRecipesPacketEvent) {
         val packet = event.packet
         packet.recipes.forEachIndexed { i, recipe ->
             val id = recipe.id.namespacedKey

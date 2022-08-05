@@ -5,7 +5,6 @@ import net.minecraft.commands.CommandSourceStack
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer
 import org.bukkit.craftbukkit.v1_19_R1.command.VanillaCommandWrapper
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.command.impl.NovaCommand
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
@@ -24,7 +23,6 @@ object CommandManager : Initializable() {
     override val dependsOn = setOf(ItemCategories, RecipeRegistry)
     
     override fun init() {
-        LOGGER.info("Registering Commands")
         registerCommands()
     }
     

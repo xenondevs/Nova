@@ -56,7 +56,7 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
         if (time != 0) {
             builder.addIngredient(
                 't', CoreGUIMaterial.TP_STOPWATCH
-                .createBasicItemBuilder()
+                .createClientsideItemBuilder()
                 .setDisplayName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
             )
         }

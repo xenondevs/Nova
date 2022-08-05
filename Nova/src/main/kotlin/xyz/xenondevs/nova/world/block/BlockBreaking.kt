@@ -1,30 +1,29 @@
 package xyz.xenondevs.nova.world.block
 
+import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Axis
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
+import xyz.xenondevs.nmsutils.network.event.PacketEventManager
+import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.CoreBlockOverlay
-import xyz.xenondevs.nova.network.event.serverbound.PlayerActionPacketEvent
 import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.concurrent.runInServerThread
 import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolUtils
@@ -39,13 +38,13 @@ import java.util.logging.Level
 import kotlin.random.Random
 import net.minecraft.world.entity.EquipmentSlot as MojangSlot
 
-internal object BlockBreaking : Listener {
+internal object BlockBreaking {
     
     private val playerBreakers = ConcurrentHashMap<Player, Breaker>()
     private val internalBreakers = HashMap<Int, BreakMethod>()
     
     fun init() {
-        Bukkit.getPluginManager().registerEvents(this, NOVA)
+        PacketEventManager.registerListener(this)
         runTaskTimer(0, 1, ::handleTick)
     }
     
@@ -91,14 +90,21 @@ internal object BlockBreaking : Listener {
         }
     }
     
-    private fun handleDestroyStart(player: Player, pos: BlockPos): Boolean {
+    private fun handleDestroyStart(player: Player, pos: BlockPos, sequence: Int): Boolean {
         val blockState = BlockManager.getBlock(pos)
         if (blockState != null) {
             val material = blockState.material
             if (material.hardness >= 0) {
-                ProtectionManager.canBreak(player, player.inventory.itemInMainHand.takeUnlessAir(), pos.location).runIfTrue {
-                    // initiate block breaker in server thread as block states are accessed
-                    runInServerThread { playerBreakers[player] = Breaker(player, pos.location.block, blockState) }
+                val future = ProtectionManager.canBreak(player, player.inventory.itemInMainHand.takeUnlessAir(), pos.location)
+                future.thenRun {
+                    val result = future.get()
+                    if (result) {
+                        // initiate block breaker in server thread as block states are accessed
+                        runInServerThread { playerBreakers[player] = Breaker(player, pos.location.block, blockState, sequence) }
+                    } else {
+                        // The ack packet removes client-predicted block states and shows those sent by the server
+                        player.send(ClientboundBlockChangedAckPacket(sequence))
+                    }
                 }
                 
                 return true
@@ -117,14 +123,14 @@ internal object BlockBreaking : Listener {
         return false
     }
     
-    @EventHandler
-    private fun handlePlayerAction(event: PlayerActionPacketEvent) {
+    @PacketHandler
+    private fun handlePlayerAction(event: ServerboundPlayerActionPacketEvent) {
         val player = event.player
         val pos = event.pos
         val blockPos = BlockPos(event.player.world, pos.x, pos.y, pos.z)
         
         event.isCancelled = when (event.action) {
-            START_DESTROY_BLOCK -> handleDestroyStart(player, blockPos)
+            START_DESTROY_BLOCK -> handleDestroyStart(player, blockPos, event.sequence)
             STOP_DESTROY_BLOCK, ABORT_DESTROY_BLOCK -> handleDestroyStop(player)
             else -> false
         }
@@ -140,7 +146,7 @@ private fun getBreakMethod(block: Block, material: BlockNovaMaterial, entityId: 
 
 private val MINING_FATIGUE = MobEffectInstance(MobEffect.byId(4), Integer.MAX_VALUE, 255, false, false, false)
 
-private class Breaker(val player: Player, val block: Block, val blockState: NovaBlockState) {
+private class Breaker(val player: Player, val block: Block, val blockState: NovaBlockState, val sequence: Int) {
     
     private val material = blockState.material
     private val tool: ItemStack = player.inventory.itemInMainHand
@@ -174,7 +180,10 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
             if (player.gameMode == GameMode.CREATIVE || drops)
                 blockState.pos.location.dropItems(material.novaBlock.getDrops(blockState, ctx))
             // If the block broke instantaneously for the client, the effects will also be played clientside
-            block.remove(ctx, calculateClientsideDamage() < 1)
+            val effects = calculateClientsideDamage() < 1
+            block.remove(ctx, effects, effects)
+            // The ack packet removes client-predicted block states and shows those sent by the server
+            player.send(ClientboundBlockChangedAckPacket(sequence))
         } else {
             // spawn hit particles if not rendered clientside
             if (block.type == Material.BARRIER) spawnHitParticles()
@@ -241,7 +250,7 @@ private class Breaker(val player: Player, val block: Block, val blockState: Nova
     
     private fun calculateClientsideDamage(): Double {
         if (player.gameMode == GameMode.CREATIVE) return 1.0
-        return ToolUtils.calculateDamage(player, tool, toolCategory, block.type.hardness.toDouble(), correctCategory, drops)
+        return ToolUtils.calculateDamage(player, EquipmentSlot.HAND, block)
     }
     
 }

@@ -89,7 +89,7 @@ internal inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additi
     val tileEntities = HashMap<BlockFace, T>()
     CUBE_FACES.forEach {
         val location = blockLocation.advance(it)
-        val tileEntity = TileEntityManager.getTileEntityAt(location, additionalHitboxes)
+        val tileEntity = TileEntityManager.getTileEntity(location, additionalHitboxes)
             ?: VanillaTileEntityManager.getTileEntityAt(location)
         if (tileEntity != null && tileEntity is T) tileEntities[it] = tileEntity as T
     }

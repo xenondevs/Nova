@@ -2,27 +2,23 @@
 
 package xyz.xenondevs.nova.util
 
-import io.netty.buffer.Unpooled
-import io.netty.channel.ChannelFuture
-import net.minecraft.core.BlockPos
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Rotations
-import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
-import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
-import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.MinecraftServer
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.Property
+import net.minecraft.world.level.chunk.LevelChunkSection
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
+import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
@@ -32,10 +28,10 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.network.PacketManager
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
+import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.item.ItemStack as NMSItemStack
 
@@ -51,8 +47,11 @@ val ItemStack.nmsStack: NMSItemStack
 val NMSItemStack.bukkitStack: ItemStack
     get() = CraftItemStack.asBukkitCopy(this)
 
-val Location.blockPos: BlockPos
-    get() = BlockPos(blockX, blockY, blockZ)
+val Location.blockPos: MojangBlockPos
+    get() = MojangBlockPos(blockX, blockY, blockZ)
+
+val BlockPos.nmsPos: MojangBlockPos
+    get() = MojangBlockPos(x, y, z)
 
 val World.serverLevel: ServerLevel
     get() = (this as CraftWorld).handle
@@ -73,19 +72,15 @@ val InteractionHand.bukkitSlot: EquipmentSlot
         InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
     }
 
+val Block.nmsState: BlockState
+    get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))
+
+fun MojangBlockPos.toNovaPos(world: World): BlockPos =
+    BlockPos(world, x, y, z)
+
 fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
     packets.forEach { connection.send(it) }
-}
-
-fun Player.send(vararg bufs: FriendlyByteBuf, retain: Boolean = true, flush: Boolean = true) {
-    val queue = PacketManager.playerHandlers[name]?.queue ?: return
-    bufs.forEach {
-        if (retain) it.retain()
-        queue += it
-    }
-    
-    if (flush) connection.connection.channel.flush()
 }
 
 fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
@@ -96,32 +91,8 @@ fun Rotations.add(x: Float, y: Float, z: Float) =
 
 val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).server
 
-val MinecraftServer.channels: List<ChannelFuture>
-    get() = ReflectionRegistry.SERVER_CONNECTION_LISTENER_CHANNELS_FIELD.get(this.connection) as List<ChannelFuture>
-
 val serverTick: Int
     get() = minecraftServer.tickCount
-
-fun ClientboundPlaceGhostRecipePacket(containerId: Int, resourceLocation: String): ClientboundPlaceGhostRecipePacket {
-    val buffer = FriendlyByteBuf(Unpooled.buffer())
-    buffer.writeByte(containerId)
-    buffer.writeResourceLocation(ResourceLocation(resourceLocation))
-    return ClientboundPlaceGhostRecipePacket(buffer)
-}
-
-fun ClientboundSetPassengersPacket(vehicle: Int, passengers: IntArray): ClientboundSetPassengersPacket {
-    val buffer = FriendlyByteBuf(Unpooled.buffer())
-    buffer.writeVarInt(vehicle)
-    buffer.writeVarIntArray(passengers)
-    return ClientboundSetPassengersPacket(buffer)
-}
-
-fun ClientboundRotateHeadPacket(entity: Int, yaw: Float): ClientboundRotateHeadPacket {
-    val buffer = FriendlyByteBuf(Unpooled.buffer())
-    buffer.writeVarInt(entity)
-    buffer.writeByte(yaw.toPackedByte().toInt())
-    return ClientboundRotateHeadPacket(buffer)
-}
 
 fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
     val nonNullList: NonNullList<E>
@@ -134,6 +105,48 @@ fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
     }
     
     return nonNullList
+}
+
+fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T): Boolean {
+    return hasProperty(property) && values[property] == value
+}
+
+fun BlockPos.setBlockStateNoUpdate(state: BlockState) {
+    val section = chunkSection
+    section.acquire()
+    val old = section.getBlockState(this)
+    section.setBlockStateSilently(this, state)
+    section.release()
+    world.serverLevel.sendBlockUpdated(nmsPos, old, state, 3)
+}
+
+fun BlockPos.setBlockStateSilently(state: BlockState) {
+    val section = chunkSection
+    section.acquire()
+    section.setBlockStateSilently(this, state)
+    section.release()
+}
+
+fun BlockPos.getBlockState(): BlockState {
+    val section = chunkSection
+    section.acquire()
+    val blockState = section.getBlockState(this)
+    section.release()
+    return blockState
+}
+
+val BlockPos.chunkSection: LevelChunkSection
+    get() {
+        val chunk = world.serverLevel.getChunk(x shr 4, z shr 4)
+        return chunk.getSection(chunk.getSectionIndex(y))
+    }
+
+fun LevelChunkSection.setBlockStateSilently(pos: BlockPos, state: BlockState) {
+    setBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF, state)
+}
+
+fun LevelChunkSection.getBlockState(pos: BlockPos): BlockState {
+    return getBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF)
 }
 
 object NMSUtils {

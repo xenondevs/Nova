@@ -23,10 +23,10 @@ internal abstract class NetworkedVanillaTileEntity internal constructor(state: V
     }
     
     override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? =
-        retrieveOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
+        retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
     
     override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? =
-        retrieveOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
+        retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     
     override fun saveData() {
         storeData("networks", serializeNetworks())

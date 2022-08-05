@@ -7,7 +7,7 @@
     <parent>
         <groupId>xyz.xenondevs.nova</groupId>
         <artifactId>Nova-Parent</artifactId>
-        <version>0.9.11</version>
+        <version>0.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -20,9 +20,12 @@
         <annotations.version>23.0.0</annotations.version>
         <invui.version>0.8-SNAPSHOT</invui.version>
         <ktor.version>2.0.2</ktor.version>
+        <nms-utilities.version>0.1-SNAPSHOT</nms-utilities.version>
         <maven-resolver-provider.version>3.8.5</maven-resolver-provider.version>
         <maven-resolver-connector-basic.version>1.8.0</maven-resolver-connector-basic.version>
         <maven-resolver-transport-http.version>1.8.0</maven-resolver-transport-http.version>
+        <asm.version>9.3</asm.version>
+        <byte-buddy.version>1.12.10</byte-buddy.version>
     </properties>
 
     <pluginRepositories>
@@ -85,9 +88,9 @@
                     <version>${invui.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>xyz.xenondevs.kadvancements</groupId>
-                    <artifactId>kadvancements-adapter-r2</artifactId>
-                    <version>0.1-SNAPSHOT</version>
+                    <groupId>xyz.xenondevs</groupId>
+                    <artifactId>nms-utilities</artifactId>
+                    <version>${nms-utilities.version}</version>
                 </dependency>
             </dependencies>
             <build>
@@ -141,10 +144,10 @@
                     <classifier>remapped-mojang</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>xyz.xenondevs.kadvancements</groupId>
-                    <artifactId>kadvancements-adapter-r2</artifactId>
+                    <groupId>xyz.xenondevs</groupId>
+                    <artifactId>nms-utilities</artifactId>
                     <classifier>remapped-mojang</classifier>
-                    <version>0.1-SNAPSHOT</version>
+                    <version>${nms-utilities.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -155,7 +158,7 @@
         <dependency>
             <groupId>xyz.xenondevs.nova</groupId>
             <artifactId>Nova-API</artifactId>
-            <version>0.9.11</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Spigot -->
@@ -460,13 +463,14 @@
             <version>5.1.0.7</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.bekvon</groupId>
+            <artifactId>Residence</artifactId>
+            <version>5.0.1.6</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Not provided -->
-        <dependency>
-            <groupId>xyz.xenondevs.kadvancements</groupId>
-            <artifactId>kadvancements-core</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>de.studiocode.invui</groupId>
             <artifactId>InvUI</artifactId>
@@ -528,6 +532,21 @@
             <artifactId>bstats-bukkit</artifactId>
             <version>3.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs.bytebase</groupId>
+            <artifactId>ByteBase-Runtime</artifactId>
+            <version>0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs.cbf</groupId>
+            <artifactId>cosmic-binary-format</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs.cbf</groupId>
+            <artifactId>cosmic-binary-format-netty-adapter</artifactId>
+            <version>0.1</version>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -549,7 +568,7 @@
             <plugin>
                 <groupId>xyz.xenondevs</groupId>
                 <artifactId>string-remapper-maven-plugin</artifactId>
-                <version>0.6</version>
+                <version>0.7</version>
 
                 <executions>
                     <execution>
@@ -569,6 +588,7 @@
                             <classes>
                                 <class>xyz.xenondevs.nova.util.reflection.ReflectionRegistry</class>
                                 <class>xyz.xenondevs.nova.util.NMSUtils</class>
+                                <class>xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch</class>
                             </classes>
                         </configuration>
                     </execution>
@@ -610,13 +630,7 @@
                         <filter>
                             <artifact>*:*</artifact>
                             <excludes>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                                <exclude>META-INF/*.MF</exclude>
-                                <exclude>META-INF/DEPENDENCIES</exclude>
-                                <exclude>META-INF/**/module-info.class</exclude>
+                                <exclude>META-INF/*</exclude>
                             </excludes>
                         </filter>
                     </filters>
@@ -625,7 +639,9 @@
                             <include>xyz.xenondevs.nova:Nova-API</include>
                             <include>de.studiocode.invui:*</include>
                             <include>org.bstats:*</include>
-                            <include>xyz.xenondevs.kadvancements:*</include>
+                            <include>xyz.xenondevs:nms-utilities</include>
+                            <include>xyz.xenondevs.bytebase:*</include>
+                            <include>xyz.xenondevs.cbf</include>
                         </includes>
                     </artifactSet>
                 </configuration>

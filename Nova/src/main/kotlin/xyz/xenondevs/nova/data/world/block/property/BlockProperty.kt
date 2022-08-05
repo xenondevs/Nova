@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.world.block.property
 
-import io.netty.buffer.ByteBuf
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 
 interface BlockProperty {
@@ -11,14 +11,14 @@ interface BlockProperty {
     fun init(ctx: BlockPlaceContext)
     
     /**
-     * Reads the values of this [BlockProperty] from the given [ByteBuf]
+     * Reads the values of this [BlockProperty] from the given [Compound]
      */
-    fun read(buf: ByteBuf)
+    fun read(compound: Compound)
     
     /**
-     * Write the values of this [BlockProperty] to the given [ByteBuf]
+     * Writes the values of this [BlockProperty] to the given [Compound]
      */
-    fun write(buf: ByteBuf)
+    fun write(compound: Compound)
     
 }
 

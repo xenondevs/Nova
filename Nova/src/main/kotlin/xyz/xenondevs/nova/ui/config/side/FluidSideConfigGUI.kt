@@ -4,18 +4,17 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
-import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.ui.item.BUTTON_COLORS
 import xyz.xenondevs.nova.util.data.addLoreLines
 
-class FluidSideConfigGUI(
-    val fluidHolder: FluidHolder,
+internal class FluidSideConfigGUI(
+    private val fluidHolder: FluidHolder,
     inventories: List<Pair<FluidContainer, String>>
-) : InventorySideConfigGUI() {
+) : InventorySideConfigGUI(fluidHolder) {
     
     private val containers: List<FluidContainer> =
         inventories.map { it.first }
@@ -77,10 +76,6 @@ class FluidSideConfigGUI(
         }
         
         return true
-    }
-    
-    override fun getBlockFace(blockSide: BlockSide): BlockFace {
-        return (fluidHolder.endPoint as TileEntity).getFace(blockSide)
     }
     
     override fun getConnectionType(blockFace: BlockFace): NetworkConnectionType {

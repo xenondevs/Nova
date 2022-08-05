@@ -21,6 +21,10 @@ class Version : Comparable<Version> {
         this.patch = split.getOrNull(2)?.toIntOrNull() ?: 0
     }
     
+    fun copy(major: Int? = null, minor: Int? = null, patch: Int? = null): Version {
+        return Version(major ?: this.major, minor ?: this.minor, patch ?: this.patch)
+    }
+    
     override fun toString() = "$major.$minor.$patch"
     
     override fun compareTo(other: Version) = compareTo(other, false)

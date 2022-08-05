@@ -16,6 +16,7 @@ import org.eclipse.aether.spi.connector.transport.TransporterFactory
 import org.eclipse.aether.transfer.AbstractTransferListener
 import org.eclipse.aether.transfer.TransferEvent
 import org.eclipse.aether.transport.http.HttpTransporterFactory
+import xyz.xenondevs.nova.addon.AddonLogger
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
@@ -24,16 +25,16 @@ import java.util.logging.Level
 private const val CENTRAL_REPO = "https://repo1.maven.org/maven2/"
 private val LIBRARIES_DIR = File("libraries")
 
-internal class AddonLibraryLoader(private val loader: AddonLoader) {
+internal class AddonLibraryLoader(private val loaders: List<AddonLoader>) {
     
-    private val logger = loader.logger
+    private val logger = AddonLogger(loaders.joinToString { it.description.name })
     
     private lateinit var repoSystem: RepositorySystem
     private lateinit var session: DefaultRepositorySystemSession
     private lateinit var repositories: List<RemoteRepository>
     
     fun createClassLoader(): LibraryClassLoader? {
-        if (loader.description.libraries.isEmpty())
+        if (loaders.all { it.description.libraries.isEmpty() })
             return null
         
         setupConnection()
@@ -57,13 +58,13 @@ internal class AddonLibraryLoader(private val loader: AddonLoader) {
         
         repositories = repoSystem.newResolutionRepositories(
             session,
-            (loader.description.repositories + CENTRAL_REPO)
+            (loaders.flatMap { it.description.repositories } + CENTRAL_REPO)
                 .mapIndexed { idx, url -> RemoteRepository.Builder(idx.toString(), "default", url).build() }
         )
     }
     
     private fun loadLibraries(): List<URL> {
-        val libraries = loader.description.libraries
+        val libraries = loaders.flatMapTo(HashSet()) { it.description.libraries }
         logger.info("Loading ${libraries.size} libraries...")
         
         val request = CollectRequest(

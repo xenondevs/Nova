@@ -6,6 +6,7 @@ import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
+import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.world.chunkPos
 import java.util.*

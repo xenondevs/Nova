@@ -13,13 +13,16 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
+import xyz.xenondevs.nmsutils.network.ClientboundPlaceGhostRecipePacket
+import xyz.xenondevs.nmsutils.network.event.PacketEventManager
+import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.network.event.serverbound.PlaceRecipePacketEvent
 import xyz.xenondevs.nova.util.*
 import xyz.xenondevs.nova.util.data.clientsideCopy
 import xyz.xenondevs.nova.util.data.key
@@ -28,6 +31,7 @@ import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import kotlin.collections.flatMap
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 
 interface ItemTest {
@@ -114,6 +118,7 @@ object RecipeManager : Initializable(), Listener {
     override fun init() {
         LOGGER.info("Loading recipes")
         Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
+        PacketEventManager.registerListener(this)
         loadRecipes()
     }
     
@@ -219,8 +224,8 @@ object RecipeManager : Initializable(), Listener {
         }
     }
     
-    @EventHandler
-    private fun handleRecipePlace(event: PlaceRecipePacketEvent) {
+    @PacketHandler
+    private fun handleRecipePlace(event: ServerboundPlaceRecipePacketEvent) {
         val key = NamespacedKey.fromString(event.packet.recipe.toString())
         if (key in shapedRecipes) {
             runTask { fillCraftingInventory(event.player, shapedRecipes[key]!!) }

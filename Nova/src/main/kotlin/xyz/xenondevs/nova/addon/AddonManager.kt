@@ -3,10 +3,12 @@ package xyz.xenondevs.nova.addon
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.loader.AddonLoader
+import xyz.xenondevs.nova.addon.loader.LibraryLoaderPools
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationException
 import java.io.File
 import java.util.logging.Level
 
@@ -66,11 +68,16 @@ object AddonManager {
                         return@forEach
                     }
                     
+                    if (id in loaders)
+                        throw InitializationException("Duplicate addon id $id for ${loader.file} and ${loaders[id]!!.file}")
+                    
                     loader.logger.info("Loaded ${getAddonString(description)}")
-                    loaders[id] = AddonLoader(it)
+                    loaders[id] = loader
                 }
+            } catch (i: InitializationException) {
+                throw InitializationException("Could not load addon ${it.name}: ${i.message}")
             } catch (t: Throwable) {
-                LOGGER.log(Level.SEVERE, "An exception occurred trying to load ${it.name} (Is it up to date?)", t)
+                throw AddonLoadException(it, t)
             }
         }
         
@@ -78,15 +85,15 @@ object AddonManager {
     }
     
     internal fun initializeAddons() {
+        LibraryLoaderPools.init(loaders.values)
         loaders.values.sortedBy { it.description }.forEach { loader ->
             val description = loader.description
             loader.logger.info("Initializing ${getAddonString(description)}")
             
             val missingDependencies = loader.description.depend.filter { it !in loaders.keys }
             if (missingDependencies.isNotEmpty()) {
-                loader.logger.log(Level.SEVERE, "Failed to initialize ${getAddonString(description)}: Missing addon(s): " +
+                throw InitializationException("Failed to initialize ${getAddonString(description)}: Missing addon(s): " +
                     missingDependencies.joinToString { "[$it]" })
-                return@forEach
             }
             
             try {
@@ -95,7 +102,7 @@ object AddonManager {
                 addons[addon.description.id] = addon
                 addon.init()
             } catch (t: Throwable) {
-                loader.logger.log(Level.SEVERE, "An exception occurred trying to initialize ${getAddonString(description)} (Is it up to date?)", t)
+                throw AddonInitializeException(loader, t)
             }
         }
     }
@@ -123,9 +130,6 @@ object AddonManager {
         }
     }
     
-    private fun getAddonString(description: AddonDescription) =
-        "${description.name} [${description.id}] v${description.version}"
-    
     private fun generateAddonsHashCode() {
         var result = NOVA.version.hashCode()
         loaders.values.forEach {
@@ -138,3 +142,16 @@ object AddonManager {
     }
     
 }
+
+private fun getAddonString(description: AddonDescription) =
+    "${description.name} [${description.id}] v${description.version}"
+
+private class AddonLoadException(file: File, t: Throwable) : Exception(
+    "An exception occurred trying to load ${file.name}. (Is it up to date?)",
+    t
+)
+
+private class AddonInitializeException(loader: AddonLoader, t: Throwable) : Exception(
+    "An exception occurred trying to initialize ${getAddonString(loader.description)}. (Is it up to date?)",
+    t
+)

@@ -10,21 +10,21 @@ import xyz.xenondevs.nova.integration.InternalIntegration
 internal interface CustomItemService : InternalIntegration {
     
     /**
-     * If this [CustomItemService] requires the Nova initialization to be delayed
+     * Blocks the thread until this [CustomItemService] has been loaded.
      */
-    val requiresLoadDelay: Boolean
+    fun awaitLoad() = Unit
     
     /**
      * Remove a block from the world without handling drops
      * @return If the block was from this [CustomItemService] and has been removed successfully
      */
-    fun removeBlock(block: Block, playEffects: Boolean): Boolean
+    fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean
     
     /**
      * Breaks a block from this [CustomItemService]
      * @return the drops or null if the block isn't from this [CustomItemService]
      */
-    fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>?
+    fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>?
     
     /**
      * Places an item from this [CustomItemService]
@@ -32,7 +32,7 @@ internal interface CustomItemService : InternalIntegration {
      * @return If the item is a block from this [CustomItemService] and has been placed
      * successfully
      */
-    fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean
+    fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean
     
     /**
      * Gets all drops of a block from this [CustomItemService]

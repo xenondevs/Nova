@@ -1,8 +1,10 @@
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
+
 package xyz.xenondevs.nova.util.reflection
 
 import com.google.gson.reflect.TypeToken
+import jdk.internal.misc.Unsafe
 import org.bukkit.Bukkit
-import org.checkerframework.checker.units.qual.K
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CALLABLE_REFERENCE_RECEIVER_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.K_PROPERTY_1_GET_DELEGATE_METHOD
@@ -95,6 +97,12 @@ object ReflectionUtils {
         return method
     }
     
+    fun getMethodByName(clazz: Class<*>, declared: Boolean, methodName: String): Method {
+        val method = if (declared) clazz.declaredMethods.first { it.name == methodName } else clazz.methods.first { it.name == methodName }
+        if (declared) method.isAccessible = true
+        return method
+    }
+    
     fun <C> getConstructor(clazz: Class<C>, declared: Boolean, vararg args: Class<*>): Constructor<C> {
         val constructor = if (declared) clazz.getDeclaredConstructor(*args) else clazz.getConstructor(*args)
         if (declared) constructor.isAccessible = true
@@ -105,6 +113,19 @@ object ReflectionUtils {
         val field = if (declared) clazz.getDeclaredField(name) else clazz.getField(name)
         if (declared) field.isAccessible = true
         return field
+    }
+    
+    internal fun setFinalField(field: Field, obj: Any, value: Any?) {
+        val unsafe = Unsafe.getUnsafe()
+        val offset = unsafe.objectFieldOffset(field)
+        unsafe.putReference(obj, offset, value)
+    }
+    
+    internal fun setStaticFinalField(field: Field, value: Any?) {
+        val unsafe = Unsafe.getUnsafe()
+        val base = unsafe.staticFieldBase(field)
+        val offset = unsafe.staticFieldOffset(field)
+        unsafe.putReference(base, offset, value)
     }
     
 }

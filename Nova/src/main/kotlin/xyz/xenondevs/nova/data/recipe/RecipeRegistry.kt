@@ -41,12 +41,11 @@ object RecipeRegistry : Initializable() {
     }
     
     override fun init() {
-        LOGGER.info("Initializing RecipeRegistry")
+        LOGGER.info("Indexing recipes")
         BUKKIT_RECIPES = loadBukkitRecipes()
         CREATION_RECIPES = loadCreationRecipes()
         USAGE_RECIPES = loadUsageRecipes()
         RECIPES_BY_TYPE = loadRecipesByGroup()
-        LOGGER.info("Finished initializing RecipeRegistry")
     }
     
     private fun loadBukkitRecipes(): List<Recipe> {

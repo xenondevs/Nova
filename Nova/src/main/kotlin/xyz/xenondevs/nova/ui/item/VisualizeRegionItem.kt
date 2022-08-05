@@ -8,7 +8,6 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.material.CoreGUIMaterial
-import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
@@ -23,8 +22,8 @@ class VisualizeRegionItem(
             override fun get() = null
             override fun getFor(playerUUID: UUID): ItemStack {
                 val visible = VisualRegion.isVisible(playerUUID, regionUUID)
-                return (if (visible) CoreGUIMaterial.AREA_BTN_ON.createBasicItemBuilder().setLocalizedName("menu.nova.visual_region.hide")
-                else CoreGUIMaterial.AREA_BTN_OFF.createBasicItemBuilder().setLocalizedName("menu.nova.visual_region.show")).getFor(playerUUID)
+                return (if (visible) CoreGUIMaterial.AREA_BTN_ON.clientsideProvider
+                else CoreGUIMaterial.AREA_BTN_OFF.clientsideProvider).get()
             }
         }
     

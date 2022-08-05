@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.material.clientsideDurability
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.item.retrieveData
+import xyz.xenondevs.nova.util.item.retrieveDataOrNull
 import xyz.xenondevs.nova.util.item.storeData
 
 private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy")
@@ -21,7 +21,7 @@ class Chargeable(
     val maxEnergy by maxEnergy
     
     fun getEnergy(itemStack: ItemStack) : Long {
-        val currentEnergy = itemStack.retrieveData(ENERGY_KEY) ?: 0L
+        val currentEnergy = itemStack.retrieveDataOrNull(ENERGY_KEY) ?: 0L
         if (currentEnergy > maxEnergy) {
             setEnergy(itemStack, maxEnergy)
             return maxEnergy

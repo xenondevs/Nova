@@ -78,7 +78,7 @@ fun <E> Collection<E>.searchFor(query: String, getString: (E) -> String): List<E
 @Suppress("NOTHING_TO_INLINE")
 inline fun List<Item>.notifyWindows(): Unit = forEach(Item::notifyWindows)
 
-fun <T> Array<T?>.getOrSet(index: Int, lazyValue: () -> T): T {
+inline fun <T> Array<T?>.getOrSet(index: Int, lazyValue: () -> T): T {
     var value = get(index)
     if (value == null) {
         value = lazyValue()
@@ -174,11 +174,19 @@ fun <K, V> LinkedHashMap<K, V>.poll(): Map.Entry<K, V>? {
     return entries.pollFirst()
 }
 
-inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
+inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { transform(get(it)) }
 }
 
-inline fun <T, reified R> Array<T>.mapToArray(transform: (T) -> R): Array<R> {
+inline fun <T> Array<T>.mapToIntArray(transform: (T) -> Int): IntArray {
+    return IntArray(size) { transform(get(it)) }
+}
+
+inline fun <T> Array<T>.mapToBooleanArray(transform: (T) -> Boolean): BooleanArray {
+    return BooleanArray(size) { transform(get(it)) }
+}
+
+inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
     return Array(size) { transform(get(it)) }
 }
 
@@ -186,4 +194,20 @@ inline fun <T> List<T>.mapToIntArray(transform: (T) -> Int): IntArray {
     return IntArray(size) { transform(get(it)) }
 }
 
+inline fun <T> List<T>.mapToBooleanArray(transform: (T) -> Boolean): BooleanArray {
+    return BooleanArray(size) { transform(get(it)) }
+}
+
 fun <K, V> treeMapOf(vararg pairs: Pair<K, V>) = TreeMap<K, V>().apply { putAll(pairs) }
+
+inline fun <T, R> Iterable<T>.flatMap(transform: (T) -> Array<R>): List<R> {
+    return flatMapTo(ArrayList<R>(), transform)
+}
+
+inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(destination: C, transform: (T) -> Array<R>): C {
+    for (element in this) {
+        val list = transform(element)
+        destination.addAll(list)
+    }
+    return destination
+}

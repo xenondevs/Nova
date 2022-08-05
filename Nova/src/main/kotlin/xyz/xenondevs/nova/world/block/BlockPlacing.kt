@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -56,7 +57,7 @@ internal object BlockPlacing : Listener {
                 if (material is BlockNovaMaterial) {
                     placeNovaBlock(event, material)
                 } else if (
-                    WorldDataManager.getBlockState(block.pos) != null // the block placed against is from Nova
+                    BlockManager.hasBlock(block.pos) // the block placed against is from Nova
                     && block.type.isReplaceable() // and will be replaced without special behavior
                     && material == null
                     && handItem?.type?.isBlock == true // a vanilla block material is used 
@@ -71,7 +72,12 @@ internal object BlockPlacing : Listener {
         val player = event.player
         val handItem = event.item!!
         val playerLocation = player.location
-        val placeLoc = event.clickedBlock!!.location.advance(event.blockFace)
+        
+        val clicked = event.clickedBlock!!
+        val placeLoc: Location =
+            if (clicked.type.isReplaceable() && !BlockManager.hasBlock(clicked.pos))
+                clicked.location
+            else clicked.location.advance(event.blockFace)
         
         val placeFuture = if (material.placeCheck != null) {
             CombinedBooleanFuture(

@@ -4,13 +4,15 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
-import xyz.xenondevs.nova.data.world.block.property.Directional
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.behavior.Consumable
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.TileEntityBlock
-import xyz.xenondevs.nova.world.block.model.ArmorStandModelProvider
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
 
 object NovaMaterialRegistry : INovaMaterialRegistry {
@@ -35,18 +37,53 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         placeCheck: PlaceCheckFun? = null,
         multiBlockLoader: MultiBlockLoader? = null,
         isInteractive: Boolean = true,
-        properties: List<BlockPropertyType<*>> = listOf(Directional)
+        properties: List<BlockPropertyType<*>> = emptyList()
+    ): TileEntityNovaMaterial {
+        return registerTileEntity(
+            addon, name, options, tileEntityConstructor, NovaItem(TileEntityItemBehavior),
+            if (isInteractive) TileEntityBlock.INTERACTIVE else TileEntityBlock.NON_INTERACTIVE,
+            properties, placeCheck, multiBlockLoader
+        )
+    }
+    
+    fun registerTileEntity(
+        addon: Addon,
+        name: String,
+        options: BlockOptions,
+        tileEntityConstructor: TileEntityConstructor,
+        item: NovaItem = NovaItem(),
+        block: NovaBlock<NovaTileEntityState>,
+        properties: List<BlockPropertyType<*>> = emptyList(),
+        placeCheck: PlaceCheckFun? = null,
+        multiBlockLoader: MultiBlockLoader? = null
     ): TileEntityNovaMaterial {
         val namespace = addon.description.id
         val material = TileEntityNovaMaterial(
-            NamespacedId(namespace, name), "block.$namespace.$name", NovaItem(TileEntityItemBehavior),
-            if (isInteractive) TileEntityBlock.INTERACTIVE else TileEntityBlock.NON_INTERACTIVE,
-            options, tileEntityConstructor, ArmorStandModelProvider, properties, placeCheck, multiBlockLoader
+            NamespacedId(namespace, name), "block.$namespace.$name", item, block,
+            options, tileEntityConstructor, properties, placeCheck, multiBlockLoader
         )
         return register(material)
     }
     
-    fun registerItem(addon: Addon, name: String, localizedName: String = "", novaItem: NovaItem?): ItemNovaMaterial {
+    fun registerBlock(
+        addon: Addon,
+        name: String,
+        options: BlockOptions,
+        item: NovaItem = NovaItem(),
+        block: NovaBlock<NovaBlockState> = NovaBlock.Default,
+        properties: List<BlockPropertyType<*>> = emptyList(),
+        placeCheck: PlaceCheckFun? = null,
+        multiBlockLoader: MultiBlockLoader? = null
+    ): BlockNovaMaterial {
+        val namespace = addon.description.id
+        val material = BlockNovaMaterial(
+            NamespacedId(namespace, name), "block.$namespace.$name", item, block,
+            options, properties, placeCheck, multiBlockLoader
+        )
+        return register(material)
+    }
+    
+    fun registerItem(addon: Addon, name: String, localizedName: String = "", novaItem: NovaItem = NovaItem()): ItemNovaMaterial {
         return register(ItemNovaMaterial(NamespacedId(addon.description.id, name), localizedName, novaItem))
     }
     
@@ -54,11 +91,11 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(ItemNovaMaterial(
             NamespacedId(addon.description.id, name),
             localizedName,
-            itemBehaviors.takeUnless(Array<*>::isEmpty)?.let(::NovaItem)
+            NovaItem(*itemBehaviors)
         ))
     }
     
-    fun registerDefaultItem(addon: Addon, name: String, novaItem: NovaItem?): ItemNovaMaterial {
+    fun registerDefaultItem(addon: Addon, name: String, novaItem: NovaItem = NovaItem()): ItemNovaMaterial {
         val namespace = addon.description.id
         return register(ItemNovaMaterial(NamespacedId(addon.description.id, name), "item.$namespace.$name", novaItem))
     }
@@ -68,16 +105,16 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(ItemNovaMaterial(
             NamespacedId(namespace, name),
             "item.$namespace.$name",
-            itemBehaviors.takeUnless(Array<*>::isEmpty)?.let(::NovaItem)
+            NovaItem(*itemBehaviors)
         ))
     }
     
-    fun registerFood(addon: Addon, name: String, options: FoodOptions): FoodNovaMaterial {
+    fun registerFood(addon: Addon, name: String, options: FoodOptions): ItemNovaMaterial {
         val namespace = addon.description.id
-        return register(FoodNovaMaterial(
+        return register(ItemNovaMaterial(
             NamespacedId(namespace, name),
             "item.$namespace.$name",
-            options
+            NovaItem(Consumable(options))
         ))
     }
     
@@ -85,7 +122,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(ItemNovaMaterial(
             NamespacedId("nova", name),
             "item.nova.$name",
-            itemBehaviors.takeUnless(Array<*>::isEmpty)?.let(::NovaItem)
+            NovaItem(*itemBehaviors)
         ))
     }
     
@@ -93,7 +130,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(ItemNovaMaterial(
             NamespacedId("nova", name),
             localizedName,
-            itemBehaviors.takeUnless(Array<*>::isEmpty)?.let(::NovaItem)
+            NovaItem(*itemBehaviors)
         ))
     }
     

@@ -12,6 +12,7 @@ import net.md_5.bungee.api.chat.hover.content.Text
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.*
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -19,7 +20,6 @@ import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.AdvancedTooltips
@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.util.data.ComponentUtils
@@ -40,6 +41,7 @@ import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DIST
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
 import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.pos
 
@@ -67,12 +69,16 @@ internal object NovaCommand : Command("nova") {
                     .executesCatching(::showTileEntityData))
                 .then(literal("reloadNetworks")
                     .executesCatching(::reloadNetworks))
-                .then(literal("energyNet")
-                    .executesCatching { toggleNetworkDebugging(NetworkType.ENERGY, it) })
-                .then(literal("itemNet")
-                    .executesCatching { toggleNetworkDebugging(NetworkType.ITEMS, it) })
-                .then(literal("fluidNet")
-                    .executesCatching { toggleNetworkDebugging(NetworkType.FLUID, it) }))
+                .then(literal("updateChunkSearchId")
+                    .executesCatching(::updateChunkSearchId))
+                .then(literal("showNetwork")
+                    .apply {
+                        NetworkTypeRegistry.types.forEach { type ->
+                            then(literal(type.id.toString())
+                                .executesCatching { toggleNetworkDebugging(it, type) })
+                        }
+                    }
+                ))
             .then(literal("items")
                 .requiresPlayerPermission("nova.command.items")
                 .executesCatching(::openItemInventory))
@@ -98,6 +104,11 @@ internal object NovaCommand : Command("nova") {
                     .executesCatching(::reloadConfigs))
                 .then(literal("recipes")
                     .executesCatching(::reloadRecipes)))
+    }
+    
+    private fun updateChunkSearchId(ctx: CommandContext<CommandSourceStack>) {
+        BlockBehaviorManager.updateChunkSearchId()
+        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.update_chunk_search_id.success"))
     }
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
@@ -199,7 +210,7 @@ internal object NovaCommand : Command("nova") {
         
         val location = player.getTargetBlockExact(8)?.location
         if (location != null) {
-            val tileEntity = TileEntityManager.getTileEntityAt(location, true)
+            val tileEntity = TileEntityManager.getTileEntity(location, true)
             if (tileEntity != null) {
                 sendSuccess(tileEntity.material.localizedName, tileEntity.data)
             } else {
@@ -211,7 +222,7 @@ internal object NovaCommand : Command("nova") {
         
     }
     
-    private fun toggleNetworkDebugging(type: NetworkType, ctx: CommandContext<CommandSourceStack>) {
+    private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType) {
         val player = ctx.player
         NetworkDebugger.toggleDebugger(type, player)
         

@@ -8,6 +8,7 @@ import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.serialization.json.*
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.world.loot.LootItem
@@ -31,9 +32,12 @@ val GSON: Gson =
         .registerTypeHierarchyAdapter<IntRange>(IntRangeSerialization)
         .registerTypeHierarchyAdapter<LootTable>(LootTableSerialization)
         .registerTypeHierarchyAdapter<LootItem>(LootItemSerialization)
+        .registerTypeHierarchyAdapter<BlockModelData>(BlockModelDataSerialization)
         .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
         .enableComplexMapKeySerialization()
         .create()
+
+fun File.parseJson(): JsonElement = reader().use(JsonParser::parseReader)
 
 fun JsonObject.hasString(property: String) =
     has(property) && this[property].isString()
@@ -73,6 +77,8 @@ fun JsonObject.getDouble(property: String, default: Double) = if (hasNumber(prop
 fun JsonObject.getFloat(property: String, default: Float) = if (hasNumber(property)) get(property).asFloat else default
 
 fun JsonObject.getBoolean(property: String, default: Boolean = false) = if (hasBoolean(property)) get(property).asBoolean else default
+
+fun JsonObject.getOrNull(property: String) = if (has(property)) get(property) else null
 
 inline fun <reified T> JsonObject.getDeserialized(property: String) = GSON.fromJson<T>(get(property))
 

@@ -48,13 +48,13 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     private var currentWindow: Window? = null
     
     private val openSearchItem = clickableItem(
-        CoreGUIMaterial.TP_SEARCH
-            .createBasicItemBuilder()
-            .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search-item")
+        CoreGUIMaterial.TP_SEARCH.createClientsideItemBuilder()
+            .setLocalizedName("menu.nova.items.search-item")
     ) { openSearchWindow() }
     
     private val openMainWindowItem = clickableItem(
-        CoreGUIMaterial.ARROW_1_UP.createBasicItemBuilder().setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
+        CoreGUIMaterial.ARROW_1_UP.createClientsideItemBuilder()
+            .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
     ) { openMainWindow() }
     
     private val tabPagesGUI = GUIBuilder(GUIType.PAGED_ITEMS)
@@ -101,7 +101,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         .addIngredient('s', openMainWindowItem)
         .build() as SimplePagedItemsGUI
     
-    private val textItem = AnvilTextItem(CoreGUIMaterial.INVISIBLE_ITEM.createBasicItemBuilder(), "")
+    private val textItem = AnvilTextItem(CoreGUIMaterial.INVISIBLE_ITEM.createClientsideItemBuilder(), "")
     
     private var filteredItems: List<Item>? = null
     private var filter = ""
@@ -164,7 +164,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             .apply {
                 setItem(0, textItem)
                 setItem(2, clickableItem(
-                    CoreGUIMaterial.X.createBasicItemBuilder().setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.clear")
+                    CoreGUIMaterial.X.createClientsideItemBuilder()
+                        .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.clear")
                 ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
             }
         
@@ -224,8 +225,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasPageBefore())
-                CoreGUIMaterial.TP_PIXEL_ARROW_LEFT_ON.itemProvider
-            else CoreGUIMaterial.TP_PIXEL_ARROW_LEFT_OFF.itemProvider
+                CoreGUIMaterial.TP_PIXEL_ARROW_LEFT_ON.clientsideProvider
+            else CoreGUIMaterial.TP_PIXEL_ARROW_LEFT_OFF.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -241,8 +242,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasNextPage())
-                CoreGUIMaterial.TP_PIXEL_ARROW_RIGHT_ON.itemProvider
-            else CoreGUIMaterial.TP_PIXEL_ARROW_RIGHT_OFF.itemProvider
+                CoreGUIMaterial.TP_PIXEL_ARROW_RIGHT_ON.clientsideProvider
+            else CoreGUIMaterial.TP_PIXEL_ARROW_RIGHT_OFF.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

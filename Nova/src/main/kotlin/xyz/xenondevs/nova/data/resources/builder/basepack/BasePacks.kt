@@ -6,6 +6,8 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
+import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
 import java.io.File
 import java.nio.file.Path
@@ -19,18 +21,17 @@ private val BASE_PACKS by configReloadable { DEFAULT_CONFIG.getStringList("resou
 
 internal class BasePacks {
     
-    private val mergers = listOf(
-        ModelFileMerger(this),
-        LangFileMerger(this),
-        FontFileMerger(this)
-    )
+    private val mergers = FileMerger.createMergers(this)
+    private val packs = BASE_PACKS + (ResourcePackBuilder.BASE_PACKS_DIR.listFiles() ?: emptyArray())
     
+    val packAmount = packs.size
     val occupiedModelData = HashMap<Material, HashSet<Int>>()
+    val occupiedSolidIds = HashMap<BlockStateConfigType<*>, HashSet<Int>>()
     
     fun include() {
-        BASE_PACKS.map {
-            if (it.isFile) {
-                val dir = File(ResourcePackBuilder.BASE_PACKS_DIR, it.nameWithoutExtension + StringUtils.randomString(10))
+        packs.map {
+            if (it.isFile && it.extension.equals("zip", true)) {
+                val dir = File(ResourcePackBuilder.TEMP_BASE_PACKS_DIR, it.nameWithoutExtension + StringUtils.randomString(10))
                 dir.mkdirs()
                 ZipFile(it).extractAll(dir.absolutePath)
                 
@@ -55,6 +56,7 @@ internal class BasePacks {
                 val relPath = Path.of(relStr)
                 val packFile = File(ResourcePackBuilder.PACK_DIR, relStr)
                 
+                packFile.parentFile.mkdirs()
                 val fileMerger = mergers.firstOrNull { relPath.startsWith(it.path) }
                 if (fileMerger != null) {
                     fileMerger.merge(file, packFile)

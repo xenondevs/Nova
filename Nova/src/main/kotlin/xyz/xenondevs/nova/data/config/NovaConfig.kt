@@ -2,12 +2,14 @@ package xyz.xenondevs.nova.data.config
 
 import org.bukkit.configuration.file.YamlConfiguration
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.player.PlayerFreezer
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -17,6 +19,7 @@ import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
+import java.io.File
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -82,6 +85,7 @@ object NovaConfig : Initializable() {
         TileEntityLimits.reload()
         ChunkReloadWatcher.reload()
         UpdateReminder.reload()
+        PlayerFreezer.reload()
     }
     
     operator fun get(name: String): YamlConfiguration =
@@ -89,6 +93,10 @@ object NovaConfig : Initializable() {
     
     operator fun get(material: ItemNovaMaterial): YamlConfiguration =
         configs[material.id.toString()]!!
+    
+    fun save(name: String) {
+        configs[name]!!.save(File(NOVA.dataFolder, "configs/$name.yml"))
+    }
     
 }
 

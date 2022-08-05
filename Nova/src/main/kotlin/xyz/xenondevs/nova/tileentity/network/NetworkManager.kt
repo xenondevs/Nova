@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
+import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -9,7 +10,9 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
+import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -17,8 +20,17 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.util.*
-import xyz.xenondevs.nova.util.concurrent.*
+import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
+import xyz.xenondevs.nova.util.concurrent.ObservableLock
+import xyz.xenondevs.nova.util.concurrent.lockAndRun
+import xyz.xenondevs.nova.util.concurrent.mapToAllFuture
+import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
+import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.filterIsInstanceValues
+import xyz.xenondevs.nova.util.flatMap
+import xyz.xenondevs.nova.util.pollFirst
+import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
@@ -111,17 +123,18 @@ interface NetworkManager {
         }
         
         override val inMainThread = true
-        override val dependsOn = emptySet<Initializable>()
+        override val dependsOn = setOf(LegacyFileConverter)
         
         override fun init() {
-            LOGGER.info("Initializing NetworkManager")
+            LOGGER.info("Starting network threads")
             NETWORK_MANAGER.init()
             Bukkit.getPluginManager().registerEvents(this, NOVA)
         }
-    
+        
         override fun disable() {
             LOGGER.info("Unloading networks")
-            Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.forEach { unloadChunk(it.pos) }
+            PermanentStorage.store("legacyNetworkChunks", NETWORK_MANAGER.legacyNetworkChunks)
+            Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach { unloadChunk(it.pos) }
         }
         
         @EventHandler(priority = EventPriority.HIGHEST)
@@ -151,6 +164,8 @@ private class NetworkManagerImpl : NetworkManager {
     override val networks = ArrayList<Network>()
     val networksById = HashMap<UUID, Network>()
     val nodesById = HashMap<UUID, NetworkNode>()
+    
+    val legacyNetworkChunks: HashSet<ChunkPos> by lazy { PermanentStorage.retrieve("legacyNetworkChunks") { hashSetOf() } }
     
     fun init() {
         runTaskTimer(0, 1) {
@@ -225,7 +240,7 @@ private class NetworkManagerImpl : NetworkManager {
     }
     
     override fun reloadNetworks() {
-        val chunks = Bukkit.getWorlds().flatMap { it.loadedChunks.asList() }.map(Chunk::pos)
+        val chunks = Bukkit.getWorlds().flatMap(World::getLoadedChunks).map(Chunk::pos)
         chunks.forEach { unloadChunk(it, true) }
         networks.clear()
         chunks.forEach { loadChunk(it, true) }
@@ -234,8 +249,9 @@ private class NetworkManagerImpl : NetworkManager {
     private fun loadChunk(pos: ChunkPos, loadNodesIndividually: Boolean = false) {
         val nodes = getNodesInChunk(pos)
         
-        if (loadNodesIndividually) {
+        if (loadNodesIndividually || pos in legacyNetworkChunks) {
             loadNodesIndividually(nodes)
+            legacyNetworkChunks -= pos
             return
         }
         
@@ -758,7 +774,7 @@ private class NetworkManagerImpl : NetworkManager {
                 
                 unexploredNodes = newUnexploredNodes
             }
-    
+            
             // prevent networks that are only made up of one end point and nothing else
             if (connectedNodeFaces.size > 1 || connectedNodeFaces.first().second is NetworkBridge) {
                 previouslyExploredBridges += exploredBridges

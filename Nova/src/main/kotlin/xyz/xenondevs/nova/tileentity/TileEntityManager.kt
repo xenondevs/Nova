@@ -47,23 +47,25 @@ object TileEntityManager : Initializable(), ITileEntityManager {
         }
     }
     
+    @Synchronized
     internal fun registerTileEntity(state: NovaTileEntityState) {
         tileEntityMap.getOrPut(state.pos.chunkPos) { HashMap() }[state.pos] = state.tileEntity
     }
     
+    @Synchronized
     internal fun unregisterTileEntity(state: NovaTileEntityState) {
         tileEntityMap[state.pos.chunkPos]?.remove(state.pos)
     }
     
-    override fun getTileEntityAt(location: Location): TileEntity? {
-        return getTileEntityAt(location, true)
+    override fun getTileEntity(location: Location): TileEntity? {
+        return getTileEntity(location, true)
     }
     
-    fun getTileEntityAt(location: Location, additionalHitboxes: Boolean): TileEntity? {
-        return getTileEntityAt(location.pos, additionalHitboxes)
+    fun getTileEntity(location: Location, additionalHitboxes: Boolean): TileEntity? {
+        return getTileEntity(location.pos, additionalHitboxes)
     }
     
-    fun getTileEntityAt(pos: BlockPos, additionalHitboxes: Boolean = true): TileEntity? {
+    fun getTileEntity(pos: BlockPos, additionalHitboxes: Boolean = true): TileEntity? {
         val blockState = BlockManager.getBlock(pos, additionalHitboxes)
         return if (blockState is NovaTileEntityState && blockState.isInitialized) blockState.tileEntity else null
     }

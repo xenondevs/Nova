@@ -7,18 +7,25 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.Chunk
+import org.bukkit.Location
+import org.bukkit.NamespacedKey
+import org.bukkit.OfflinePlayer
+import org.bukkit.Sound
+import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -28,7 +35,16 @@ import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.overlay.GUITexture
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.LocationUtils
+import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.center
+import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.nova.util.getYaw
+import xyz.xenondevs.nova.util.hasInventoryOpen
+import xyz.xenondevs.nova.util.salt
+import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
@@ -42,8 +58,11 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     companion object {
         val SELF_UPDATE_REASON = object : UpdateReason {}
-        val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
+        internal val LEGACY_TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
+        val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntityData")
     }
+    
+    override var legacyData: LegacyCompound? = blockState.legacyData
     
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid
@@ -64,7 +83,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val chunkPos: ChunkPos
         get() = pos.chunkPos
     val facing: BlockFace
-        get() = blockState.getProperty(Directional)?.facing ?: BlockFace.NORTH
+        get() = blockState.getProperty(Directional::class)?.facing ?: BlockFace.NORTH
     
     @Volatile
     var isValid: Boolean = true
@@ -72,8 +91,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     abstract val gui: Lazy<TileEntityGUI>?
     
-    private val multiModels = ArrayList<MultiModel>()
-    private val particleTasks = ArrayList<TileEntityParticleTask>()
+    internal val multiModels = ArrayList<MultiModel>()
+    internal val particleTasks = ArrayList<TileEntityParticleTask>()
     
     private val _inventories = HashMap<VirtualInventory, Boolean>()
     private val _fluidContainers = HashMap<NovaFluidContainer, Boolean>()
@@ -234,12 +253,22 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): FluidContainer {
         val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
         
-        val fluidData = retrieveOrNull<Compound>("fluidContainer.$uuid")
-        val storedAmount = fluidData?.get<Long>("amount")
-        val storedType = fluidData?.get<FluidType>("type")
+        val storedAmount: Long?
+        val storedType: FluidType?
+        
+        if (legacyData != null) {
+            val fluidData = retrieveDataOrNull<LegacyCompound>("fluidContainer.$uuid")
+            storedAmount = fluidData?.get<Long>("amount")
+            storedType = fluidData?.get<FluidType>("type")
+        } else {
+            val fluidData = retrieveDataOrNull<Compound>("fluidContainer.$uuid")
+            storedAmount = fluidData?.get<Long>("amount")
+            storedType = fluidData?.get<FluidType>("type")
+        }
         
         val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, storedAmount
             ?: defaultAmount, capacity, upgradeHolder)
+        
         updateHandler?.apply(container.updateHandlers::add)
         _fluidContainers[container] = global
         return container
@@ -288,7 +317,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      * visible for.
      */
     fun getViewers(): List<Player> =
-        FakeArmorStandManager.getViewersOf(chunkPos)
+        FakeArmorStandManager.getChunkViewers(chunkPos)
     
     /**
      * Gets the correct direction a block side.

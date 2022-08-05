@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.serialization.cbf.Compound
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
@@ -65,7 +64,7 @@ class NovaItemHolder(
 ) : ItemHolder {
     
     override val inventories: MutableMap<BlockFace, NetworkedInventory> =
-        (endPoint.retrieveOrNull<EnumMap<BlockFace, UUID>>("inventories") ?: defaultInvConfig())
+        (endPoint.retrieveDataOrNull<EnumMap<BlockFace, UUID>>("inventories") ?: defaultInvConfig())
             .mapValuesTo(enumMapOf()) { availableInventories[it.value]!! }
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
@@ -73,12 +72,10 @@ class NovaItemHolder(
             ?: { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.NONE } })
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveData<EnumMap<BlockFace, Compound>>("insertFilters") { emptyEnumMap() }
-            .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
+        endPoint.retrieveData<EnumMap<BlockFace, ItemFilter>>("insertFilters") { emptyEnumMap() }
     
     override val extractFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveData<EnumMap<BlockFace, Compound>>("extractFilters") { emptyEnumMap() }
-            .mapValuesTo(emptyEnumMap()) { ItemFilter(it.value) }
+        endPoint.retrieveData<EnumMap<BlockFace, ItemFilter>>("extractFilters") { emptyEnumMap() }
     
     override val insertPriorities: MutableMap<BlockFace, Int> =
         endPoint.retrieveData("insertPriorities") { CUBE_FACES.associateWithToEnumMap { 50 } }
@@ -100,8 +97,8 @@ class NovaItemHolder(
     
     override fun saveData() {
         endPoint.storeData("itemConfig", connectionConfig)
-        endPoint.storeData("insertFilters", insertFilters.mapValuesTo(emptyEnumMap()) { it.value.compound })
-        endPoint.storeData("extractFilters", extractFilters.mapValuesTo(emptyEnumMap()) { it.value.compound })
+        endPoint.storeData("insertFilters", insertFilters)
+        endPoint.storeData("extractFilters", extractFilters)
         endPoint.storeData("channels", channels)
         endPoint.storeData("insertPriorities", insertPriorities)
         endPoint.storeData("extractPriorities", extractPriorities)

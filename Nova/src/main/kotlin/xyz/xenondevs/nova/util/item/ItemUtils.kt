@@ -16,7 +16,11 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.recipe.*
+import xyz.xenondevs.nova.data.recipe.ComplexTest
+import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
+import xyz.xenondevs.nova.data.recipe.ModelDataTest
+import xyz.xenondevs.nova.data.recipe.NovaIdTest
+import xyz.xenondevs.nova.data.recipe.NovaNameTest
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -89,11 +93,16 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
 fun ItemStack.takeUnlessAir(): ItemStack? =
     if (type.isAir) null else this
 
-inline fun <reified K> ItemStack.retrieveData(key: NamespacedKey): K? {
+inline fun <reified K> ItemStack.retrieveData(key: NamespacedKey, getAlternative: () -> K): K {
+    val persistentDataContainer = itemMeta?.persistentDataContainer ?: return getAlternative()
+    return if (persistentDataContainer.has(key, PersistentDataType.BYTE_ARRAY)) persistentDataContainer.get(key)!! else getAlternative();
+}
+
+inline fun <reified K> ItemStack.retrieveDataOrNull(key: NamespacedKey): K? {
     return itemMeta?.persistentDataContainer?.get(key)
 }
 
-fun <T> ItemStack.retrieveData(key: NamespacedKey, persistentDataType: PersistentDataType<*, T>): T? {
+fun <T> ItemStack.retrieveDataOrNull(key: NamespacedKey, persistentDataType: PersistentDataType<*, T>): T? {
     return itemMeta?.persistentDataContainer?.get(key, persistentDataType)
 }
 
@@ -166,17 +175,19 @@ object ItemUtils {
                         val material = Material.valueOf(id.drop(10).uppercase())
                         return@map ModelDataTest(material, intArrayOf(0), ItemStack(material))
                     }
+                    
                     "nova" -> {
                         val name = id.substringAfter(':')
                         val novaMaterials = NovaMaterialRegistry.getNonNamespaced(name)
                         if (novaMaterials.isNotEmpty()) {
-                            return@map NovaNameTest(name, novaMaterials.map { it.itemProvider.get() })
+                            return@map NovaNameTest(name, novaMaterials.map { it.clientsideProvider.get() })
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
+                    
                     else -> {
                         val novaMaterial = NovaMaterialRegistry.getOrNull(id)
                         if (novaMaterial != null) {
-                            return@map NovaIdTest(id, novaMaterial.itemProvider.get())
+                            return@map NovaIdTest(id, novaMaterial.clientsideProvider.get())
                         } else {
                             return@map CustomItemServiceManager.getItemTest(id)!!
                         }
@@ -202,6 +213,7 @@ object ItemUtils {
                     if (basicClientSide) novaMaterial.item.createClientsideItemBuilder()
                     else novaMaterial.createItemBuilder()
                 }
+                
                 else -> {
                     val novaMaterial = NovaMaterialRegistry.getOrNull(id)
                     if (novaMaterial != null) {
@@ -215,7 +227,7 @@ object ItemUtils {
         }
     }
     
-    fun getItemAndLocalizedName(id: String, basic: Boolean = false): Pair<ItemStack, String> {
+    fun getItemAndLocalizedName(id: String): Pair<ItemStack, String> {
         val itemStack: ItemStack
         val localizedName: String
         
@@ -225,17 +237,19 @@ object ItemUtils {
                     itemStack = toItemStack(id)
                     localizedName = itemStack.type.localizedName!!
                 }
+                
                 "nova" -> {
                     val name = id.substringAfter(':')
                     val novaMaterial = NovaMaterialRegistry.getNonNamespaced(name).first()
                     itemStack = novaMaterial.createItemStack()
                     localizedName = novaMaterial.localizedName
                 }
+                
                 else -> {
                     val novaMaterial = NovaMaterialRegistry.getOrNull(id)
                     if (novaMaterial != null) {
                         localizedName = novaMaterial.localizedName
-                        itemStack = if (basic) novaMaterial.createBasicItemBuilder().get() else novaMaterial.createItemStack()
+                        itemStack = novaMaterial.createItemStack()
                     } else {
                         itemStack = CustomItemServiceManager.getItemByName(id)!!
                         localizedName = itemStack.displayName ?: ""

@@ -16,8 +16,6 @@ object ChunkLoadManager : Initializable() {
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
-        LOGGER.info("Initializing ChunkLoadManager")
-        
         Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false }
         forceLoadedChunks.removeIf { it.key.chunk?.apply { isForceLoaded = true } == null }
     }

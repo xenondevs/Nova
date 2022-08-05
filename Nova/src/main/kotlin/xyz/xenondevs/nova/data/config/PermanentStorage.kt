@@ -1,24 +1,23 @@
 package xyz.xenondevs.nova.data.config
 
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.fromJson
+import xyz.xenondevs.nova.util.data.parseJson
 import java.io.File
 
 internal object PermanentStorage {
     
-    private val file: File = File("${NOVA.dataFolder}/storage.do-not-edit").also { it.parentFile.mkdirs() }
+    private val file: File = File("plugins/Nova/storage.do-not-edit").also { it.parentFile.mkdirs() }
     val mainObj: JsonObject
     
     init {
-        val legacyFile = File("${NOVA.dataFolder}/storage.json")
+        val legacyFile = File("plugins/Nova/storage.json")
         if (!file.exists() && legacyFile.exists())
             legacyFile.renameTo(file)
         
         mainObj = if (file.exists())
-            JsonParser.parseReader(file.reader()).asJsonObject
+            file.parseJson() as JsonObject
         else JsonObject()
     }
     

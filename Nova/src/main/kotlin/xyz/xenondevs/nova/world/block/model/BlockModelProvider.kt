@@ -4,6 +4,8 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 
 sealed interface BlockModelProvider {
     
+    val currentSubId: Int
+    
     fun load(placed: Boolean)
     
     fun remove(broken: Boolean)

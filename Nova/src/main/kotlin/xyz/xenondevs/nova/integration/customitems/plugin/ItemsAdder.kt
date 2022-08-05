@@ -20,40 +20,47 @@ import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.playBreakEffects
+import java.util.concurrent.CompletableFuture
 
 internal object ItemsAdder : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("ItemsAdder") != null
-    override val requiresLoadDelay = true
+    private val loaded = CompletableFuture<Unit>()
     
     init {
         if (isInstalled) {
-            Bukkit.getPluginManager().registerEvents(
-                ItemsAdderLoadListener {
-                    CustomItemServiceManager.READY_LATCH.countDown()
-                },
-                NOVA
-            )
+            @Suppress("DEPRECATION")
+            if (ItemsAdder.areItemsLoaded()) {
+                loaded.complete(Unit)
+            } else {
+                Bukkit.getPluginManager().registerEvents(
+                    ItemsAdderLoadListener { loaded.complete(Unit) },
+                    NOVA
+                )
+            }
         }
     }
     
-    override fun removeBlock(block: Block, playEffects: Boolean): Boolean {
+    override fun awaitLoad() {
+        loaded.get()
+    }
+    
+    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
         val customBlock = CustomBlock.byAlreadyPlaced(block) ?: return false
-        if (playEffects) customBlock.playBreakEffect()
+        if (playSound || showParticles) customBlock.playBreakEffect()
         customBlock.remove()
         return true
     }
     
-    override fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
+    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
         if (customBlock != null) {
             val loot = customBlock.getLoot(tool, true)
-            if (playEffects) customBlock.playBreakEffect()
+            if (playSound || showParticles) customBlock.playBreakEffect()
             customBlock.remove()
             return loot
         }
@@ -61,7 +68,7 @@ internal object ItemsAdder : CustomItemService {
         val customCrop = CustomCrop.byAlreadyPlaced(block)
         if (customCrop != null) {
             val loot = customCrop.getLoot(tool)
-            if (playEffects) block.playBreakEffects()
+            if (playSound || showParticles) block.playBreakEffects()
             block.type = Material.AIR
             return loot
         }
@@ -82,7 +89,7 @@ internal object ItemsAdder : CustomItemService {
         return null
     }
     
-    override fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
+    override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
         // Note: CustomBlock.byItemStack(item) can't be used because of an illegal cast in the ItemsAdder API
         val customItem = CustomStack.byItemStack(item) ?: return false
         

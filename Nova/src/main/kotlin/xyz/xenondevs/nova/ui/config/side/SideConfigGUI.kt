@@ -76,21 +76,21 @@ class SideConfigGUI(
                     if (it.currentTab == 0)
                         CoreGUIMaterial.ENERGY_BTN_SELECTED
                     else CoreGUIMaterial.ENERGY_BTN_ON
-                } else CoreGUIMaterial.ENERGY_BTN_OFF).itemProvider
+                } else CoreGUIMaterial.ENERGY_BTN_OFF).clientsideProvider
             })
             .addIngredient('i', ClickyTabItem(1) {
                 (if (itemConfigGUI != null) {
                     if (it.currentTab == 1)
                         CoreGUIMaterial.ITEM_BTN_SELECTED
                     else CoreGUIMaterial.ITEM_BTN_ON
-                } else CoreGUIMaterial.ITEM_BTN_OFF).itemProvider
+                } else CoreGUIMaterial.ITEM_BTN_OFF).clientsideProvider
             })
             .addIngredient('f', ClickyTabItem(2) {
                 (if (fluidConfigGUI != null) {
                     if (it.currentTab == 2)
                         CoreGUIMaterial.FLUID_BTN_SELECTED
                     else CoreGUIMaterial.FLUID_BTN_ON
-                } else CoreGUIMaterial.FLUID_BTN_OFF).itemProvider
+                } else CoreGUIMaterial.FLUID_BTN_OFF).clientsideProvider
             })
             .setGUIs(listOf(energyConfigGUI, itemConfigGUI, fluidConfigGUI))
             .build()
@@ -102,7 +102,7 @@ class SideConfigGUI(
     
 }
 
-class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(CoreGUIMaterial.SIDE_CONFIG_BTN.itemProvider) {
+class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(CoreGUIMaterial.SIDE_CONFIG_BTN.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
@@ -111,7 +111,7 @@ class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(
     
 }
 
-class BackItem(private val openPrevious: (Player) -> Unit) : SimpleItem(CoreGUIMaterial.ARROW_1_LEFT.itemProvider) {
+class BackItem(private val openPrevious: (Player) -> Unit) : SimpleItem(CoreGUIMaterial.ARROW_1_LEFT.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         openPrevious(player)

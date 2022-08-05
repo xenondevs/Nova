@@ -5,9 +5,9 @@ import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
-import xyz.xenondevs.kadvancements.*
-import xyz.xenondevs.kadvancements.predicate.ItemPredicate
-import xyz.xenondevs.kadvancements.predicate.NbtPredicate
+import xyz.xenondevs.nmsutils.advancement.*
+import xyz.xenondevs.nmsutils.advancement.predicate.ItemPredicate
+import xyz.xenondevs.nmsutils.advancement.predicate.NbtPredicate
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 

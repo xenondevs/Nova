@@ -10,6 +10,7 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -101,21 +102,21 @@ val Block.sourceFluidType: FluidType?
  * Works for vanilla blocks, Nova blocks and blocks from custom item integrations.
  *
  * @param ctx The context to use
- * @param playEffects If effects such as sounds should be played
+ * @param playSound If the block placing sound should be played
  * @return If a block has been placed
  */
-fun Block.place(ctx: BlockPlaceContext, playEffects: Boolean = true): Boolean {
+fun Block.place(ctx: BlockPlaceContext, playSound: Boolean = true): Boolean {
     val item = ctx.item
     val novaMaterial = item.novaMaterial
     if (novaMaterial is BlockNovaMaterial) {
         if (novaMaterial is TileEntityNovaMaterial && !TileEntityLimits.canPlace(ctx).allowed)
             return false
         
-        BlockManager.placeBlock(novaMaterial, ctx, playEffects)
+        BlockManager.placeBlock(novaMaterial, ctx, playSound)
         return true
     }
     
-    if (CustomItemServiceManager.placeBlock(item, ctx.pos.location, playEffects))
+    if (CustomItemServiceManager.placeBlock(item, ctx.pos.location, playSound))
         return true
     
     if (item.type.isBlock) {
@@ -131,10 +132,10 @@ fun Block.place(ctx: BlockPlaceContext, playEffects: Boolean = true): Boolean {
  *
  * @param player The [Player] to be used for place checking
  * @param itemStack The [ItemStack] to be placed
- * @param playEffects If effects such as sounds should be played
+ * @param playSound If the block placing sound should be played
  * @return If the item could be placed
  */
-fun Block.placeVanilla(player: ServerPlayer, itemStack: ItemStack, playEffects: Boolean = true): Boolean {
+fun Block.placeVanilla(player: ServerPlayer, itemStack: ItemStack, playSound: Boolean = true): Boolean {
     val location = location
     val nmsStack = itemStack.nmsStack
     val blockItem = nmsStack.item as BlockItem
@@ -153,7 +154,7 @@ fun Block.placeVanilla(player: ServerPlayer, itemStack: ItemStack, playEffects: 
     
     if (result.consumesAction()) {
         setBlockEntityDataFromItemStack(itemStack)
-        if (playEffects) itemStack.type.playPlaceSoundEffect(location)
+        if (playSound) itemStack.type.playPlaceSoundEffect(location)
         return true
     }
     return false
@@ -186,15 +187,17 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
  * This method works for vanilla blocks, blocks from Nova and blocks from custom item integrations.
  *
  * @param ctx The [BlockBreakContext] to be used
- * @param playEffects If effects such as sounds and particles should be played
+ * @param playSound If block breaking sounds should be played
+ * @param showParticles If block break particles should be displayed
  */
-fun Block.remove(ctx: BlockBreakContext, playEffects: Boolean = true) {
-    if (CustomItemServiceManager.removeBlock(this, playEffects))
+fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true) {
+    if (CustomItemServiceManager.removeBlock(this, playSound, showParticles))
         return
-    if (BlockManager.removeBlock(ctx, playEffects))
+    if (BlockManager.removeBlock(ctx, playSound, showParticles))
         return
     
-    if (playEffects && GlobalValues.BLOCK_BREAK_EFFECTS) playBreakEffects()
+    if (playSound) playBreakSound()
+    if (showParticles && GlobalValues.BLOCK_BREAK_EFFECTS) showBreakParticles()
     getMainHalf().type = Material.AIR
 }
 
@@ -316,7 +319,7 @@ fun Block.sendDestructionPacket(entityId: Int, stage: Int) {
     val packet = ClientboundBlockDestructionPacket(entityId, location.blockPos, stage)
     
     chunk.getSurroundingChunks(1, true)
-        .flatMap { it.entities.toList() }
+        .flatMap(Chunk::getEntities)
         .filterIsInstance<Player>()
         .forEach { it.send(packet) }
 }

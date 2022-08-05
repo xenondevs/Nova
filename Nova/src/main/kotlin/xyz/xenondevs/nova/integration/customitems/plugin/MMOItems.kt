@@ -17,7 +17,6 @@ import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 internal object MMOItems : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("MMOItems") != null
-    override val requiresLoadDelay = false
     
     private lateinit var mmoItems: MMOItemsPlugin
     private lateinit var itemTypes: Collection<Type>
@@ -29,19 +28,19 @@ internal object MMOItems : CustomItemService {
         }
     }
     
-    override fun removeBlock(block: Block, playEffects: Boolean): Boolean {
+    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
         if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) return false
         block.type = Material.AIR
         return true
     }
     
-    override fun breakBlock(block: Block, tool: ItemStack?, playEffects: Boolean): List<ItemStack>? {
+    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
         val customBlock = mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null) ?: return null
         block.type = Material.AIR
         return listOf(customBlock.item)
     }
     
-    override fun placeBlock(item: ItemStack, location: Location, playEffects: Boolean): Boolean {
+    override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
         val block = location.block
         if (!mmoItems.customBlocks.isMushroomBlock(block.type)) {
             val nbtItem = NBTItem.get(item)

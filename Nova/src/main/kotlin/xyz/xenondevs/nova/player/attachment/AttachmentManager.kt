@@ -7,6 +7,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import xyz.xenondevs.nmsutils.network.event.PacketEventManager
+import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetPassengersPacketEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -14,11 +17,10 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.network.event.clientbound.SetPassengersPacketEvent
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
-private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments")
+private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments1")
 
 object AttachmentManager : Initializable(), Listener {
     
@@ -28,8 +30,8 @@ object AttachmentManager : Initializable(), Listener {
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()
     
     override fun init() {
-        LOGGER.info("Initializing AttachmentManager")
         Bukkit.getPluginManager().registerEvents(this, NOVA)
+        PacketEventManager.registerListener(this)
         Bukkit.getOnlinePlayers().forEach(::loadAttachments)
         runTaskTimer(0, 1) { activeAttachments.values.flatMap(Map<*, Attachment>::values).forEach(Attachment::handleTick) }
     }
@@ -71,8 +73,8 @@ object AttachmentManager : Initializable(), Listener {
         saveAndRemoveAttachments(event.player)
     }
     
-    @EventHandler
-    private fun handlePassengersSet(event: SetPassengersPacketEvent) {
+    @PacketHandler
+    private fun handlePassengersSet(event: ClientboundSetPassengersPacketEvent) {
         val attachments = (activeAttachments.entries.firstOrNull { it.key.entityId == event.vehicle } ?: return).value.values
         event.passengers += attachments.map(Attachment::entityId)
     }

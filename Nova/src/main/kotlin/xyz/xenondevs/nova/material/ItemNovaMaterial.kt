@@ -6,9 +6,9 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 
@@ -16,41 +16,41 @@ import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 open class ItemNovaMaterial internal constructor(
     final override val id: NamespacedId,
     val localizedName: String,
-    novaItem: NovaItem? = null,
+    val novaItem: NovaItem,
 ) : INovaMaterial {
     
-    val novaItem = novaItem ?: NovaItem()
-    val item: ModelData by lazy { Resources.getModelData(id).first!! }
+    val item: ItemModelData by lazy { Resources.getModelData(id).first!! }
     val maxStackSize: Int
         get() = item.material.maxStackSize
-    
-    val itemProviders: LazyArray<ItemProvider> by lazy {
-        LazyArray(item.dataArray.size) { ItemWrapper(this.novaItem.modifyItemBuilder(item.createItemBuilder(it)).get()) }
-    }
     
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            ItemWrapper(item.createClientsideItemBuilder(
-                this.novaItem.getName(itemStack),
-                null,
-                subId
-            ).get())
+            ItemWrapper(
+                item.createClientsideItemBuilder(
+                    this.novaItem.getName(itemStack),
+                    null,
+                    subId
+                ).get()
+            )
         }
     }
     
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
-            val itemStack = itemProvider.get()
-            ItemWrapper(this.novaItem.modifyItemBuilder(item.createClientsideItemBuilder(
-                this.novaItem.getName(itemStack),
-                this.novaItem.getLore(itemStack),
-                subId
-            )).get())
+            val itemStack = item.createItemBuilder(subId).get()
+            ItemWrapper(
+                this.novaItem.modifyItemBuilder(
+                    item.createClientsideItemBuilder(
+                        this.novaItem.getName(itemStack),
+                        this.novaItem.getLore(itemStack),
+                        subId
+                    )
+                ).get()
+            )
         }
     }
     
-    val itemProvider: ItemProvider by lazy { itemProviders[0] }
     val basicClientsideProvider: ItemProvider by lazy { basicClientsideProviders[0] }
     val clientsideProvider: ItemProvider by lazy { clientsideProviders[0] }
     
@@ -59,21 +59,15 @@ open class ItemNovaMaterial internal constructor(
     }
     
     /**
-     * Creates a basic [ItemBuilder][ItemBuilder] without any additional information
-     * like an energy bar added to the [ItemStack].
-     *
-     * Can be used for just previewing the item type or as a base in
-     * a `createItemBuilder` function for a [TileEntity].
-     */
-    fun createBasicItemBuilder(): ItemBuilder =
-        item.createItemBuilder()
-    
-    /**
-     * Creates an [ItemBuilder][ItemBuilder] for this [ItemNovaMaterial].
+     * Creates an [ItemBuilder] for this [ItemNovaMaterial].
      */
     fun createItemBuilder(): ItemBuilder =
-        novaItem.modifyItemBuilder(createBasicItemBuilder())
+        novaItem.modifyItemBuilder(item.createItemBuilder())
     
+     /**
+     * Creates a clientside [ItemBuilder] for this [ItemNovaMaterial].
+     * It does not have a display name, lore, or any special nbt data.
+     */
     fun createClientsideItemBuilder(): ItemBuilder =
         item.createClientsideItemBuilder()
     
