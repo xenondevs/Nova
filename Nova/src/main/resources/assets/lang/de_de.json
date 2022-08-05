@@ -84,7 +84,6 @@
   "item.nova.wrench.mode.nova.fluid": "Modus: Flüssigkeiten",
   "command.nova.network_debug.nova.fluid": "Debug-Ansicht für Flüssigkeits-Netzwerke umgeschaltet.",
   "item.nova.wrench.mode.nova.energy": "Modus: Energie",
-  "command.nova.network_debug.nova.items": "Debug-Ansicht für Item-Netzwerke umgeschaltet.",
   "command.nova.network_debug.nova.energy": "Debug-Ansicht für Energie-Netzwerke umgeschaltet.",
   "command.nova.resource_pack.create.start": "Ressourcenpaket wird erstellt... bitte warten",
   "menu.nova.items": "Items",

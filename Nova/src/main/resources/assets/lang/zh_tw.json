@@ -74,7 +74,6 @@
   "item.nova.wrench.mode.nova.items": "模式: 物品",
   "item.nova.wrench.mode.nova.fluid": "模式: 流體",
   "command.nova.network_debug.nova.energy": "切換能量網路的除錯模式",
-  "command.nova.network_debug.nova.items": "切換物品網路的除錯模式",
   "command.nova.network_debug.nova.fluid": "切換流體網路的除錯模式",
   "command.nova.addons.header": "附加套件 (%s): ",
   "command.nova.network_reload.success": "已重新載入所有網路",

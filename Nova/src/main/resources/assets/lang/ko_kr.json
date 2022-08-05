@@ -45,7 +45,6 @@
   "command.nova.recipe.no-recipe": "이 아이템에는 조합법이 없습니다.",
   "command.nova.reload_recipes.start": "조합법을 새로고치는 중...",
   "nova.tile_entity_limits.type_world_blacklist.deny": "이 세계에서는 이 블록을 설치할 수 없습니다.",
-  "command.nova.network_debug.nova.items": "아이템망에 대한 디버그 보기를 전환했습니다.",
   "command.nova.network_debug.nova.fluid": "유체망에 대한 디버그 보기를 전환했습니다.",
   "command.nova.network_debug.nova.energy": "에너지망에 대한 디버그 보기를 전환했습니다.",
   "menu.nova.visual_region.hide": "범위 숨기기",

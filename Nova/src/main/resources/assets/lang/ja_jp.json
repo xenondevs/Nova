@@ -28,7 +28,6 @@
   "item.nova.wrench.mode.nova.energy": "モード: エネルギー",
   "item.nova.wrench.mode.nova.items": "モード: アイテム",
   "item.nova.wrench.mode.nova.fluid": "モード: 液体",
-  "command.nova.network_debug.nova.items": "アイテムネットワークのデバッグ表示を切り替えました。",
   "command.nova.network_debug.nova.fluid": "液体ネットワークのデバッグ表示を切り替えました。",
   "command.nova.network_debug.nova.energy": "エネルギーネットワークのデバッグ表示を切り替えました。",
   "item.nova.wrench": "レンチ",

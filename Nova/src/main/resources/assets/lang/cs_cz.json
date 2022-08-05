@@ -83,7 +83,6 @@
   "item.nova.wrench.mode.nova.energy": "Režim: Energie",
   "item.nova.wrench.mode.nova.items": "Režim: Předměty",
   "item.nova.wrench.mode.nova.fluid": "Režím: Kapaliny",
-  "command.nova.network_debug.nova.items": "Zapnout režim ladění pro Sítě-Předmětů.",
   "command.nova.network_debug.nova.fluid": "Zapnout režim ladění pro Sítě-Kapaliny.",
   "command.nova.network_debug.nova.energy": "Zapnout režim ladění pro Energetické-Sítě.",
   "command.nova.resource_pack.create.success": "Resource pack byl vytvořen. Doporučujeme restartovat server.",
