@@ -257,11 +257,11 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         val storedType: FluidType?
         
         if (legacyData != null) {
-            val fluidData = retrieveOrNull<LegacyCompound>("fluidContainer.$uuid")
+            val fluidData = retrieveDataOrNull<LegacyCompound>("fluidContainer.$uuid")
             storedAmount = fluidData?.get<Long>("amount")
             storedType = fluidData?.get<FluidType>("type")
         } else {
-            val fluidData = retrieveOrNull<Compound>("fluidContainer.$uuid")
+            val fluidData = retrieveDataOrNull<Compound>("fluidContainer.$uuid")
             storedAmount = fluidData?.get<Long>("amount")
             storedType = fluidData?.get<FluidType>("type")
         }

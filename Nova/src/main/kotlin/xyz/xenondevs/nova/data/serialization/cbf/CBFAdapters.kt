@@ -9,7 +9,14 @@ import xyz.xenondevs.cbf.CBF.registerBinaryAdapter
 import xyz.xenondevs.cbf.CBF.registerBinaryHierarchyAdapter
 import xyz.xenondevs.cbf.adapter.NettyBufferProvider
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.serialization.cbf.adapter.*
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.ColorBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemFilterBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemStackBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.LocationBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedIdBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedKeyBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.NetworkTypeBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.VirtualInventoryBinaryAdapter
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import java.awt.Color

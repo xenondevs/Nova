@@ -60,7 +60,7 @@ class NovaFluidHolder(
 ) : FluidHolder {
     
     override val containerConfig: MutableMap<BlockFace, FluidContainer> =
-        (dataHolder.retrieveOrNull<EnumMap<BlockFace, UUID>>("fluidContainerConfig")
+        (dataHolder.retrieveDataOrNull<EnumMap<BlockFace, UUID>>("fluidContainerConfig")
             ?.mapValuesTo(emptyEnumMap()) { availableContainers[it.value] })
             ?: defaultContainerConfig()
     

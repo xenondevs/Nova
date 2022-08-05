@@ -21,19 +21,28 @@ abstract class DataHolder(includeGlobal: Boolean) {
     }
     
     /**
-     * Retrieves data from the data [LegacyCompound] of this TileEntity.
+     * Retrieves data from the data [Compound] of this TileEntity.
      * If it can't find anything under the given key, the result of the
      * [getAlternative] lambda is returned.
      */
     inline fun <reified T> retrieveData(key: String, getAlternative: () -> T): T {
-        return retrieveOrNull(key) ?: getAlternative()
+        return retrieveDataOrNull(key) ?: getAlternative()
     }
     
     /**
-     * Retrieves data using CBF deserialization from the data [LegacyCompound].
+     * Retrieves data using CBF deserialization from the data [Compound].
      * If neither [data] nor [globalData] contains the given key, ``null`` is returned
      */
+    @Deprecated("Inconsistent name", ReplaceWith("retrieveDataOrNull<T>(key)"))
     inline fun <reified T> retrieveOrNull(key: String): T? {
+        return retrieveDataOrNull(key)
+    }
+    
+    /**
+     * Retrieves data using CBF deserialization from the data [Compound].
+     * If neither [data] nor [globalData] contains the given key, ``null`` is returned
+     */
+    inline fun <reified T> retrieveDataOrNull(key: String): T? {
         if (legacyData != null)
             return legacyData!!.get<T>(key) ?: legacyGlobalData.get<T>(key)
         return data[key] ?: globalData[key]
