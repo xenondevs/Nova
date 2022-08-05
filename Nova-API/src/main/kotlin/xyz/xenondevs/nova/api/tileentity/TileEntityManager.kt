@@ -7,6 +7,12 @@ interface TileEntityManager {
     /**
      * Gets the [TileEntity] at that [location] or null if there isn't one
      */
-    fun getTileEntityAt(location: Location): TileEntity?
+    @Deprecated("Inconsistent name", replaceWith = ReplaceWith("getTileEntity"))
+    fun getTileEntityAt(location: Location): TileEntity? = getTileEntity(location)
+    
+    /**
+     * Gets the [TileEntity] at that [location] or null if there isn't one
+     */
+    fun getTileEntity(location: Location): TileEntity?
     
 }

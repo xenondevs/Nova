@@ -45,7 +45,7 @@ internal object WrenchBehavior : ItemBehavior() {
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK && !player.isSneaking) {
             val pos = event.clickedBlock!!.pos
-            val endPoint = (TileEntityManager.getTileEntityAt(pos) ?: VanillaTileEntityManager.getTileEntityAt(pos)) as? NetworkEndPoint
+            val endPoint = (TileEntityManager.getTileEntity(pos) ?: VanillaTileEntityManager.getTileEntityAt(pos)) as? NetworkEndPoint
             if (endPoint != null) {
                 val mode = itemStack.wrenchMode
                 val face = event.blockFace

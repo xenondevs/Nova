@@ -210,7 +210,7 @@ internal object NovaCommand : Command("nova") {
         
         val location = player.getTargetBlockExact(8)?.location
         if (location != null) {
-            val tileEntity = TileEntityManager.getTileEntityAt(location, true)
+            val tileEntity = TileEntityManager.getTileEntity(location, true)
             if (tileEntity != null) {
                 sendSuccess(tileEntity.material.localizedName, tileEntity.data)
             } else {
