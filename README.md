@@ -27,6 +27,7 @@ just focus in adding content to the game.
 * Custom blocks
   * Customizable break time, particles and sounds
   * Block break effect even on barrier blocks
+  * Solid blocks via noteblocks and mushroom blocks
 * TileEntity system
 * Attachment system
 * Ability system
@@ -40,7 +41,6 @@ just focus in adding content to the game.
 
 ## Planned features
 
-* Non-ArmorStand blocks
 * Armor with custom textures
 * Custom entities
 
