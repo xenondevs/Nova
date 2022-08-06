@@ -23,7 +23,9 @@ class NovaFluidContainer(
     }
     
     override fun reload() {
-        capacity = (baseCapacity * upgradeHolder!!.getValue(UpgradeType.FLUID)).toLong()
+        capacity = if (upgradeHolder != null)
+            (baseCapacity * upgradeHolder.getValue(UpgradeType.FLUID)).toLong()
+        else baseCapacity
     }
     
 }
