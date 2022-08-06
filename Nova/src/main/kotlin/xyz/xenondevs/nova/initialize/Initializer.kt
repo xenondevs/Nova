@@ -74,11 +74,9 @@ internal object Initializer : Listener {
     var isDone = false
         private set
     
-    init {
-        Bukkit.getPluginManager().registerEvents(this, NOVA)
-    }
-    
     fun init() {
+        Bukkit.getPluginManager().registerEvents(this, NOVA)
+        
         ReflectionUtils.setPlugin(NOVA)
         NMSUtilities.init(NOVA)
         NovaConfig.loadDefaultConfig()
