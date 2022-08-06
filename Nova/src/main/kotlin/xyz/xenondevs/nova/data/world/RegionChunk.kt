@@ -130,6 +130,7 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
                     state.tileEntity = tileEntity
                     tileEntity.multiModels.forEach(MultiModel::close)
                     tileEntity.particleTasks.forEach(TileEntityParticleTask::stop)
+                    runCatching { tileEntity.handleRemoved(true) }
                 } else {
                     state = VanillaTileEntityState(pos, type)
                     val legacyCompound = CBFLegacy.read<LegacyCompound>(buf)

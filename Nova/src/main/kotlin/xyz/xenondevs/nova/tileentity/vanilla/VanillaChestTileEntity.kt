@@ -29,14 +29,17 @@ internal class VanillaChestTileEntity internal constructor(blockState: VanillaTi
     init {
         setInventories()
         itemHolder = DynamicVanillaItemHolder(this, { inventories }, { allowedConnectionTypes })
-    
-        runTaskLaterSynchronized(VanillaTileEntityManager, 1) {
-            doubleChestLocation = getOtherChestLocation()
-            doubleChestLocation?.let {
-                val tileEntity = VanillaTileEntityManager.getTileEntityAt(it)
-                if (tileEntity is VanillaChestTileEntity) tileEntity.handleChestStateChange()
+        
+        if (isChunkLoaded) {
+            runTaskLaterSynchronized(VanillaTileEntityManager, 1) {
+                if (!isChunkLoaded) return@runTaskLaterSynchronized
+                doubleChestLocation = getOtherChestLocation()
+                doubleChestLocation?.let {
+                    val tileEntity = VanillaTileEntityManager.getTileEntityAt(it)
+                    if (tileEntity is VanillaChestTileEntity) tileEntity.handleChestStateChange()
+                }
+                handleChestStateChange()
             }
-            handleChestStateChange()
         }
     }
     

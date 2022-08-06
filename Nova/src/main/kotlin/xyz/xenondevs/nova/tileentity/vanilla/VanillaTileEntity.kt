@@ -18,6 +18,9 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
     val pos = blockState.pos
     val block = pos.block
     
+    val isChunkLoaded
+        get() = pos.chunkPos.isLoaded()
+    
     override var legacyData: LegacyCompound? = blockState.legacyData
     
     internal abstract fun handleInitialized()
@@ -29,7 +32,7 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
     internal open fun handleBlockUpdate() = Unit
     
     internal enum class Type(val id: String, val constructor: VanillaTileEntityConstructor) {
-    
+        
         CHEST("minecraft:chest", ::VanillaChestTileEntity),
         FURNACE("minecraft:furnace", ::VanillaFurnaceTileEntity),
         CONTAINER("minecraft:container", ::VanillaContainerTileEntity),

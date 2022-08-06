@@ -26,7 +26,7 @@ object TileEntityManager : Initializable(), ITileEntityManager {
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, TileEntity>>()
     val tileEntities: Sequence<TileEntity>
-        get() = tileEntityMap.asSequence().flatMap { it.value.values }
+        get() = tileEntityMap.asSequence().filter { it.key.isLoaded() }.flatMap { it.value.values }
     
     override fun init() {
         fun handleTick(tileEntity: TileEntity, tickHandler: (TileEntity) -> Unit) {

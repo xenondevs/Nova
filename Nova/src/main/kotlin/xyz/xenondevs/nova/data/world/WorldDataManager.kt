@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
@@ -29,7 +30,7 @@ import kotlin.concurrent.thread
 internal object WorldDataManager : Initializable(), Listener {
     
     override val inMainThread = true
-    override val dependsOn = setOf(AddonsInitializer, LegacyFileConverter, TileEntityManager, VanillaTileEntityManager)
+    override val dependsOn = setOf(AddonsInitializer, LegacyFileConverter, TileEntityManager, VanillaTileEntityManager, NetworkManager)
     
     private val worlds = HashMap<World, WorldDataStorage>()
     private val tasks = ConcurrentLinkedQueue<Task>() // TODO: Map RegionFile -> Queue
@@ -42,11 +43,15 @@ internal object WorldDataManager : Initializable(), Listener {
         thread(name = "Nova WorldDataManager", isDaemon = true) { // TODO: Use Phaser instead of Thread.sleep
             while (NOVA.isEnabled) {
                 while (tasks.isNotEmpty()) {
-                    when (val task = tasks.poll()) {
-                        is ChunkLoadTask -> loadChunk(task.pos)
-                        is ChunkUnloadTask -> unloadChunk(task.pos)
-                        is SaveWorldTask -> saveWorld(task.world)
-                        is WorldUnloadTask -> unloadWorld(task.world)
+                    try {
+                        when (val task = tasks.poll()) {
+                            is ChunkLoadTask -> loadChunk(task.pos)
+                            is ChunkUnloadTask -> unloadChunk(task.pos)
+                            is SaveWorldTask -> saveWorld(task.world)
+                            is WorldUnloadTask -> unloadWorld(task.world)
+                        }
+                    } catch (t: Throwable) {
+                        LOGGER.log(Level.SEVERE, "An exception occurred in a WorldDataManager task", t)
                     }
                 }
                 Thread.sleep(50)
@@ -68,8 +73,8 @@ internal object WorldDataManager : Initializable(), Listener {
                     ArrayList(blockStates.values).forEach { blockState ->
                         try {
                             blockState.handleInitialized(false)
-                        } catch (e: Exception) {
-                            LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", e)
+                        } catch (t: Throwable) {
+                            LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", t)
                             blockStates -= blockState.pos
                         }
                     }

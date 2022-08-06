@@ -25,8 +25,11 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
     }
     
     override fun handleRemoved(broken: Boolean) {
-        tileEntity.handleRemoved(!broken)
-        VanillaTileEntityManager.unregisterTileEntity(this)
+        // The tile entity could be null when the chunk was unloaded before the WorldDataManager could call handleInitialized
+        if (::tileEntity.isInitialized) {
+            tileEntity.handleRemoved(!broken)
+            VanillaTileEntityManager.unregisterTileEntity(this)
+        }
     }
     
     override fun read(buf: ByteBuffer) {
