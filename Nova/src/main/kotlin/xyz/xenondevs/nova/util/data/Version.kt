@@ -77,4 +77,8 @@ class VersionRange(val min: Version, val max: Version) : Comparable<VersionRange
         return this.min.compareTo(other.min)
     }
     
+    override fun toString(): String {
+        return "$min <= version <= $max"
+    }
+    
 }

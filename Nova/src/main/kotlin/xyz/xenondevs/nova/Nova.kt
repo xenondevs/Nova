@@ -21,7 +21,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
 
-private val REQUIRED_SERVER_VERSION = Version("1.19.1")
+private val REQUIRED_SERVER_VERSION = Version("1.19.1")..Version("1.19.2")
 
 lateinit var NOVA: Nova
 internal var IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
@@ -59,7 +59,7 @@ class Nova : JavaPlugin(), INova {
     
     private fun checkStartup(): Boolean {
         // prevent execution on unsupported minecraft versions
-        if (Version.SERVER_VERSION != REQUIRED_SERVER_VERSION) {
+        if (Version.SERVER_VERSION !in REQUIRED_SERVER_VERSION) {
             LOGGER.severe("Nova is not compatible with this version of Minecraft!")
             LOGGER.severe("Nova only runs on $REQUIRED_SERVER_VERSION.")
             Bukkit.getPluginManager().disablePlugin(this)
