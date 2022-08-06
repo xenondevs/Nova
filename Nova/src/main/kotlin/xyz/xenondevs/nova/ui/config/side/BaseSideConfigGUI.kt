@@ -55,6 +55,10 @@ internal abstract class BaseSideConfigGUI(
         }
     }
     
+    fun updateConfigItems(blockFace: BlockFace) {
+        configItems[blockFace]?.forEach(Item::notifyWindows)
+    }
+    
     inner class ConnectionConfigItem(blockSide: BlockSide) : ConfigItem(blockSide) {
         
         override fun getItemProvider(): ItemProvider {
@@ -68,6 +72,13 @@ internal abstract class BaseSideConfigGUI(
                 NetworkConnectionType.BUFFER ->
                     CoreGUIMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GREEN, "menu.nova.side_config.input_output")
             }.setDisplayName(getSideName(blockSide, blockFace))
+        }
+    
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            if (changeConnectionType(blockFace, clickType.isLeftClick)) {
+                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                updateConfigItems(blockFace)
+            }
         }
         
     }
@@ -83,13 +94,6 @@ internal abstract class BaseSideConfigGUI(
             this.blockFace = pair.second
             
             registerConfigItem(blockFace, this)
-        }
-        
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            if (changeConnectionType(blockFace, clickType.isLeftClick)) {
-                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
-                configItems[blockFace]?.forEach(Item::notifyWindows)
-            }
         }
         
     }

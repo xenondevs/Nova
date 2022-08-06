@@ -3,8 +3,11 @@ package xyz.xenondevs.nova.ui.config.side
 import de.studiocode.invui.gui.structure.Structure
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.builder.ItemBuilder
+import org.bukkit.Sound
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.util.BlockSide
 
@@ -40,6 +43,13 @@ internal abstract class InventorySideConfigGUI(
         
         override fun getItemProvider(): ItemProvider {
             return getInventoryButtonBuilder(blockFace).setDisplayName(getSideName(blockSide, blockFace))
+        }
+    
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            if (changeInventory(blockFace, clickType.isLeftClick)) {
+                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                updateConfigItems(blockFace)
+            }
         }
         
     }
