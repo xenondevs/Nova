@@ -520,6 +520,10 @@
                     <groupId>de.studiocode.invui</groupId>
                     <artifactId>IA-R10</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>de.studiocode.invui</groupId>
+                    <artifactId>IA-R11</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
