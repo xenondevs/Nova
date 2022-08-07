@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.write
 import java.io.File
 
@@ -33,6 +34,10 @@ internal object ResourcePackBuilder {
         File(RESOURCE_PACK_DIR, "asset_packs").deleteRecursively()
         File(RESOURCE_PACK_DIR, "pack").deleteRecursively()
         RESOURCE_PACK_BUILD_DIR.deleteRecursively()
+        
+        if (NOVA.lastVersion != null && NOVA.lastVersion!! < Version("0.10")) {
+            BASE_PACKS_DIR.delete()
+        }
         
         // create base packs folder
         BASE_PACKS_DIR.mkdirs()
