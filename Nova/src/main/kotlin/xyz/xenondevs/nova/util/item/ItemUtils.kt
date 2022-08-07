@@ -180,14 +180,14 @@ object ItemUtils {
                         val name = id.substringAfter(':')
                         val novaMaterials = NovaMaterialRegistry.getNonNamespaced(name)
                         if (novaMaterials.isNotEmpty()) {
-                            return@map NovaNameTest(name, novaMaterials.map { it.clientsideProvider.get() })
+                            return@map NovaNameTest(name, novaMaterials.map { it.createItemStack() })
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     
                     else -> {
                         val novaMaterial = NovaMaterialRegistry.getOrNull(id)
                         if (novaMaterial != null) {
-                            return@map NovaIdTest(id, novaMaterial.clientsideProvider.get())
+                            return@map NovaIdTest(id, novaMaterial.createItemStack())
                         } else {
                             return@map CustomItemServiceManager.getItemTest(id)!!
                         }
