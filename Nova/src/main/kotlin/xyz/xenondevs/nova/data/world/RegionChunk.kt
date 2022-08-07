@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.world
 
 import io.netty.buffer.ByteBuf
 import org.bukkit.World
+import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.adapter.NettyBufferProvider
 import xyz.xenondevs.cbf.buffer.ByteBuffer
@@ -19,11 +20,12 @@ import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.MultiModel
 import xyz.xenondevs.nova.tileentity.TileEntityParticleTask
-import xyz.xenondevs.nova.tileentity.vanilla.ItemStorageVanillaTileEntity
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.util.data.readUUID
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import java.util.*
 import java.util.logging.Level
 
 private val DELETE_UNKNOWN_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("world.delete_unknown_blocks") }
@@ -133,19 +135,54 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
                     runCatching { tileEntity.handleRemoved(true) }
                 } else {
                     state = VanillaTileEntityState(pos, type)
-                    val legacyCompound = CBFLegacy.read<LegacyCompound>(buf)
-                    state.data = Compound()
-                    state.legacyData = legacyCompound!!
-                    val tileEntity = VanillaTileEntity.of(state)!!
-                    state.tileEntity = tileEntity
-                    if (tileEntity is ItemStorageVanillaTileEntity)
-                        tileEntity.holders
+                    val legacyCompound = CBFLegacy.read<LegacyCompound>(buf)!!
+                    val compound = convertVTECompound(legacyCompound)
+                    state.data = compound
                 }
                 blockStates[pos] = state
             } catch (e: Exception) {
                 LOGGER.log(Level.SEVERE, "Failed to load block at $pos", e)
             }
         }
+    }
+    
+    private fun convertVTECompound(legacyCompound: LegacyCompound): Compound {
+        val compound = Compound()
+        
+        legacyCompound.get<Map<BlockFace, NetworkConnectionType>>("itemConfig")
+            ?.let { compound["itemConfig"] = it }
+        
+        legacyCompound.get<Map<BlockFace, ItemFilter>>("insertFilters")
+            ?.let { compound["insertFilters"] = it }
+        
+        legacyCompound.get<Map<BlockFace, ItemFilter>>("extractFilters")
+            ?.let { compound["extractFilters"] = it }
+        
+        legacyCompound.get<Map<BlockFace, Int>>("insertPriorities")
+            ?.let { compound["insertPriorities"] = it }
+        
+        legacyCompound.get<Map<BlockFace, Int>>("extractPriorities")
+            ?.let { compound["extractPriorities"] = it }
+        
+        legacyCompound.get<Map<BlockFace, Int>>("channels")
+            ?.let { compound["channels"] = it }
+        
+        legacyCompound.get<Map<BlockFace, NetworkConnectionType>>("fluidConnectionConfig")
+            ?.let { compound["fluidConnectionConfig"] = it }
+        
+        legacyCompound.get<Map<BlockFace, Int>>("fluidInsertPriorities")
+            ?.let { compound["fluidInsertPriorities"] = it }
+        
+        legacyCompound.get<Map<BlockFace, Int>>("fluidExtractPriorities")
+            ?.let { compound["fluidExtractPriorities"] = it }
+        
+        legacyCompound.get<Map<BlockFace, UUID>>("fluidContainerConfig")
+            ?.let { compound["fluidContainerConfig"] = it }
+        
+        legacyCompound.get<Map<BlockFace, Int>>("fluidChannels")
+            ?.let { compound["fluidChannels"] = it }
+        
+        return compound
     }
     
     // </editor-fold>

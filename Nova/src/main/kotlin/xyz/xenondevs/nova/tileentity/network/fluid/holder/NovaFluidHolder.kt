@@ -81,7 +81,7 @@ class NovaFluidHolder(
     }
     
     override fun saveData() {
-        dataHolder.storeData("channels", channels)
+        dataHolder.storeData("fluidChannels", channels)
         dataHolder.storeData("fluidConnectionConfig", connectionConfig)
         dataHolder.storeData("fluidInsertPriorities", insertPriorities)
         dataHolder.storeData("fluidExtractPriorities", extractPriorities)
