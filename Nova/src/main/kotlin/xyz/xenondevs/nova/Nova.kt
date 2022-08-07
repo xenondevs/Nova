@@ -24,12 +24,18 @@ import xyz.xenondevs.nova.api.Nova as INova
 private val REQUIRED_SERVER_VERSION = Version("1.19.1")..Version("1.19.2")
 
 lateinit var NOVA: Nova
+    private set
+
 internal var IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
+    private set
+
 internal val HTTP_CLIENT = HttpClient(CIO) {
     install(ContentNegotiation) { gson() }
     expectSuccess = false
 }
+
 internal lateinit var LOGGER: Logger
+    private set
 
 class Nova : JavaPlugin(), INova {
     
