@@ -42,7 +42,7 @@ internal abstract class InventorySideConfigGUI(
     private inner class InventoryConfigItem(blockSide: BlockSide) : ConfigItem(blockSide) {
         
         override fun getItemProvider(): ItemProvider {
-            return getInventoryButtonBuilder(blockFace).setDisplayName(getSideName(blockSide, blockFace))
+            return getInventoryButtonBuilder(blockFace).setDisplayName(*getSideName(blockSide, blockFace))
         }
     
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

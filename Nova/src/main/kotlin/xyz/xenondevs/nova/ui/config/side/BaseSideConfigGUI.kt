@@ -5,6 +5,8 @@ import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
@@ -42,16 +44,17 @@ internal abstract class BaseSideConfigGUI(
         else null to blockSide.blockFace
     }
     
-    fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): TranslatableComponent {
+    fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Array<BaseComponent> {
         return if (blockSide != null) {
-            localized(
-                ChatColor.GRAY,
-                "menu.nova.side_config.direction",
-                TranslatableComponent("menu.nova.side_config.${blockSide.name.lowercase()}"),
-                TranslatableComponent("menu.nova.side_config.${blockFace.name.lowercase()}")
-            )
+            ComponentBuilder()
+                .color(ChatColor.GRAY)
+                .append(TranslatableComponent("menu.nova.side_config.${blockSide.name.lowercase()}"))
+                .append(" (")
+                .append(TranslatableComponent("menu.nova.side_config.${blockFace.name.lowercase()}"))
+                .append(")")
+                .create()
         } else {
-            localized(ChatColor.GRAY, "menu.nova.side_config.${blockFace.name.lowercase()}")
+            arrayOf(localized(ChatColor.GRAY, "menu.nova.side_config.${blockFace.name.lowercase()}"))
         }
     }
     
@@ -71,7 +74,7 @@ internal abstract class BaseSideConfigGUI(
                     CoreGUIMaterial.BLUE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.AQUA, "menu.nova.side_config.input")
                 NetworkConnectionType.BUFFER ->
                     CoreGUIMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GREEN, "menu.nova.side_config.input_output")
-            }.setDisplayName(getSideName(blockSide, blockFace))
+            }.setDisplayName(*getSideName(blockSide, blockFace))
         }
     
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

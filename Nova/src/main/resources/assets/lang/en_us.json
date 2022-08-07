@@ -20,7 +20,6 @@
   "menu.nova.recipe.item_info": "Item Info",
   "menu.nova.recipe.time": "Time: %ss",
   "menu.nova.side_config": "Side Config",
-  "menu.nova.side_config.direction": "%s (%s)",
   "menu.nova.side_config.energy": "Energy",
   "menu.nova.side_config.items": "Items",
   "menu.nova.side_config.fluids": "Fluids",
