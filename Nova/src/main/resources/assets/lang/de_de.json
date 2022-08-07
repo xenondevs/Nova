@@ -94,7 +94,6 @@
   "command.nova.advanced_tooltips.true": "Erweiterte Schnellinfos aktiviert.",
   "command.nova.advanced_tooltips.false": "Erweiterte Schnellinfos deaktiviert.",
   "command.nova.update_chunk_search_id.success": "Chunk Such-Id aktualisiert.",
-  "menu.nova.side_config.direction": "%s (%s)",
   "menu.nova.side_config.north": "Norden",
   "menu.nova.side_config.east": "Osten",
   "menu.nova.side_config.south": "Süden",
