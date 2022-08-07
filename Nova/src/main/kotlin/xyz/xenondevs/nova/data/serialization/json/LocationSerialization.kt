@@ -1,6 +1,11 @@
 package xyz.xenondevs.nova.data.serialization.json
 
-import com.google.gson.*
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import java.lang.reflect.Type

@@ -1,10 +1,23 @@
 package xyz.xenondevs.nova.data.recipe
 
-import org.bukkit.inventory.*
+import org.bukkit.inventory.FurnaceRecipe
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.inventory.ShapelessRecipe
+import org.bukkit.inventory.SmithingRecipe
+import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.recipe.RecipeTypeRegistry.register
-import xyz.xenondevs.nova.data.serialization.json.*
-import xyz.xenondevs.nova.ui.menu.item.recipes.group.*
+import xyz.xenondevs.nova.data.serialization.json.FurnaceRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.ShapedRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.ShapelessRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.SmithingRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.StonecutterRecipeDeserializer
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.SmeltingRecipeGroup
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.SmithingRecipeGroup
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.StonecutterRecipeGroup
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.TableRecipeGroup
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 

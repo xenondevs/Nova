@@ -5,7 +5,13 @@ import de.studiocode.invui.virtualinventory.VirtualInventory
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
-import org.bukkit.inventory.*
+import org.bukkit.inventory.CraftingInventory
+import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.InventoryView
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.PlayerInventory
+import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 
 /**

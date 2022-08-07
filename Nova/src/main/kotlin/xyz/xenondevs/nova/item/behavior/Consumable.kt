@@ -13,8 +13,17 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.material.FoodOptions
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.getPlayersNearby
+import xyz.xenondevs.nova.util.intValue
+import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.item.genericMaxHealth
+import xyz.xenondevs.nova.util.playSoundNearby
+import xyz.xenondevs.nova.util.removeIf
+import xyz.xenondevs.nova.util.runTask
+import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.util.send
+import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.serverTick
 import kotlin.math.min
 import kotlin.random.Random
 

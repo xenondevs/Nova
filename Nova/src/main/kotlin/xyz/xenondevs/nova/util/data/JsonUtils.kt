@@ -1,6 +1,12 @@
 package xyz.xenondevs.nova.util.data
 
-import com.google.gson.*
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.google.gson.JsonPrimitive
 import com.google.gson.reflect.TypeToken
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -9,7 +15,19 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
-import xyz.xenondevs.nova.data.serialization.json.*
+import xyz.xenondevs.nova.data.serialization.json.BlockModelDataSerialization
+import xyz.xenondevs.nova.data.serialization.json.EnumMapInstanceCreator
+import xyz.xenondevs.nova.data.serialization.json.IntRangeSerialization
+import xyz.xenondevs.nova.data.serialization.json.ItemStackSerialization
+import xyz.xenondevs.nova.data.serialization.json.LocationSerialization
+import xyz.xenondevs.nova.data.serialization.json.LootItemSerialization
+import xyz.xenondevs.nova.data.serialization.json.LootTableSerialization
+import xyz.xenondevs.nova.data.serialization.json.NamespacedIdTypeAdapter
+import xyz.xenondevs.nova.data.serialization.json.NamespacedKeyTypeAdapter
+import xyz.xenondevs.nova.data.serialization.json.NovaMaterialSerialization
+import xyz.xenondevs.nova.data.serialization.json.UUIDTypeAdapter
+import xyz.xenondevs.nova.data.serialization.json.WorldTypeAdapter
+import xyz.xenondevs.nova.data.serialization.json.YamlConfigurationTypeAdapter
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.world.loot.LootItem
 import xyz.xenondevs.nova.world.loot.LootTable

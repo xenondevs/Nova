@@ -7,8 +7,12 @@ import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
 import net.minecraft.world.level.Level
 import org.bukkit.inventory.Recipe
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.NonNullList
+import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.nmsIngredient
+import xyz.xenondevs.nova.util.nmsStack
+import xyz.xenondevs.nova.util.removeFirstWhere
+import xyz.xenondevs.nova.util.resourceLocation
 import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe

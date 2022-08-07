@@ -14,7 +14,14 @@ import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.command.*
+import xyz.xenondevs.nova.command.Command
+import xyz.xenondevs.nova.command.executesCatching
+import xyz.xenondevs.nova.command.get
+import xyz.xenondevs.nova.command.player
+import xyz.xenondevs.nova.command.requiresPermission
+import xyz.xenondevs.nova.command.requiresPlayerPermission
+import xyz.xenondevs.nova.command.sendFailure
+import xyz.xenondevs.nova.command.sendSuccess
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources

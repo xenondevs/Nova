@@ -23,15 +23,21 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.addToInventoryOrDrop
+import xyz.xenondevs.nova.util.containsAll
 import xyz.xenondevs.nova.util.data.clientsideCopy
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.unhandledTags
+import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import kotlin.collections.flatMap
+import xyz.xenondevs.nova.util.resourceLocation
+import xyz.xenondevs.nova.util.runTask
+import xyz.xenondevs.nova.util.send
+import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.takeFirstOccurrence
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 
 interface ItemTest {

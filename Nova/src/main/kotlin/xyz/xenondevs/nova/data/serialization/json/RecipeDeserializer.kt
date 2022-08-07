@@ -4,12 +4,33 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.NamespacedKey
-import org.bukkit.inventory.*
+import org.bukkit.inventory.FurnaceRecipe
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.RecipeChoice
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.inventory.ShapelessRecipe
+import org.bukkit.inventory.SmithingRecipe
+import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.data.getAllStrings
+import xyz.xenondevs.nova.util.data.getFloat
+import xyz.xenondevs.nova.util.data.getInt
+import xyz.xenondevs.nova.util.data.getString
+import xyz.xenondevs.nova.util.data.isString
+import xyz.xenondevs.nova.util.data.toStringList
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.ItemUtils.getItemBuilder
 import java.io.File
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.firstOrNull
+import kotlin.collections.forEach
+import kotlin.collections.listOf
+import kotlin.collections.map
+import kotlin.collections.set
+import kotlin.collections.toTypedArray
 
 interface RecipeDeserializer<T> {
     

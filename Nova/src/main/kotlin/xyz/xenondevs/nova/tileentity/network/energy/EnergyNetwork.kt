@@ -3,7 +3,13 @@ package xyz.xenondevs.nova.tileentity.network.energy
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.tileentity.network.*
+import xyz.xenondevs.nova.tileentity.network.Network
+import xyz.xenondevs.nova.tileentity.network.NetworkBridge
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.NetworkException
+import xyz.xenondevs.nova.tileentity.network.NetworkNode
+import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.sumOfNoOverflow
 import java.util.*

@@ -2,7 +2,11 @@ package xyz.xenondevs.nova.tileentity.vanilla
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
-import xyz.xenondevs.nova.tileentity.network.*
+import xyz.xenondevs.nova.tileentity.network.Network
+import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.tileentity.network.NetworkNode
+import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.util.data.HashUtils
 import java.util.*
 

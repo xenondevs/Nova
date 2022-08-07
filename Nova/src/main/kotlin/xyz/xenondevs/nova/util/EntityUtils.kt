@@ -8,7 +8,6 @@ import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
 import org.bukkit.entity.Entity

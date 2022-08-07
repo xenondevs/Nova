@@ -1,6 +1,11 @@
 package xyz.xenondevs.nova.util.data
 
-import net.minecraft.nbt.*
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.DoubleTag
+import net.minecraft.nbt.FloatTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.StringTag
+import net.minecraft.nbt.Tag
 import net.minecraft.world.item.ItemStack
 import java.util.stream.Stream
 

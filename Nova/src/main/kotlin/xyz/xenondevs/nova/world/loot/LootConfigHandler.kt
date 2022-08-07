@@ -7,7 +7,11 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.HashUtils
+import xyz.xenondevs.nova.util.data.fromJson
+import xyz.xenondevs.nova.util.data.getResourceAsStream
+import xyz.xenondevs.nova.util.data.getResources
 import java.io.File
 
 private val LOOT_DIRECTORY = File(NOVA.dataFolder, "loot")

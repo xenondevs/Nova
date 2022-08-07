@@ -17,7 +17,11 @@ import xyz.xenondevs.nova.util.item.isTraversable
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
-import kotlin.math.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sin
 
 val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
 val HORIZONTAL_FACES = listOf(NORTH, EAST, SOUTH, WEST)

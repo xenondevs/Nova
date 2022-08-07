@@ -12,7 +12,13 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
 import xyz.xenondevs.nova.integration.InternalIntegration
-import xyz.xenondevs.nova.integration.protection.plugin.*
+import xyz.xenondevs.nova.integration.protection.plugin.GriefPrevention
+import xyz.xenondevs.nova.integration.protection.plugin.PlotSquared
+import xyz.xenondevs.nova.integration.protection.plugin.ProtectionStones
+import xyz.xenondevs.nova.integration.protection.plugin.QuickShop
+import xyz.xenondevs.nova.integration.protection.plugin.Residence
+import xyz.xenondevs.nova.integration.protection.plugin.Towny
+import xyz.xenondevs.nova.integration.protection.plugin.WorldGuard
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.data.ArrayKey

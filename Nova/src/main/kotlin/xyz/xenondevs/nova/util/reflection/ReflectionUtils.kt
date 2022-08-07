@@ -8,8 +8,14 @@ import org.bukkit.Bukkit
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CALLABLE_REFERENCE_RECEIVER_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.K_PROPERTY_1_GET_DELEGATE_METHOD
-import java.lang.reflect.*
 import java.lang.reflect.Array
+import java.lang.reflect.Constructor
+import java.lang.reflect.Field
+import java.lang.reflect.GenericArrayType
+import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+import java.lang.reflect.WildcardType
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty0

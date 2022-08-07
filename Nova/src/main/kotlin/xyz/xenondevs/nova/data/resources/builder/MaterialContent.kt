@@ -4,7 +4,13 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.addon.assets.*
+import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.addon.assets.BlockDirection
+import xyz.xenondevs.nova.addon.assets.BlockModelInformation
+import xyz.xenondevs.nova.addon.assets.BlockModelType
+import xyz.xenondevs.nova.addon.assets.ItemModelInformation
+import xyz.xenondevs.nova.addon.assets.ItemModelType
+import xyz.xenondevs.nova.addon.assets.ModelInformation
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.Resources

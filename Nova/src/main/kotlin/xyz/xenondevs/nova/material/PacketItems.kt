@@ -21,7 +21,11 @@ import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.clientbound.*
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEntityDataPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.recipe.RecipeManager
@@ -29,7 +33,11 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.bukkitStack
-import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.data.coloredText
+import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.serialize
+import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaMaterial

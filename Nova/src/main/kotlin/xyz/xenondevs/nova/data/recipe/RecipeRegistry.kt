@@ -2,7 +2,12 @@ package xyz.xenondevs.nova.data.recipe
 
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
-import org.bukkit.inventory.*
+import org.bukkit.inventory.FurnaceRecipe
+import org.bukkit.inventory.Recipe
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.inventory.ShapelessRecipe
+import org.bukkit.inventory.SmithingRecipe
+import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager

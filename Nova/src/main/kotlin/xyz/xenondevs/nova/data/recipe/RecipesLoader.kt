@@ -8,7 +8,13 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
-import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.data.HashUtils
+import xyz.xenondevs.nova.util.data.getAllJsonObjects
+import xyz.xenondevs.nova.util.data.getBoolean
+import xyz.xenondevs.nova.util.data.getResourceAsStream
+import xyz.xenondevs.nova.util.data.getResources
+import xyz.xenondevs.nova.util.data.hasArray
+import xyz.xenondevs.nova.util.data.parseJson
 import java.io.File
 import java.util.logging.Level
 

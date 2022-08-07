@@ -5,7 +5,11 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.util.data.*
+import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.getInt
+import xyz.xenondevs.nova.util.data.getString
+import xyz.xenondevs.nova.util.data.parseJson
+import xyz.xenondevs.nova.util.data.set
 import java.io.File
 import java.util.*
 

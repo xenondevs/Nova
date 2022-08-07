@@ -5,7 +5,12 @@ import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
-import xyz.xenondevs.nmsutils.advancement.*
+import xyz.xenondevs.nmsutils.advancement.Advancement
+import xyz.xenondevs.nmsutils.advancement.CriteriaBuilder
+import xyz.xenondevs.nmsutils.advancement.Criterion
+import xyz.xenondevs.nmsutils.advancement.Display
+import xyz.xenondevs.nmsutils.advancement.FrameType
+import xyz.xenondevs.nmsutils.advancement.advancement
 import xyz.xenondevs.nmsutils.advancement.predicate.ItemPredicate
 import xyz.xenondevs.nmsutils.advancement.predicate.NbtPredicate
 import xyz.xenondevs.nova.addon.Addon
