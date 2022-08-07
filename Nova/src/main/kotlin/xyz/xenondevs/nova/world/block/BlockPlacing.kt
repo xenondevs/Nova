@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockMultiPlaceEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.NOVA
@@ -16,13 +17,20 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.util.*
+import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.facing
+import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.placeVanilla
+import xyz.xenondevs.nova.util.runTask
+import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.swingHand
+import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.pos
@@ -33,12 +41,18 @@ internal object BlockPlacing : Listener {
         Bukkit.getPluginManager().registerEvents(this, NOVA)
     }
     
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private fun handleBlockPlace(event: BlockPlaceEvent) {
         // Prevent players from placing blocks where there are actually already blocks form Nova
         // This can happen when the hitbox material is replaceable, like as structure void
-        if (WorldDataManager.getBlockState(event.block.pos) is NovaBlockState)
-            event.isCancelled = true
+        event.isCancelled = WorldDataManager.getBlockState(event.block.pos) is NovaBlockState
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    private fun handleBlockPlace(event: BlockMultiPlaceEvent) {
+        // Prevent players from placing blocks where there are actually already blocks form Nova
+        // This can happen when the hitbox material is replaceable, like as structure void
+        event.isCancelled = event.replacedBlockStates.any { WorldDataManager.getBlockState(it.location.pos) is NovaBlockState }
     }
     
     @EventHandler(priority = EventPriority.HIGH)
@@ -122,20 +136,8 @@ internal object BlockPlacing : Listener {
         ProtectionManager.canPlace(player, handItem, replaceLocation).runIfTrue {
             // check that there isn't already a block there (which is not replaceable)
             if (replaceBlock.type.isReplaceable() && WorldDataManager.getBlockState(replaceBlock.pos) == null) {
-                // mimic the way the actual BlockPlaceEvent works by first setting the block type,
-                // then calling the event and reverting if it is cancelled
-                val previousType = replaceBlock.type
-                val previousData = replaceBlock.blockData
-                
-                replaceBlock.type = handItem.type
-                
-                val placeEvent = BlockPlaceEvent(replaceBlock, replaceBlock.state, block, handItem, player, true, event.hand!!)
-                Bukkit.getPluginManager().callEvent(placeEvent)
-                
-                if (placeEvent.isCancelled) {
-                    replaceBlock.type = previousType
-                    replaceBlock.blockData = previousData
-                } else if (player.gameMode != GameMode.CREATIVE) {
+                val placed = replaceBlock.placeVanilla(player.serverPlayer, handItem, true)
+                if (placed && player.gameMode != GameMode.CREATIVE) {
                     player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
                 }
             }
