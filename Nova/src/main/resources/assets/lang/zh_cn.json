@@ -92,5 +92,12 @@
   "command.nova.resource_pack.reupload.success": "资源包已上传到 %s。",
   "command.nova.advanced_tooltips.false": "已关闭高级信息提示。",
   "command.nova.advanced_tooltips.true": "已开启高级信息提示。",
-  "menu.nova.items": "物品"
+  "menu.nova.items": "物品",
+  "menu.nova.side_config.north": "北",
+  "menu.nova.side_config.south": "南",
+  "menu.nova.side_config.west": "西",
+  "menu.nova.side_config.up": "上",
+  "menu.nova.side_config.east": "东",
+  "menu.nova.side_config.down": "下",
+  "menu.nova.side_config.direction": "%s (%s)"
 }
