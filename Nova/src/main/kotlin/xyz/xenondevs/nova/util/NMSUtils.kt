@@ -113,26 +113,17 @@ fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T):
 
 fun BlockPos.setBlockStateNoUpdate(state: BlockState) {
     val section = chunkSection
-    section.acquire()
     val old = section.getBlockState(this)
     section.setBlockStateSilently(this, state)
-    section.release()
     world.serverLevel.sendBlockUpdated(nmsPos, old, state, 3)
 }
 
 fun BlockPos.setBlockStateSilently(state: BlockState) {
-    val section = chunkSection
-    section.acquire()
-    section.setBlockStateSilently(this, state)
-    section.release()
+    chunkSection.setBlockStateSilently(this, state)
 }
 
 fun BlockPos.getBlockState(): BlockState {
-    val section = chunkSection
-    section.acquire()
-    val blockState = section.getBlockState(this)
-    section.release()
-    return blockState
+    return chunkSection.getBlockState(this)
 }
 
 val BlockPos.chunkSection: LevelChunkSection
