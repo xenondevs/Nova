@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.command.executesCatching
 import xyz.xenondevs.nova.command.get
 import xyz.xenondevs.nova.command.player
 import xyz.xenondevs.nova.command.requiresPermission
+import xyz.xenondevs.nova.command.requiresPlayer
 import xyz.xenondevs.nova.command.requiresPlayerPermission
 import xyz.xenondevs.nova.command.sendFailure
 import xyz.xenondevs.nova.command.sendSuccess
@@ -68,17 +69,20 @@ internal object NovaCommand : Command("nova") {
                         }
                     }))
             .then(literal("debug")
-                .requiresPlayerPermission("nova.command.debug")
+                .requiresPermission("nova.command.debug")
                 .then(literal("removeNovaBlocks")
+                    .requiresPlayer()
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching(::removeNovaBlocks)))
                 .then(literal("getTileEntityData")
+                    .requiresPlayer()
                     .executesCatching(::showTileEntityData))
                 .then(literal("reloadNetworks")
                     .executesCatching(::reloadNetworks))
                 .then(literal("updateChunkSearchId")
                     .executesCatching(::updateChunkSearchId))
                 .then(literal("showNetwork")
+                    .requiresPlayer()
                     .apply {
                         NetworkTypeRegistry.types.forEach { type ->
                             then(literal(type.id.toString())
