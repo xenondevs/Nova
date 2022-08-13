@@ -1,8 +1,11 @@
 package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonObject
+import kotlinx.coroutines.runBlocking
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.model.ZipParameters
+import xyz.xenondevs.downloader.ExtractionMode
+import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -17,7 +20,7 @@ import java.io.File
 internal object ResourcePackBuilder {
     
     val RESOURCE_PACK_DIR = File(NOVA.dataFolder, "resource_pack")
-    val RESOURCE_PACK_BUILD_DIR = File(RESOURCE_PACK_DIR, "build")
+    val RESOURCE_PACK_BUILD_DIR = File(RESOURCE_PACK_DIR, ".build")
     val BASE_PACKS_DIR = File(RESOURCE_PACK_DIR, "base_packs")
     val TEMP_BASE_PACKS_DIR = File(RESOURCE_PACK_BUILD_DIR, "base_packs")
     val ASSET_PACKS_DIR = File(RESOURCE_PACK_BUILD_DIR, "asset_packs")
@@ -28,6 +31,7 @@ internal object ResourcePackBuilder {
     val GUIS_FILE = File(ASSETS_DIR, "nova/font/gui.json")
     val PACK_MCMETA_FILE = File(PACK_DIR, "pack.mcmeta")
     val RESOURCE_PACK_FILE = File(RESOURCE_PACK_DIR, "ResourcePack.zip")
+    val MCASSETS_DIR = File(RESOURCE_PACK_DIR, ".mcassets")
     
     init {
         // delete legacy resource pack files
@@ -48,10 +52,20 @@ internal object ResourcePackBuilder {
         LOGGER.info("Building resource pack")
         
         try {
+            // download minecraft assets if not present
+            if (!MCASSETS_DIR.exists()) {
+                LOGGER.info("Downloading minecraft assets")
+                runBlocking {
+                    val downloader = MinecraftAssetsDownloader(outputDirectory = MCASSETS_DIR, mode = ExtractionMode.ALL)
+                    // TODO: filters
+                    downloader.downloadAssets()
+                }
+            }
+            
             // extract files
             val basePacks = BasePacks().also(BasePacks::include)
             val assetPacks = extractAssetPacks()
-    
+            
             // extract assets/minecraft
             extractMinecraftAssets()
             
@@ -95,8 +109,8 @@ internal object ResourcePackBuilder {
     }
     
     private fun extractAssetPacks(): List<AssetPack> {
-        return (AddonManager.loaders.asSequence().map { (id, loader) -> Triple(loader.file, id, "assets/") } 
-                + Triple(NOVA.pluginFile, "nova", "assets/nova/")
+        return (AddonManager.loaders.asSequence().map { (id, loader) -> Triple(loader.file, id, "assets/") }
+            + Triple(NOVA.pluginFile, "nova", "assets/nova/")
             ).mapTo(ArrayList()) { (addonFile, namespace, assetsDirPath) ->
                 val assetPackDir = File(ASSET_PACKS_DIR, namespace)
                 

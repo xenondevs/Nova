@@ -551,6 +551,11 @@
             <artifactId>cosmic-binary-format-netty-adapter</artifactId>
             <version>0.1</version>
         </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs</groupId>
+            <artifactId>minecraft-asset-downloader</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -646,6 +651,7 @@
                             <include>xyz.xenondevs:nms-utilities</include>
                             <include>xyz.xenondevs.bytebase:*</include>
                             <include>xyz.xenondevs.cbf</include>
+                            <include>xyz.xenondevs:minecraft-asset-downloader</include>
                         </includes>
                     </artifactSet>
                 </configuration>
