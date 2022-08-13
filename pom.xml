@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <kotlin.version>1.7.0</kotlin.version>
+        <kotlin.version>1.7.10</kotlin.version>
         <spigot.version>1.19.2-R0.1-SNAPSHOT</spigot.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
