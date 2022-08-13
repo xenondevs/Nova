@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.write
 import java.io.File
+import java.util.function.Predicate
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal object ResourcePackBuilder {
@@ -57,7 +58,7 @@ internal object ResourcePackBuilder {
                 LOGGER.info("Downloading minecraft assets")
                 runBlocking {
                     val downloader = MinecraftAssetsDownloader(outputDirectory = MCASSETS_DIR, mode = ExtractionMode.ALL)
-                    // TODO: filters
+                    downloader.filters += Predicate { it.startsWith("assets/minecraft/textures/") || it.startsWith("assets/minecraft/lang/") }
                     downloader.downloadAssets()
                 }
             }
