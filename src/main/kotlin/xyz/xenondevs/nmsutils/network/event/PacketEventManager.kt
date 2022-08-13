@@ -3,7 +3,20 @@ package xyz.xenondevs.nmsutils.network.event
 import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
-import xyz.xenondevs.nmsutils.network.event.clientbound.*
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundActionBarPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBlockDestructionPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBlockEventPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBlockUpdatePacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundLevelChunkWithLightPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEntityDataPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetPassengersPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
@@ -40,6 +53,7 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundLevelChunkWithLightPacketEvent)
         registerPlayerEventType(::ClientboundBlockUpdatePacketEvent)
         registerPlayerEventType(::ClientboundBlockEventPacketEvent)
+        registerPlayerEventType(::ClientboundBossEventPacketEvent)
         
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)
