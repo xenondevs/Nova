@@ -23,8 +23,12 @@ armor_stand_render_distance:
   default: 4
 
 # The actionbar overlay used for custom UIs
-actionbar_overlay:
-  enabled: true
+overlay:
+  actionbar:
+    enabled: true
+  bossbar:
+    enabled: true
+    amount: 20
 
 # Default transfer rates for networks when tile entities are directly connected.
 network:

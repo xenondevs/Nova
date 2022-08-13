@@ -87,6 +87,7 @@ fun Array<out BaseComponent>.toComponent(): Component {
     }
 }
 
+// TODO: Option to omit text that is not in the default font
 fun Array<out BaseComponent>.toPlainText(locale: String): String {
     val sb = StringBuilder()
     

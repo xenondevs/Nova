@@ -1,26 +1,25 @@
-package xyz.xenondevs.nova.ui.overlay
+package xyz.xenondevs.nova.ui.overlay.actionbar
 
 import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.HandlerList
-import org.bukkit.event.Listener
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundActionBarPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
+import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.data.forceDefaultFont
 import xyz.xenondevs.nova.util.data.toPlainText
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
 import java.util.*
 
-object ActionbarOverlayManager : Listener {
+object ActionbarOverlayManager {
     
     private var tickTask: BukkitTask? = null
     
@@ -35,15 +34,13 @@ object ActionbarOverlayManager : Listener {
     fun reload() {
         if (tickTask != null) {
             tickTask?.cancel()
-            HandlerList.unregisterAll(this)
             PacketEventManager.unregisterListener(this)
             tickTask = null
         }
         
-        if (DEFAULT_CONFIG.getBoolean("actionbar_overlay.enabled")) {
-            Bukkit.getPluginManager().registerEvents(this, NOVA)
+        if (DEFAULT_CONFIG.getBoolean("overlay.actionbar.enabled")) {
             PacketEventManager.registerListener(this)
-            tickTask = runTaskTimer(0, 1, ::handleTick)
+            tickTask = runTaskTimer(0, 1, ActionbarOverlayManager::handleTick)
         }
     }
     
@@ -112,7 +109,7 @@ object ActionbarOverlayManager : Listener {
         val components = ArrayList<BaseComponent>()
         
         // calculate the length (in pixels) of the intercepted message
-        val textLength = MoveCharacters.getStringLength(text.toPlainText(player.locale))
+        val textLength = DefaultFont.getStringLength(text.toPlainText(player.locale))
         // to center, move the cursor to the right by half of the length
         components.add(MoveCharacters.getMovingComponent(textLength / -2))
         // append the text while explicitly setting it to the default font (required because of the moving component)

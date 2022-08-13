@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
 import xyz.xenondevs.nova.util.data.getInputStacks
 
 abstract class ConversionRecipeGroup : RecipeGroup() {

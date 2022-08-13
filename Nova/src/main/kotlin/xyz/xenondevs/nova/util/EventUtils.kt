@@ -48,6 +48,10 @@ fun Any.registerPacketListener() {
     PacketEventManager.registerListener(this)
 }
 
+fun Any.unregisterPacketListener() {
+    PacketEventManager.unregisterListener(this)
+}
+
 fun Listener.registerEvents() {
     Bukkit.getPluginManager().registerEvents(this, NOVA)
 }

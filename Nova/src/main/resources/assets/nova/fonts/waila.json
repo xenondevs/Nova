@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "file": "nova:font/waila/0.png",
+      "chars": ["\u0000"],
+      "height": 48,
+      "ascent": 0,
+      "type": "bitmap"
+    }
+  ]
+}

@@ -13,7 +13,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.config.side.BackItem
 import xyz.xenondevs.nova.ui.item.AioNumberItem
-import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
 import java.awt.Color
 
 class ColorPickerWindow(

@@ -31,7 +31,8 @@ import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.ui.overlay.MoveCharacters
+import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
+import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.item.ItemUtils
 import java.util.*
 
@@ -133,7 +134,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
             .append(currentType.texture.component)
             .append(MoveCharacters.getMovingComponent(-84)) // move back to the middle
             .append(MoveCharacters.getMovingComponent((
-                MoveCharacters.getStringLength(pageNumberString) // this would be the string length in the default font
+                DefaultFont.getStringLength(pageNumberString) // this would be the string length in the default font
                     + pageNumberString.replace(" ", "").length // non-space characters are generally one pixel bigger in this font
                 ) / -2 // divided by -2 to center it
             ))

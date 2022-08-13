@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.SmithingRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.CoreGUITexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
 
 internal object SmithingRecipeGroup : RecipeGroup() {
     

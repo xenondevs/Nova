@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui.overlay
+package xyz.xenondevs.nova.ui.overlay.actionbar
 
 import net.md_5.bungee.api.chat.BaseComponent
 

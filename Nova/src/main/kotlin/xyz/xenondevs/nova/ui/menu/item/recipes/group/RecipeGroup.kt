@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.menu.item.recipes.group
 import de.studiocode.invui.gui.GUI
 import de.studiocode.invui.item.ItemProvider
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
-import xyz.xenondevs.nova.ui.overlay.GUITexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.GUITexture
 
 abstract class RecipeGroup : Comparable<RecipeGroup> {
     

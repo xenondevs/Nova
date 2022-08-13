@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry
-import xyz.xenondevs.nova.ui.overlay.ActionbarOverlayManager
+import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.world.ChunkReloadWatcher

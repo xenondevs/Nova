@@ -23,6 +23,7 @@ internal object ResourcePackBuilder {
     val ASSET_PACKS_DIR = File(RESOURCE_PACK_BUILD_DIR, "asset_packs")
     val PACK_DIR = File(RESOURCE_PACK_BUILD_DIR, "pack")
     val ASSETS_DIR = File(PACK_DIR, "assets")
+    val MINECRAFT_ASSETS_DIR = File(ASSETS_DIR, "minecraft")
     val LANGUAGE_DIR = File(ASSETS_DIR, "minecraft/lang")
     val GUIS_FILE = File(ASSETS_DIR, "nova/font/gui.json")
     val PACK_MCMETA_FILE = File(PACK_DIR, "pack.mcmeta")
@@ -50,6 +51,9 @@ internal object ResourcePackBuilder {
             // extract files
             val basePacks = BasePacks().also(BasePacks::include)
             val assetPacks = extractAssetPacks()
+    
+            // extract assets/minecraft
+            extractMinecraftAssets()
             
             // init content
             val contents = listOf(
@@ -76,15 +80,30 @@ internal object ResourcePackBuilder {
         }
     }
     
+    private fun extractMinecraftAssets() {
+        val zip = ZipFile(NOVA.pluginFile)
+        zip.fileHeaders.forEach { header ->
+            if (!header.isDirectory && header.fileName.startsWith("assets/minecraft/")) {
+                val file = File(MINECRAFT_ASSETS_DIR, header.fileName.substringAfter("assets/minecraft/"))
+                val inputStream = zip.getInputStream(header)
+                file.parentFile.mkdirs()
+                if (header.fileName.endsWith(".png")) {
+                    PNGMetadataRemover.remove(inputStream, file.outputStream())
+                } else file.write(inputStream)
+            }
+        }
+    }
+    
     private fun extractAssetPacks(): List<AssetPack> {
-        return (AddonManager.loaders.asSequence().map { (id, loader) -> loader.file to id } + (NOVA.pluginFile to "nova"))
-            .mapTo(ArrayList()) { (addonFile, namespace) ->
+        return (AddonManager.loaders.asSequence().map { (id, loader) -> Triple(loader.file, id, "assets/") } 
+                + Triple(NOVA.pluginFile, "nova", "assets/nova/")
+            ).mapTo(ArrayList()) { (addonFile, namespace, assetsDirPath) ->
                 val assetPackDir = File(ASSET_PACKS_DIR, namespace)
                 
                 val zip = ZipFile(addonFile)
                 zip.fileHeaders.forEach { header ->
-                    if (!header.isDirectory && header.fileName.startsWith("assets/")) {
-                        val file = File(assetPackDir, header.fileName.substringAfter("assets/"))
+                    if (!header.isDirectory && header.fileName.startsWith(assetsDirPath)) {
+                        val file = File(assetPackDir, header.fileName.substringAfter(assetsDirPath))
                         val inputStream = zip.getInputStream(header)
                         if (header.fileName.endsWith(".png")) {
                             file.parentFile.mkdirs()
