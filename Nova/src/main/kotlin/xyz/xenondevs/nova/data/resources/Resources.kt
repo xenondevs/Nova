@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.GUIData
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.WailaIconData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
@@ -20,6 +21,7 @@ internal object Resources : Initializable() {
     
     private lateinit var modelDataLookup: Map<String, Pair<ItemModelData?, BlockModelData?>>
     private lateinit var guiDataLookup: Map<String, GUIData>
+    private lateinit var wailaDataLookup: Map<String, WailaIconData>
     internal lateinit var languageLookup: Map<String, Map<String, String>>
     
     override fun init() {
@@ -27,11 +29,13 @@ internal object Resources : Initializable() {
             PermanentStorage.retrieveOrNull<Int>("addonsHashCode") == AddonManager.addonsHashCode
             && PermanentStorage.has("modelDataLookup")
             && PermanentStorage.has("guiDataLookup")
+            && PermanentStorage.has("wailaDataLookup")
             && PermanentStorage.has("languageLookup")
         ) {
             // Load from PermanentStorage
             modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, Pair<ItemModelData?, BlockModelData?>>>("modelDataLookup")!!
             languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>("languageLookup")!!
+            wailaDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, WailaIconData>>("wailaDataLookup")!!
             guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, GUIData>>("guiDataLookup")!!
         } else {
             // Create ResourcePack
@@ -64,41 +68,62 @@ internal object Resources : Initializable() {
         PermanentStorage.store("guiDataLookup", guiDataLookup)
     }
     
+    internal fun updateWailaDataLookup(wailaDataLookup: Map<String, WailaIconData>) {
+        this.wailaDataLookup = wailaDataLookup
+        PermanentStorage.store("wailaDataLookup", wailaDataLookup)
+    }
+    
     internal fun updateLanguageLookup(languageLookup: Map<String, Map<String, String>>) {
         this.languageLookup = languageLookup
         PermanentStorage.store("languageLookup", languageLookup)
-    }
-    
-    fun getModelDataOrNull(id: NamespacedId): Pair<ItemModelData?, BlockModelData?>? {
-        return modelDataLookup[id.toString()]
     }
     
     fun getModelData(id: NamespacedId): Pair<ItemModelData?, BlockModelData?> {
         return modelDataLookup[id.toString()]!!
     }
     
-    fun getGUIDataOrNull(id: NamespacedId): GUIData? {
-        return guiDataLookup[id.toString()]
+    fun getModelData(id: String): Pair<ItemModelData?, BlockModelData?> {
+        return modelDataLookup[id]!!
     }
     
-    fun getGUIData(id: NamespacedId): GUIData {
-        return guiDataLookup[id.toString()]!!
+    fun getModelDataOrNull(id: NamespacedId): Pair<ItemModelData?, BlockModelData?>? {
+        return modelDataLookup[id.toString()]
     }
     
     fun getModelDataOrNull(id: String): Pair<ItemModelData?, BlockModelData?>? {
         return modelDataLookup[id]
     }
     
-    fun getModelData(id: String): Pair<ItemModelData?, BlockModelData?> {
-        return modelDataLookup[id]!!
+    fun getGUIData(id: NamespacedId): GUIData {
+        return guiDataLookup[id.toString()]!!
+    }
+    
+    fun getGUIData(id: String): GUIData {
+        return guiDataLookup[id]!!
+    }
+    
+    fun getGUIDataOrNull(id: NamespacedId): GUIData? {
+        return guiDataLookup[id.toString()]
     }
     
     fun getGUIDataOrNull(id: String): GUIData? {
         return guiDataLookup[id]
     }
     
-    fun getGUIData(id: String): GUIData {
-        return guiDataLookup[id]!!
+    fun getWailaIconData(id: NamespacedId): WailaIconData {
+        return wailaDataLookup[id.toString()]!!
+    }
+    
+    fun getWailaIconData(id: String): WailaIconData {
+        return wailaDataLookup[id]!!
+    }
+    
+    fun getWailaIconDataOrNull(id: NamespacedId): WailaIconData? {
+        return wailaDataLookup[id.toString()]
+    }
+    
+    fun getWailaIconDataOrNull(id: String): WailaIconData? {
+        return wailaDataLookup[id]
     }
     
 }

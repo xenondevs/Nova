@@ -22,6 +22,12 @@ abstract class BossBarOverlay {
     abstract val width: Int
     
     /**
+     * At which x-coordinate the [text][components] should be centered at.
+     * Null if there should they shouldn't be centered.
+     */
+    abstract val centerX: Int?
+    
+    /**
      * If the [components] have been changed and an update should be sent in the next tick.
      */
     var changed: Boolean = false

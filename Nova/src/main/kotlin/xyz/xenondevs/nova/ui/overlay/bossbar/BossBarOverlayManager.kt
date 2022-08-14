@@ -3,14 +3,11 @@ package xyz.xenondevs.nova.ui.overlay.bossbar
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.minecraft.network.chat.Component
 import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import xyz.xenondevs.nmsutils.bossbar.BossBar
-import xyz.xenondevs.nmsutils.bossbar.operation.AddBossBarOperation
-import xyz.xenondevs.nmsutils.bossbar.operation.UpdateNameBossBarOperation
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
@@ -33,21 +30,36 @@ object BossBarOverlayManager : Initializable(), Listener {
     override val dependsOn = emptySet<Initializable>()
     
     private val bars = HashMap<UUID, Array<BossBar>>()
-    private val overlays = HashMap<UUID, HashSet<BossBarOverlay>>()
+    private val overlays = HashMap<UUID, ArrayList<BossBarOverlay>>()
     
     override fun init() {
         registerEvents()
         registerPacketListener()
         runTaskTimer(0, 1, ::handleTick)
+        Bukkit.getOnlinePlayers().forEach(::sendBars)
+    }
+    
+    override fun disable() {
+        Bukkit.getOnlinePlayers().forEach(::removeBars)
     }
     
     fun registerOverlay(player: Player, overlay: BossBarOverlay) {
-        overlays.getOrPut(player.uniqueId, ::HashSet) += overlay
+        overlays.getOrPut(player.uniqueId, ::ArrayList) += overlay
+        remakeBars(player.uniqueId)
+    }
+    
+    fun registerOverlays(player: Player, overlays: Iterable<BossBarOverlay>) {
+        this.overlays.getOrPut(player.uniqueId, ::ArrayList) += overlays
         remakeBars(player.uniqueId)
     }
     
     fun unregisterOverlay(player: Player, overlay: BossBarOverlay) {
-        overlays.getOrPut(player.uniqueId, ::HashSet) -= overlay
+        overlays.getOrPut(player.uniqueId, ::ArrayList) -= overlay
+        remakeBars(player.uniqueId)
+    }
+    
+    fun unregisterOverlays(player: Player, overlays: Iterable<BossBarOverlay>) {
+        this.overlays.getOrPut(player.uniqueId, ::ArrayList) -= overlays.toSet()
         remakeBars(player.uniqueId)
     }
     
@@ -73,10 +85,18 @@ object BossBarOverlayManager : Initializable(), Listener {
                     // reset changed state
                     it.changed = false
                     
-                    // append text / movement
+                    val centerX = it.centerX
+                    var width = it.width
+                    if (centerX != null) {
+                        val preMove = centerX - width / 2
+                        builder.append(MoveCharacters.getMovingComponent(preMove))
+                        
+                        width += preMove
+                    }
+                    
                     builder
                         .append(it.components)
-                        .append(MoveCharacters.getMovingComponent(-it.width))
+                        .append(MoveCharacters.getMovingComponent(-width))
                 }
                 
                 bars[barLevel].name = builder.create()
@@ -87,22 +107,23 @@ object BossBarOverlayManager : Initializable(), Listener {
         bars.forEach { player.send(it.updateNamePacket) }
     }
     
-    @EventHandler
-    private fun handleJoin(event: PlayerJoinEvent) {
-        val player = event.player
+    private fun sendBars(player: Player) {
         val playerBars = bars.getOrPut(player.uniqueId) { Array(BAR_AMOUNT) { BossBar(UUID(it.toLong(), 0L)) } }
         playerBars.forEach { player.send(it.addPacket) }
     }
     
+    private fun removeBars(player: Player) {
+        val playerBars = bars[player.uniqueId] ?: return
+        playerBars.forEach { player.send(it.removePacket) }
+    }
+    
+    @EventHandler
+    private fun handleJoin(event: PlayerJoinEvent) {
+        sendBars(event.player)
+    }
+    
     @PacketHandler(ignoreIfCancelled = true)
     private fun handleBossBar(event: ClientboundBossEventPacketEvent) {
-        val operation = event.operation
-        if (operation is AddBossBarOperation) {
-            println(CraftChatMessage.toJSON(operation.name))
-        } else if (operation is UpdateNameBossBarOperation) {
-            println(CraftChatMessage.toJSON(operation.name))
-        }
-        
         val id = event.id
         event.isCancelled = id.leastSignificantBits != 0L || id.mostSignificantBits !in 0 until BAR_AMOUNT
     }

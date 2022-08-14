@@ -29,7 +29,8 @@ internal object ResourcePackBuilder {
     val ASSETS_DIR = File(PACK_DIR, "assets")
     val MINECRAFT_ASSETS_DIR = File(ASSETS_DIR, "minecraft")
     val LANGUAGE_DIR = File(ASSETS_DIR, "minecraft/lang")
-    val GUIS_FILE = File(ASSETS_DIR, "nova/font/gui.json")
+    val FONT_DIR = File(ASSETS_DIR, "nova/font")
+    val GUIS_FILE = File(FONT_DIR, "gui.json")
     val PACK_MCMETA_FILE = File(PACK_DIR, "pack.mcmeta")
     val RESOURCE_PACK_FILE = File(RESOURCE_PACK_DIR, "ResourcePack.zip")
     val MCASSETS_DIR = File(RESOURCE_PACK_DIR, ".mcassets")
@@ -74,7 +75,8 @@ internal object ResourcePackBuilder {
             val contents = listOf(
                 MaterialContent(basePacks),
                 GUIContent(),
-                LanguageContent()
+                LanguageContent(),
+                WailaContent()
             )
             
             // Include asset packs
@@ -85,6 +87,7 @@ internal object ResourcePackBuilder {
             }
             
             // Write changes
+            LOGGER.info("Writing content")
             contents.forEach(PackContent::write)
             writeMetadata(assetPacks.size, basePacks.packAmount)
             
