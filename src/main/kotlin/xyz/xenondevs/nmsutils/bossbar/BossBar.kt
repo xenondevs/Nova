@@ -198,7 +198,7 @@ class BossBar(
             return _updatePropertiesPacket!!
         }
     
-    private val removePacket = ClientboundBossEventPacket(id, removeOperation)
+    val removePacket = ClientboundBossEventPacket(id, removeOperation)
     
     constructor(
         id: UUID,
