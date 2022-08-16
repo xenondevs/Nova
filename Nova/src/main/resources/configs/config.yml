@@ -22,13 +22,18 @@ armor_stand_render_distance:
   max: 6
   default: 4
 
-# The actionbar overlay used for custom UIs
+# The overlay used for custom UIs
 overlay:
   actionbar:
     enabled: true
   bossbar:
     enabled: true
     amount: 20
+
+# The waila overlay
+waila:
+  enabled: true
+  update_interval: 1
 
 # Default transfer rates for networks when tile entities are directly connected.
 network:

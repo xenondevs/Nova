@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.builder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.removeNamespace
@@ -19,6 +20,12 @@ internal class WailaContent : PackContent {
     private var char = START_CHAR
     
     override fun addFromPack(pack: AssetPack) {
+        if (!DEFAULT_CONFIG.getBoolean("waila.enabled")) {
+            val texturesDir = File(ResourcePackBuilder.ASSETS_DIR, "${pack.namespace}/textures/waila/")
+            texturesDir.deleteRecursively()
+            return
+        }
+        
         val wailaDir = pack.texturesDir?.let { File(it, "waila/") }
         if (wailaDir == null || !wailaDir.exists())
             return

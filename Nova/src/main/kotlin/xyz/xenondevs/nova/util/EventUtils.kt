@@ -56,6 +56,10 @@ fun Listener.registerEvents() {
     Bukkit.getPluginManager().registerEvents(this, NOVA)
 }
 
+fun Listener.unregisterEvents() {
+    HandlerList.unregisterAll(this)
+}
+
 fun Listener.registerEventsExcept(vararg eventClasses: KClass<out Event>) {
     registerEventsExcept(*eventClasses.mapToArray(KClass<out Event>::java))
 }
