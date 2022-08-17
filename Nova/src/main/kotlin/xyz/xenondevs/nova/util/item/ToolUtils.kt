@@ -63,7 +63,7 @@ object ToolUtils {
         if (hardness == 0.0) return 1.0
         
         val toolType = tool?.type
-        val toolCategory = toolType?.let(ToolCategory::of)
+        val toolCategory = toolType?.let(ToolCategory::ofItem)
         
         var speedMultiplier = 1.0
         if (toolCategory != null && toolCategory.isCorrectToolCategory(blockType)) {
@@ -140,6 +140,10 @@ object ToolUtils {
             || (tool != null && CraftMagicNumbers.getItem(tool).isCorrectToolForDrops(blockState))
     }
     
+    fun requiresCorrectToolForDrops(block: Block): Boolean {
+        return (block as CraftBlock).nms.requiresCorrectToolForDrops()
+    }
+    
     private fun getFatigueMultiplier(level: Int): Double =
         when (level) {
             0 -> 1.0
@@ -169,6 +173,15 @@ enum class ToolLevel(higherTier: ToolLevel?, vararg materials: Material) {
         else this.materials
     
     companion object {
+        
+        fun ofBlock(block: Material): ToolLevel? {
+            return when {
+                Tag.NEEDS_STONE_TOOL.isTagged(block) -> STONE
+                Tag.NEEDS_IRON_TOOL.isTagged(block) -> IRON
+                Tag.NEEDS_DIAMOND_TOOL.isTagged(block) -> DIAMOND
+                else -> null
+            }
+        }
         
         fun isCorrectLevel(block: Material, tool: Material): Boolean {
             val levelTag = when {
@@ -256,7 +269,7 @@ enum class ToolCategory(val multipliers: Map<Material, Double>, val isCorrectToo
     
     companion object {
         
-        fun of(material: Material): ToolCategory? =
+        fun ofItem(material: Material): ToolCategory? =
             when (material) {
                 WOODEN_SHOVEL, STONE_SHOVEL, IRON_SHOVEL, DIAMOND_SHOVEL, NETHERITE_SHOVEL, GOLDEN_SHOVEL -> SHOVEL
                 WOODEN_PICKAXE, STONE_PICKAXE, IRON_PICKAXE, DIAMOND_PICKAXE, NETHERITE_PICKAXE, GOLDEN_PICKAXE -> PICKAXE
@@ -267,6 +280,19 @@ enum class ToolCategory(val multipliers: Map<Material, Double>, val isCorrectToo
                 
                 else -> null
             }
+        
+        fun ofBlock(material: Material): List<ToolCategory> {
+            val list = ArrayList<ToolCategory>()
+            
+            if (Tag.MINEABLE_SHOVEL.isTagged(material)) list.add(SHOVEL)
+            if (Tag.MINEABLE_PICKAXE.isTagged(material)) list.add(PICKAXE)
+            if (Tag.MINEABLE_AXE.isTagged(material)) list.add(AXE)
+            if (Tag.MINEABLE_HOE.isTagged(material)) list.add(HOE)
+            if (material == COBWEB || material == BAMBOO) list.add(SWORD)
+            if (Tag.LEAVES.isTagged(material) || Tag.WOOL.isTagged(material) || material == COBWEB) list.add(SHEARS)
+            
+            return list
+        }
         
     }
     

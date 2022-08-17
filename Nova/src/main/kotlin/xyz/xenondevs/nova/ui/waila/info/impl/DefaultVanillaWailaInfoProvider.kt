@@ -23,8 +23,9 @@ internal object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null)
         return WailaInfo(
             id,
             listOf(
-                ComponentBuilder().append(translate).color(ChatColor.WHITE).create(),
-                ComponentBuilder(id.toString()).color(ChatColor.DARK_GRAY).create()
+                ComponentBuilder().append(translate).color(ChatColor.WHITE).create() to null,
+                ComponentBuilder(id.toString()).color(ChatColor.DARK_GRAY).create() to null,
+                ToolLine.getToolLine(player, block)
             ),
             player
         )

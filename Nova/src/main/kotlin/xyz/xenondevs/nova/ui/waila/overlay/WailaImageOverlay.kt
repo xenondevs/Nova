@@ -6,7 +6,7 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
-import xyz.xenondevs.nova.data.resources.builder.WailaIconData
+import xyz.xenondevs.nova.data.resources.builder.content.FontChar
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import java.util.concurrent.TimeUnit
@@ -22,7 +22,7 @@ private const val ICON_MARGIN_LEFT = 2
 private const val ICON_SIZE = 32
 private const val ICON_MARGIN_RIGHT = 2
 
-private const val TEXT_MARGIN_RIGHT = 2
+private const val TEXT_MARGIN_RIGHT = 4
 
 private const val MIN_LINES = 2
 private const val MAX_LINES = 10
@@ -32,7 +32,7 @@ private val overlayCache: Cache<OverlayCacheKey, OverlayData> = CacheBuilder.new
     .expireAfterAccess(5, TimeUnit.MINUTES)
     .build()
 
-private data class OverlayCacheKey(val icon: WailaIconData, val lines: Int, val longestLineLength: Int)
+private data class OverlayCacheKey(val icon: FontChar, val lines: Int, val longestLineLength: Int)
 private typealias OverlayData = Pair<Array<BaseComponent>, Int>
 
 internal class WailaImageOverlay : BossBarOverlay() {
@@ -49,7 +49,7 @@ internal class WailaImageOverlay : BossBarOverlay() {
      *
      * @return The x position for centering the text.
      */
-    fun update(icon: WailaIconData, lines: Int, longestLineLength: Int): Int {
+    fun update(icon: FontChar, lines: Int, longestLineLength: Int): Int {
         require(lines in MIN_LINES..MAX_LINES) { "Unsupported line amount: $lines" }
         
         val (components, textCenterX) = overlayCache.get(OverlayCacheKey(icon, lines, longestLineLength)) {

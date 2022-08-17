@@ -1,14 +1,12 @@
 package xyz.xenondevs.nova.ui.overlay.character
 
 import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import xyz.xenondevs.nova.util.data.formatWithTemplate
+import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 
 object DefaultFont {
     
     private val charWidths = getResourceAsStream("char_widths.bin")!!.readAllBytes()
-    private val vertMoveTemplates = HashMap<Int, BaseComponent>()
     
     fun getStringLength(string: String): Int {
         var size = 0
@@ -25,11 +23,17 @@ object DefaultFont {
         // For that reason, only 20 vertical movement fonts are included for now.
         require(distance in -20..0) { "No font for vertical distance $distance available" }
         
-        return components.formatWithTemplate(vertMoveTemplates.getOrPut(distance) {
-            ComponentBuilder("")
-                .font("nova:default/$distance")
-                .create()[0]
-        })
+        val moved = components.copyOf()
+        moved.forEach {
+            val rawFont = it.fontRaw
+            if (rawFont == null || rawFont == "default") {
+                it.font = "nova:default/$distance"
+            } else if (rawFont.startsWith(TextureIconContent.FONT_NAME_START)) {
+                it.font = "${rawFont.substringBeforeLast('/')}/$distance"
+            }
+        }
+        
+        return moved
     }
     
 }

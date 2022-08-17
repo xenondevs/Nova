@@ -110,6 +110,13 @@ fun TranslatableComponent.toPlainText(locale: String): String {
     return text.removeMinecraftFormatting()
 }
 
+fun BaseComponent.toPlainText(locale: String): String {
+    return when (this) {
+        is TranslatableComponent -> return toPlainText(locale)
+        else -> toPlainText()
+    }
+}
+
 fun Array<BaseComponent>.forceDefaultFont(): Array<BaseComponent> {
     return formatWithTemplate(DEFAULT_FONT_TEMPLATE)
 }

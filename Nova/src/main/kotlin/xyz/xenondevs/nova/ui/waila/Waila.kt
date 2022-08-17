@@ -29,18 +29,16 @@ internal class Waila(val player: Player) {
     }
     
     fun update(pos: BlockPos?) {
-        if (lookingAt != pos) {
-            lookingAt = pos
-            setActive(tryUpdate(pos))
-        }
+        lookingAt = pos
+        setActive(tryUpdate(pos))
     }
     
     private fun tryUpdate(pos: BlockPos?): Boolean {
         if (pos != null) {
             val info = WailaInfoProviderRegistry.getInfo(player, pos) ?: return false
             require(info.text.size <= 10) { "Waila text can't be longer than 10 lines" }
-            val icon = Resources.getWailaIconDataOrNull(info.icon) ?: return false
-        
+            val icon = Resources.getWailaIconCharOrNull(info.icon) ?: return false
+            
             val centerX = imageOverlay.update(icon, info.text.size, info.widths.max())
             info.text.forEachIndexed { idx, text ->
                 val overlay = lineOverlays[idx]
@@ -49,7 +47,7 @@ internal class Waila(val player: Player) {
                 overlay.width = info.widths[idx]
                 overlay.changed = true
             }
-        
+            
             return true
         }
         

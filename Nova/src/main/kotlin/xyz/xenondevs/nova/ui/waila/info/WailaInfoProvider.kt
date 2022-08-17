@@ -11,6 +11,13 @@ import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.util.data.toPlainText
 
+fun WailaInfo(icon: NamespacedId, text: List<Pair<Array<BaseComponent>, Int?>>, player: Player): WailaInfo =
+    WailaInfo(
+        icon,
+        text.map { it.first },
+        text.map { it.second ?: DefaultFont.getStringLength(it.first.toPlainText(player.locale)) }
+    )
+
 class WailaInfo {
     
     val icon: NamespacedId

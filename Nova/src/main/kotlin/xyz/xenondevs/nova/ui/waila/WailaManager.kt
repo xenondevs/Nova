@@ -46,8 +46,8 @@ internal object WailaManager : Initializable(), Listener {
     }
     
     private fun handleTick() {
-        overlays.forEach { (player, waila) -> 
-            player.getTargetBlockExact(5)?.pos?.let(waila::update)
+        overlays.forEach { (player, waila) ->
+            waila.update(player.getTargetBlockExact(5)?.pos)
         }
     }
     

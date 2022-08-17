@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.builder
+package xyz.xenondevs.nova.data.resources.builder.content
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.addon.assets.ModelInformation
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
 import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
