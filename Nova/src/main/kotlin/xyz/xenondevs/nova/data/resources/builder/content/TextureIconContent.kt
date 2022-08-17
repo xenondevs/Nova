@@ -5,8 +5,8 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import java.io.File
 
-private const val SIZE = 8
-private const val ASCENT = 7
+private const val SIZE = 16
+private const val ASCENT = 12
 
 internal class TextureIconContent : FontContent<FontChar, TextureIconContent.TextureFontData>(
     Resources::updateTextureIconLookup, true
