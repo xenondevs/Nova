@@ -83,8 +83,8 @@
   "item.nova.wrench.mode.nova.energy": "Režim: Energie",
   "item.nova.wrench.mode.nova.items": "Režim: Předměty",
   "item.nova.wrench.mode.nova.fluid": "Režím: Kapaliny",
-  "command.nova.network_debug.nova.fluid": "Zapnout režim ladění pro Sítě-Kapaliny.",
-  "command.nova.network_debug.nova.energy": "Zapnout režim ladění pro Energetické-Sítě.",
+  "command.nova.network_debug.nova.fluid": "Zapnout režim ladění pro Kapalinové Sítě.",
+  "command.nova.network_debug.nova.energy": "Zapnout režim ladění pro Energetické Sítě.",
   "command.nova.resource_pack.create.success": "Resource pack byl vytvořen. Doporučujeme restartovat server.",
   "command.nova.resource_pack.reupload.start": "Nahrávám resource pack... prosím počkejte",
   "command.nova.resource_pack.reupload.success": "Resource pack byl nahrán na %s.",
@@ -92,5 +92,13 @@
   "command.nova.resource_pack.create.start": "Vytvářím resource pack... Prosím čekejte",
   "command.nova.resource_pack.reupload.fail": "Nepodařilo se nahrát resource pack.",
   "command.nova.advanced_tooltips.false": "Vypnout pokročilou nápovědu.",
-  "menu.nova.items": "Předměty"
+  "menu.nova.items": "Předměty",
+  "menu.nova.side_config.north": "Sever",
+  "menu.nova.side_config.east": "Východ",
+  "menu.nova.side_config.south": "Jih",
+  "menu.nova.side_config.west": "Západ",
+  "menu.nova.side_config.up": "Vršek",
+  "menu.nova.side_config.down": "Spodek",
+  "command.nova.network_debug.nova.item": "Zapnout režim ladění pro Předmětové Sítě.",
+  "command.nova.update_chunk_search_id.success": "Vyhledávací ID chunku aktualizováno."
 }
