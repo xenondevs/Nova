@@ -66,6 +66,3 @@ ${dir}/
 # gradle directories
 build/
 gradle/
-
-# wip waila files
-Nova/src/main/resources/assets/nova/textures/waila/*

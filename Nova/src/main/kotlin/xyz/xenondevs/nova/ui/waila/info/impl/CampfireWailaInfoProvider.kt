@@ -1,0 +1,24 @@
+package xyz.xenondevs.nova.ui.waila.info.impl
+
+import org.bukkit.Material
+import org.bukkit.block.Block
+import org.bukkit.block.data.type.Campfire
+import org.bukkit.entity.Player
+import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.WailaInfo
+
+object CampfireWailaInfoProvider : VanillaWailaInfoProvider(
+    listOf(Material.CAMPFIRE, Material.SOUL_CAMPFIRE)
+) {
+    
+    override fun getInfo(player: Player, block: Block): WailaInfo {
+        val defaultInfo = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+        val lit = (block.blockData as Campfire).isLit
+        return WailaInfo(
+            NamespacedId("minecraft", if (lit) block.type.name.lowercase() else "campfire_off"),
+            defaultInfo.text, defaultInfo.widths
+        )
+    }
+    
+}
