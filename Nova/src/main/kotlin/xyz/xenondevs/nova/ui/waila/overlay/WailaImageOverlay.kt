@@ -83,7 +83,7 @@ internal class WailaImageOverlay : BossBarOverlay() {
             // the min x position for text to be displayed
             val textMin = -halfWidth + START_TEXTURE_SIZE + ICON_MARGIN_LEFT + ICON_SIZE + ICON_MARGIN_RIGHT
             // returns the middle between textMin and the end of the box, which is the center point of text
-            val textCenterX = textMin + (halfWidth - textMin) / 2
+            val textCenterX = textMin + (halfWidth - textMin - TEXT_MARGIN_RIGHT) / 2
     
             return@get components to textCenterX
         }

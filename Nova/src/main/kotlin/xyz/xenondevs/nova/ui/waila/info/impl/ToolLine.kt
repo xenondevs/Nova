@@ -19,7 +19,7 @@ private const val CROSS = "❌"
 
 typealias WidthLine = Pair<Array<BaseComponent>, Int>
 
-internal object ToolLine {
+object ToolLine {
     
     fun getToolLine(player: Player, block: Block): WidthLine {
         val tool = player.inventory.itemInMainHand
@@ -42,7 +42,7 @@ internal object ToolLine {
             builder.append(TranslatableComponent("waila.nova.required_tool")).color(ChatColor.GRAY)
             
             blockCategories.forEach {
-                builder.append(getToolIcon(blockLevel ?: ToolLevel.WOODEN, it)).color(ChatColor.WHITE)
+                builder.append(getToolIcon(blockLevel ?: ToolLevel.WOODEN, it), 16).color(ChatColor.WHITE)
             }
             
             builder.append(" ").font("default")
