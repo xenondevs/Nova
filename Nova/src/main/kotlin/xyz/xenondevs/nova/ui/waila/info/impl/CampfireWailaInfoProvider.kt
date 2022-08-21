@@ -13,12 +13,10 @@ object CampfireWailaInfoProvider : VanillaWailaInfoProvider(
 ) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
-        val defaultInfo = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
         val lit = (block.blockData as Campfire).isLit
-        return WailaInfo(
-            NamespacedId("minecraft", if (lit) block.type.name.lowercase() else "campfire_off"),
-            defaultInfo.text, defaultInfo.widths
-        )
+        info.icon = NamespacedId("minecraft", if (lit) block.type.name.lowercase() else "campfire_off")
+        return info
     }
     
 }

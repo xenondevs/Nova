@@ -8,16 +8,13 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 
-internal object CakeWailaInfoProvider : VanillaWailaInfoProvider(listOf(Material.CAKE)){
+internal object CakeWailaInfoProvider : VanillaWailaInfoProvider(listOf(Material.CAKE)) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
-        val defaultInfo = DefaultVanillaWailaInfoProvider.getInfo(player, block)
-    
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
         val bites = (block.blockData as Cake).bites
-        return WailaInfo(
-            NamespacedId("minecraft", if (bites == 0) "cake" else "cake_slice$bites"),
-            defaultInfo.text, defaultInfo.widths
-        )
+        info.icon = NamespacedId("minecraft", if (bites == 0) "cake" else "cake_slice$bites")
+        return info
     }
     
 }

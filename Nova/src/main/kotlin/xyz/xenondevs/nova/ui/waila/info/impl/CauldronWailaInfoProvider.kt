@@ -16,7 +16,7 @@ internal object CauldronWailaInfoProvider : VanillaWailaInfoProvider(
 ) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
-        val defaultInfo = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
         val levelled = block.blockData as Levelled
         val level = when(levelled.level) {
             1 -> "level1"
@@ -24,10 +24,8 @@ internal object CauldronWailaInfoProvider : VanillaWailaInfoProvider(
             3 -> "full"
             else -> throw IllegalStateException("Cauldron level is not 1, 2 or 3")
         }
-        return WailaInfo(
-            NamespacedId("minecraft", block.type.name.lowercase() + "_$level"),
-            defaultInfo.text, defaultInfo.widths
-        )
+        info.icon = NamespacedId("minecraft", block.type.name.lowercase() + "_$level")
+        return info
     }
     
 }

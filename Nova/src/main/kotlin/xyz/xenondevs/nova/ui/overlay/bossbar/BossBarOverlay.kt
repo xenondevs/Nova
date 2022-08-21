@@ -13,7 +13,7 @@ abstract class BossBarOverlay {
     /**
      * The components to display.
      */
-    abstract val components: Array<BaseComponent>
+    abstract val components: Array<out BaseComponent>
     
     /**
      * The width of the [components] in pixels.

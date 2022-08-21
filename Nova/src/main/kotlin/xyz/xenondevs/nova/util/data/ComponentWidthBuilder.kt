@@ -3,7 +3,9 @@ package xyz.xenondevs.nova.util.data
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
+import xyz.xenondevs.nova.data.resources.builder.content.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
+import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 
 class ComponentWidthBuilder(private val locale: String) {
     
@@ -31,6 +33,18 @@ class ComponentWidthBuilder(private val locale: String) {
     fun append(component: BaseComponent, width: Int): ComponentWidthBuilder {
         builder.append(component)
         this.width += width
+        return this
+    }
+    
+    fun append(fontChar: FontChar): ComponentWidthBuilder {
+        builder.append(fontChar.component)
+        width += fontChar.width
+        return this
+    }
+    
+    fun move(distance: Int): ComponentWidthBuilder {
+        builder.append(MoveCharacters.getMovingComponent(distance))
+        width += distance
         return this
     }
     

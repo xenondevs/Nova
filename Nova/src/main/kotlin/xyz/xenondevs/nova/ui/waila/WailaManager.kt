@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unregisterEvents
-import xyz.xenondevs.nova.world.pos
 
 private val UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getLong("waila.update_interval") }
 
@@ -37,18 +36,12 @@ internal object WailaManager : Initializable(), Listener {
         if (DEFAULT_CONFIG.getBoolean("waila.enabled")) {
             registerEvents()
             Bukkit.getOnlinePlayers().forEach(::addWailaOverlay)
-            tickTask = runTaskTimer(0, UPDATE_INTERVAL, ::handleTick)
+            tickTask = runTaskTimer(0, UPDATE_INTERVAL) { overlays.values.forEach(Waila::handleTick) }
         }
     }
     
     override fun disable() {
         overlays.values.forEach { it.setActive(false) }
-    }
-    
-    private fun handleTick() {
-        overlays.forEach { (player, waila) ->
-            waila.update(player.getTargetBlockExact(5)?.pos)
-        }
     }
     
     private fun addWailaOverlay(player: Player) {

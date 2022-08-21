@@ -11,32 +11,34 @@ import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.util.data.toPlainText
 
-fun WailaInfo(icon: NamespacedId, text: List<Pair<Array<BaseComponent>, Int?>>, player: Player): WailaInfo =
-    WailaInfo(
-        icon,
-        text.map { it.first },
-        text.map { it.second ?: DefaultFont.getStringLength(it.first.toPlainText(player.locale)) }
+class WailaLine(val components: Array<out BaseComponent>, val width: Int, val alignment: Alignment) {
+    
+    constructor(components: Array<out BaseComponent>, player: Player, alignment: Alignment) : this(
+        components,
+        DefaultFont.getStringLength(components.toPlainText(player.locale)),
+        alignment
     )
-
-class WailaInfo {
     
-    val icon: NamespacedId
-    val text: List<Array<BaseComponent>>
-    val widths: List<Int>
+    constructor(widthComponent: Pair<Array<out BaseComponent>, Int>, alignment: Alignment) : this(
+        widthComponent.first,
+        widthComponent.second,
+        alignment
+    )
     
-    constructor(icon: NamespacedId, text: List<Array<BaseComponent>>, width: List<Int>) {
-        this.icon = icon
-        this.text = text
-        this.widths = width
-    }
+    operator fun component1() = components
+    operator fun component2() = width
+    operator fun component3() = alignment
     
-    constructor(icon: NamespacedId, text: List<Array<BaseComponent>>, player: Player) {
-        this.icon = icon
-        this.text = text
-        this.widths = text.map { DefaultFont.getStringLength(it.toPlainText(player.locale)) }
+    enum class Alignment {
+        LEFT,
+        CENTERED,
+        FIRST_LINE,
+        PREVIOUS_LINE
     }
     
 }
+
+class WailaInfo(var icon: NamespacedId, var lines: MutableList<WailaLine>)
 
 sealed interface WailaInfoProvider<T> {
     fun getInfo(player: Player, block: T): WailaInfo

@@ -14,9 +14,11 @@ import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.resources.builder.content.FontChar
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.serialization.json.BlockModelDataSerialization
 import xyz.xenondevs.nova.data.serialization.json.EnumMapInstanceCreator
+import xyz.xenondevs.nova.data.serialization.json.FontCharSerialization
 import xyz.xenondevs.nova.data.serialization.json.IntRangeSerialization
 import xyz.xenondevs.nova.data.serialization.json.ItemStackSerialization
 import xyz.xenondevs.nova.data.serialization.json.LocationSerialization
@@ -36,24 +38,26 @@ import java.io.Reader
 import java.lang.reflect.Type
 import java.util.*
 
-val GSON: Gson =
-    GsonBuilder()
-        .setPrettyPrinting()
-        .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
-        .registerTypeHierarchyAdapter<NamespacedId>(NamespacedIdTypeAdapter)
-        .registerTypeHierarchyAdapter<NamespacedKey>(NamespacedKeyTypeAdapter)
-        .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerialization)
-        .registerTypeHierarchyAdapter<Location>(LocationSerialization)
-        .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
-        .registerTypeHierarchyAdapter<ItemNovaMaterial>(NovaMaterialSerialization)
-        .registerTypeHierarchyAdapter<YamlConfiguration>(YamlConfigurationTypeAdapter)
-        .registerTypeHierarchyAdapter<IntRange>(IntRangeSerialization)
-        .registerTypeHierarchyAdapter<LootTable>(LootTableSerialization)
-        .registerTypeHierarchyAdapter<LootItem>(LootItemSerialization)
-        .registerTypeHierarchyAdapter<BlockModelData>(BlockModelDataSerialization)
-        .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
-        .enableComplexMapKeySerialization()
-        .create()
+private val GSON_BUILDER = GsonBuilder()
+    .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
+    .registerTypeHierarchyAdapter<NamespacedId>(NamespacedIdTypeAdapter)
+    .registerTypeHierarchyAdapter<NamespacedKey>(NamespacedKeyTypeAdapter)
+    .registerTypeHierarchyAdapter<ItemStack>(ItemStackSerialization)
+    .registerTypeHierarchyAdapter<Location>(LocationSerialization)
+    .registerTypeHierarchyAdapter<World>(WorldTypeAdapter)
+    .registerTypeHierarchyAdapter<ItemNovaMaterial>(NovaMaterialSerialization)
+    .registerTypeHierarchyAdapter<YamlConfiguration>(YamlConfigurationTypeAdapter)
+    .registerTypeHierarchyAdapter<IntRange>(IntRangeSerialization)
+    .registerTypeHierarchyAdapter<LootTable>(LootTableSerialization)
+    .registerTypeHierarchyAdapter<LootItem>(LootItemSerialization)
+    .registerTypeHierarchyAdapter<BlockModelData>(BlockModelDataSerialization)
+    .registerTypeAdapter<FontChar>(FontCharSerialization)
+    .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
+    .enableComplexMapKeySerialization()
+
+val GSON: Gson = GSON_BUILDER.create()
+
+val PRETTY_GSON: Gson = GSON_BUILDER.setPrettyPrinting().create()
 
 fun File.parseJson(): JsonElement = reader().use(JsonParser::parseReader)
 
@@ -215,6 +219,9 @@ inline fun <reified T> Gson.fromJson(jsonElement: JsonElement?): T? {
 inline fun <reified T> Gson.fromJson(reader: Reader): T? {
     return fromJson(reader, type<T>())
 }
+
+inline fun <reified T> GsonBuilder.registerTypeAdapter(typeAdapter: Any): GsonBuilder =
+    registerTypeAdapter(T::class.java, typeAdapter)
 
 inline fun <reified T> GsonBuilder.registerTypeHierarchyAdapter(typeAdapter: Any): GsonBuilder =
     registerTypeHierarchyAdapter(T::class.java, typeAdapter)

@@ -33,7 +33,8 @@ overlay:
 # The waila overlay
 waila:
   enabled: true
-  update_interval: 1
+  pos_update_interval: 1
+  data_update_interval: 5
 
 # Default transfer rates for networks when tile entities are directly connected.
 network:

@@ -33,7 +33,7 @@ private val overlayCache: Cache<OverlayCacheKey, OverlayData> = CacheBuilder.new
     .build()
 
 private data class OverlayCacheKey(val icon: FontChar, val lines: Int, val longestLineLength: Int)
-private typealias OverlayData = Pair<Array<BaseComponent>, Int>
+private typealias OverlayData = Triple<Array<BaseComponent>, Int, Int>
 
 internal class WailaImageOverlay : BossBarOverlay() {
     
@@ -49,47 +49,47 @@ internal class WailaImageOverlay : BossBarOverlay() {
      *
      * @return The x position for centering the text.
      */
-    fun update(icon: FontChar, lines: Int, longestLineLength: Int): Int {
+    fun update(icon: FontChar, lines: Int, longestLineLength: Int): Pair<Int, Int> {
         require(lines in MIN_LINES..MAX_LINES) { "Unsupported line amount: $lines" }
         
-        val (components, textCenterX) = overlayCache.get(OverlayCacheKey(icon, lines, longestLineLength)) {
+        val (components, textBeginX, textCenterX) = overlayCache.get(OverlayCacheKey(icon, lines, longestLineLength)) {
             // left margin (2) + icon size (32) + distance between icon and text + right margin (2)
             // (margins are not counting start and end textures)
             val optimalWidth = ICON_MARGIN_LEFT + ICON_SIZE + ICON_MARGIN_RIGHT + longestLineLength + TEXT_MARGIN_RIGHT
-    
+            
             val partAmount = ceil(optimalWidth / PART_SIZE.toDouble()).toInt()
-    
+            
             val actualWidth = START_TEXTURE_SIZE + partAmount * PART_SIZE + END_TEXTURE_SIZE
             val halfWidth = actualWidth / 2
-    
+            
             val builder = ComponentBuilder()
                 .append(MoveCharacters.getMovingComponent(-halfWidth))
                 .append(getComponent(lines, 0)) // start texture
                 .append(MoveCharacters.getMovingComponent(-1)) // move one back
-    
+            
             repeat(partAmount) {
                 builder
                     .append(getComponent(lines, 1)) // part texture
                     .append(MoveCharacters.getMovingComponent(-1)) // move one back
             }
-    
+            
             val components = builder
                 .append(getComponent(lines, 2)) // end texture
                 .append(MoveCharacters.getMovingComponent(-actualWidth - 1 + ICON_MARGIN_LEFT + START_TEXTURE_SIZE)) // move to start icon texture
                 .append(icon.char.toString()).font(icon.font) // icon texture
-                .append(MoveCharacters.getMovingComponent(-1 - ICON_SIZE - ICON_MARGIN_LEFT - START_TEXTURE_SIZE + halfWidth)) // move back to the middle
+                .append(MoveCharacters.getMovingComponent(-1 - icon.width - ICON_MARGIN_LEFT - START_TEXTURE_SIZE + halfWidth)) // move back to the middle
                 .create()
-    
+            
             // the min x position for text to be displayed
             val textMin = -halfWidth + START_TEXTURE_SIZE + ICON_MARGIN_LEFT + ICON_SIZE + ICON_MARGIN_RIGHT
             // returns the middle between textMin and the end of the box, which is the center point of text
             val textCenterX = textMin + (halfWidth - textMin - TEXT_MARGIN_RIGHT) / 2
-    
-            return@get components to textCenterX
+            
+            return@get Triple(components, textMin, textCenterX)
         }
         
         this.components = components
-        return textCenterX
+        return textBeginX to textCenterX
     }
     
     /**

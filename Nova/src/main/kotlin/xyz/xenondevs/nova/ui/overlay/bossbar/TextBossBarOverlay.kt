@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.util.data.toPlainText
 abstract class TextBossBarOverlay(private val player: Player) : BossBarOverlay() {
     
     final override val centerX = null
-    abstract val text: Array<BaseComponent>
+    abstract val text: Array<out BaseComponent>
     abstract val x: Int
     abstract val y: Int
     

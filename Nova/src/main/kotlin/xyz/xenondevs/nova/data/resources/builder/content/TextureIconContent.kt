@@ -1,11 +1,12 @@
 package xyz.xenondevs.nova.data.resources.builder.content
 
 import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import java.io.File
 
-private const val SIZE = 16
+private const val HEIGHT = 16
 private const val ASCENT = 12
 
 internal class TextureIconContent : FontContent<FontChar, TextureIconContent.TextureFontData>(
@@ -23,30 +24,30 @@ internal class TextureIconContent : FontContent<FontChar, TextureIconContent.Tex
     }
     
     private fun exploreTexturesDir(namespace: String, texturesDir: File) {
-        val itemDir = File(texturesDir, "item/").takeIf(File::exists) ?: return
-        itemDir.walkTopDown().forEach { file ->
-            if (file.isDirectory || !file.extension.equals("png", true))
-                return@forEach
-            
-            val relPath = file.relativeTo(texturesDir).path.replace('\\', '/')
-            addFontEntry(
-                "${namespace}:${relPath.substringBeforeLast('.')}",
-                "${namespace}:$relPath"
-            )
-        }
+        (File(texturesDir, "block").walkTopDown() + File(texturesDir, "item").walkTopDown())
+            .forEach { file ->
+                if (file.isDirectory || !file.extension.equals("png", true))
+                    return@forEach
+                
+                val relPath = file.relativeTo(texturesDir).path.replace('\\', '/')
+                addFontEntry(
+                    "${namespace}:${relPath.substringBeforeLast('.')}",
+                    ResourcePath(namespace, relPath)
+                )
+            }
     }
     
-    override fun createFontData(id: Int, char: Char, path: String): TextureFontData =
-        TextureFontData("${FONT_NAME_START}_$id", char, path)
+    override fun createFontData(id: Int, char: Char, path: ResourcePath): TextureFontData =
+        TextureFontData("${FONT_NAME_START}_$id", char, path, getWidth(HEIGHT, path))
     
-    class TextureFontData(font: String, char: Char, path: String) : FontData<FontChar>(font, char, path) {
-        override val height = SIZE
+    class TextureFontData(font: String, char: Char, path: ResourcePath, width: Int) : FontData<FontChar>(font, char, path, width) {
+        override val height = HEIGHT
         override val ascent = ASCENT
-        override fun toFontInfo() = FontChar("$font/0", char)
+        override fun toFontInfo() = FontChar("$font/0", char, width)
     }
     
     companion object {
-        const val FONT_NAME_START = "nova:texture_icons_"
+        const val FONT_NAME_START = "nova:texture_icons"
     }
     
 }

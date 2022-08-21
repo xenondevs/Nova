@@ -17,7 +17,7 @@ object DefaultFont {
     fun getCharWidth(char: Char): Int =
         charWidths[char.code].toInt()
     
-    fun getVerticallyMovedText(components: Array<BaseComponent>, distance: Int): Array<BaseComponent> {
+    fun getVerticallyMovedText(components: Array<out BaseComponent>, distance: Int): Array<out BaseComponent> {
         // Due to Minecraft's inefficient font loading, too many fonts will cause the client to crash, even though
         // the same bitmap files are used.
         // For that reason, only 20 vertical movement fonts are included for now.

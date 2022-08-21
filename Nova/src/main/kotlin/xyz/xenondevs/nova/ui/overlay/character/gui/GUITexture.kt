@@ -6,7 +6,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.data.resources.builder.content.GUIFontChar
+import xyz.xenondevs.nova.data.resources.builder.content.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.data.formatWithTemplate
@@ -16,7 +16,7 @@ private val TITLE_TEMPLATE = ComponentBuilder("")
     .font("default")
     .create()[0]
 
-class GUITexture(private val info: GUIFontChar) {
+class GUITexture(private val info: FontChar) {
     
     val component: BaseComponent = ComponentBuilder(info.char.toString())
         .font(info.font)

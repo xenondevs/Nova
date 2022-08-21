@@ -18,8 +18,9 @@ internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
 ) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
-        val defaultInfo = DefaultVanillaWailaInfoProvider.getInfo(player, block)
-        return WailaInfo(getCandleId(block), defaultInfo.text, defaultInfo.widths)
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+        info.icon = getCandleId(block)
+        return info
     }
     
     private fun getCandleId(block: Block): NamespacedId {

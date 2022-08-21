@@ -5,12 +5,17 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.data.Powerable
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.block.data.type.TechnicalPiston
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
+import xyz.xenondevs.nova.ui.waila.info.WailaLine
+import xyz.xenondevs.nova.ui.waila.info.line.RedstonePowerLine
+import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
+import xyz.xenondevs.nova.util.data.ComponentWidthBuilder
 import xyz.xenondevs.nova.util.item.localizedName
 
 internal object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
@@ -22,15 +27,16 @@ internal object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null)
         val translate = TranslatableComponent(mainMaterial.localizedName ?: "block.minecraft.${mainMaterial.name.lowercase()}")
         translate.color = ChatColor.WHITE
         
-        return WailaInfo(
-            NamespacedId("minecraft", mainMaterial.name.lowercase()),
-            listOf(
-                ComponentBuilder().append(translate).color(ChatColor.WHITE).create() to null,
-                ComponentBuilder("minecraft:${material.name.lowercase()}").color(ChatColor.DARK_GRAY).create() to null,
-                ToolLine.getToolLine(player, block)
-            ),
-            player
-        )
+        val lines = ArrayList<WailaLine>()
+        lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), player, WailaLine.Alignment.CENTERED)
+        lines += WailaLine(ComponentBuilder("minecraft:${material.name.lowercase()}").color(ChatColor.DARK_GRAY).create(), player, WailaLine.Alignment.CENTERED)
+        lines += ToolLine.getToolLine(player, block)
+        if (block.blockData is Powerable) {
+            lines += WailaLine(ComponentWidthBuilder(player.locale).append("").create(), WailaLine.Alignment.CENTERED) // empty line
+            lines += RedstonePowerLine.getRedstonePowerLine(player, block)
+        }
+        
+        return WailaInfo(NamespacedId("minecraft", mainMaterial.name.lowercase()), lines)
     }
     
     private fun getMainMaterial(block: Block): Material {

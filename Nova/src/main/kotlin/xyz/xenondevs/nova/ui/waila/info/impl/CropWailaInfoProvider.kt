@@ -26,15 +26,13 @@ object CropWailaInfoProvider : VanillaWailaInfoProvider(
 ) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
-        val defaultInfo = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
         
         val ageable = block.blockData as Ageable
         val stage = ((ageable.age / ageable.maximumAge.toDouble()) * MAX_TEXTURE_STAGE[block.type]!!).roundToInt()
         
-        return WailaInfo(
-            NamespacedId("minecraft", block.type.name.lowercase() + "_stage$stage"),
-            defaultInfo.text, defaultInfo.widths
-        )
+        info.icon = NamespacedId("minecraft", block.type.name.lowercase() + "_stage$stage")
+        return info
     }
 
 }

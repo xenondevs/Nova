@@ -13,11 +13,9 @@ internal object SeaPickleWailaInfoProvider : VanillaWailaInfoProvider(
 ) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
-        val defaultInfo = DefaultVanillaWailaInfoProvider.getInfo(player, block)
-        return WailaInfo(
-            NamespacedId("minecraft", getSeaPickleName(block)),
-            defaultInfo.text, defaultInfo.widths
-        )
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+        info.icon = NamespacedId("minecraft", getSeaPickleName(block))
+        return info
     }
     
     private fun getSeaPickleName(block: Block): String {

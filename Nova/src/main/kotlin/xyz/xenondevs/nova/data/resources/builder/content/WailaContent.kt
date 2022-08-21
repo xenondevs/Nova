@@ -3,11 +3,11 @@ package xyz.xenondevs.nova.data.resources.builder.content
 import org.bukkit.Material
 import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.util.enumMapOf
 import java.io.File
-import javax.imageio.ImageIO
 
 //<editor-fold desc="Hardcoded Textures", defaultstate="collapsed">
 private val MATERIAL_TEXTURES = enumMapOf(
@@ -141,7 +141,8 @@ private val MATERIAL_TEXTURES = enumMapOf(
     Material.STRING to "item/string",
     Material.COBWEB to null,
     Material.BARRIER to "item/barrier",
-    Material.STRUCTURE_VOID to "item/structure_void"
+    Material.STRUCTURE_VOID to "item/structure_void",
+    Material.POINTED_DRIPSTONE to "item/pointed_dripstone",
 )
 
 private val TEXTURES = setOf(
@@ -162,11 +163,11 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
     init {
         MATERIAL_TEXTURES.forEach { (material, texture) ->
             val name = material.name.lowercase()
-            addFontEntry("minecraft:$name", (texture ?: "minecraft:block/$name") + ".png")
+            addFontEntry("minecraft:$name", ResourcePath.of((texture ?: "block/$name") + ".png"))
         }
         
         TEXTURES.forEach {
-            addFontEntry("minecraft:$it", "minecraft:block/$it.png")
+            addFontEntry("minecraft:$it", ResourcePath("minecraft", "block/$it.png"))
         }
     }
     
@@ -186,33 +187,19 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
             
             val idNamespace = pack.namespace.takeUnless { it == "nova" } ?: "minecraft" // all textures form "nova" asset pack are for minecraft blocks
             val id = "$idNamespace:${file.nameWithoutExtension}"
-            val path = "${pack.namespace}:waila/${file.name}"
+            val path = ResourcePath(pack.namespace, "waila/${file.name}")
             
             addFontEntry(id, path)
-            processImage(file)
         }
     }
     
-    private fun processImage(file: File) {
-        val image = ImageIO.read(file)
-        for (x in 0 until image.width) {
-            for (y in 0 until image.height) {
-                val color = image.getRGB(x, y)
-                if (color ushr 24 == 0)
-                    image.setRGB(x, y, 0x1000000)
-            }
-        }
-        
-        ImageIO.write(image, "png", file)
-    }
+    override fun createFontData(id: Int, char: Char, path: ResourcePath): WailaIconData =
+        WailaIconData("nova:waila_textures_$id", char, path, getWidth(SIZE, path))
     
-    override fun createFontData(id: Int, char: Char, path: String): WailaIconData =
-        WailaIconData("nova:waila_textures_$id", char, path)
-    
-    class WailaIconData(font: String, char: Char, path: String) : FontData<FontChar>(font, char, path) {
+    class WailaIconData(font: String, char: Char, path: ResourcePath, width: Int) : FontData<FontChar>(font, char, path, width) {
         override val height = SIZE
         override val ascent = ASCENT
-        override fun toFontInfo(): FontChar = FontChar(font, char)
+        override fun toFontInfo(): FontChar = FontChar(font, char, width)
     }
     
 }

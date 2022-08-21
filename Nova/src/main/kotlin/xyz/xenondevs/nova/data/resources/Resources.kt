@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.FontChar
-import xyz.xenondevs.nova.data.resources.builder.content.GUIFontChar
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
@@ -20,7 +19,7 @@ object Resources : Initializable() {
     override val dependsOn = setOf(AddonsLoader)
     
     private lateinit var modelDataLookup: Map<String, Pair<ItemModelData?, BlockModelData?>>
-    private lateinit var guiDataLookup: Map<String, GUIFontChar>
+    private lateinit var guiDataLookup: Map<String, FontChar>
     private lateinit var wailaDataLookup: Map<String, FontChar>
     private lateinit var textureIconLookup: Map<String, FontChar>
     internal lateinit var languageLookup: Map<String, Map<String, String>>
@@ -38,7 +37,7 @@ object Resources : Initializable() {
             languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>("languageLookup")!!
             textureIconLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>("textureIconLookup")!!
             wailaDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>("wailaDataLookup")!!
-            guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, GUIFontChar>>("guiDataLookup")!!
+            guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>("guiDataLookup")!!
         } else {
             // Create ResourcePack
             ResourcePackBuilder.buildPack()
@@ -65,7 +64,7 @@ object Resources : Initializable() {
         PermanentStorage.store("modelDataLookup", modelDataLookup)
     }
     
-    internal fun updateGuiDataLookup(guiDataLookup: Map<String, GUIFontChar>) {
+    internal fun updateGuiDataLookup(guiDataLookup: Map<String, FontChar>) {
         this.guiDataLookup = guiDataLookup
         PermanentStorage.store("guiDataLookup", guiDataLookup)
     }
@@ -101,19 +100,19 @@ object Resources : Initializable() {
         return modelDataLookup[id]
     }
     
-    fun getGUIChar(id: NamespacedId): GUIFontChar {
+    fun getGUIChar(id: NamespacedId): FontChar {
         return guiDataLookup[id.toString()]!!
     }
     
-    fun getGUIChar(id: String): GUIFontChar {
+    fun getGUIChar(id: String): FontChar {
         return guiDataLookup[id]!!
     }
     
-    fun getGUICharOrNull(id: NamespacedId): GUIFontChar? {
+    fun getGUICharOrNull(id: NamespacedId): FontChar? {
         return guiDataLookup[id.toString()]
     }
     
-    fun getGUICharOrNull(id: String): GUIFontChar? {
+    fun getGUICharOrNull(id: String): FontChar? {
         return guiDataLookup[id]
     }
     
