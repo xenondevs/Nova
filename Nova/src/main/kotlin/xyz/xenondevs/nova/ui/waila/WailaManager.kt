@@ -7,8 +7,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.scheduler.BukkitTask
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -19,7 +21,7 @@ private val UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getLong("waila.
 internal object WailaManager : Initializable(), Listener {
     
     override val inMainThread = true
-    override val dependsOn = emptySet<Initializable>()
+    override val dependsOn = setOf(Resources, AddonsInitializer)
     
     private var tickTask: BukkitTask? = null
     private val overlays = HashMap<Player, Waila>()
