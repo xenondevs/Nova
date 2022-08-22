@@ -24,9 +24,11 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
     
     internal abstract fun handleRemoved(unload: Boolean)
     
-    internal abstract fun saveData()
-    
     internal open fun handleBlockUpdate() = Unit
+    
+    internal open fun saveData() {
+        saveDataAccessors()
+    }
     
     internal enum class Type(val id: String, val constructor: VanillaTileEntityConstructor) {
         

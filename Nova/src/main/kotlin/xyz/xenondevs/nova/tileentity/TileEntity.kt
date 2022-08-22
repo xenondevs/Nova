@@ -140,6 +140,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             
             storeData("fluidContainer.${con.uuid}", compound, global)
         }
+        
+        saveDataAccessors()
     }
     
     /**

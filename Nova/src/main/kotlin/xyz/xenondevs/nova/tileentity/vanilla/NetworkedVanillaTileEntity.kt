@@ -33,6 +33,8 @@ internal abstract class NetworkedVanillaTileEntity internal constructor(state: V
         retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     
     override fun saveData() {
+        super.saveData()
+        
         storeData("networks", serializeNetworks())
         storeData("connectedNodes", serializeConnectedNodes())
     }

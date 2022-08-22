@@ -4,8 +4,11 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.TileEntity
+import java.lang.reflect.Type
 
-abstract class DataHolder(includeGlobal: Boolean) {
+abstract class DataHolder internal constructor(includeGlobal: Boolean) {
+    
+    val dataAccessors = ArrayList<DataAccessor<*>>()
     
     abstract val data: Compound
     val globalData: Compound by lazy {
@@ -31,7 +34,7 @@ abstract class DataHolder(includeGlobal: Boolean) {
     
     /**
      * Retrieves data using CBF deserialization from the data [Compound].
-     * If neither [data] nor [globalData] contains the given key, ``null`` is returned
+     * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
      */
     @Deprecated("Inconsistent name", ReplaceWith("retrieveDataOrNull<T>(key)"))
     inline fun <reified T> retrieveOrNull(key: String): T? {
@@ -40,12 +43,31 @@ abstract class DataHolder(includeGlobal: Boolean) {
     
     /**
      * Retrieves data using CBF deserialization from the data [Compound].
-     * If neither [data] nor [globalData] contains the given key, ``null`` is returned
+     * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
      */
     inline fun <reified T> retrieveDataOrNull(key: String): T? {
         if (legacyData != null)
             return legacyData!!.get<T>(key) ?: legacyGlobalData.get<T>(key)
         return data[key] ?: globalData[key]
+    }
+    
+    /**
+     * Retrieves data of the specified [type] from the data [Compound] of this TileEntity.
+     * If it can't find anything under the given key, the result of the
+     * [getAlternative] lambda is returned.
+     */
+    fun <T> retrieveData(type: Type, key: String, getAlternative: () -> T): T {
+        return retrieveDataOrNull(type, key) ?: getAlternative()
+    }
+    
+    /**
+     * Retrieves data of the specified [type] using CBF deserialization from the data [Compound].
+     * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
+     */
+    fun <T> retrieveDataOrNull(type: Type, key: String): T? {
+        if (legacyData != null)
+            return legacyData!!.get(type, key) ?: legacyGlobalData.get(type, key)
+        return data.get(type, key) ?: globalData.get(type, key)
     }
     
     /**
@@ -65,6 +87,45 @@ abstract class DataHolder(includeGlobal: Boolean) {
             if (value != null) data[key] = value
             else data.remove(key)
         }
+    }
+    
+    /**
+     * Creates a [DataAccessor] to which properties can delegate.
+     * 
+     * The non-global value under the [key] is retrieved and [getAlternative] is called if there is no
+     * value stored under that key.
+     */
+    inline fun <reified T> storedValue(key: String, getAlternative: () -> T): DataAccessor<T> {
+        return storedValue(key, false, getAlternative)
+    }
+    
+    /**
+     * Creates a [DataAccessor] to which properties can delegate.
+     * 
+     * The value under the [key] is retrieved and [getAlternative] is called if there is no value
+     * stored under that key.
+     * 
+     * @param global If the data should also be stored in the [ItemStack] of this [TileEntity].
+     */
+    inline fun <reified T> storedValue(key: String, global: Boolean, getAlternative: () -> T): DataAccessor<T> {
+        val initialValue = retrieveData(key, getAlternative)
+        return NonNullDataAccessor(this, key, global, initialValue).also(dataAccessors::add)
+    }
+    
+    /**
+     * Creates a [DataAccessor] to which properties can delegate.
+     * 
+     * The value under the [key] is retrieved and null is returned if there is no value stored under that key.
+     * 
+     * @param global If the data should also be stored in the [ItemStack] of this [TileEntity].
+     */
+    inline fun <reified T> storedValue(key: String, global: Boolean = false): DataAccessor<T?> {
+        val initialValue = retrieveDataOrNull<T>(key)
+        return NullableDataAccessor(this, key, global, initialValue).also(dataAccessors::add)
+    }
+    
+    internal fun saveDataAccessors() {
+        dataAccessors.forEach(DataAccessor<*>::save)
     }
     
 }
