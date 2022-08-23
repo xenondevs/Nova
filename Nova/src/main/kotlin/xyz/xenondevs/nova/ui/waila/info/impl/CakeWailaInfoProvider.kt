@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 
-internal object CakeWailaInfoProvider : VanillaWailaInfoProvider(listOf(Material.CAKE)) {
+internal object CakeWailaInfoProvider : VanillaWailaInfoProvider(setOf(Material.CAKE)) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)

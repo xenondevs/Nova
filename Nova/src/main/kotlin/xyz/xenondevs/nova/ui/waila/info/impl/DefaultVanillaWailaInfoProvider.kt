@@ -5,7 +5,6 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.block.data.Powerable
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.block.data.type.TechnicalPiston
 import org.bukkit.entity.Player
@@ -13,12 +12,10 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
-import xyz.xenondevs.nova.ui.waila.info.line.RedstonePowerLine
 import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
-import xyz.xenondevs.nova.util.data.ComponentWidthBuilder
 import xyz.xenondevs.nova.util.item.localizedName
 
-internal object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
+object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
         val material = block.type
@@ -31,10 +28,6 @@ internal object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null)
         lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), player, WailaLine.Alignment.CENTERED)
         lines += WailaLine(ComponentBuilder("minecraft:${material.name.lowercase()}").color(ChatColor.DARK_GRAY).create(), player, WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block)
-        if (block.blockData is Powerable) {
-            lines += WailaLine(ComponentWidthBuilder(player.locale).append("").create(), WailaLine.Alignment.CENTERED) // empty line
-            lines += RedstonePowerLine.getRedstonePowerLine(player, block)
-        }
         
         return WailaInfo(NamespacedId("minecraft", mainMaterial.name.lowercase()), lines)
     }
@@ -60,6 +53,14 @@ internal object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null)
             Material.WALL_TORCH -> Material.TORCH
             Material.REDSTONE_WALL_TORCH -> Material.TORCH
             Material.SOUL_WALL_TORCH -> Material.TORCH
+            
+            // head / skull
+            Material.ZOMBIE_WALL_HEAD -> Material.ZOMBIE_HEAD
+            Material.CREEPER_WALL_HEAD -> Material.CREEPER_HEAD
+            Material.PLAYER_WALL_HEAD -> Material.PLAYER_HEAD
+            Material.SKELETON_WALL_SKULL -> Material.SKELETON_SKULL
+            Material.WITHER_SKELETON_WALL_SKULL -> Material.WITHER_SKELETON_SKULL
+            Material.DRAGON_WALL_HEAD -> Material.DRAGON_HEAD
             
             // misc
             Material.BIG_DRIPLEAF_STEM -> Material.BIG_DRIPLEAF

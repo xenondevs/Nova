@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 
 internal object SeaPickleWailaInfoProvider : VanillaWailaInfoProvider(
-    listOf(Material.SEA_PICKLE)
+    setOf(Material.SEA_PICKLE)
 ) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {

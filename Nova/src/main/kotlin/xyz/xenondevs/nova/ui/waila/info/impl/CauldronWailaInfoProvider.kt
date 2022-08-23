@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 
 internal object CauldronWailaInfoProvider : VanillaWailaInfoProvider(
-    listOf(
+    setOf(
         Material.WATER_CAULDRON,
         Material.POWDER_SNOW_CAULDRON
     )

@@ -18,8 +18,8 @@ private val MAX_TEXTURE_STAGE = mapOf(
     Material.SWEET_BERRY_BUSH to 3
 )
 
-object CropWailaInfoProvider : VanillaWailaInfoProvider(
-    listOf(
+internal object CropWailaInfoProvider : VanillaWailaInfoProvider(
+    setOf(
         Material.BEETROOTS, Material.CARROTS, Material.NETHER_WART, Material.POTATOES,
         Material.SWEET_BERRY_BUSH, Material.WHEAT
     )
