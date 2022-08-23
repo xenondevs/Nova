@@ -54,14 +54,17 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
 class AddNumberItem(
     getRange: () -> IntRange,
     getNumber: () -> Int,
-    setNumber: (Int) -> Unit
+    setNumber: (Int) -> Unit,
+    localizedName: String? = null
 ) : ChangeNumberItem(
     1,
     10,
     getRange,
     getNumber,
     setNumber,
-    CoreGUIMaterial.PLUS_BTN_ON.clientsideProvider,
+    localizedName
+        ?.let { CoreGUIMaterial.PLUS_BTN_ON.createClientsideItemBuilder().setDisplayName(TranslatableComponent(it)) }
+        ?: CoreGUIMaterial.PLUS_BTN_ON.clientsideProvider,
     CoreGUIMaterial.PLUS_BTN_OFF.clientsideProvider
 )
 
@@ -69,13 +72,16 @@ class RemoveNumberItem(
     getRange: () -> IntRange,
     getNumber: () -> Int,
     setNumber: (Int) -> Unit,
+    localizedName: String? = null
 ) : ChangeNumberItem(
     -1,
     -10,
     getRange,
     getNumber,
     setNumber,
-    CoreGUIMaterial.MINUS_BTN_ON.clientsideProvider,
+    localizedName
+        ?.let { CoreGUIMaterial.MINUS_BTN_ON.createClientsideItemBuilder().setDisplayName(TranslatableComponent(it)) } 
+        ?: CoreGUIMaterial.MINUS_BTN_ON.clientsideProvider,
     CoreGUIMaterial.MINUS_BTN_OFF.clientsideProvider
 )
 

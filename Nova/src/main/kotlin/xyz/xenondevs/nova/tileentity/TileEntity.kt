@@ -50,7 +50,12 @@ import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.block.TileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
+import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
+import xyz.xenondevs.nova.world.region.ReloadableRegion
+import xyz.xenondevs.nova.world.region.StaticRegion
+import xyz.xenondevs.nova.world.region.UpgradableRegion
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
@@ -93,6 +98,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     internal val multiModels = ArrayList<MultiModel>()
     internal val particleTasks = ArrayList<TileEntityParticleTask>()
+    private val regions = HashMap<String, ReloadableRegion>()
     
     private val _inventories = HashMap<VirtualInventory, Boolean>()
     private val _fluidContainers = HashMap<NovaFluidContainer, Boolean>()
@@ -102,24 +108,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val fluidContainers: List<FluidContainer>
         get() = _fluidContainers.keys.toList()
     
-    override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
-        val drops = ArrayList<ItemStack>()
-        if (includeSelf) {
-            saveData()
-            
-            val item = material.createItemStack()
-            if (globalData.isNotEmpty()) {
-                val itemMeta = item.itemMeta!!
-                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, globalData)
-                item.itemMeta = itemMeta
-            }
-            
-            drops += item
-        }
-        
-        if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
-        _inventories.forEach { (inv, global) -> if (!global) drops += inv.items.filterNotNull() }
-        return drops
+    override fun reload() {
+        regions.values.forEach(ReloadableRegion::reload)
     }
     
     /**
@@ -141,7 +131,34 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             storeData("fluidContainer.${con.uuid}", compound, global)
         }
         
+        regions.forEach { (name, region) ->
+            if (region !is DynamicRegion)
+                return@forEach
+            
+            storeData("region.$name", region.size)
+        }
+        
         saveDataAccessors()
+    }
+    
+    override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
+        val drops = ArrayList<ItemStack>()
+        if (includeSelf) {
+            saveData()
+            
+            val item = material.createItemStack()
+            if (globalData.isNotEmpty()) {
+                val itemMeta = item.itemMeta!!
+                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, globalData)
+                item.itemMeta = itemMeta
+            }
+            
+            drops += item
+        }
+        
+        if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
+        _inventories.forEach { (inv, global) -> if (!global) drops += inv.items.filterNotNull() }
+        return drops
     }
     
     /**
@@ -176,6 +193,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         
         multiModels.forEach { it.close() }
         particleTasks.forEach { it.stop() }
+        regions.values.forEach { VisualRegion.removeRegion(it.uuid) }
     }
     
     /**
@@ -274,6 +292,108 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         updateHandler?.apply(container.updateHandlers::add)
         _fluidContainers[container] = global
         return container
+    }
+    
+    /**
+     * Creates a new [StaticRegion] with a reloadable [size] under the name "default".
+     */
+    fun createStaticRegion(
+        size: ValueReloadable<Int>,
+        createRegion: (Int) -> Region
+    ): StaticRegion = createStaticRegion("default", size, createRegion)
+    
+    /**
+     * Creates a new [StaticRegion] with a reloadable [size] under the given [name].
+     */
+    fun createStaticRegion(
+        name: String,
+        size: ValueReloadable<Int>,
+        createRegion: (Int) -> Region
+    ): StaticRegion {
+        check(name !in regions) { "Another region is already registered under the name $name." }
+        
+        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val region = StaticRegion(uuid, size, createRegion)
+        regions[name] = region
+        
+        return region
+    }
+    
+    /**
+     * Creates a new dynamic region with the reloadable bounds [minSize] and [maxSize] under the name "default".
+     * If this [TileEntity] did not save a size under that name before, [defaultSize] is used.
+     * 
+     * The configured size will be automatically saved during [TileEntity.saveData].
+     */
+    fun getDynamicRegion(
+        minSize: ValueReloadable<Int>,
+        maxSize: ValueReloadable<Int>,
+        defaultSize: Int,
+        createRegion: (Int) -> Region
+    ): DynamicRegion = getDynamicRegion("default", minSize, maxSize, defaultSize, createRegion)
+    
+    /**
+     * Creates a new dynamic region with the reloadable bounds [minSize] and [maxSize] under the given [name].
+     * If this [TileEntity] did not save a size under that name before, [defaultSize] is used.
+     *
+     * The configured size will be automatically saved during [TileEntity.saveData].
+     */
+    fun getDynamicRegion(
+        name: String,
+        minSize: ValueReloadable<Int>,
+        maxSize: ValueReloadable<Int>,
+        defaultSize: Int,
+        createRegion: (Int) -> Region
+    ): DynamicRegion {
+        check(name !in regions) { "Another region is already registered under the name $name." }
+        
+        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val size = retrieveDataOrNull<Int>("region.$name") ?: defaultSize
+        val region = DynamicRegion(uuid, minSize, maxSize, size, createRegion)
+        regions[name] = region
+        
+        return region
+    }
+    
+    /**
+     * Creates a new upgradable region with the reloadable bounds [minSize] and [maxSize] under the name "default"
+     * using the specified [upgradeType] as a modifier for [maxSize].
+     * If this [TileEntity] did not save a size under that name before, [defaultSize] is used.
+     *
+     * The configured size will be automatically saved during [TileEntity.saveData].
+     */
+    fun getUpgradableRegion(
+        upgradeType: UpgradeType<Int>,
+        minSize: ValueReloadable<Int>,
+        maxSize: ValueReloadable<Int>,
+        defaultSize: Int,
+        createRegion: (Int) -> Region
+    ): UpgradableRegion = getUpgradableRegion("default", upgradeType, minSize, maxSize, defaultSize, createRegion)
+    
+    /**
+     * Creates a new upgradable region with the reloadable bounds [minSize] and [maxSize] under the given [name]
+     * using the specified [upgradeType] as a modifier for [maxSize].
+     * If this [TileEntity] did not save a size under that name before, [defaultSize] is used.
+     *
+     * The configured size will be automatically saved during [TileEntity.saveData].
+     */
+    fun getUpgradableRegion(
+        name: String,
+        upgradeType: UpgradeType<Int>,
+        minSize: ValueReloadable<Int>,
+        maxSize: ValueReloadable<Int>,
+        defaultSize: Int,
+        createRegion: (Int) -> Region
+    ): UpgradableRegion {
+        check(name !in regions) { "Another region is already registered under the name $name." }
+        check(this is Upgradable) { "Can't create an UpgradableRegion for a TileEntity that isn't Upgradable" }
+        
+        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val size = retrieveDataOrNull<Int>("region.$name") ?: defaultSize
+        val region = UpgradableRegion(uuid, upgradeHolder, upgradeType, minSize, maxSize, size, createRegion)
+        regions[name] = region
+        
+        return region
     }
     
     /**

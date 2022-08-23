@@ -51,6 +51,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     }
     
     override fun reload() {
+        super.reload()
         holders.forEach { (_, holder) -> holder.reload() }
     }
     
