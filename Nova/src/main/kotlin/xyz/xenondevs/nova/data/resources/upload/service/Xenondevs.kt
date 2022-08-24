@@ -17,7 +17,7 @@ internal object Xenondevs : UploadService {
     private const val API_URL = "https://api.xenondevs.xyz/nova/rp/patreon/upload"
     
     override val name = "xenondevs"
-    lateinit var key: String
+    private lateinit var key: String
     
     override fun loadConfig(cfg: ConfigurationSection) {
         key = cfg.getString("key")

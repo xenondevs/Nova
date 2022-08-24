@@ -40,6 +40,9 @@ fun String.removeMinecraftFormatting(): String {
 fun String.addPrefix(prefix: String): String =
     if (startsWith(prefix)) this else "$prefix$this"
 
+fun String.addSuffix(suffix: String): String =
+    if (endsWith(suffix)) this else "$this$suffix"
+
 fun String.addNamespace(namespace: String): String =
     addPrefix("$namespace:")
 

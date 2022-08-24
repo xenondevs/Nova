@@ -26,6 +26,7 @@ libraries:
   - org.ow2.asm:asm-commons:${asm.version}
   - org.ow2.asm:asm-tree:${asm.version}
   - org.ow2.asm:asm-util:${asm.version}
+  - software.amazon.awssdk:s3:${aws.version}
 
 softdepend:
   - WorldGuard

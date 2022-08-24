@@ -26,6 +26,7 @@
         <maven-resolver-transport-http.version>1.8.0</maven-resolver-transport-http.version>
         <asm.version>9.3</asm.version>
         <byte-buddy.version>1.12.10</byte-buddy.version>
+        <aws.version>2.17.259</aws.version>
     </properties>
 
     <pluginRepositories>
@@ -225,6 +226,11 @@
             <groupId>io.ktor</groupId>
             <artifactId>ktor-serialization-gson-jvm</artifactId>
             <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>${aws.version}</version>
         </dependency>
         <!-- Provided through library loader, not transitive -->
         <dependency>

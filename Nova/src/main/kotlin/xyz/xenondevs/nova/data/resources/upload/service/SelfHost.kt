@@ -21,12 +21,13 @@ import kotlin.concurrent.thread
 @Suppress("HttpUrlsUsage")
 internal object SelfHost : UploadService {
     
-    private val selfHostDir = File(NOVA.dataFolder, "resource_pack/self_host")
-    private val packFile = File(selfHostDir, "pack.zip")
-    private lateinit var server: NettyApplicationEngine
+    override val name = "SelfHost"
     internal val startedLatch = Latch()
     
-    override val name = "SelfHost"
+    private val selfHostDir = File(NOVA.dataFolder, "resource_pack/self_host")
+    private val packFile = File(selfHostDir, "pack.zip")
+    
+    private lateinit var server: NettyApplicationEngine
     
     private lateinit var host: String
     private var port = 38519
