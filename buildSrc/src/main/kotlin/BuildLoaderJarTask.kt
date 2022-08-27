@@ -62,6 +62,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         
         // copy to custom output directory
         val customOutDir = System.getProperty("outDir")?.let(::File) ?: return
+        customOutDir.mkdirs()
         val copyTo = File(customOutDir, outFile.name)
         outFile.inputStream().use { ins -> copyTo.outputStream().use { out -> ins.copyTo(out) } }
     }
