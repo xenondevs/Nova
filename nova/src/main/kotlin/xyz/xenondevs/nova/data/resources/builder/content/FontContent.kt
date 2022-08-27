@@ -13,7 +13,7 @@ import java.io.FileNotFoundException
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
 
-private const val START_CHAR = '\u0001'
+private const val START_CHAR = '\uF000'
 
 internal abstract class FontContent<C : FontChar, D : FontContent.FontData<C>>(
     private val updateResources: ((Map<String, C>) -> Unit)? = null,

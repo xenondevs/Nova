@@ -7,10 +7,10 @@ import org.bukkit.GameMode
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
 import xyz.xenondevs.nova.util.data.ComponentWidthBuilder
-import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolCategory
 import xyz.xenondevs.nova.util.item.ToolLevel
 import xyz.xenondevs.nova.util.item.ToolUtils
@@ -23,12 +23,44 @@ object ToolLine {
     fun getToolLine(player: Player, block: Block): WailaLine {
         val tool = player.inventory.itemInMainHand
         val blockType = block.type
-        val blockCategories = ToolCategory.ofBlock(blockType)
-        val blockLevel = ToolLevel.ofBlock(blockType)
+        return getToolLine(
+            player,
+            ToolCategory.ofBlock(blockType),
+            ToolLevel.ofBlock(blockType), 
+            blockType.hardness.toDouble(),
+            ToolUtils.isCorrectToolForDrops(tool.type, block)
+        )
+    }
+    
+    fun getToolLine(player: Player, block: BlockNovaMaterial): WailaLine {
+        val tool = player.inventory.itemInMainHand
+        val toolType = tool.type
+        val itemToolCategory = ToolCategory.ofItem(toolType)
+        
+        val correctCategory =  itemToolCategory != null && block.toolCategory == itemToolCategory
+        val correctLevel = block.toolLevel == null || tool.type in block.toolLevel.materialsWithHigherTier
+        
+        return getToolLine(
+            player,
+            block.toolCategory?.let(::listOf) ?: emptyList(),
+            block.toolLevel,
+            block.hardness,
+            !block.requiresToolForDrops || (correctCategory && correctLevel)
+        )
+    }
+    
+    fun getToolLine(
+        player: Player,
+        blockToolCategories: List<ToolCategory>,
+        blockToolLevel: ToolLevel?,
+        hardness: Double,
+        correctToolForDrops: Boolean
+    ): WailaLine {
+        val tool = player.inventory.itemInMainHand
         val toolType = tool.type
         
         val builder = ComponentWidthBuilder(player.locale)
-        if (block.hardness < 0) {
+        if (hardness < 0) {
             return WailaLine(
                 builder
                     .append(TranslatableComponent("waila.nova.required_tool.unbreakable"))
@@ -38,13 +70,13 @@ object ToolLine {
             )
         }
         
-        val canBreak = player.gameMode == GameMode.CREATIVE || ToolUtils.isCorrectToolForDrops(toolType, block)
+        val canBreak = player.gameMode == GameMode.CREATIVE || correctToolForDrops
         
-        if (blockCategories.isNotEmpty()) {
+        if (blockToolCategories.isNotEmpty()) {
             builder.append(TranslatableComponent("waila.nova.required_tool")).color(ChatColor.GRAY)
             
-            blockCategories.forEach {
-                builder.append(getToolIcon(blockLevel ?: ToolLevel.WOODEN, it), 16).color(ChatColor.WHITE)
+            blockToolCategories.forEach {
+                builder.append(getToolIcon(blockToolLevel ?: ToolLevel.WOODEN, it), 16).color(ChatColor.WHITE)
             }
             
             builder.append(" ").font("default")
