@@ -1,14 +1,13 @@
 package xyz.xenondevs.nova.world.loot
 
-import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.world.LootGenerateEvent
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.util.registerEvents
 
 internal object LootGeneration : Initializable(), Listener {
     
@@ -19,7 +18,7 @@ internal object LootGeneration : Initializable(), Listener {
     override val dependsOn = setOf(LootConfigHandler)
     
     override fun init() {
-        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
+        registerEvents()
     }
     
     @EventHandler

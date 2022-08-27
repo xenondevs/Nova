@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.api.Nova as INova
 
 private val REQUIRED_SERVER_VERSION = Version("1.19.1")..Version("1.19.2")
 
-lateinit var NOVA: Nova
+internal lateinit var NOVA: Nova
     private set
 
 internal var IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null

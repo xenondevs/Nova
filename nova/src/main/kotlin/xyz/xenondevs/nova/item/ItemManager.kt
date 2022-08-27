@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.item
 
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -12,11 +11,9 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
@@ -26,6 +23,8 @@ import xyz.xenondevs.nova.util.bukkitSlot
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.registerPacketListener
 
 internal object ItemManager : Initializable(), Listener {
     
@@ -35,8 +34,8 @@ internal object ItemManager : Initializable(), Listener {
     private val usedItems = HashMap<Player, ItemStack>()
     
     override fun init() {
-        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        PacketEventManager.registerListener(this)
+        registerEvents()
+        registerPacketListener()
     }
     
     @EventHandler(priority = EventPriority.LOW)

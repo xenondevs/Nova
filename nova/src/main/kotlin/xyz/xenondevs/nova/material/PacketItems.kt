@@ -8,7 +8,6 @@ import net.minecraft.nbt.StringTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData.DataItem
 import net.minecraft.world.item.Items
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Player
@@ -19,7 +18,6 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
@@ -27,7 +25,6 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEntityData
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
@@ -44,6 +41,8 @@ import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.namespacedKey
+import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.registerPacketListener
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -70,8 +69,8 @@ internal object PacketItems : Initializable(), Listener {
     override val dependsOn = setOf(Resources)
     
     override fun init() {
-        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
-        PacketEventManager.registerListener(this)
+        registerEvents()
+        registerPacketListener()
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)

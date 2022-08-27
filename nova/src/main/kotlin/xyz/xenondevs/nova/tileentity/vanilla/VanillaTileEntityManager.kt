@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -9,11 +8,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.chunkPos
@@ -30,7 +29,7 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
     private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, VanillaTileEntity>>()
     
     override fun init() {
-        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
+        registerEvents()
     }
     
     @Synchronized

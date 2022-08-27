@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package xyz.xenondevs.nova.util
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
@@ -20,55 +18,55 @@ import java.util.logging.Level
 
 val USE_NOVA_SCHEDULER by configReloadable { DEFAULT_CONFIG.getBoolean("performance.nova_executor.enabled") }
 
-inline fun runTaskLater(delay: Long, noinline run: () -> Unit) =
-    Bukkit.getScheduler().runTaskLater(NOVA, run, delay)
+fun runTaskLater(delay: Long, run: () -> Unit) =
+    Bukkit.getScheduler().runTaskLater(NOVA.loader, run, delay)
 
-inline fun runTask(noinline run: () -> Unit) =
-    Bukkit.getScheduler().runTask(NOVA, run)
+fun runTask(run: () -> Unit) =
+    Bukkit.getScheduler().runTask(NOVA.loader, run)
 
-inline fun runTaskTimer(delay: Long, period: Long, noinline run: () -> Unit) =
-    Bukkit.getScheduler().runTaskTimer(NOVA, run, delay, period)
+fun runTaskTimer(delay: Long, period: Long, run: () -> Unit) =
+    Bukkit.getScheduler().runTaskTimer(NOVA.loader, run, delay, period)
 
-inline fun runTaskSynchronized(lock: Any, noinline run: () -> Unit) =
-    Bukkit.getScheduler().runTask(NOVA, Runnable { synchronized(lock, run) })
+fun runTaskSynchronized(lock: Any, run: () -> Unit) =
+    Bukkit.getScheduler().runTask(NOVA.loader, Runnable { synchronized(lock, run) })
 
-inline fun runTaskLaterSynchronized(lock: Any, delay: Long, noinline run: () -> Unit) =
-    Bukkit.getScheduler().runTaskLater(NOVA, Runnable { synchronized(lock, run) }, delay)
+fun runTaskLaterSynchronized(lock: Any, delay: Long, run: () -> Unit) =
+    Bukkit.getScheduler().runTaskLater(NOVA.loader, Runnable { synchronized(lock, run) }, delay)
 
-inline fun runTaskTimerSynchronized(lock: Any, delay: Long, period: Long, noinline run: () -> Unit) =
-    Bukkit.getScheduler().runTaskTimer(NOVA, Runnable { synchronized(lock, run) }, delay, period)
+fun runTaskTimerSynchronized(lock: Any, delay: Long, period: Long, run: () -> Unit) =
+    Bukkit.getScheduler().runTaskTimer(NOVA.loader, Runnable { synchronized(lock, run) }, delay, period)
 
 fun runSyncTaskWhenUnlocked(lock: ObservableLock, run: () -> Unit) {
     runTaskLater(1) { if (!lock.tryLockAndRun(run)) runSyncTaskWhenUnlocked(lock, run) }
 }
 
-inline fun runAsyncTask(noinline run: () -> Unit) {
+fun runAsyncTask(run: () -> Unit) {
     if (USE_NOVA_SCHEDULER) AsyncExecutor.run(run)
-    else Bukkit.getScheduler().runTaskAsynchronously(NOVA, run)
+    else Bukkit.getScheduler().runTaskAsynchronously(NOVA.loader, run)
 }
 
-inline fun runAsyncTaskLater(delay: Long, noinline run: () -> Unit) {
+fun runAsyncTaskLater(delay: Long, run: () -> Unit) {
     if (USE_NOVA_SCHEDULER) AsyncExecutor.runLater(delay * 50, run)
-    else Bukkit.getScheduler().runTaskLaterAsynchronously(NOVA, run, delay)
+    else Bukkit.getScheduler().runTaskLaterAsynchronously(NOVA.loader, run, delay)
 }
 
-inline fun runAsyncTaskSynchronized(lock: Any, noinline run: () -> Unit) {
+fun runAsyncTaskSynchronized(lock: Any, run: () -> Unit) {
     val task = { synchronized(lock, run) }
     if (USE_NOVA_SCHEDULER) AsyncExecutor.run(task)
-    else Bukkit.getScheduler().runTaskAsynchronously(NOVA, task)
+    else Bukkit.getScheduler().runTaskAsynchronously(NOVA.loader, task)
 }
 
-inline fun runAsyncTaskWithLock(lock: ObservableLock, noinline run: () -> Unit) {
+fun runAsyncTaskWithLock(lock: ObservableLock, run: () -> Unit) {
     val task = { lock.lockAndRun(run) }
     if (USE_NOVA_SCHEDULER) AsyncExecutor.run(task)
-    else Bukkit.getScheduler().runTaskAsynchronously(NOVA, task)
+    else Bukkit.getScheduler().runTaskAsynchronously(NOVA.loader, task)
 }
 
-inline fun runAsyncTaskTimerSynchronized(lock: Any, delay: Long, period: Long, noinline run: () -> Unit) =
-    Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA, Runnable { synchronized(lock, run) }, delay, period)
+fun runAsyncTaskTimerSynchronized(lock: Any, delay: Long, period: Long, run: () -> Unit) =
+    Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA.loader, Runnable { synchronized(lock, run) }, delay, period)
 
-inline fun runAsyncTaskTimer(delay: Long, period: Long, noinline run: () -> Unit) =
-    Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA, run, delay, period)
+fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit) =
+    Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA.loader, run, delay, period)
 
 object AsyncExecutor {
     

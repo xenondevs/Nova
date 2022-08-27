@@ -1,18 +1,17 @@
 package xyz.xenondevs.nova.world.block.hitbox
 
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.castRay
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.isTraversable
+import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.chunkPos
 
@@ -21,7 +20,7 @@ object HitboxManager : Listener {
     private val hitboxes = HashMap<ChunkPos, ArrayList<Hitbox>>()
     
     init {
-        Bukkit.getServer().pluginManager.registerEvents(this, NOVA)
+        registerEvents()
     }
     
     fun addHitbox(hitbox: Hitbox) {
