@@ -37,6 +37,7 @@ local.properties
 
 # IntelliJ
 /out/
+.run/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/

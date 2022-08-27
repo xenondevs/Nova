@@ -1,0 +1,158 @@
+{
+    "gui_anvil_overlay_arrow": "gui/anvil_overlay_arrow",
+    "gui_anvil_overlay_arrow_left": "gui/anvil_overlay_arrow_left",
+    "gui_anvil_overlay_plus": "gui/anvil_overlay_plus",
+    "gui_arrow_1_down": "gui/arrow_1_down",
+    "gui_arrow_1_left": "gui/arrow_1_left",
+    "gui_arrow_1_right": "gui/arrow_1_right",
+    "gui_arrow_1_up": "gui/arrow_1_up",
+    "gui_arrow_2_down": "gui/arrow_2_down",
+    "gui_arrow_2_left": "gui/arrow_2_left",
+    "gui_arrow_2_right": "gui/arrow_2_right",
+    "gui_arrow_2_up": "gui/arrow_2_up",
+    "gui_checkmark": "gui/checkmark",
+    "gui_corner_bottom_left": "gui/corner_bottom_left",
+    "gui_corner_bottom_right": "gui/corner_bottom_right",
+    "gui_corner_top_left": "gui/corner_top_left",
+    "gui_corner_top_right": "gui/corner_top_right",
+    "gui_green_checkmark": "gui/green_checkmark",
+    "gui_horizontal_dots": "gui/horizontal_dots",
+    "gui_horizontal_down": "gui/horizontal_down",
+    "gui_horizontal_line": "gui/horizontal_line",
+    "gui_horizontal_up": "gui/horizontal_up",
+    "gui_inventory_part": "gui/inventory_part",
+    "gui_invisible": "empty",
+    "gui_light_arrow_1_down": "gui/light_arrow_1_down",
+    "gui_light_arrow_1_left": "gui/light_arrow_1_left",
+    "gui_light_arrow_1_right": "gui/light_arrow_1_right",
+    "gui_light_arrow_1_up": "gui/light_arrow_1_up",
+    "gui_light_arrow_2_down": "gui/light_arrow_2_down",
+    "gui_light_arrow_2_left": "gui/light_arrow_2_left",
+    "gui_light_arrow_2_right": "gui/light_arrow_2_right",
+    "gui_light_arrow_2_up": "gui/light_arrow_2_up",
+    "gui_light_checkmark": "gui/light_checkmark",
+    "gui_light_corner_bottom_left": "gui/light_corner_bottom_left",
+    "gui_light_corner_bottom_right": "gui/light_corner_bottom_right",
+    "gui_light_corner_top_left": "gui/light_corner_top_left",
+    "gui_light_corner_top_right": "gui/light_corner_top_right",
+    "gui_light_horizontal_dots": "gui/light_horizontal_dots",
+    "gui_light_horizontal_down": "gui/light_horizontal_down",
+    "gui_light_horizontal_line": "gui/light_horizontal_line",
+    "gui_light_horizontal_up": "gui/light_horizontal_up",
+    "gui_light_vertical_dots": "gui/light_vertical_dots",
+    "gui_light_vertical_horizontal": "gui/light_vertical_horizontal",
+    "gui_light_vertical_left": "gui/light_vertical_left",
+    "gui_light_vertical_line": "gui/light_vertical_line",
+    "gui_light_vertical_right": "gui/light_vertical_right",
+    "gui_light_x": "gui/light_x",
+    "gui_red_x": "gui/red_x",
+    "gui_vertical_dots": "gui/vertical_dots",
+    "gui_vertical_horizontal": "gui/vertical_horizontal",
+    "gui_vertical_left": "gui/vertical_left",
+    "gui_vertical_line": "gui/vertical_line",
+    "gui_vertical_right": "gui/vertical_right",
+    "gui_x": "gui/x",
+    "gui_tp_search": "gui/search",
+    "gui_tp_arrow_left_btn_off": "gui/btn/arrow_left_off",
+    "gui_tp_arrow_left_btn_on": "gui/btn/arrow_left_on",
+    "gui_tp_arrow_right_btn_off": "gui/btn/arrow_right_off",
+    "gui_tp_arrow_right_btn_on": "gui/btn/arrow_right_on",
+    "gui_area_btn_off": "gui/btn/area_off",
+    "gui_area_btn_on": "gui/btn/area_on",
+    "gui_minus_btn_off": "gui/btn/minus_off",
+    "gui_minus_btn_on": "gui/btn/minus_on",
+    "gui_plus_btn_off": "gui/btn/plus_off",
+    "gui_plus_btn_on": "gui/btn/plus_on",
+    "gui_side_config_btn": "gui/btn/side_config",
+    "gui_energy_btn_off": "gui/btn/energy_off",
+    "gui_energy_btn_on": "gui/btn/energy_on",
+    "gui_energy_btn_selected": "gui/btn/energy_selected",
+    "gui_items_btn_off": "gui/btn/items_off",
+    "gui_items_btn_on": "gui/btn/items_on",
+    "gui_items_btn_selected": "gui/btn/items_selected",
+    "gui_fluids_btn_off": "gui/btn/fluids_off",
+    "gui_fluids_btn_on": "gui/btn/fluids_on",
+    "gui_fluids_btn_selected": "gui/btn/fluids_selected",
+    "gui_blue_btn": "gui/btn/blue",
+    "gui_gray_btn": "gui/btn/gray",
+    "gui_green_btn": "gui/btn/green",
+    "gui_orange_btn": "gui/btn/orange",
+    "gui_pink_btn": "gui/btn/pink",
+    "gui_red_btn": "gui/btn/red",
+    "gui_yellow_btn": "gui/btn/yellow",
+    "gui_minus": "gui/minus",
+    "gui_upgrades_btn": "gui/btn/upgrades",
+    "gui_speed_upgrade": "gui/upgrade/speed",
+    "gui_efficiency_upgrade": "gui/upgrade/efficiency",
+    "gui_energy_upgrade": "gui/upgrade/energy",
+    "gui_range_upgrade": "gui/upgrade/range",
+    "gui_fluid_upgrade": "gui/upgrade/fluid",
+    "gui_tp_stopwatch": "gui/stopwatch",
+    "gui_tp_color_picker": "gui/color_picker",
+    "gui_tp_pixel_arrow_left_off": "gui/pixel_arrow_left_off",
+    "gui_tp_pixel_arrow_left_on": "gui/pixel_arrow_left_on",
+    "gui_tp_pixel_arrow_right_off": "gui/pixel_arrow_right_off",
+    "gui_tp_pixel_arrow_right_on": "gui/pixel_arrow_right_on",
+    "gui_bar_blue": {
+        "item": {
+            "models": {
+                "gui/bar/blue/%s": [0, 16]
+            }
+        }
+    },
+    "gui_bar_green": {
+        "item": {
+            "models": {
+                "gui/bar/green/%s": [0, 16]
+            }
+        }
+    },
+    "gui_bar_red": {
+        "item": {
+            "models": {
+                "gui/bar/red/%s": [0, 16]
+            }
+        }
+    },
+    "gui_bar_orange": {
+        "item": {
+            "models": {
+                "gui/bar/orange/%s": [0, 16]
+            }
+        }
+    },
+    "gui_tp_bar_blue": {
+        "item": {
+            "models": {
+                "gui/bar/tp_blue/%s": [0, 16]
+            }
+        }
+    },
+    "gui_tp_bar_orange": {
+        "item": {
+            "models": {
+                "gui/bar/tp_orange/%s": [0, 16]
+            }
+        }
+    },
+    "gui_number": {
+        "item": {
+            "models": {
+                "gui/number/%s": [0, 999]
+            }
+        }
+    },
+    "break_stage_overlay": {
+        "item": {
+            "models": {
+                "block/break_stage/%s": [0, 9]
+            }
+        }
+    },
+    "wrench": "item/wrench",
+    "speed_upgrade": "item/upgrade/speed",
+    "efficiency_upgrade": "item/upgrade/efficiency",
+    "energy_upgrade": "item/upgrade/energy",
+    "range_upgrade": "item/upgrade/range",
+    "fluid_upgrade": "item/upgrade/fluid"
+}

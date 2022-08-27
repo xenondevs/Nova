@@ -1,0 +1,15 @@
+{
+  "result": "nova:energy_upgrade",
+  "shape": [
+    "rcr",
+    "cic",
+    "pgp"
+  ],
+  "ingredients": {
+    "r": "minecraft:redstone",
+    "i": "nova:iron_plate; minecraft:paper",
+    "p": "nova:basic_cable; minecraft:redstone_block",
+    "c": "minecraft:copper_ingot",
+    "g": "nova:copper_gear; minecraft:redstone"
+  }
+}

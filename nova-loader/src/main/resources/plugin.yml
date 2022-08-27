@@ -1,0 +1,67 @@
+name: Nova
+version: "${version}"
+authors: [ "StudioCode", "ByteZ1337", "Javahase" ]
+website: "https://github.com/xenondevs/Nova/"
+main: xyz.xenondevs.nova.loader.NovaLoader
+api-version: 1.19
+
+softdepend:
+  - WorldGuard
+  - GriefPrevention
+  - PlotSquared
+  - GriefDefender
+  - ProtectionStones
+  - Towny
+  - QuickShop
+  - Residence
+  - Vault
+  - ItemsAdder
+  - Oraxen
+  - MMOItems
+  - AuthMe
+
+permissions:
+  nova.command.*:
+    description: Gives access to all Nova commands.
+    children:
+      - nova.command.give
+      - nova.command.debug
+      - nova.command.items
+      - nova.command.advancedTooltips
+      - nova.command.render_distance
+      - nova.command.nvrecipe
+      - nova.command.nvusage
+      - nova.misc.updateReminder
+      - nova.misc.bypassTileEntityLimits
+      - nova.command.addons
+      - nova.command.resourcePack
+      - nova.command.reload
+  nova.command.give:
+    description: Allows players to cheat nova items using /nova give.
+  nova.command.debug:
+    description: Allows the usage of the /nova debug command.
+  nova.command.items:
+    description: Allows players to open the nova items menu.
+    default: true
+  nova.command.advancedTooltips:
+    description: Allows players to toggle advanced tooltips for Nova items.
+    default: true
+  nova.command.renderDistance:
+    description: Allows players to configure their armor stand render distance.
+    default: true
+  nova.command.nvrecipe:
+    description: Allows players to use the /nvrecipe command.
+    default: true
+  nova.command.nvusage:
+    description: Allows players to use the /nvusage command.
+    default: true
+  nova.misc.updateReminder:
+    description: Players with this permission will be reminded if a new version is available
+  nova.misc.bypassTileEntityLimits:
+    description: Players with this permission will be able to bypass the tile entity limits set in the config.
+  nova.command.addons:
+    description: Allows players to use the /nova addons command.
+  nova.command.resourcePack:
+    description: Allows players to create and reupload the resource pack.
+  nova.command.reload:
+    description: Allows players to reload configs and recipes.

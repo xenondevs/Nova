@@ -1,0 +1,14 @@
+{
+    "empty": "gui/guis/empty",
+    "search": "gui/guis/search",
+    "items_0": "gui/guis/items/0",
+    "items_1": "gui/guis/items/1",
+    "items_2": "gui/guis/items/2",
+    "items_3": "gui/guis/items/3",
+    "items_4": "gui/guis/items/4",
+    "recipe_crafting": "gui/guis/recipe/crafting",
+    "recipe_smelting": "gui/guis/recipe/furnace",
+    "recipe_smithing": "gui/guis/recipe/smithing",
+    "recipe_conversion": "gui/guis/recipe/conversion",
+    "color_picker": "gui/guis/color_picker"
+}
