@@ -43,6 +43,10 @@ public class NovaLoader extends JavaPlugin {
             nova.onDisable();
     }
     
+    public Plugin getNova() {
+        return nova;
+    }
+    
     public static File extractNovaJar(String pathInJar) throws IOException {
         var path = Files.createTempFile("nova", ".jar");
         var file = path.toFile();

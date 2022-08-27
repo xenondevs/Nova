@@ -6,6 +6,7 @@ plugins {
 }
 
 dependencies {
+    compileOnly(project(":nova-loader"))
     compileOnly(deps.spigot.api)
 }
 
