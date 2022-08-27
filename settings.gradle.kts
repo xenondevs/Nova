@@ -2,6 +2,7 @@ rootProject.name = "nova-parent"
 include("nova")
 include("nova-api")
 include("nova-loader")
+include("nova-gradle-plugin")
 
 enableFeaturePreview("VERSION_CATALOGS")
 dependencyResolutionManagement {
@@ -40,11 +41,16 @@ dependencyResolutionManagement {
             library("maven-resolver-connector-basic", "org.apache.maven.resolver:maven-resolver-connector-basic:1.8.2")
             library("maven-resolver-transport-http", "org.apache.maven.resolver:maven-resolver-transport-http:1.8.2")
             
+            // lib - minecraft assets
+            library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.0-SNAPSHOT")
+            library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.0-SNAPSHOT")
+            
             // bundles
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-netty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
             bundle("cbf", listOf("cosmic-binary-format", "cosmic-binary-format-netty-adapter"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
+            bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer"))
             
             // plugins
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
