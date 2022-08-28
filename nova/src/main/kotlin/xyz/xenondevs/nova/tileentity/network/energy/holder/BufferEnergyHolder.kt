@@ -9,7 +9,7 @@ import java.util.*
 class BufferEnergyHolder(
     endPoint: NetworkedTileEntity,
     defaultMaxEnergy: ValueReloadable<Long>,
-    private val creative: Boolean,
+    val creative: Boolean,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : NovaEnergyHolder(endPoint, defaultMaxEnergy, null, lazyDefaultConfig) {
     

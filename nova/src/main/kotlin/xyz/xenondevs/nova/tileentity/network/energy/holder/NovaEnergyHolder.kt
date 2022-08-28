@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.util.serverTick
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 sealed class NovaEnergyHolder(
@@ -35,8 +34,8 @@ sealed class NovaEnergyHolder(
             val capped = max(min(value, maxEnergy), 0)
             if (field != capped) {
                 val energyDelta = capped - field
-                if (energyDelta > 0) energyPlus += energyDelta
-                else energyMinus -= energyDelta
+                if (energyDelta > 0) _energyPlus.add(energyDelta)
+                else _energyMinus.take(energyDelta)
                 
                 field = capped
                 callUpdateHandlers()
@@ -46,8 +45,11 @@ sealed class NovaEnergyHolder(
     override val requestedEnergy: Long
         get() = maxEnergy - energy
     
-    var energyMinus by TickedLong()
-    var energyPlus by TickedLong()
+    private val _energyMinus = TickedLong()
+    private val _energyPlus = TickedLong()
+    
+    val energyMinus by _energyMinus
+    val energyPlus by _energyPlus
     
     override fun saveData() {
         endPoint.storeData("energy", energy, true)
@@ -70,22 +72,34 @@ sealed class NovaEnergyHolder(
     
 }
 
-private class TickedLong : ReadWriteProperty<Any, Long> {
+private class TickedLong {
     
-    var lastUpdated: Int = 0
-    var value: Long = 0
+    private var lastUpdated: Int = 0
+    private var value: Long = 0
+    private var prevValue: Long = 0
     
-    override fun getValue(thisRef: Any, property: KProperty<*>): Long {
+     fun get(): Long {
         if (lastUpdated != serverTick) {
+            prevValue = value
             value = 0
             lastUpdated = serverTick
         }
         
-        return value
+        return if (value == 0L) prevValue else value
     }
     
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Long) {
+    operator fun getValue(thisRef: Any, property: KProperty<*>): Long = get()
+    
+    fun set(value: Long) {
         this.value = value
+    }
+    
+    fun add(value: Long) {
+        this.value += value
+    }
+    
+    fun take(value: Long) {
+        this.value -= value
     }
     
 }
