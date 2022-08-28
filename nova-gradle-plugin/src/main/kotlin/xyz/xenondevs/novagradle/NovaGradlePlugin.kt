@@ -42,6 +42,9 @@ class NovaGradlePlugin : Plugin<Project> {
             addonId.set(wailaExt.addonId.orElse(addonExt.id).orElse(resourcesDir.map { AddonUtils.getAddonId(project, it) }))
             filter.set(wailaExt.filter.orElse { true })
         }
+        
+        val novaCfg = project.configurations.create("nova")
+        project.configurations.getByName("implementation").extendsFrom(novaCfg)
     }
     
 }
