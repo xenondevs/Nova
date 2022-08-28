@@ -114,6 +114,7 @@ publishing {
     publications {
         create<MavenPublication>("nova") {
             from(components.getByName("kotlin"))
+            artifact(tasks.getByName("sources"))
         }
     }
 }
