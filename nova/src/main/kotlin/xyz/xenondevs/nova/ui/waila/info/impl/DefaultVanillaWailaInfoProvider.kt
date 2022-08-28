@@ -48,6 +48,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             // plant
             Material.WEEPING_VINES_PLANT -> Material.WEEPING_VINES
             Material.TWISTING_VINES_PLANT -> Material.TWISTING_VINES
+            Material.KELP_PLANT -> Material.KELP
             
             // torch
             Material.WALL_TORCH -> Material.TORCH

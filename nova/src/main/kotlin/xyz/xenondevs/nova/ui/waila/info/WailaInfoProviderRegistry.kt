@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.CakeWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CampfireWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CandleWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CauldronWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.impl.CocoaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.ComparatorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CropWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.DaylightDetectorWailaInfoProvider
@@ -42,6 +43,7 @@ object WailaInfoProviderRegistry {
         registerProvider(LanternWailaInfoProvider)
         registerProvider(DaylightDetectorWailaInfoProvider)
         registerProvider(BellWailaInfoProvider)
+        registerProvider(CocoaWailaInfoProvider)
     }
     
     fun registerProvider(provider: WailaInfoProvider<*>) {

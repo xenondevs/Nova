@@ -32,7 +32,7 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
         if (block is NovaTileEntityState) {
             val tileEntity = block.tileEntity
             if (tileEntity is NetworkedTileEntity) {
-                val energyHolder = tileEntity.holders[NetworkType.ENERGY] as? NovaEnergyHolder
+                val energyHolder = tileEntity.holders[NetworkType.ENERGY] as? NovaEnergyHolder      
                 if (energyHolder != null && (energyHolder !is BufferEnergyHolder || !energyHolder.creative)) {
                     lines += EnergyHolderLine.getEnergyBarLine(player, energyHolder)
                     lines += EnergyHolderLine.getEnergyAmountLine(player, energyHolder)
