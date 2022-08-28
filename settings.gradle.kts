@@ -16,7 +16,7 @@ dependencyResolutionManagement {
             version("cbf", "0.1")
             
             // lib - kotlin
-            library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").versionRef("kotlin")
+            library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib-jdk8").versionRef("kotlin")
             library("kotlin-reflect", "org.jetbrains.kotlin", "kotlin-reflect").versionRef("kotlin")
             library("kotlin-test-junit", "org.jetbrains.kotlin", "kotlin-test-junit").versionRef("kotlin")
             
@@ -44,6 +44,9 @@ dependencyResolutionManagement {
             // lib - minecraft assets
             library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.0-SNAPSHOT")
             library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.0-SNAPSHOT")
+            
+            // lib - zip4j
+            library("zip4j", "net.lingala.zip4j:zip4j:2.11.1")
             
             // bundles
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))

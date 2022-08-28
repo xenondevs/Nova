@@ -18,6 +18,7 @@ dependencies {
     api(deps.bundles.ktor)
     api(deps.bundles.cbf)
     api(deps.bundles.minecraft.assets)
+    api(deps.zip4j)
     compileOnly(deps.bundles.maven.resolver)
     compileOnly(variantOf(deps.spigot.server) { classifier("remapped-mojang") })
     
@@ -28,7 +29,6 @@ dependencies {
     api("xyz.xenondevs:particle:1.8")
     api("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     api("xyz.xenondevs.bytebase:ByteBase-Runtime:0.3-SNAPSHOT")
-    api("net.lingala.zip4j:zip4j:2.11.1")
     api("me.xdrop:fuzzywuzzy:1.4.0")
     api("software.amazon.awssdk:s3:2.17.259")
     

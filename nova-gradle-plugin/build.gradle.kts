@@ -8,6 +8,8 @@ plugins {
 
 dependencies {
     implementation(deps.bundles.minecraft.assets)
+    implementation(deps.spigot.api)
+    implementation(deps.zip4j)
 }
 
 tasks {
