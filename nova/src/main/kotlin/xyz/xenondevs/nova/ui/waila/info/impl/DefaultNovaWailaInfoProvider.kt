@@ -4,6 +4,8 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
@@ -29,7 +31,7 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
         lines += WailaLine(ComponentBuilder(material.id.toString()).color(ChatColor.DARK_GRAY).create(), player, WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, material)
         
-        if (block is NovaTileEntityState) {
+        if (block is NovaTileEntityState && block.isInitialized) {
             val tileEntity = block.tileEntity
             if (tileEntity is NetworkedTileEntity) {
                 val energyHolder = tileEntity.holders[NetworkType.ENERGY] as? NovaEnergyHolder      
@@ -41,7 +43,15 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
             }
         }
         
-        return WailaInfo(material.id, lines)
+        var id = material.id
+        val subId = block.modelProvider.currentSubId
+        if (subId > 0) {
+            val subIdTexture = NamespacedId(id.namespace, "${id.name}_$subId")
+            if (Resources.getWailaIconCharOrNull(subIdTexture) != null)
+                id = subIdTexture
+        }
+        
+        return WailaInfo(id, lines)
     }
     
 }
