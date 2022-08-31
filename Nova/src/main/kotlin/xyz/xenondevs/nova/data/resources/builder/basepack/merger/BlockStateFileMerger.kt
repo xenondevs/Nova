@@ -70,12 +70,16 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks
     }
     
     private fun processVariants(configType: BlockStateConfigType<*>, obj: JsonObject) {
-        val occupied = basePacks.occupiedSolidIds.getOrPut(configType, ::HashSet)
-        obj.entrySet().forEach { (variant, _) ->
-            occupied += configType.of(variant).id
+        try {
+            val occupied = basePacks.occupiedSolidIds.getOrPut(configType, ::HashSet)
+            obj.entrySet().forEach { (variant, _) ->
+                occupied += configType.of(variant).id
+            }
+    
+            configType.handleMerged(occupied)
+        } catch (e: Exception) {
+            LOGGER.log(Level.SEVERE, "Failed to process variants for $configType in $obj", e)
         }
-        
-        configType.handleMerged(occupied)
     }
     
 }
