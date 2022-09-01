@@ -73,8 +73,8 @@
   "item.nova.wrench.mode.nova.energy": "模式：能量",
   "item.nova.wrench.mode.nova.items": "模式：物品",
   "item.nova.wrench.mode.nova.fluid": "模式：液体",
-  "command.nova.network_debug.nova.energy": "能源网络调试视角已切换。",
-  "command.nova.network_debug.nova.fluid": "液体网络调试视角已切换。",
+  "command.nova.network_debug.nova.energy": "已为能源网络切换调试模式视角。",
+  "command.nova.network_debug.nova.fluid": "已为液体网络切换调试模式视角。",
   "command.nova.addons.header": "扩展(%s): ",
   "command.nova.network_reload.success": "所有激活的网络都已重载。",
   "command.nova.reload_configs.start": "正在重载配置文件...",
@@ -98,5 +98,7 @@
   "menu.nova.side_config.west": "西",
   "menu.nova.side_config.up": "上",
   "menu.nova.side_config.east": "东",
-  "menu.nova.side_config.down": "下"
+  "menu.nova.side_config.down": "下",
+  "command.nova.network_debug.nova.item": "已为物品网络切换调试模式视角。",
+  "command.nova.update_chunk_search_id.success": "区块搜索已更新。"
 }
