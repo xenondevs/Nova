@@ -94,7 +94,11 @@ object PacketEventManager {
     private fun callEvent(event: PacketEvent<*>) {
         listeners[event::class]?.forEach { (instance, method, _, ignoreIfCancelled) ->
             if (!ignoreIfCancelled || !event.isCancelled) {
-                method.invoke(instance, event)
+                try {
+                    method.invoke(instance, event)
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                }
             }
         }
     }
