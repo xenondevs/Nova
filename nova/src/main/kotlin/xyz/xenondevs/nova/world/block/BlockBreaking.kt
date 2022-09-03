@@ -39,8 +39,8 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.sendDestructionPacket
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.fakeentity.impl.FakeArmorStand
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.concurrent.ConcurrentHashMap
@@ -294,8 +294,8 @@ private class PacketBreakMethod(pos: BlockPos, val fakeEntityId: Int) : BreakMet
 private class ArmorStandBreakMethod(pos: BlockPos) : BreakMethod(pos) {
     
     private val armorStand = FakeArmorStand(pos.location.center(), true) { _, data ->
-        data.invisible = true
-        data.marker = true
+        data.isInvisible = true
+        data.isMarker = true
     }
     
     override var breakStage: Int = -1

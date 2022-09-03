@@ -53,9 +53,9 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.loot.LootConfigHandler
 import xyz.xenondevs.nova.world.loot.LootGeneration
 import xyz.xenondevs.particle.utils.ReflectionUtils
@@ -67,7 +67,7 @@ internal object Initializer : Listener {
     
     private val INITIALIZABLES = listOf(
         LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, Resources,
-        CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeArmorStandManager,
+        CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeEntityManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,

@@ -47,7 +47,7 @@ import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.block.TileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.region.DynamicRegion
@@ -439,7 +439,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      * visible for.
      */
     fun getViewers(): List<Player> =
-        FakeArmorStandManager.getChunkViewers(chunkPos)
+        FakeEntityManager.getChunkViewers(chunkPos)
     
     /**
      * Gets the correct direction a block side.

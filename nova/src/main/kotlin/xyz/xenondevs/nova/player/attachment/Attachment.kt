@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.util.mapToIntArray
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverTick
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.fakeentity.impl.FakeArmorStand
 
 /**
  * A model that attaches to a [Player] by using an [ArmorStand] as a passenger.
@@ -26,8 +26,8 @@ open class Attachment(
     
     private val armorStand = FakeArmorStand(player.location) { ast, data ->
         ast.setEquipment(EquipmentSlot.HEAD, itemStack, false)
-        data.invisible = true
-        data.marker = true
+        data.isInvisible = true
+        data.isMarker = true
         
         ast.spawnHandler = {
             // This packet will be modified in AbilityManager to include all attachment armor stands

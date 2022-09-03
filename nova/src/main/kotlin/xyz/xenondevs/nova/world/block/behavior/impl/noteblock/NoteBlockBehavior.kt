@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.send
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.pos
 
@@ -47,7 +47,7 @@ internal object NoteBlockBehavior : BlockBehavior(NoteBlockStateConfig, false), 
         val soundPacket = vnb.soundPacket
         val particlePacket = vnb.particlePacket
         
-        FakeArmorStandManager.getChunkViewers(pos.chunkPos).forEach {
+        FakeEntityManager.getChunkViewers(pos.chunkPos).forEach {
             it.send(soundPacket, particlePacket)
         }
     }

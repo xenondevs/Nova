@@ -1,8 +1,9 @@
-package xyz.xenondevs.nova.world.armorstand
+package xyz.xenondevs.nova.world.fakeentity
 
 import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.item.ItemStack
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
@@ -13,23 +14,20 @@ import xyz.xenondevs.nova.util.positionEquals
 import xyz.xenondevs.nova.util.toFixedPoint
 import xyz.xenondevs.nova.util.toPackedByte
 import xyz.xenondevs.nova.world.chunkPos
+import xyz.xenondevs.nova.world.fakeentity.metadata.Metadata
 import java.util.*
-import net.minecraft.world.item.ItemStack as MojangStack
-import org.bukkit.inventory.ItemStack as BItemStack
+import org.bukkit.inventory.ItemStack as BukkitStack
 
 /**
- * A fake armor stand that does not exist in the world and does therefore not impact performance
- * as much and can also be used asynchronously.
+ * A fake entity that does not exist in the world and can be updated asynchronously.
  */
-class FakeArmorStand(
-    location: Location,
-    autoRegister: Boolean = true,
-    beforeSpawn: ((FakeArmorStand, ArmorStandDataHolder) -> Unit)? = null
-) {
+abstract class FakeEntity<M : Metadata> internal constructor(location: Location) {
+    
+    protected abstract val metadata: M
     
     private var registered = false
     val viewers: List<Player>
-        get() = FakeArmorStandManager.getChunkViewers(chunk)
+        get() = FakeEntityManager.getChunkViewers(chunk)
     
     val entityId = NMSUtils.ENTITY_COUNTER.incrementAndGet()
     private val uuid = UUID.randomUUID()
@@ -45,52 +43,49 @@ class FakeArmorStand(
     val location: Location
         get() = expectedLocation.clone()
     
-    private val equipment = Array<MojangStack>(6) { MojangStack.EMPTY }
-    private val entityDataHolder = ArmorStandDataHolder(entityId)
+    private val equipment = Array<ItemStack>(6) { ItemStack.EMPTY }
     
     var spawnHandler: ((Player) -> Unit)? = null
     var despawnHandler: ((Player) -> Unit)? = null
     
-    init {
-        beforeSpawn?.invoke(this, entityDataHolder)
-        if (autoRegister) register()
-    }
-    
     /**
-     * Registers this [FakeArmorStand] in the [FakeArmorStandManager].
-     * @throws IllegalStateException If this [FakeArmorStand] is already registered.
+     * Registers this [FakeEntity] in the [FakeEntityManager].
+     * @throws IllegalStateException If this [FakeEntity] is already registered.
      */
     fun register() {
-        if (registered) throw IllegalStateException("This FakeArmorStand is already registered")
-        FakeArmorStandManager.addArmorStand(chunk, this)
+        if (registered) throw IllegalStateException("This FakeEntity is already registered")
+        FakeEntityManager.addEntity(chunk, this)
         registered = true
     }
     
     /**
-     * Removes the [FakeArmorStand] from the [chunkArmorStands Map][FakeArmorStandManager.chunkArmorStands] and despawns it
+     * Removes the [FakeEntity] from the [chunk entities Map][FakeEntityManager.chunkEntities] and despawns it
      * for all current viewers.
      */
     fun remove() {
         registered = false
-        FakeArmorStandManager.removeArmorStand(chunk, this)
+        FakeEntityManager.removeEntity(chunk, this)
     }
     
     /**
-     * Spawns the [FakeArmorStand] for a specific [Player].
-     * Also sends entity data and equipment.
+     * Spawns the [FakeEntity] for a specific [Player].
      */
     fun spawn(player: Player) {
         val spawnBuf = this.spawnBuf ?: createSpawnBuf().also { this.spawnBuf = it }
-        val equipmentBuf = this.equipmentBuf ?: createEquipmentBuf().also { this.equipmentBuf = it }
-        val dataBuf = this.dataBuf ?: entityDataHolder.createCompleteDataBuf().also { this.dataBuf = it }
+        val dataBuf = this.dataBuf ?: metadata.pack(entityId).also { this.dataBuf = it }
         
-        player.send(spawnBuf, equipmentBuf, dataBuf)
+        if (equipment.all { it == ItemStack.EMPTY }) {
+            player.send(spawnBuf, dataBuf)
+        } else {
+            val equipmentBuf = this.equipmentBuf ?: createEquipmentBuf().also { this.equipmentBuf = it }
+            player.send(spawnBuf, dataBuf, equipmentBuf)
+        }
         
         spawnHandler?.invoke(player)
     }
     
     /**
-     * Despawns the [FakeArmorStand] for a specific [Player].
+     * Despawns the [FakeEntity] for a specific [Player].
      */
     fun despawn(player: Player) {
         player.send(despawnBuf)
@@ -98,19 +93,19 @@ class FakeArmorStand(
     }
     
     /**
-     * Updates the entity data of this [FakeArmorStand]
+     * Updates the entity data of this [FakeEntity]
      */
-    fun updateEntityData(sendPacket: Boolean, update: ArmorStandDataHolder.() -> Unit) {
+    fun updateEntityData(sendPacket: Boolean, update: M.() -> Unit) {
         // release the dataBuf as it will change
         dataBuf?.release()
         dataBuf = null
         
         // update the entity data
-        entityDataHolder.update()
+        metadata.update()
         
         // rebuild buf and send packet if requested
         if (sendPacket) {
-            val buf = entityDataHolder.createPartialDataBuf()
+            val buf = metadata.packDirty(entityId)
             viewers.forEach { it.send(buf) }
             buf.release() // partial buf is no longer needed
         }
@@ -119,7 +114,7 @@ class FakeArmorStand(
     /**
      * Sets the equipment for a specific [EquipmentSlot].
      */
-    fun setEquipment(slot: EquipmentSlot, bukkitStack: BItemStack?, sendPacket: Boolean) {
+    fun setEquipment(slot: EquipmentSlot, bukkitStack: BukkitStack?, sendPacket: Boolean) {
         // release the equipment buf as it will change
         equipmentBuf?.release()
         equipmentBuf = null
@@ -135,7 +130,7 @@ class FakeArmorStand(
     }
     
     /**
-     * Teleports the [FakeArmorStand] to a different location. (Different worlds aren't supported)
+     * Teleports the [FakeEntity] to a different location. (Different worlds aren't supported)
      *
      * This function automatically chooses which packet (Teleport / Pos / PosRot / Rot) to send.
      */
@@ -146,7 +141,7 @@ class FakeArmorStand(
     }
     
     /**
-     * Teleports the [FakeArmorStand] to a different location.
+     * Teleports the [FakeEntity] to a different location.
      *
      * This function automatically chooses which packet (Teleport / Pos / PosRot / Rot) to send.
      */
@@ -178,7 +173,7 @@ class FakeArmorStand(
                 
                 if (newLocation.yaw != actualLocation.yaw || newLocation.pitch != actualLocation.pitch) {
                     // rotation also loses precision (a lot actually) but it isn't necessary to reflect that in the
-                    // armor stand location as no rotation deltas are sent
+                    // entity location as no rotation deltas are sent
                     actualLocation.yaw = newLocation.yaw
                     actualLocation.pitch = newLocation.pitch
                     
@@ -202,7 +197,7 @@ class FakeArmorStand(
         val newChunk = actualLocation.chunkPos
         chunk = newChunk
         
-        if (previousChunk != newChunk) FakeArmorStandManager.changeArmorStandChunk(this, previousChunk, newChunk)
+        if (previousChunk != newChunk) FakeEntityManager.changeEntityChunk(this, previousChunk, newChunk)
     }
     
     private fun createSpawnBuf(): FriendlyByteBuf {

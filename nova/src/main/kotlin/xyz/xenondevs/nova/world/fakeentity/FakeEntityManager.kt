@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.armorstand
+package xyz.xenondevs.nova.world.fakeentity
 
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -21,32 +21,32 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.DEFAULT_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.RENDER_DISTANCE_KEY
 import xyz.xenondevs.nova.world.chunkPos
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.DEFAULT_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.RENDER_DISTANCE_KEY
 import java.util.concurrent.CopyOnWriteArrayList
 
-var Player.armorStandRenderDistance: Int
+var Player.fakeEntityRenderDistance: Int
     get() = (persistentDataContainer.get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER) ?: DEFAULT_RENDER_DISTANCE)
         .coerceIn(MIN_RENDER_DISTANCE..MAX_RENDER_DISTANCE)
     set(value) {
         persistentDataContainer.set(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER, value)
-        FakeArmorStandManager.updateRenderDistance(this)
+        FakeEntityManager.updateRenderDistance(this)
     }
 
-internal object FakeArmorStandManager : Initializable(), Listener {
+internal object FakeEntityManager : Initializable(), Listener {
     
-    val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "armor_stand_render_distance")
-    val DEFAULT_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.default") }
-    val MIN_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.min") }
-    val MAX_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("armor_stand_render_distance.max") }
+    val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "entity_render_distance")
+    val DEFAULT_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("entity_render_distance.default") }
+    val MIN_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("entity_render_distance.min") }
+    val MAX_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("entity_render_distance.max") }
     
     private val renderDistance = HashMap<Player, Int>()
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
-    private val chunkArmorStands = HashMap<ChunkPos, MutableList<FakeArmorStand>>()
+    private val chunkEntities = HashMap<ChunkPos, MutableList<FakeEntity<*>>>()
     
     override val inMainThread = false
     override val dependsOn = emptySet<Initializable>()
@@ -61,28 +61,28 @@ internal object FakeArmorStandManager : Initializable(), Listener {
     }
     
     override fun disable() {
-        LOGGER.info("Despawning fake armor stands")
-        synchronized(FakeArmorStandManager) {
-            chunkArmorStands.forEach { (chunk, armorStands) ->
+        LOGGER.info("Despawning fake entities")
+        synchronized(FakeEntityManager) {
+            chunkEntities.forEach { (chunk, entities) ->
                 val viewers = chunkViewers[chunk] ?: return@forEach
-                armorStands.forEach { armorStand -> viewers.forEach { viewer -> armorStand.despawn(viewer) } }
+                entities.forEach { entity -> viewers.forEach { viewer -> entity.despawn(viewer) } }
             }
         }
     }
     
     @Synchronized
-    fun addArmorStand(chunk: ChunkPos, armorStand: FakeArmorStand) {
-        val armorStands = chunkArmorStands.getOrPut(chunk) { mutableListOf() }
-        armorStands.add(armorStand)
+    fun addEntity(chunk: ChunkPos, entity: FakeEntity<*>) {
+        val entities = chunkEntities.getOrPut(chunk) { mutableListOf() }
+        entities.add(entity)
         
         val viewers = chunkViewers.getOrPut(chunk) { CopyOnWriteArrayList() }
-        viewers.forEach { armorStand.spawn(it) }
+        viewers.forEach { entity.spawn(it) }
     }
     
     @Synchronized
-    fun removeArmorStand(chunk: ChunkPos, armorStand: FakeArmorStand) {
-        chunkArmorStands[chunk]!!.remove(armorStand)
-        chunkViewers[chunk]!!.forEach { armorStand.despawn(it) }
+    fun removeEntity(chunk: ChunkPos, entity: FakeEntity<*>) {
+        chunkEntities[chunk]!!.remove(entity)
+        chunkViewers[chunk]!!.forEach { entity.despawn(it) }
     }
     
     @Synchronized
@@ -91,21 +91,21 @@ internal object FakeArmorStandManager : Initializable(), Listener {
     }
     
     @Synchronized
-    fun changeArmorStandChunk(armorStand: FakeArmorStand, previousChunk: ChunkPos, newChunk: ChunkPos) {
+    fun changeEntityChunk(entity: FakeEntity<*>, previousChunk: ChunkPos, newChunk: ChunkPos) {
         // move the armor stand to the new chunk key
-        chunkArmorStands[previousChunk]!!.remove(armorStand)
-        chunkArmorStands.getOrPut(newChunk) { mutableListOf() }.add(armorStand)
+        chunkEntities[previousChunk]!!.remove(entity)
+        chunkEntities.getOrPut(newChunk) { mutableListOf() }.add(entity)
         
         // find all players that saw the old chunk but don't see the new one and despawn it for them
         val newChunkViewers = chunkViewers.getOrPut(newChunk) { CopyOnWriteArrayList() }
         chunkViewers[previousChunk]!!.asSequence()
             .filterNot { newChunkViewers.contains(it) }
-            .forEach { armorStand.despawn(it) }
+            .forEach { entity.despawn(it) }
         
         // find all players that didn't see the old chunk but should see the armor stand now and spawn it for them
         newChunkViewers.asSequence()
             .filterNot { (chunkViewers[previousChunk]?.contains(it) ?: false) }
-            .forEach { armorStand.spawn(it) }
+            .forEach { entity.spawn(it) }
     }
     
     @Synchronized
@@ -118,9 +118,7 @@ internal object FakeArmorStandManager : Initializable(), Listener {
             .filterNot { newChunks.contains(it) }
             .forEach { chunk ->
                 // despawn the armor stands there
-                chunkArmorStands[chunk]?.forEach { armorStand ->
-                    armorStand.despawn(player)
-                }
+                chunkEntities[chunk]?.forEach { it.despawn(player) }
                 
                 // copy the chunkViewerList and remove the player there
                 // (The list is copied to prevent other threads from causing issues by iterating over the chunkViewerList concurrently)
@@ -132,9 +130,7 @@ internal object FakeArmorStandManager : Initializable(), Listener {
             .filterNot { currentChunks.contains(it) }
             .forEach { chunk ->
                 // spawn the armor stands there
-                chunkArmorStands[chunk]?.forEach { armorStand ->
-                    armorStand.spawn(player)
-                }
+                chunkEntities[chunk]?.forEach { it.spawn(player) }
                 
                 // copy the chunkViewerList and add the player there
                 chunkViewers.getOrPut(chunk) { CopyOnWriteArrayList() }.add(player)
@@ -146,7 +142,7 @@ internal object FakeArmorStandManager : Initializable(), Listener {
     
     @Synchronized
     internal fun updateRenderDistance(player: Player) {
-        renderDistance[player] = player.armorStandRenderDistance
+        renderDistance[player] = player.fakeEntityRenderDistance
     }
     
     @Synchronized

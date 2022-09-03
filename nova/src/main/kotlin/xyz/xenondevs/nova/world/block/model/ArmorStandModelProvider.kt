@@ -8,8 +8,8 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.tileentity.requiresLight
 import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.yaw
-import xyz.xenondevs.nova.world.armorstand.ArmorStandDataHolder
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.fakeentity.impl.FakeArmorStand
+import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ArmorStandMetadata
 
 class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
     
@@ -38,10 +38,10 @@ class ArmorStandModelProvider(blockState: NovaBlockState) : BlockModelProvider {
         }
     }
     
-    private fun setArmorStandValues(armorStand: FakeArmorStand, data: ArmorStandDataHolder, subId: Int = 0) {
-        data.invisible = true
-        data.marker = true
-        data.onFire = modelData.hitboxType.requiresLight
+    private fun setArmorStandValues(armorStand: FakeArmorStand, data: ArmorStandMetadata, subId: Int = 0) {
+        data.isInvisible = true
+        data.isMarker = true
+        data.isOnFire = modelData.hitboxType.requiresLight
         armorStand.setEquipment(EquipmentSlot.HEAD, modelData[subId].get(), false)
     }
     

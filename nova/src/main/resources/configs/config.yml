@@ -17,7 +17,7 @@ use_agent: true
 
 # The render distance for armor stands from Nova, in chunks.
 # Note that the render distance is limited by the entity render distance of the client.
-armor_stand_render_distance:
+entity_render_distance:
   min: 1
   max: 6
   default: 4

@@ -5,7 +5,7 @@ import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStand
+import xyz.xenondevs.nova.world.fakeentity.impl.FakeArmorStand
 import java.util.logging.Level
 
 class MultiModel {
@@ -48,8 +48,8 @@ class MultiModel {
             val location = model.location
             val armorStand = FakeArmorStand(location) { ast, data ->
                 ast.setEquipment(EquipmentSlot.HEAD, model.itemStack, false)
-                data.invisible = true
-                data.marker = true
+                data.isInvisible = true
+                data.isMarker = true
                 data.headRotation = model.headPose
             }
             
