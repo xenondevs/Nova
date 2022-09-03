@@ -22,6 +22,11 @@ abstract class BossBarOverlay {
     abstract val width: Int
     
     /**
+     * The last relative y position that this [BossBarOverlay] draws at.
+     */
+    abstract val endY: Int
+    
+    /**
      * At which x-coordinate the [text][components] should be centered at.
      * Null if there should they shouldn't be centered.
      */
@@ -30,6 +35,6 @@ abstract class BossBarOverlay {
     /**
      * If the [components] have been changed and an update should be sent in the next tick.
      */
-    var changed: Boolean = false
+    var changed: Boolean = true
     
 }

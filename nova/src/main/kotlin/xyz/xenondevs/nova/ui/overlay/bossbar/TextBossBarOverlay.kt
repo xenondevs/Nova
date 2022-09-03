@@ -25,4 +25,7 @@ abstract class TextBossBarOverlay(private val player: Player) : BossBarOverlay()
     override val width: Int
         get() = x + DefaultFont.getStringLength(text.toPlainText(player.locale))
     
+    override val endY: Int
+        get() = y % 19
+    
 }

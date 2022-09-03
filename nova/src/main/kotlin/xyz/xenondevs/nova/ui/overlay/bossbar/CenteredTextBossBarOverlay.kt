@@ -19,4 +19,7 @@ abstract class CenteredTextBossBarOverlay(private val player: Player) : BossBarO
     override val width: Int
         get() = DefaultFont.getStringLength(text.toPlainText(player.locale))
     
+    override val endY: Int
+        get() = y % 19
+    
 }

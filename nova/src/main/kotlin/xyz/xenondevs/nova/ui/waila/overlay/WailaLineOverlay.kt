@@ -24,6 +24,8 @@ internal class WailaLineOverlay(line: Int) : BossBarOverlay() {
         get() = if (centered) textWidth else x + textWidth
     override val centerX: Int?
         get() = if (centered) x else null
+    override val endY: Int
+        get() = 0
     
     var text: Array<out BaseComponent> = EMPTY_TEXT
     var x = 0

@@ -26,7 +26,7 @@ internal class Waila(val player: Player) {
     
     private var active = false
     private val imageOverlay = WailaImageOverlay()
-    private val lineOverlays = Array(10, ::WailaLineOverlay)
+    private val lineOverlays = Array(10, ::WailaLineOverlay).toList()
     
     fun setActive(active: Boolean) {
         if (this.active == active)
@@ -34,9 +34,12 @@ internal class Waila(val player: Player) {
         
         this.active = active
         
-        val overlays = arrayListOf<BossBarOverlay>(imageOverlay).apply { addAll(lineOverlays) }
-        if (active) BossBarOverlayManager.registerOverlays(player, overlays)
-        else BossBarOverlayManager.unregisterOverlays(player, overlays)
+        if (active) {
+            BossBarOverlayManager.registerOverlay(player, imageOverlay)
+        } else {
+            val overlays = arrayListOf<BossBarOverlay>(imageOverlay).apply { addAll(lineOverlays) }
+            BossBarOverlayManager.unregisterOverlays(player, overlays)
+        }
     }
     
     fun handleTick() {
@@ -70,6 +73,7 @@ internal class Waila(val player: Player) {
             
             val (beginX, centerX) = imageOverlay.update(icon, lines.size, lines.maxOf { it.width })
             
+            BossBarOverlayManager.unregisterOverlays(player, lineOverlays)
             lineOverlays.forEachIndexed { idx, overlay ->
                 if (lines.size <= idx) {
                     overlay.clear()
@@ -87,6 +91,8 @@ internal class Waila(val player: Player) {
                     Alignment.PREVIOUS_LINE -> getBeginX(lines, idx - 1, beginX, centerX)
                 }
                 overlay.changed = true
+                
+                BossBarOverlayManager.registerOverlay(player, overlay)
             }
             
             return true
