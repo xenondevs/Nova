@@ -43,7 +43,8 @@ open class ItemAttachment(
         armorStand = FakeArmorStand(spawnLoc, false) { ast, data ->
             ast.setEquipment(EquipmentSlot.HEAD, itemStack, false)
             data.isInvisible = true
-            data.isMarker = true
+            if (position == Position.BODY)
+                data.isMarker = true
         }
         
         val passenger = when (position) {
