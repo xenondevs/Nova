@@ -7,12 +7,13 @@ import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceLocation
+import xyz.xenondevs.nmsutils.bossbar.operation.BossBarOperation
 import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry
 import xyz.xenondevs.nmsutils.internal.util.toPackedByte
-import xyz.xenondevs.nmsutils.bossbar.operation.BossBarOperation
 import java.util.*
 
 fun ClientboundPlaceGhostRecipePacket(containerId: Int, resourceLocation: String): ClientboundPlaceGhostRecipePacket {
@@ -45,6 +46,19 @@ fun ClientboundSetEntityDataPacket(id: Int, packedData: List<SynchedEntityData.D
 
 fun ClientboundBossEventPacket(id: UUID, operation: BossBarOperation): ClientboundBossEventPacket {
     return ReflectionRegistry.CLIENTBOUND_BOSS_EVENT_PACKET_CONSTRUCTOR.newInstance(id, operation.toNMS())
+}
+
+fun ClientboundTeleportEntityPacket(entityId: Int, x: Double, y: Double, z: Double, yaw: Float, pitch: Float, isOnGround: Boolean): ClientboundTeleportEntityPacket {
+    val buf = FriendlyByteBuf(Unpooled.buffer())
+    buf.writeVarInt(entityId)
+    buf.writeDouble(x)
+    buf.writeDouble(y)
+    buf.writeDouble(z)
+    buf.writeByte(yaw.toPackedByte().toInt())
+    buf.writeByte(pitch.toPackedByte().toInt())
+    buf.writeBoolean(isOnGround)
+    
+    return ClientboundTeleportEntityPacket(buf)
 }
 
 fun ServerboundPlaceRecipePacket(containerId: Int, recipe: ResourceLocation, shiftDown: Boolean): ServerboundPlaceRecipePacket {
