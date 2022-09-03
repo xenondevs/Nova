@@ -211,4 +211,19 @@ class BossBar(
         createWorldFog: Boolean = false
     ) : this(id, name.toComponent(), progress, color, overlay, darkenScreen, playMusic, createWorldFog)
     
+    companion object {
+        
+        fun of(id: UUID, operation: AddBossBarOperation) = BossBar(
+            id,
+            operation.name,
+            operation.progress,
+            operation.color,
+            operation.overlay,
+            operation.darkenScreen,
+            operation.playMusic,
+            operation.createWorldFog
+        )
+        
+    }
+    
 }
