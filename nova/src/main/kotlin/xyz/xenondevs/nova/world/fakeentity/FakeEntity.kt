@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.world.fakeentity
 
 import io.netty.buffer.Unpooled
+import net.minecraft.core.Registry
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
 import org.bukkit.Location
@@ -10,6 +12,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.fromFixedPoint
+import xyz.xenondevs.nova.util.fromPackedByte
 import xyz.xenondevs.nova.util.positionEquals
 import xyz.xenondevs.nova.util.toFixedPoint
 import xyz.xenondevs.nova.util.toPackedByte
@@ -24,6 +27,7 @@ import org.bukkit.inventory.ItemStack as BukkitStack
 abstract class FakeEntity<M : Metadata> internal constructor(location: Location) {
     
     protected abstract val metadata: M
+    protected abstract val entityType: EntityType<*>
     
     private var registered = false
     val viewers: List<Player>
@@ -145,7 +149,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
      *
      * This function automatically chooses which packet (Teleport / Pos / PosRot / Rot) to send.
      */
-    fun teleport(newLocation: Location) {
+    fun teleport(newLocation: Location, forceTeleport: Boolean = false) {
         // release the spawn buf as the location has changed
         spawnBuf?.release()
         spawnBuf = null
@@ -155,12 +159,12 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
             var buf: FriendlyByteBuf? = null
             
             // get the correct packet for this kind of movement
-            if (actualLocation.positionEquals(newLocation)) {
+            if (!forceTeleport && actualLocation.positionEquals(newLocation)) {
                 if (newLocation.yaw != actualLocation.yaw || newLocation.pitch != actualLocation.pitch) {
                     buf = createRotBuf(newLocation)
                     actualLocation = newLocation.clone() // position won't be changed, exact rotation is not necessary
                 }
-            } else if (actualLocation.distance(newLocation) > 8) {
+            } else if (forceTeleport || actualLocation.distance(newLocation) > 8) {
                 buf = createTeleportBuf(newLocation)
                 actualLocation = newLocation.clone() // exact position will be displayed to user
             } else {
@@ -207,7 +211,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         buf.writeVarInt(0x00)
         buf.writeVarInt(entityId)
         buf.writeUUID(uuid)
-        buf.writeVarInt(2)
+        buf.writeId(Registry.ENTITY_TYPE, entityType)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)
         buf.writeDouble(location.z)
@@ -283,10 +287,19 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)
         buf.writeDouble(location.z)
-        buf.writeByte(location.yaw.toPackedByte().toInt())
+        buf.writeByte((location.yaw % 360).toPackedByte().toInt())
         buf.writeByte(location.pitch.toPackedByte().toInt())
         buf.writeBoolean(true)
         return buf
+    }
+    
+}
+
+fun main() {
+    
+    println("--")
+    for (i in -720..720 step 45) {
+        println("$i -> " + (i.toFloat().toPackedByte().fromPackedByte()))
     }
     
 }

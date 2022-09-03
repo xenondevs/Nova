@@ -1,57 +1,33 @@
 package xyz.xenondevs.nova.player.attachment
 
-import net.minecraft.world.entity.EquipmentSlot
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nmsutils.network.ClientboundRotateHeadPacket
-import xyz.xenondevs.nmsutils.network.ClientboundSetPassengersPacket
-import xyz.xenondevs.nova.util.mapToIntArray
-import xyz.xenondevs.nova.util.runTaskLater
-import xyz.xenondevs.nova.util.send
-import xyz.xenondevs.nova.util.serverTick
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeArmorStand
 
 /**
- * A model that attaches to a [Player] by using an [ArmorStand] as a passenger.
- *
- * @param player Specifies the [Player] that carries this [Attachment].
- * @param itemStack The [ItemStack] to be used for the [Attachment].
+ * Superclass for all attachments.
+ * 
+ * @see ItemAttachment
+ * @see HideDownItemAttachment
  */
-open class Attachment(
-    val player: Player,
-    val itemStack: ItemStack
-) {
+interface Attachment {
     
-    private val armorStand = FakeArmorStand(player.location) { ast, data ->
-        ast.setEquipment(EquipmentSlot.HEAD, itemStack, false)
-        data.isInvisible = true
-        data.isMarker = true
-        
-        ast.spawnHandler = {
-            // This packet will be modified in AbilityManager to include all attachment armor stands
-            runTaskLater(1) {
-                it.send(ClientboundSetPassengersPacket(player.entityId, player.passengers.mapToIntArray(Entity::getEntityId)))
-            }
-        }
-    }
-    val entityId = armorStand.entityId
+    /**
+     * The player that this [Attachment] is placed on.
+     */
+    val player: Player
     
-    fun despawn() {
-        armorStand.remove()
-    }
+    /**
+     * The id of the entity that rides the [player].
+     */
+    val passengerId: Int
     
-    open fun handleTick() {
-        if (serverTick % 10 == 0) {
-            // teleport the armor stand near the player because it's not actually a passenger
-            armorStand.teleport(player.location)
-        }
-        
-        if (serverTick % 3 == 0) {
-            val headRotPacket = ClientboundRotateHeadPacket(entityId, player.location.yaw)
-            armorStand.viewers.forEach { it.send(headRotPacket) }
-        }
-    }
+    /**
+     * Called every tick by the [AttachmentManager].
+     */
+    fun handleTick()
+    
+    /**
+     * Despawns all entities of this [Attachment].
+     */
+    fun despawn()
     
 }

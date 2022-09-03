@@ -10,13 +10,14 @@ import xyz.xenondevs.nova.util.send
 import net.minecraft.world.item.ItemStack as MojangStack
 
 /**
- * A special type of [Attachment] that gets hidden for the player of they look down
+ * A special type of [ItemAttachment] that gets hidden for the player of they look down
  */
-class HideDownAttachment(
+class HideDownItemAttachment(
     private val pitchThreshold: Float,
     player: Player,
-    itemStack: ItemStack
-) : Attachment(player, itemStack) {
+    itemStack: ItemStack,
+    position: Position = Position.BODY
+) : ItemAttachment(player, itemStack, position) {
     
     private var hidden = false
     
@@ -26,13 +27,13 @@ class HideDownAttachment(
         val pitch = player.location.pitch
         if (pitch >= pitchThreshold && !hidden) {
             // hide armor stand for attachment carrier
-            val packet = ClientboundSetEquipmentPacket(entityId, listOf(Pair(EquipmentSlot.HEAD, MojangStack.EMPTY)))
+            val packet = ClientboundSetEquipmentPacket(armorStand.entityId, listOf(Pair(EquipmentSlot.HEAD, MojangStack.EMPTY)))
             player.send(packet)
             
             hidden = true
         } else if (hidden && pitch < pitchThreshold) {
             // show armor stand again
-            val packet = ClientboundSetEquipmentPacket(entityId, mutableListOf(Pair(EquipmentSlot.HEAD, itemStack.nmsStack)))
+            val packet = ClientboundSetEquipmentPacket(armorStand.entityId, mutableListOf(Pair(EquipmentSlot.HEAD, itemStack.nmsStack)))
             player.send(packet)
             
             hidden = false

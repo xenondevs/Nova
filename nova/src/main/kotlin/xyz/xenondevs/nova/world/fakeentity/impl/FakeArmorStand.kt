@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.fakeentity.impl
 
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.decoration.ArmorStand
 import org.bukkit.Location
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ArmorStandMetadata
@@ -11,8 +13,10 @@ class FakeArmorStand(
     override val metadata: ArmorStandMetadata
 ) : FakeEntity<ArmorStandMetadata>(location) {
     
-    constructor(location: Location, autoSpawn: Boolean = true, beforeSpawn: ((FakeArmorStand, ArmorStandMetadata) -> Unit)? = null) :
-        this(location, autoSpawn, beforeSpawn, ArmorStandMetadata())
+    override val entityType: EntityType<ArmorStand> = EntityType.ARMOR_STAND
+    
+    constructor(location: Location, autoRegister: Boolean = true, beforeSpawn: ((FakeArmorStand, ArmorStandMetadata) -> Unit)? = null) :
+        this(location, autoRegister, beforeSpawn, ArmorStandMetadata())
     
     init {
         beforeSpawn?.invoke(this, metadata)

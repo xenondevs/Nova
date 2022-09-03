@@ -76,8 +76,8 @@ object AttachmentManager : Initializable(), Listener {
     
     @PacketHandler
     private fun handlePassengersSet(event: ClientboundSetPassengersPacketEvent) {
-        val attachments = (activeAttachments.entries.firstOrNull { it.key.entityId == event.vehicle } ?: return).value.values
-        event.passengers += attachments.map(Attachment::entityId)
+        val attachments = (activeAttachments.entries.firstOrNull { (player, _) -> player.entityId == event.vehicle } ?: return).value.values
+        event.passengers += attachments.map(Attachment::passengerId)
     }
     
     private fun loadAttachments(player: Player) {
@@ -94,7 +94,7 @@ object AttachmentManager : Initializable(), Listener {
     private fun saveAttachments(player: Player) {
         val dataContainer = player.persistentDataContainer
         val activeAttachments = activeAttachments[player]?.map { it.key.id }
-        if (activeAttachments != null && activeAttachments.isNotEmpty()) {
+        if (!activeAttachments.isNullOrEmpty()) {
             dataContainer.set(ATTACHMENTS_KEY, activeAttachments)
         } else dataContainer.remove(ATTACHMENTS_KEY)
     }

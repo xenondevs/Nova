@@ -45,12 +45,12 @@ import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.runAsyncTask
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MAX_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.armorstand.FakeArmorStandManager.MIN_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.armorstand.armorStandRenderDistance
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
+import xyz.xenondevs.nova.world.fakeentity.fakeEntityRenderDistance
 import xyz.xenondevs.nova.world.pos
 
 internal object NovaCommand : Command("nova") {
@@ -250,7 +250,7 @@ internal object NovaCommand : Command("nova") {
     private fun setRenderDistance(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val distance: Int = ctx["distance"]
-        player.armorStandRenderDistance = distance
+        player.fakeEntityRenderDistance = distance
         
         ctx.source.sendSuccess(localized(
             ChatColor.GRAY,
