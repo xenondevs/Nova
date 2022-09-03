@@ -4,7 +4,6 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProviderRegistry
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
@@ -35,10 +34,9 @@ internal class Waila(val player: Player) {
         this.active = active
         
         if (active) {
-            BossBarOverlayManager.registerOverlay(player, imageOverlay)
+            BossBarOverlayManager.registerBackgroundOverlay(player, imageOverlay)
         } else {
-            val overlays = arrayListOf<BossBarOverlay>(imageOverlay).apply { addAll(lineOverlays) }
-            BossBarOverlayManager.unregisterOverlays(player, overlays)
+            BossBarOverlayManager.unregisterOverlayIf(player) { it == imageOverlay || it in lineOverlays}
         }
     }
     

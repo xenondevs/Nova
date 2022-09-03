@@ -58,6 +58,12 @@ object BossBarOverlayManager : Initializable(), Listener {
         changes += uuid
     }
     
+    fun registerBackgroundOverlay(player: Player, overlay: BossBarOverlay) {
+        val uuid = player.uniqueId
+        overlays.getOrPut(uuid, ::ArrayList).add(0, overlay)
+        changes += uuid
+    }
+    
     fun registerOverlays(player: Player, overlays: Iterable<BossBarOverlay>) {
         val uuid = player.uniqueId
         this.overlays.getOrPut(uuid, ::ArrayList) += overlays
@@ -66,20 +72,20 @@ object BossBarOverlayManager : Initializable(), Listener {
     
     fun unregisterOverlay(player: Player, overlay: BossBarOverlay) {
         val uuid = player.uniqueId
-        overlays.getOrPut(uuid, ::ArrayList) -= overlay
-        changes += uuid
+        val changed = overlays.getOrPut(uuid, ::ArrayList).remove(overlay)
+        if (changed) changes += uuid
     }
     
     fun unregisterOverlays(player: Player, overlays: Iterable<BossBarOverlay>) {
         val uuid = player.uniqueId
-        this.overlays.getOrPut(uuid, ::ArrayList) -= overlays.toSet()
-        changes += uuid
+        val changed = this.overlays.getOrPut(uuid, ::ArrayList).removeAll(overlays.toSet())
+        if (changed) changes += uuid
     }
     
-    private fun unregisterOverlayIf(player: Player, predicate: (BossBarOverlay) -> Boolean) {
+    fun unregisterOverlayIf(player: Player, predicate: (BossBarOverlay) -> Boolean) {
         val uuid = player.uniqueId
-        overlays[uuid]?.removeIf(predicate)
-        changes += uuid
+        val changed = overlays[uuid]?.removeIf(predicate) ?: false
+        if (changed) changes += uuid
     }
     
     fun getEndY(player: Player): Int {
