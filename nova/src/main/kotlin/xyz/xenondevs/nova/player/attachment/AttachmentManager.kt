@@ -5,8 +5,10 @@ import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerRespawnEvent
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetPassengersPacketEvent
@@ -29,6 +31,7 @@ object AttachmentManager : Initializable(), Listener {
     override val dependsOn = setOf(AddonsInitializer)
     
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()
+    private val inactiveAttachments = HashMap<Player, HashSet<NamespacedId>>()
     
     override fun init() {
         registerEvents()
@@ -43,10 +46,10 @@ object AttachmentManager : Initializable(), Listener {
     }
     
     fun <A : Attachment, T : AttachmentType<A>> addAttachment(player: Player, type: T): A {
-        val attachmentsMap = activeAttachments.getOrPut(player, ::HashMap)
-        if (type in attachmentsMap)
-            throw java.lang.IllegalStateException("An attachment with that type is already active")
+        check(!player.isDead) { "Attachments cannot be added to dead players" }
         
+        val attachmentsMap = activeAttachments.getOrPut(player, ::HashMap)
+        check(type !in attachmentsMap) { "An attachment with that type is already active" }
         
         val attachment = type.constructor(player)
         attachmentsMap[type] = attachment
@@ -55,13 +58,19 @@ object AttachmentManager : Initializable(), Listener {
     }
     
     fun removeAttachment(player: Player, type: AttachmentType<*>) {
-        val attachmentsMap = activeAttachments[player] ?: return
-        val attachment = attachmentsMap.remove(type) ?: return
+        val inactiveAttachmentsMap = inactiveAttachments[player]
+        inactiveAttachmentsMap?.remove(type.id)
         
-        if (attachmentsMap.isEmpty())
+        if (inactiveAttachmentsMap != null && inactiveAttachmentsMap.isEmpty())
+            inactiveAttachments -= player
+        
+        val activeAttachmentsMap = activeAttachments[player]
+        val attachment = activeAttachmentsMap?.remove(type)
+        
+        if (activeAttachmentsMap != null && activeAttachmentsMap.isEmpty())
             activeAttachments -= player
         
-        attachment.despawn()
+        attachment?.despawn()
     }
     
     @EventHandler
@@ -74,28 +83,67 @@ object AttachmentManager : Initializable(), Listener {
         saveAndRemoveAttachments(event.player)
     }
     
+    @EventHandler
+    private fun handleDeath(event: PlayerDeathEvent) {
+        deactivateAttachments(event.entity)
+    }
+    
+    @EventHandler
+    private fun handleRespawn(event: PlayerRespawnEvent) {
+        activateAttachments(event.player)
+    }
+    
     @PacketHandler
     private fun handlePassengersSet(event: ClientboundSetPassengersPacketEvent) {
         val attachments = (activeAttachments.entries.firstOrNull { (player, _) -> player.entityId == event.vehicle } ?: return).value.values
         event.passengers += attachments.map(Attachment::passengerId)
     }
     
+    private fun deactivateAttachments(player: Player) {
+        val attachmentsMap = activeAttachments[player] ?: return
+        val inactive = inactiveAttachments.getOrPut(player, ::HashSet)
+        attachmentsMap.forEach { (type, attachment) ->
+            inactive += type.id
+            attachment.despawn()
+        }
+        
+        activeAttachments -= player
+    }
+    
+    private fun activateAttachments(player: Player) {
+        val attachmentIds = inactiveAttachments[player] ?: return
+        activateAttachments(player, attachmentIds)
+        inactiveAttachments -= player
+    }
+    
+    private fun activateAttachments(player: Player, attachmentIds: Set<NamespacedId>) {
+        attachmentIds.forEach {
+            val type = AttachmentTypeRegistry.of<AttachmentType<*>>(it)
+            if (type != null) {
+                addAttachment(player, type)
+            } else LOGGER.severe("Unknown attachment type $it on player ${player.name}")
+        }
+    }
+    
     private fun loadAttachments(player: Player) {
-        player.persistentDataContainer
-            .get<List<NamespacedId>>(ATTACHMENTS_KEY)
-            ?.forEach {
-                val type = AttachmentTypeRegistry.of<AttachmentType<*>>(it)
-                if (type != null) {
-                    addAttachment(player, type)
-                } else LOGGER.severe("Unknown attachment type $it on player ${player.name}")
-            }
+        val attachmentIds = player.persistentDataContainer
+            .get<HashSet<NamespacedId>>(ATTACHMENTS_KEY)
+            ?: return
+        
+        if (player.isDead) {
+            inactiveAttachments.getOrPut(player, ::HashSet) += attachmentIds
+        } else {
+            activateAttachments(player, attachmentIds)
+        }
     }
     
     private fun saveAttachments(player: Player) {
         val dataContainer = player.persistentDataContainer
-        val activeAttachments = activeAttachments[player]?.map { it.key.id }
-        if (!activeAttachments.isNullOrEmpty()) {
-            dataContainer.set(ATTACHMENTS_KEY, activeAttachments)
+        val attachmentIds = HashSet<NamespacedId>()
+        activeAttachments[player]?.forEach { attachmentIds += it.key.id }
+        inactiveAttachments[player]?.let { attachmentIds += it }
+        if (attachmentIds.isNotEmpty()) {
+            dataContainer.set(ATTACHMENTS_KEY, attachmentIds)
         } else dataContainer.remove(ATTACHMENTS_KEY)
     }
     
