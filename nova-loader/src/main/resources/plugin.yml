@@ -28,6 +28,7 @@ permissions:
       - nova.command.debug
       - nova.command.items
       - nova.command.advancedTooltips
+      - nova.command.waila
       - nova.command.render_distance
       - nova.command.nvrecipe
       - nova.command.nvusage
@@ -45,6 +46,9 @@ permissions:
     default: true
   nova.command.advancedTooltips:
     description: Allows players to toggle advanced tooltips for Nova items.
+    default: true
+  nova.command.waila:
+    description: Allows players to toggle the waila overlay on and off.
     default: true
   nova.command.renderDistance:
     description: Allows players to configure their armor stand render distance.

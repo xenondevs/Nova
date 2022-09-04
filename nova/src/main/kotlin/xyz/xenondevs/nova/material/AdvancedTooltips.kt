@@ -25,17 +25,24 @@ internal object AdvancedTooltips : Listener {
         Bukkit.getOnlinePlayers().forEach(::loadPlayer)
     }
     
-    fun toggle(player: Player): Boolean {
+    fun toggle(player: Player, state: Boolean): Boolean {
         val dataContainer = player.persistentDataContainer
-        if (player in _players) {
-            _players -= player
-            dataContainer.set(ADVANCED_TOOLTIPS_KEY, false)
-        } else {
+        if (state) {
+            if (player in _players)
+                return false
+            
             _players += player
             dataContainer.set(ADVANCED_TOOLTIPS_KEY, true)
+            return true
+        } else {
+            if (player !in players)
+                return false
+            
+            _players -= player
+            dataContainer.set(ADVANCED_TOOLTIPS_KEY, false)
         }
         
-        return player in _players
+        return true
     }
     
     private fun loadPlayer(player: Player) {

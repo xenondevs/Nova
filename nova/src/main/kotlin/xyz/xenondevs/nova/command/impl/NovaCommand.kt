@@ -40,6 +40,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
+import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.data.ComponentUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
@@ -95,7 +96,16 @@ internal object NovaCommand : Command("nova") {
                 .executesCatching(::openItemInventory))
             .then(literal("advancedTooltips")
                 .requiresPlayerPermission("nova.command.advancedTooltips")
-                .executesCatching(::toggleAdvancedTooltips))
+                .then(literal("on")
+                    .executesCatching { toggleAdvancedTooltips(it, true) })
+                .then(literal("off")
+                    .executesCatching { toggleAdvancedTooltips(it, false) }))
+            .then(literal("waila")
+                .requiresPlayerPermission("nova.command.waila")
+                .then(literal("on")
+                    .executesCatching { toggleWaila(it, true) })
+                .then(literal("off")
+                    .executesCatching { toggleWaila(it, false) }))
             .then(literal("renderDistance")
                 .requiresPlayerPermission("nova.command.renderDistance")
                 .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
@@ -142,9 +152,40 @@ internal object NovaCommand : Command("nova") {
         }
     }
     
-    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>) {
+    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>, state: Boolean) {
         val player = ctx.player
-        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.advanced_tooltips." + AdvancedTooltips.toggle(player)))
+        val changed = AdvancedTooltips.toggle(player, state)
+        
+        val onOff = if (state) "on" else "off"
+        if (changed) {
+            ctx.source.sendSuccess(localized(
+                ChatColor.GRAY,
+                "command.nova.advanced_tooltips.$onOff"
+            ))
+        } else {
+            ctx.source.sendFailure(localized(
+                ChatColor.RED,
+                "command.nova.advanced_tooltips.already_$onOff"
+            ))
+        }
+    }
+    
+    private fun toggleWaila(ctx: CommandContext<CommandSourceStack>, state: Boolean) {
+        val player = ctx.player
+        val changed = WailaManager.toggle(player, state)
+        
+        val onOff = if (state) "on" else "off"
+        if (changed) {
+            ctx.source.sendSuccess(localized(
+                ChatColor.GRAY,
+                "command.nova.waila.$onOff"
+            ))
+        } else {
+            ctx.source.sendFailure(localized(
+                ChatColor.RED,
+                "command.nova.waila.already_$onOff"
+            ))
+        }
     }
     
     private fun reuploadResourcePack(ctx: CommandContext<CommandSourceStack>) {
