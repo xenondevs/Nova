@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry
 import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager
+import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
@@ -83,6 +84,7 @@ object NovaConfig : Initializable() {
         AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)
         AutoUploadManager.reload()
         ActionbarOverlayManager.reload()
+        BossBarOverlayManager.reload()
         TileEntityLimits.reload()
         ChunkReloadWatcher.reload()
         UpdateReminder.reload()

@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nmsutils.bossbar.BossBar
 import xyz.xenondevs.nmsutils.bossbar.operation.AddBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.RemoveBossBarOperation
@@ -25,27 +26,48 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
+import xyz.xenondevs.nova.util.unregisterEvents
+import xyz.xenondevs.nova.util.unregisterPacketListener
 import java.util.*
 
+private val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.enabled") }
 private val BAR_AMOUNT by configReloadable { DEFAULT_CONFIG.getInt("overlay.bossbar.amount") }
 
-// TODO: proper config reloading
 object BossBarOverlayManager : Initializable(), Listener {
     
     override val inMainThread = true
     override val dependsOn = emptySet<Initializable>()
     
+    private var tickTask: BukkitTask? = null
     private val bars = HashMap<UUID, Array<BossBar>>()
     private val overlays = HashMap<UUID, ArrayList<BossBarOverlay>>()
     private val changes = HashSet<UUID>()
     
     internal val trackedBars = HashMap<Player, LinkedHashMap<UUID, BossBar>>()
     
-    override fun init() {
-        registerEvents()
-        registerPacketListener()
-        runTaskTimer(0, 1, ::handleTick)
-        Bukkit.getOnlinePlayers().forEach(::sendBars)
+    override fun init() = reload()
+    
+    fun reload() {
+        // was previously enabled?
+        if (tickTask != null) {
+            unregisterEvents()
+            unregisterPacketListener()
+            Bukkit.getOnlinePlayers().forEach(::removeBars)
+            tickTask?.cancel()
+            tickTask = null
+        }
+        
+        if (ENABLED) {
+            registerEvents()
+            registerPacketListener()
+            tickTask = runTaskTimer(0, 1, ::handleTick)
+            Bukkit.getOnlinePlayers().forEach(::sendBars)
+        } else {
+            // re-add tracked boss bars as real boss bars
+            trackedBars.forEach { (player, bars) ->
+                bars.values.forEach { bar -> player.send(bar.addPacket) }
+            }
+        }
     }
     
     override fun disable() {
