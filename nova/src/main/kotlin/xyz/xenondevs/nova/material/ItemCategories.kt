@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -41,9 +42,16 @@ internal object ItemCategories : Initializable() {
     
     override fun init() {
         LOGGER.info("Loading item categories")
+        reload()
+    }
+    
+    fun reload() {
+        // Clear ItemMenu history to prevent old item categories from showing up
+        ItemMenu.clearAllHistory()
         
         // Unlike recipes, item categories cannot be disabled
-        if (!CATEGORIES_FILE.exists()) UpdatableFile.removeStoredHash(CATEGORIES_FILE)
+        if (!CATEGORIES_FILE.exists())
+            UpdatableFile.removeStoredHash(CATEGORIES_FILE)
         
         UpdatableFile.load(CATEGORIES_FILE) {
             val defaultCategories = LinkedHashMap<String, Pair<CategoryPriority, ConfigurationSection>>()

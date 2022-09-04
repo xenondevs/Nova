@@ -26,6 +26,10 @@ internal interface ItemMenu {
             userHistory?.pollLast()?.show()
         }
         
+        fun clearAllHistory() {
+            itemMenuHistory.clear()
+        }
+        
     }
     
 }
