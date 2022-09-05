@@ -113,7 +113,12 @@ internal object ResourcePackBuilder {
                 val inputStream = zip.getInputStream(header)
                 file.parentFile.mkdirs()
                 if (header.fileName.endsWith(".png")) {
-                    PNGMetadataRemover.remove(inputStream, file.outputStream())
+                    try {
+                        PNGMetadataRemover.remove(inputStream, file.outputStream())
+                    } catch (e: IllegalStateException) {
+                        LOGGER.warning("Failed to remove metadata from ${header.fileName}")
+                        file.write(inputStream)
+                    }
                 } else file.write(inputStream)
             }
         }
@@ -132,7 +137,12 @@ internal object ResourcePackBuilder {
                         val inputStream = zip.getInputStream(header)
                         if (header.fileName.endsWith(".png")) {
                             file.parentFile.mkdirs()
-                            PNGMetadataRemover.remove(inputStream, file.outputStream())
+                            try {
+                                PNGMetadataRemover.remove(inputStream, file.outputStream())
+                            } catch (e: IllegalStateException) {
+                                LOGGER.warning("Failed to remove metadata from ${file.name} in $namespace")
+                                file.write(inputStream)
+                            }
                         } else file.write(inputStream)
                     }
                 }
