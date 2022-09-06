@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.runAsyncTaskTimerSynchronized
-import xyz.xenondevs.nova.util.runTaskTimerSynchronized
+import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -29,22 +29,21 @@ object TileEntityManager : Initializable(), ITileEntityManager {
         get() = tileEntityMap.asSequence().filter { it.key.isLoaded() }.flatMap { it.value.values }
     
     override fun init() {
-        fun handleTick(tileEntity: TileEntity, tickHandler: (TileEntity) -> Unit) {
-            if (tileEntity.isValid) {
-                try {
-                    tickHandler.invoke(tileEntity)
-                } catch (e: Exception) {
-                    LOGGER.log(Level.SEVERE, "An exception occurred while ticking $tileEntity", e)
+        fun handleTick(tickHandler: (TileEntity) -> Unit) {
+            val tileEntities = synchronized(this) { tileEntities.toList() }
+            tileEntities.forEach { tileEntity ->
+                if (tileEntity.isValid) {
+                    try {
+                        tickHandler.invoke(tileEntity)
+                    } catch (e: Exception) {
+                        LOGGER.log(Level.SEVERE, "An exception occurred while ticking $tileEntity", e)
+                    }
                 }
             }
         }
         
-        runTaskTimerSynchronized(this, 0, 1) {
-            tileEntities.toList().forEach { handleTick(it, TileEntity::handleTick) }
-        }
-        runAsyncTaskTimerSynchronized(this, 0, 1) {
-            tileEntities.toList().forEach { handleTick(it, TileEntity::handleAsyncTick) }
-        }
+        runTaskTimer(0, 1) { handleTick(TileEntity::handleTick) }
+        runAsyncTaskTimerSynchronized(this, 0, 1) { handleTick(TileEntity::handleAsyncTick) }
     }
     
     @Synchronized
