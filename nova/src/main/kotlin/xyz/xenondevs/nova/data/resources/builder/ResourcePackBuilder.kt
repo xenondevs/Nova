@@ -3,13 +3,14 @@ package xyz.xenondevs.nova.data.resources.builder
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
 import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.model.ZipParameters
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
@@ -17,11 +18,23 @@ import xyz.xenondevs.nova.data.resources.builder.content.MaterialContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.WailaContent
+import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.write
+import xyz.xenondevs.resourcepackobfuscator.ResourcePackObfuscator
 import java.io.File
 import java.util.function.Predicate
+
+private val BOSS_BAR_ENABLED = { BossBarOverlayManager.isEnabled }
+private val CORE_RESOURCE_FILTER = resourceFilterOf(
+    "assets/minecraft/textures/gui/bars.png" to BOSS_BAR_ENABLED,
+    "assets/nova/font/bossbar/*" to BOSS_BAR_ENABLED,
+)
+private val CONFIG_RESOURCE_FILTER by configReloadable { resourceFilterOf(*DEFAULT_CONFIG.getStringList("resource_pack.content_filters").toTypedArray()) }
+
+private val OBFUSCATE by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.protection.obfuscate") }
+private val CORRUPT_ENTRIES by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.protection.corrupt_entries") }
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal object ResourcePackBuilder {
@@ -40,6 +53,15 @@ internal object ResourcePackBuilder {
     val PACK_MCMETA_FILE = File(PACK_DIR, "pack.mcmeta")
     val RESOURCE_PACK_FILE = File(RESOURCE_PACK_DIR, "ResourcePack.zip")
     val MCASSETS_DIR = File(RESOURCE_PACK_DIR, ".mcassets")
+    
+    private val resourceFilters = buildList {
+        this += CORE_RESOURCE_FILTER
+        this += CONFIG_RESOURCE_FILTER
+        AddonManager.addons.values.forEach {
+            val filter = it.resourceFilter ?: return@forEach
+            this += filter
+        }
+    }
     
     init {
         // delete legacy resource pack files
@@ -99,7 +121,9 @@ internal object ResourcePackBuilder {
             writeMetadata(assetPacks.size, basePacks.packAmount)
             
             // Create a zip
-            return createZip()
+            val zip = createZip()
+            LOGGER.info("ResourcePack created.")
+            return zip
         } finally {
             RESOURCE_PACK_BUILD_DIR.deleteRecursively()
         }
@@ -175,18 +199,29 @@ internal object ResourcePackBuilder {
     }
     
     private fun createZip(): File {
-        LOGGER.info("Packing zip")
+        resourceFilters.forEach(ResourceFilter::performFilterEvaluations)
+        
+        // filter files
+        LOGGER.info("Applying resource filters")
+        PACK_DIR.walkTopDown().forEach { file ->
+            if (file.isDirectory)
+                return@forEach
+            
+            val path = file.relativeTo(PACK_DIR).invariantSeparatorsPath
+            if (resourceFilters.any { !it.test(path) })
+                file.delete()
+        }
         
         // delete old zip file
         RESOURCE_PACK_FILE.delete()
         
         // pack zip
-        val parameters = ZipParameters().apply {
-            isIncludeRootFolder = false
-            lastModifiedFileTime = 1
-        }
-        val zip = ZipFile(RESOURCE_PACK_FILE)
-        zip.addFolder(PACK_DIR, parameters)
+        LOGGER.info("Packing zip...")
+        ResourcePackObfuscator(
+            OBFUSCATE, CORRUPT_ENTRIES,
+            PACK_DIR, RESOURCE_PACK_FILE,
+            MCASSETS_DIR
+        ).packZip()
         
         return RESOURCE_PACK_FILE
     }

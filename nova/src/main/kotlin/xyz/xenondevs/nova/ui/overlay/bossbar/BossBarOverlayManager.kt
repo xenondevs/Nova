@@ -30,7 +30,6 @@ import xyz.xenondevs.nova.util.unregisterEvents
 import xyz.xenondevs.nova.util.unregisterPacketListener
 import java.util.*
 
-private val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.enabled") }
 private val BAR_AMOUNT by configReloadable { DEFAULT_CONFIG.getInt("overlay.bossbar.amount") }
 
 object BossBarOverlayManager : Initializable(), Listener {
@@ -44,6 +43,7 @@ object BossBarOverlayManager : Initializable(), Listener {
     private val changes = HashSet<UUID>()
     
     internal val trackedBars = HashMap<Player, LinkedHashMap<UUID, BossBar>>()
+    internal val isEnabled by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.enabled") }
     
     override fun init() = reload()
     
@@ -57,7 +57,7 @@ object BossBarOverlayManager : Initializable(), Listener {
             tickTask = null
         }
         
-        if (ENABLED) {
+        if (isEnabled) {
             registerEvents()
             registerPacketListener()
             tickTask = runTaskTimer(0, 1, ::handleTick)

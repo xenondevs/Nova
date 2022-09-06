@@ -5,6 +5,18 @@ resource_pack:
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:
     enabled: false
+  # Protection settings for the resource pack
+  protection:
+    # Renames resource pack textures and models
+    obfuscate: true
+    # Protects the zip from being opened in normal zip programs.
+    corrupt_entries: false
+  # Resource packs that should be merged with Nova's resource pack.
+  # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
+  base_packs: []
+  # Defines what content is included in the generated resource pack.
+  # Excluding content will decrease the size of your resource pack but might also break some features.
+  content_filters: []
   # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
   # Please read the following documentation page before change this value:  https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
   use_solid_blocks: true
@@ -22,18 +34,24 @@ entity_render_distance:
   max: 6
   default: 4
 
-# The overlay used for custom UIs
 overlay:
   actionbar:
+    # Enable / disable all action bar overlays.
     enabled: true
   bossbar:
+    # Enable / disable all boss bar overlays.
+    # You will need to regenerate the resource pack after changing this value.
     enabled: true
+    # How many invisible boss bar should be sent to the player.
     amount: 20
 
-# The waila overlay
 waila:
+  # Enable / disable the WAILA overlay.
   enabled: true
+  # The interval for checking if a player is looking at a new block.
   pos_update_interval: 1
+  # The interval for updating the overlay, regardless if the player is still looking at the same block.
+  # Updating the overlay under these circumstances is still required for displaying the tool matching, energy, etc. properly.
   data_update_interval: 5
 
 # Default transfer rates for networks when tile entities are directly connected.

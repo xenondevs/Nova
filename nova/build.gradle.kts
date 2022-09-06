@@ -30,7 +30,7 @@ dependencies {
     api("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     api("xyz.xenondevs.bytebase:ByteBase-Runtime:0.3-SNAPSHOT")
     api("me.xdrop:fuzzywuzzy:1.4.0")
-    api("software.amazon.awssdk:s3:2.17.259")
+    api("software.amazon.awssdk:s3:2.17.261")
     
     // plugin dependencies
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6")

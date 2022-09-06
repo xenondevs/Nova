@@ -44,6 +44,7 @@ dependencyResolutionManagement {
             // lib - minecraft assets
             library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.0-SNAPSHOT")
             library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.0-SNAPSHOT")
+            library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:1.0-SNAPSHOT")
             
             // lib - zip4j
             library("zip4j", "net.lingala.zip4j:zip4j:2.11.1")
@@ -53,7 +54,7 @@ dependencyResolutionManagement {
             bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-netty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
             bundle("cbf", listOf("cosmic-binary-format", "cosmic-binary-format-netty-adapter"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
-            bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer"))
+            bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer", "resource-pack-obfuscator"))
             
             // plugins
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
