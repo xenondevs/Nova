@@ -35,7 +35,7 @@ class GUITexture(private val info: FontChar) {
         return ComponentBuilder()
             .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
             .append(info.char.toString())
-            .font("nova:gui")
+            .font(info.font)
             .color(ChatColor.WHITE)
             .append(MoveCharacters.getMovingComponent(-info.width + 7)) // move back to start
             .append(title.formatWithTemplate(TITLE_TEMPLATE))
