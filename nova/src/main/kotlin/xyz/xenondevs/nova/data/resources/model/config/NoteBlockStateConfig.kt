@@ -46,9 +46,9 @@ internal data class NoteBlockStateConfig(
                 .associate { val s = it.split('='); s[0] to s[1] }
             
             return NoteBlockStateConfig(
-                Instrument.valueOf(properties["instrument"]!!.uppercase()),
-                properties["note"]!!.toInt(),
-                properties["powered"]!!.toBooleanStrict()
+                properties["instrument"]?.let { Instrument.valueOf(it.uppercase()) } ?: Instrument.HARP,
+                properties["note"]?.toInt() ?: 0,
+                properties["powered"]?.toBoolean() ?: false
             )
         }
         

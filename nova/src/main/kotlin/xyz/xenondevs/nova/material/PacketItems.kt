@@ -73,7 +73,7 @@ internal object PacketItems : Initializable(), Listener {
         registerPacketListener()
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleClick(event: InventoryClickEvent) {
         val view = event.view
         val rawSlot = event.rawSlot

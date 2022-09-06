@@ -92,5 +92,13 @@
   "command.nova.resource_pack.reupload.success": "資源包已上傳到 %s",
   "command.nova.advanced_tooltips.false": "關閉進階工具提示",
   "command.nova.advanced_tooltips.true": "開啟進階工具提示",
-  "menu.nova.items": "物品"
+  "menu.nova.items": "物品",
+  "menu.nova.side_config.north": "北方",
+  "menu.nova.side_config.east": "東方",
+  "menu.nova.side_config.south": "南方",
+  "menu.nova.side_config.west": "西方",
+  "menu.nova.side_config.up": "上方",
+  "menu.nova.side_config.down": "下方",
+  "command.nova.network_debug.nova.item": "切換物品網路的除錯工具",
+  "command.nova.update_chunk_search_id.success": "已更新區塊搜尋ID"
 }

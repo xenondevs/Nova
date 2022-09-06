@@ -21,9 +21,8 @@ abstract class Initializable internal constructor() : Comparable<Initializable> 
             try {
                 init()
                 isInitialized = true
-                initialization.complete(true)
-                
                 Initializer.initialized += this
+                initialization.complete(true)
             } catch (e: InitializationException) {
                 LOGGER.severe(e.message)
             } catch (e: Exception) {
