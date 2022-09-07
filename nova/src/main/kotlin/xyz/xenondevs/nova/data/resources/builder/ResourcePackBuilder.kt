@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.write
 import xyz.xenondevs.resourcepackobfuscator.ResourcePackObfuscator
 import java.io.File
-import java.util.function.Predicate
 
 private val BOSS_BAR_ENABLED = { BossBarOverlayManager.isEnabled }
 private val CORE_RESOURCE_FILTER = resourceFilterOf(
@@ -87,7 +86,6 @@ internal object ResourcePackBuilder {
                 LOGGER.info("Downloading minecraft assets")
                 runBlocking {
                     val downloader = MinecraftAssetsDownloader(outputDirectory = MCASSETS_DIR, mode = ExtractionMode.ALL)
-                    downloader.filters += Predicate { it.startsWith("assets/minecraft/textures/") || it.startsWith("assets/minecraft/lang/") }
                     downloader.downloadAssets()
                 }
             }
