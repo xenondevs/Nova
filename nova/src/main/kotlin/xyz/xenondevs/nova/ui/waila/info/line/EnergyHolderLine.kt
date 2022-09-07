@@ -37,9 +37,9 @@ object EnergyHolderLine {
         return WailaLine(
             ComponentWidthBuilder(player.locale)
                 .color(ChatColor.GRAY)
-                .append("↑ ")
+                .append("+")
                 .append(TranslatableComponent("menu.nova.energy_per_tick", NumberFormatUtils.getEnergyString(holder.energyPlus)))
-                .append(" ↓ ")
+                .append(" | -")
                 .append(TranslatableComponent("menu.nova.energy_per_tick", NumberFormatUtils.getEnergyString(holder.energyMinus)))
                 .create(),
             WailaLine.Alignment.CENTERED

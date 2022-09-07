@@ -35,7 +35,7 @@ sealed class NovaEnergyHolder(
             if (field != capped) {
                 val energyDelta = capped - field
                 if (energyDelta > 0) _energyPlus.add(energyDelta)
-                else _energyMinus.take(energyDelta)
+                else _energyMinus.add(-energyDelta)
                 
                 field = capped
                 callUpdateHandlers()
@@ -78,7 +78,7 @@ private class TickedLong {
     private var value: Long = 0
     private var prevValue: Long = 0
     
-     fun get(): Long {
+    fun get(): Long {
         if (lastUpdated != serverTick) {
             prevValue = value
             value = 0
@@ -91,15 +91,22 @@ private class TickedLong {
     operator fun getValue(thisRef: Any, property: KProperty<*>): Long = get()
     
     fun set(value: Long) {
+        if (lastUpdated != serverTick) {
+            prevValue = value
+            lastUpdated = serverTick
+        }
+        
         this.value = value
     }
     
     fun add(value: Long) {
+        if (lastUpdated != serverTick) {
+            prevValue = value
+            this.value = 0
+            lastUpdated = serverTick
+        }
+        
         this.value += value
-    }
-    
-    fun take(value: Long) {
-        this.value -= value
     }
     
 }
