@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 abstract class BossBarOverlay {
     
     /**
-     * Which boss bar should be used. For every bar level, the text will be displayed 20px deeper.
+     * Which boss bar should be used. For every bar level, the text will be rendered 20px lower.
      */
     abstract val barLevel: Int
     
