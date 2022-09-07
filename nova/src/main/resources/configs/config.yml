@@ -8,7 +8,7 @@ resource_pack:
   # Protection settings for the resource pack
   protection:
     # Renames resource pack textures and models
-    obfuscate: true
+    obfuscate: false
     # Protects the zip from being opened in normal zip programs.
     corrupt_entries: false
   # Resource packs that should be merged with Nova's resource pack.
