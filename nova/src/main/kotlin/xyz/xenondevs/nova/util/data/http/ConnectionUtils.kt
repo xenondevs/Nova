@@ -8,7 +8,7 @@ import java.net.URL
 
 object ConnectionUtils {
     
-    val SERVER_IP by lazy { runBlocking { HTTP_CLIENT.get("https://checkip.amazonaws.com/").body<String>().trim() } }
+    val SERVER_IP by lazy { runBlocking { HTTP_CLIENT.get("https://checkip.amazonaws.com/").body<String>().trim().split("\n")[0] } }
     
     fun isURL(url: String) =
         runCatching { URL(url) }.isSuccess

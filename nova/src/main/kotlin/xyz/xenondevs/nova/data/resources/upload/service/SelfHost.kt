@@ -31,14 +31,14 @@ internal object SelfHost : UploadService {
     
     private lateinit var host: String
     private var port = 38519
-    private var portNeeded = true
+    private var appendPort = true
     
     private val url: String
         get() = buildString {
             if (!host.startsWithAny("http://", "https://"))
                 append("http://")
             append(host)
-            if (portNeeded)
+            if (appendPort)
                 append(":$port")
         }
     
@@ -49,7 +49,7 @@ internal object SelfHost : UploadService {
         
         val port = cfg.getIntOrNull("port")
         if (port != null) this.port = port
-        portNeeded = cfg.getBooleanOrNull("portNeeded") ?: (configuredHost != null)
+        appendPort = cfg.getBooleanOrNull("append_port") ?: cfg.getBooleanOrNull("portNeeded") ?: (configuredHost == null)
         
         thread(name = "ResourcePack Server", isDaemon = true) {
             server = embeddedServer(Netty, port = this.port) {
