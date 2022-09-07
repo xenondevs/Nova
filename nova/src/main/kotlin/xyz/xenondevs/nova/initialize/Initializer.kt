@@ -85,7 +85,6 @@ internal object Initializer : Listener {
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
         
-        NovaConfig.loadDefaultConfig()
         CBFAdapters.registerExtraAdapters()
         InventoryUtils.stackSizeProvider = StackSizeProvider { it.novaMaxStackSize }
         CoreItems.init()

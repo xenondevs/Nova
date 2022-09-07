@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -59,6 +60,7 @@ class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by lo
         if (IS_DEV_SERVER)
             LOGGER.warning("Running in dev mode! Never use this on a production server!")
         
+        NovaConfig.loadDefaultConfig()
         if (checkStartup()) {
             Initializer.init()
         }
