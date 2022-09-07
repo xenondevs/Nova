@@ -11,10 +11,10 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.named
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardOpenOption
+import java.io.InputStreamReader
 
 private const val MAVEN_CENTRAL = "https://repo.maven.apache.org/maven2/"
+private val MOJANG_MAPPED = System.getProperty("mojang-mapped") != null
 
 abstract class BuildLoaderJarTask : DefaultTask() {
     
@@ -56,6 +56,15 @@ abstract class BuildLoaderJarTask : DefaultTask() {
             ZipParameters().apply { fileNameInZip = "libraries.yml" }
         )
         
+        // update plugin.yml
+        val pluginYml = zip.getInputStream(zip.getFileHeader("plugin.yml"))
+            .use { YamlConfiguration.loadConfiguration(InputStreamReader(it)) }
+        setLibraries(pluginYml, "spigotLoader")
+        zip.addStream(
+            pluginYml.saveToString().byteInputStream(),
+            ZipParameters().apply { fileNameInZip = "plugin.yml" }
+        )
+        
         // close zip files
         zip.close()
         apiZip.close()
@@ -67,23 +76,28 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         outFile.inputStream().use { ins -> copyTo.outputStream().use { out -> ins.copyTo(out) } }
     }
     
-    @Suppress("SENSELESS_COMPARISON") // it isn't
     private fun generateLibrariesYaml(project: Project): YamlConfiguration {
-        val cfg = YamlConfiguration()
+        val librariesYml = YamlConfiguration()
         
-        cfg["repositories"] = project.repositories.asSequence()
+        librariesYml["repositories"] = project.repositories.asSequence()
             .filterIsInstance<DefaultMavenArtifactRepository>()
             .filter { it !is DefaultMavenLocalArtifactRepository }
             .mapTo(HashSet()) { it.url.toString() }
             .apply { this -= MAVEN_CENTRAL }
             .toList() // Required for proper serialization
         
-        val mojangMapped = System.getProperty("mojang-mapped") != null
-        cfg["libraries"] = project.configurations.getByName("runtimeClasspath")
+        setLibraries(librariesYml, "novaLoader")
+        
+        return librariesYml
+    }
+    
+    @Suppress("SENSELESS_COMPARISON") // it isn't
+    private fun setLibraries(cfg: YamlConfiguration, configuration: String) {
+        cfg["libraries"] = project.configurations.getByName(configuration)
             .incoming.dependencies.asSequence()
             .filterIsInstance<DefaultExternalModuleDependency>()
             .mapTo(ArrayList()) { dep ->
-                val artifact = dep.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && !mojangMapped }
+                val artifact = dep.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && !MOJANG_MAPPED }
                 val coords = if (artifact != null)
                     "${dep.group}:${dep.name}:${artifact.extension}:${artifact.classifier}:${dep.version}"
                 else "${dep.group}:${dep.name}:${dep.version}"
@@ -95,7 +109,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
                     exCfg["exclusions"] = excludeRules.map {
                         require(it.module != null) { "Exclusion rules need to specify a module" }
                         if (it.group != null)
-                            "${it.group}:${it.module}" 
+                            "${it.group}:${it.module}"
                         else it.module
                     }
                     
@@ -104,8 +118,6 @@ abstract class BuildLoaderJarTask : DefaultTask() {
                 
                 return@mapTo coords
             }
-        
-        return cfg
     }
     
     private fun getOutputFile(project: Project): File {

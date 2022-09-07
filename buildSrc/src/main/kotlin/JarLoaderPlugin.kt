@@ -1,7 +1,5 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.internal.provider.ValueSupplier.ValueProducer.task
-import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 
 class JarLoaderPlugin : Plugin<Project> {
@@ -24,6 +22,14 @@ class JarLoaderPlugin : Plugin<Project> {
             this.novaAPI = novaAPI
             this.novaLoader = novaLoader
         }
+    
+        val novaLoaderAPI = project.configurations.create("novaLoaderApi")
+        val spigotLoaderAPI = project.configurations.create("spigotLoaderApi")
+        project.configurations.getByName("api").extendsFrom(novaLoaderAPI, spigotLoaderAPI)
+        
+        val novaLoaderCfg = project.configurations.create("novaLoader").apply { extendsFrom(novaLoaderAPI) }
+        val spigotLoaderCfg = project.configurations.create("spigotLoader").apply { extendsFrom(spigotLoaderAPI) }
+        project.configurations.getByName("implementation").extendsFrom(novaLoaderCfg, spigotLoaderCfg)
     }
     
 }

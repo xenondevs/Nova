@@ -5,6 +5,7 @@ val mojangMapped = System.getProperty("mojang-mapped") != null
 plugins {
     java
     kotlin("jvm") version "1.7.10"
+    id("xyz.xenondevs.jar-loader-gradle-plugin")
     id("xyz.xenondevs.specialsource-gradle-plugin") version "1.0.0"
     id("xyz.xenondevs.string-remapper-gradle-plugin") version "1.0.0"
     `maven-publish`
@@ -14,23 +15,25 @@ dependencies {
     api(project(":nova-api"))
     compileOnly(project(":nova-loader"))
     
-    api(deps.bundles.kotlin)
-    api(deps.bundles.ktor)
-    api(deps.bundles.cbf)
-    api(deps.bundles.minecraft.assets)
-    api(deps.zip4j)
+    spigotLoaderApi(deps.bundles.kotlin)
+    novaLoaderApi(deps.bundles.cbf)
+    novaLoader(deps.bundles.ktor)
+    novaLoader(deps.bundles.minecraft.assets)
+    novaLoader(deps.zip4j)
+    
+    novaLoaderApi("de.studiocode.invui:InvUI:0.8-SNAPSHOT") { for (i in 1..11) exclude(module = "IA-R$i") }
+    novaLoaderApi("de.studiocode.invui:ResourcePack:0.8-SNAPSHOT") { exclude(module = "InvUI") }
+    novaLoaderApi("de.studiocode.invui:IA-R11:0.8-SNAPSHOT:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs:nms-utilities:0.1-SNAPSHOT:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs:particle:1.8")
+    novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
+    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.3-SNAPSHOT")
+    novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
+    novaLoader("software.amazon.awssdk:s3:2.17.267")
+    
+    // provided through spigot
     compileOnly(deps.bundles.maven.resolver)
     compileOnly(variantOf(deps.spigot.server) { classifier("remapped-mojang") })
-    
-    api("de.studiocode.invui:InvUI:0.8-SNAPSHOT") { for (i in 1..11) exclude(module = "IA-R$i") }
-    api("de.studiocode.invui:ResourcePack:0.8-SNAPSHOT") { exclude(module = "InvUI") }
-    api("de.studiocode.invui:IA-R11:0.8-SNAPSHOT:remapped-mojang")
-    api("xyz.xenondevs:nms-utilities:0.1-SNAPSHOT:remapped-mojang")
-    api("xyz.xenondevs:particle:1.8")
-    api("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
-    api("xyz.xenondevs.bytebase:ByteBase-Runtime:0.3-SNAPSHOT")
-    api("me.xdrop:fuzzywuzzy:1.4.0")
-    api("software.amazon.awssdk:s3:2.17.261")
     
     // plugin dependencies
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6")
