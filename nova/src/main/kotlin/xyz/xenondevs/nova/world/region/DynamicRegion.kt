@@ -11,8 +11,8 @@ open class DynamicRegion internal constructor(
     minSize: ValueReloadable<Int>,
     maxSize: ValueReloadable<Int>,
     size: Int,
-    private val createRegion: (Int) -> Region,
-) : ReloadableRegion(uuid) {
+    createRegion: (Int) -> Region,
+) : ReloadableRegion(uuid, createRegion) {
     
     private val _displaySizeItem = lazy { DisplayNumberItem({ this.size }, "menu.nova.region.size") }
     private val _increaseSizeItem = lazy { AddNumberItem({ this.minSize..this.maxSize }, { this.size }, { this.size = it }, "menu.nova.region.increase") }
@@ -25,17 +25,14 @@ open class DynamicRegion internal constructor(
     val minSize by minSize
     open val maxSize by maxSize
     
-    final override var region: Region = createRegion(size)
-        private set
-    
-    var size = size
+    override var size = size
         set(value) {
             if (field != value) {
                 if (value !in minSize..maxSize)
                     throw IllegalArgumentException("Illegal region size $value for minSize $minSize, maxSize $maxSize")
                 
                 field = value
-                region = createRegion(value)
+                updateRegion()
                 
                 if (_displaySizeItem.isInitialized())
                     displaySizeItem.notifyWindows()
@@ -43,8 +40,6 @@ open class DynamicRegion internal constructor(
                     increaseSizeItem.notifyWindows()
                 if (_decreaseSizeItem.isInitialized())
                     decreaseSizeItem.notifyWindows()
-                
-                VisualRegion.updateRegion(uuid, region)
             }
         }
     

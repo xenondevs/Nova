@@ -6,17 +6,9 @@ import java.util.*
 class StaticRegion internal constructor(
     uuid: UUID,
     size: ValueReloadable<Int>,
-    private val createRegion: (Int) -> Region,
-) : ReloadableRegion(uuid) {
+    createRegion: (Int) -> Region,
+) : ReloadableRegion(uuid, createRegion) {
     
-    val size by size
-    
-    override var region: Region = createRegion(this.size)
-        private set
-    
-    override fun reload() {
-        region = createRegion(this.size)
-        VisualRegion.updateRegion(uuid, region)
-    }
+    override val size by size
     
 }

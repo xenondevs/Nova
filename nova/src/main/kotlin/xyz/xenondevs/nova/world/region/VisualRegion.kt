@@ -31,7 +31,7 @@ object VisualRegion {
     fun isVisible(playerUUID: UUID, regionUUID: UUID) =
         viewers[regionUUID]?.contains(playerUUID) ?: false
     
-    fun removeRegionViewer(player: Player, regionUUID: UUID) {
+    fun hideRegion(player: Player, regionUUID: UUID) {
         val viewerList = viewers[regionUUID]
         if (viewerList != null) {
             viewerList.remove(player.uniqueId)

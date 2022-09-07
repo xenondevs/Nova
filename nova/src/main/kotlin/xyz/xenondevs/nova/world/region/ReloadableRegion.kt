@@ -6,9 +6,24 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
 import java.util.*
 
-abstract class ReloadableRegion(val uuid: UUID): Iterable<Block> {
+abstract class ReloadableRegion(
+    val uuid: UUID,
+    private val createRegion: (Int) -> Region
+) : Iterable<Block> {
     
-    abstract val region: Region
+    abstract val size: Int
+    
+    private lateinit var _region: Region
+    private var region: Region
+        set(value) {
+            _region = value
+            VisualRegion.updateRegion(uuid, region)
+        }
+        get() {
+            if (!::_region.isInitialized)
+                _region = createRegion(size)
+            return _region
+        }
     
     val visualizeRegionItem by lazy { VisualizeRegionItem(uuid) { region } }
     
@@ -24,14 +39,20 @@ abstract class ReloadableRegion(val uuid: UUID): Iterable<Block> {
     override fun iterator(): Iterator<Block> = blocks.iterator()
     //</editor-fold>
     
-    abstract fun reload()
+    open fun reload() {
+        updateRegion()
+    }
     
     fun showRegionOutline(player: Player) {
         VisualRegion.showRegion(player, uuid, region)
     }
     
     fun hideRegionOutline(player: Player) {
-        VisualRegion.removeRegionViewer(player, uuid)
+        VisualRegion.hideRegion(player, uuid)
+    }
+    
+    fun updateRegion() {
+        region = createRegion(size)
     }
     
 }
