@@ -1082,6 +1082,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun canBreatheUnderwater(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getCategory(): EntityCategory {
         throw UnsupportedOperationException("Player is not online")
     }
