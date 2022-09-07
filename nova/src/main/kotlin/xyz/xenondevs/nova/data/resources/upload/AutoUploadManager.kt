@@ -98,10 +98,10 @@ internal object AutoUploadManager : Initializable() {
                     LOGGER.warning("The resource pack was not uploaded. (Misconfigured auto uploader?)")
             }
             lastConfig = configHash
+            
+            if (fromReload)
+                forceResourcePack()
         }
-        
-        if (fromReload)
-            forceResourcePack()
     }
     
     override fun disable() {
