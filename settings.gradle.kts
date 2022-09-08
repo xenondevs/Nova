@@ -42,9 +42,9 @@ dependencyResolutionManagement {
             library("maven-resolver-transport-http", "org.apache.maven.resolver:maven-resolver-transport-http:1.8.2")
             
             // lib - minecraft assets
-            library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.0-SNAPSHOT")
+            library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.0")
             library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.0")
-            library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:1.0-SNAPSHOT")
+            library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:0.1")
             
             // lib - zip4j
             library("zip4j", "net.lingala.zip4j:zip4j:2.11.1")
