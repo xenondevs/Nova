@@ -41,6 +41,7 @@ softdepend:
   - Oraxen
   - MMOItems
   - AuthMe
+  - IridiumSkyblock
 
 permissions:
   nova.command.*:

@@ -18,8 +18,7 @@ import com.iridium.iridiumskyblock.IridiumSkyblock as ISkyBlock
 
 internal object IridiumSkyblock : ProtectionIntegration, InternalIntegration {
 
-    private val IRIDIUMSKYBLOCK = if (Bukkit.getPluginManager().getPlugin("IridiumSkyblock") != null) GriefPrevention.instance else null
-    override val isInstalled = IRIDIUMSKYBLOCK != null
+    override val isInstalled = Bukkit.getPluginManager().getPlugin("IridiumSkyblock") != null;
 
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean {
         return checkIridiumSkyblockPlayer(player, location, PermissionType.BLOCK_BREAK)
@@ -46,11 +45,12 @@ internal object IridiumSkyblock : ProtectionIntegration, InternalIntegration {
     }
 
     private fun checkIridiumSkyblockPlayer(player: OfflinePlayer, location: Location, permissionType: PermissionType): Boolean {
-        val user: User = ISkyBlock.getInstance().userManager.getUser(player)
+        val instance = ISkyBlock.getInstance()
+        val user: User = instance.userManager.getUser(player)
         val island: Optional<Island> =
-            ISkyBlock.getInstance().islandManager.getIslandViaLocation(location)
+            instance.islandManager.getIslandViaLocation(location)
         if (!island.isPresent) return true
-        return ISkyBlock.getInstance().islandManager
+        return instance.islandManager
             .getIslandPermission(island.get(), user, permissionType)
     }
 
