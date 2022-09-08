@@ -2,6 +2,7 @@ package xyz.xenondevs.nova
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
 import org.bukkit.Bukkit
@@ -34,6 +35,10 @@ internal var IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 
 internal val HTTP_CLIENT = HttpClient(CIO) {
     install(ContentNegotiation) { gson() }
+    install(HttpTimeout) {
+        connectTimeoutMillis = 10_000
+        requestTimeoutMillis = HttpTimeout.INFINITE_TIMEOUT_MS
+    }
     expectSuccess = false
 }
 
