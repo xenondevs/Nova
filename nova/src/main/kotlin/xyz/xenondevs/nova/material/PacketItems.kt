@@ -8,6 +8,8 @@ import net.minecraft.nbt.StringTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData.DataItem
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.trading.MerchantOffer
+import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Player
@@ -21,6 +23,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundMerchantOffersPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
@@ -139,10 +142,9 @@ internal object PacketItems : Initializable(), Listener {
         val carriedItem = packet.carriedItem
         
         items.forEachIndexed { i, item ->
-            if (isContainerItem(item))
-                items[i] = filterContainerItems(item, fromCreative = false)
-            else if (isNovaItem(item))
-                items[i] = getFakeItem(player, item)
+            val newItem = getClientsideItemOrNull(player, item, fromCreative = false)
+            if (newItem != null)
+                items[i] = newItem
         }
         
         if (isNovaItem(carriedItem))
@@ -153,10 +155,9 @@ internal object PacketItems : Initializable(), Listener {
     private fun handleSetSlotPacket(event: ClientboundContainerSetSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
-        if (isContainerItem(item))
-            event.item = filterContainerItems(item, fromCreative = false)
-        else if (isNovaItem(item))
-            event.item = getFakeItem(event.player, item)
+        val newItem = getClientsideItemOrNull(event.player, item, fromCreative = false)
+        if (newItem != null)
+            event.item = newItem
     }
     
     @PacketHandler
@@ -206,6 +207,32 @@ internal object PacketItems : Initializable(), Listener {
         }
     }
     
+    @PacketHandler
+    private fun handleMerchantOffers(event: ClientboundMerchantOffersPacketEvent) {
+        val newOffers = MerchantOffers()
+        var changed = false
+        
+        event.offers.forEach { offer ->
+            val newSlotA = getClientsideItemOrNull(event.player, offer.baseCostA, fromCreative = false)
+            val newSlotB = getClientsideItemOrNull(event.player, offer.costB, fromCreative = false)
+            val newResult = getClientsideItemOrNull(event.player, offer.result, fromCreative = false)
+            if (newSlotA != null || newSlotB != null || newResult != null) {
+                newOffers.add(MerchantOffer(
+                    newSlotA ?: offer.baseCostA,
+                    newSlotB ?: offer.costB,
+                    newResult ?: offer.result,
+                    offer.uses,
+                    offer.maxUses,
+                    offer.xp,
+                    offer.priceMultiplier,
+                    offer.demand
+                ))
+                changed = true
+            } else newOffers.add(offer)
+        }
+        if (changed) event.offers = newOffers
+    }
+    
     internal fun isNovaItem(item: MojangStack): Boolean {
         return item.item == SERVER_SIDE_ITEM
             && item.tag != null
@@ -243,6 +270,13 @@ internal object PacketItems : Initializable(), Listener {
             }
         }
     }
+    
+    private fun getClientsideItemOrNull(player: Player?, item: MojangStack, fromCreative: Boolean, useName: Boolean = true) =
+        when {
+            isContainerItem(item) -> filterContainerItems(item, fromCreative)
+            isNovaItem(item) -> getFakeItem(player, item, useName)
+            else -> null
+        }
     
     internal fun getFakeItem(player: Player?, item: MojangStack, useName: Boolean = true): MojangStack {
         val itemTag = item.tag!!
