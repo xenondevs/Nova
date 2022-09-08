@@ -8,12 +8,13 @@ import org.gradle.api.internal.artifacts.repositories.DefaultMavenArtifactReposi
 import org.gradle.api.internal.artifacts.repositories.DefaultMavenLocalArtifactRepository
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.component.external.model.DefaultModuleComponentIdentifier
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.named
 import java.io.File
 import java.io.InputStreamReader
 
-private const val MAVEN_CENTRAL = "https://repo.maven.apache.org/maven2/"
+private const val MAVEN_CENTRAL = "https://repo1.maven.org/maven2/"
 private val MOJANG_MAPPED = System.getProperty("mojang-mapped") != null
 
 abstract class BuildLoaderJarTask : DefaultTask() {
@@ -87,6 +88,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
             .toList() // Required for proper serialization
         
         setLibraries(librariesYml, "novaLoader")
+        setExclusions(librariesYml, "spigotLoader")
         
         return librariesYml
     }
@@ -97,20 +99,14 @@ abstract class BuildLoaderJarTask : DefaultTask() {
             .incoming.dependencies.asSequence()
             .filterIsInstance<DefaultExternalModuleDependency>()
             .mapTo(ArrayList()) { dep ->
-                val artifact = dep.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && !MOJANG_MAPPED }
-                val coords = if (artifact != null)
-                    "${dep.group}:${dep.name}:${artifact.extension}:${artifact.classifier}:${dep.version}"
-                else "${dep.group}:${dep.name}:${dep.version}"
-                
+                val coords = getArtifactCoords(dep)
                 val excludeRules = dep.excludeRules
                 if (excludeRules.isNotEmpty()) {
                     val exCfg = YamlConfiguration()
                     exCfg["library"] = coords
                     exCfg["exclusions"] = excludeRules.map {
-                        require(it.module != null) { "Exclusion rules need to specify a module" }
-                        if (it.group != null)
-                            "${it.group}:${it.module}"
-                        else it.module
+                        require(it.group != null && it.module != null) { "Exclusion rules need to specify group and module" }
+                        "${it.group}:${it.module}::jar"
                     }
                     
                     return@mapTo exCfg
@@ -118,6 +114,21 @@ abstract class BuildLoaderJarTask : DefaultTask() {
                 
                 return@mapTo coords
             }
+    }
+    
+    private fun setExclusions(cfg: YamlConfiguration, configuration: String) {
+        cfg["exclusions"] = project.configurations.getByName(configuration)
+            .incoming.artifacts.artifacts.asSequence()
+            .map { it.variant.owner }
+            .filterIsInstance<DefaultModuleComponentIdentifier>()
+            .mapTo(ArrayList()) { "${it.group}:${it.module}" }
+    }
+    
+    private fun getArtifactCoords(dependency: DefaultExternalModuleDependency): String {
+        val artifact = dependency.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && !MOJANG_MAPPED }
+        return if (artifact != null)
+            "${dependency.group}:${dependency.name}:${artifact.extension}:${artifact.classifier}:${dependency.version}"
+        else "${dependency.group}:${dependency.name}:${dependency.version}"
     }
     
     private fun getOutputFile(project: Project): File {

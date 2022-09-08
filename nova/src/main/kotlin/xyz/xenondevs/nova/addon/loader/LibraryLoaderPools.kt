@@ -52,6 +52,7 @@ internal object LibraryLoaderPools {
         val urls = LibraryLoader.downloadLibraries(
             loaders.flatMap { it.description.repositories },
             loaders.flatMap { it.description.libraries },
+            emptyList(),
             AddonLogger(loaders.joinToString { it.description.name })
         ).toTypedArray()
         

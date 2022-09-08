@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.loader.library;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -22,7 +22,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +36,7 @@ public class LibraryLoader {
         LIBRARIES_DIR = repoProperty != null ? new File(repoProperty) : new File("libraries");
     }
     
-    public static List<URL> downloadLibraries(List<String> repositories, List<Dependency> libraries, Logger logger) throws DependencyResolutionException, MalformedURLException {
+    public static List<URL> downloadLibraries(List<String> repositories, List<Dependency> dependencies, List<String> exclusions, Logger logger) throws DependencyResolutionException, MalformedURLException {
         // setup connection
         var locator = MavenRepositorySystemUtils.newServiceLocator();
         locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
@@ -65,26 +64,23 @@ public class LibraryLoader {
         remoteRepos = repoSystem.newResolutionRepositories(session, remoteRepos);
         
         // download libraries
-        logger.info("Loading " + libraries.size() + " libraries...");
+        logger.info("Loading " + dependencies.size() + " libraries...");
+        
+        var request = new DependencyRequest(
+            new CollectRequest(
+                (Dependency) null,
+                dependencies,
+                remoteRepos
+            ),
+            new ExclusionsDependencyFilter(exclusions)
+        );
         
         var urls = new ArrayList<URL>();
-        for (var dep : libraries) {
-            List<String> exclusions = dep instanceof Dependency.ExclusionDependency eDep ? eDep.exclusions() : Collections.emptyList();
-            
-            var request = new DependencyRequest(
-                new CollectRequest(
-                    new org.eclipse.aether.graph.Dependency(new DefaultArtifact(dep.coords()), null),
-                    remoteRepos
-                ),
-                new ExclusionsDependencyFilter(exclusions)
-            );
-            
-            var results = repoSystem.resolveDependencies(session, request).getArtifactResults();
-            for (var result : results) {
-                var file = result.getArtifact().getFile();
-                logger.info("Loaded library " + file.getAbsolutePath());
-                urls.add(file.toURI().toURL());
-            }
+        var results = repoSystem.resolveDependencies(session, request).getArtifactResults();
+        for (var result : results) {
+            var file = result.getArtifact().getFile();
+            logger.info("Loaded library " + file.getAbsolutePath());
+            urls.add(file.toURI().toURL());
         }
         
         return urls;

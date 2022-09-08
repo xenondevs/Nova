@@ -14,7 +14,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
 import xyz.xenondevs.novagradle.util.TaskUtils
 
-private const val MAVEN_CENTRAL = "https://repo.maven.apache.org/maven2/"
+private const val MAVEN_CENTRAL = "https://repo1.maven.org/maven2/"
 
 abstract class AddonTask : DefaultTask() {
     
@@ -90,20 +90,14 @@ abstract class AddonTask : DefaultTask() {
             .incoming.dependencies.asSequence()
             .filterIsInstance<DefaultExternalModuleDependency>()
             .mapTo(ArrayList()) { dep ->
-                val artifact = dep.artifacts.firstOrNull()
-                val coords = if (artifact != null)
-                    "${dep.group}:${dep.name}:${artifact.extension}:${artifact.classifier}:${dep.version}"
-                else "${dep.group}:${dep.name}:${dep.version}"
-                
+                val coords = getArtifactCoords(dep)
                 val excludeRules = dep.excludeRules
                 if (excludeRules.isNotEmpty()) {
                     val exCfg = YamlConfiguration()
                     exCfg["library"] = coords
                     exCfg["exclusions"] = excludeRules.map {
-                        require(it.module != null) { "Exclusion rules need to specify a module" }
-                        if (it.group != null)
-                            "${it.group}:${it.module}"
-                        else it.module
+                        require(it.group != null && it.module != null) { "Exclusion rules need to specify group and module" }
+                        "${it.group}:${it.module}::jar"
                     }
                     
                     return@mapTo exCfg
@@ -111,6 +105,13 @@ abstract class AddonTask : DefaultTask() {
                 
                 return@mapTo coords
             }
+    }
+    
+    private fun getArtifactCoords(dependency: DefaultExternalModuleDependency): String {
+        val artifact = dependency.artifacts.first()
+        return if (artifact != null)
+            "${dependency.group}:${dependency.name}:${artifact.extension}:${artifact.classifier}:${dependency.version}"
+        else "${dependency.group}:${dependency.name}:${dependency.version}"
     }
     
 }

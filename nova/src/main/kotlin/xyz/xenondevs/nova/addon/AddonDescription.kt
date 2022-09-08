@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.addon
 
 import org.bukkit.configuration.file.YamlConfiguration
-import xyz.xenondevs.nova.loader.library.Dependency
+import org.eclipse.aether.graph.Dependency
 import xyz.xenondevs.nova.loader.library.NovaLibraryLoader
 import xyz.xenondevs.nova.util.data.Version
 import java.io.Reader
