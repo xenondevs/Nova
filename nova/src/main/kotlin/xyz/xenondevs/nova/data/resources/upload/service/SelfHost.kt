@@ -7,7 +7,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bukkit.configuration.ConfigurationSection
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.concurrent.Latch
@@ -23,9 +23,6 @@ internal object SelfHost : UploadService {
     
     override val name = "SelfHost"
     internal val startedLatch = Latch()
-    
-    private val selfHostDir = File(NOVA.dataFolder, "resource_pack/self_host")
-    private val packFile = File(selfHostDir, "pack.zip")
     
     private lateinit var server: NettyApplicationEngine
     
@@ -55,6 +52,7 @@ internal object SelfHost : UploadService {
             server = embeddedServer(Netty, port = this.port) {
                 routing {
                     get("*") {
+                        val packFile = ResourcePackBuilder.RESOURCE_PACK_FILE
                         if (packFile.exists()) call.respondFile(packFile)
                         else call.respond(HttpStatusCode.NotFound)
                     }
@@ -75,7 +73,6 @@ internal object SelfHost : UploadService {
     }
     
     override suspend fun upload(file: File): String {
-        file.copyTo(packFile, overwrite = true)
         return url + "/" + StringUtils.randomString(5) // https://bugs.mojang.com/browse/MC-251126
     }
     
