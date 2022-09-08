@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.integration.protection.plugin
 import com.iridium.iridiumskyblock.PermissionType
 import com.iridium.iridiumskyblock.database.Island
 import com.iridium.iridiumskyblock.database.User
-import me.ryanhamshire.GriefPrevention.GriefPrevention
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
@@ -12,13 +11,12 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.integration.InternalIntegration
 import java.util.*
-
 import com.iridium.iridiumskyblock.IridiumSkyblock as ISkyBlock
 
 
 internal object IridiumSkyblock : ProtectionIntegration, InternalIntegration {
 
-    override val isInstalled = Bukkit.getPluginManager().getPlugin("IridiumSkyblock") != null;
+    override val isInstalled = Bukkit.getPluginManager().getPlugin("IridiumSkyblock") != null
 
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean {
         return checkIridiumSkyblockPlayer(player, location, PermissionType.BLOCK_BREAK)
