@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.integration.protection.plugin
 
+import com.iridium.iridiumskyblock.IridiumSkyblock
 import com.iridium.iridiumskyblock.PermissionType
 import com.iridium.iridiumskyblock.database.Island
 import com.iridium.iridiumskyblock.database.User
@@ -15,6 +16,8 @@ import com.iridium.iridiumskyblock.IridiumSkyblock as ISkyBlock
 
 
 internal object IridiumSkyblock : ProtectionIntegration, InternalIntegration {
+
+    private val instance: IridiumSkyblock = ISkyBlock.getInstance()
 
     override val isInstalled = Bukkit.getPluginManager().getPlugin("IridiumSkyblock") != null
 
@@ -43,7 +46,6 @@ internal object IridiumSkyblock : ProtectionIntegration, InternalIntegration {
     }
 
     private fun checkIridiumSkyblockPlayer(player: OfflinePlayer, location: Location, permissionType: PermissionType): Boolean {
-        val instance = ISkyBlock.getInstance()
         val user: User = instance.userManager.getUser(player)
         val island: Optional<Island> =
             instance.islandManager.getIslandViaLocation(location)
