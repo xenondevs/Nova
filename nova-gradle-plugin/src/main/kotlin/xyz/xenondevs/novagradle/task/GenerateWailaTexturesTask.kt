@@ -32,7 +32,7 @@ abstract class GenerateWailaTexturesTask : DefaultTask() {
         val mcAssetsDir = File(project.buildDir, "mcassets")
         if (!mcAssetsDir.exists()) {
             runBlocking {
-                MinecraftAssetsDownloader(outputDirectory = mcAssetsDir, mode = ExtractionMode.CLIENT).downloadAssets()
+                MinecraftAssetsDownloader(outputDirectory = mcAssetsDir, mode = ExtractionMode.MOJANG_API_CLIENT).downloadAssets()
             }
         }
         
