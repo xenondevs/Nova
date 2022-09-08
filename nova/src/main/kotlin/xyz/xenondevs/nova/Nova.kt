@@ -30,8 +30,7 @@ private val REQUIRED_SERVER_VERSION = Version("1.19.1")..Version("1.19.2")
 internal lateinit var NOVA: Nova
     private set
 
-internal var IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
-    private set
+internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 
 internal val HTTP_CLIENT = HttpClient(CIO) {
     install(ContentNegotiation) { gson() }
