@@ -83,7 +83,6 @@
   "command.nova.resource_pack.reupload.start": "Загрузка ресурс-пака... Пожалуйста подождите",
   "command.nova.resource_pack.reupload.fail": "Не удалось загрузить ресурс-пак.",
   "command.nova.resource_pack.reupload.success": "Ресурс-пак загружен на %s.",
-  "command.nova.advanced_tooltips.false": "Расширенные подсказки отключены.",
   "command.nova.advanced_tooltips.true": "Расширенные подсказки включены.",
   "nova.tile_entity_limits.amount_per_world.deny": "Вы не можете разместить больше блоков этого типа в этом мире.",
   "nova.outdated_version": "У вас установлена устаревшая версия %s.\nПожалуйста, скачайте последнюю версию на %s.",

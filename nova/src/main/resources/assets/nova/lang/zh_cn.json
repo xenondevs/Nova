@@ -90,7 +90,6 @@
   "command.nova.resource_pack.reupload.start": "正在上传资源包...请等待",
   "command.nova.resource_pack.reupload.fail": "此资源包无法被上传。",
   "command.nova.resource_pack.reupload.success": "资源包已上传到 %s。",
-  "command.nova.advanced_tooltips.false": "已关闭高级信息提示。",
   "command.nova.advanced_tooltips.true": "已开启高级信息提示。",
   "menu.nova.items": "物品",
   "menu.nova.side_config.north": "北",
