@@ -91,7 +91,6 @@
   "command.nova.resource_pack.create.success": "Ressourcenpaket erstellt. Ein Server Neustart ist empfohlen.",
   "command.nova.resource_pack.reupload.start": "Ressourcenpaket wird hochgeladen... Bitte warten",
   "command.nova.resource_pack.reupload.fail": "Das Ressourcenpaket konnte nicht hochgeladen werden.",
-  "command.nova.advanced_tooltips.true": "Erweiterte Schnellinfos aktiviert.",
   "command.nova.advanced_tooltips.false": "Erweiterte Schnellinfos deaktiviert.",
   "command.nova.update_chunk_search_id.success": "Chunk Such-Id aktualisiert.",
   "menu.nova.side_config.north": "Norden",
@@ -100,5 +99,19 @@
   "menu.nova.side_config.west": "Westen",
   "menu.nova.side_config.up": "Oben",
   "menu.nova.side_config.down": "Unten",
-  "command.nova.network_debug.nova.item": "Debug-Ansicht für Item-Netzwerke umgeschaltet."
+  "command.nova.network_debug.nova.item": "Debug-Ansicht für Item-Netzwerke umgeschaltet.",
+  "menu.nova.region.increase": "Bereich vergrößern",
+  "menu.nova.region.decrease": "Bereich verkleinern",
+  "command.nova.advanced_tooltips.on": "Erweiterte Schnellinfos aktiviert.",
+  "command.nova.advanced_tooltips.already_on": "Erweiterte Schnellinfos sind bereits aktiviert.",
+  "command.nova.waila.off": "WAILA deaktiviert.",
+  "command.nova.waila.already_off": "WAILA ist bereits deaktiviert.",
+  "command.nova.waila.on": "WAILA aktiviert.",
+  "waila.nova.required_tool": "Werkzeug: ",
+  "waila.nova.required_tool.none": "Kein Werkzeug benötigt",
+  "waila.nova.required_tool.unbreakable": "Unzerstörbar",
+  "menu.nova.region.size": "Bereich-Größe: %s",
+  "command.nova.advanced_tooltips.off": "Erweiterte Schnellinfos deaktiviert.",
+  "command.nova.advanced_tooltips.already_off": "Erweiterte Schnellinfos sind bereits deaktiviert.",
+  "command.nova.waila.already_on": "WAILA ist bereits aktiviert."
 }
