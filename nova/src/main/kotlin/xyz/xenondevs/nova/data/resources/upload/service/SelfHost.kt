@@ -7,6 +7,8 @@ import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bukkit.configuration.ConfigurationSection
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import xyz.xenondevs.nova.util.StringUtils
@@ -17,6 +19,8 @@ import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import xyz.xenondevs.nova.util.startsWithAny
 import java.io.File
 import kotlin.concurrent.thread
+
+private val SELF_HOST_DELAY by configReloadable { DEFAULT_CONFIG.getLong("debug.self_host_delay") }
 
 @Suppress("HttpUrlsUsage")
 internal object SelfHost : UploadService {
@@ -59,7 +63,7 @@ internal object SelfHost : UploadService {
                 }
                 environment.monitor.subscribe(ApplicationStarted) {
                     thread(isDaemon = true) {
-                        Thread.sleep(1000) // https://youtrack.jetbrains.com/issue/KTOR-4259
+                        Thread.sleep(SELF_HOST_DELAY) // https://youtrack.jetbrains.com/issue/KTOR-4259
                         startedLatch.off()
                     }
                 }
