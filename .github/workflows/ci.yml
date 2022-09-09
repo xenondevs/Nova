@@ -48,4 +48,4 @@ jobs:
           args: ./artifacts/*.jar
 
       - name: Build & Publish Mojang-Mapped
-        run: ./gradlew clean publishNovaPublicationToXenondevsRepository publishNovaAPIPublicationToXenondevsRepository publishNovaGradlePluginPublicationToXenondevsRepository -PxenondevsUsername=${{ secrets.MAVEN_USERNAME }} -PxenondevsPassword=${{ secrets.MAVEN_PASSWORD }} -Dmojang-mapped
+        run: ./gradlew clean publishNovaPublicationToXenondevsRepository publishNovaAPIPublicationToXenondevsRepository publishNovaGradlePluginPublicationToXenondevsRepository publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository -PxenondevsUsername=${{ secrets.MAVEN_USERNAME }} -PxenondevsPassword=${{ secrets.MAVEN_PASSWORD }} -Dmojang-mapped
