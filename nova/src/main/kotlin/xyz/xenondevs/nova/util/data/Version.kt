@@ -30,9 +30,13 @@ class Version : Comparable<Version> {
     override fun compareTo(other: Version) = compareTo(other, false)
     
     fun compareTo(other: Version, ignorePatches: Boolean): Int {
-        if (this.major < other.major || this.minor < other.minor || (!ignorePatches && this.patch < other.patch))
+        if (this.major < other.major 
+            || (this.minor == other.minor && this.minor < other.minor) 
+            || (!ignorePatches && this.major == other.major && this.minor == other.minor && this.patch < other.patch))
             return -1
-        if (this.major > other.major || this.minor > other.minor || (!ignorePatches && this.patch > other.patch))
+        if (this.major > other.major 
+            || (this.major == other.major && this.minor > other.minor) 
+            || (!ignorePatches && this.major == other.major && this.minor == other.minor && this.patch > other.patch))
             return 1
         return 0
     }
