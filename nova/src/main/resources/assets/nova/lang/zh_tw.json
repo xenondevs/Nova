@@ -90,7 +90,6 @@
   "command.nova.resource_pack.reupload.start": "正在上傳資源包... 請稍後",
   "command.nova.resource_pack.reupload.fail": "資源包無法上傳",
   "command.nova.resource_pack.reupload.success": "資源包已上傳到 %s",
-  "command.nova.advanced_tooltips.true": "開啟進階工具提示",
   "menu.nova.items": "物品",
   "menu.nova.side_config.north": "北方",
   "menu.nova.side_config.east": "東方",

@@ -89,6 +89,5 @@
   "command.nova.resource_pack.reupload.fail": "리소스 팩을 업로드할 수 없습니다.",
   "command.nova.resource_pack.reupload.success": "리소스 팩이 %s에 업로드되었습니다.",
   "nova.tile_entity_limits.amount_per_world.deny": "이 세계에서는 이 블록을 더 이상 설치할 수 없습니다.",
-  "nova.outdated_version": "%s의 오래된 버전을 실행하고 있습니다.\n%s에서 최신 버전을 다운로드하십시오.",
-  "command.nova.advanced_tooltips.true": "아이템 툴팁을 활성화했습니다."
+  "nova.outdated_version": "%s의 오래된 버전을 실행하고 있습니다.\n%s에서 최신 버전을 다운로드하십시오."
 }
