@@ -164,13 +164,23 @@ private const val ASCENT = -4
 internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(Resources::updateWailaDataLookup) {
     
     init {
+        fun copyMCTexture(path: ResourcePath): ResourcePath {
+            val from = File(ResourcePackBuilder.MCASSETS_DIR, "assets/${path.namespace}/textures/${path.path}")
+            val name = path.path.substringAfterLast('/')
+            val to = File(ResourcePackBuilder.PACK_DIR, "assets/nova/textures/waila_generated/$name")
+            from.copyTo(to, overwrite = true)
+            
+            return ResourcePath("nova", "waila_generated/$name")
+        }
+        
         MATERIAL_TEXTURES.forEach { (material, texture) ->
             val name = material.name.lowercase()
-            addFontEntry("minecraft:$name", ResourcePath.of((texture ?: "block/$name") + ".png"))
+            val path = ResourcePath.of((texture ?: "block/$name") + ".png")
+            addFontEntry("minecraft:$name", copyMCTexture(path))
         }
         
         TEXTURES.forEach {
-            addFontEntry("minecraft:$it", ResourcePath("minecraft", "block/$it.png"))
+            addFontEntry("minecraft:$it", copyMCTexture(ResourcePath("minecraft", "block/$it.png")))
         }
     }
     
