@@ -98,5 +98,19 @@
   "menu.nova.side_config.up": "Vršek",
   "menu.nova.side_config.down": "Spodek",
   "command.nova.network_debug.nova.item": "Zapnout režim ladění pro Předmětové Sítě.",
-  "command.nova.update_chunk_search_id.success": "Vyhledávací ID chunku aktualizováno."
+  "command.nova.update_chunk_search_id.success": "Vyhledávací ID chunku aktualizováno.",
+  "menu.nova.region.increase": "Zvětšit Region",
+  "menu.nova.region.decrease": "Zmenšit Region",
+  "command.nova.advanced_tooltips.already_off": "Pokročilé nápovědy jsou již vypnuté.",
+  "command.nova.advanced_tooltips.on": "Zapnout pokročilé nápovědy.",
+  "command.nova.waila.already_off": "WAILA je již vypnutá.",
+  "command.nova.waila.on": "Zapnout WAILA(U).",
+  "command.nova.waila.already_on": "WAILA je již zapnutá.",
+  "waila.nova.required_tool": "Nástroj: ",
+  "waila.nova.required_tool.none": "Není vyžadován nástroj",
+  "menu.nova.region.size": "Velikost Regionu: %s",
+  "command.nova.advanced_tooltips.off": "Vypnout pokročilé nápovědy.",
+  "command.nova.advanced_tooltips.already_on": "Pokročilé nápovědy jsou již zapnuté.",
+  "command.nova.waila.off": "Vypnout WAILA(U).",
+  "waila.nova.required_tool.unbreakable": "Nerozbitný"
 }
