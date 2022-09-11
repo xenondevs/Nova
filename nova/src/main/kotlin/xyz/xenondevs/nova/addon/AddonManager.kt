@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.util.CollectionUtils
 import java.io.File
 import java.util.logging.Level
 
@@ -82,20 +83,27 @@ object AddonManager {
             }
         }
         
+        loaders.values.forEach { loader ->
+            val description = loader.description
+            
+            val missingDependencies = description.depend.filter { it !in loaders.keys }
+            if (missingDependencies.isNotEmpty()) {
+                throw InitializationException("Failed to initialize ${getAddonString(description)}: Missing addon(s): " +
+                    missingDependencies.joinToString { "[$it]" })
+            }
+        }
+        
         generateAddonsHashCode()
     }
     
     internal fun initializeAddons() {
         LibraryLoaderPools.init(loaders.values)
-        loaders.values.sortedBy { it.description }.forEach { loader ->
+        val addonLoaders = CollectionUtils.sortDependencies(loaders.values) {
+            (it.description.depend + it.description.softdepend).mapNotNull(loaders::get).toSet()
+        }
+        addonLoaders.forEach { loader ->
             val description = loader.description
             loader.logger.info("Initializing ${getAddonString(description)}")
-            
-            val missingDependencies = loader.description.depend.filter { it !in loaders.keys }
-            if (missingDependencies.isNotEmpty()) {
-                throw InitializationException("Failed to initialize ${getAddonString(description)}: Missing addon(s): " +
-                    missingDependencies.joinToString { "[$it]" })
-            }
             
             try {
                 loader.classLoader.setDependencyClassLoaders()

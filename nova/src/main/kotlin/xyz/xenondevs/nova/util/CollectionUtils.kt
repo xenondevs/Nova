@@ -214,12 +214,13 @@ inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(destination
 
 object CollectionUtils {
     
-    internal fun <T> sortDependencies(list: List<T>, dependenciesMapper: (T) -> Set<T>): List<T> {
+    internal fun <T> sortDependencies(list: Collection<T>, dependenciesMapper: (T) -> Set<T>): List<T> {
+        val dependencies = list.associateWith { dependenciesMapper(it).filter(list::contains) }
         val inp = list.toMutableList()
         val out = LinkedList<T>()
         while (inp.isNotEmpty()) {
             inp.removeIf {
-                if (out.containsAll(dependenciesMapper(it))) {
+                if (out.containsAll(dependencies[it]!!)) {
                     out.add(it)
                     return@removeIf true
                 }

@@ -18,29 +18,7 @@ data class AddonDescription internal constructor(
     val spigotResourceId: Int,
     val repositories: List<String>,
     val libraries: List<Dependency>
-) : Comparable<AddonDescription> {
-    
-    override fun compareTo(other: AddonDescription): Int {
-        val dependencies = depend + softdepend
-        val otherDependencies = other.depend + other.softdepend
-        
-        if (dependencies.isEmpty() && otherDependencies.isEmpty()) {
-            return 0 // Both depend on nothing
-        }
-        if (dependencies.isEmpty()) {
-            return -1 // This depends on nothing, but other does
-        }
-        if (otherDependencies.isEmpty()) {
-            return 1 // Other depends on nothing, but this does
-        }
-        if (dependencies.contains(other.id)) {
-            return 1 // This depends on other
-        }
-        if (otherDependencies.contains(id)) {
-            return -1 // Other depends on this
-        }
-        return 0 // Both depend on different things
-    }
+) {
     
     internal companion object {
         
