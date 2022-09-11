@@ -1082,6 +1082,34 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getHurtSound(): Sound? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getDeathSound(): Sound? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getFallDamageSound(fallHeight: Int): Sound {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getFallDamageSoundSmall(): Sound {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getFallDamageSoundBig(): Sound {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getDrinkingSound(itemStack: ItemStack): Sound {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getEatingSound(itemStack: ItemStack): Sound {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun canBreatheUnderwater(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1312,6 +1340,18 @@ class FakeOnlinePlayer(
     }
     
     override fun getType(): EntityType {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getSwimSound(): Sound {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getSwimSplashSound(): Sound {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getSwimHighSpeedSplashSound(): Sound {
         throw UnsupportedOperationException("Player is not online")
     }
     
