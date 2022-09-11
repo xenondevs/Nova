@@ -27,26 +27,66 @@ val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
 val HORIZONTAL_FACES = listOf(NORTH, EAST, SOUTH, WEST)
 val VERTICAL_FACES = listOf(UP, DOWN)
 
-fun Location(world: World?, x: Int, y: Int, z: Int): Location =
-    Location(world, x.toDouble(), y.toDouble(), z.toDouble())
-
+//<editor-fold desc="location creation / modification", defaultstate="collapsed">
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
 
-fun Location.dropItems(items: Iterable<ItemStack>) {
-    val world = world!!
-    items.forEach { world.dropItemNaturally(this, it) }
-}
-
-fun Location.dropItem(item: ItemStack) {
-    world!!.dropItemNaturally(this, item)
-}
+fun Location(world: World?, x: Int, y: Int, z: Int): Location =
+    Location(world, x.toDouble(), y.toDouble(), z.toDouble())
 
 fun Location.removeOrientation() {
     yaw = 0f
     pitch = 0f
 }
 
+fun Location.center(): Location =
+    add(0.5, 0.0, 0.5)
+
+fun Location.advance(blockFace: BlockFace, stepSize: Double = 1.0) =
+    add(
+        blockFace.modX.toDouble() * stepSize,
+        blockFace.modY.toDouble() * stepSize,
+        blockFace.modZ.toDouble() * stepSize
+    )
+
+fun Location.setCoordinate(axis: Axis, coordinate: Double) {
+    when (axis) {
+        Axis.X -> x = coordinate
+        Axis.Y -> y = coordinate
+        Axis.Z -> z = coordinate
+    }
+}
+
+fun Location.getCoordinate(axis: Axis): Double {
+    return when (axis) {
+        Axis.X -> x
+        Axis.Y -> y
+        Axis.Z -> z
+    }
+}
+//</editor-fold>
+
+//<editor-fold desc="location info", defaultstate="collapsed">
+fun Location.positionEquals(other: Location): Boolean =
+    world == other.world
+        && x == other.x
+        && y == other.y
+        && z == other.z
+
+fun Location.isBlockLocation(): Boolean =
+    x.toInt() - x == 0.0 && y.toInt() - y == 0.0 && z.toInt() - z == 0.0
+
+fun Location.isBetween(min: Location, max: Location): Boolean =
+    x in min.x.rangeTo(max.x)
+        && y in min.y.rangeTo(max.y)
+        && z in min.z.rangeTo(max.z)
+
+fun Location.isBetweenXZ(min: Location, max: Location): Boolean =
+    x in min.x.rangeTo(max.x)
+        && z in min.z.rangeTo(max.z)
+//</editor-fold>
+
+//<editor-fold desc="direction / vector", defaultstate="collapsed">
 fun Vector.calculateYawPitch(): FloatArray {
     // Minecraft's coordinate system is weird
     val x = this.z
@@ -77,14 +117,9 @@ fun Vector(yaw: Float, pitch: Float): Vector {
     val z = sin(pitchRadians)
     return Vector(-y, z, x)
 }
+//</editor-fold>
 
-fun Location.advance(blockFace: BlockFace, stepSize: Double = 1.0) =
-    add(
-        blockFace.modX.toDouble() * stepSize,
-        blockFace.modY.toDouble() * stepSize,
-        blockFace.modZ.toDouble() * stepSize
-    )
-
+//<editor-fold desc="surrounding blocks / entities / etc.", defaultstate="collapsed">
 fun Location.getNeighboringTileEntities(additionalHitboxes: Boolean): Map<BlockFace, TileEntity> {
     return getNeighboringTileEntitiesOfType(additionalHitboxes)
 }
@@ -101,6 +136,33 @@ internal inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additi
     return tileEntities
 }
 
+fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean, ignoreUnloaded: Boolean = false): List<Chunk> {
+    val chunks = ArrayList<Chunk>()
+    val world = world
+    for (chunkX in (x - range)..(x + range)) {
+        for (chunkZ in (z - range)..(z + range)) {
+            if (ignoreUnloaded && !world.isChunkLoaded(chunkX, chunkZ)) continue
+            
+            val chunk = world.getChunkAt(chunkX, chunkZ)
+            if (chunk != this || includeCurrent)
+                chunks += world.getChunkAt(chunkX, chunkZ)
+        }
+    }
+    
+    return chunks
+}
+
+fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Sequence<Player> {
+    val maxDistanceSquared = maxDistance * maxDistance
+    
+    return world!!.players
+        .asSequence()
+        .filter { it !in excluded }
+        .filter { distanceSquared(it.location) <= maxDistanceSquared }
+}
+//</editor-fold>
+
+//<editor-fold desc="stepping", defaultstate="collapsed">
 inline fun Location.castRay(stepSize: Double, maxDistance: Double, run: (Location) -> Boolean) {
     val vector = direction.multiply(stepSize)
     val location = clone()
@@ -127,22 +189,6 @@ fun Location.getTargetLocation(stepSize: Double, maxDistance: Double): Location 
     return location
 }
 
-fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean, ignoreUnloaded: Boolean = false): List<Chunk> {
-    val chunks = ArrayList<Chunk>()
-    val world = world
-    for (chunkX in (x - range)..(x + range)) {
-        for (chunkZ in (z - range)..(z + range)) {
-            if (ignoreUnloaded && !world.isChunkLoaded(chunkX, chunkZ)) continue
-            
-            val chunk = world.getChunkAt(chunkX, chunkZ)
-            if (chunk != this || includeCurrent)
-                chunks += world.getChunkAt(chunkX, chunkZ)
-        }
-    }
-    
-    return chunks
-}
-
 fun Location.untilHeightLimit(includeThis: Boolean, run: (Location) -> Boolean) {
     val heightLimit = world!!.maxHeight
     val location = clone().apply { if (!includeThis) add(0.0, 1.0, 0.0) }
@@ -153,31 +199,20 @@ fun Location.untilHeightLimit(includeThis: Boolean, run: (Location) -> Boolean) 
     }
 }
 
-fun Location.positionEquals(other: Location) =
-    world == other.world
-        && x == other.x
-        && y == other.y
-        && z == other.z
-
-fun Location.isBlockLocation() =
-    x.toInt() - x == 0.0 && y.toInt() - y == 0.0 && z.toInt() - z == 0.0
-
-fun Location.center() = add(0.5, 0.0, 0.5)
-
-fun Location.setCoordinate(axis: Axis, coordinate: Double) =
-    when (axis) {
-        Axis.X -> x = coordinate
-        Axis.Y -> y = coordinate
-        Axis.Z -> z = coordinate
+fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Location? {
+    val location = clone()
+    if (!countSelf) location.y -= 1
+    while (location.y >= (world?.minHeight ?: -64)) {
+        val type = location.block.type
+        if (!type.isAir && (!requiresSolid || type.isSolid)) return location
+        location.y -= 1
     }
+    
+    return null
+}
+//</editor-fold>
 
-fun Location.getCoordinate(axis: Axis): Double =
-    when (axis) {
-        Axis.X -> x
-        Axis.Y -> y
-        Axis.Z -> z
-    }
-
+//<editor-fold desc="shapes", defaultstate="collapsed">
 fun Location.getStraightLine(axis: Axis, to: Int): List<Location> {
     val min = min(getCoordinate(axis).toInt(), to)
     val max = max(getCoordinate(axis).toInt(), to)
@@ -229,18 +264,6 @@ inline fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
         }
     }
 }
-
-fun World.dropItemsNaturally(location: Location, items: Iterable<ItemStack>) =
-    items.forEach { dropItemNaturally(location, it) }
-
-fun Location.isBetween(min: Location, max: Location) =
-    x in min.x.rangeTo(max.x)
-        && y in min.y.rangeTo(max.y)
-        && z in min.z.rangeTo(max.z)
-
-fun Location.isBetweenXZ(min: Location, max: Location) =
-    x in min.x.rangeTo(max.x)
-        && z in min.z.rangeTo(max.z)
 
 fun Location.getBoxOutline(other: Location, correct: Boolean, stepSize: Double = 0.5): List<Location> {
     val locations = ArrayList<Location>()
@@ -300,29 +323,27 @@ fun Location.getFullCuboid(other: Location): List<Location> {
     
     return list
 }
+//</editor-fold>
 
-fun Location.createColoredParticle(color: Color): Any = ParticleBuilder(ParticleEffect.REDSTONE, this).setColor(color).toPacket()
-
-fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Location? {
-    val location = clone()
-    if (!countSelf) location.y -= 1
-    while (location.y >= (world?.minHeight ?: -64)) {
-        val type = location.block.type
-        if (!type.isAir && (!requiresSolid || type.isSolid)) return location
-        location.y -= 1
-    }
-    
-    return null
+//<editor-fold desc="items", defaultstate="collapsed">
+fun Location.dropItems(items: Iterable<ItemStack>) {
+    val world = world!!
+    items.forEach { world.dropItemNaturally(this, it) }
 }
 
-fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Sequence<Player> {
-    val maxDistanceSquared = maxDistance * maxDistance
-    
-    return world!!.players
-        .asSequence()
-        .filter { it !in excluded }
-        .filter { distanceSquared(it.location) <= maxDistanceSquared }
+fun Location.dropItem(item: ItemStack) {
+    world!!.dropItemNaturally(this, item)
 }
+
+fun World.dropItemsNaturally(location: Location, items: Iterable<ItemStack>) {
+    items.forEach { dropItemNaturally(location, it) }
+}
+//</editor-fold>
+
+//<editor-fold desc="particles">
+fun Location.createColoredParticle(color: Color): Any =
+    ParticleBuilder(ParticleEffect.REDSTONE, this).setColor(color).toPacket()
+//</editor-fold>
 
 object LocationUtils {
     
