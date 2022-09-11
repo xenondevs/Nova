@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.pos
+import java.util.*
 
 /**
  * Manages wrappers for vanilla TileEntities
@@ -26,31 +27,30 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
     override val inMainThread = true
     override val dependsOn = setOf(AddonsInitializer)
     
-    private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, VanillaTileEntity>>()
+    private val tileEntityMap: MutableMap<ChunkPos, MutableMap<BlockPos, VanillaTileEntity>> =
+        Collections.synchronizedMap(HashMap())
     
     override fun init() {
         registerEvents()
     }
     
-    @Synchronized
     internal fun registerTileEntity(state: VanillaTileEntityState) {
-        tileEntityMap.getOrPut(state.pos.chunkPos) { HashMap() }[state.pos] = state.tileEntity
+        tileEntityMap.getOrPut(state.pos.chunkPos) { Collections.synchronizedMap(HashMap()) }[state.pos] = state.tileEntity
     }
     
-    @Synchronized
     internal fun unregisterTileEntity(state: VanillaTileEntityState) {
         val pos = state.pos
         tileEntityMap[pos.chunkPos]?.remove(pos)
     }
     
-    @Synchronized
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunkPos]?.get(location.pos)
     
-    @Synchronized
     fun getTileEntityAt(pos: BlockPos) = tileEntityMap[pos.chunkPos]?.get(pos)
     
-    @Synchronized
-    fun getTileEntitiesInChunk(pos: ChunkPos) = tileEntityMap[pos]?.values?.toList() ?: emptyList()
+    fun getTileEntitiesInChunk(pos: ChunkPos): List<VanillaTileEntity> {
+        val tileEntities = tileEntityMap[pos] ?: return emptyList()
+        return synchronized(tileEntities) { tileEntities.values.toList() }
+    }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun handlePlace(event: BlockPlaceEvent) {
@@ -71,7 +71,6 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
         }
     }
     
-    @Synchronized
     private fun tryCreateVTE(pos: BlockPos): VanillaTileEntityState? {
         val block = pos.block
         val type = VanillaTileEntity.Type.of(block) ?: return null
@@ -91,7 +90,6 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
         handleBlockBreak(event.block.pos)
     }
     
-    @Synchronized
     private fun handleBlockBreak(pos: BlockPos) {
         val blockState = WorldDataManager.getBlockState(pos)
         if (blockState is VanillaTileEntityState) {
