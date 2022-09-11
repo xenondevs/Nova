@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.fromJson
@@ -19,7 +20,7 @@ private val LOOT_FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
 
 internal object LootConfigHandler : Initializable() {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(AddonsInitializer)
     
     override fun init() {

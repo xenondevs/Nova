@@ -61,6 +61,7 @@ sealed interface NetworkNode {
      * Gets a map of [NetworkType] and [Network] which are attached at this block face.
      */
     fun getNetworks(face: BlockFace): Map<NetworkType, Network> {
+        @Suppress("REDUNDANT_ELSE_IN_WHEN") // kotlin compiler bug
         return when (this) {
             is NetworkEndPoint -> {
                 val networks = HashMap<NetworkType, Network>()
@@ -71,6 +72,7 @@ sealed interface NetworkNode {
                 networks
             }
             is NetworkBridge -> networks
+            else -> throw UnsupportedOperationException()
         }
     }
     
@@ -78,11 +80,13 @@ sealed interface NetworkNode {
      * Changes all connections from [previousNetwork] to [newNetwork]
      */
     fun move(previousNetwork: Network, newNetwork: Network) {
+        @Suppress("REDUNDANT_ELSE_IN_WHEN") // kotlin compiler bug
         when (this) {
             is NetworkBridge -> networks.replaceAll { _, network -> if (network == previousNetwork) newNetwork else network }
             is NetworkEndPoint -> networks.forEach { (_, networkMap) ->
                 networkMap.replaceAll { _, network -> if (network == previousNetwork) newNetwork else network }
             }
+            else -> throw UnsupportedOperationException()
         }
     }
     

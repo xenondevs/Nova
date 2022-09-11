@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.*
 import org.bukkit.inventory.RecipeChoice.ExactChoice
 import xyz.xenondevs.nmsutils.network.ClientboundPlaceGhostRecipePacket
-import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nova.LOGGER
@@ -22,6 +21,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
 import xyz.xenondevs.nova.util.containsAll
 import xyz.xenondevs.nova.util.data.clientsideCopy
@@ -119,7 +119,7 @@ object RecipeManager : Initializable(), Listener {
     val novaRecipes: Map<RecipeType<*>, Map<NamespacedKey, NovaRecipe>>
         get() = _novaRecipes
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(AddonsInitializer)
     
     override fun init() {

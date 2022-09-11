@@ -12,11 +12,12 @@ import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 
 object Resources : Initializable() {
     
-    override val inMainThread = false
-    override val dependsOn = setOf(AddonsLoader)
+    override val initializationStage = InitializationStage.PRE_WORLD
+    override val dependsOn = setOf(AddonsLoader, AutoUploadManager)
     
     private lateinit var modelDataLookup: Map<String, Pair<ItemModelData?, BlockModelData?>>
     private lateinit var guiDataLookup: Map<String, FontChar>

@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
@@ -27,7 +28,7 @@ private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments1")
 
 object AttachmentManager : Initializable(), Listener {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(AddonsInitializer)
     
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()

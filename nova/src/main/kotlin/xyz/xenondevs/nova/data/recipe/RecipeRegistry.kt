@@ -10,6 +10,7 @@ import org.bukkit.inventory.SmithingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.data.getInputStacks
@@ -25,7 +26,7 @@ object RecipeRegistry : Initializable() {
         private set
     var RECIPES_BY_TYPE: Map<RecipeGroup, List<RecipeContainer>> = HashMap()
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = setOf(RecipeManager)
     
     private val hardcodedRecipes = ArrayList<NovaRecipe>()

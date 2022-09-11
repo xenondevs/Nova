@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.isRightClick
@@ -30,7 +31,7 @@ private fun ItemStack?.getNullIfAir(): ItemStack? {
 
 internal object ArmorEquipListener : Initializable(), Listener {
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {

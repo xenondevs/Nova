@@ -15,6 +15,7 @@ import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
@@ -28,7 +29,7 @@ import xyz.xenondevs.nova.util.registerPacketListener
 
 internal object ItemManager : Initializable(), Listener {
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = emptySet<Initializable>()
     
     private val usedItems = HashMap<Player, ItemStack>()

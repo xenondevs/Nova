@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.data.ComponentUtils
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.coloredText
@@ -25,7 +26,7 @@ internal object UpdateReminder : Initializable(), Listener {
     
     private const val NOVA_RESOURCE_ID = 93648
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = setOf(NovaConfig)
     
     private var task: BukkitTask? = null

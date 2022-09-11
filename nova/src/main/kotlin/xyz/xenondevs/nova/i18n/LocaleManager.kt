@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.formatSafely
@@ -17,7 +18,7 @@ import java.io.File
 
 object LocaleManager : Initializable() {
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = setOf(Resources)
     
     private val loadedLangs = HashSet<String>()

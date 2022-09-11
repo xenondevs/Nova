@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
@@ -23,7 +24,7 @@ import xyz.xenondevs.nova.world.pos
  */
 internal object VanillaTileEntityManager : Initializable(), Listener {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(AddonsInitializer)
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, VanillaTileEntity>>()

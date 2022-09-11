@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.player.PlayerFreezer
@@ -31,7 +32,7 @@ val DEFAULT_CONFIG by configReloadable { NovaConfig["config"] }
 
 object NovaConfig : Initializable() {
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = setOf(AddonsLoader)
     
     private val configs = HashMap<String, YamlConfiguration>()

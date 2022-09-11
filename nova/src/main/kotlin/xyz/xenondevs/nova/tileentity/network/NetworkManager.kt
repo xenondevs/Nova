@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -122,8 +123,8 @@ interface NetworkManager {
                 task.invoke(NETWORK_MANAGER)
             }
         }
-        
-        override val inMainThread = true
+    
+        override val initializationStage = InitializationStage.POST_WORLD
         override val dependsOn = setOf(LegacyFileConverter)
         
         override fun init() {

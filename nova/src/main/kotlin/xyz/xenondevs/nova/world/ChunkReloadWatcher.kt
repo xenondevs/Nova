@@ -7,6 +7,7 @@ import org.bukkit.event.world.ChunkLoadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.registerEvents
 import java.util.logging.Level
 
@@ -17,7 +18,7 @@ internal object ChunkReloadWatcher : Initializable(), Listener {
     
     private val CHUNK_LOADS = HashMap<ChunkPos, Pair<Long, Int>>()
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {

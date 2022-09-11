@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
@@ -19,7 +20,7 @@ object CommandManager : Initializable() {
     
     private val registeredCommands = ArrayList<String>()
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(ItemCategories, RecipeRegistry)
     
     override fun init() {

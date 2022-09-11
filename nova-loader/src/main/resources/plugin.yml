@@ -4,6 +4,7 @@ authors: [ "StudioCode", "ByteZ1337", "Javahase" ]
 website: "https://github.com/xenondevs/Nova/"
 main: xyz.xenondevs.nova.loader.NovaLoader
 api-version: 1.19
+load: STARTUP
 
 softdepend:
   - WorldGuard

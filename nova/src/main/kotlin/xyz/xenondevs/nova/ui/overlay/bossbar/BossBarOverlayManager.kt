@@ -21,6 +21,7 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPack
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
@@ -34,7 +35,7 @@ private val BAR_AMOUNT by configReloadable { DEFAULT_CONFIG.getInt("overlay.boss
 
 object BossBarOverlayManager : Initializable(), Listener {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = emptySet<Initializable>()
     
     private var tickTask: BukkitTask? = null

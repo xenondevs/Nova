@@ -31,6 +31,7 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeMo
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
@@ -68,7 +69,7 @@ internal object PacketItems : Initializable(), Listener {
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(Resources)
     
     override fun init() {

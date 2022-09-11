@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.*
@@ -12,7 +13,7 @@ object ChunkLoadManager : Initializable() {
     
     private val forceLoadedChunks = PermanentStorage.retrieve("forceLoadedChunks") { HashMap<ChunkPos, HashSet<UUID>>() }
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {

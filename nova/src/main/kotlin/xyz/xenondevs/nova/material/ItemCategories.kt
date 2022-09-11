@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
@@ -30,7 +31,7 @@ internal object ItemCategories : Initializable() {
     private const val PATH_IN_JAR = "item_categories.yml"
     private val CATEGORIES_FILE = File(NOVA.dataFolder, "configs/item_categories.yml").apply { parentFile.mkdirs() }
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(AddonsInitializer)
     
     lateinit var CATEGORIES: List<ItemCategory>

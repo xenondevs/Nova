@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unregisterEvents
@@ -28,7 +29,7 @@ private val Player.isWailaEnabled: Boolean
 
 internal object WailaManager : Initializable(), Listener {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(Resources, AddonsInitializer)
     
     private var tickTask: BukkitTask? = null

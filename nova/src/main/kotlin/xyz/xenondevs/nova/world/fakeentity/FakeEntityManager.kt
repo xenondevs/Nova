@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
@@ -48,7 +49,7 @@ internal object FakeEntityManager : Initializable(), Listener {
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
     private val chunkEntities = HashMap<ChunkPos, MutableList<FakeEntity<*>>>()
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {

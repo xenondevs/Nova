@@ -8,13 +8,13 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
 import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.data.hash
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import java.io.File
@@ -22,8 +22,8 @@ import java.util.logging.Level
 
 internal object AutoUploadManager : Initializable() {
     
-    override val inMainThread = false
-    override val dependsOn = setOf(NovaConfig, Resources)
+    override val initializationStage = InitializationStage.PRE_WORLD
+    override val dependsOn = setOf(NovaConfig)
     
     private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost, CustomMultiPart, S3)
     

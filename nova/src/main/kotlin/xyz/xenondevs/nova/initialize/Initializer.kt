@@ -1,5 +1,8 @@
+@file:Suppress("UnstableApiUsage")
+
 package xyz.xenondevs.nova.initialize
 
+import com.google.common.graph.GraphBuilder
 import de.studiocode.invui.InvUI
 import de.studiocode.invui.util.InventoryUtils
 import de.studiocode.invui.virtualinventory.StackSizeProvider
@@ -10,6 +13,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
+import org.bukkit.event.server.ServerLoadEvent
 import xyz.xenondevs.nmsutils.NMSUtilities
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
@@ -47,6 +51,7 @@ import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.ui.waila.WailaManager
+import xyz.xenondevs.nova.util.CollectionUtils
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents
@@ -65,20 +70,31 @@ import kotlin.reflect.jvm.jvmName
 
 internal object Initializer : Listener {
     
-    private val INITIALIZABLES = listOf(
+    private val INITIALIZABLES = CollectionUtils.sortDependencies(listOf(
         LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, Resources,
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeEntityManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
-        BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer, BossBarOverlayManager, WailaManager
-    ).sorted()
+        BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
+        BossBarOverlayManager, WailaManager
+    ), Initializable::dependsOn)
+    
+    private val INITIALIZABLE_GRAPH = GraphBuilder.directed().build<String>()
+    
+    init {
+        INITIALIZABLES.forEach {
+            it.dependsOn.forEach { dependency ->
+                INITIALIZABLE_GRAPH.putEdge(it::class.simpleName, dependency::class.simpleName)
+            }
+        }
+    }
     
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())
     var isDone = false
         private set
     
-    fun init() {
+    fun initPreWorld() {
         registerEvents()
         
         ReflectionUtils.setPlugin(NOVA)
@@ -89,23 +105,38 @@ internal object Initializer : Listener {
         InventoryUtils.stackSizeProvider = StackSizeProvider { it.novaMaxStackSize }
         CoreItems.init()
         
+        val toInit = INITIALIZABLES.filter { it.initializationStage == InitializationStage.PRE_WORLD }
+        
+        toInit.forEach { initializable ->
+            if (!waitForDependencies(initializable))
+                return@forEach
+            
+            initializable.initialize()
+        }
+        
+        if (initialized.size != toInit.size)
+            Bukkit.getPluginManager().disablePlugin(NOVA.loader)
+    }
+    
+    fun initPostWorld() {
         runAsyncTask {
-            INITIALIZABLES.forEach { initializable ->
+            val toInit = INITIALIZABLES.filter { it.initializationStage != InitializationStage.PRE_WORLD }
+            
+            toInit.forEach { initializable ->
                 runAsyncTask initializableTask@{
-                    initializable.dependsOn.forEach { dependency ->
-                        // wait for all dependencies to load and skip own initialization if one of them failed
-                        if (!dependency.initialization.get()) {
-                            LOGGER.warning("Skipping initialization: ${initializable::class.jvmName}")
-                            initializable.initialization.complete(false)
-                            return@initializableTask
-                        }
+                    if (!waitForDependencies(initializable))
+                        return@initializableTask
+                    
+                    if (initializable.initializationStage == InitializationStage.POST_WORLD) {
+                        runTask { initializable.initialize() }
+                    } else {
+                        runAsyncTask { initializable.initialize() }
                     }
                     
-                    initializable.initialize()
                 }
             }
             
-            INITIALIZABLES.forEach { it.initialization.get() }
+            toInit.forEach { it.initialization.get() }
             isDone = true
             
             if (initialized.size == INITIALIZABLES.size) {
@@ -124,8 +155,24 @@ internal object Initializer : Listener {
         }
     }
     
+    private fun waitForDependencies(initializable: Initializable): Boolean {
+        val dependencies = initializable.dependsOn
+        if (initializable.initializationStage == InitializationStage.PRE_WORLD && dependencies.any { it.initializationStage != InitializationStage.PRE_WORLD })
+            throw IllegalStateException("Initializable ${initializable::class.jvmName} has incompatible dependencies!")
+        
+        dependencies.forEach { dependency ->
+            // wait for all dependencies to load and skip own initialization if one of them failed
+            if (!dependency.initialization.get()) {
+                LOGGER.warning("Skipping initialization: ${initializable::class.jvmName}")
+                initializable.initialization.complete(false)
+                return false
+            }
+        }
+        return true
+    }
+    
     fun disable() {
-        initialized.sortedDescending().forEach {
+        CollectionUtils.sortDependencies(initialized, Initializable::dependsOn).reversed().forEach {
             try {
                 it.disable()
             } catch (e: Exception) {
@@ -141,6 +188,11 @@ internal object Initializer : Listener {
         if (!isDone && !IS_DEV_SERVER) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "[Nova] Initialization not complete. Please wait.")
         }
+    }
+    
+    @EventHandler
+    private fun handleServerStarted(event: ServerLoadEvent) {
+        initPostWorld()
     }
     
     private fun setupMetrics() {

@@ -6,6 +6,7 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.customitems.plugin.ItemsAdder
 import xyz.xenondevs.nova.integration.customitems.plugin.MMOItems
@@ -15,7 +16,7 @@ object CustomItemServiceManager : Initializable() {
     
     internal val PLUGINS: List<CustomItemService> by lazy { listOf(ItemsAdder, Oraxen, MMOItems).filter(InternalIntegration::isInstalled) }
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {

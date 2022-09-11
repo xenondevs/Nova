@@ -9,12 +9,13 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationException
+import xyz.xenondevs.nova.initialize.InitializationStage
 import java.io.File
 import java.util.logging.Level
 
 internal object AddonsLoader : Initializable() {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = emptySet<Initializable>()
     
     override fun init() {
@@ -26,7 +27,7 @@ internal object AddonsLoader : Initializable() {
 
 internal object AddonsInitializer : Initializable() {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = setOf(NovaConfig, Resources)
     
     override fun init() {

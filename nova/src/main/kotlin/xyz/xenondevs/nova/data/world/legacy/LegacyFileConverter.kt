@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.PreVarIntConverter
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
@@ -28,7 +29,7 @@ private val WORLD_VERSION_KEY = NamespacedKey(NOVA, "regionVersion")
 
 internal object LegacyFileConverter : Initializable(), Listener {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(AddonsInitializer, VanillaTileEntityManager)
     
     private val converters = TreeMap<VersionRange, VersionConverter>()

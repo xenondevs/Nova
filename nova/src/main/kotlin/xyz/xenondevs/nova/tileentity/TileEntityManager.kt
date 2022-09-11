@@ -5,6 +5,7 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.runAsyncTaskTimerSynchronized
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -21,7 +22,7 @@ val Material?.requiresLight: Boolean
 
 object TileEntityManager : Initializable(), ITileEntityManager {
     
-    override val inMainThread = true
+    override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(CustomItemServiceManager)
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, TileEntity>>()

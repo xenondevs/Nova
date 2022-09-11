@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -16,7 +17,7 @@ import java.lang.reflect.Field
 
 internal object Patcher : Initializable() {
     
-    override val inMainThread = false
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = emptySet<Initializable>()
     
     private val extraOpens = setOf("java.lang", "jdk.internal.misc", "jdk.internal.reflect")
