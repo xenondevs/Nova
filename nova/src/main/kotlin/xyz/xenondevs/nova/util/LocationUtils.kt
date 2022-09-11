@@ -315,11 +315,14 @@ fun Location.getNextBlockBelow(countSelf: Boolean, requiresSolid: Boolean): Loca
     return null
 }
 
-fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Sequence<Player> =
-    world!!.players
+fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Sequence<Player> {
+    val maxDistanceSquared = maxDistance * maxDistance
+    
+    return world!!.players
         .asSequence()
         .filter { it !in excluded }
-        .filter { distance(it.location) <= maxDistance }
+        .filter { distanceSquared(it.location) <= maxDistanceSquared }
+}
 
 object LocationUtils {
     
