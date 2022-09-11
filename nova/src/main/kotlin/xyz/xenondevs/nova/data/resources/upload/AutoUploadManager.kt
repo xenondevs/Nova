@@ -51,6 +51,9 @@ internal object AutoUploadManager : Initializable() {
         
         if (url != null)
             forceResourcePack()
+        
+        if (selectedService == SelfHost)
+            SelfHost.startedLatch.await()
     }
     
     private fun enable(fromReload: Boolean) {

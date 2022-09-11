@@ -114,6 +114,10 @@ internal object Initializer : Listener {
             initializable.initialize()
         }
         
+        toInit.forEach { it.initialization.get() }
+        
+        isDone = true
+        
         if (initialized.size != toInit.size)
             Bukkit.getPluginManager().disablePlugin(NOVA.loader)
     }
@@ -137,7 +141,6 @@ internal object Initializer : Listener {
             }
             
             toInit.forEach { it.initialization.get() }
-            isDone = true
             
             if (initialized.size == INITIALIZABLES.size) {
                 callEvent(NovaLoadDataEvent())
