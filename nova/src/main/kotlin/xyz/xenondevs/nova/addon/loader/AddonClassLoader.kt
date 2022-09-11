@@ -38,7 +38,11 @@ internal class AddonClassLoader(private val loader: AddonLoader, parent: ClassLo
             // load class from parent (nova classloader)
             if (c == null) {
                 c = parent.loadClass(name)
-                checkNotNull(c)
+            }
+            
+            // should never be true because parent class loader should throw ClassNotFoundException before
+            if (c == null) {
+                throw ClassNotFoundException(name)
             }
             
             if (resolve) {

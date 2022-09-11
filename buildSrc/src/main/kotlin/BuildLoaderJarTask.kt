@@ -88,7 +88,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
             .toList() // Required for proper serialization
         
         setLibraries(librariesYml, "novaLoader")
-        setExclusions(librariesYml, "spigotLoader")
+        setExclusions(librariesYml, "spigotRuntime")
         
         return librariesYml
     }

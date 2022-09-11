@@ -12,28 +12,29 @@ plugins {
 }
 
 dependencies {
+    // api dependencies
     api(project(":nova-api"))
-    compileOnly(project(":nova-loader"))
-    
     spigotLoaderApi(deps.bundles.kotlin)
     novaLoaderApi(deps.bundles.cbf)
-    novaLoader(deps.bundles.ktor)
-    novaLoader(deps.bundles.minecraft.assets)
-    novaLoader(deps.zip4j)
-    
     novaLoaderApi("de.studiocode.invui:InvUI:0.8-SNAPSHOT") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
     novaLoaderApi("de.studiocode.invui:ResourcePack:0.8-SNAPSHOT") { exclude("de.studiocode.invui", "InvUI") }
     novaLoaderApi("de.studiocode.invui:IA-R11:0.8-SNAPSHOT:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.1-SNAPSHOT:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:particle:1.8")
+    
+    // internal dependencies
+    compileOnly(project(":nova-loader"))
+    novaLoader(deps.bundles.ktor)
+    novaLoader(deps.bundles.minecraft.assets)
+    novaLoader(deps.zip4j)
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.3-SNAPSHOT")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
     novaLoader("software.amazon.awssdk:s3:2.17.267")
     
-    // provided through spigot
-    compileOnly(deps.bundles.maven.resolver)
-    compileOnly(variantOf(deps.spigot.server) { classifier("remapped-mojang") })
+    // spigot runtime dependencies
+    spigotRuntime(deps.bundles.maven.resolver)
+    spigotRuntime(variantOf(deps.spigot.server) { classifier("remapped-mojang") })
     
     // plugin dependencies
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6")
@@ -78,12 +79,6 @@ tasks {
         dependsOn(JavaPlugin.CLASSES_TASK_NAME)
         from("src/main/kotlin")
         archiveClassifier.set("sources")
-    }
-    
-    register<Jar>("publishJar") {
-        dependsOn("remapStrings")
-        from(sourceSets.main.get().output)
-        exclude("assets/*", "configs/*", "recipes/*", "*.bin", "*.yml")
     }
 }
 

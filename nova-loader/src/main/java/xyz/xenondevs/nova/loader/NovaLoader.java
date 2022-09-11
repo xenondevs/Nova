@@ -7,7 +7,6 @@ import xyz.xenondevs.nova.loader.library.NovaLibraryLoader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
@@ -27,7 +26,7 @@ public class NovaLoader extends JavaPlugin {
             var classpath = NovaLibraryLoader.loadLibraries(logger);
             classpath.add(novaJarFile.toURI().toURL());
             
-            var loader = new URLClassLoader(classpath.toArray(URL[]::new), getClassLoader());
+            var loader = new NovaClassLoader(classpath.toArray(URL[]::new), getClassLoader());
             var novaClass = loader.loadClass("xyz.xenondevs.nova.Nova");
             nova = (Plugin) novaClass.getConstructor(JavaPlugin.class, File.class).newInstance(this, novaJarFile);
             

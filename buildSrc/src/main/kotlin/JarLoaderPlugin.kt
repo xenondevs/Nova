@@ -23,13 +23,16 @@ class JarLoaderPlugin : Plugin<Project> {
             this.novaLoader = novaLoader
         }
     
-        val novaLoaderAPI = project.configurations.create("novaLoaderApi")
-        val spigotLoaderAPI = project.configurations.create("spigotLoaderApi")
-        project.configurations.getByName("api").extendsFrom(novaLoaderAPI, spigotLoaderAPI)
+        val novaLoaderAPICfg = project.configurations.create("novaLoaderApi")
+        val spigotLoaderAPICfg = project.configurations.create("spigotLoaderApi")
+        project.configurations.getByName("api").extendsFrom(novaLoaderAPICfg, spigotLoaderAPICfg)
         
-        val novaLoaderCfg = project.configurations.create("novaLoader").apply { extendsFrom(novaLoaderAPI) }
-        val spigotLoaderCfg = project.configurations.create("spigotLoader").apply { extendsFrom(spigotLoaderAPI) }
+        val novaLoaderCfg = project.configurations.create("novaLoader").apply { extendsFrom(novaLoaderAPICfg) }
+        val spigotLoaderCfg = project.configurations.create("spigotLoader").apply { extendsFrom(spigotLoaderAPICfg) }
         project.configurations.getByName("implementation").extendsFrom(novaLoaderCfg, spigotLoaderCfg)
+    
+        val spigotRuntimeCfg = project.configurations.create("spigotRuntime").apply { extendsFrom(spigotLoaderCfg) }
+        project.configurations.getByName("compileOnly").extendsFrom(spigotRuntimeCfg)
     }
     
 }
