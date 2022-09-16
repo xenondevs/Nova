@@ -2,8 +2,18 @@ package xyz.xenondevs.nova.util.data
 
 import io.netty.buffer.Unpooled
 import java.io.File
+import java.io.InputStream
 import java.security.MessageDigest
 import java.util.*
+
+fun MessageDigest.update(ins: InputStream, bufferSize: Int = 4096) {
+    val buffer = ByteArray(bufferSize)
+    var len: Int
+    while (run { len = ins.read(buffer); len } != -1) {
+        update(buffer, 0, len)
+    }
+    ins.close()
+}
 
 object HashUtils {
     

@@ -44,9 +44,6 @@ object AddonManager {
     internal val loaders = HashMap<String, AddonLoader>()
     internal val addons = LinkedHashMap<String, Addon>()
     
-    internal var addonsHashCode = -1
-        private set
-    
     init {
         addonsDir.mkdirs()
     }
@@ -80,8 +77,6 @@ object AddonManager {
                 throw AddonLoadException(it, t)
             }
         }
-        
-        generateAddonsHashCode()
     }
     
     internal fun initializeAddons() {
@@ -128,17 +123,6 @@ object AddonManager {
                 addon.logger.log(Level.SEVERE, "An exception occurred trying to disable ${getAddonString(addon.description)}", t)
             }
         }
-    }
-    
-    private fun generateAddonsHashCode() {
-        var result = NOVA.version.hashCode()
-        loaders.values.forEach {
-            val description = it.description
-            result = result * 31 + description.id.hashCode()
-            result = result * 31 + description.version.hashCode()
-        }
-        
-        addonsHashCode = result
     }
     
 }
