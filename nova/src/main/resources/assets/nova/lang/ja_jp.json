@@ -81,7 +81,6 @@
   "command.nova.reload_recipes.start": "レシピの再読み込み中…",
   "command.nova.reload_recipes.success": "レシピを再読み込みしました。",
   "nova.tile_entity_limits.world_blacklist.deny": "あなたはこのワールドでNovaのブロックを置くことが許可されていません。",
-  "nova.tile_entity_limits.amount.deny": "あなたはこの種類のブロックをこれ以上置けません。",
   "command.nova.resource_pack.reupload.success": "リソースパックがアップロードされました: %s",
   "command.nova.resource_pack.create.start": "リソースパックの作成中… お待ちください",
   "command.nova.resource_pack.create.success": "リソースパックが作成されました。サーバーを再起動することをお勧めします。",

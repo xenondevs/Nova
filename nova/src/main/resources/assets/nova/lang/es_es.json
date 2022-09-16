@@ -66,6 +66,5 @@
   "command.nova.modeldata.block": "El bloque %s usa %s y tiene los siguientes datos de modelo personalizado: %s.",
   "command.nova.modeldata.no-nova-item": "Sujeta un item de Nova en tu mano e inténtalo de nuevo.",
   "command.nova.recipe.no-recipe": "Este item no tiene una receta.",
-  "command.nova.usage.no-usage": "Este item no tiene ningún uso.",
-  "nova.tile_entity_limits.amount.deny": "No puedes colocar más bloques de este tipo."
+  "command.nova.usage.no-usage": "Este item no tiene ningún uso."
 }

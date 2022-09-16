@@ -65,6 +65,5 @@
   "command.nova.modeldata.block": "Het blok %s gebruikt %s en heeft de volgende aangepaste modelgegevens: %s.",
   "command.nova.modeldata.no-nova-item": "Houd een voorwerp van Nova in je hand en probeer het opnieuw.",
   "command.nova.recipe.no-recipe": "Dit voorwerp heeft geen recept.",
-  "command.nova.usage.no-usage": "Dit voorwerp heeft geen gebruik.",
-  "nova.tile_entity_limits.amount.deny": "Je kan niet meer blokken van dit type plaatsen."
+  "command.nova.usage.no-usage": "Dit voorwerp heeft geen gebruik."
 }

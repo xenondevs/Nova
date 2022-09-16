@@ -68,7 +68,6 @@
   "command.nova.modeldata.no-nova-item": "Segure um item do Nova na sua mão e tente novamente.",
   "command.nova.recipe.no-recipe": "Este item não possui uma receita.",
   "command.nova.usage.no-usage": "Este item não tem usos.",
-  "nova.tile_entity_limits.amount.deny": "Você não pode colocar mais blocos deste tipo.",
   "item.nova.wrench.mode.nova.items": "Modo: Items",
   "item.nova.wrench.mode.nova.fluid": "Modo: Fluidos",
   "menu.nova.energy_per_tick": "%s / tick",

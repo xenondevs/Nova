@@ -73,7 +73,6 @@
   "command.nova.reload_configs.success": "설정을 새로고쳤습니다.",
   "command.nova.reload_recipes.success": "조합법을 새로고쳤습니다.",
   "nova.tile_entity_limits.world_blacklist.deny": "이 세계에서는 노바 블록을 설치할 수 없습니다.",
-  "nova.tile_entity_limits.amount.deny": "이 블록은 더 이상 설치할 수 없습니다.",
   "menu.nova.color_picker.current_color": "현재 색상",
   "inventory.nova.default": "인벤토리",
   "inventory.nova.input": "입력 인벤토리",

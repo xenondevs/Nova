@@ -69,7 +69,6 @@
   "command.nova.modeldata.no-nova-item": "Держите предмет из Nova и попробуйте ещё раз.",
   "command.nova.recipe.no-recipe": "У этого предмета нет рецепта.",
   "command.nova.usage.no-usage": "У этого предмета нету использований.",
-  "nova.tile_entity_limits.amount.deny": "Вы больше не можете ставить блоки этого вида.",
   "command.nova.network_debug.nova.energy": "Переключен отладочный вид для Энергетических Сетей.",
   "command.nova.network_debug.nova.fluid": "Переключен отладочный вид для Жидкостных Сетей.",
   "command.nova.resource_pack.create.success": "Ресурс-пак создан. Рекомендуется перезагрузить сервер.",

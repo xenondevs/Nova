@@ -68,7 +68,6 @@
   "command.nova.modeldata.no-nova-item": "Tieni un oggetto di Nova in mano e riprova.",
   "command.nova.recipe.no-recipe": "Questo oggetto non ha una ricetta.",
   "command.nova.usage.no-usage": "Questo oggetto non ha utilizzi.",
-  "nova.tile_entity_limits.amount.deny": "Non puoi piazzare ulteriori blocchi di questo tipo.",
   "item.nova.wrench.mode.nova.energy": "Modalità: Energia",
   "item.nova.wrench.mode.nova.items": "Modalità: Oggetti",
   "item.nova.wrench.mode.nova.fluid": "Modalità: Fluidi",
