@@ -44,6 +44,9 @@ overlay:
     enabled: true
     # How many invisible boss bar should be sent to the player.
     amount: 20
+    # If the boss bars should be sent after the player confirms that the server resource pack has been loaded.
+    # !!! THIS WILL CAUSE ISSUES IF YOU'RE NOT USING NOVA'S FORCED RESOURCE PACK !!!
+    send_bars_after_resource_pack_loaded: false
 
 waila:
   # Enable / disable the WAILA overlay.

@@ -108,9 +108,13 @@
   "waila.nova.required_tool": "Tool: ",
   "waila.nova.required_tool.none": "No tool required",
   "waila.nova.required_tool.unbreakable": "Unbreakable",
-  "nova.tile_entity_limits.world_blacklist.deny": "You are not allowed to place any blocks from Nova in this world.",
-  "nova.tile_entity_limits.type_world_blacklist.deny": "You are not allowed to place this block in this world.",
-  "nova.tile_entity_limits.amount.deny": "You cannot place more blocks of this type.",
-  "nova.tile_entity_limits.amount_per_world.deny": "You cannot place more blocks of this type in this world.",
+  "nova.tile_entity_limits.world_blacklist.deny": "You are not allowed to place any tile-entities from Nova in this world.",
+  "nova.tile_entity_limits.type_world_blacklist.deny": "You are not allowed to place this tile-entity in this world.",
+  "nova.tile_entity_limits.amount_global.deny": "You cannot place more tile-entities of this type.",
+  "nova.tile_entity_limits.amount_per_world.deny": "You cannot place more tile-entities of this type in this world.",
+  "nova.tile_entity_limits.amount_per_chunk.deny": "You cannot place more tile-entities of this type in this chunk.",
+  "nova.tile_entity_limits.amount_global_total.deny": "You cannot place more tile-entities.",
+  "nova.tile_entity_limits.amount_per_world_total.deny": "You cannot place more tile-entities in this world.",
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "You cannot place more tile-entities in this chunk.",
   "nova.outdated_version": "You're running an outdated version of %s.\nPlease download the latest version at %s."
 }

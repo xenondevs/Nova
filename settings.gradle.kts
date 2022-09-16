@@ -13,7 +13,7 @@ dependencyResolutionManagement {
             version("ktor", "2.1.0")
             version("spigot", "1.19.2-R0.1-SNAPSHOT")
             version("invui", "0.8-SNAPSHOT")
-            version("cbf", "0.1")
+            version("cbf", "0.2")
             
             // lib - kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib-jdk8").versionRef("kotlin")

@@ -69,7 +69,6 @@
   "command.nova.modeldata.no-nova-item": "请在手中拿着一个新星科技的物品然后重试。",
   "command.nova.recipe.no-recipe": "此物品没有配方。",
   "command.nova.usage.no-usage": "这件物品没有使用方法。",
-  "nova.tile_entity_limits.amount.deny": "你无法放置更多该类型的方块。",
   "item.nova.wrench.mode.nova.energy": "模式：能量",
   "item.nova.wrench.mode.nova.items": "模式：物品",
   "item.nova.wrench.mode.nova.fluid": "模式：液体",

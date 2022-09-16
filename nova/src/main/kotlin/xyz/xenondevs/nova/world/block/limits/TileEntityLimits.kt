@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block.limits
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
 import java.util.logging.Level
 
 internal object TileEntityLimits {
@@ -33,12 +34,12 @@ internal object TileEntityLimits {
     
     fun canPlace(ctx: BlockPlaceContext): PlaceResult {
         limiters.forEach {
-            if (!it.canPlace(ctx)) {
-                return PlaceResult(false, it.denyMessage)
-            }
+            val result = it.canPlace(ctx)
+            if (!result.allowed)
+                return result
         }
         
-        return PlaceResult(true, "")
+        return ALLOWED
     }
     
     data class PlaceResult(val allowed: Boolean, val message: String)

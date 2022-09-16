@@ -69,7 +69,6 @@
   "command.nova.modeldata.no-nova-item": "將Nova物品拿在手中並再試一次",
   "command.nova.recipe.no-recipe": "此物品沒有合成表",
   "command.nova.usage.no-usage": "此物品沒有用途",
-  "nova.tile_entity_limits.amount.deny": "你無法放置更多此類型的方塊",
   "item.nova.wrench.mode.nova.energy": "模式: 能量",
   "item.nova.wrench.mode.nova.items": "模式: 物品",
   "item.nova.wrench.mode.nova.fluid": "模式: 流體",

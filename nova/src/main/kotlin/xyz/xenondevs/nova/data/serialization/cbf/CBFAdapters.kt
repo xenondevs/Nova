@@ -7,7 +7,10 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.CBF.registerBinaryAdapter
 import xyz.xenondevs.cbf.CBF.registerBinaryHierarchyAdapter
+import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.adapter.NettyBufferProvider
+import xyz.xenondevs.cbf.instancecreator.InstanceCreator
+import xyz.xenondevs.cbf.security.CBFSecurityManager
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ColorBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemFilterBinaryAdapter
@@ -20,10 +23,11 @@ import xyz.xenondevs.nova.data.serialization.cbf.adapter.VirtualInventoryBinaryA
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import java.awt.Color
+import kotlin.reflect.KClass
 
 internal object CBFAdapters {
     
-    fun registerExtraAdapters() {
+    fun register() {
         CBF.defaultBufferProvider = NettyBufferProvider
         
         // binary adapters
@@ -37,6 +41,25 @@ internal object CBFAdapters {
         
         // binary hierarchy adapters
         registerBinaryHierarchyAdapter(ItemStack::class, ItemStackBinaryAdapter)
+        
+        // register security manager (this prevents addons from registering adapters / instance creators for non-addon classes)
+        CBF.securityManager = CBFAddonSecurityManager()
+    }
+    
+    private class CBFAddonSecurityManager : CBFSecurityManager {
+        
+        override fun <T : Any> canRegisterAdapter(clazz: KClass<T>, adapter: BinaryAdapter<T>): Boolean {
+            return clazz.java.classLoader == adapter.javaClass.classLoader
+        }
+        
+        override fun <T : Any> canRegisterHierarchyAdapter(clazz: KClass<T>, adapter: BinaryAdapter<T>): Boolean {
+            return clazz.java.classLoader == adapter.javaClass.classLoader
+        }
+        
+        override fun <T : Any> canRegisterInstanceCreator(clazz: KClass<T>, instanceCreator: InstanceCreator<T>): Boolean {
+            return clazz.java.classLoader == instanceCreator.javaClass.classLoader
+        }
+        
     }
     
 }
