@@ -8,6 +8,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerResourcePackStatusEvent
+import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nmsutils.bossbar.BossBar
 import xyz.xenondevs.nmsutils.bossbar.operation.AddBossBarOperation
@@ -31,6 +33,7 @@ import xyz.xenondevs.nova.util.unregisterPacketListener
 import java.util.*
 
 private val BAR_AMOUNT by configReloadable { DEFAULT_CONFIG.getInt("overlay.bossbar.amount") }
+private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.send_bars_after_resource_pack_loaded") }
 
 object BossBarOverlayManager : Initializable(), Listener {
     
@@ -182,8 +185,18 @@ object BossBarOverlayManager : Initializable(), Listener {
     
     @EventHandler
     private fun handleJoin(event: PlayerJoinEvent) {
-        sendBars(event.player)
-        changes += event.player.uniqueId
+        if (!SEND_BARS_AFTER_RESOURCE_PACK_LOADED) {
+            sendBars(event.player)
+            changes += event.player.uniqueId
+        }
+    }
+    
+    @EventHandler
+    private fun handlePackStatus(event: PlayerResourcePackStatusEvent) {
+        if (event.status == Status.SUCCESSFULLY_LOADED && SEND_BARS_AFTER_RESOURCE_PACK_LOADED) {
+            sendBars(event.player)
+            changes += event.player.uniqueId
+        }
     }
     
     @EventHandler
