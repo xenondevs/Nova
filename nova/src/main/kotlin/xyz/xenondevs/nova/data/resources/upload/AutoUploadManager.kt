@@ -115,12 +115,17 @@ internal object AutoUploadManager : Initializable() {
     }
     
     suspend fun uploadPack(pack: File): String? {
-        if (selectedService == SelfHost)
-            SelfHost.startedLatch.await()
+        try {
+            if (selectedService == SelfHost)
+                SelfHost.startedLatch.await()
+            
+            require(pack.exists()) { pack.absolutePath + " not found!" }
+            
+            this.url = selectedService?.upload(pack)
+        } catch (e: Exception) {
+            LOGGER.log(Level.SEVERE, "Failed to upload the resource pack!", e)
+        }
         
-        require(pack.exists()) { pack.absolutePath + " not found!" }
-        
-        this.url = selectedService?.upload(pack)
         forceResourcePack()
         return url
     }
@@ -149,8 +154,8 @@ internal object AutoUploadManager : Initializable() {
                 ComponentBuilder("Nova Resource Pack").create(),
                 true
             )
-        } catch (ex: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to download resourcepack! Is the server down?", ex)
+        } catch (e: Exception) {
+            LOGGER.log(Level.SEVERE, "Failed to download the resource pack! Is the server down?", e)
         }
     }
     
