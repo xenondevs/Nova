@@ -11,7 +11,6 @@ import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.adapter.NettyBufferProvider
 import xyz.xenondevs.cbf.instancecreator.InstanceCreator
 import xyz.xenondevs.cbf.security.CBFSecurityManager
-import xyz.xenondevs.nova.addon.loader.AddonClassLoader
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ColorBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemFilterBinaryAdapter
@@ -50,15 +49,15 @@ internal object CBFAdapters {
     private class CBFAddonSecurityManager : CBFSecurityManager {
         
         override fun <T : Any> canRegisterAdapter(clazz: KClass<T>, adapter: BinaryAdapter<T>): Boolean {
-            return clazz.java.classLoader is AddonClassLoader
+            return clazz.java.classLoader == adapter.javaClass.classLoader
         }
         
         override fun <T : Any> canRegisterHierarchyAdapter(clazz: KClass<T>, adapter: BinaryAdapter<T>): Boolean {
-            return clazz.java.classLoader is AddonClassLoader
+            return clazz.java.classLoader == adapter.javaClass.classLoader
         }
         
         override fun <T : Any> canRegisterInstanceCreator(clazz: KClass<T>, instanceCreator: InstanceCreator<T>): Boolean {
-            return clazz.java.classLoader is AddonClassLoader
+            return clazz.java.classLoader == instanceCreator.javaClass.classLoader
         }
         
     }
