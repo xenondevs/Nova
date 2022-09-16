@@ -32,6 +32,7 @@ import org.bukkit.conversations.ConversationAbandonedEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityCategory
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Firework
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
@@ -845,7 +846,11 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun setLastDeathLocation(p0: Location?) {
+    override fun setLastDeathLocation(location: Location?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun fireworkBoost(itemStack: ItemStack): Firework? {
         throw UnsupportedOperationException("Player is not online")
     }
     
