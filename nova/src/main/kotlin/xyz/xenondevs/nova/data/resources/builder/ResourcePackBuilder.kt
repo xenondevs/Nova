@@ -83,9 +83,8 @@ internal object ResourcePackBuilder {
         try {
             // download minecraft assets if not present
             if (!MCASSETS_DIR.exists()) {
-                LOGGER.info("Downloading minecraft assets")
                 runBlocking {
-                    val downloader = MinecraftAssetsDownloader(outputDirectory = MCASSETS_DIR, mode = ExtractionMode.GITHUB)
+                    val downloader = MinecraftAssetsDownloader(outputDirectory = MCASSETS_DIR, mode = ExtractionMode.GITHUB, logger = LOGGER)
                     downloader.downloadAssets()
                 }
             }
