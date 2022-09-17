@@ -8,6 +8,7 @@ import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.item.ItemDisplayData
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -15,7 +16,7 @@ import xyz.xenondevs.nova.util.NumberFormatUtils
 
 internal object TileEntityItemBehavior : ItemBehavior() {
     
-    override fun getLore(itemStack: ItemStack): List<Array<BaseComponent>> {
+    override fun updateItemDisplay(itemStack: ItemStack, display: ItemDisplayData) {
         val data: Compound? = itemStack.itemMeta?.persistentDataContainer?.get(TileEntity.TILE_ENTITY_KEY)
         
         if (data != null) {
@@ -46,10 +47,8 @@ internal object TileEntityItemBehavior : ItemBehavior() {
                 }
             }
             
-            return lore
+            display.addLore(lore)
         }
-        
-        return emptyList()
     }
     
 }

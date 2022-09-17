@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Consumable
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
+import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.TileEntityBlock

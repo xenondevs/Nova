@@ -26,9 +26,10 @@ open class ItemNovaMaterial internal constructor(
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
+            val itemDisplayData = novaItem.getItemDisplayData(itemStack)
             ItemWrapper(
                 item.createClientsideItemBuilder(
-                    this.novaItem.getName(itemStack),
+                    itemDisplayData.name,
                     null,
                     subId
                 ).get()
@@ -39,11 +40,12 @@ open class ItemNovaMaterial internal constructor(
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
+            val itemDisplayData = novaItem.getItemDisplayData(itemStack)
             ItemWrapper(
-                this.novaItem.modifyItemBuilder(
+                novaItem.modifyItemBuilder(
                     item.createClientsideItemBuilder(
-                        this.novaItem.getName(itemStack),
-                        this.novaItem.getLore(itemStack),
+                        itemDisplayData.name,
+                        itemDisplayData.lore,
                         subId
                     )
                 ).get()
@@ -64,7 +66,7 @@ open class ItemNovaMaterial internal constructor(
     fun createItemBuilder(): ItemBuilder =
         novaItem.modifyItemBuilder(item.createItemBuilder())
     
-     /**
+    /**
      * Creates a clientside [ItemBuilder] for this [ItemNovaMaterial].
      * It does not have a display name, lore, or any special nbt data.
      */

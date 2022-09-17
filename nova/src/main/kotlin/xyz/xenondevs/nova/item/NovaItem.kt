@@ -34,14 +34,10 @@ class NovaItem(val behaviors: List<ItemBehavior>) {
         return builder
     }
     
-    fun getName(itemStack: ItemStack): Array<BaseComponent> {
-        return behaviors.firstNotNullOfOrNull { it.getName(itemStack) } ?: name
-    }
-    
-    fun getLore(itemStack: ItemStack): List<Array<BaseComponent>> {
-        val lore = ArrayList<Array<BaseComponent>>()
-        behaviors.forEach { it.getLore(itemStack)?.also(lore::addAll) }
-        return lore
+    fun getItemDisplayData(itemStack: ItemStack): ItemDisplayData {
+        val displayData = ItemDisplayData()
+        behaviors.forEach { it.updateItemDisplay(itemStack, displayData) }
+        return displayData.also { if (it.name == null) it.name = this.name }
     }
     
     @Suppress("UNCHECKED_CAST")

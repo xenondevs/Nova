@@ -126,12 +126,20 @@ object Resources : Initializable() {
         return modelDataLookup[id.toString()]!!
     }
     
+    fun getModelData(path: ResourcePath): Pair<ItemModelData?, BlockModelData?> {
+        return modelDataLookup[path.toString()]!!
+    }
+    
     fun getModelData(id: String): Pair<ItemModelData?, BlockModelData?> {
         return modelDataLookup[id]!!
     }
     
     fun getModelDataOrNull(id: NamespacedId): Pair<ItemModelData?, BlockModelData?>? {
         return modelDataLookup[id.toString()]
+    }
+    
+    fun getModelDataOrNull(path: ResourcePath): Pair<ItemModelData?, BlockModelData?>? {
+        return modelDataLookup[path.toString()]
     }
     
     fun getModelDataOrNull(id: String): Pair<ItemModelData?, BlockModelData?>? {
@@ -142,12 +150,20 @@ object Resources : Initializable() {
         return guiDataLookup[id.toString()]!!
     }
     
+    fun getGUIChar(path: ResourcePath): FontChar {
+        return guiDataLookup[path.toString()]!!
+    }
+    
     fun getGUIChar(id: String): FontChar {
         return guiDataLookup[id]!!
     }
     
     fun getGUICharOrNull(id: NamespacedId): FontChar? {
         return guiDataLookup[id.toString()]
+    }
+    
+    fun getGUICharOrNull(path: ResourcePath): FontChar? {
+        return guiDataLookup[path.toString()]
     }
     
     fun getGUICharOrNull(id: String): FontChar? {
@@ -158,12 +174,20 @@ object Resources : Initializable() {
         return wailaDataLookup[id.toString()]!!
     }
     
+    fun getWailaIconChar(path: ResourcePath): FontChar {
+        return wailaDataLookup[path.toString()]!!
+    }
+    
     fun getWailaIconChar(id: String): FontChar {
         return wailaDataLookup[id]!!
     }
     
     fun getWailaIconCharOrNull(id: NamespacedId): FontChar? {
         return wailaDataLookup[id.toString()]
+    }
+    
+    fun getWailaIconCharOrNull(path: ResourcePath): FontChar? {
+        return wailaDataLookup[path.toString()]
     }
     
     fun getWailaIconCharOrNull(id: String): FontChar? {
@@ -174,12 +198,20 @@ object Resources : Initializable() {
         return textureIconLookup[id.toString()]!!
     }
     
+    fun getTextureIconChar(path: ResourcePath): FontChar {
+        return textureIconLookup[path.toString()]!!
+    }
+    
     fun getTextureIconChar(id: String): FontChar {
         return textureIconLookup[id]!!
     }
     
     fun getTextureIconCharOrNull(id: NamespacedId): FontChar? {
         return textureIconLookup[id.toString()]
+    }
+    
+    fun getTextureIconCharOrNull(path: ResourcePath): FontChar? {
+        return textureIconLookup[path.toString()]
     }
     
     fun getTextureIconCharOrNull(id: String): FontChar? {

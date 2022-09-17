@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.material.options
 
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect

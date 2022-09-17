@@ -6,6 +6,7 @@ import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.HolderLookup.RegistryLookup
 import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.world.item.Items
 import org.bukkit.Material
@@ -34,6 +35,11 @@ val ItemStack.novaMaterial: ItemNovaMaterial?
         ?.getString("id")
         ?.let(NovaMaterialRegistry::getOrNull)
 
+val MojangStack.novaMaterial: ItemNovaMaterial?
+    get() = tag?.getCompound("nova")
+        ?.getString("id")
+        ?.let(NovaMaterialRegistry::getOrNull)
+
 val ItemStack.customModelData: Int
     get() {
         if (hasItemMeta()) {
@@ -57,11 +63,6 @@ val ItemStack.displayName: String?
 val ItemStack.localizedName: String?
     get() = novaMaterial?.localizedName ?: type.localizedName
 
-val MojangStack.novaMaterial: ItemNovaMaterial?
-    get() = tag?.getCompound("nova")
-        ?.getString("id")
-        ?.let(NovaMaterialRegistry::getOrNull)
-
 val ItemStack.namelessCopyOrSelf: ItemStack
     get() {
         var itemStack = this
@@ -82,6 +83,12 @@ val ItemStack.novaMaxStackSize: Int
 @Suppress("UNCHECKED_CAST")
 val ItemMeta.unhandledTags: MutableMap<String, Tag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, Tag>
+
+val ItemStack.canDestroy: List<Material>
+    get() {
+        val tag = itemMeta?.unhandledTags?.get("CanDestroy") as? ListTag ?: return emptyList()
+        return tag.mapNotNull { runCatching { NamespacedId.of(it.asString) }.getOrNull()?.let { Material.valueOf(it.name) } }
+    }
 
 fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     val first = this.namelessCopyOrSelf

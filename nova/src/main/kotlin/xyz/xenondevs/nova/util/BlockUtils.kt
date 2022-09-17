@@ -10,6 +10,7 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -20,6 +21,7 @@ import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.Levelled
 import org.bukkit.block.data.type.Bed
 import org.bukkit.block.data.type.PistonHead
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.GlobalValues
@@ -30,11 +32,11 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.world.block.BlockBreaking
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
+import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
@@ -98,6 +100,7 @@ val Block.sourceFluidType: FluidType?
 
 /**
  * Places a block using the given [BlockPlaceContext].
+ * 
  * Works for vanilla blocks, Nova blocks and blocks from custom item integrations.
  *
  * @param ctx The context to use
@@ -183,6 +186,7 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
 
 /**
  * Removes this block using the given [ctx].
+ * 
  * This method works for vanilla blocks, blocks from Nova and blocks from custom item integrations.
  *
  * @param ctx The [BlockBreakContext] to be used
@@ -202,6 +206,7 @@ fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticle
 
 /**
  * Gets a list of [ItemStacks][ItemStack] containing the drops of this [Block] for the specified [BlockBreakContext].
+ * 
  * Works for vanilla blocks, Nova blocks and blocks from custom item integrations.
  */
 fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
@@ -222,8 +227,13 @@ fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
         state.inventory.clear()
     }
     
-    val block = getMainHalf()
-    drops += block.getDrops(tool)
+    // don't include the actual block for creative players
+    if (ctx.source !is Player || ctx.source.gameMode != GameMode.CREATIVE) {
+        val block = getMainHalf()
+        drops += if (tool != null && ctx.source is Entity)
+            block.getDrops(tool, ctx.source)
+        else block.getDrops(tool)
+    }
     
     return drops.filterNot { it.type.isAir }
 }

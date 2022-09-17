@@ -19,7 +19,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
@@ -43,25 +42,11 @@ import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
-import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
-
-/**
- * The fake durability displayed clientside, stored in the nova tag.
- * Ranges from 0.0 to 1.0
- */
-var ItemStack.clientsideDurability: Double
-    get() = (itemMeta?.unhandledTags?.get("nova") as CompoundTag?)?.getDouble("durability") ?: 1.0
-    set(value) {
-        require(value in 0.0..1.0)
-        val itemMeta = itemMeta
-        (itemMeta?.unhandledTags?.get("nova") as CompoundTag?)?.putDouble("durability", value)
-        this.itemMeta = itemMeta
-    }
 
 @Suppress("DEPRECATION")
 internal object PacketItems : Initializable(), Listener {
@@ -287,7 +272,6 @@ internal object PacketItems : Initializable(), Listener {
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)
         val material = NovaMaterialRegistry.getOrNull(id) ?: return getMissingItem(item, id)
         val subId = novaTag.getInt("subId")
-        val durabilityPercentage = if (novaTag.contains("durability")) novaTag.getDouble("durability") else null
         
         val data = Resources.getModelDataOrNull(id)?.first ?: return getMissingItem(item, id)
         
@@ -300,21 +284,26 @@ internal object PacketItems : Initializable(), Listener {
             newItemTag.getCompound("display")
         } else CompoundTag().also { newItemTag.put("display", it) }
         
-        val novaItem = material.novaItem
-        val bukkitStack = item.bukkitStack
-        if (useName && !displayTag.contains("Name"))
-            displayTag.putString("Name", novaItem.getName(bukkitStack).serialize())
+        val itemDisplayData = material.novaItem.getItemDisplayData(item.bukkitStack)
+        val itemDisplayName = itemDisplayData.name
+        val itemDisplayLore = itemDisplayData.lore
+        val itemDisplayDurability = itemDisplayData.durability
         
-        val loreTag = ListTag()
-        val lore = novaItem.getLore(bukkitStack)
-        lore.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
-        if (player != null && player in AdvancedTooltips.players)
-            loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
-        displayTag.put("Lore", loreTag)
+        if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
+            displayTag.putString("Name", itemDisplayName.serialize())
+        }
         
-        if (durabilityPercentage != null) {
+        if (itemDisplayLore != null) {
+            val loreTag = ListTag()
+            itemDisplayLore.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
+            if (player != null && player in AdvancedTooltips.players)
+                loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
+            displayTag.put("Lore", loreTag)
+        }
+        
+        if (itemDisplayDurability != 1.0) {
             val maxDurability = newItem.item.maxDamage
-            newItem.damageValue = maxDurability - (maxDurability * durabilityPercentage).toInt()
+            newItem.damageValue = maxDurability - (maxDurability * itemDisplayDurability).toInt()
         }
         
         return newItem
