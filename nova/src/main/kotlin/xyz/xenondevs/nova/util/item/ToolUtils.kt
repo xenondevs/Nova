@@ -79,9 +79,6 @@ object ToolUtils {
                 return true
         } else if (!requiresCorrectToolForDropsVanilla(block)) return true
         
-        if (tool == null)
-            return false
-        
         val blockToolCategories = ToolCategory.ofBlock(block)
         val blockToolLevel = ToolLevel.ofBlock(block)
         val itemToolCategory = ToolCategory.ofItem(tool)

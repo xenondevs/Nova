@@ -97,7 +97,10 @@ class ToolCategory internal constructor(
             )
         ) { ResourcePath.of("minecraft:item/shears") }
         
-        fun ofItem(item: ItemStack): ToolCategory? {
+        fun ofItem(item: ItemStack?): ToolCategory? {
+            if (item == null)
+                return null
+            
             val novaCategory = item.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.category
             if (novaCategory != null)
                 return novaCategory

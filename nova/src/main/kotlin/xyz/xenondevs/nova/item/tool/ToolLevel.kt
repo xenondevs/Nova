@@ -17,7 +17,7 @@ class ToolLevel(
     levelValue: ValueReloadable<Double>
 ) : Comparable<ToolLevel> {
     
-    private val levelValue by levelValue
+    internal val levelValue by levelValue
     
     override fun compareTo(other: ToolLevel): Int {
         return levelValue.compareTo(other.levelValue)
@@ -43,7 +43,10 @@ class ToolLevel(
             }
         }
         
-        fun ofItem(item: ItemStack): ToolLevel? {
+        fun ofItem(item: ItemStack?): ToolLevel? {
+            if (item == null)
+                return null
+            
             val novaLevel = item.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.level
             if (novaLevel != null)
                 return novaLevel
@@ -81,7 +84,7 @@ class ToolLevel(
         }
         
         fun isCorrectLevel(blockLevel: ToolLevel?, toolLevel: ToolLevel?): Boolean {
-            return blockLevel == null || (toolLevel != null && toolLevel >= blockLevel)
+            return blockLevel == null || (toolLevel?.levelValue ?: 0.0) >= blockLevel.levelValue
         }
         
     }
