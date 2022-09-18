@@ -381,8 +381,11 @@ internal object PacketItems : Initializable(), Listener {
     private fun getMissingItem(item: MojangStack, id: String?): MojangStack {
         val newItem = item.copy()
         newItem.item = Items.BARRIER
-        newItem.tag!!.putInt("CustomModelData", 0)
-        newItem.tag!!.getCompound("display")!!.put("Lore", NBTUtils.createStringList(
+        val tag = newItem.tag!!
+        tag.putInt("CustomModelData", 0)
+        
+        val displayTag = tag.getCompound("display").also { tag.put("display", it) }
+        displayTag.put("Lore", NBTUtils.createStringList(
             listOf(ComponentSerializer.toString(coloredText(ChatColor.RED, "Missing model for $id").withoutPreFormatting()))
         ))
         
