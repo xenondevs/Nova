@@ -9,10 +9,10 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolLevel
-import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
 import xyz.xenondevs.nova.util.data.ComponentWidthBuilder
+import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 
 private const val CHECK_MARK = "✔"
@@ -26,24 +26,8 @@ object ToolLine {
             player,
             ToolCategory.ofBlock(block),
             ToolLevel.ofBlock(block),
-            block.type.hardness.toDouble(),
-            ToolUtils.isCorrectToolForDropsVanilla(tool.type, block)
-        )
-    }
-    
-    fun getToolLine(player: Player, material: BlockNovaMaterial): WailaLine {
-        val tool = player.inventory.itemInMainHand
-        val itemToolCategory = ToolCategory.ofItem(tool)
-        
-        val correctCategory = itemToolCategory != null && itemToolCategory in material.toolCategories
-        val correctLevel = ToolLevel.isCorrectLevel(material.toolLevel, ToolLevel.ofItem(tool))
-        
-        return getToolLine(
-            player,
-            material.toolCategories,
-            material.toolLevel,
-            material.hardness,
-            !material.requiresToolForDrops || (correctCategory && correctLevel)
+            block.hardness,
+            ToolUtils.isCorrectToolForDrops(tool, block)
         )
     }
     
@@ -54,9 +38,6 @@ object ToolLine {
         hardness: Double,
         correctToolForDrops: Boolean
     ): WailaLine {
-        val tool = player.inventory.itemInMainHand
-        val toolType = tool.type
-        
         val builder = ComponentWidthBuilder(player.locale)
         if (hardness < 0) {
             return WailaLine(

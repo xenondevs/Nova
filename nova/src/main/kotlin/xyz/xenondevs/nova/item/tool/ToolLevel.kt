@@ -5,59 +5,29 @@ import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.tool.ToolLevelRegistry.register
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
-import java.util.*
 
 class ToolLevel(
-    val id: NamespacedId
-) {
+    val id: NamespacedId,
+    levelValue: ValueReloadable<Double>
+) : Comparable<ToolLevel> {
     
-    private val parentLevels = ArrayList<ToolLevel>()
-    private var flatParentLevels: Set<ToolLevel> = emptySet()
+    private val levelValue by levelValue
     
-    fun extendsFrom(vararg other: ToolLevel) {
-        parentLevels += other
-        makeFlatParentLevels()
-    }
-    
-    fun clearInheritance() {
-        parentLevels.clear()
-        flatParentLevels = emptySet()
-    }
-    
-    fun doesExtendFrom(other: ToolLevel): Boolean {
-        return other in flatParentLevels
-    }
-    
-    private fun makeFlatParentLevels() {
-        val explored = HashSet<ToolLevel>()
-        val unexplored = LinkedList<ToolLevel>().apply { addAll(parentLevels) }
-        
-        while (unexplored.isNotEmpty()) {
-            val level = unexplored.poll()
-            for (parentLevel in level.parentLevels) {
-                if (parentLevel in explored)
-                    throw IllegalStateException("Recursive tool level inheritance")
-                
-                unexplored += parentLevel
-            }
-            
-            explored += level
-        }
-        
-        flatParentLevels = explored
+    override fun compareTo(other: ToolLevel): Int {
+        return levelValue.compareTo(other.levelValue)
     }
     
     companion object {
         
         val STONE = register("stone")
-        val IRON = register("iron").apply { extendsFrom(STONE) }
-        val DIAMOND = register("diamond").apply { extendsFrom(IRON) }
-        val NETHERITE = register("netherite").apply { extendsFrom(DIAMOND) }
+        val IRON = register("iron")
+        val DIAMOND = register("diamond")
         
         fun ofBlock(block: Block): ToolLevel? {
             val novaLevel = BlockManager.getBlock(block.pos)?.material?.toolLevel
@@ -80,9 +50,12 @@ class ToolLevel(
             
             return when (item.type) {
                 Material.STONE_SWORD, Material.STONE_SHOVEL, Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_HOE -> STONE
+                
                 Material.IRON_SWORD, Material.IRON_SHOVEL, Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_HOE -> IRON
-                Material.DIAMOND_SWORD, Material.DIAMOND_SHOVEL, Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_HOE -> DIAMOND
-                Material.NETHERITE_SWORD, Material.NETHERITE_SHOVEL, Material.NETHERITE_PICKAXE, Material.NETHERITE_AXE, Material.NETHERITE_HOE -> NETHERITE
+                
+                Material.DIAMOND_SWORD, Material.DIAMOND_SHOVEL, Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_HOE,
+                Material.NETHERITE_SWORD, Material.NETHERITE_SHOVEL, Material.NETHERITE_PICKAXE, Material.NETHERITE_AXE, Material.NETHERITE_HOE -> DIAMOND
+                
                 else -> null
             }
         }
@@ -108,7 +81,7 @@ class ToolLevel(
         }
         
         fun isCorrectLevel(blockLevel: ToolLevel?, toolLevel: ToolLevel?): Boolean {
-            return blockLevel == null || blockLevel == toolLevel || (toolLevel != null && toolLevel.doesExtendFrom(blockLevel))
+            return blockLevel == null || (toolLevel != null && toolLevel >= blockLevel)
         }
         
     }

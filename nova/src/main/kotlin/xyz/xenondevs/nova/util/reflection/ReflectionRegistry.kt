@@ -2,11 +2,13 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.PalettedContainer
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
+import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
 import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
@@ -19,6 +21,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import java.util.*
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty1
+import net.minecraft.world.item.ItemStack as MojangStack
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal object ReflectionRegistry {
@@ -39,6 +42,7 @@ internal object ReflectionRegistry {
     // Methods
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class.java)
     val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class.java, false, "getDelegate", Any::class.java)
+    val CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlock::class.java, true, "isPreferredTool", BlockState::class.java, MojangStack::class.java)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

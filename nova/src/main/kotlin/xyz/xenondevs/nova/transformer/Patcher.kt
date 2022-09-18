@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.transformer.patch.tool.PreferredToolPatch
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -23,7 +24,7 @@ internal object Patcher : Initializable() {
     
     private val extraOpens = setOf("java.lang", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
-        sequenceOf(NoteBlockPatch, FieldFilterPatch)
+        sequenceOf(NoteBlockPatch, FieldFilterPatch, PreferredToolPatch)
             .filter(Transformer::shouldTransform).toSet()
     }
     

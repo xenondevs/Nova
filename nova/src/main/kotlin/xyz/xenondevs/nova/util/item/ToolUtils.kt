@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util.item
 
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
+import net.minecraft.server.level.ServerPlayer
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -11,15 +13,30 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.item.tool.ToolCategory
+import xyz.xenondevs.nova.item.tool.ToolLevel
+import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.eyeInWater
+import xyz.xenondevs.nova.util.getPlayersNearby
+import xyz.xenondevs.nova.util.nmsEntity
+import xyz.xenondevs.nova.util.send
+import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
+import net.minecraft.core.BlockPos as MojangBlockPos
 import org.bukkit.inventory.meta.Damageable as BukkitDamageable
 import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
 
 fun Player.damageToolInMainHand(damage: Int = 1) {
     val inventory = inventory
     val item = inventory.getItem(EquipmentSlot.HAND)?.takeUnlessAir() ?: return
-    inventory.setItem(EquipmentSlot.HAND, ToolUtils.damageTool(item, damage))
+    val damagedTool = ToolUtils.damageTool(item, damage)
+    
+    if (damagedTool == null) {
+        val breakPacket = ClientboundEntityEventPacket(nmsEntity, 47.toByte())
+        location.getPlayersNearby(32.0).forEach { it.send(breakPacket) }
+    }
+    
+    inventory.setItem(EquipmentSlot.HAND, damagedTool)
 }
 
 object ToolUtils {
@@ -56,6 +73,43 @@ object ToolUtils {
         }
         
         return item
+    }
+    
+    @JvmStatic
+    fun hasCorrectToolForDrops(player: ServerPlayer, pos: MojangBlockPos): Boolean {
+        return isCorrectToolForDrops(
+            player.inventory.getSelected().bukkitStack,
+            player.bukkitEntity.world.getBlockAt(pos.x, pos.y, pos.z)
+        )
+    }
+    
+    fun isCorrectToolForDrops(tool: ItemStack?, block: Block): Boolean {
+        val novaBlock = BlockManager.getBlock(block.pos)
+        if (novaBlock != null) {
+            if (!novaBlock.material.requiresToolForDrops)
+                return true
+        } else if (!requiresCorrectToolForDropsVanilla(block)) return true
+        
+        if (tool == null)
+            return false
+        
+        val blockToolCategories = ToolCategory.ofBlock(block)
+        val blockToolLevel = ToolLevel.ofBlock(block)
+        val itemToolCategory = ToolCategory.ofItem(tool)
+        val itemToolLevel = ToolLevel.ofItem(tool)
+        
+        return itemToolCategory in blockToolCategories && ToolLevel.isCorrectLevel(blockToolLevel, itemToolLevel)
+    }
+    
+    internal fun isCorrectToolForDropsVanilla(tool: Material?, block: Block): Boolean {
+        val blockState = (block as CraftBlock).nms
+        
+        return !blockState.requiresCorrectToolForDrops()
+            || (tool != null && CraftMagicNumbers.getItem(tool).isCorrectToolForDrops(blockState))
+    }
+    
+    internal fun requiresCorrectToolForDropsVanilla(block: Block): Boolean {
+        return (block as CraftBlock).nms.requiresCorrectToolForDrops()
     }
     
     @Suppress("DEPRECATION")
@@ -179,17 +233,6 @@ object ToolUtils {
         if (!onGround) speedMultiplier /= 5.0
         
         return speedMultiplier / hardness / if (correctForDrops) 30.0 else 100.0
-    }
-    
-    internal fun isCorrectToolForDropsVanilla(tool: Material?, block: Block): Boolean {
-        val blockState = (block as CraftBlock).nms
-        
-        return !blockState.requiresCorrectToolForDrops()
-            || (tool != null && CraftMagicNumbers.getItem(tool).isCorrectToolForDrops(blockState))
-    }
-    
-    internal fun requiresCorrectToolForDropsVanilla(block: Block): Boolean {
-        return (block as CraftBlock).nms.requiresCorrectToolForDrops()
     }
     
     private fun getFatigueMultiplier(level: Int): Double =

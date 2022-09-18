@@ -16,7 +16,11 @@ object ToolCategoryRegistry {
     internal fun register(
         name: String,
         multipliers: Map<Material, Double>
-    ): ToolCategory = register(name, multipliers) { ResourcePath("minecraft", "item/" + (it?.id?.name ?: "wooden") + "_" + name) }
+    ): ToolCategory = register(name, multipliers) {
+        if (it != null)
+            ResourcePath(it.id.namespace, "item/${it.id.name}_$name")
+        else ResourcePath("minecraft", "item/wooden_$name")
+    }
     
     internal fun register(
         name: String,
@@ -26,7 +30,11 @@ object ToolCategoryRegistry {
         val id = NamespacedId("minecraft", name)
         check(id !in _categories) { "A ToolCategory is already registered under that id." }
         
-        val category = ToolCategory(id, { multipliers[it.type] ?: 0.0 }, getIcon)
+        val category = ToolCategory(
+            id,
+            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.speedMultiplier ?: multipliers[it.type] ?: 0.0 },
+            getIcon
+        )
         _categories[id] = category
         return category
     }
