@@ -130,15 +130,14 @@ object BossBarOverlayManager : Initializable(), Listener {
     private fun handleTick() {
         overlays.forEach { (uuid, overlays) ->
             if (uuid in changes || overlays.any { it.changed }) {
-                changes -= uuid
-                remakeBars(uuid)
+                if (remakeBars(uuid)) changes -= uuid
             }
         }
     }
     
-    private fun remakeBars(playerUUID: UUID) {
-        val overlays = overlays[playerUUID] ?: return
-        val bars = bars[playerUUID] ?: return
+    private fun remakeBars(playerUUID: UUID): Boolean {
+        val overlays = overlays[playerUUID] ?: return false
+        val bars = bars[playerUUID] ?: return false
         
         // clear bars
         bars.forEach { it.nmsName = Component.literal("") }
@@ -169,8 +168,10 @@ object BossBarOverlayManager : Initializable(), Listener {
             }
         
         // send update if player is online
-        val player = Bukkit.getPlayer(playerUUID) ?: return
+        val player = Bukkit.getPlayer(playerUUID) ?: return true
         bars.forEach { player.send(it.updateNamePacket) }
+        
+        return true
     }
     
     private fun sendBars(player: Player) {
