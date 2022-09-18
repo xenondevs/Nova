@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.util.item
 
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
-import net.minecraft.server.level.ServerPlayer
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -14,7 +13,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolLevel
-import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.eyeInWater
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.nmsEntity
@@ -22,7 +20,6 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
-import net.minecraft.core.BlockPos as MojangBlockPos
 import org.bukkit.inventory.meta.Damageable as BukkitDamageable
 import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
 
@@ -73,14 +70,6 @@ object ToolUtils {
         }
         
         return item
-    }
-    
-    @JvmStatic
-    fun hasCorrectToolForDrops(player: ServerPlayer, pos: MojangBlockPos): Boolean {
-        return isCorrectToolForDrops(
-            player.inventory.getSelected().bukkitStack,
-            player.bukkitEntity.world.getBlockAt(pos.x, pos.y, pos.z)
-        )
     }
     
     fun isCorrectToolForDrops(tool: ItemStack?, block: Block): Boolean {
