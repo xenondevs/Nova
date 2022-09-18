@@ -137,8 +137,8 @@ object BossBarOverlayManager : Initializable(), Listener {
     }
     
     private fun remakeBars(playerUUID: UUID) {
-        val overlays = overlays[playerUUID]!!
-        val bars = bars[playerUUID]!!
+        val overlays = overlays[playerUUID] ?: return
+        val bars = bars[playerUUID] ?: return
         
         // clear bars
         bars.forEach { it.nmsName = Component.literal("") }
