@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.transformer
 
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap
 import xyz.xenondevs.bytebase.INSTRUMENTATION
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.LOGGER
@@ -17,11 +18,14 @@ import java.lang.reflect.Field
 
 internal object Patcher : Initializable() {
     
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
+    override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = emptySet<Initializable>()
     
-    private val extraOpens = setOf("java.lang", "jdk.internal.misc", "jdk.internal.reflect")
-    private val transformers by lazy { sequenceOf(NoteBlockPatch, FieldFilterPatch).filter(ClassTransformer::shouldTransform).toSet() }
+    private val extraOpens = setOf("java.lang", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
+    private val transformers by lazy {
+        sequenceOf(NoteBlockPatch, FieldFilterPatch)
+            .filter(Transformer::shouldTransform).toSet()
+    }
     
     override fun init() {
         if (!DEFAULT_CONFIG.getBoolean("use_agent"))
@@ -59,8 +63,15 @@ internal object Patcher : Initializable() {
     }
     
     private fun runTransformers() {
-        val classes = transformers.groupBy { it.clazz.java }.map { it.key to it.value.any(ClassTransformer::computeFrames) }
-        transformers.forEach(ClassTransformer::transform)
+        val classes = Object2BooleanOpenHashMap<Class<*>>() // class -> computeFrames
+        transformers.forEach { transformer ->
+            transformer.classes.forEach { clazz ->
+                if (transformer.computeFrames)
+                    classes[clazz.java] = true
+                else classes.putIfAbsent(clazz.java, false)
+            }
+        }
+        transformers.forEach(Transformer::transform)
         val definitions = classes.map { (clazz, computeFrames) ->
             ClassDefinition(clazz, VirtualClassPath[clazz].assemble(computeFrames))
         }.toTypedArray()
