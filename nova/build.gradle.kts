@@ -28,7 +28,7 @@ dependencies {
     novaLoader(deps.bundles.minecraft.assets)
     novaLoader(deps.zip4j)
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
-    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.3-SNAPSHOT")
+    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
     novaLoader("software.amazon.awssdk:s3:2.17.267")
     
@@ -91,11 +91,14 @@ spigotRemap {
 remapStrings {
     remapGoal.set(if (mojangMapped) "mojang" else "spigot")
     spigotVersion.set(deps.versions.spigot.get())
-    classes.set(listOf(
+    classes.addAll(
         "xyz.xenondevs.nova.util.reflection.ReflectionRegistry",
         "xyz.xenondevs.nova.util.NMSUtils",
-        "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch"
-    ))
+        "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.PalettePatch",
+        "xyz.xenondevs.nova.Nova"
+    )
 }
 
 publishing {
