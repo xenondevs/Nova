@@ -96,8 +96,7 @@ remapStrings {
         "xyz.xenondevs.nova.util.NMSUtils",
         "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch",
         "xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch",
-        "xyz.xenondevs.nova.transformer.patch.worldgen.PalettePatch",
-        "xyz.xenondevs.nova.Nova"
+        "xyz.xenondevs.nova.transformer.patch.worldgen.LevelChunkSectionPatch",
     )
 }
 
