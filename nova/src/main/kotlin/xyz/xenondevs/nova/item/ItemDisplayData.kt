@@ -15,11 +15,34 @@ class ItemDisplayData {
     var lore: MutableList<Array<BaseComponent>>? = null
     
     /**
+     * The damage shown with advanced tooltips enabled.
+     */
+    var damage: Int? = null
+    
+    /**
+     * The maximum durability shown with advanced tooltips enabled.
+     */
+    var maxDurability: Int? = null
+    
+    private var _durabilityBar: Double? = null
+    
+    /**
      * The durability percentage of this item from 0 to 1.
      */
-    var durability: Double = 1.0
+    var durabilityBar: Double
         set(value) {
-            field = value.coerceIn(0.0..1.0)
+            _durabilityBar = value.coerceIn(0.0..1.0)
+        }
+        get() {
+            val percentage = _durabilityBar
+            if (percentage != null)
+                return percentage
+    
+            val damage = damage
+            val maxDurability = maxDurability
+            return if (damage != null && maxDurability != null) {
+                (maxDurability - damage) / maxDurability.toDouble()
+            } else 1.0
         }
     
     /**

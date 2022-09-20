@@ -36,6 +36,7 @@ import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.isPlayerView
@@ -285,25 +286,31 @@ internal object PacketItems : Initializable(), Listener {
         } else CompoundTag().also { newItemTag.put("display", it) }
         
         val itemDisplayData = material.novaItem.getItemDisplayData(item.bukkitStack)
-        val itemDisplayName = itemDisplayData.name
-        val itemDisplayLore = itemDisplayData.lore
-        val itemDisplayDurability = itemDisplayData.durability
         
+        val itemDisplayName = itemDisplayData.name
         if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
             displayTag.putString("Name", itemDisplayName.serialize())
         }
-        
-        if (itemDisplayLore != null) {
-            val loreTag = ListTag()
-            itemDisplayLore.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
-            if (player != null && player in AdvancedTooltips.players)
-                loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
-            displayTag.put("Lore", loreTag)
+    
+        val loreTag = ListTag()
+        val itemDisplayLore = itemDisplayData.lore
+        itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
+        if (player != null && player in AdvancedTooltips.players) {
+            val itemDisplayDamage = itemDisplayData.damage
+            val itemDisplayMaxDurability = itemDisplayData.maxDurability
+            if (itemDisplayDamage != null && itemDisplayMaxDurability != null) {
+                loreTag += StringTag.valueOf(localized(
+                    ChatColor.WHITE, "item.durability", itemDisplayMaxDurability - itemDisplayDamage, itemDisplayMaxDurability
+                ).withoutPreFormatting().serialize())
+            }
+            loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
         }
+        displayTag.put("Lore", loreTag)
         
-        if (itemDisplayDurability != 1.0) {
+        val itemDisplayDurabilityBar = itemDisplayData.durabilityBar
+        if (itemDisplayDurabilityBar != 1.0) {
             val maxDurability = newItem.item.maxDamage
-            newItem.damageValue = maxDurability - (maxDurability * itemDisplayDurability).toInt()
+            newItem.damageValue = maxDurability - (maxDurability * itemDisplayDurabilityBar).toInt()
         }
         
         return newItem

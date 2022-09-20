@@ -40,7 +40,8 @@ class Damageable(
     
     override fun updateItemDisplay(itemStack: ItemStack, display: ItemDisplayData) {
         val damage = getDamage(itemStack)
-        display.durability = damage.toDouble() / maxDurability.toDouble()
+        display.damage = damage
+        display.maxDurability = maxDurability
     }
     
 }

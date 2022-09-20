@@ -49,7 +49,7 @@ class Chargeable(
         display.addLore(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, maxEnergy)))
         
         if (affectsItemDurability)
-            display.durability = energy.toDouble() / maxEnergy.toDouble()
+            display.durabilityBar = energy.toDouble() / maxEnergy.toDouble()
     }
     
 }
