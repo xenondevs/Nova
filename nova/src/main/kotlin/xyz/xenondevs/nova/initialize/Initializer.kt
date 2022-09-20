@@ -61,6 +61,7 @@ import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
+import xyz.xenondevs.nova.world.generation.WorldGenerationManager
 import xyz.xenondevs.nova.world.loot.LootConfigHandler
 import xyz.xenondevs.nova.world.loot.LootGeneration
 import xyz.xenondevs.particle.utils.ReflectionUtils
@@ -77,7 +78,7 @@ internal object Initializer : Listener {
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
-        BossBarOverlayManager, WailaManager
+        BossBarOverlayManager, WailaManager, WorldGenerationManager
     ), Initializable::dependsOn)
     
     private val INITIALIZABLE_GRAPH = GraphBuilder.directed().build<String>()

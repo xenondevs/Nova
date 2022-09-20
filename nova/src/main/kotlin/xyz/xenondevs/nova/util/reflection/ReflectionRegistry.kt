@@ -1,8 +1,14 @@
 package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
+import com.mojang.serialization.Codec
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.level.biome.FeatureSorter
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateHolder
 import net.minecraft.world.level.chunk.HashMapPalette
+import net.minecraft.world.level.chunk.LevelChunkSection
 import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.PalettedContainer
 import org.bukkit.configuration.ConfigurationSection
@@ -17,6 +23,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getConstructor
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import java.util.*
+import java.util.function.Function
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty1
 
@@ -38,6 +45,9 @@ internal object ReflectionRegistry {
     
     // Methods
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class.java)
+    val FEATURE_SORTER_BUILD_FEATURES_PER_STEP_METHOD = getMethod(FeatureSorter::class.java, true, "SRM(net.minecraft.world.level.biome.FeatureSorter buildFeaturesPerStep)", List::class.java, java.util.function.Function::class.java, Boolean::class.java)
+    val STATE_HOLDER_CODEC_METHOD = getMethod(StateHolder::class.java, true, "SRM(net.minecraft.world.level.block.state.StateHolder codec)", Codec::class.java, Function::class.java)
+    val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class.java, true, "SRM(net.minecraft.world.level.chunk.LevelChunkSection setBlockState)", Int::class.java, Int::class.java, Int::class.java, BlockState::class.java, Boolean::class.java)
     val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class.java, false, "getDelegate", Any::class.java)
     
     // Fields
@@ -56,5 +66,8 @@ internal object ReflectionRegistry {
     val PALETTED_CONTAINER_DATA_STORAGE_FIELD = getField(PALETTED_CONTAINER_DATA_CLASS, true, "SRF(net.minecraft.world.level.chunk.PalettedContainer\$Data storage)")
     val LINEAR_PALETTE_VALUES_FIELD = getField(LinearPalette::class.java, true, "SRF(net.minecraft.world.level.chunk.LinearPalette values)")
     val HASH_MAP_PALETTE_VALUES_FIELD = getField(HashMapPalette::class.java, true, "SRF(net.minecraft.world.level.chunk.HashMapPalette values)")
+    val BLOCK_DEFAULT_BLOCK_STATE_FIELD = getField(Block::class.java, true, "SRF(net.minecraft.world.level.block.Block defaultBlockState)")
+    val BLOCK_STATE_CODEC_FIELD = getField(BlockState::class.java, false, "SRF(net.minecraft.world.level.block.state.BlockState CODEC)")
+    val STATE_HOLDER_PROPERTIES_CODEC_FIELD = getField(StateHolder::class.java, true, "SRF(net.minecraft.world.level.block.state.StateHolder propertiesCodec)")
     
 }
