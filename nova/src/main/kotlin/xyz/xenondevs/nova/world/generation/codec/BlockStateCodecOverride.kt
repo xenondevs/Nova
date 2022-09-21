@@ -6,9 +6,11 @@ import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.ExtraCodecs
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BLOCK_STATE_CODEC_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.STATE_HOLDER_CODEC_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import java.util.function.Function
 
 internal object BlockStateCodecOverride : CodecOverride {
     
@@ -18,7 +20,7 @@ internal object BlockStateCodecOverride : CodecOverride {
         val blockCodec = ResourceLocation.CODEC.flatXmap(::getBlockFromLocation, ::getLocationFromBlock)
         val legacyBlockCodec = ExtraCodecs.idResolverCodec(::getLegacyIdFromBlock, BLOCK_REGISTRY::byId, -1)
         val registryCodec = ExtraCodecs.overrideLifecycle(ExtraCodecs.orCompressed(blockCodec, legacyBlockCodec), BLOCK_REGISTRY::lifecycle) { BLOCK_REGISTRY.lifecycle() }
-        val newCodec = (STATE_HOLDER_CODEC_METHOD(null, registryCodec, Block::defaultBlockState) as Codec<*>).stable()
+        val newCodec = (STATE_HOLDER_CODEC_METHOD(null, registryCodec, Function<Block, BlockState>(Block::defaultBlockState)) as Codec<*>).stable()
         ReflectionUtils.setStaticFinalField(BLOCK_STATE_CODEC_FIELD, newCodec)
     }
     
