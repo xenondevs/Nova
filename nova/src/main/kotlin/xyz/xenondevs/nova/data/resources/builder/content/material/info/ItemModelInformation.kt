@@ -9,8 +9,7 @@ internal object VanillaMaterialTypes {
     
     private val MATERIAL_TYPES = enumMapOf(
         Material.FISHING_ROD to setOf(VanillaMaterialProperty.DAMAGEABLE),
-        Material.WOODEN_PICKAXE to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.DAMAGING_NORMAL),
-        Material.WOODEN_SWORD to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.DAMAGING_SWEEPING),
+        Material.WOODEN_SWORD to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING),
         Material.APPLE to setOf(VanillaMaterialProperty.CONSUMABLE_NORMAL),
         Material.DRIED_KELP to setOf(VanillaMaterialProperty.CONSUMABLE_FAST),
         Material.GOLDEN_APPLE to setOf(VanillaMaterialProperty.CONSUMABLE_ALWAYS)

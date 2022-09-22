@@ -9,6 +9,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.attribute.Attribute
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.PacketItemData
+import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
@@ -23,7 +24,11 @@ private const val PLAYER_ATTACK_DAMAGE = 1.0
 
 class Tool(val toolOptions: ToolOptions) : ItemBehavior() {
     
-    override val vanillaMaterialProperties = listOf(VanillaMaterialProperty.DAMAGING_NORMAL)
+    override val vanillaMaterialProperties = buildList { 
+        this += VanillaMaterialProperty.DAMAGEABLE
+        if (toolOptions.category == ToolCategory.SWORD)
+            this += VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING
+    }
     
     override val attributeModifiers = buildList {
         if (toolOptions.attackSpeed > 0) {

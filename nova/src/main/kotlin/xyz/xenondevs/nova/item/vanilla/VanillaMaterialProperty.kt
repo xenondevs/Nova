@@ -8,14 +8,9 @@ enum class VanillaMaterialProperty {
     DAMAGEABLE,
     
     /**
-     * The item has a set damage and cooldown.
+     * The item can't break any blocks in creative.
      */
-    DAMAGING_NORMAL,
-    
-    /**
-     * The item has a set damage and cooldown and can also do sweeping attacks.
-     */
-    DAMAGING_SWEEPING, // TODO: check if this even handled clientside
+    CREATIVE_NON_BLOCK_BREAKING,
     
     /**
      * The item can be consumed normally.

@@ -79,7 +79,7 @@ internal object BlockBreaking {
                 LOGGER.log(Level.SEVERE, "An exception occurred in BlockBreaker tick", e)
             }
             
-            return@removeIf breaker.isDone()
+            return@removeIf breaker.isStopped
         }
     }
     

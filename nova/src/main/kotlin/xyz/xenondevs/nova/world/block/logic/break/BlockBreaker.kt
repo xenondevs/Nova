@@ -96,17 +96,27 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
     protected val drops: Boolean by lazy { !requiresToolForDrops || (correctCategory && correctLevel) } // lazy because accessing abstract val
     
     private var progress = 0.0
+    private val isDone: Boolean
+        get() = progress >= 1
     
-    fun isDone(): Boolean = progress >= 1
+    var isStopped: Boolean = false
+        private set
     
     fun handleTick() {
-        check(!isDone()) { "Breaker is done" }
+        check(!isDone) { "Breaker is done" }
         
         val damage = calculateDamage()
+        val clientsideDamage = calculateClientsideDamage()
+        
+        if (clientsideDamage >= 1 && damage < 1) {
+            stop()
+            return
+        }
+        
         if (damage >= 1.0 || serverTick >= blockedUntil)
             progress += damage
         
-        if (isDone()) {
+        if (isDone) {
             // Stop break animation and mining fatigue effect
             stop()
             // create a block breaking context
@@ -123,7 +133,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             if (player.gameMode != GameMode.CREATIVE && toolCategory != null && hardness > 0)
                 player.damageToolInMainHand(toolCategory.breakBlockItemDamage)
             // If the block broke instantaneously for the client, the effects will also be played clientside
-            val effects = calculateClientsideDamage() < 1
+            val effects = clientsideDamage < 1
             block.remove(ctx, effects, effects)
             // The ack packet removes client-predicted block states and shows those sent by the server
             player.send(ClientboundBlockChangedAckPacket(sequence))
@@ -157,10 +167,11 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
     }
     
     fun stop() {
+        isStopped = true
         breakMethod?.stop()
         
         val effect = player.getPotionEffect(PotionEffectType.SLOW_DIGGING)
-        val packet = if (effect != null) {
+        val effectPacket = if (effect != null) {
             // If the player actually has mining fatigue, send the correct effect again
             val effectInstance = MobEffectInstance(
                 MobEffect.byId(4),
@@ -173,7 +184,8 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             ClientboundRemoveMobEffectPacket(player.entityId, MobEffect.byId(4))
         }
         
-        player.send(packet)
+        val ackPacket = ClientboundBlockChangedAckPacket(sequence)
+        player.send(effectPacket, ackPacket)
     }
     
     private fun calculateClientsideDamage(): Double {
