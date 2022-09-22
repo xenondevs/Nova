@@ -12,7 +12,6 @@ import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.options.DamageOptions
 import xyz.xenondevs.nova.material.options.ToolOptions
 import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.localized
@@ -22,40 +21,41 @@ import kotlin.math.roundToInt
 private const val PLAYER_ATTACK_SPEED = 4.0
 private const val PLAYER_ATTACK_DAMAGE = 1.0
 
-class Tool(val toolOptions: ToolOptions, val damageOptions: DamageOptions?) : ItemBehavior() {
+class Tool(val toolOptions: ToolOptions) : ItemBehavior() {
     
     override val vanillaMaterialProperties = listOf(VanillaMaterialProperty.DAMAGING_NORMAL)
     
     override val attributeModifiers = buildList {
-        if (damageOptions != null) {
+        if (toolOptions.attackSpeed > 0) {
             this += AttributeModifier(
                 Attribute.GENERIC_ATTACK_SPEED,
                 AttributeModifier.Operation.INCREMENT,
-                damageOptions.attackSpeed - PLAYER_ATTACK_SPEED,
+                toolOptions.attackSpeed - PLAYER_ATTACK_SPEED,
                 EquipmentSlot.MAINHAND
             )
-            
+        }
+        if (toolOptions.attackDamage > 0) {
             this += AttributeModifier(
                 Attribute.GENERIC_ATTACK_DAMAGE,
                 AttributeModifier.Operation.INCREMENT,
-                damageOptions.attackDamage - PLAYER_ATTACK_DAMAGE,
+                toolOptions.attackDamage - PLAYER_ATTACK_DAMAGE,
                 EquipmentSlot.MAINHAND
             )
         }
     }
     
     override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
-        if (damageOptions != null) {
+        if (toolOptions.attackDamage > 0 && toolOptions.attackSpeed > 0) {
             itemData.addLore(arrayOf(TextComponent(" ")))
             itemData.addLore(arrayOf(localized(ChatColor.GRAY, "item.modifiers.mainhand")))
             
             val mojangStack = itemStack.nmsStack
-            val attackDamage = (damageOptions.attackDamage + EnchantmentHelper.getDamageBonus(mojangStack, MobType.UNDEFINED)).roundToInt()
+            val attackDamage = (toolOptions.attackDamage + EnchantmentHelper.getDamageBonus(mojangStack, MobType.UNDEFINED)).roundToInt()
             itemData.addLore(ComponentBuilder(" $attackDamage ")
                 .color(ChatColor.DARK_GREEN)
                 .appendLocalized("attribute.name.generic.attack_damage")
                 .create())
-            itemData.addLore(ComponentBuilder(" ${damageOptions.attackSpeed} ")
+            itemData.addLore(ComponentBuilder(" ${toolOptions.attackSpeed} ")
                 .color(ChatColor.DARK_GREEN)
                 .appendLocalized("attribute.name.generic.attack_speed")
                 .create())

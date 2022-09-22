@@ -6,10 +6,7 @@ import xyz.xenondevs.nova.item.tool.ToolLevel
 data class ToolOptions(
     val level: ToolLevel,
     val category: ToolCategory,
-    val speedMultiplier: Double
-)
-
-data class DamageOptions(
+    val breakSpeedMultiplier: Double,
     val attackDamage: Double,
     val attackSpeed: Double
 )

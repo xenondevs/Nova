@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.item.behavior
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.util.item.retrieveDataOrNull
@@ -12,13 +11,9 @@ import kotlin.math.min
 
 private val DAMAGE_KEY = NamespacedKey(NOVA, "damage")
 
-class Damageable(
-    maxDurability: ValueReloadable<Int>
-) : ItemBehavior() {
+class Damageable(val maxDurability: Int) : ItemBehavior() {
     
     override val vanillaMaterialProperties = listOf(VanillaMaterialProperty.DAMAGEABLE)
-    
-    val maxDurability by maxDurability
     
     fun getDamage(itemStack: ItemStack): Int {
         return min(maxDurability, itemStack.retrieveDataOrNull(DAMAGE_KEY) ?: 0)

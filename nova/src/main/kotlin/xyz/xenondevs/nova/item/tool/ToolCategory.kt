@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.world.pos
  */
 class ToolCategory internal constructor(
     val id: NamespacedId,
+    val canDoSweepAttack: Boolean,
     val breakBlockItemDamage: Int,
     val attackEntityItemDamage: Int,
     val getMultiplier: (ItemStack) -> Double,
@@ -36,6 +37,7 @@ class ToolCategory internal constructor(
         
         val SHOVEL = ToolCategoryRegistry.register(
             "shovel",
+            false,
             1, 2,
             mapOf(
                 Material.WOODEN_SHOVEL to 2.0,
@@ -49,6 +51,7 @@ class ToolCategory internal constructor(
         
         val PICKAXE = ToolCategoryRegistry.register(
             "pickaxe",
+            false,
             1, 2,
             mapOf(
                 Material.WOODEN_PICKAXE to 2.0,
@@ -62,6 +65,7 @@ class ToolCategory internal constructor(
         
         val AXE = ToolCategoryRegistry.register(
             "axe",
+            false,
             1, 2,
             mapOf(
                 Material.WOODEN_AXE to 2.0,
@@ -75,6 +79,7 @@ class ToolCategory internal constructor(
         
         val HOE = ToolCategoryRegistry.register(
             "hoe",
+            false,
             1, 2,
             mapOf(
                 Material.WOODEN_HOE to 2.0,
@@ -88,6 +93,7 @@ class ToolCategory internal constructor(
         
         val SWORD = ToolCategoryRegistry.register(
             "sword",
+            true,
             2, 1,
             mapOf(
                 Material.WOODEN_SWORD to 1.5,
@@ -101,6 +107,7 @@ class ToolCategory internal constructor(
         
         val SHEARS = ToolCategoryRegistry.register(
             "shears",
+            false,
             1, 0,
             mapOf(
                 Material.SHEARS to 1.5
