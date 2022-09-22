@@ -2,9 +2,13 @@
 
 package xyz.xenondevs.nova.util
 
+import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
+import net.minecraft.core.Registry
+import net.minecraft.core.RegistryAccess
 import net.minecraft.core.Rotations
 import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
@@ -28,6 +32,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
@@ -148,4 +153,13 @@ object NMSUtils {
         "SRF(net.minecraft.world.entity.Entity ENTITY_COUNTER)"
     ).get(null) as AtomicInteger
     
+    fun <T> freezeRegistry(registry: Registry<T>) {
+        if (registry !is MappedRegistry) return
+        ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = true
+    }
+    
+    fun <T> unfreezeRegistry(registry: Registry<T>) {
+        if (registry !is MappedRegistry) return
+        ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = false
+    }
 }

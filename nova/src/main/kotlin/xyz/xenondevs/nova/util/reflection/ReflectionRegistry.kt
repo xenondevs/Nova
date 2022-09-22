@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import com.mojang.serialization.Codec
+import net.minecraft.core.MappedRegistry
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.level.biome.FeatureSorter
 import net.minecraft.world.level.block.Block
@@ -37,6 +38,7 @@ internal object ReflectionRegistry {
     val CB_CRAFT_META_ITEM_CLASS = getCBClass("inventory.CraftMetaItem")
     val SECTION_PATH_DATA_CLASS = getClass("org.bukkit.configuration.SectionPathData")
     val PALETTED_CONTAINER_DATA_CLASS = getClass("SRC(net.minecraft.world.level.chunk.PalettedContainer\$Data)")
+    val HOLDER_SET_DIRECT_CLASS = getClass("SRC(net.minecraft.core.HolderSet\$Direct)")
     
     // Constructors
     val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class.java, false, Class::class.java)
@@ -69,5 +71,8 @@ internal object ReflectionRegistry {
     val BLOCK_DEFAULT_BLOCK_STATE_FIELD = getField(Block::class.java, true, "SRF(net.minecraft.world.level.block.Block defaultBlockState)")
     val BLOCK_STATE_CODEC_FIELD = getField(BlockState::class.java, false, "SRF(net.minecraft.world.level.block.state.BlockState CODEC)")
     val STATE_HOLDER_PROPERTIES_CODEC_FIELD = getField(StateHolder::class.java, true, "SRF(net.minecraft.world.level.block.state.StateHolder propertiesCodec)")
+    val MAPPED_REGISTRY_FROZEN_FIELD = getField(MappedRegistry::class.java, true, "SRF(net.minecraft.core.MappedRegistry frozen)")
+    val HOLDER_SET_DIRECT_CONTENTS_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contents)")
+    val HOLDER_SET_DIRECT_CONTENTS_SET_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contentsSet)")
     
 }
