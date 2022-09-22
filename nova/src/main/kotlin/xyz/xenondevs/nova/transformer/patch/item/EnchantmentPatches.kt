@@ -1,24 +1,35 @@
 package xyz.xenondevs.nova.transformer.patch.item
 
+import net.minecraft.world.entity.ExperienceOrb
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.item.enchantment.Enchantments
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.util.callsMethod
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.bytebase.util.replaceFirst
+import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.transformer.MultiTransformer
+import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import kotlin.math.min
 import kotlin.reflect.jvm.javaMethod
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 
-internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::class, MojangItem::class), computeFrames = true) {
+internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::class, MojangItem::class, ExperienceOrb::class), computeFrames = true) {
     
     override fun transform() {
+        patchEnchantmentTableEnchanting()
+        patchMending()
+    }
+    
+    private fun patchEnchantmentTableEnchanting() {
         val enchantmentHelperWrapper = classWrappers[EnchantmentHelper::class.internalName]!!
         
         enchantmentHelperWrapper
@@ -79,6 +90,51 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
         }
         
         return item.maxStackSize == 1 && item.canBeDepleted()
+    }
+    
+    private fun patchMending() {
+        classWrappers[ExperienceOrb::class.internalName]!!
+            .getMethodLike(ReflectionRegistry.EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD)!!
+            .instructions = buildInsnList {
+            aLoad(0)
+            aLoad(1)
+            iLoad(2)
+            invokeStatic(::repairPlayerItems.javaMethod!!)
+            ireturn()
+        }
+    }
+    
+    @JvmStatic
+    fun repairPlayerItems(orb: ExperienceOrb, player: Player, exp: Int): Int {
+        val itemStack = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player) {
+            val novaMaterial = it.novaMaterial
+            if (novaMaterial != null) {
+                val damage = novaMaterial.novaItem.getBehavior(Damageable::class)?.getDamage(it.bukkitMirror)
+                return@getRandomItemWith damage != null && damage > 0
+            }
+            
+            return@getRandomItemWith it.isDamaged
+        }?.value
+        
+        if (itemStack != null) {
+            val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(Damageable::class)
+            
+            val repair: Int
+            if (damageable != null) {
+                val bukkitMirror = itemStack.bukkitMirror
+                val damageValue = damageable.getDamage(bukkitMirror)
+                repair = min(orb.value * 2, damageValue)
+                damageable.setDamage(bukkitMirror, damageValue - repair)
+            } else {
+                repair = min(orb.value * 2, itemStack.damageValue)
+                itemStack.damageValue -= repair
+            }
+            
+            val remainingExp = exp - (repair / 2)
+            return if (remainingExp > 0) repairPlayerItems(orb, player, remainingExp) else 0
+        }
+        
+        return exp
     }
     
 }

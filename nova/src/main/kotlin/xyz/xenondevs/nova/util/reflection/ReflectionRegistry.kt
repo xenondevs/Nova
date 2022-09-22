@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.reflection
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
@@ -64,6 +65,7 @@ internal object ReflectionRegistry {
     val ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD = getMethod(EnchantmentCategory::class.java, false, "SRM(net.minecraft.item.enchantment.EnchantmentCategory canEnchant)", MojangItem::class.java)
     val ITEM_IS_ENCHANTABLE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item isEnchantable)", MojangStack::class.java)
     val ITEM_GET_ENCHANTMENT_VALUE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item getEnchantmentValue)")
+    val EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD = getMethod(ExperienceOrb::class.java, true, "SRM(net.minecraft.world.entity.ExperienceOrb repairPlayerItems)", MojangPlayer::class.java, Int::class.java)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
