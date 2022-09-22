@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.resources.builder.content
 
 import com.google.gson.JsonObject
-import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.util.NumberFormatUtils

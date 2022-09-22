@@ -33,7 +33,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
-import net.minecraft.world.item.ItemStack as NMSItemStack
+import net.minecraft.world.item.ItemStack as MojangStack
 
 val Entity.nmsEntity: MojangEntity
     get() = (this as CraftEntity).handle
@@ -41,11 +41,18 @@ val Entity.nmsEntity: MojangEntity
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
-val ItemStack.nmsStack: NMSItemStack
+val ItemStack.nmsStack: MojangStack
     get() = CraftItemStack.asNMSCopy(this)
 
-val NMSItemStack.bukkitStack: ItemStack
+@Deprecated(replaceWith = ReplaceWith("bukkitCopy"), message = "Misleading name")
+val MojangStack.bukkitStack: ItemStack
     get() = CraftItemStack.asBukkitCopy(this)
+
+val MojangStack.bukkitCopy: ItemStack
+    get() = CraftItemStack.asBukkitCopy(this)
+
+val MojangStack.bukkitMirror: ItemStack
+    get() = CraftItemStack.asCraftMirror(this)
 
 val Location.blockPos: MojangBlockPos
     get() = MojangBlockPos(blockX, blockY, blockZ)

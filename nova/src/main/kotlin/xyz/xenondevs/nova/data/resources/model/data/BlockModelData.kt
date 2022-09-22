@@ -4,7 +4,8 @@ import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
+import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.world.block.model.ArmorStandModelProvider
 import xyz.xenondevs.nova.world.block.model.BlockModelProviderType
@@ -18,9 +19,8 @@ sealed interface BlockModelData {
 class ArmorStandBlockModelData(
     id: String,
     val hitboxType: Material,
-    material: Material,
     dataArray: IntArray
-) : ItemModelData(id, material, dataArray), BlockModelData {
+) : ItemModelData(id, VanillaMaterialTypes.DEFAULT_MATERIAL, dataArray), BlockModelData {
     
     override val modelProviderType = ArmorStandModelProvider
     

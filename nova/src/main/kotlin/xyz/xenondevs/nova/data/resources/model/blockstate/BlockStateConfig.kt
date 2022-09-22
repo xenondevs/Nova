@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.model.config
+package xyz.xenondevs.nova.data.resources.model.blockstate
 
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.data.config.PermanentStorage

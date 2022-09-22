@@ -10,10 +10,15 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
-import xyz.xenondevs.nova.item.ItemDisplayData
+import xyz.xenondevs.nova.item.PacketItemData
+import xyz.xenondevs.nova.item.vanilla.AttributeModifier
+import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 
 abstract class ItemBehavior {
+    
+    open val vanillaMaterialProperties: List<VanillaMaterialProperty> = emptyList()
+    open val attributeModifiers: List<AttributeModifier> = emptyList()
     
     open fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) = Unit
     open fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
@@ -25,6 +30,6 @@ abstract class ItemBehavior {
     open fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
     
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
-    open fun updateItemDisplay(itemStack: ItemStack, display: ItemDisplayData) = Unit
+    open fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) = Unit
     
 }

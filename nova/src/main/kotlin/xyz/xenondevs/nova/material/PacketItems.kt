@@ -31,6 +31,7 @@ import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
@@ -244,6 +245,7 @@ internal object PacketItems : Initializable(), Listener {
             val tag = tag!!
             tag.remove("CustomModelData")
             tag.remove("Damage")
+            tag.remove("HideFlags")
             
             val display = tag.getOrNull<CompoundTag>("display")
             
@@ -273,8 +275,9 @@ internal object PacketItems : Initializable(), Listener {
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)
         val material = NovaMaterialRegistry.getOrNull(id) ?: return getMissingItem(item, id)
         val subId = novaTag.getInt("subId")
+        val novaItem = material.novaItem
         
-        val data = Resources.getModelDataOrNull(id)?.first ?: return getMissingItem(item, id)
+        val data = Resources.getModelDataOrNull(id)?.first?.get(novaItem.vanillaMaterial) ?: return getMissingItem(item, id)
         
         val newItem = item.copy()
         val newItemTag = newItem.tag!!
@@ -285,13 +288,15 @@ internal object PacketItems : Initializable(), Listener {
             newItemTag.getCompound("display")
         } else CompoundTag().also { newItemTag.put("display", it) }
         
-        val itemDisplayData = material.novaItem.getItemDisplayData(item.bukkitStack)
+        val itemDisplayData = novaItem.getPacketItemData(item.bukkitStack)
         
+        // name
         val itemDisplayName = itemDisplayData.name
         if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
             displayTag.putString("Name", itemDisplayName.serialize())
         }
-    
+        
+        // lore
         val loreTag = ListTag()
         val itemDisplayLore = itemDisplayData.lore
         itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
@@ -307,10 +312,17 @@ internal object PacketItems : Initializable(), Listener {
         }
         displayTag.put("Lore", loreTag)
         
+        // durability
         val itemDisplayDurabilityBar = itemDisplayData.durabilityBar
         if (itemDisplayDurabilityBar != 1.0) {
             val maxDurability = newItem.item.maxDamage
             newItem.damageValue = maxDurability - (maxDurability * itemDisplayDurabilityBar).toInt()
+        }
+        
+        // hide flags
+        val hiddenFlags = itemDisplayData.hiddenFlags
+        if (!hiddenFlags.isNullOrEmpty()) {
+            newItemTag.putInt("HideFlags", HideableFlag.toInt(hiddenFlags))
         }
         
         return newItem

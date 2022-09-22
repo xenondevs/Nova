@@ -8,13 +8,12 @@ import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
-import xyz.xenondevs.nova.data.resources.builder.content.MaterialContent
+import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.WailaContent

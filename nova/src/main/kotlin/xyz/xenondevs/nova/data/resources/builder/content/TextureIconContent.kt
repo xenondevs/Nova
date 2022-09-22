@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.resources.builder.content
 
-import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder

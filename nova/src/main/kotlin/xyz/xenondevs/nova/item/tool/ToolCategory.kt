@@ -13,12 +13,16 @@ import xyz.xenondevs.nova.world.pos
 
 /**
  * @param id The [NamespacedId] of this [ToolCategory]
+ * @param breakBlockItemDamage The item damage applied when an item of this [ToolCategory] is used to break a block
+ * @param attackEntityItemDamage The item damage applied when an item of this [ToolCategory] is used to a attack an entity
  * @param getMultiplier Retrieves the multiplier for a specific [ItemStack] of this [ToolCategory]
- * @param getIcon Retrieves the icon for this [ToolCategory] with a given [ToolLevel]. An example id would 
+ * @param getIcon Retrieves the icon for this [ToolCategory] with a given [ToolLevel]. An example id would
  * be `minecraft:item/diamond_pickaxe` for the `minecraft:pickaxe` category and `minecraft:diamond` level.
  */
 class ToolCategory internal constructor(
     val id: NamespacedId,
+    val breakBlockItemDamage: Int,
+    val attackEntityItemDamage: Int,
     val getMultiplier: (ItemStack) -> Double,
     val getIcon: (ToolLevel?) -> ResourcePath
 ) {
@@ -32,6 +36,7 @@ class ToolCategory internal constructor(
         
         val SHOVEL = ToolCategoryRegistry.register(
             "shovel",
+            1, 2,
             mapOf(
                 Material.WOODEN_SHOVEL to 2.0,
                 Material.STONE_SHOVEL to 4.0,
@@ -44,6 +49,7 @@ class ToolCategory internal constructor(
         
         val PICKAXE = ToolCategoryRegistry.register(
             "pickaxe",
+            1, 2,
             mapOf(
                 Material.WOODEN_PICKAXE to 2.0,
                 Material.STONE_PICKAXE to 4.0,
@@ -56,6 +62,7 @@ class ToolCategory internal constructor(
         
         val AXE = ToolCategoryRegistry.register(
             "axe",
+            1, 2,
             mapOf(
                 Material.WOODEN_AXE to 2.0,
                 Material.STONE_AXE to 4.0,
@@ -68,6 +75,7 @@ class ToolCategory internal constructor(
         
         val HOE = ToolCategoryRegistry.register(
             "hoe",
+            1, 2,
             mapOf(
                 Material.WOODEN_HOE to 2.0,
                 Material.STONE_HOE to 4.0,
@@ -80,6 +88,7 @@ class ToolCategory internal constructor(
         
         val SWORD = ToolCategoryRegistry.register(
             "sword",
+            2, 1,
             mapOf(
                 Material.WOODEN_SWORD to 1.5,
                 Material.STONE_SWORD to 1.5,
@@ -92,6 +101,7 @@ class ToolCategory internal constructor(
         
         val SHEARS = ToolCategoryRegistry.register(
             "shears",
+            1, 0,
             mapOf(
                 Material.SHEARS to 1.5
             )
@@ -101,7 +111,7 @@ class ToolCategory internal constructor(
             if (item == null)
                 return null
             
-            val novaCategory = item.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.category
+            val novaCategory = item.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.category
             if (novaCategory != null)
                 return novaCategory
             

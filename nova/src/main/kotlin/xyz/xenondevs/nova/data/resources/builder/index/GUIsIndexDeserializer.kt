@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.addon.assets
+package xyz.xenondevs.nova.data.resources.builder.index
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject

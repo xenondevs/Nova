@@ -6,7 +6,8 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.ValueReloadable
-import xyz.xenondevs.nova.item.ItemDisplayData
+import xyz.xenondevs.nova.item.PacketItemData
+import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.item.retrieveDataOrNull
 import xyz.xenondevs.nova.util.item.storeData
@@ -17,6 +18,10 @@ class Chargeable(
     maxEnergy: ValueReloadable<Long>,
     private val affectsItemDurability: Boolean = true
 ) : ItemBehavior() {
+    
+    override val vanillaMaterialProperties = if (affectsItemDurability)
+        listOf(VanillaMaterialProperty.DAMAGEABLE)
+    else emptyList()
     
     val maxEnergy by maxEnergy
     
@@ -43,13 +48,13 @@ class Chargeable(
         return itemBuilder
     }
     
-    override fun updateItemDisplay(itemStack: ItemStack, display: ItemDisplayData) {
+    override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
         val energy = getEnergy(itemStack)
         
-        display.addLore(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, maxEnergy)))
+        itemData.addLore(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, maxEnergy)))
         
         if (affectsItemDurability)
-            display.durabilityBar = energy.toDouble() / maxEnergy.toDouble()
+            itemData.durabilityBar = energy.toDouble() / maxEnergy.toDouble()
     }
     
 }

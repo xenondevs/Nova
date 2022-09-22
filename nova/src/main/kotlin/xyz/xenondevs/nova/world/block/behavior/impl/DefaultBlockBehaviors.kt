@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.block.behavior.impl
 
-import xyz.xenondevs.nova.data.resources.model.config.BrownMushroomBlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.MushroomStemBlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.RedMushroomBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.RedMushroomBlockStateConfig
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 
 internal object RedMushroomBlockBehavior : BlockBehavior(RedMushroomBlockStateConfig, true)

@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.resources.builder.content
 
 import org.bukkit.Material
-import xyz.xenondevs.nova.addon.assets.AssetPack
+import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources

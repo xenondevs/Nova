@@ -15,8 +15,9 @@ object ToolCategoryRegistry {
     
     internal fun register(
         name: String,
+        breakBlockItemDamage: Int, attackEntityItemDamage: Int,
         multipliers: Map<Material, Double>
-    ): ToolCategory = register(name, multipliers) {
+    ): ToolCategory = register(name, breakBlockItemDamage, attackEntityItemDamage, multipliers) {
         if (it != null)
             ResourcePath(it.id.namespace, "item/${it.id.name}_$name")
         else ResourcePath("minecraft", "item/wooden_$name")
@@ -24,6 +25,7 @@ object ToolCategoryRegistry {
     
     internal fun register(
         name: String,
+        breakBlockItemDamage: Int, attackEntityItemDamage: Int,
         multipliers: Map<Material, Double>,
         getIcon: (ToolLevel?) -> ResourcePath
     ): ToolCategory {
@@ -32,20 +34,26 @@ object ToolCategoryRegistry {
         
         val category = ToolCategory(
             id,
-            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.speedMultiplier ?: multipliers[it.type] ?: 0.0 },
+            breakBlockItemDamage, attackEntityItemDamage,
+            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.speedMultiplier ?: multipliers[it.type] ?: 0.0 },
             getIcon
         )
         _categories[id] = category
         return category
     }
     
-    fun register(addon: Addon, name: String, getIcon: (ToolLevel?) -> ResourcePath): ToolCategory {
+    fun register(
+        addon: Addon, name: String,
+        breakBlockItemDamage: Int, attackEntityItemDamage: Int,
+        getIcon: (ToolLevel?) -> ResourcePath
+    ): ToolCategory {
         val id = NamespacedId(addon, name)
         check(id !in _categories) { "A ToolCategory is already registered under that id." }
         
         val category = ToolCategory(
             id,
-            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.speedMultiplier ?: 0.0 },
+            breakBlockItemDamage, attackEntityItemDamage,
+            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.speedMultiplier ?: 0.0 },
             getIcon
         )
         

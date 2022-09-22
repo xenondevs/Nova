@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.data.LazyArray
+import kotlin.math.min
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 
 @Suppress("MemberVisibilityCanBePrivate", "LeakingThis")
@@ -17,16 +18,16 @@ open class ItemNovaMaterial internal constructor(
     final override val id: NamespacedId,
     val localizedName: String,
     val novaItem: NovaItem,
+    maxStackSize: Int = 64
 ) : INovaMaterial {
     
-    val item: ItemModelData by lazy { Resources.getModelData(id).first!! }
-    val maxStackSize: Int
-        get() = item.material.maxStackSize
+    val item: ItemModelData by lazy { Resources.getModelData(id).first!![novaItem.vanillaMaterial]!! }
+    val maxStackSize: Int = min(maxStackSize, novaItem.vanillaMaterial.maxStackSize)
     
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            val itemDisplayData = novaItem.getItemDisplayData(itemStack)
+            val itemDisplayData = novaItem.getPacketItemData(itemStack)
             ItemWrapper(
                 item.createClientsideItemBuilder(
                     itemDisplayData.name,
@@ -40,7 +41,7 @@ open class ItemNovaMaterial internal constructor(
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            val itemDisplayData = novaItem.getItemDisplayData(itemStack)
+            val itemDisplayData = novaItem.getPacketItemData(itemStack)
             ItemWrapper(
                 novaItem.modifyItemBuilder(
                     item.createClientsideItemBuilder(

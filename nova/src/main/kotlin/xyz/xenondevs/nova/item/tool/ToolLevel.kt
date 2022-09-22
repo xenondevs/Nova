@@ -47,7 +47,7 @@ class ToolLevel(
             if (item == null)
                 return null
             
-            val novaLevel = item.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.level
+            val novaLevel = item.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.level
             if (novaLevel != null)
                 return novaLevel
             

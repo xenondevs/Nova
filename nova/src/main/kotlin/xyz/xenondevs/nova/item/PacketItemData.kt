@@ -1,8 +1,15 @@
 package xyz.xenondevs.nova.item
 
 import net.md_5.bungee.api.chat.BaseComponent
+import xyz.xenondevs.nova.item.vanilla.HideableFlag
 
-class ItemDisplayData {
+/**
+ * Stores data that should be added when creating the clientside item.
+ * 
+ * Note that all values contained in this class are only for display purposes and do not affect gameplay.
+ */
+@Suppress("MemberVisibilityCanBePrivate")
+class PacketItemData {
     
     /**
      * The displayed name of this item.
@@ -46,6 +53,11 @@ class ItemDisplayData {
         }
     
     /**
+     * The flags that should be hidden on this item.
+     */
+    var hiddenFlags: MutableList<HideableFlag>? = null
+    
+    /**
      * Adds multiple lore lines to the current lore.
      */
     fun addLore(lore: List<Array<BaseComponent>>) {
@@ -63,6 +75,16 @@ class ItemDisplayData {
             this.lore = ArrayList()
         
         this.lore!!.add(lore)
+    }
+    
+    /**
+     * Hides something from the item.
+     */
+    fun hide(vararg hideableFlags: HideableFlag) {
+        if (hiddenFlags == null)
+            hiddenFlags = ArrayList()
+        
+        hiddenFlags!!.addAll(hideableFlags)
     }
     
 }

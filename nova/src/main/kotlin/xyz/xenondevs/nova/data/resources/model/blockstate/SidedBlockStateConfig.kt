@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.model.config
+package xyz.xenondevs.nova.data.resources.model.blockstate
 
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState

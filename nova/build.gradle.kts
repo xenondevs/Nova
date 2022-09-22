@@ -94,7 +94,8 @@ remapStrings {
     classes.set(listOf(
         "xyz.xenondevs.nova.util.reflection.ReflectionRegistry",
         "xyz.xenondevs.nova.util.NMSUtils",
-        "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch"
+        "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch",
+        "xyz.xenondevs.nova.transformer.patch.ToolPatches"
     ))
 }
 

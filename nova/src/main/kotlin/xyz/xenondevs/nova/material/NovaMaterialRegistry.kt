@@ -41,7 +41,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         properties: List<BlockPropertyType<*>> = emptyList()
     ): TileEntityNovaMaterial {
         return registerTileEntity(
-            addon, name, options, tileEntityConstructor, NovaItem(TileEntityItemBehavior),
+            addon, name, options, tileEntityConstructor, NovaItem(TileEntityItemBehavior), 64,
             if (isInteractive) TileEntityBlock.INTERACTIVE else TileEntityBlock.NON_INTERACTIVE,
             properties, placeCheck, multiBlockLoader
         )
@@ -53,6 +53,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         options: BlockOptions,
         tileEntityConstructor: TileEntityConstructor,
         item: NovaItem = NovaItem(),
+        maxStackSize: Int = 64,
         block: NovaBlock<NovaTileEntityState>,
         properties: List<BlockPropertyType<*>> = emptyList(),
         placeCheck: PlaceCheckFun? = null,
@@ -60,8 +61,8 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     ): TileEntityNovaMaterial {
         val namespace = addon.description.id
         val material = TileEntityNovaMaterial(
-            NamespacedId(namespace, name), "block.$namespace.$name", item, block,
-            options, tileEntityConstructor, properties, placeCheck, multiBlockLoader
+            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize,
+            block, options, tileEntityConstructor, properties, placeCheck, multiBlockLoader
         )
         return register(material)
     }
@@ -71,6 +72,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         name: String,
         options: BlockOptions,
         item: NovaItem = NovaItem(),
+        maxStackSize: Int = 64,
         block: NovaBlock<NovaBlockState> = NovaBlock.Default,
         properties: List<BlockPropertyType<*>> = emptyList(),
         placeCheck: PlaceCheckFun? = null,
@@ -78,14 +80,19 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     ): BlockNovaMaterial {
         val namespace = addon.description.id
         val material = BlockNovaMaterial(
-            NamespacedId(namespace, name), "block.$namespace.$name", item, block,
-            options, properties, placeCheck, multiBlockLoader
+            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize,
+            block, options, properties, placeCheck, multiBlockLoader
         )
         return register(material)
     }
     
-    fun registerItem(addon: Addon, name: String, localizedName: String = "", novaItem: NovaItem = NovaItem()): ItemNovaMaterial {
-        return register(ItemNovaMaterial(NamespacedId(addon.description.id, name), localizedName, novaItem))
+    fun registerItem(addon: Addon, name: String, localizedName: String = "", novaItem: NovaItem = NovaItem(), maxStackSize: Int = 64): ItemNovaMaterial {
+        return register(ItemNovaMaterial(
+            NamespacedId(addon.description.id, name),
+            localizedName,
+            novaItem,
+            maxStackSize
+        ))
     }
     
     fun registerItem(addon: Addon, name: String, localizedName: String = "", vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
@@ -96,9 +103,14 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         ))
     }
     
-    fun registerDefaultItem(addon: Addon, name: String, novaItem: NovaItem = NovaItem()): ItemNovaMaterial {
+    fun registerDefaultItem(addon: Addon, name: String, novaItem: NovaItem = NovaItem(), maxStackSize: Int = 64): ItemNovaMaterial {
         val namespace = addon.description.id
-        return register(ItemNovaMaterial(NamespacedId(addon.description.id, name), "item.$namespace.$name", novaItem))
+        return register(ItemNovaMaterial(
+            NamespacedId(addon.description.id, name),
+            "item.$namespace.$name",
+            novaItem,
+            maxStackSize
+        ))
     }
     
     fun registerDefaultItem(addon: Addon, name: String, vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {

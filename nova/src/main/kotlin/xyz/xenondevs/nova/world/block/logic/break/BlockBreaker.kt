@@ -120,8 +120,8 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             if (player.gameMode == GameMode.CREATIVE || drops)
                 block.location.dropItems(block.getAllDrops(ctx))
             // Damage tool
-            if (player.gameMode != GameMode.CREATIVE && hardness > 0)
-                player.damageToolInMainHand()
+            if (player.gameMode != GameMode.CREATIVE && toolCategory != null && hardness > 0)
+                player.damageToolInMainHand(toolCategory.breakBlockItemDamage)
             // If the block broke instantaneously for the client, the effects will also be played clientside
             val effects = calculateClientsideDamage() < 1
             block.remove(ctx, effects, effects)

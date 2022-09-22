@@ -8,3 +8,8 @@ data class ToolOptions(
     val category: ToolCategory,
     val speedMultiplier: Double
 )
+
+data class DamageOptions(
+    val attackDamage: Double,
+    val attackSpeed: Double
+)

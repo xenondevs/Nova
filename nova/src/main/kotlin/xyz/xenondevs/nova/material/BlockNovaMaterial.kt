@@ -25,12 +25,13 @@ open class BlockNovaMaterial internal constructor(
     id: NamespacedId,
     localizedName: String,
     novaItem: NovaItem,
+    maxStackSize: Int,
     val novaBlock: NovaBlock<NovaBlockState>,
     options: BlockOptions,
     val properties: List<BlockPropertyType<*>>,
     val placeCheck: PlaceCheckFun?,
     val multiBlockLoader: MultiBlockLoader?
-) : ItemNovaMaterial(id, localizedName, novaItem) {
+) : ItemNovaMaterial(id, localizedName, novaItem, maxStackSize) {
     
     val block: BlockModelData by lazy { Resources.getModelData(id).second!! }
     
