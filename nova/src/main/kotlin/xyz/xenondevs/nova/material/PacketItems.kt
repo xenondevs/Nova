@@ -293,6 +293,9 @@ internal object PacketItems : Initializable(), Listener {
         // name
         val itemDisplayName = itemDisplayData.name
         if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
+            if (item.isEnchanted && itemDisplayName.size == 1)
+                itemDisplayName[0].color = ChatColor.AQUA
+            
             displayTag.putString("Name", itemDisplayName.serialize())
         }
         
