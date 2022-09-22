@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.world.pos
 class ToolCategory internal constructor(
     val id: NamespacedId,
     val canDoSweepAttack: Boolean,
+    val canBreakBlocksInCreative: Boolean,
     val breakBlockItemDamage: Int,
     val attackEntityItemDamage: Int,
     val getMultiplier: (ItemStack) -> Double,
@@ -37,9 +38,9 @@ class ToolCategory internal constructor(
         
         val SHOVEL = ToolCategoryRegistry.register(
             "shovel",
-            false,
-            1, 2,
-            mapOf(
+            canDoSweepAttack = false, canBreakBlocksInCreative = true,
+            breakBlockItemDamage = 1, attackEntityItemDamage = 2,
+            multipliers = mapOf(
                 Material.WOODEN_SHOVEL to 2.0,
                 Material.STONE_SHOVEL to 4.0,
                 Material.IRON_SHOVEL to 6.0,
@@ -51,9 +52,9 @@ class ToolCategory internal constructor(
         
         val PICKAXE = ToolCategoryRegistry.register(
             "pickaxe",
-            false,
-            1, 2,
-            mapOf(
+            false, canBreakBlocksInCreative = true,
+            breakBlockItemDamage = 1, attackEntityItemDamage = 2,
+            multipliers = mapOf(
                 Material.WOODEN_PICKAXE to 2.0,
                 Material.STONE_PICKAXE to 4.0,
                 Material.IRON_PICKAXE to 6.0,
@@ -65,9 +66,9 @@ class ToolCategory internal constructor(
         
         val AXE = ToolCategoryRegistry.register(
             "axe",
-            false,
-            1, 2,
-            mapOf(
+            false, canBreakBlocksInCreative = true,
+            breakBlockItemDamage = 1, attackEntityItemDamage = 2,
+            multipliers = mapOf(
                 Material.WOODEN_AXE to 2.0,
                 Material.STONE_AXE to 4.0,
                 Material.IRON_AXE to 6.0,
@@ -79,9 +80,9 @@ class ToolCategory internal constructor(
         
         val HOE = ToolCategoryRegistry.register(
             "hoe",
-            false,
-            1, 2,
-            mapOf(
+            false, canBreakBlocksInCreative = true,
+            breakBlockItemDamage = 1, attackEntityItemDamage = 2,
+            multipliers = mapOf(
                 Material.WOODEN_HOE to 2.0,
                 Material.STONE_HOE to 4.0,
                 Material.IRON_HOE to 6.0,
@@ -93,9 +94,9 @@ class ToolCategory internal constructor(
         
         val SWORD = ToolCategoryRegistry.register(
             "sword",
-            true,
-            2, 1,
-            mapOf(
+            true, canBreakBlocksInCreative = false,
+            breakBlockItemDamage = 2, attackEntityItemDamage = 1,
+            multipliers = mapOf(
                 Material.WOODEN_SWORD to 1.5,
                 Material.STONE_SWORD to 1.5,
                 Material.IRON_SWORD to 1.5,
@@ -107,9 +108,9 @@ class ToolCategory internal constructor(
         
         val SHEARS = ToolCategoryRegistry.register(
             "shears",
-            false,
-            1, 0,
-            mapOf(
+            false, canBreakBlocksInCreative = true,
+            breakBlockItemDamage = 1, attackEntityItemDamage = 0,
+            multipliers = mapOf(
                 Material.SHEARS to 1.5
             )
         ) { ResourcePath.of("minecraft:item/shears") }

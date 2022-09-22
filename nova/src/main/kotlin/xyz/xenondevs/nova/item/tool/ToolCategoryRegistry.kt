@@ -15,10 +15,10 @@ object ToolCategoryRegistry {
     
     internal fun register(
         name: String,
-        canDoSweepAttack: Boolean,
+        canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         breakBlockItemDamage: Int, attackEntityItemDamage: Int,
         multipliers: Map<Material, Double>
-    ): ToolCategory = register(name, canDoSweepAttack, breakBlockItemDamage, attackEntityItemDamage, multipliers) {
+    ): ToolCategory = register(name, canDoSweepAttack, canBreakBlocksInCreative, breakBlockItemDamage, attackEntityItemDamage, multipliers) {
         if (it != null)
             ResourcePath(it.id.namespace, "item/${it.id.name}_$name")
         else ResourcePath("minecraft", "item/wooden_$name")
@@ -26,7 +26,7 @@ object ToolCategoryRegistry {
     
     internal fun register(
         name: String,
-        canDoSweepAttack: Boolean,
+        canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         breakBlockItemDamage: Int, attackEntityItemDamage: Int,
         multipliers: Map<Material, Double>,
         getIcon: (ToolLevel?) -> ResourcePath
@@ -36,7 +36,7 @@ object ToolCategoryRegistry {
         
         val category = ToolCategory(
             id,
-            canDoSweepAttack,
+            canDoSweepAttack, canBreakBlocksInCreative,
             breakBlockItemDamage, attackEntityItemDamage,
             { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.breakSpeedMultiplier ?: multipliers[it.type] ?: 0.0 },
             getIcon
@@ -47,7 +47,7 @@ object ToolCategoryRegistry {
     
     fun register(
         addon: Addon, name: String,
-        canDoSweepAttack: Boolean,
+        canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         breakBlockItemDamage: Int, attackEntityItemDamage: Int,
         getIcon: (ToolLevel?) -> ResourcePath
     ): ToolCategory {
@@ -56,7 +56,7 @@ object ToolCategoryRegistry {
         
         val category = ToolCategory(
             id,
-            canDoSweepAttack,
+            canDoSweepAttack, canBreakBlocksInCreative,
             breakBlockItemDamage, attackEntityItemDamage,
             { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.breakSpeedMultiplier ?: 0.0 },
             getIcon
