@@ -45,8 +45,15 @@ object LocaleManager : Initializable() {
             
             synchronized(LocaleManager) {
                 translationProviders.getOrPut(lang, ::HashMap) += translations
+                loadedLangs += lang
+                loadingLangs -= lang
             }
         }
+    }
+    
+    @Synchronized
+    fun getAllTranslations(key: String, vararg args: Any): Set<String> {
+        return loadedLangs.mapTo(HashSet()) { getTranslation(it, key, *args) }
     }
     
     @Synchronized

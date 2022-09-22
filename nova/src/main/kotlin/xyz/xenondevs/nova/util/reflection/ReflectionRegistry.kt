@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LinearPalette
@@ -52,6 +54,9 @@ internal object ReflectionRegistry {
     val ITEM_STACK_HURT_AND_BREAK_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack hurtAndBreak)", Int::class.java, MojangLivingEntity::class.java, Consumer::class.java)
     val ITEM_STACK_HURT_ENTITY_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack hurtEnemy)", MojangLivingEntity::class.java, MojangPlayer::class.java)
     val PLAYER_ATTACK_METHOD = getMethod(MojangPlayer::class.java, false, "SRM(net.minecraft.world.entity.player.Player attack)", MojangEntity::class.java)
+    val ANVIL_MENU_CREATE_RESULT_METHOD = getMethod(AnvilMenu::class.java, false, "SRM(net.minecraft.world.inventory.AnvilMenu createResult)")
+    val ITEM_STACK_GET_HOVER_NAME_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack getHoverName)")
+    val ITEM_STACK_SET_HOVER_NAME_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack setHoverName)", Component::class.java)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
