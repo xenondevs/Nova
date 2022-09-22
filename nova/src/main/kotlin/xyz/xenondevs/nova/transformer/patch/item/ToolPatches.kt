@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.transformer.patch
+package xyz.xenondevs.nova.transformer.patch.item
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps

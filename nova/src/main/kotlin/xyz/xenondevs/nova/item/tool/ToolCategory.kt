@@ -119,7 +119,7 @@ class ToolCategory internal constructor(
             if (item == null)
                 return null
             
-            val novaCategory = item.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.category
+            val novaCategory = item.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.category
             if (novaCategory != null)
                 return novaCategory
             

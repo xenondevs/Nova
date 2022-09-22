@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.transformer.patch
+package xyz.xenondevs.nova.transformer.patch.item
 
 import org.apache.commons.lang3.StringUtils
 import org.objectweb.asm.Opcodes
@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import java.io.File
 import kotlin.reflect.jvm.javaMethod
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -24,8 +23,6 @@ internal object AnvilRenamingPatch : MethodTransformer(ReflectionRegistry.ANVIL_
             it.opcode == Opcodes.INVOKESTATIC && (it as MethodInsnNode).callsMethod(StringUtils::isBlank.javaMethod!!)
                 && it.previous?.opcode == Opcodes.GETFIELD
         }
-        
-        File("out.class").writeBytes(classWrapper.assemble(true))
     }
     
     @JvmStatic

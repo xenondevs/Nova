@@ -2,8 +2,10 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
+import net.minecraft.util.RandomSource
 import net.minecraft.world.inventory.AnvilMenu
+import net.minecraft.world.item.enchantment.EnchantmentCategory
+import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LinearPalette
@@ -28,6 +30,7 @@ import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.entity.player.Player as MojangPlayer
+import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -55,8 +58,12 @@ internal object ReflectionRegistry {
     val ITEM_STACK_HURT_ENTITY_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack hurtEnemy)", MojangLivingEntity::class.java, MojangPlayer::class.java)
     val PLAYER_ATTACK_METHOD = getMethod(MojangPlayer::class.java, false, "SRM(net.minecraft.world.entity.player.Player attack)", MojangEntity::class.java)
     val ANVIL_MENU_CREATE_RESULT_METHOD = getMethod(AnvilMenu::class.java, false, "SRM(net.minecraft.world.inventory.AnvilMenu createResult)")
-    val ITEM_STACK_GET_HOVER_NAME_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack getHoverName)")
-    val ITEM_STACK_SET_HOVER_NAME_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack setHoverName)", Component::class.java)
+    val ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD = getMethod(EnchantmentHelper::class.java, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getAvailableEnchantmentResults)", Int::class.java, MojangStack::class.java, Boolean::class.java)
+    val ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD = getMethod(EnchantmentHelper::class.java, true, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getEnchantmentCost)", RandomSource::class.java, Int::class.java, Int::class.java, MojangStack::class.java)
+    val ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD = getMethod(EnchantmentHelper::class.java, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper selectEnchantment)", RandomSource::class.java, MojangStack::class.java, Int::class.java, Boolean::class.java)
+    val ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD = getMethod(EnchantmentCategory::class.java, false, "SRM(net.minecraft.item.enchantment.EnchantmentCategory canEnchant)", MojangItem::class.java)
+    val ITEM_IS_ENCHANTABLE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item isEnchantable)", MojangStack::class.java)
+    val ITEM_GET_ENCHANTMENT_VALUE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item getEnchantmentValue)")
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

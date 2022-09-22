@@ -21,45 +21,45 @@ import kotlin.math.roundToInt
 private const val PLAYER_ATTACK_SPEED = 4.0
 private const val PLAYER_ATTACK_DAMAGE = 1.0
 
-class Tool(val toolOptions: ToolOptions) : ItemBehavior() {
+class Tool(val options: ToolOptions) : ItemBehavior() {
     
     override val vanillaMaterialProperties = buildList { 
         this += VanillaMaterialProperty.DAMAGEABLE
-        if (toolOptions.category.canBreakBlocksInCreative)
+        if (!options.category.canBreakBlocksInCreative)
             this += VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING
     }
     
     override val attributeModifiers = buildList {
-        if (toolOptions.attackSpeed > 0) {
+        if (options.attackSpeed > 0) {
             this += AttributeModifier(
                 Attribute.GENERIC_ATTACK_SPEED,
                 AttributeModifier.Operation.INCREMENT,
-                toolOptions.attackSpeed - PLAYER_ATTACK_SPEED,
+                options.attackSpeed - PLAYER_ATTACK_SPEED,
                 EquipmentSlot.MAINHAND
             )
         }
-        if (toolOptions.attackDamage > 0) {
+        if (options.attackDamage > 0) {
             this += AttributeModifier(
                 Attribute.GENERIC_ATTACK_DAMAGE,
                 AttributeModifier.Operation.INCREMENT,
-                toolOptions.attackDamage - PLAYER_ATTACK_DAMAGE,
+                options.attackDamage - PLAYER_ATTACK_DAMAGE,
                 EquipmentSlot.MAINHAND
             )
         }
     }
     
     override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
-        if (toolOptions.attackDamage > 0 && toolOptions.attackSpeed > 0) {
+        if (options.attackDamage > 0 && options.attackSpeed > 0) {
             itemData.addLore(arrayOf(TextComponent(" ")))
             itemData.addLore(arrayOf(localized(ChatColor.GRAY, "item.modifiers.mainhand")))
             
             val mojangStack = itemStack.nmsStack
-            val attackDamage = (toolOptions.attackDamage + EnchantmentHelper.getDamageBonus(mojangStack, MobType.UNDEFINED)).roundToInt()
+            val attackDamage = (options.attackDamage + EnchantmentHelper.getDamageBonus(mojangStack, MobType.UNDEFINED)).roundToInt()
             itemData.addLore(ComponentBuilder(" $attackDamage ")
                 .color(ChatColor.DARK_GREEN)
                 .appendLocalized("attribute.name.generic.attack_damage")
                 .create())
-            itemData.addLore(ComponentBuilder(" ${toolOptions.attackSpeed} ")
+            itemData.addLore(ComponentBuilder(" ${options.attackSpeed} ")
                 .color(ChatColor.DARK_GREEN)
                 .appendLocalized("attribute.name.generic.attack_speed")
                 .create())

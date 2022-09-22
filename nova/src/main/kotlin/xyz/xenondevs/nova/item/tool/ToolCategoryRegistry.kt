@@ -18,7 +18,12 @@ object ToolCategoryRegistry {
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         breakBlockItemDamage: Int, attackEntityItemDamage: Int,
         multipliers: Map<Material, Double>
-    ): ToolCategory = register(name, canDoSweepAttack, canBreakBlocksInCreative, breakBlockItemDamage, attackEntityItemDamage, multipliers) {
+    ): ToolCategory = register(
+        name,
+        canDoSweepAttack, canBreakBlocksInCreative,
+        breakBlockItemDamage, attackEntityItemDamage,
+        multipliers
+    ) {
         if (it != null)
             ResourcePath(it.id.namespace, "item/${it.id.name}_$name")
         else ResourcePath("minecraft", "item/wooden_$name")
@@ -38,7 +43,7 @@ object ToolCategoryRegistry {
             id,
             canDoSweepAttack, canBreakBlocksInCreative,
             breakBlockItemDamage, attackEntityItemDamage,
-            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.breakSpeedMultiplier ?: multipliers[it.type] ?: 0.0 },
+            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.breakSpeedMultiplier ?: multipliers[it.type] ?: 0.0 },
             getIcon
         )
         _categories[id] = category
@@ -58,7 +63,7 @@ object ToolCategoryRegistry {
             id,
             canDoSweepAttack, canBreakBlocksInCreative,
             breakBlockItemDamage, attackEntityItemDamage,
-            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.toolOptions?.breakSpeedMultiplier ?: 0.0 },
+            { it.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.breakSpeedMultiplier ?: 0.0 },
             getIcon
         )
         
