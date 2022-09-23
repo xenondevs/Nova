@@ -10,15 +10,17 @@ import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethodByName
 import kotlin.reflect.jvm.javaMethod
 import net.minecraft.world.item.ItemStack as MojangStack
 
+@Suppress("unused")
 internal object AnvilRenamingPatch : MethodTransformer(ReflectionRegistry.ANVIL_MENU_CREATE_RESULT_METHOD, computeFrames = true) {
     
     override fun transform() {
         methodNode.replaceFirst(0, 0, buildInsnList {
             aLoad(1)
-            invokeStatic(::isNotCustomName.javaMethod!!)
+            invokeStatic(getMethodByName(AnvilRenamingPatch::class.java, false, "isNotCustomName"))
         }) {
             it.opcode == Opcodes.INVOKESTATIC && (it as MethodInsnNode).calls(StringUtils::isBlank.javaMethod!!)
                 && it.previous?.opcode == Opcodes.GETFIELD

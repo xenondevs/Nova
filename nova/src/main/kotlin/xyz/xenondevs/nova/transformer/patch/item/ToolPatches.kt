@@ -13,6 +13,7 @@ import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.TypeInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
+import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.item.tool.ToolCategory
@@ -23,12 +24,13 @@ import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethodByName
 import xyz.xenondevs.nova.util.resourceLocation
 import java.util.function.Consumer
-import kotlin.reflect.jvm.javaMethod
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 
+@Suppress("unused")
 internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangStack::class, MojangPlayer::class), true) {
     
     override fun transform() {
@@ -43,12 +45,12 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * Patches the CraftBlock#isPreferredTool method to properly handle Nova's tools.
      */
     private fun transformCraftBlockIsPreferredTool() {
-        classWrappers[CraftBlock::class.internalName]!![ReflectionRegistry.CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD]!!
+        VirtualClassPath[ReflectionRegistry.CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD]
             .instructions = buildInsnList {
             aLoad(0)
             aLoad(1)
             aLoad(2)
-            invokeStatic(::isPreferredTool.javaMethod!!)
+            invokeStatic(getMethodByName(ToolPatches::class.java, false, "isPreferredTool"))
             ireturn()
         }
     }
@@ -62,12 +64,12 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * Patches the ItemStack#getAttributeModifiers to return to correct modifiers for Nova's tools.
      */
     private fun transformItemStackGetAttributeModifiers() {
-        classWrappers[MojangStack::class.internalName]!![ReflectionRegistry.ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD]!!
+        VirtualClassPath[ReflectionRegistry.ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD]
             .replaceFirst(2, 0, buildInsnList {
                 aLoad(0)
                 aLoad(2)
                 checkCast(Multimap::class.internalName)
-                invokeStatic(::modifyAttributeModifiers.javaMethod!!)
+                invokeStatic(getMethodByName(ToolPatches::class.java, false, "modifyAttributeModifiers"))
                 areturn()
             }) { it.opcode == Opcodes.ARETURN }
     }
@@ -98,13 +100,13 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * Patches the ItemStack#hurtAndBreak method to properly damage Nova's tools.
      */
     private fun transformItemStackHurtAndBreak() {
-        classWrappers[MojangStack::class.internalName]!![ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD]!!
+        VirtualClassPath[ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD]
             .instructions = buildInsnList {
             aLoad(0)
             iLoad(1)
             aLoad(2)
             aLoad(3)
-            invokeStatic(::hurtAndBreak.javaMethod!!)
+            invokeStatic(getMethodByName(ToolPatches::class.java, false, "hurtAndBreak"))
             _return()
         }
     }
@@ -121,11 +123,11 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * defined in their tool category.
      */
     private fun transformItemStackHurtEnemy() {
-        classWrappers[MojangStack::class.internalName]!![ReflectionRegistry.ITEM_STACK_HURT_ENTITY_METHOD]!!
+        VirtualClassPath[ReflectionRegistry.ITEM_STACK_HURT_ENTITY_METHOD]
             .instructions = buildInsnList {
             aLoad(0)
             aLoad(2)
-            invokeStatic(::hurtEnemy.javaMethod!!)
+            invokeStatic(getMethodByName(ToolPatches::class.java, false, "hurtEnemy"))
             _return()
         }
     }
@@ -146,9 +148,9 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * Patches the Player#attack method to use [ToolCategory.canDoSweepAttack] instead of the default sword check
      */
     private fun transformPlayerAttack() {
-        classWrappers[MojangPlayer::class.internalName]!![ReflectionRegistry.PLAYER_ATTACK_METHOD]!!
+        VirtualClassPath[ReflectionRegistry.PLAYER_ATTACK_METHOD]
             .replaceFirst(1, 0, buildInsnList {
-                invokeStatic(::canDoSweepAttack.javaMethod!!)
+                invokeStatic(getMethodByName(ToolPatches::class.java, false, "canDoSweepAttack"))
             }) { it.opcode == Opcodes.INSTANCEOF && (it as TypeInsnNode).desc == "SRC/(net.minecraft.world.item.SwordItem)" }
     }
     

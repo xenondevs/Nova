@@ -62,7 +62,7 @@ internal object ReflectionRegistry {
     val ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD = getMethod(EnchantmentHelper::class.java, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getAvailableEnchantmentResults)", Int::class.java, MojangStack::class.java, Boolean::class.java)
     val ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD = getMethod(EnchantmentHelper::class.java, true, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getEnchantmentCost)", RandomSource::class.java, Int::class.java, Int::class.java, MojangStack::class.java)
     val ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD = getMethod(EnchantmentHelper::class.java, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper selectEnchantment)", RandomSource::class.java, MojangStack::class.java, Int::class.java, Boolean::class.java)
-    val ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD = getMethod(EnchantmentCategory::class.java, false, "SRM(net.minecraft.item.enchantment.EnchantmentCategory canEnchant)", MojangItem::class.java)
+    val ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD = getMethod(EnchantmentCategory::class.java, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentCategory canEnchant)", MojangItem::class.java)
     val ITEM_IS_ENCHANTABLE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item isEnchantable)", MojangStack::class.java)
     val ITEM_GET_ENCHANTMENT_VALUE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item getEnchantmentValue)")
     val EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD = getMethod(ExperienceOrb::class.java, true, "SRM(net.minecraft.world.entity.ExperienceOrb repairPlayerItems)", MojangPlayer::class.java, Int::class.java)
