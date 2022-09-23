@@ -8,7 +8,7 @@ import net.minecraft.world.item.enchantment.Enchantments
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
-import xyz.xenondevs.bytebase.util.callsMethod
+import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.item.behavior.Damageable
@@ -32,27 +32,25 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     private fun patchEnchantmentTableEnchanting() {
         val enchantmentHelperWrapper = classWrappers[EnchantmentHelper::class.internalName]!!
         
-        enchantmentHelperWrapper
-            .getMethodLike(ReflectionRegistry.ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD)!!
+        enchantmentHelperWrapper[ReflectionRegistry.ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD]!!
             .replaceFirst(1, 0, buildInsnList {
                 aLoad(1)
                 invokeStatic(EnchantmentPatches::canEnchantItemWith.javaMethod!!)
-            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).callsMethod(ReflectionRegistry.ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD) }
+            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ReflectionRegistry.ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD) }
         
         val enchantmentValueAccessingMethods = mapOf(
-            enchantmentHelperWrapper.getMethodLike(ReflectionRegistry.ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD)!! to 3,
-            enchantmentHelperWrapper.getMethodLike(ReflectionRegistry.ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD)!! to 1
+            enchantmentHelperWrapper[ReflectionRegistry.ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD]!! to 3,
+            enchantmentHelperWrapper[ReflectionRegistry.ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD]!! to 1
         )
         
         enchantmentValueAccessingMethods.forEach { (method, localIdx) ->
             method.replaceFirst(1, 0, buildInsnList {
                 aLoad(localIdx)
                 invokeStatic(::getEnchantmentValue.javaMethod!!)
-            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).callsMethod(ReflectionRegistry.ITEM_GET_ENCHANTMENT_VALUE_METHOD) }
+            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ReflectionRegistry.ITEM_GET_ENCHANTMENT_VALUE_METHOD) }
         }
-        
-        classWrappers[MojangItem::class.internalName]!!
-            .getMethodLike(ReflectionRegistry.ITEM_IS_ENCHANTABLE_METHOD)!!
+    
+        classWrappers[MojangItem::class.internalName]!![ReflectionRegistry.ITEM_IS_ENCHANTABLE_METHOD]!!
             .instructions = buildInsnList {
             aLoad(1)
             aLoad(0)
@@ -93,8 +91,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     }
     
     private fun patchMending() {
-        classWrappers[ExperienceOrb::class.internalName]!!
-            .getMethodLike(ReflectionRegistry.EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD)!!
+        classWrappers[ExperienceOrb::class.internalName]!![ReflectionRegistry.EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD]!!
             .instructions = buildInsnList {
             aLoad(0)
             aLoad(1)

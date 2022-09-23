@@ -43,8 +43,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * Patches the CraftBlock#isPreferredTool method to properly handle Nova's tools.
      */
     private fun transformCraftBlockIsPreferredTool() {
-        classWrappers[CraftBlock::class.internalName]!!
-            .getMethodLike(ReflectionRegistry.CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD)!!
+        classWrappers[CraftBlock::class.internalName]!![ReflectionRegistry.CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD]!!
             .instructions = buildInsnList {
             aLoad(0)
             aLoad(1)
@@ -63,8 +62,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * Patches the ItemStack#getAttributeModifiers to return to correct modifiers for Nova's tools.
      */
     private fun transformItemStackGetAttributeModifiers() {
-        classWrappers[MojangStack::class.internalName]!!
-            .getMethodLike(ReflectionRegistry.ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD)!!
+        classWrappers[MojangStack::class.internalName]!![ReflectionRegistry.ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD]!!
             .replaceFirst(2, 0, buildInsnList {
                 aLoad(0)
                 aLoad(2)
@@ -100,8 +98,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * Patches the ItemStack#hurtAndBreak method to properly damage Nova's tools.
      */
     private fun transformItemStackHurtAndBreak() {
-        classWrappers[MojangStack::class.internalName]!!
-            .getMethodLike(ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD)!!
+        classWrappers[MojangStack::class.internalName]!![ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD]!!
             .instructions = buildInsnList {
             aLoad(0)
             iLoad(1)
@@ -124,8 +121,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * defined in their tool category.
      */
     private fun transformItemStackHurtEnemy() {
-        classWrappers[MojangStack::class.internalName]!!
-            .getMethodLike(ReflectionRegistry.ITEM_STACK_HURT_ENTITY_METHOD)!!
+        classWrappers[MojangStack::class.internalName]!![ReflectionRegistry.ITEM_STACK_HURT_ENTITY_METHOD]!!
             .instructions = buildInsnList {
             aLoad(0)
             aLoad(2)
@@ -150,8 +146,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
      * Patches the Player#attack method to use [ToolCategory.canDoSweepAttack] instead of the default sword check
      */
     private fun transformPlayerAttack() {
-        classWrappers[MojangPlayer::class.internalName]!!
-            .getMethodLike(ReflectionRegistry.PLAYER_ATTACK_METHOD)!!
+        classWrappers[MojangPlayer::class.internalName]!![ReflectionRegistry.PLAYER_ATTACK_METHOD]!!
             .replaceFirst(1, 0, buildInsnList {
                 invokeStatic(::canDoSweepAttack.javaMethod!!)
             }) { it.opcode == Opcodes.INSTANCEOF && (it as TypeInsnNode).desc == "SRC/(net.minecraft.world.item.SwordItem)" }

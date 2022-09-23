@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
-import xyz.xenondevs.bytebase.util.callsMethod
+import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.transformer.MethodTransformer
@@ -20,7 +20,7 @@ internal object AnvilRenamingPatch : MethodTransformer(ReflectionRegistry.ANVIL_
             aLoad(1)
             invokeStatic(::isNotCustomName.javaMethod!!)
         }) {
-            it.opcode == Opcodes.INVOKESTATIC && (it as MethodInsnNode).callsMethod(StringUtils::isBlank.javaMethod!!)
+            it.opcode == Opcodes.INVOKESTATIC && (it as MethodInsnNode).calls(StringUtils::isBlank.javaMethod!!)
                 && it.previous?.opcode == Opcodes.GETFIELD
         }
     }
