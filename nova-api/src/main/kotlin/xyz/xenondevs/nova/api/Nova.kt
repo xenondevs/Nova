@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.api
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.api.block.BlockManager
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.api.player.WailaManager
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager
 import xyz.xenondevs.nova.loader.NovaLoader
@@ -30,6 +31,11 @@ interface Nova {
      * To look up nova materials
      */
     val materialRegistry: NovaMaterialRegistry
+    
+    /**
+     * Manages the WAILA overlay
+     */
+    val wailaManager: WailaManager
     
     /**
      * Registers a [ProtectionIntegration]
