@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.getAllDrops
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
-import xyz.xenondevs.nova.util.item.damageToolInMainHand
+import xyz.xenondevs.nova.util.item.damageToolBreakBlock
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.particleBuilder
@@ -89,7 +89,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
     protected abstract val requiresToolForDrops: Boolean
     
     protected val hardness: Double = block.hardness
-    protected val tool: ItemStack = player.inventory.itemInMainHand
+    protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessAir()
     protected val toolCategory: ToolCategory? = ToolCategory.ofItem(tool)
     protected val correctCategory: Boolean = toolCategory != null && toolCategory.isCorrectToolCategoryForBlock(block)
     protected val correctLevel: Boolean = ToolLevel.isCorrectLevel(block, tool)
@@ -131,7 +131,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
                 block.location.dropItems(block.getAllDrops(ctx))
             // Damage tool
             if (player.gameMode != GameMode.CREATIVE && toolCategory != null && hardness > 0)
-                player.damageToolInMainHand(toolCategory.breakBlockItemDamage)
+                player.damageToolBreakBlock()
             // If the block broke instantaneously for the client, the effects will also be played clientside
             val effects = clientsideDamage < 1
             block.remove(ctx, effects, effects)
@@ -193,7 +193,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
     }
     
     private fun calculateDamage(): Double {
-        return ToolUtils.calculateDamage(player, block, tool, toolCategory, hardness, correctCategory, drops)
+        return ToolUtils.calculateDamage(player, block, tool, hardness, correctCategory, drops)
     }
     
     protected abstract fun handleBreakTick()

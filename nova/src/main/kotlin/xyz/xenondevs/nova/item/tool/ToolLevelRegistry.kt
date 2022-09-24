@@ -30,4 +30,6 @@ object ToolLevelRegistry {
     
     fun of(id: NamespacedId): ToolLevel? = _levels[id]
     
+    fun of(name: String): ToolLevel? = _levels[NamespacedId.of(name, "minecraft")]
+    
 }

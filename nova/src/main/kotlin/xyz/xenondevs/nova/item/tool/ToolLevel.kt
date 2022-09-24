@@ -63,7 +63,7 @@ class ToolLevel(
             }
         }
         
-        fun isCorrectLevel(block: Block, tool: ItemStack): Boolean {
+        fun isCorrectLevel(block: Block, tool: ItemStack?): Boolean {
             val toolLevel = ofItem(tool)
             
             val novaMaterial = BlockManager.getBlock(block.pos)?.material

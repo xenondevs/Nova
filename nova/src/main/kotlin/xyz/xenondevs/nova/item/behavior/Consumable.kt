@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.material.options.FoodOptions
-import xyz.xenondevs.nova.material.options.FoodType
+import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.util.isRightClick
@@ -119,9 +119,8 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
         player.saturation = min(player.saturation + options.nutrition * options.saturationModifier * 2.0f, player.foodLevel.toFloat())
         player.health = min(player.health + options.instantHealth, player.genericMaxHealth)
         
-        // effects and custom code
+        // effects
         options.effects?.forEach { player.addPotionEffect(it) }
-        options.custom?.invoke(player)
         
         // sounds
         player.location.playSoundNearby(SOUND_DISTANCE, Sound.ENTITY_PLAYER_BURP, 0.5f, Random.nextDouble(0.9, 1.0).toFloat())

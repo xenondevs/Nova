@@ -16,10 +16,14 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.bytebase.util.replaceFirst
+import xyz.xenondevs.nova.item.behavior.Damageable
+import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.tool.ToolCategory
+import xyz.xenondevs.nova.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.item.ToolDamageResult
+import xyz.xenondevs.nova.util.item.DamageableUtils
+import xyz.xenondevs.nova.util.item.ItemDamageResult
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.takeUnlessAir
@@ -57,7 +61,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
     
     @JvmStatic
     fun isPreferredTool(block: CraftBlock, blockState: BlockState, tool: MojangStack): Boolean {
-        return !blockState.requiresCorrectToolForDrops() || ToolUtils.isCorrectToolForDrops(tool.bukkitMirror.takeUnlessAir(), block)
+        return !blockState.requiresCorrectToolForDrops() || ToolUtils.isCorrectToolForDrops(block, tool.bukkitMirror.takeUnlessAir())
     }
     
     /**
@@ -113,14 +117,13 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
     
     @JvmStatic
     fun hurtAndBreak(itemStack: MojangStack, damage: Int, entity: LivingEntity, consumer: Consumer<LivingEntity>) {
-        if (ToolUtils.damageAndBreakTool(itemStack, damage, entity) == ToolDamageResult.BROKEN) {
+        if (DamageableUtils.damageAndBreakItem(itemStack, damage, entity) == ItemDamageResult.BROKEN) {
             consumer.accept(entity)
         }
     }
     
     /**
-     * Patches the ItemStack#hurtEnemy method to properly damage Nova's tools and with the proper damage values
-     * defined in their tool category.
+     * Patches the ItemStack#hurtEnemy method to properly damage Nova's tools and with the proper damage values.
      */
     private fun transformItemStackHurtEnemy() {
         VirtualClassPath[ReflectionRegistry.ITEM_STACK_HURT_ENTITY_METHOD]
@@ -134,10 +137,16 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
     
     @JvmStatic
     fun hurtEnemy(itemStack: MojangStack, player: MojangPlayer) {
-        val damage = ToolCategory.ofItem(itemStack.bukkitMirror)?.attackEntityItemDamage ?: return
+        val novaMaterial = itemStack.novaMaterial
         
-        if (itemStack.novaMaterial == null)
+        val damage = if (novaMaterial != null) {
+            val damageable = novaMaterial.novaItem.getBehavior(Damageable::class) ?: return
+            damageable.options.itemDamageOnAttackEntity
+        } else {
+            val category = ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory ?: return
             player.awardStat(Stats.ITEM_USED.get(itemStack.item))
+            category.itemDamageOnAttackEntity
+        }
         
         itemStack.hurtAndBreak(damage, player) {
             player.broadcastBreakEvent(EquipmentSlot.MAINHAND)
@@ -145,7 +154,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
     }
     
     /**
-     * Patches the Player#attack method to use [ToolCategory.canDoSweepAttack] instead of the default sword check
+     * Patches the Player#attack method to use properly perform sweep attacks.
      */
     private fun transformPlayerAttack() {
         VirtualClassPath[ReflectionRegistry.PLAYER_ATTACK_METHOD]
@@ -156,7 +165,13 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
     
     @JvmStatic
     fun canDoSweepAttack(itemStack: MojangStack): Boolean {
-        return ToolCategory.ofItem(itemStack.bukkitMirror)?.canDoSweepAttack ?: false
+        val novaMaterial = itemStack.novaMaterial
+    
+        return if (novaMaterial != null) {
+            novaMaterial.novaItem.getBehavior(Tool::class)?.options?.canSweepAttack ?: false
+        } else {
+            (ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory)?.canSweepAttack ?: false
+        }
     }
     
 }

@@ -1,11 +1,7 @@
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
+
 package xyz.xenondevs.nova.util.item
 
-import net.minecraft.advancements.CriteriaTriggers
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.stats.Stats
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.item.enchantment.EnchantmentHelper
-import net.minecraft.world.item.enchantment.Enchantments
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -16,111 +12,71 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
+import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolLevel
+import xyz.xenondevs.nova.item.tool.VanillaToolCategory
+import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.eyeInWater
+import xyz.xenondevs.nova.util.nmsStack
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
-import kotlin.random.Random
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
-import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
-import org.bukkit.inventory.meta.Damageable as BukkitDamageable
 import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
 
+/**
+ * Damages the tool in the [player's][Player] main hand by [damage] amount.
+ */
 fun Player.damageToolInMainHand(damage: Int = 1) {
     val serverPlayer = serverPlayer
-    if (ToolUtils.damageAndBreakTool(serverPlayer.mainHandItem, damage, serverPlayer) == ToolDamageResult.BROKEN) {
+    if (DamageableUtils.damageAndBreakItem(serverPlayer.mainHandItem, damage, serverPlayer) == ItemDamageResult.BROKEN) {
+        serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.MAINHAND)
+    }
+}
+
+/**
+ * Damages the tool in the [player's][Player] main hand as if they've broken a block.
+ */
+fun Player.damageToolBreakBlock() = damageToolInMainHand {
+    val novaItem = it.novaMaterial?.novaItem
+    if (novaItem != null) {
+        if (novaItem.hasBehavior(Tool::class)) {
+            novaItem.getBehavior(NovaDamageable::class)?.options?.itemDamageOnBreakBlock ?: 0
+        } else 0
+    } else (ToolCategory.ofItem(it.bukkitMirror) as? VanillaToolCategory)?.itemDamageOnBreakBlock ?: 0
+}
+
+/**
+ * Damages the tool in the [player's][Player] main hand as if they've attack an entity.
+ */
+fun Player.damageToolAttackEntity() = damageToolInMainHand {
+    val novaItem = it.novaMaterial?.novaItem
+    if (novaItem != null) {
+        if (novaItem.hasBehavior(Tool::class)) {
+            novaItem.getBehavior(NovaDamageable::class)?.options?.itemDamageOnAttackEntity ?: 0
+        } else 0
+    } else (ToolCategory.ofItem(it.bukkitMirror) as? VanillaToolCategory)?.itemDamageOnAttackEntity ?: 0
+}
+
+internal inline fun Player.damageToolInMainHand(damageReceiver: (MojangStack) -> Int) {
+    val serverPlayer = serverPlayer
+    val itemStack = serverPlayer.mainHandItem
+    val damage = damageReceiver(itemStack)
+    
+    if (damage <= 0)
+        return
+    
+    if (DamageableUtils.damageAndBreakItem(itemStack, damage, serverPlayer) == ItemDamageResult.BROKEN) {
         serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.MAINHAND)
     }
 }
 
 object ToolUtils {
     
-    /**
-     * Damages the given [item] while taking the unbreaking enchantment and unbreakable property into account.
-     *
-     * This method works for both Vanilla and Nova tools.
-     *
-     * @return The same [ItemStack] with the durability possibly reduced or null if the item was broken.
-     */
-    fun damageTool(item: ItemStack, damage: Int = 1): ItemStack? {
-        val meta = item.itemMeta ?: return item
-        
-        if (meta.isUnbreakable)
-            return item
-        
-        val unbreakingLevel = meta.getEnchantLevel(Enchantment.DURABILITY)
-        if (unbreakingLevel > 0 && Random.nextInt(0, unbreakingLevel + 1) > 0)
-            return item
-        
-        val novaDamageable = item.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
-        if (novaDamageable != null) {
-            val newDamage = novaDamageable.getDamage(item) + damage
-            novaDamageable.setDamage(item, newDamage)
-            if (newDamage >= novaDamageable.maxDurability)
-                return null
-        } else if (meta is BukkitDamageable && item.type.maxDurability > 0) {
-            meta.damage += damage
-            if (meta.damage >= item.type.maxDurability)
-                return null
-            item.itemMeta = meta
-        }
-        
-        return item
-    }
-    
-    /**
-     * Damages an [itemStack] with damage amount [damage] for [player].
-     *
-     * This method takes the unbreaking enchantment into consideration and also calls the item_durability_changed
-     * criteria trigger if [player] is not null.
-     *
-     * @return If the item is now broken
-     */
-    internal fun damageAndBreakTool(itemStack: MojangStack, damage: Int, entity: LivingEntity?): ToolDamageResult {
-        if (entity is MojangPlayer && entity.abilities.instabuild)
-            return ToolDamageResult.UNDAMAGED
-        
-        val unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, itemStack)
-        if (unbreakingLevel > 0 && Random.nextInt(0, unbreakingLevel + 1) > 0)
-            return ToolDamageResult.UNDAMAGED
-        
-        var broken = false
-        
-        val novaDamageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
-        if (novaDamageable != null) {
-            val bukkitStack = itemStack.bukkitMirror
-            
-            if (entity is ServerPlayer)
-                CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger(entity, itemStack, novaDamageable.getDamage(bukkitStack) + damage)
-            
-            val newDamage = novaDamageable.getDamage(bukkitStack) + damage
-            novaDamageable.setDamage(bukkitStack, newDamage)
-            if (newDamage >= novaDamageable.maxDurability)
-                broken = true
-        } else if (itemStack.isDamageableItem) {
-            if (entity is ServerPlayer)
-                CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger(entity, itemStack, itemStack.damageValue + damage)
-            
-            itemStack.damageValue += damage
-            if (itemStack.damageValue >= itemStack.maxDamage)
-                broken = true
-        } else return ToolDamageResult.UNDAMAGED
-        
-        if (broken) {
-            itemStack.shrink(1)
-            if (entity is MojangPlayer && novaDamageable != null) {
-                entity.awardStat(Stats.ITEM_BROKEN.get(itemStack.item))
-            }
-        }
-        
-        return if (broken) ToolDamageResult.BROKEN else ToolDamageResult.DAMAGED
-    }
-    
-    fun isCorrectToolForDrops(tool: ItemStack?, block: Block): Boolean {
+    fun isCorrectToolForDrops(block: Block, tool: ItemStack?): Boolean {
         val novaBlock = BlockManager.getBlock(block.pos)
         if (novaBlock != null) {
             if (!novaBlock.material.requiresToolForDrops)
@@ -135,6 +91,7 @@ object ToolUtils {
         return itemToolCategory in blockToolCategories && ToolLevel.isCorrectLevel(blockToolLevel, itemToolLevel)
     }
     
+    //<editor-fold desc="vanilla tool damage", defaultstate="collapsed">
     internal fun isCorrectToolForDropsVanilla(tool: Material?, block: Block): Boolean {
         val blockState = (block as CraftBlock).nms
         
@@ -148,7 +105,13 @@ object ToolUtils {
     
     @Suppress("DEPRECATION")
     internal fun calculateDamageVanilla(player: Player, block: Block): Double {
-        val tool = player.inventory.getItem(EquipmentSlot.HAND)?.takeUnlessAir()
+        val serverTool = player.inventory.getItem(EquipmentSlot.HAND)?.takeUnlessAir()
+        val tool = serverTool?.let {
+            val nmsStack = it.nmsStack
+            return@let if (PacketItems.isNovaItem(nmsStack))
+                PacketItems.getFakeItem(player, nmsStack).bukkitMirror
+            else it
+        }
         
         when (player.gameMode) {
             GameMode.CREATIVE -> return when (tool?.type) {
@@ -185,7 +148,7 @@ object ToolUtils {
         val toolCategory = tool?.let(ToolCategory::ofItem)
         var speedMultiplier = 1.0
         if (toolCategory != null && toolCategory.isCorrectToolCategoryForBlock(block)) {
-            speedMultiplier = toolCategory.getMultiplier(tool)
+            speedMultiplier = getToolSpeedMultiplier(tool)
             val efficiency = tool.getEnchantmentLevel(Enchantment.DIG_SPEED)
             if (efficiency > 0) {
                 speedMultiplier += efficiency * efficiency + 1
@@ -200,27 +163,29 @@ object ToolUtils {
         
         return speedMultiplier / hardness / if (isCorrectToolForDropsVanilla(tool?.type, block)) 30.0 else 100.0
     }
+    //</editor-fold>
     
-    
+    //<editor-fold desc="tool damage", defaultstate="collapsed">
     @Suppress("DEPRECATION")
     internal fun calculateDamage(
         player: Player,
         block: Block,
-        tool: ItemStack,
-        toolCategory: ToolCategory?,
+        tool: ItemStack?,
         hardness: Double,
         correctCategory: Boolean,
         correctForDrops: Boolean,
     ): Double {
         when (player.gameMode) {
-            GameMode.CREATIVE -> return if (
-            // Players in creative cannot break blocks with those items
-                ToolCategory.ofItem(tool) == ToolCategory.SWORD
-                || tool.type == Material.DEBUG_STICK
-                || tool.type == Material.TRIDENT
-            ) 0.0 else 1.0
             
-            GameMode.ADVENTURE -> if (block.type !in tool.canDestroy) return 0.0
+            GameMode.CREATIVE -> {
+                val canBreakBlocks = tool?.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.canBreakBlocksInCreative
+                    ?: (ToolCategory.ofItem(tool) as? VanillaToolCategory)?.canBreakBlocksInCreative
+                    ?: (tool?.type == Material.DEBUG_STICK || tool?.type == Material.TRIDENT)
+                
+                return if (canBreakBlocks) 1.0 else 0.0
+            }
+            
+            GameMode.ADVENTURE -> if (tool != null && block.type !in tool.canDestroy) return 0.0
             GameMode.SPECTATOR -> return 0.0
             
             else -> Unit
@@ -230,8 +195,8 @@ object ToolUtils {
             hardness,
             correctCategory,
             correctForDrops,
-            toolCategory?.getMultiplier?.invoke(tool) ?: 0.0,
-            tool.getEnchantmentLevel(Enchantment.DIG_SPEED),
+            getToolSpeedMultiplier(tool),
+            tool?.getEnchantmentLevel(Enchantment.DIG_SPEED) ?: 0,
             player.isOnGround,
             player.eyeInWater && player.inventory.helmet?.containsEnchantment(Enchantment.WATER_WORKER) != true,
             player.getPotionEffect(PotionEffectType.FAST_DIGGING)?.amplifier?.plus(1) ?: 0,
@@ -268,6 +233,15 @@ object ToolUtils {
         
         return speedMultiplier / hardness / if (correctForDrops) 30.0 else 100.0
     }
+    //</editor-fold>
+    
+    private fun getToolSpeedMultiplier(itemStack: ItemStack?): Double {
+        if (itemStack == null)
+            return 1.0
+        return itemStack.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.breakSpeed
+            ?: (ToolCategory.ofItem(itemStack) as? VanillaToolCategory)?.multipliers?.get(itemStack.type)
+            ?: 1.0
+    }
     
     private fun getFatigueMultiplier(level: Int): Double =
         when (level) {
@@ -278,10 +252,4 @@ object ToolUtils {
             else -> 0.00081
         }
     
-}
-
-internal enum class ToolDamageResult {
-    UNDAMAGED,
-    DAMAGED,
-    BROKEN
 }

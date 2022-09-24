@@ -7,6 +7,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
@@ -16,14 +17,15 @@ import kotlin.reflect.full.superclasses
 /**
  * Handles actions performed on [ItemStack]s of a [ItemNovaMaterial]
  */
-class NovaItem(val behaviors: List<ItemBehavior>) {
+class NovaItem(holders: List<ItemBehaviorHolder<*>>) {
     
+    val behaviors by lazy { holders.map { it.get(material) } }
     private lateinit var material: ItemNovaMaterial
     private lateinit var name: Array<BaseComponent>
     
-    internal val vanillaMaterial: Material = VanillaMaterialTypes.getMaterial(behaviors.flatMapTo(HashSet()) { it.vanillaMaterialProperties })
+    internal val vanillaMaterial: Material by lazy { VanillaMaterialTypes.getMaterial(behaviors.flatMapTo(HashSet()) { it.vanillaMaterialProperties }) }
     
-    constructor(vararg behaviors: ItemBehavior) : this(behaviors.toList())
+    constructor(vararg holders: ItemBehaviorHolder<*>) : this(holders.toList())
     
     internal fun setMaterial(material: ItemNovaMaterial) {
         if (::material.isInitialized)

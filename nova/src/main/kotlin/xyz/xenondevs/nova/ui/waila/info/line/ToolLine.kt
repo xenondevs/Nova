@@ -27,7 +27,7 @@ object ToolLine {
             ToolCategory.ofBlock(block),
             ToolLevel.ofBlock(block),
             block.hardness,
-            ToolUtils.isCorrectToolForDrops(tool, block)
+            ToolUtils.isCorrectToolForDrops(block, tool)
         )
     }
     

@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Consumable
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.util.item.novaMaterial
@@ -113,7 +114,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         ))
     }
     
-    fun registerDefaultItem(addon: Addon, name: String, vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
+    fun registerDefaultItem(addon: Addon, name: String, vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial {
         val namespace = addon.description.id
         return register(ItemNovaMaterial(
             NamespacedId(namespace, name),
@@ -131,7 +132,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         ))
     }
     
-    internal fun registerDefaultCoreItem(name: String, vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
+    internal fun registerDefaultCoreItem(name: String, vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial {
         return register(ItemNovaMaterial(
             NamespacedId("nova", name),
             "item.nova.$name",
@@ -139,7 +140,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         ))
     }
     
-    internal fun registerCoreItem(name: String, localizedName: String = "", vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
+    internal fun registerCoreItem(name: String, localizedName: String = "", vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial {
         return register(ItemNovaMaterial(
             NamespacedId("nova", name),
             localizedName,

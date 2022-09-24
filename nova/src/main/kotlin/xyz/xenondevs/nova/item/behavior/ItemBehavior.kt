@@ -13,9 +13,10 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionP
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 
-abstract class ItemBehavior {
+abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     
     open val vanillaMaterialProperties: List<VanillaMaterialProperty> = emptyList()
     open val attributeModifiers: List<AttributeModifier> = emptyList()
@@ -32,4 +33,15 @@ abstract class ItemBehavior {
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     open fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) = Unit
     
+    final override fun get(material: ItemNovaMaterial): ItemBehavior = this
+    
+}
+
+abstract class ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder<T>() {
+    internal abstract fun create(material: ItemNovaMaterial): T
+    final override fun get(material: ItemNovaMaterial) = create(material)
+}
+
+abstract class ItemBehaviorHolder<T : ItemBehavior> internal constructor() {
+    internal abstract fun get(material: ItemNovaMaterial): T
 }

@@ -22,7 +22,7 @@ open class ItemNovaMaterial internal constructor(
 ) : INovaMaterial {
     
     val item: ItemModelData by lazy { Resources.getModelData(id).first!![novaItem.vanillaMaterial]!! }
-    val maxStackSize: Int = min(maxStackSize, novaItem.vanillaMaterial.maxStackSize)
+    val maxStackSize: Int
     
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
@@ -59,6 +59,7 @@ open class ItemNovaMaterial internal constructor(
     
     init {
         this.novaItem.setMaterial(this)
+        this.maxStackSize = min(maxStackSize, novaItem.vanillaMaterial.maxStackSize)
     }
     
     /**

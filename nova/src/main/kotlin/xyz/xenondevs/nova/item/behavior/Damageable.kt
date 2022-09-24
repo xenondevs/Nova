@@ -5,13 +5,18 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.options.DamageableOptions
 import xyz.xenondevs.nova.util.item.retrieveDataOrNull
 import xyz.xenondevs.nova.util.item.storeData
 import kotlin.math.min
 
 private val DAMAGE_KEY = NamespacedKey(NOVA, "damage")
 
-class Damageable(val maxDurability: Int) : ItemBehavior() {
+class Damageable(val options: DamageableOptions) : ItemBehavior() {
+    
+    val maxDurability: Int
+        get() = options.maxDurability
     
     override val vanillaMaterialProperties = listOf(VanillaMaterialProperty.DAMAGEABLE)
     
@@ -40,6 +45,11 @@ class Damageable(val maxDurability: Int) : ItemBehavior() {
         val damage = getDamage(itemStack)
         itemData.damage = damage
         itemData.maxDurability = maxDurability
+    }
+    
+    companion object : ItemBehaviorFactory<Damageable>() {
+        override fun create(material: ItemNovaMaterial) =
+            Damageable(DamageableOptions.configurable(material))
     }
     
 }
