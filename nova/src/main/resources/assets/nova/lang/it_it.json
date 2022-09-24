@@ -101,6 +101,6 @@
   "menu.nova.region.size": "Grandezza Region: %s",
   "menu.nova.region.increase": "Espandi Region",
   "command.nova.waila.off": "Disabilitato WAILA.",
-  "command.nova.waila.already_off": "WAILA è gia disabilitato",
+  "command.nova.waila.already_off": "WAILA è gia disabilitato.",
   "command.nova.waila.on": "Abilitato WAILA"
 }
