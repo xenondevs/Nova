@@ -96,7 +96,7 @@
   "menu.nova.side_config.up": "Su",
   "menu.nova.side_config.down": "Sotto",
   "menu.nova.region.decrease": "Diminuisci Region",
-  "command.nova.update_chunk_search_id.success": "Id di ricerca chunk updatato",
+  "command.nova.update_chunk_search_id.success": "Id di ricerca chunk updatato.",
   "menu.nova.side_config.north": "Nord",
   "menu.nova.region.size": "Grandezza Region: %s",
   "menu.nova.region.increase": "Espandi Region",
