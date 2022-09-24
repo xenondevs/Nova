@@ -89,5 +89,15 @@
   "menu.nova.energy_per_tick": "%s / tick",
   "command.nova.resource_pack.create.start": "Creazione del pacchetto risorse... attendi",
   "nova.tile_entity_limits.type_world_blacklist.deny": "Non ti è concesso piazzare questo blocco in questo mondo.",
-  "nova.outdated_version": "Stai eseguendo una versione obsoleta di %s.\nPer favore, scarica l'ultima versione su %s"
+  "nova.outdated_version": "Stai eseguendo una versione obsoleta di %s.\nPer favore, scarica l'ultima versione su %s",
+  "menu.nova.side_config.east": "Est",
+  "menu.nova.side_config.south": "Sud",
+  "menu.nova.side_config.west": "Ovest",
+  "menu.nova.side_config.up": "Su",
+  "menu.nova.side_config.down": "Sotto",
+  "menu.nova.region.decrease": "Diminuisci Region",
+  "command.nova.update_chunk_search_id.success": "Id di ricerca chunk updatato",
+  "menu.nova.side_config.north": "Nord",
+  "menu.nova.region.size": "Grandezza Region: %s",
+  "menu.nova.region.increase": "Espandi Region"
 }
