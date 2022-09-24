@@ -47,6 +47,9 @@ overlay:
     # If the boss bars should be sent after the player confirms that the server resource pack has been loaded.
     # !!! THIS WILL CAUSE ISSUES IF YOU'RE NOT USING NOVA'S FORCED RESOURCE PACK !!!
     send_bars_after_resource_pack_loaded: false
+    # A list of colors for which the boss bar should not be rendered.
+    # Possible colors: pink, blue, red, green, yellow, purple, white
+    invisible_colors: []
 
 waila:
   # Enable / disable the WAILA overlay.
