@@ -54,10 +54,12 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
                 val isVanillaBlock = type.startsWith("minecraft:")
                 var material: BlockNovaMaterial? = null
                 
-                if (!isVanillaBlock && (NovaMaterialRegistry.get(type) as? BlockNovaMaterial)?.also { material = it } == null) {
+                if (!isVanillaBlock && (NovaMaterialRegistry.getOrNull(type) as? BlockNovaMaterial)?.also { material = it } == null) {
                     LOGGER.severe("Could not load block at $pos: Invalid id $type")
-                    if (!DELETE_UNKNOWN_BLOCKS)
-                        unknownStates[pos] = type to buf.readBytes(dataLength)
+                    if (DELETE_UNKNOWN_BLOCKS)
+                        buf.readBytes(dataLength)
+                    else unknownStates[pos] = type to buf.readBytes(dataLength)
+                    
                     continue
                 }
                 

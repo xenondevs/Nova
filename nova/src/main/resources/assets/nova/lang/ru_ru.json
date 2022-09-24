@@ -82,10 +82,10 @@
   "command.nova.resource_pack.reupload.start": "Загрузка ресурс-пака... Пожалуйста подождите",
   "command.nova.resource_pack.reupload.fail": "Не удалось загрузить ресурс-пак.",
   "command.nova.resource_pack.reupload.success": "Ресурс-пак загружен на %s.",
-  "nova.tile_entity_limits.amount_per_world.deny": "Вы не можете разместить больше блоков этого типа в этом мире.",
+  "nova.tile_entity_limits.amount_per_world.deny": "Достигнут лимит размещенных объектов этого типа в этом мире.",
   "nova.outdated_version": "У вас установлена устаревшая версия %s.\nПожалуйста, скачайте последнюю версию на %s.",
-  "nova.tile_entity_limits.world_blacklist.deny": "Вам не разрешается размещать какие-либо блоки из Nova в этом мире.",
-  "nova.tile_entity_limits.type_world_blacklist.deny": "Вам не разрешено размещать этот блок в этом мире.",
+  "nova.tile_entity_limits.world_blacklist.deny": "Вам не разрешается размещать какие-либо объекты из Nova в этом мире.",
+  "nova.tile_entity_limits.type_world_blacklist.deny": "Вам не разрешено размещать этот объект в этом мире.",
   "item.nova.wrench.mode.nova.energy": "Режим: Энергия",
   "item.nova.wrench.mode.nova.items": "Режим: Предметы",
   "command.nova.network_reload.success": "Все активные сети были перезагружены.",
@@ -111,5 +111,10 @@
   "menu.nova.region.increase": "Увеличить область действия",
   "command.nova.advanced_tooltips.off": "Расширенные всплывающие подсказки отключены.",
   "command.nova.advanced_tooltips.already_off": "Расширенные всплывающие подсказки уже отключены.",
-  "command.nova.waila.already_off": "WAILA уже отключена."
+  "command.nova.waila.already_off": "WAILA уже отключена.",
+  "nova.tile_entity_limits.amount_global.deny": "Достигнут лимит размещенных объектов этого типа.",
+  "nova.tile_entity_limits.amount_per_chunk.deny": "Достигнут лимит размещенных объектов этого типа в этом чанке.",
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Достигнут лимит размещенных объектов Nova в этом чанке.",
+  "nova.tile_entity_limits.amount_global_total.deny": "Достигнут лимит размещенных объектов Nova.",
+  "nova.tile_entity_limits.amount_per_world_total.deny": "Достигнут лимит размещенных объектов Nova в этом мире."
 }
