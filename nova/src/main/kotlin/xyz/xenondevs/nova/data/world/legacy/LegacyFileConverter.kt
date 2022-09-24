@@ -54,7 +54,7 @@ internal object LegacyFileConverter : Initializable(), Listener {
     private fun runConversions(worlds: List<World>) {
         val worldVersions = worlds.groupBy {
             Version(it.persistentDataContainer.get(WORLD_VERSION_KEY, PersistentDataType.STRING) ?: "0.9")
-        }.toMutableMap().apply { removeIf { it.key.compareTo(NOVA.version, true) == 0 } }
+        }.toMutableMap().apply { removeIf { it.key.compareTo(NOVA.version, 2) == 0 } }
         
         worldVersions.forEach { (version, worlds) ->
             var minReached = false
