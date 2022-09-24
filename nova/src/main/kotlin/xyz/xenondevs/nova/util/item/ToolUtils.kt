@@ -148,7 +148,7 @@ object ToolUtils {
         val toolCategory = tool?.let(ToolCategory::ofItem)
         var speedMultiplier = 1.0
         if (toolCategory != null && toolCategory.isCorrectToolCategoryForBlock(block)) {
-            speedMultiplier = getToolSpeedMultiplier(tool)
+            speedMultiplier = (toolCategory as VanillaToolCategory).multipliers[tool.type] ?: 1.0
             val efficiency = tool.getEnchantmentLevel(Enchantment.DIG_SPEED)
             if (efficiency > 0) {
                 speedMultiplier += efficiency * efficiency + 1
@@ -180,7 +180,7 @@ object ToolUtils {
             GameMode.CREATIVE -> {
                 val canBreakBlocks = tool?.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.canBreakBlocksInCreative
                     ?: (ToolCategory.ofItem(tool) as? VanillaToolCategory)?.canBreakBlocksInCreative
-                    ?: (tool?.type == Material.DEBUG_STICK || tool?.type == Material.TRIDENT)
+                    ?: (tool?.type != Material.DEBUG_STICK && tool?.type != Material.TRIDENT)
                 
                 return if (canBreakBlocks) 1.0 else 0.0
             }
