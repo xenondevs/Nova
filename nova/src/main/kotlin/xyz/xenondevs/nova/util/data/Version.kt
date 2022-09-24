@@ -4,13 +4,17 @@ import org.bukkit.Bukkit
 import xyz.xenondevs.nova.util.mapToIntArray
 import kotlin.math.max
 
-class Version(version: String) : Comparable<Version> {
+class Version : Comparable<Version> {
     
-    private val parts: IntArray
+    private val version: IntArray
     
-    init {
+    constructor(vararg version: Int) {
+        this.version = version
+    }
+    
+    constructor(version: String) {
         val split = version.removeSuffix("-SNAPSHOT").split('.')
-        this.parts = split.mapToIntArray { it.toIntOrNull() ?: 0 }
+        this.version = split.mapToIntArray { it.toIntOrNull() ?: 0 }
     }
     
     override fun toString(): String =
@@ -18,11 +22,11 @@ class Version(version: String) : Comparable<Version> {
     
     fun toString(separator: String = ".", omitZeros: Boolean = false): String {
         val sb = StringBuilder()
-        for (i in 0..parts.lastIndex) {
-            sb.append(parts[i])
+        for (i in 0..version.lastIndex) {
+            sb.append(version[i])
             
-            if (i != parts.lastIndex) {
-                if (omitZeros && parts.copyOfRange(i + 1, parts.size).all { it == 0 })
+            if (i != version.lastIndex) {
+                if (omitZeros && version.copyOfRange(i + 1, version.size).all { it == 0 })
                     break
                 sb.append(separator)
             }
@@ -40,14 +44,14 @@ class Version(version: String) : Comparable<Version> {
      * (Example: with ignoreIdx = 2, 1.0.1 and 1.0.2 would be considered equal.)
      */
     fun compareTo(other: Version, ignoreIdx: Int): Int {
-        val size = max(parts.size, other.parts.size)
+        val size = max(version.size, other.version.size)
         
         for (i in 0 until size) {
             if (i == ignoreIdx)
                 return 0
             
-            val myPart = parts.getOrElse(i) { 0 }
-            val otherPart = other.parts.getOrElse(i) { 0 }
+            val myPart = version.getOrElse(i) { 0 }
+            val otherPart = other.version.getOrElse(i) { 0 }
             
             val compare = myPart.compareTo(otherPart)
             if (compare != 0)
@@ -72,7 +76,7 @@ class Version(version: String) : Comparable<Version> {
         compareTo(other, ignoreIdx) == 0
     
     override fun hashCode(): Int {
-        return parts.contentHashCode()
+        return version.contentHashCode()
     }
     
     companion object {
