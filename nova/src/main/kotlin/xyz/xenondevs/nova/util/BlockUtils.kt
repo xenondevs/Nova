@@ -281,8 +281,8 @@ fun Block.showBreakParticles() {
 fun Material.showBreakParticles(location: Location) {
     particleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5)) {
         texture(this@showBreakParticles)
-        offset(0.2, 0.2, 0.2)
-        amount(50)
+        offset(0.3, 0.3, 0.3)
+        amount(70)
     }.display()
 }
 
