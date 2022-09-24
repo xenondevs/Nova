@@ -1,6 +1,8 @@
 # Configuration options for the resource pack
 # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#step-2-resourcepack-hosting
 resource_pack:
+  # The resource pack prompt message
+  message: §bNova Resource Pack
   # The auto uploader automatically uploads the resource pack after generation.
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:

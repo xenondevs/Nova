@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.data.resources.upload
 
 import de.studiocode.invui.resourcepack.ForceResourcePack
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.TextComponent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
@@ -151,7 +151,7 @@ internal object AutoUploadManager : Initializable() {
         try {
             ForceResourcePack.getInstance().setResourcePack(
                 url,
-                ComponentBuilder("Nova Resource Pack").create(),
+                TextComponent.fromLegacyText(DEFAULT_CONFIG.getString("resource_pack.message")),
                 true
             )
         } catch (e: Exception) {
