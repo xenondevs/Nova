@@ -99,5 +99,7 @@
   "command.nova.update_chunk_search_id.success": "Id di ricerca chunk updatato",
   "menu.nova.side_config.north": "Nord",
   "menu.nova.region.size": "Grandezza Region: %s",
-  "menu.nova.region.increase": "Espandi Region"
+  "menu.nova.region.increase": "Espandi Region",
+  "command.nova.waila.off": "Disabilitato WAILA.",
+  "command.nova.waila.already_off": "WAILA è gia disabilitato"
 }
