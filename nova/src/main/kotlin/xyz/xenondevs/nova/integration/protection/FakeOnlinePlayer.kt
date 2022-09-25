@@ -24,6 +24,7 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeInstance
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.BlockState
 import org.bukkit.block.PistonMoveReaction
 import org.bukkit.block.Sign
 import org.bukkit.block.data.BlockData
@@ -297,6 +298,10 @@ class FakeOnlinePlayer(
     }
     
     override fun sendBlockChange(loc: Location, block: BlockData) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendBlockChanges(blocks: MutableCollection<BlockState>, suppressLightUpdates: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
     

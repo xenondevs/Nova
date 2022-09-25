@@ -34,6 +34,15 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
     
     private fun getMainMaterial(block: Block): Material {
         return when (val material = block.type) {
+            // infested blocks
+            Material.INFESTED_CHISELED_STONE_BRICKS -> Material.CHISELED_STONE_BRICKS
+            Material.INFESTED_COBBLESTONE -> Material.COBBLESTONE
+            Material.INFESTED_CRACKED_STONE_BRICKS -> Material.STONE_BRICKS
+            Material.INFESTED_DEEPSLATE -> Material.DEEPSLATE
+            Material.INFESTED_MOSSY_STONE_BRICKS -> Material.MOSSY_STONE_BRICKS
+            Material.INFESTED_STONE -> Material.STONE
+            Material.INFESTED_STONE_BRICKS -> Material.STONE_BRICKS
+            
             // signs
             Material.OAK_WALL_SIGN -> Material.OAK_SIGN
             Material.SPRUCE_WALL_SIGN -> Material.SPRUCE_SIGN
