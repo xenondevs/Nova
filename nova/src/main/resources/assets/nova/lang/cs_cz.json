@@ -75,9 +75,9 @@
   "command.nova.reload_configs.success": "Konfigurace načteny.",
   "command.nova.reload_recipes.start": "Načítání receptů...",
   "command.nova.reload_recipes.success": "Recepty načteny.",
-  "nova.tile_entity_limits.world_blacklist.deny": "Nemáš dovoleno pokládat Nova bloky v tomto světě.",
-  "nova.tile_entity_limits.type_world_blacklist.deny": "Nemáš dovoleno položit tento blok v tomto světě.",
-  "nova.tile_entity_limits.amount_per_world.deny": "Nemáš dovoleno položit více bloků tohoto typu v tomto světě.",
+  "nova.tile_entity_limits.world_blacklist.deny": "Nemáš dovoleno pokládat Nova entity v tomto světě.",
+  "nova.tile_entity_limits.type_world_blacklist.deny": "Nemáš dovoleno položit tuto entitu v tomto světě.",
+  "nova.tile_entity_limits.amount_per_world.deny": "Nemáš dovoleno položit více entit tohoto typu v tomto světě.",
   "nova.outdated_version": "Používáte zastaralou verzi %s.\nProsím stáhněte si nejnovější verzi na %s.",
   "item.nova.wrench.mode.nova.energy": "Režim: Energie",
   "item.nova.wrench.mode.nova.items": "Režim: Předměty",
@@ -111,5 +111,10 @@
   "command.nova.advanced_tooltips.off": "Vypnout pokročilé nápovědy.",
   "command.nova.advanced_tooltips.already_on": "Pokročilé nápovědy jsou již zapnuté.",
   "command.nova.waila.off": "Vypnout WAILA(U).",
-  "waila.nova.required_tool.unbreakable": "Nerozbitný"
+  "waila.nova.required_tool.unbreakable": "Nerozbitný",
+  "nova.tile_entity_limits.amount_global.deny": "Nemáš dovoleno položit více entit tohoto typu.",
+  "nova.tile_entity_limits.amount_global_total.deny": "Nemáš dovoleno položit žádné další entity.",
+  "nova.tile_entity_limits.amount_per_chunk.deny": "Nemáš dovoleno položit více entit tohoto typu v tomto chunku.",
+  "nova.tile_entity_limits.amount_per_world_total.deny": "Nemáš dovoleno položit více entit v tomto světě.",
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Nemáš dovoleno položit více entit v tomto chunku."
 }

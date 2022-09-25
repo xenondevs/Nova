@@ -7,6 +7,8 @@ import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.world.BossEvent.BossBarColor
 import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.bossbar.BossBar
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.data.toPlainText
@@ -14,6 +16,11 @@ import xyz.xenondevs.nova.util.enumMapOf
 import java.awt.Color
 import kotlin.math.roundToInt
 import net.minecraft.world.BossEvent.BossBarOverlay as BossBarStyle
+
+private val INVISIBLE_COLORS by configReloadable {
+    DEFAULT_CONFIG.getStringList("overlay.bossbar.invisible_colors")
+        .mapTo(HashSet()) { BossBarColor.valueOf(it.uppercase()) }
+}
 
 private val COLOR_LOOKUP: Map<BossBarColor, ChatColor> = mapOf(
     BossBarColor.PINK to Color(255, 0, 199),
@@ -59,33 +66,39 @@ internal class FakeBossBarOverlay(
     
     override val components: Array<out BaseComponent>
         get() {
-            val color = COLOR_LOOKUP[bar.color]!!
-            
-            // boss bar image
-            val font = "nova:bossbar/${y % 19}"
-            
             val builder = ComponentBuilder()
-                .append(MoveCharacters.getMovingComponent(-HALF_BOSS_BAR_LENGTH))
-                .append(TextComponent("\uF000")) // background
-                .color(color)
-                .font(font)
-                .append(MoveCharacters.getMovingComponent(-BOSS_BAR_LENGTH - 1))
             
-            val progress = getProgressComponent(font, bar.progress)
-            if (progress != null) {
-                val (progressComponent, progressWidth) = progress
+            val barColor = bar.color
+            val barRendered = barColor !in INVISIBLE_COLORS
+            if (barRendered) {
+                val color = COLOR_LOOKUP[bar.color]!!
+                
+                // boss bar image
+                val font = "nova:bossbar/${y % 19}"
+                
                 builder
-                    .append(progressComponent)
+                    .append(MoveCharacters.getMovingComponent(-HALF_BOSS_BAR_LENGTH))
+                    .append(TextComponent("\uF000")) // background
                     .color(color)
-                    .append(MoveCharacters.getMovingComponent(-progressWidth - 1))
-            }
-            
-            val style = getStyleComponent(font, bar.overlay)
-            if (style != null) {
-                builder
-                    .append(style)
-                    .color(ChatColor.WHITE)
-                    .append(MoveCharacters.getMovingComponent(-STYLE_OVERLAY_LENGTH - 1))
+                    .font(font)
+                    .append(MoveCharacters.getMovingComponent(-BOSS_BAR_LENGTH - 1))
+                
+                val progress = getProgressComponent(font, bar.progress)
+                if (progress != null) {
+                    val (progressComponent, progressWidth) = progress
+                    builder
+                        .append(progressComponent)
+                        .color(color)
+                        .append(MoveCharacters.getMovingComponent(-progressWidth - 1))
+                }
+                
+                val style = getStyleComponent(font, bar.overlay)
+                if (style != null) {
+                    builder
+                        .append(style)
+                        .color(ChatColor.WHITE)
+                        .append(MoveCharacters.getMovingComponent(-STYLE_OVERLAY_LENGTH - 1))
+                }
             }
             
             // text
@@ -94,7 +107,7 @@ internal class FakeBossBarOverlay(
             val halfTextLength = textLength / 2
             
             builder
-                .append(MoveCharacters.getMovingComponent(HALF_BOSS_BAR_LENGTH - halfTextLength)) // move to the text start
+                .append(MoveCharacters.getMovingComponent((if (barRendered) HALF_BOSS_BAR_LENGTH else 0) - halfTextLength)) // move to the text start
                 .color(ChatColor.WHITE)
                 .append(DefaultFont.getVerticallyMovedText(text, y % 19)) // append text
                 .append(MoveCharacters.getMovingComponent(-halfTextLength)) // move back to the center

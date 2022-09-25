@@ -43,7 +43,7 @@ dependencyResolutionManagement {
             
             // lib - minecraft assets
             library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.0")
-            library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.1")
+            library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.2")
             library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:0.1")
             
             // lib - zip4j

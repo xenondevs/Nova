@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
@@ -80,11 +81,18 @@ internal object ResourcePackBuilder {
         LOGGER.info("Building resource pack")
         
         try {
-            // download minecraft assets if not present
-            if (!MCASSETS_DIR.exists()) {
+            // download minecraft assets if not present / outdated
+            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("mcassetsVersion") != Version.SERVER_VERSION) {
+                MCASSETS_DIR.deleteRecursively()
                 runBlocking {
-                    val downloader = MinecraftAssetsDownloader(outputDirectory = MCASSETS_DIR, mode = ExtractionMode.GITHUB, logger = LOGGER)
+                    val downloader = MinecraftAssetsDownloader(
+                        version = Version.SERVER_VERSION.toString(omitZeros = true),
+                        outputDirectory = MCASSETS_DIR,
+                        mode = ExtractionMode.GITHUB,
+                        logger = LOGGER
+                    )
                     downloader.downloadAssets()
+                    PermanentStorage.store("mcassetsVersion", Version.SERVER_VERSION)
                 }
             }
             
