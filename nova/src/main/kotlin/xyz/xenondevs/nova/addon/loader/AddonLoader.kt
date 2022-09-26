@@ -25,7 +25,7 @@ internal class AddonLoader(val file: File) {
         
         if (description.novaVersion > NOVA.version)
             throw InitializationException("This addon is made for a newer version of Nova (v${description.novaVersion})")
-        if (description.novaVersion < NOVA.version.copy(patch = 0))
+        if (description.novaVersion.compareTo(NOVA.version, 2) == -1)
             throw InitializationException("This addon is made for an older version of Nova (v${description.novaVersion})")
     }
     

@@ -1,43 +1,63 @@
 package xyz.xenondevs.nova.util.data
 
 import org.bukkit.Bukkit
+import xyz.xenondevs.nova.util.mapToIntArray
+import kotlin.math.max
 
 class Version : Comparable<Version> {
     
-    val major: Int
-    val minor: Int
-    val patch: Int
+    private val version: IntArray
     
-    constructor(major: Int, minor: Int, patch: Int) {
-        this.major = major
-        this.minor = minor
-        this.patch = patch
+    constructor(vararg version: Int) {
+        this.version = version
     }
     
     constructor(version: String) {
         val split = version.removeSuffix("-SNAPSHOT").split('.')
-        this.major = split.getOrNull(0)?.toIntOrNull() ?: 0
-        this.minor = split.getOrNull(1)?.toIntOrNull() ?: 0
-        this.patch = split.getOrNull(2)?.toIntOrNull() ?: 0
+        this.version = split.mapToIntArray { it.toIntOrNull() ?: 0 }
     }
     
-    fun copy(major: Int? = null, minor: Int? = null, patch: Int? = null): Version {
-        return Version(major ?: this.major, minor ?: this.minor, patch ?: this.patch)
+    override fun toString(): String =
+        toString(omitZeros = false)
+    
+    fun toString(separator: String = ".", omitZeros: Boolean = false): String {
+        val sb = StringBuilder()
+        for (i in 0..version.lastIndex) {
+            sb.append(version[i])
+            
+            if (i != version.lastIndex) {
+                if (omitZeros && version.copyOfRange(i + 1, version.size).all { it == 0 })
+                    break
+                sb.append(separator)
+            }
+        }
+        
+        return sb.toString()
     }
     
-    override fun toString() = "$major.$minor.$patch"
+    override fun compareTo(other: Version) = compareTo(other, -1)
     
-    override fun compareTo(other: Version) = compareTo(other, false)
-    
-    fun compareTo(other: Version, ignorePatches: Boolean): Int {
-        if (this.major < other.major 
-            || (this.minor == other.minor && this.minor < other.minor) 
-            || (!ignorePatches && this.major == other.major && this.minor == other.minor && this.patch < other.patch))
-            return -1
-        if (this.major > other.major 
-            || (this.major == other.major && this.minor > other.minor) 
-            || (!ignorePatches && this.major == other.major && this.minor == other.minor && this.patch > other.patch))
-            return 1
+    /**
+     * Compares this [Version] to [other].
+     *
+     * @param ignoreIdx Specifies after which version index the versions should not be compared.
+     * (Example: with ignoreIdx = 2, 1.0.1 and 1.0.2 would be considered equal.)
+     */
+    fun compareTo(other: Version, ignoreIdx: Int): Int {
+        val size = max(version.size, other.version.size)
+        
+        for (i in 0 until size) {
+            if (i == ignoreIdx)
+                return 0
+            
+            val myPart = version.getOrElse(i) { 0 }
+            val otherPart = other.version.getOrElse(i) { 0 }
+            
+            val compare = myPart.compareTo(otherPart)
+            if (compare != 0)
+                return compare
+        }
+        
         return 0
     }
     
@@ -48,16 +68,15 @@ class Version : Comparable<Version> {
             return true
         if (other !is Version)
             return false
-        return this.major == other.major
-            && this.minor == other.minor
-            && this.patch == other.patch
+        
+        return equals(other, -1)
     }
     
+    fun equals(other: Version, ignoreIdx: Int): Boolean =
+        compareTo(other, ignoreIdx) == 0
+    
     override fun hashCode(): Int {
-        var result = major
-        result = 31 * result + minor
-        result = 31 * result + patch
-        return result
+        return version.contentHashCode()
     }
     
     companion object {

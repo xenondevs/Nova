@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -24,6 +25,10 @@ import java.io.File
 import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
+import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
+import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
+import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
+import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
 private val REQUIRED_SERVER_VERSION = Version("1.19.1")..Version("1.19.2")
 
@@ -51,9 +56,10 @@ class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by lo
     val isVersionChange = lastVersion != null && lastVersion != version
     val isDevServer = IS_DEV_SERVER
     
-    override val blockManager = BlockManager
-    override val tileEntityManager = TileEntityManager
-    override val materialRegistry = NovaMaterialRegistry
+    override val blockManager: IBlockManager = BlockManager
+    override val tileEntityManager: ITileEntityManager = TileEntityManager
+    override val materialRegistry: INovaMaterialRegistry = NovaMaterialRegistry
+    override val wailaManager: IWailaManager = WailaManager
     
     internal val disableHandlers = ArrayList<() -> Unit>()
     

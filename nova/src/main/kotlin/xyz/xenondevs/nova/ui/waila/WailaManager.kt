@@ -20,6 +20,9 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unregisterEvents
+import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
+
+private val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
 
 private val WAILA_ENABLED_KEY = NamespacedKey(NOVA, "waila")
 private val UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getLong("waila.update_interval") }
@@ -27,13 +30,25 @@ private val UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getLong("waila.
 private val Player.isWailaEnabled: Boolean
     get() = persistentDataContainer.get<Boolean>(WAILA_ENABLED_KEY) != false
 
-internal object WailaManager : Initializable(), Listener {
+internal object WailaManager : Initializable(), Listener, IWailaManager {
     
     override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(Resources, AddonsInitializer)
     
     private var tickTask: BukkitTask? = null
     private val overlays = HashMap<Player, Waila>()
+    
+    //<editor-fold desc="Nova-API", defaultstate="collapsed">
+    override val isCompletelyDisabled: Boolean
+        get() = ENABLED
+    
+    override fun getState(player: Player): Boolean =
+        player.isWailaEnabled
+    
+    override fun setState(player: Player, enabled: Boolean): Boolean {
+        return if (toggle(player, enabled)) enabled else !enabled
+    }
+    //</editor-fold>
     
     override fun init() {
         reload()
@@ -44,7 +59,7 @@ internal object WailaManager : Initializable(), Listener {
         overlays.values.forEach { it.setActive(false) }
         overlays.clear()
         tickTask?.cancel()
-        if (DEFAULT_CONFIG.getBoolean("waila.enabled")) {
+        if (ENABLED) {
             registerEvents()
             Bukkit.getOnlinePlayers().forEach(::tryAddWailaOverlay)
             tickTask = runTaskTimer(0, UPDATE_INTERVAL) { overlays.values.forEach(Waila::handleTick) }

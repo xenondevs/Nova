@@ -66,5 +66,8 @@
   "command.nova.modeldata.block": "El bloque %s usa %s y tiene los siguientes datos de modelo personalizado: %s.",
   "command.nova.modeldata.no-nova-item": "Sujeta un item de Nova en tu mano e inténtalo de nuevo.",
   "command.nova.recipe.no-recipe": "Este item no tiene una receta.",
-  "command.nova.usage.no-usage": "Este item no tiene ningún uso."
+  "command.nova.usage.no-usage": "Este item no tiene ningún uso.",
+  "item.nova.wrench.mode.nova.energy": "Modo: Energía",
+  "item.nova.wrench.mode.nova.items": "Modo: Items",
+  "item.nova.wrench.mode.nova.fluid": "Modo: Fluido"
 }
