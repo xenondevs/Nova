@@ -39,7 +39,7 @@ internal object WailaManager : Initializable(), Listener, IWailaManager {
     
     //<editor-fold desc="Nova-API", defaultstate="collapsed">
     override val isCompletelyDisabled: Boolean
-        get() = ENABLED
+        get() = !ENABLED
     
     override fun getState(player: Player): Boolean =
         player.isWailaEnabled
