@@ -24,9 +24,19 @@ fun <R> DataResult<R>.getOrThrow(message: String): R {
     else throw IllegalStateException(message, IllegalArgumentException(error().get().toString()))
 }
 
+fun <R> DataResult<R>.getOrThrow(): R {
+    return if (result().isPresent) result().get()
+    else throw IllegalArgumentException(error().get().toString())
+}
+
 fun <R> DataResult<Holder<R>>.getValueOrThrow(message: String): R {
     return if (result().isPresent) result().get().value()
     else throw IllegalStateException(message, IllegalArgumentException(error().get().toString()))
+}
+
+fun <R> DataResult<Holder<R>>.getValueOrThrow(): R {
+    return if (result().isPresent) result().get().value()
+    else throw IllegalArgumentException(error().get().toString())
 }
 
 fun <F, S> DataResult<MojangPair<F, S>>.getFirstOrThrow(message: String): F {
@@ -34,7 +44,17 @@ fun <F, S> DataResult<MojangPair<F, S>>.getFirstOrThrow(message: String): F {
     else throw IllegalStateException(message, IllegalArgumentException(error().get().toString()))
 }
 
+fun <F, S> DataResult<MojangPair<F, S>>.getFirstOrThrow(): F {
+    return if (result().isPresent) result().get().first
+    else throw IllegalArgumentException(error().get().toString())
+}
+
 fun <F: Any, S: Any> DataResult<MojangPair<Holder<F>, S>>.getFirstValueOrThrow(message: String): F {
     return if (result().isPresent) result().get().first.value()
     else throw IllegalStateException(message, IllegalArgumentException(error().get().toString()))
+}
+
+fun <F: Any, S: Any> DataResult<MojangPair<Holder<F>, S>>.getFirstValueOrThrow(): F {
+    return if (result().isPresent) result().get().first.value()
+    else throw IllegalArgumentException(error().get().toString())
 }

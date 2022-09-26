@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.generation.codec
+package xyz.xenondevs.nova.world.generation.inject.codec
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
