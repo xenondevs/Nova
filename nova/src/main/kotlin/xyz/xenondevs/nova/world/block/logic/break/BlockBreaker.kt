@@ -5,12 +5,15 @@ import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.entity.item.ItemEntity
 import org.bukkit.Axis
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory
 import org.bukkit.entity.Player
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -19,16 +22,21 @@ import xyz.xenondevs.nova.item.tool.ToolLevel
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.axis
-import xyz.xenondevs.nova.util.dropItems
+import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.getAllDrops
+import xyz.xenondevs.nova.util.getExpDrop
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.damageToolBreakBlock
 import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.nmsPos
+import xyz.xenondevs.nova.util.nmsStack
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.nova.util.remove
 import xyz.xenondevs.nova.util.send
+import xyz.xenondevs.nova.util.serverLevel
+import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.pos
@@ -109,7 +117,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
         val clientsideDamage = calculateClientsideDamage()
         
         if (clientsideDamage >= 1 && damage < 1) {
-            stop()
+            stop(true)
             return
         }
         
@@ -118,27 +126,9 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
         
         if (isDone) {
             // Stop break animation and mining fatigue effect
-            stop()
-            // create a block breaking context
-            val ctx = BlockBreakContext(
-                block.pos,
-                player, player.location,
-                BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 8.0, 0.2),
-                player.inventory.itemInMainHand.takeUnlessAir()
-            )
-            // Drop items
-            if (player.gameMode == GameMode.CREATIVE || drops)
-                block.location.dropItems(block.getAllDrops(ctx))
-            // Damage tool
-            if (player.gameMode != GameMode.CREATIVE && toolCategory != null && hardness > 0)
-                player.damageToolBreakBlock()
-            // If the block broke instantaneously for the client, the effects will also be played clientside
-            val effects = clientsideDamage < 1
-            block.remove(ctx, effects, effects)
-            // The ack packet removes client-predicted block states and shows those sent by the server
-            player.send(ClientboundBlockChangedAckPacket(sequence))
-            // set cooldown for the next block
-            BlockBreaking.setBreakCooldown(player)
+            stop(false)
+            // break block, call event, drop items and exp, etc.
+            breakBlock(clientsideDamage < 1) // If the block broke instantaneously for the client, the effects will also be played clientside
         } else {
             // break tick logic of subclasses (i.e. spawning particles for barrier nova blocks)
             handleBreakTick()
@@ -166,7 +156,54 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
         }
     }
     
-    fun stop() {
+    private fun breakBlock(effects: Boolean) {
+        // create a block breaking context
+        val ctx = BlockBreakContext(
+            block.pos,
+            player, player.location,
+            BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 8.0, 0.2),
+            player.inventory.itemInMainHand.takeUnlessAir()
+        )
+        
+        // call break event
+        val event = BlockBreakEvent(block, player).apply { if (drops) expToDrop = block.getExpDrop(ctx) }
+        callEvent(event)
+        
+        if (!event.isCancelled) {
+            val level = block.world.serverLevel
+            
+            // drop items
+            if (event.isDropItems && (player.gameMode == GameMode.CREATIVE || drops)) {
+                val itemEntities = block.getAllDrops(ctx).map {
+                    ItemEntity(
+                        block.world.serverLevel,
+                        block.x + 0.5 + Random.nextDouble(-0.25, 0.25),
+                        block.y + 0.5 + Random.nextDouble(-0.25, 0.25),
+                        block.z + 0.5 + Random.nextDouble(-0.25, 0.25),
+                        it.nmsStack
+                    )
+                }
+                CraftEventFactory.handleBlockDropItemEvent(block, block.state, player.serverPlayer, itemEntities)
+            }
+            
+            // drop exp
+            block.nmsState.block.popExperience(level, block.pos.nmsPos, event.expToDrop)
+            
+            // damage tool
+            if (player.gameMode != GameMode.CREATIVE && toolCategory != null && hardness > 0)
+                player.damageToolBreakBlock()
+            
+            // remove block
+            block.remove(ctx, effects, effects)
+        }
+        
+        // send ack packet
+        player.send(ClientboundBlockChangedAckPacket(sequence))
+        // set cooldown for the next block
+        BlockBreaking.setBreakCooldown(player)
+    }
+    
+    fun stop(ack: Boolean) {
         isStopped = true
         breakMethod?.stop()
         
@@ -184,8 +221,11 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             ClientboundRemoveMobEffectPacket(player.entityId, MobEffect.byId(4))
         }
         
-        val ackPacket = ClientboundBlockChangedAckPacket(sequence)
-        player.send(effectPacket, ackPacket)
+        player.send(effectPacket)
+        
+        if (ack) {
+            player.send(ClientboundBlockChangedAckPacket(sequence))
+        }
     }
     
     private fun calculateClientsideDamage(): Double {

@@ -124,7 +124,7 @@ internal object BlockBreaking {
     private fun handleDestroyStop(player: Player): Boolean {
         val breaker = playerBreakers.remove(player)
         if (breaker != null) {
-            breaker.stop()
+            breaker.stop(false)
             return true
         }
         return false
