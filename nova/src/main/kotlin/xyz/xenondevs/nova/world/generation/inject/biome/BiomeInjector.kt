@@ -34,7 +34,7 @@ object BiomeInjector {
             // decode the biome injection file
             val biomeInjection = BiomeInjection.CODEC.decodeJsonFile(file).getFirstOrThrow()
             // get a list of all biomes in the specified tag
-            val biomes = BIOME_REGISTRY.getTag(biomeInjection.biomesTag).get().map { BIOME_REGISTRY.getKey(it.value()) }
+            val biomes = biomeInjection.biomes
             // loop through all biomes and add new injections to the toInject map
             biomes.forEach { biome ->
                 // retrieve or create the list of injections for this biome
@@ -94,7 +94,7 @@ object BiomeInjector {
             
             patchedBiomes += hash
             
-            println("Patched new biome: $biome")
+            println("Patched new biome: $key")
         }
     }
     
