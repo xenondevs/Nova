@@ -88,8 +88,8 @@ object BiomeInjector {
                     } else {
                         newList.add(HolderSet.direct(injections[i].toMutableList()))
                     }
-                    ReflectionUtils.setFinalField(BIOME_GENERATION_SETTINGS_FEATURES_FIELD, settings, ImmutableList.copyOf(newList))
                 }
+                ReflectionUtils.setFinalField(BIOME_GENERATION_SETTINGS_FEATURES_FIELD, settings, ImmutableList.copyOf(newList))
             }
             
             patchedBiomes += hash
