@@ -2,12 +2,13 @@
 
 package xyz.xenondevs.nova.util
 
+import com.mojang.serialization.JsonOps
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
-import net.minecraft.core.RegistryAccess
 import net.minecraft.core.Rotations
 import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
@@ -153,13 +154,20 @@ object NMSUtils {
         "SRF(net.minecraft.world.entity.Entity ENTITY_COUNTER)"
     ).get(null) as AtomicInteger
     
-    fun <T> freezeRegistry(registry: Registry<T>) {
+    val REGISTRY_ACCESS = minecraftServer.registryAccess()!!
+    val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, REGISTRY_ACCESS)!!
+    
+    fun freezeRegistry(registry: Registry<*>) {
         if (registry !is MappedRegistry) return
         ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = true
     }
     
-    fun <T> unfreezeRegistry(registry: Registry<T>) {
+    fun unfreezeRegistry(registry: Registry<*>) {
         if (registry !is MappedRegistry) return
         ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = false
     }
+    
+    fun <T, R : Registry<T>> getRegistry(location: ResourceKey<R>) =
+        REGISTRY_ACCESS.registry(location).get() ?: throw IllegalArgumentException("Registry $location does not exist!")
+    
 }
