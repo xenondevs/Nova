@@ -8,10 +8,15 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.callEvent
 import kotlin.random.Random
+import net.minecraft.world.item.ItemStack as MojangStack
+import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
 
 object DamageableUtils {
     
@@ -32,7 +37,7 @@ object DamageableUtils {
         if (unbreakingLevel > 0 && Random.nextInt(0, unbreakingLevel + 1) > 0)
             return item
         
-        val novaDamageable = item.novaMaterial?.novaItem?.getBehavior(xyz.xenondevs.nova.item.behavior.Damageable::class)
+        val novaDamageable = item.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
         if (novaDamageable != null) {
             val newDamage = novaDamageable.getDamage(item) + damage
             novaDamageable.setDamage(item, newDamage)
@@ -56,17 +61,36 @@ object DamageableUtils {
      *
      * @return If the item is now broken
      */
-    internal fun damageAndBreakItem(itemStack: net.minecraft.world.item.ItemStack, damage: Int, entity: LivingEntity?): ItemDamageResult {
+    @Suppress("NAME_SHADOWING")
+    internal fun damageAndBreakItem(itemStack: MojangStack, damage: Int, entity: LivingEntity?): ItemDamageResult {
+        var damage = damage
+        
+        // check for creative mode
         if (entity is Player && entity.abilities.instabuild)
             return ItemDamageResult.UNDAMAGED
         
+        // check if the item is damageable
+        val novaDamageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (novaDamageable == null && !itemStack.isDamageableItem)
+            return ItemDamageResult.UNDAMAGED
+        
+        // consider unbreaking level
         val unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, itemStack)
         if (unbreakingLevel > 0 && Random.nextInt(0, unbreakingLevel + 1) > 0)
             return ItemDamageResult.UNDAMAGED
         
-        var broken = false
+        // fire PlayerItemDamageEvent
+        if (entity is ServerPlayer) {
+            val event = PlayerItemDamageEvent(entity.bukkitEntity, itemStack.bukkitMirror, damage)
+            callEvent(event)
+            
+            damage = event.damage
+            if (damage <= 0 || event.isCancelled)
+                return ItemDamageResult.UNDAMAGED
+        }
         
-        val novaDamageable = itemStack.novaMaterial?.novaItem?.getBehavior(xyz.xenondevs.nova.item.behavior.Damageable::class)
+        // damage item
+        var broken = false
         if (novaDamageable != null) {
             val bukkitStack = itemStack.bukkitMirror
             
@@ -87,10 +111,17 @@ object DamageableUtils {
         } else return ItemDamageResult.UNDAMAGED
         
         if (broken) {
-            itemStack.shrink(1)
-            if (entity is Player && novaDamageable != null) {
-                entity.awardStat(Stats.ITEM_BROKEN.get(itemStack.item))
+            if (entity is ServerPlayer) {
+                // only award stats for non-nova items
+                if (novaDamageable == null)
+                    entity.awardStat(Stats.ITEM_BROKEN.get(itemStack.item))
+                
+                // fire PlayerBreakItemEvent
+                callEvent(PlayerItemBreakEvent(entity.bukkitEntity, itemStack.bukkitMirror))
             }
+            
+            // remove item
+            itemStack.shrink(1)
         }
         
         return if (broken) ItemDamageResult.BROKEN else ItemDamageResult.DAMAGED
