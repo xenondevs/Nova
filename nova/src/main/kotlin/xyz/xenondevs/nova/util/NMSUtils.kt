@@ -41,10 +41,14 @@ val Entity.nmsEntity: MojangEntity
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
+@Deprecated("Misleading name", replaceWith = ReplaceWith("nmsCopy"))
 val ItemStack.nmsStack: MojangStack
     get() = CraftItemStack.asNMSCopy(this)
 
-@Deprecated(replaceWith = ReplaceWith("bukkitCopy"), message = "Misleading name")
+val ItemStack?.nmsCopy: MojangStack
+    get() = CraftItemStack.asNMSCopy(this)
+
+@Deprecated("Misleading name", replaceWith = ReplaceWith("bukkitCopy"))
 val MojangStack.bukkitStack: ItemStack
     get() = CraftItemStack.asBukkitCopy(this)
 

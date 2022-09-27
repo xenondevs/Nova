@@ -5,7 +5,11 @@ import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Axis
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -14,23 +18,24 @@ import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolLevel
 import xyz.xenondevs.nova.util.BlockFaceUtils
+import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.axis
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.getAllDrops
-import xyz.xenondevs.nova.util.getExpDrop
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.damageToolBreakBlock
 import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsPos
-import xyz.xenondevs.nova.util.nmsStack
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.nova.util.remove
@@ -162,32 +167,55 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             block.pos,
             player, player.location,
             BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 8.0, 0.2),
-            player.inventory.itemInMainHand.takeUnlessAir()
+            tool
         )
         
+        val level = block.world.serverLevel
+        val blockPos = block.pos.nmsPos
+        
         // call break event
-        val event = BlockBreakEvent(block, player).apply { if (drops) expToDrop = block.getExpDrop(ctx) }
-        callEvent(event)
+        val event = BlockBreakEvent(block, player)
+            .apply { if (drops) expToDrop = BlockUtils.getVanillaBlockExp(level, blockPos, tool.nmsCopy) }
+            .also(::callEvent)
         
         if (!event.isCancelled) {
-            val level = block.world.serverLevel
-            
+            //<editor-fold desc="item drops", defaultstate="collapsed">
+            // TODO: block drops gamerule?
             // drop items
             if (event.isDropItems && (player.gameMode == GameMode.CREATIVE || drops)) {
                 val itemEntities = block.getAllDrops(ctx).map {
                     ItemEntity(
-                        block.world.serverLevel,
+                        level,
                         block.x + 0.5 + Random.nextDouble(-0.25, 0.25),
                         block.y + 0.5 + Random.nextDouble(-0.25, 0.25),
                         block.z + 0.5 + Random.nextDouble(-0.25, 0.25),
-                        it.nmsStack
-                    )
+                        it.nmsCopy
+                    ).apply(ItemEntity::setDefaultPickUpDelay)
                 }
                 CraftEventFactory.handleBlockDropItemEvent(block, block.state, player.serverPlayer, itemEntities)
             }
+            //</editor-fold>
+            //<editor-fold desc="exp drops", defaultstate="collapsed">
+            if (level.gameRules.getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
+                val exp = event.expToDrop
+                if (exp > 0) {
+                    ExperienceOrb.award(level, Vec3.atCenterOf(blockPos), event.expToDrop)
+                }
+            }
             
-            // drop exp
-            block.nmsState.block.popExperience(level, block.pos.nmsPos, event.expToDrop)
+            // furnace experience has its own event
+            val furnace = level.getBlockEntity(blockPos) as? AbstractFurnaceBlockEntity
+            if (furnace != null) {
+                val exp = BlockExpEvent(block, BlockUtils.getVanillaFurnaceExp(furnace))
+                    .also(::callEvent)
+                    .expToDrop
+                
+                if (exp > 0) {
+                    // vanilla Minecraft does not check the block drops gamerule here, so we won't either
+                    ExperienceOrb.award(level, Vec3.atCenterOf(blockPos), exp)
+                }
+            }
+            //</editor-fold>
             
             // damage tool
             if (player.gameMode != GameMode.CREATIVE && toolCategory != null && hardness > 0)

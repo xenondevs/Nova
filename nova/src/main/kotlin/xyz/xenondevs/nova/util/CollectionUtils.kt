@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST", "UseWithIndex")
+
 package xyz.xenondevs.nova.util
 
 import de.studiocode.invui.item.Item
@@ -186,16 +188,37 @@ inline fun <T> Array<T>.mapToBooleanArray(transform: (T) -> Boolean): BooleanArr
     return BooleanArray(size) { transform(get(it)) }
 }
 
-inline fun <T, reified R> List<T>.mapToArray(transform: (T) -> R): Array<R> {
-    return Array(size) { transform(get(it)) }
+inline fun <T, reified R> Collection<T>.mapToArray(transform: (T) -> R): Array<R> {
+    val array = arrayOfNulls<R>(size)
+    
+    var i = 0
+    for (element in this) {
+        array[i++] = transform(element)
+    }
+    
+    return array as Array<R>
 }
 
-inline fun <T> List<T>.mapToIntArray(transform: (T) -> Int): IntArray {
-    return IntArray(size) { transform(get(it)) }
+inline fun <T> Collection<T>.mapToIntArray(transform: (T) -> Int): IntArray {
+    val array = IntArray(size)
+    
+    var i = 0
+    for (element in this) {
+        array[i++] = transform(element)
+    }
+    
+    return array
 }
 
-inline fun <T> List<T>.mapToBooleanArray(transform: (T) -> Boolean): BooleanArray {
-    return BooleanArray(size) { transform(get(it)) }
+inline fun <T> Collection<T>.mapToBooleanArray(transform: (T) -> Boolean): BooleanArray {
+    val array = BooleanArray(size)
+    
+    var i = 0
+    for (element in this) {
+        array[i++] = transform(element)
+    }
+    
+    return array
 }
 
 fun <K, V> treeMapOf(vararg pairs: Pair<K, V>) = TreeMap<K, V>().apply { putAll(pairs) }
