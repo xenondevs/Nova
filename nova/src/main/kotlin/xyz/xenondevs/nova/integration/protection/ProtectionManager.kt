@@ -54,60 +54,74 @@ object ProtectionManager {
         NOVA.disableHandlers += { PROTECTION_CHECK_EXECUTOR.shutdown() }
     }
     
-    fun canPlace(tileEntity: TileEntity, item: ItemStack, location: Location): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(0, tileEntity.uuid, item, location.pos)) {
-            checkProtection(tileEntity.owner, location) { canPlace(tileEntity, item, location) }
+    fun canPlace(tileEntity: TileEntity, item: ItemStack, location: Location): CompletableFuture<Boolean> {
+        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
+        return PROTECTION_CACHE.get(ArrayKey(0, tileEntity.uuid, item, location.pos)) {
+            checkProtection(owner, location) { canPlace(tileEntity, item, location) }
         }
+    }
     
     fun canPlace(player: OfflinePlayer, item: ItemStack, location: Location): CompletableFuture<Boolean> =
         PROTECTION_CACHE.get(ArrayKey(0, player.uniqueId, item, location.pos)) {
             checkProtection(player, location) { canPlace(player, item, location) }
         }
     
-    fun canBreak(tileEntity: TileEntity, item: ItemStack?, location: Location): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(1, tileEntity.uuid, item, location.pos)) {
-            checkProtection(tileEntity.owner, location) { canBreak(tileEntity, item, location) }
+    fun canBreak(tileEntity: TileEntity, item: ItemStack?, location: Location): CompletableFuture<Boolean> {
+        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
+        return PROTECTION_CACHE.get(ArrayKey(1, tileEntity.uuid, item, location.pos)) {
+            checkProtection(owner, location) { canBreak(tileEntity, item, location) }
         }
+    }
+    
     
     fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location): CompletableFuture<Boolean> =
         PROTECTION_CACHE.get(ArrayKey(1, player.uniqueId, item, location.pos)) {
             checkProtection(player, location) { canBreak(player, item, location) }
         }
     
-    fun canUseBlock(tileEntity: TileEntity, item: ItemStack?, location: Location): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(2, tileEntity.uuid, item, location.pos)) {
-            checkProtection(tileEntity.owner, location) { canUseBlock(tileEntity, item, location) }
+    fun canUseBlock(tileEntity: TileEntity, item: ItemStack?, location: Location): CompletableFuture<Boolean> {
+        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
+        return PROTECTION_CACHE.get(ArrayKey(2, tileEntity.uuid, item, location.pos)) {
+            checkProtection(owner, location) { canUseBlock(tileEntity, item, location) }
         }
+    }
+    
     
     fun canUseBlock(player: OfflinePlayer, item: ItemStack?, location: Location): CompletableFuture<Boolean> =
         PROTECTION_CACHE.get(ArrayKey(2, player.uniqueId, item, location.pos)) {
             checkProtection(player, location) { canUseBlock(player, item, location) }
         }
     
-    fun canUseItem(tileEntity: TileEntity, item: ItemStack, location: Location): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(3, tileEntity.uuid, item, location.pos)) {
-            checkProtection(tileEntity.owner, location) { canUseBlock(tileEntity, item, location) }
+    fun canUseItem(tileEntity: TileEntity, item: ItemStack, location: Location): CompletableFuture<Boolean> {
+        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
+        return PROTECTION_CACHE.get(ArrayKey(3, tileEntity.uuid, item, location.pos)) {
+            checkProtection(owner, location) { canUseItem(tileEntity, item, location) }
         }
+    }
     
     fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location): CompletableFuture<Boolean> =
         PROTECTION_CACHE.get(ArrayKey(3, player.uniqueId, item, location.pos)) {
-            checkProtection(player, location) { canUseBlock(player, item, location) }
+            checkProtection(player, location) { canUseItem(player, item, location) }
         }
     
-    fun canInteractWithEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(4, tileEntity.uuid, entity, item, entity.location.pos)) {
-            checkProtection(tileEntity.owner, entity.location) { canInteractWithEntity(tileEntity, entity, item) }
+    fun canInteractWithEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> {
+        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
+        return PROTECTION_CACHE.get(ArrayKey(4, tileEntity.uuid, entity, item, entity.location.pos)) {
+            checkProtection(owner, entity.location) { canInteractWithEntity(tileEntity, entity, item) }
         }
+    }
     
     fun canInteractWithEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> =
         PROTECTION_CACHE.get(ArrayKey(4, player.uniqueId, entity, item, entity.location.pos)) {
             checkProtection(player, entity.location) { canInteractWithEntity(player, entity, item) }
         }
     
-    fun canHurtEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(5, tileEntity.uuid, entity, item, entity.location.pos)) {
-            checkProtection(tileEntity.owner, entity.location) { canHurtEntity(tileEntity, entity, item) }
+    fun canHurtEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> {
+        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
+        return PROTECTION_CACHE.get(ArrayKey(5, tileEntity.uuid, entity, item, entity.location.pos)) {
+            checkProtection(owner, entity.location) { canHurtEntity(tileEntity, entity, item) }
         }
+    }
     
     fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> =
         PROTECTION_CACHE.get(ArrayKey(5, player.uniqueId, entity, item, entity.location.pos)) {

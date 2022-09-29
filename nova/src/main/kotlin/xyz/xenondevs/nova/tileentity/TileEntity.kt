@@ -47,9 +47,9 @@ import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.block.TileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.ReloadableRegion
@@ -71,11 +71,11 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid
-    val ownerUUID: UUID = blockState.ownerUUID
+    val ownerUUID: UUID? = blockState.ownerUUID
     final override val data: Compound = blockState.data
     final override val material: TileEntityNovaMaterial = blockState.material
     
-    override val owner: OfflinePlayer by lazy { Bukkit.getOfflinePlayer(ownerUUID) }
+    override val owner: OfflinePlayer? by lazy { ownerUUID?.let(Bukkit::getOfflinePlayer) }
     
     val location: Location
         get() = Location(pos.world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), facing.getYaw(BlockFace.NORTH), 0f)

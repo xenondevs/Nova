@@ -34,11 +34,13 @@ internal object TileEntityTracker {
     }
     
     internal fun handleBlockPlace(material: TileEntityNovaMaterial, ctx: BlockPlaceContext) {
-        modifyCounters(ctx.ownerUUID, ctx.pos, material.id, 1)
+        if (ctx.ownerUUID != null)
+            modifyCounters(ctx.ownerUUID, ctx.pos, material.id, 1)
     }
     
     internal fun handleBlockBreak(tileEntity: TileEntity, ctx: BlockBreakContext) {
-        modifyCounters(tileEntity.ownerUUID, ctx.pos, tileEntity.material.id, -1)
+        if (tileEntity.ownerUUID != null)
+            modifyCounters(tileEntity.ownerUUID, ctx.pos, tileEntity.material.id, -1)
     }
     
     private fun modifyCounters(player: UUID, pos: BlockPos, id: NamespacedId, add: Int) {
@@ -68,11 +70,11 @@ internal object TileEntityTracker {
         return BLOCK_COUNTER[player]?.values?.sum() ?: 0
     }
     
-    fun getBlocksPlacedAmount(player:UUID, world: UUID): Int {
+    fun getBlocksPlacedAmount(player: UUID, world: UUID): Int {
         return BLOCK_WORLD_COUNTER[player]?.get(world)?.values?.sum() ?: 0
     }
     
-    fun getBlocksPlacedAmount(player:UUID, chunk: ChunkPos): Int {
+    fun getBlocksPlacedAmount(player: UUID, chunk: ChunkPos): Int {
         return BLOCK_CHUNK_COUNTER[player]?.get(chunk)?.values?.sum() ?: 0
     }
     

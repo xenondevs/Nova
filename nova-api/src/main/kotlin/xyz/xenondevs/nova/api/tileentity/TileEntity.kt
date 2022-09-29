@@ -9,7 +9,7 @@ interface TileEntity {
     /**
      * The owner of this [TileEntity]
      */
-    val owner: OfflinePlayer
+    val owner: OfflinePlayer?
     
     /**
      * The material of this [TileEntity]

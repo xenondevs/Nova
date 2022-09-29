@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.LEGACY_TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
@@ -20,7 +21,7 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     
     override val material: TileEntityNovaMaterial
     lateinit var uuid: UUID
-    lateinit var ownerUUID: UUID
+    var ownerUUID: UUID? = null
     lateinit var data: Compound
     internal var legacyData: LegacyCompound? = null
     
@@ -82,14 +83,14 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     override fun read(buf: ByteBuffer) {
         super.read(buf)
         uuid = buf.readUUID()
-        ownerUUID = buf.readUUID()
+        ownerUUID = buf.readUUID().takeUnless(UUIDUtils.ZERO::equals)
         data = CBF.read(buf)!!
     }
     
     override fun write(buf: ByteBuffer) {
         super.write(buf)
         buf.writeUUID(uuid)
-        buf.writeUUID(ownerUUID)
+        buf.writeUUID(ownerUUID ?: UUIDUtils.ZERO)
         
         if (_tileEntity != null)
             tileEntity.saveData()
