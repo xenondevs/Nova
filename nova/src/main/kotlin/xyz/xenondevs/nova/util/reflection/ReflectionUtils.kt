@@ -7,6 +7,7 @@ import jdk.internal.misc.Unsafe
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CALLABLE_REFERENCE_RECEIVER_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_DEFINE_CLASS_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.K_PROPERTY_1_GET_DELEGATE_METHOD
 import java.lang.reflect.Array
 import java.lang.reflect.Constructor
@@ -16,6 +17,7 @@ import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
+import java.security.ProtectionDomain
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty0
@@ -75,6 +77,9 @@ fun <T : Enum<*>> enumValueOf(enumClass: Class<T>, name: String): T =
 fun Type.tryTakeUpperBound(): Type {
     return if (this is WildcardType) this.upperBounds[0] else this
 }
+
+internal fun ClassLoader.defineClass(name: String, bytecode: ByteArray, protectionDomain: ProtectionDomain) =
+    CLASS_LOADER_DEFINE_CLASS_METHOD.invoke(this, name, bytecode, 0, bytecode.size, protectionDomain) as Class<*>
 
 @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
 object ReflectionUtils {

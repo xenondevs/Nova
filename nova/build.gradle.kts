@@ -97,7 +97,9 @@ remapStrings {
         "xyz.xenondevs.nova.world.generation.WorldGenerationManager",
         "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch",
         "xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch",
-        "xyz.xenondevs.nova.transformer.patch.worldgen.LevelChunkSectionPatch"
+        "xyz.xenondevs.nova.transformer.patch.worldgen.LevelChunkSectionPatch",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.RegistryFileCodecPatch",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch"
     )
 }
 

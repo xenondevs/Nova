@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.data.world
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import org.bukkit.Bukkit
 import org.bukkit.World
+import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -17,6 +19,7 @@ import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
@@ -24,10 +27,12 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.logging.Level
 import kotlin.concurrent.thread
+import net.minecraft.world.level.Level as MojangWorld
 
 internal object WorldDataManager : Initializable(), Listener {
     
@@ -36,6 +41,8 @@ internal object WorldDataManager : Initializable(), Listener {
     
     private val worlds = HashMap<World, WorldDataStorage>()
     private val tasks = ConcurrentLinkedQueue<Task>() // TODO: Map RegionFile -> Queue
+    
+    private val pendingOrphanBlocks = Object2ObjectOpenHashMap<ChunkPos, MutableMap<BlockPos, BlockNovaMaterial>>()
     
     override fun init() {
         LOGGER.info("Initializing WorldDataManager")
@@ -72,6 +79,10 @@ internal object WorldDataManager : Initializable(), Listener {
             
             runTask {
                 if (pos.isLoaded()) {
+                    if (pos in pendingOrphanBlocks) {
+                        pendingOrphanBlocks[pos]?.forEach(::placeOrphanBlock)
+                        pendingOrphanBlocks -= pos
+                    }
                     ArrayList(blockStates.values).forEach { blockState ->
                         try {
                             blockState.handleInitialized(false)
@@ -125,6 +136,26 @@ internal object WorldDataManager : Initializable(), Listener {
     @Synchronized
     fun removeBlockState(pos: BlockPos) {
         getChunk(pos.chunkPos).blockStates -= pos
+    }
+    
+    @Synchronized
+    internal fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: BlockNovaMaterial) {
+        val pos = BlockPos(world.world, x, y, z)
+        val chunk = pos.chunkPos
+        if (chunk.isLoaded()) {
+            placeOrphanBlock(pos, material)
+        } else {
+            pendingOrphanBlocks.getOrPut(chunk, ::Object2ObjectOpenHashMap)[pos] = material
+        }
+    }
+    
+    @Synchronized
+    private fun placeOrphanBlock(pos: BlockPos, material: BlockNovaMaterial) {
+        val ctx = BlockPlaceContext(pos, material.clientsideProvider.get(), null, null, null, pos.below, BlockFace.UP)
+        val state = material.createNewBlockState(ctx)
+        setBlockState(pos, state)
+        state.handleInitialized(true)
+        material.novaBlock.handlePlace(state, ctx)
     }
     
     @Synchronized

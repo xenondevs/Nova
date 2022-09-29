@@ -3,16 +3,25 @@ package xyz.xenondevs.nova.util.reflection
 import com.mojang.brigadier.tree.CommandNode
 import com.mojang.serialization.Codec
 import net.minecraft.core.MappedRegistry
+import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.LevelHeightAccessor
 import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.biome.FeatureSorter
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateHolder
+import net.minecraft.world.level.chunk.ChunkAccess
 import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LevelChunkSection
 import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.PalettedContainer
+import net.minecraft.world.level.chunk.UpgradeData
+import net.minecraft.world.level.levelgen.blending.BlendingData
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
 import org.bukkit.event.HandlerList
@@ -24,6 +33,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getConstructor
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
+import java.security.ProtectionDomain
 import java.util.*
 import java.util.function.Function
 import kotlin.jvm.internal.CallableReference
@@ -44,7 +54,9 @@ internal object ReflectionRegistry {
     // Constructors
     val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class.java, false, Class::class.java)
     val MEMORY_SECTION_CONSTRUCTOR = getConstructor(MemorySection::class.java, true, ConfigurationSection::class.java, String::class.java)
+    val CHUNK_ACCESS_CONSTRUCTOR = getConstructor(ChunkAccess::class.java, false, ChunkPos::class.java, UpgradeData::class.java, LevelHeightAccessor::class.java, Registry::class.java, Long::class.java, Array<LevelChunkSection>::class.java, BlendingData::class.java)
     val SECTION_PATH_DATA_CONSTRUCTOR = getConstructor(SECTION_PATH_DATA_CLASS, true, Any::class.java)
+    val TARGET_BLOCK_STATE_CONSTRUCTOR = getConstructor(TargetBlockState::class.java, true, RuleTest::class.java, BlockState::class.java)
     
     // Methods
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class.java)
@@ -52,6 +64,7 @@ internal object ReflectionRegistry {
     val STATE_HOLDER_CODEC_METHOD = getMethod(StateHolder::class.java, true, "SRM(net.minecraft.world.level.block.state.StateHolder codec)", Codec::class.java, Function::class.java)
     val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class.java, true, "SRM(net.minecraft.world.level.chunk.LevelChunkSection setBlockState)", Int::class.java, Int::class.java, Int::class.java, BlockState::class.java, Boolean::class.java)
     val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class.java, false, "getDelegate", Any::class.java)
+    val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class.java, true, "defineClass", String::class.java, ByteArray::class.java, Int::class.java, Int::class.java, ProtectionDomain::class.java)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -71,9 +84,12 @@ internal object ReflectionRegistry {
     val HASH_MAP_PALETTE_VALUES_FIELD = getField(HashMapPalette::class.java, true, "SRF(net.minecraft.world.level.chunk.HashMapPalette values)")
     val BLOCK_DEFAULT_BLOCK_STATE_FIELD = getField(Block::class.java, true, "SRF(net.minecraft.world.level.block.Block defaultBlockState)")
     val BLOCK_STATE_CODEC_FIELD = getField(BlockState::class.java, false, "SRF(net.minecraft.world.level.block.state.BlockState CODEC)")
-    val STATE_HOLDER_PROPERTIES_CODEC_FIELD = getField(StateHolder::class.java, true, "SRF(net.minecraft.world.level.block.state.StateHolder propertiesCodec)")
+    val TARGET_BLOCK_STATE_CODEC_FIELD = getField(TargetBlockState::class.java, false, "SRF(net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration\$TargetBlockState CODEC)")
+    val ORE_CONFIGURATION_CODEC_FIELD = getField(OreConfiguration::class.java, false, "SRF(net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration CODEC)")
     val MAPPED_REGISTRY_FROZEN_FIELD = getField(MappedRegistry::class.java, true, "SRF(net.minecraft.core.MappedRegistry frozen)")
     val BIOME_GENERATION_SETTINGS_FEATURES_FIELD = getField(BiomeGenerationSettings::class.java, true, "SRF(net.minecraft.world.level.biome.BiomeGenerationSettings features)")
+    val LEVEL_CHUNK_SECTION_STATES_FIELD = getField(LevelChunkSection::class.java, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection states)")
+    val LEVEL_CHUNK_SECTION_J_FIELD = getField(LevelChunkSection::class.java, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection j)")
     val HOLDER_SET_DIRECT_CONTENTS_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contents)")
     val HOLDER_SET_DIRECT_CONTENTS_SET_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contentsSet)")
     
