@@ -204,6 +204,36 @@ inline fun <T, R> Iterable<T>.flatMap(transform: (T) -> Array<R>): List<R> {
     return flatMapTo(ArrayList<R>(), transform)
 }
 
+inline fun <T> Iterable<T>.findNthOrNull(n: Int, predicate: (T) -> Boolean): T? {
+    var count = 0
+    for (element in this) {
+        if (predicate(element)) {
+            if (count == n) return element
+            count++
+        }
+    }
+    
+    return null
+}
+
+inline fun <T> Iterable<T>.findNth(n: Int, predicate: (T) -> Boolean): T =
+    findNthOrNull(n, predicate) ?: throw NoSuchElementException("No ${n + 1} element(s) matching predicate found.")
+
+inline fun <reified R> Iterable<*>.findNthOfTypeOrNull(n: Int): R? {
+    var count = 0
+    for (element in this) {
+        if (element is R) {
+            if (count == n) return element
+            count++
+        }
+    }
+    
+    return null
+}
+
+inline fun <reified R> Iterable<*>.findNthOfType(n: Int): R =
+    findNthOfTypeOrNull<R>(n) ?: throw NoSuchElementException("No ${n + 1} element(s) of type ${R::class.java} found.")
+
 inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(destination: C, transform: (T) -> Array<R>): C {
     for (element in this) {
         val list = transform(element)
