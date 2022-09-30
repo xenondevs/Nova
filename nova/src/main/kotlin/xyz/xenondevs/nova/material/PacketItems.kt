@@ -37,7 +37,6 @@ import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.getOrNull
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.isPlayerView
@@ -304,12 +303,8 @@ internal object PacketItems : Initializable(), Listener {
         val itemDisplayLore = itemDisplayData.lore
         itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
         if (player != null && player in AdvancedTooltips.players) {
-            val itemDisplayDamage = itemDisplayData.damage
-            val itemDisplayMaxDurability = itemDisplayData.maxDurability
-            if (itemDisplayDamage != null && itemDisplayMaxDurability != null) {
-                loreTag += StringTag.valueOf(localized(
-                    ChatColor.WHITE, "item.durability", itemDisplayMaxDurability - itemDisplayDamage, itemDisplayMaxDurability
-                ).withoutPreFormatting().serialize())
+            itemDisplayData.advancedTooltipsLore?.forEach { 
+                loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize())
             }
             loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
         }

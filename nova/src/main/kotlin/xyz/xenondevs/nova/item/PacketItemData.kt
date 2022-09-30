@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.item.vanilla.HideableFlag
 
 /**
  * Stores data that should be added when creating the clientside item.
- * 
+ *
  * Note that all values contained in this class are only for display purposes and do not affect gameplay.
  */
 @Suppress("MemberVisibilityCanBePrivate")
@@ -22,35 +22,14 @@ class PacketItemData {
     var lore: MutableList<Array<BaseComponent>>? = null
     
     /**
-     * The damage shown with advanced tooltips enabled.
+     * The advanced tooltips lore of this item which is displayed when Nova's advanced tooltips are enabled.
      */
-    var damage: Int? = null
-    
-    /**
-     * The maximum durability shown with advanced tooltips enabled.
-     */
-    var maxDurability: Int? = null
-    
-    private var _durabilityBar: Double? = null
+    var advancedTooltipsLore: MutableList<Array<BaseComponent>>? = null
     
     /**
      * The durability percentage of this item from 0 to 1.
      */
-    var durabilityBar: Double
-        set(value) {
-            _durabilityBar = value.coerceIn(0.0..1.0)
-        }
-        get() {
-            val percentage = _durabilityBar
-            if (percentage != null)
-                return percentage
-    
-            val damage = damage
-            val maxDurability = maxDurability
-            return if (damage != null && maxDurability != null) {
-                (maxDurability - damage) / maxDurability.toDouble()
-            } else 1.0
-        }
+    var durabilityBar: Double = 1.0
     
     /**
      * The flags that should be hidden on this item.
@@ -75,6 +54,26 @@ class PacketItemData {
             this.lore = ArrayList()
         
         this.lore!!.add(lore)
+    }
+    
+    /**
+     * Adds multiple lore lines to the advanced tooltips lore.
+     */
+    fun addAdvancedTooltipsLore(lore: List<Array<BaseComponent>>) {
+        if (this.advancedTooltipsLore == null)
+            this.advancedTooltipsLore = ArrayList()
+        
+        this.advancedTooltipsLore!!.addAll(lore)
+    }
+    
+    /**
+     * Adds one lore line to the advanced tooltips lore.
+     */
+    fun addAdvancedTooltipsLore(lore: Array<BaseComponent>) {
+        if (this.advancedTooltipsLore == null)
+            this.advancedTooltipsLore = ArrayList()
+        
+        this.advancedTooltipsLore!!.add(lore)
     }
     
     /**

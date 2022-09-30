@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item.behavior
 
+import net.md_5.bungee.api.ChatColor
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
@@ -7,6 +8,7 @@ import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.DamageableOptions
+import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.item.retrieveDataOrNull
 import xyz.xenondevs.nova.util.item.storeData
 import kotlin.math.min
@@ -43,8 +45,15 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
     
     override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
         val damage = getDamage(itemStack)
-        itemData.damage = damage
-        itemData.maxDurability = maxDurability
+        val durability = maxDurability - damage
+        
+        itemData.durabilityBar = durability / maxDurability.toDouble()
+        
+        if (damage != 0) {
+            itemData.addAdvancedTooltipsLore(
+                arrayOf(localized(ChatColor.WHITE, "item.durability", durability, maxDurability))
+            )
+        }
     }
     
     companion object : ItemBehaviorFactory<Damageable>() {
