@@ -21,36 +21,36 @@ import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
 object DamageableUtils {
     
     /**
-     * Damages the given [item] while taking the unbreaking enchantment and unbreakable property into account.
+     * Damages the given [itemStack] while taking the unbreaking enchantment and unbreakable property into account.
      *
      * This method works for both vanilla and Nova tools.
      *
      * @return The same [ItemStack] with the durability possibly reduced or null if the item was broken.
      */
-    fun damageItem(item: ItemStack, damage: Int = 1): ItemStack? {
-        val meta = item.itemMeta ?: return item
+    fun damageItem(itemStack: ItemStack, damage: Int = 1): ItemStack? {
+        val meta = itemStack.itemMeta ?: return itemStack
         
         if (meta.isUnbreakable)
-            return item
+            return itemStack
         
         val unbreakingLevel = meta.getEnchantLevel(Enchantment.DURABILITY)
         if (unbreakingLevel > 0 && Random.nextInt(0, unbreakingLevel + 1) > 0)
-            return item
+            return itemStack
         
-        val novaDamageable = item.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        val novaDamageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
         if (novaDamageable != null) {
-            val newDamage = novaDamageable.getDamage(item) + damage
-            novaDamageable.setDamage(item, newDamage)
+            val newDamage = novaDamageable.getDamage(itemStack) + damage
+            novaDamageable.setDamage(itemStack, newDamage)
             if (newDamage >= novaDamageable.maxDurability)
                 return null
-        } else if (meta is Damageable && item.type.maxDurability > 0) {
+        } else if (meta is Damageable && itemStack.type.maxDurability > 0) {
             meta.damage += damage
-            if (meta.damage >= item.type.maxDurability)
+            if (meta.damage >= itemStack.type.maxDurability)
                 return null
-            item.itemMeta = meta
+            itemStack.itemMeta = meta
         }
         
-        return item
+        return itemStack
     }
     
     /**
@@ -125,6 +125,22 @@ object DamageableUtils {
         }
         
         return if (broken) ItemDamageResult.BROKEN else ItemDamageResult.DAMAGED
+    }
+    
+    fun isDamageable(itemStack: ItemStack): Boolean {
+        val novaDamageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (novaDamageable != null)
+            return true
+        
+        return itemStack.type.maxDurability > 0
+    }
+    
+    internal fun isDamageable(itemStack: MojangStack): Boolean {
+        val novaDamageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (novaDamageable != null)
+            return true
+        
+        return itemStack.item.canBeDepleted()
     }
     
 }

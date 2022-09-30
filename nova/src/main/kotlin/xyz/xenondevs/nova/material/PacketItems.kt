@@ -99,14 +99,14 @@ internal object PacketItems : Initializable(), Listener {
                 ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
                     event.isCancelled = true
                     
-                    view.setItem(rawSlot, null)
                     if (event.view.isPlayerView()) {
+                        view.setItem(rawSlot, null)
                         view.bottomInventory.addItemCorrectly(clicked)
                     } else {
                         val toInv = if (event.clickedInventory == view.topInventory)
                             view.bottomInventory else view.topInventory
                         
-                        toInv.addItemCorrectly(clicked)
+                        clicked.amount = toInv.addItemCorrectly(clicked)
                     }
                 }
                 

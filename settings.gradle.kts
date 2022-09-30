@@ -12,7 +12,6 @@ dependencyResolutionManagement {
             version("kotlin", "1.7.10")
             version("ktor", "2.1.0")
             version("spigot", "1.19.2-R0.1-SNAPSHOT")
-            version("invui", "0.8-SNAPSHOT")
             version("cbf", "0.2")
             
             // lib - kotlin
