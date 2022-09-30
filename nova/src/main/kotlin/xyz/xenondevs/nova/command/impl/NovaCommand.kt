@@ -41,6 +41,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
+import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.ComponentUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
@@ -212,7 +213,7 @@ internal object NovaCommand : Command("nova") {
         if (targetPlayers.isNotEmpty()) {
             targetPlayers.forEach {
                 val player = it.bukkitEntity
-                player.inventory.addItem(material.createItemStack(amount))
+                player.inventory.addItemCorrectly(material.createItemStack(amount))
                 
                 ctx.source.sendSuccess(localized(
                     ChatColor.GRAY,

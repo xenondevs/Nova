@@ -16,6 +16,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.ItemMergeEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
@@ -113,6 +114,16 @@ internal object PacketItems : Initializable(), Listener {
             }
             
         }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private fun handleMerge(event: ItemMergeEvent) {
+        val first = event.entity.itemStack
+        val second = event.target.itemStack
+        
+        val novaMaterial = first.novaMaterial ?: return
+        if (first.amount + second.amount > novaMaterial.maxStackSize)
+            event.isCancelled = true
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -303,7 +314,7 @@ internal object PacketItems : Initializable(), Listener {
         val itemDisplayLore = itemDisplayData.lore
         itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
         if (player != null && player in AdvancedTooltips.players) {
-            itemDisplayData.advancedTooltipsLore?.forEach { 
+            itemDisplayData.advancedTooltipsLore?.forEach {
                 loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize())
             }
             loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())

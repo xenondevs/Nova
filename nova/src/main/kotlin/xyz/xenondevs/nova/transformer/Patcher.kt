@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
 import xyz.xenondevs.nova.transformer.patch.item.DamageablePatches
 import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
+import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -27,7 +28,10 @@ internal object Patcher : Initializable() {
     
     private val extraOpens = setOf("java.lang", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
-        sequenceOf(FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, EnchantmentPatches, AnvilResultPatch)
+        sequenceOf(
+            FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, EnchantmentPatches, AnvilResultPatch,
+            StackSizePatch
+        )
             .filter(Transformer::shouldTransform).toSet()
     }
     

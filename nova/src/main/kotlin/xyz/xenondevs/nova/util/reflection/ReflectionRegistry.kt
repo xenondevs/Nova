@@ -4,6 +4,7 @@ import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.ExperienceOrb
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.ItemCombinerMenu
 import net.minecraft.world.item.enchantment.EnchantmentCategory
@@ -31,6 +32,7 @@ import kotlin.reflect.KProperty1
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
+import net.minecraft.world.entity.player.Inventory as MojangInventory
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -67,6 +69,8 @@ internal object ReflectionRegistry {
     val ITEM_IS_ENCHANTABLE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item isEnchantable)", MojangStack::class.java)
     val ITEM_GET_ENCHANTMENT_VALUE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item getEnchantmentValue)")
     val EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD = getMethod(ExperienceOrb::class.java, true, "SRM(net.minecraft.world.entity.ExperienceOrb repairPlayerItems)", MojangPlayer::class.java, Int::class.java)
+    val ITEM_ENTITY_PLAYER_TOUCH_METHOD = getMethod(ItemEntity::class.java, false, "SRM(net.minecraft.world.entity.item.ItemEntity playerTouch)", MojangPlayer::class.java)
+    val INVENTORY_ADD_METHOD = getMethod(MojangInventory::class.java, false, "SRM(net.minecraft.world.entity.player.Inventory add)", MojangStack::class.java)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
