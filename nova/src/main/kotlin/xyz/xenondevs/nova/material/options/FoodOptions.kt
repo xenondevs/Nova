@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.material.options
 
 import org.bukkit.potion.PotionEffect
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.provider.ConfigAccess
+import xyz.xenondevs.nova.data.config.provider.map
+import xyz.xenondevs.nova.data.config.provider.orElse
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
@@ -111,7 +113,9 @@ private class HardcodedFoodOptions(
 
 private class ConfigurableFoodOptions : ConfigAccess, FoodOptions {
     
-    override val type by getEntry<String, FoodType>("food_type", FoodType.NORMAL) { FoodType.valueOf(it.uppercase()) }
+    override val type by getOptionalEntry<String>("food_type")
+        .map { FoodType.valueOf(it.uppercase()) }
+        .orElse(FoodType.NORMAL)
     override val consumeTime by getEntry<Int>("consume_time")
     override val nutrition by getEntry<Int>("nutrition")
     override val saturationModifier by getEntry<Float>("saturation_modifier")

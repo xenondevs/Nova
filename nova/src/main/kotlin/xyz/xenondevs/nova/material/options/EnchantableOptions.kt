@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.material.options
 
 import net.minecraft.world.item.enchantment.EnchantmentCategory
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.provider.ConfigAccess
+import xyz.xenondevs.nova.data.config.provider.map
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 
 @HardcodedMaterialOptions
@@ -35,9 +36,8 @@ private class HardcodedEnchantableOptions(
 private class ConfigurableEnchantableOptions : ConfigAccess, EnchantableOptions {
     
     override val enchantmentValue by getEntry<Int>("enchantment_value")
-    override val enchantmentCategories by getEntry<List<String>, List<EnchantmentCategory>>("enchantment_categories") { list ->
-        list.map { EnchantmentCategory.valueOf(it.uppercase()) }
-    }
+    override val enchantmentCategories by getEntry<List<String>>("enchantment_categories")
+        .map { list -> list.map { EnchantmentCategory.valueOf(it.uppercase()) } }
     
     constructor(path: String) : super(path)
     constructor(material: ItemNovaMaterial) : super(material)

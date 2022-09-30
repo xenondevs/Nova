@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.material.options
 
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.provider.ConfigAccess
+import xyz.xenondevs.nova.data.config.provider.map
+import xyz.xenondevs.nova.data.config.provider.orElse
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolCategoryRegistry
 import xyz.xenondevs.nova.item.tool.ToolLevel
@@ -52,13 +54,13 @@ private class HardcodedToolOptions(
 
 private class ConfigurableToolOptions : ConfigAccess, ToolOptions {
     
-    override val level by getEntry<String, ToolLevel>("tool_level") { ToolLevelRegistry.of(it)!! }
-    override val category by getEntry<String, ToolCategory>("tool_category") { ToolCategoryRegistry.of(it)!! }
+    override val level by getEntry<String>("tool_level").map { ToolLevelRegistry.of(it)!! }
+    override val category by getEntry<String>("tool_category").map { ToolCategoryRegistry.of(it)!! }
     override val breakSpeed by getEntry<Double>("break_speed")
     override val attackDamage by getOptionalEntry<Double>("attack_damage")
     override val attackSpeed by getOptionalEntry<Double>("attack_speed")
-    override val canSweepAttack by getEntry("can_sweep_attack", false)
-    override val canBreakBlocksInCreative by getEntry("can_break_blocks_in_creative", true)
+    override val canSweepAttack by getOptionalEntry<Boolean>("can_sweep_attack").orElse(false)
+    override val canBreakBlocksInCreative by getOptionalEntry<Boolean>("can_break_blocks_in_creative").orElse(true)
     
     constructor(path: String) : super(path)
     constructor(material: ItemNovaMaterial) : super(material)
