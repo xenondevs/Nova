@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package xyz.xenondevs.nova.util.item
 
 import net.minecraft.advancements.CriteriaTriggers
@@ -7,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -14,6 +17,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.callEvent
+import xyz.xenondevs.nova.util.nmsCopy
 import kotlin.random.Random
 import net.minecraft.world.item.ItemStack as MojangStack
 import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
@@ -135,12 +139,86 @@ object DamageableUtils {
         return itemStack.type.maxDurability > 0
     }
     
+    fun getMaxDurability(itemStack: ItemStack): Int {
+        val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (damageable != null) {
+            return damageable.maxDurability
+        }
+        
+        return itemStack.type.maxDurability.toInt()
+    }
+    
+    fun getDamage(itemStack: ItemStack): Int {
+        val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (damageable != null) {
+            return damageable.getDamage(itemStack)
+        }
+        
+        return (itemStack.itemMeta as? Damageable)?.damage ?: 0
+    }
+    
+    fun setDamage(itemStack: ItemStack, damage: Int) {
+        val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (damageable != null) {
+            damageable.setDamage(itemStack, damage)
+        } else {
+            val itemMeta = itemStack.itemMeta as? Damageable ?: return
+            itemMeta.damage = damage
+            itemStack.itemMeta = itemMeta
+        }
+    }
+    
+    fun isValidRepairItem(first: ItemStack, second: ItemStack): Boolean {
+        val damageable = first.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (damageable != null) {
+            return damageable.options.repairIngredient?.test(second) ?: false
+        }
+        
+        return CraftMagicNumbers.getItem(first.type).isValidRepairItem(first.nmsCopy, second.nmsCopy)
+    }
+    
     internal fun isDamageable(itemStack: MojangStack): Boolean {
         val novaDamageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
         if (novaDamageable != null)
             return true
         
         return itemStack.item.canBeDepleted()
+    }
+    
+    internal fun getMaxDurability(itemStack: MojangStack): Int {
+        val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (damageable != null) {
+            return damageable.maxDurability
+        }
+        
+        return itemStack.maxDamage
+    }
+    
+    internal fun getDamage(itemStack: MojangStack): Int {
+        val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (damageable != null) {
+            return damageable.getDamage(itemStack.bukkitMirror)
+        }
+        
+        return itemStack.damageValue
+    }
+    
+    internal fun setDamage(itemStack: MojangStack, damage: Int) {
+        val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (damageable != null) {
+            damageable.setDamage(itemStack.bukkitMirror, damage)
+        } else {
+            itemStack.damageValue = damage
+        }
+    }
+    
+    internal fun isValidRepairItem(first: MojangStack, second: MojangStack): Boolean {
+        val damageable = first.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
+        if (damageable != null) {
+            return damageable.options.repairIngredient?.test(second.bukkitMirror) ?: false
+        }
+        
+        return first.item.isValidRepairItem(first, second)
     }
     
 }

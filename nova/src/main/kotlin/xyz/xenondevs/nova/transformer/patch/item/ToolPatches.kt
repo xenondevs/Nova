@@ -3,9 +3,6 @@ package xyz.xenondevs.nova.transformer.patch.item
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
 import net.minecraft.core.Registry
-import net.minecraft.stats.Stats
-import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.level.block.state.BlockState
@@ -16,21 +13,17 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.bytebase.util.replaceFirst
-import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.item.DamageableUtils
-import xyz.xenondevs.nova.util.item.ItemDamageResult
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethodByName
 import xyz.xenondevs.nova.util.resourceLocation
-import java.util.function.Consumer
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -40,8 +33,6 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
     override fun transform() {
         transformCraftBlockIsPreferredTool()
         transformItemStackGetAttributeModifiers()
-        transformItemStackHurtAndBreak()
-        transformItemStackHurtEnemy()
         transformPlayerAttack()
     }
     
@@ -98,59 +89,6 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
         }
         
         return novaModifiers
-    }
-    
-    /**
-     * Patches the ItemStack#hurtAndBreak method to properly damage Nova's tools.
-     */
-    private fun transformItemStackHurtAndBreak() {
-        VirtualClassPath[ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD]
-            .instructions = buildInsnList {
-            aLoad(0)
-            iLoad(1)
-            aLoad(2)
-            aLoad(3)
-            invokeStatic(getMethodByName(ToolPatches::class.java, false, "hurtAndBreak"))
-            _return()
-        }
-    }
-    
-    @JvmStatic
-    fun hurtAndBreak(itemStack: MojangStack, damage: Int, entity: LivingEntity, consumer: Consumer<LivingEntity>) {
-        if (DamageableUtils.damageAndBreakItem(itemStack, damage, entity) == ItemDamageResult.BROKEN) {
-            consumer.accept(entity)
-        }
-    }
-    
-    /**
-     * Patches the ItemStack#hurtEnemy method to properly damage Nova's tools and with the proper damage values.
-     */
-    private fun transformItemStackHurtEnemy() {
-        VirtualClassPath[ReflectionRegistry.ITEM_STACK_HURT_ENTITY_METHOD]
-            .instructions = buildInsnList {
-            aLoad(0)
-            aLoad(2)
-            invokeStatic(getMethodByName(ToolPatches::class.java, false, "hurtEnemy"))
-            _return()
-        }
-    }
-    
-    @JvmStatic
-    fun hurtEnemy(itemStack: MojangStack, player: MojangPlayer) {
-        val novaMaterial = itemStack.novaMaterial
-        
-        val damage = if (novaMaterial != null) {
-            val damageable = novaMaterial.novaItem.getBehavior(Damageable::class) ?: return
-            damageable.options.itemDamageOnAttackEntity
-        } else {
-            val category = ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory ?: return
-            player.awardStat(Stats.ITEM_USED.get(itemStack.item))
-            category.itemDamageOnAttackEntity
-        }
-        
-        itemStack.hurtAndBreak(damage, player) {
-            player.broadcastBreakEvent(EquipmentSlot.MAINHAND)
-        }
     }
     
     /**

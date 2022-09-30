@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.inventory.AnvilMenu
+import net.minecraft.world.inventory.ItemCombinerMenu
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.level.block.state.BlockState
@@ -83,5 +84,7 @@ internal object ReflectionRegistry {
     val PALETTED_CONTAINER_DATA_STORAGE_FIELD = getField(PALETTED_CONTAINER_DATA_CLASS, true, "SRF(net.minecraft.world.level.chunk.PalettedContainer\$Data storage)")
     val LINEAR_PALETTE_VALUES_FIELD = getField(LinearPalette::class.java, true, "SRF(net.minecraft.world.level.chunk.LinearPalette values)")
     val HASH_MAP_PALETTE_VALUES_FIELD = getField(HashMapPalette::class.java, true, "SRF(net.minecraft.world.level.chunk.HashMapPalette values)")
+    val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class.java, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
+    val ITEM_COMBINER_MENU_PLAYER_FIELD = getField(ItemCombinerMenu::class.java, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu player)")
     
 }
