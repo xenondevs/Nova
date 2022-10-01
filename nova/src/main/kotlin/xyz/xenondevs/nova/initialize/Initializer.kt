@@ -8,7 +8,6 @@ import de.studiocode.invui.util.InventoryUtils
 import de.studiocode.invui.virtualinventory.StackSizeProvider
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
-import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -68,6 +67,7 @@ import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.*
 import java.util.logging.Level
 import kotlin.reflect.jvm.jvmName
+import kotlin.system.exitProcess
 
 internal object Initializer : Listener {
     
@@ -119,8 +119,10 @@ internal object Initializer : Listener {
         
         isDone = true
         
-        if (initialized.size != toInit.size)
-            Bukkit.getPluginManager().disablePlugin(NOVA.loader)
+        if (initialized.size != toInit.size) {
+            LOGGER.log(Level.SEVERE, "Failed to initialize. Shutting down...")
+            exitProcess(1)
+        }
     }
     
     fun initPostWorld() {
@@ -154,7 +156,8 @@ internal object Initializer : Listener {
                     LOGGER.info("Done loading")
                 }
             } else {
-                Bukkit.getPluginManager().disablePlugin(NOVA.loader)
+                LOGGER.log(Level.SEVERE, "Failed to initialize. Shutting down...")
+                exitProcess(1)
             }
         }
     }
