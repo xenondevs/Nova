@@ -14,6 +14,9 @@ import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.LevelChunkSectionPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.RegistryCodecPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.WrapperBlockPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
 import java.lang.reflect.Field
@@ -25,8 +28,10 @@ internal object Patcher : Initializable() {
     
     private val extraOpens = setOf("java.lang", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
-        sequenceOf(NoteBlockPatch, FieldFilterPatch, FeatureSorterPatch, LevelChunkSectionPatch)
-            .filter(Transformer::shouldTransform).toSet()
+        sequenceOf(
+            NoteBlockPatch, FieldFilterPatch, FeatureSorterPatch, LevelChunkSectionPatch,
+            ChunkAccessSectionsPatch, RegistryCodecPatch, WrapperBlockPatch
+        ).filter(Transformer::shouldTransform).toSet()
     }
     
     override fun init() {

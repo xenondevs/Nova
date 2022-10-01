@@ -17,8 +17,8 @@ import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.data.decodeJsonFile
 import xyz.xenondevs.nova.util.data.getFirstValueOrThrow
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjector
-import xyz.xenondevs.nova.world.generation.inject.codec.BlockStateCodecOverride
 import xyz.xenondevs.nova.world.generation.inject.codec.CodecOverride
+import xyz.xenondevs.nova.world.generation.inject.codec.blockstate.BlockStateCodecOverride
 import java.io.File
 
 internal object WorldGenManager : Initializable() {
@@ -29,11 +29,10 @@ internal object WorldGenManager : Initializable() {
     val WORLD_GEN_DIR = File(NOVA.dataFolder, ".data/worldgen")
     val REGISTRIES = setOf(
         Registry.CONFIGURED_FEATURE_REGISTRY,
-        Registry.PLACED_FEATURE_REGISTRY,
-        
+        Registry.PLACED_FEATURE_REGISTRY
     ).associateWithTo(Object2ObjectOpenHashMap()) { REGISTRY_ACCESS.registry(it).get() }
     
-    private val CODEC_OVERRIDES = listOf(BlockStateCodecOverride)
+    private val CODEC_OVERRIDES by lazy { listOf(BlockStateCodecOverride) }
     
     override fun init() {
         WorldGenFiles.extract()
@@ -49,7 +48,7 @@ internal object WorldGenManager : Initializable() {
         val configuredFeature = ConfiguredFeature.CODEC
             .decodeJsonFile(file)
             .getFirstValueOrThrow("Failed to parse feature configuration of $name")
-
+        
         BuiltinRegistries.registerExact(REGISTRIES[Registry.CONFIGURED_FEATURE_REGISTRY], name.toString(":"), configuredFeature)
     }
     
@@ -57,7 +56,7 @@ internal object WorldGenManager : Initializable() {
         val placedFeature = PlacedFeature.CODEC
             .decodeJsonFile(file)
             .getFirstValueOrThrow("Failed to parse placed feature of $name")
-
+        
         BuiltinRegistries.registerExact(REGISTRIES[Registry.PLACED_FEATURE_REGISTRY], name.toString(":"), placedFeature)
     }
     

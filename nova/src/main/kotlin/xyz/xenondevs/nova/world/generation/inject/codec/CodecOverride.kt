@@ -1,7 +1,14 @@
 package xyz.xenondevs.nova.world.generation.inject.codec
 
-internal sealed interface CodecOverride {
+import com.mojang.serialization.Codec
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import java.lang.reflect.Field
+
+internal abstract class CodecOverride {
     
-    fun replace()
+    abstract fun replace()
+    
+    fun replace(field: Field, codec: Codec<*>) =
+        ReflectionUtils.setStaticFinalField(field, codec)
     
 }
