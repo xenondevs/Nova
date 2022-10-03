@@ -145,6 +145,10 @@ fun ComponentBuilder.appendLocalized(translate: String, vararg with: Any): Compo
     return this
 }
 
+fun Array<BaseComponent>.duplicate(): Array<BaseComponent> {
+    return Array(size) { this[it].duplicate() }
+}
+
 object ComponentUtils {
     
     fun createLinkComponent(url: String): BaseComponent {

@@ -37,6 +37,7 @@ import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
+import xyz.xenondevs.nova.util.data.duplicate
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
@@ -301,10 +302,12 @@ internal object PacketItems : Initializable(), Listener {
         val itemDisplayData = novaItem.getPacketItemData(item.bukkitStack)
         
         // name
-        val itemDisplayName = itemDisplayData.name
+        var itemDisplayName = itemDisplayData.name
         if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
-            if (item.isEnchanted && itemDisplayName.size == 1)
+            if (item.isEnchanted && itemDisplayName.size == 1) {
+                itemDisplayName = itemDisplayName.duplicate()
                 itemDisplayName[0].color = ChatColor.AQUA
+            }
             
             displayTag.putString("Name", itemDisplayName.serialize())
         }
