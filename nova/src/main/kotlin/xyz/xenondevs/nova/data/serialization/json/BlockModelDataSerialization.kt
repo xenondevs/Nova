@@ -9,8 +9,8 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
+import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
@@ -32,7 +32,6 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
             is ArmorStandBlockModelData -> {
                 result.addProperty("id", src.id)
                 result.addProperty("hitboxType", src.hitboxType.name)
-                result.addProperty("material", src.material.name)
                 result.add("dataArray", GSON.toJsonTree(src.dataArray))
             }
             
@@ -76,10 +75,9 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
         } else {
             val id = json.getString("id")!!
             val hitboxType = Material.valueOf(json.getString("hitboxType")!!)
-            val material = Material.valueOf(json.getString("material")!!)
             val dataArray = json.getAsJsonArray("dataArray").getAllInts().toIntArray()
             
-            return ArmorStandBlockModelData(id, hitboxType, material, dataArray)
+            return ArmorStandBlockModelData(id, hitboxType, dataArray)
         }
     }
     

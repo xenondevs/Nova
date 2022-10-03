@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.block
+package xyz.xenondevs.nova.world.block.logic.place
 
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.GameMode
@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.util.yaw
+import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.pos

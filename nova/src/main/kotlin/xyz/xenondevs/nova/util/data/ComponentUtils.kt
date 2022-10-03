@@ -140,6 +140,11 @@ fun BaseComponent.withoutPreFormatting(): Array<BaseComponent> =
 fun Array<BaseComponent>.serialize(): String =
     ComponentSerializer.toString(this)
 
+fun ComponentBuilder.appendLocalized(translate: String, vararg with: Any): ComponentBuilder {
+    append(TranslatableComponent(translate, *with))
+    return this
+}
+
 object ComponentUtils {
     
     fun createLinkComponent(url: String): BaseComponent {

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.model.config
+package xyz.xenondevs.nova.data.resources.model.blockstate
 
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.NoteBlock

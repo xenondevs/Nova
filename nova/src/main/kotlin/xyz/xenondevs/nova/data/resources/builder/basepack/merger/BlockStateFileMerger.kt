@@ -4,11 +4,11 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.config.BrownMushroomBlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.MushroomStemBlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.RedMushroomBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
+import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.NoteBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.RedMushroomBlockStateConfig
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.addAll
 import xyz.xenondevs.nova.util.data.parseJson

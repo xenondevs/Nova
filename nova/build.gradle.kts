@@ -16,9 +16,9 @@ dependencies {
     api(project(":nova-api"))
     spigotLoaderApi(deps.bundles.kotlin)
     novaLoaderApi(deps.bundles.cbf)
-    novaLoaderApi("de.studiocode.invui:InvUI:0.8-SNAPSHOT") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
-    novaLoaderApi("de.studiocode.invui:ResourcePack:0.8-SNAPSHOT") { exclude("de.studiocode.invui", "InvUI") }
-    novaLoaderApi("de.studiocode.invui:IA-R11:0.8-SNAPSHOT:remapped-mojang")
+    novaLoaderApi("de.studiocode.invui:InvUI:0.8.1") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
+    novaLoaderApi("de.studiocode.invui:ResourcePack:0.8.1") { exclude("de.studiocode.invui", "InvUI") }
+    novaLoaderApi("de.studiocode.invui:IA-R11:0.8.1:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.1-SNAPSHOT:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:particle:1.8")
     
@@ -28,7 +28,7 @@ dependencies {
     novaLoader(deps.bundles.minecraft.assets)
     novaLoader(deps.zip4j)
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
-    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.3-SNAPSHOT")
+    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.1")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
     novaLoader("software.amazon.awssdk:s3:2.17.267")
     
@@ -94,7 +94,8 @@ remapStrings {
     classes.set(listOf(
         "xyz.xenondevs.nova.util.reflection.ReflectionRegistry",
         "xyz.xenondevs.nova.util.NMSUtils",
-        "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch"
+        "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch",
+        "xyz.xenondevs.nova.transformer.patch.item.ToolPatches"
     ))
 }
 

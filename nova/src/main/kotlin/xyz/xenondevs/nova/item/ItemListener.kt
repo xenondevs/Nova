@@ -5,11 +5,15 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
@@ -27,7 +31,7 @@ import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 
-internal object ItemManager : Initializable(), Listener {
+internal object ItemListener : Initializable(), Listener {
     
     override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = emptySet<Initializable>()
@@ -55,6 +59,25 @@ internal object ItemManager : Initializable(), Listener {
     private fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
         val item = event.player.inventory.getItem(event.hand)
         findBehaviors(item)?.forEach { it.handleEntityInteract(event.player, item!!, event.rightClicked, event) }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private fun handleEntityAttack(event: EntityDamageByEntityEvent) {
+        val player = event.damager as? Player ?: return
+        val item = player.inventory.getItem(EquipmentSlot.HAND)
+        findBehaviors(item)?.forEach { it.handleAttackEntity(player, item!!, event.entity, event) }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private fun handleBlockBreak(event: BlockBreakEvent) {
+        val item = event.player.inventory.getItem(EquipmentSlot.HAND)
+        findBehaviors(item)?.forEach { it.handleBreakBlock(event.player, item!!, event) }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private fun handleDamage(event: PlayerItemDamageEvent) {
+        val item = event.item
+        findBehaviors(item)?.forEach { it.handleDamage(event.player, item, event) }
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

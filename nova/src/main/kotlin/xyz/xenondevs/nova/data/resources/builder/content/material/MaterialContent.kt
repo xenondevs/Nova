@@ -1,24 +1,24 @@
-package xyz.xenondevs.nova.data.resources.builder.content
+package xyz.xenondevs.nova.data.resources.builder.content.material
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.addon.assets.AssetPack
-import xyz.xenondevs.nova.addon.assets.BlockDirection
-import xyz.xenondevs.nova.addon.assets.BlockModelInformation
-import xyz.xenondevs.nova.addon.assets.BlockModelType
-import xyz.xenondevs.nova.addon.assets.ItemModelInformation
-import xyz.xenondevs.nova.addon.assets.ItemModelType
-import xyz.xenondevs.nova.addon.assets.ModelInformation
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfigType
+import xyz.xenondevs.nova.data.resources.builder.content.PackContent
+import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockDirection
+import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelType
+import xyz.xenondevs.nova.data.resources.builder.content.material.info.ModelInformation
+import xyz.xenondevs.nova.data.resources.builder.content.material.info.RegisteredMaterial
+import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
@@ -31,11 +31,11 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 
-private val USE_SOLID_BLOCKS by configReloadable {  DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks") }
+private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks") }
 
 internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
     
-    private val novaMaterials = HashMap<String, Pair<ItemModelInformation, BlockModelInformation>>()
+    private val novaMaterials = HashMap<String, RegisteredMaterial>()
     
     private val modelDataPosition = HashMap<Material, Int>()
     
@@ -45,13 +45,9 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
     override fun addFromPack(pack: AssetPack) {
         val materialsIndex = pack.materialsIndex ?: return
         
-        materialsIndex.forEach { mat ->
-            val itemInfo = mat.itemInfo
-            val blockInfo = mat.blockInfo
-            
-            novaMaterials[mat.id] = itemInfo to blockInfo
-            
-            createDefaultModelFiles(pack, itemInfo)
+        materialsIndex.forEach { registeredMaterial ->
+            novaMaterials[registeredMaterial.id] = registeredMaterial
+            createDefaultModelFiles(pack, registeredMaterial.itemInfo)
         }
     }
     
@@ -73,36 +69,47 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
         file.writeText(GSON.toJson(modelObj))
     }
     
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("ReplaceWithEnumMap")
     override fun write() {
-        val modelDataLookup = HashMap<String, Pair<ItemModelData?, BlockModelData?>>()
+        // the general lookup later passed to Resources
+        val modelDataLookup = HashMap<String, Pair<HashMap<Material, ItemModelData>?, BlockModelData?>>()
         
+        // stores the custom model id overrides, used to prevent duplicate registration of armor stand models and for writing to the respective file
         val customItemModels = HashMap<Material, HashMap<String, Int>>()
+        // stores block state block models by their name and direction, used to prevent duplicate registration of solid blocks
         val blockStateModelsByName = HashMap<Pair<String, BlockDirection>, BlockStateConfig>()
+        // stores block state block models by their type and id / direction, used for writing them to their respective files
         val blockStateModelsByType = HashMap<BlockStateConfigType<*>, HashMap<Pair<String, BlockDirection>, BlockStateConfig>>()
         
-        novaMaterials.forEach { (id, pair) ->
-            val info = pair.first
-            val material = info.material
-            
-            val registeredModels = customItemModels.getOrPut(material, ::HashMap)
-            val dataArray = info.models.mapToIntArray { model -> registeredModels.getOrPut(model) { getNextCustomModelData(material) } }
-            modelDataLookup[id] = ItemModelData(info.id, material, dataArray) to null
+        // generate item models map
+        novaMaterials.forEach { (id, regMat) ->
+            val info = regMat.itemInfo
+            // create map containing all ItemModelData instances for each vanilla material of this item
+            val materialsMap: HashMap<Material, ItemModelData> = HashMap()
+            modelDataLookup[id] = materialsMap to null
+            // register that item model under the required vanilla materials
+            val materials = info.material?.let(::listOf) ?: VanillaMaterialTypes.MATERIALS
+            materials.forEach { material ->
+                val registeredModels = customItemModels.getOrPut(material, ::HashMap)
+                val dataArray = info.models.mapToIntArray { model -> registeredModels.getOrPut(model) { getNextCustomModelData(material) } }
+                materialsMap[material] = ItemModelData(info.id, material, dataArray)
+            }
         }
         
+        // generate block models map
         novaMaterials.entries
-            .sortedByDescending { it.value.second.priority }
-            .forEach { (id, pair) ->
-                val info = pair.second
+            .sortedByDescending { it.value.blockInfo.priority }
+            .forEach { (id, regMat) ->
+                val info = regMat.blockInfo
                 val itemModelData = modelDataLookup[id]!!.first
                 
                 val blockModelData: BlockModelData
                 if (getRemainingBlockStateIdAmount(info.type) < info.models.size) {
-                    val material = ItemModelType.DEFAULT.material
+                    // If there are not enough block states left over for this block, use armor stands to display it
+                    val material = VanillaMaterialTypes.DEFAULT_MATERIAL
                     val registeredModels = customItemModels.getOrPut(material, ::HashMap)
                     val dataArray = info.models.mapToIntArray { registeredModels.getOrPut(it) { getNextCustomModelData(material) } }
-                    
-                    blockModelData = ArmorStandBlockModelData(id, info.hitboxType, material, dataArray)
+                    blockModelData = ArmorStandBlockModelData(id, info.hitboxType, dataArray)
                 } else {
                     val configs = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
                     info.models.forEach { model ->
@@ -123,8 +130,10 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
                 modelDataLookup[id] = itemModelData to blockModelData
             }
         
+        // pass modelDataLookup to Resources
         Resources.updateModelDataLookup(modelDataLookup)
         
+        // write item models
         customItemModels.forEach { (material, registeredModels) ->
             val (file, modelObj, overrides) = getModelFile(material)
             
@@ -141,6 +150,7 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
             file.writeText(GSON.toJson(modelObj))
         }
         
+        // write block models
         blockStateModelsByType.forEach { (type, registeredModels) ->
             val (file, mainObj, variants) = getBlockStateFile(type)
             

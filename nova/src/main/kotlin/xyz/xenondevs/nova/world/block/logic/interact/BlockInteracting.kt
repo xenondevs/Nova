@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.block
+package xyz.xenondevs.nova.world.block.logic.interact
 
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.pos

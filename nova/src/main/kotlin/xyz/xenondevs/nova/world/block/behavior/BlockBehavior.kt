@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.world.block.behavior
 
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.event.Listener
-import xyz.xenondevs.nova.data.resources.model.config.BlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.config.DefaultingBlockStateConfigType
+import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.DefaultingBlockStateConfigType
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState

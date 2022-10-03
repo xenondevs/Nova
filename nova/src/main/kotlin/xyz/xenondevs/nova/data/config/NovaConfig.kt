@@ -36,7 +36,7 @@ object NovaConfig : Initializable() {
     override val dependsOn = setOf(AddonsLoader)
     
     private val configs = HashMap<String, YamlConfiguration>()
-    internal val configReloadables = arrayListOf<Reloadable>()
+    internal val reloadables = arrayListOf<Reloadable>()
     
     fun loadDefaultConfig() {
         LOGGER.info("Loading default config")
@@ -79,7 +79,7 @@ object NovaConfig : Initializable() {
         loadDefaultConfig()
         init()
         UpgradeTypeRegistry.types.forEach(Reloadable::reload)
-        configReloadables.sorted().forEach(Reloadable::reload)
+        reloadables.sorted().forEach(Reloadable::reload)
         TileEntityManager.tileEntities.forEach(Reloadable::reload)
         NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
         AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)
@@ -94,10 +94,10 @@ object NovaConfig : Initializable() {
     }
     
     operator fun get(name: String): YamlConfiguration =
-        configs[name]!!
+        configs[name] ?: throw IllegalArgumentException("Config not found: $name")
     
     operator fun get(material: ItemNovaMaterial): YamlConfiguration =
-        configs[material.id.toString()]!!
+        configs[material.id.toString()] ?: throw IllegalArgumentException("Config not found: ${material.id}")
     
     fun save(name: String) {
         configs[name]!!.save(File(NOVA.dataFolder, "configs/$name.yml"))
@@ -126,7 +126,7 @@ class ConfigReloadable<T : Any> internal constructor(val initializer: () -> T) :
         }
     
     init {
-        NovaConfig.configReloadables += this
+        NovaConfig.reloadables += this
     }
     
     override fun reload() {

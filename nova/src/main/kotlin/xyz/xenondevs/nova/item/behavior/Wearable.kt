@@ -54,7 +54,6 @@ class Wearable(private val type: ArmorType, private val armor: Double = 0.0, pri
         }
     }
     
-    @Suppress("UNNECESSARY_SAFE_CALL")
     override fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
         if ((event.click == ClickType.SHIFT_LEFT || event.click == ClickType.SHIFT_RIGHT)
             && event.view.isPlayerView()

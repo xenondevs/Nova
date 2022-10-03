@@ -12,7 +12,8 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
-import xyz.xenondevs.nova.material.FoodOptions
+import xyz.xenondevs.nova.material.options.FoodOptions
+import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.util.isRightClick
@@ -33,6 +34,8 @@ private const val PACKET_DISTANCE = 500.0
 data class Eater(val itemStack: ItemStack, val hand: EquipmentSlot, val startTime: Int)
 
 class Consumable(private val options: FoodOptions) : ItemBehavior() {
+    
+    override val vanillaMaterialProperties = listOf(options.type.vanillaMaterialProperty)
     
     private val eaters = HashMap<Player, Eater>()
     
@@ -55,7 +58,7 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
             return
         
         // food which is not always consumable cannot be eaten in survival with a full hunger bar
-        if (!options.alwaysConsumable && player.gameMode != GameMode.CREATIVE && event.player.foodLevel == 20)
+        if (options.type != FoodType.ALWAYS_EATABLE && player.gameMode != GameMode.CREATIVE && event.player.foodLevel == 20)
             return
         
         event.isCancelled = true
@@ -76,7 +79,7 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
             playEatSound(player)
         } else {
             val eatTimePassed = serverTick - eater.startTime
-            if ((options.fast || eatTimePassed > 7) && eatTimePassed % 4 == 0)
+            if ((options.type == FoodType.FAST || eatTimePassed > 7) && eatTimePassed % 4 == 0)
                 playEatSound(player)
         }
     }
@@ -116,9 +119,8 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
         player.saturation = min(player.saturation + options.nutrition * options.saturationModifier * 2.0f, player.foodLevel.toFloat())
         player.health = min(player.health + options.instantHealth, player.genericMaxHealth)
         
-        // effects and custom code
+        // effects
         options.effects?.forEach { player.addPotionEffect(it) }
-        options.custom?.invoke(player)
         
         // sounds
         player.location.playSoundNearby(SOUND_DISTANCE, Sound.ENTITY_PLAYER_BURP, 0.5f, Random.nextDouble(0.9, 1.0).toFloat())

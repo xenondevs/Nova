@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.resources
 
 import de.studiocode.inventoryaccess.util.DataUtils
 import kotlinx.coroutines.runBlocking
+import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -28,12 +29,14 @@ private const val WAILA_DATA_LOOKUP = "wailaDataLookup"
 
 private val ASSET_INDEX_FILES = listOf("assets/materials.json", "assets/guis.json")
 
+typealias ModelData = Pair<Map<Material, ItemModelData>?, BlockModelData?>
+
 object Resources : Initializable() {
     
     override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = setOf(AddonsLoader, AutoUploadManager)
     
-    private lateinit var modelDataLookup: Map<String, Pair<ItemModelData?, BlockModelData?>>
+    private lateinit var modelDataLookup: Map<String, ModelData>
     private lateinit var guiDataLookup: Map<String, FontChar>
     private lateinit var wailaDataLookup: Map<String, FontChar>
     private lateinit var textureIconLookup: Map<String, FontChar>
@@ -50,7 +53,7 @@ object Resources : Initializable() {
             && PermanentStorage.has(GUI_DATA_LOOKUP)
         ) {
             // Load from PermanentStorage
-            modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, Pair<ItemModelData?, BlockModelData?>>>(MODEL_DATA_LOOKUP)!!
+            modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, ModelData>>(MODEL_DATA_LOOKUP)!!
             languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>(LANGUAGE_LOOKUP)!!
             textureIconLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(TEXTURE_ICON_LOOKUP)!!
             wailaDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(WAILA_DATA_LOOKUP)!!
@@ -97,7 +100,7 @@ object Resources : Initializable() {
         }
     }
     
-    internal fun updateModelDataLookup(modelDataLookup: Map<String, Pair<ItemModelData?, BlockModelData?>>) {
+    internal fun updateModelDataLookup(modelDataLookup: Map<String, ModelData>) {
         this.modelDataLookup = modelDataLookup
         PermanentStorage.store("modelDataLookup", modelDataLookup)
     }
@@ -122,24 +125,36 @@ object Resources : Initializable() {
         PermanentStorage.store("languageLookup", languageLookup)
     }
     
-    fun getModelData(id: NamespacedId): Pair<ItemModelData?, BlockModelData?> {
+    fun getModelData(id: NamespacedId): ModelData {
         return modelDataLookup[id.toString()]!!
     }
     
-    fun getModelData(id: String): Pair<ItemModelData?, BlockModelData?> {
+    fun getModelData(path: ResourcePath): ModelData {
+        return modelDataLookup[path.toString()]!!
+    }
+    
+    fun getModelData(id: String): ModelData {
         return modelDataLookup[id]!!
     }
     
-    fun getModelDataOrNull(id: NamespacedId): Pair<ItemModelData?, BlockModelData?>? {
+    fun getModelDataOrNull(id: NamespacedId): ModelData? {
         return modelDataLookup[id.toString()]
     }
     
-    fun getModelDataOrNull(id: String): Pair<ItemModelData?, BlockModelData?>? {
+    fun getModelDataOrNull(path: ResourcePath): ModelData? {
+        return modelDataLookup[path.toString()]
+    }
+    
+    fun getModelDataOrNull(id: String): ModelData? {
         return modelDataLookup[id]
     }
     
     fun getGUIChar(id: NamespacedId): FontChar {
         return guiDataLookup[id.toString()]!!
+    }
+    
+    fun getGUIChar(path: ResourcePath): FontChar {
+        return guiDataLookup[path.toString()]!!
     }
     
     fun getGUIChar(id: String): FontChar {
@@ -150,12 +165,20 @@ object Resources : Initializable() {
         return guiDataLookup[id.toString()]
     }
     
+    fun getGUICharOrNull(path: ResourcePath): FontChar? {
+        return guiDataLookup[path.toString()]
+    }
+    
     fun getGUICharOrNull(id: String): FontChar? {
         return guiDataLookup[id]
     }
     
     fun getWailaIconChar(id: NamespacedId): FontChar {
         return wailaDataLookup[id.toString()]!!
+    }
+    
+    fun getWailaIconChar(path: ResourcePath): FontChar {
+        return wailaDataLookup[path.toString()]!!
     }
     
     fun getWailaIconChar(id: String): FontChar {
@@ -166,6 +189,10 @@ object Resources : Initializable() {
         return wailaDataLookup[id.toString()]
     }
     
+    fun getWailaIconCharOrNull(path: ResourcePath): FontChar? {
+        return wailaDataLookup[path.toString()]
+    }
+    
     fun getWailaIconCharOrNull(id: String): FontChar? {
         return wailaDataLookup[id]
     }
@@ -174,12 +201,20 @@ object Resources : Initializable() {
         return textureIconLookup[id.toString()]!!
     }
     
+    fun getTextureIconChar(path: ResourcePath): FontChar {
+        return textureIconLookup[path.toString()]!!
+    }
+    
     fun getTextureIconChar(id: String): FontChar {
         return textureIconLookup[id]!!
     }
     
     fun getTextureIconCharOrNull(id: NamespacedId): FontChar? {
         return textureIconLookup[id.toString()]
+    }
+    
+    fun getTextureIconCharOrNull(path: ResourcePath): FontChar? {
+        return textureIconLookup[path.toString()]
     }
     
     fun getTextureIconCharOrNull(id: String): FontChar? {

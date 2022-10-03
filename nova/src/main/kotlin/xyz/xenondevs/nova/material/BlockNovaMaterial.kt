@@ -10,9 +10,9 @@ import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.tool.ToolCategory
+import xyz.xenondevs.nova.item.tool.ToolLevel
 import xyz.xenondevs.nova.util.SoundEffect
-import xyz.xenondevs.nova.util.item.ToolCategory
-import xyz.xenondevs.nova.util.item.ToolLevel
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
@@ -25,17 +25,18 @@ open class BlockNovaMaterial internal constructor(
     id: NamespacedId,
     localizedName: String,
     novaItem: NovaItem,
+    maxStackSize: Int,
     val novaBlock: NovaBlock<NovaBlockState>,
     options: BlockOptions,
     val properties: List<BlockPropertyType<*>>,
     val placeCheck: PlaceCheckFun?,
     val multiBlockLoader: MultiBlockLoader?
-) : ItemNovaMaterial(id, localizedName, novaItem) {
+) : ItemNovaMaterial(id, localizedName, novaItem, maxStackSize) {
     
     val block: BlockModelData by lazy { Resources.getModelData(id).second!! }
     
     val hardness = options.hardness
-    val toolCategory = options.toolCategory
+    val toolCategories = options.toolCategories
     val toolLevel = options.toolLevel
     val requiresToolForDrops = options.requiresToolForDrops
     val placeSound = options.placeSound
@@ -53,11 +54,33 @@ open class BlockNovaMaterial internal constructor(
 
 data class BlockOptions(
     val hardness: Double,
-    val toolCategory: ToolCategory?,
+    val toolCategories: List<ToolCategory>,
     val toolLevel: ToolLevel?,
     val requiresToolForDrops: Boolean,
     val placeSound: SoundEffect? = null,
     val breakSound: SoundEffect? = null,
     val breakParticles: Material? = null,
     val showBreakAnimation: Boolean = true
-)
+) {
+    
+    constructor(
+        hardness: Double,
+        toolCategory: ToolCategory?,
+        toolLevel: ToolLevel?,
+        requiresToolForDrops: Boolean,
+        placeSound: SoundEffect? = null,
+        breakSound: SoundEffect? = null,
+        breakParticles: Material? = null,
+        showBreakAnimation: Boolean = true
+    ) : this(
+        hardness,
+        toolCategory?.let(::listOf) ?: emptyList(),
+        toolLevel,
+        requiresToolForDrops,
+        placeSound,
+        breakSound,
+        breakParticles,
+        showBreakAnimation
+    )
+    
+}
