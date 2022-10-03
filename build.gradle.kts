@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "1.7.10"
     id("xyz.xenondevs.jar-loader-gradle-plugin")
@@ -30,6 +32,13 @@ subprojects {
     tasks.withType<ProcessResources> {
         filesMatching(listOf("*.yml", "*.json")) {
             expand(project.properties)
+        }
+    }
+    
+    tasks.withType<KotlinCompile>().all {
+        kotlinOptions {
+            jvmTarget = "17"
+            freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all"
         }
     }
 }
