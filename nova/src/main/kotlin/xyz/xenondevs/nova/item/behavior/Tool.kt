@@ -16,8 +16,7 @@ import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.ToolOptions
 import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.util.nmsStack
-import kotlin.math.roundToInt
+import xyz.xenondevs.nova.util.nmsCopy
 
 private const val PLAYER_ATTACK_SPEED = 4.0
 private const val PLAYER_ATTACK_DAMAGE = 1.0
@@ -54,13 +53,13 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
             itemData.addLore(arrayOf(TextComponent(" ")))
             itemData.addLore(arrayOf(localized(ChatColor.GRAY, "item.modifiers.mainhand")))
             
-            val mojangStack = itemStack.nmsStack
-            val attackDamage = (options.attackDamage!! + EnchantmentHelper.getDamageBonus(mojangStack, MobType.UNDEFINED)).roundToInt()
-            itemData.addLore(ComponentBuilder(" $attackDamage ")
+            val mojangStack = itemStack.nmsCopy
+            val attackDamage = options.attackDamage!! + EnchantmentHelper.getDamageBonus(mojangStack, MobType.UNDEFINED)
+            itemData.addLore(ComponentBuilder(" ${attackDamage.toFormattedString()} ")
                 .color(ChatColor.DARK_GREEN)
                 .appendLocalized("attribute.name.generic.attack_damage")
                 .create())
-            itemData.addLore(ComponentBuilder(" ${options.attackSpeed} ")
+            itemData.addLore(ComponentBuilder(" ${options.attackSpeed!!.toFormattedString()} ")
                 .color(ChatColor.DARK_GREEN)
                 .appendLocalized("attribute.name.generic.attack_speed")
                 .create())
@@ -68,6 +67,8 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
         
         itemData.hide(HideableFlag.MODIFIERS)
     }
+    
+    private fun Double.toFormattedString(): String = toString().removeSuffix(".0")
     
     companion object : ItemBehaviorFactory<Tool>() {
         override fun create(material: ItemNovaMaterial) =
