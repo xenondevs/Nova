@@ -40,6 +40,7 @@ import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.pos
+import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.floor
 import kotlin.random.Random
