@@ -83,7 +83,7 @@ internal object ResourcePackBuilder {
         
         try {
             // download minecraft assets if not present / outdated
-            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("mcassetsVersion") != Version.SERVER_VERSION) {
+            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != Version.SERVER_VERSION) {
                 MCASSETS_DIR.deleteRecursively()
                 runBlocking {
                     val downloader = MinecraftAssetsDownloader(
@@ -93,7 +93,7 @@ internal object ResourcePackBuilder {
                         logger = LOGGER
                     )
                     downloader.downloadAssets()
-                    PermanentStorage.store("mcassetsVersion", Version.SERVER_VERSION)
+                    PermanentStorage.store("minecraftAssetsVersion", Version.SERVER_VERSION)
                 }
             }
             

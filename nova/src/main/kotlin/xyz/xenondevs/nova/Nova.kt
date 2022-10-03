@@ -52,7 +52,7 @@ internal lateinit var LOGGER: Logger
 class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by loader, INova {
     
     val version = Version(loader.description.version)
-    val lastVersion = PermanentStorage.retrieveOrNull<String>("last_version")?.let { if (it == "0.1") Version("0.10") else Version(it) }
+    val lastVersion = PermanentStorage.retrieveOrNull<Version>("last_version")?.let { if (it == Version("0.1")) Version("0.10") else it }
     val isVersionChange = lastVersion != null && lastVersion != version
     val isDevServer = IS_DEV_SERVER
     
