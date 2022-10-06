@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.transformer.patch.worldgen.chunksection;
 
 import net.minecraft.core.Holder;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
@@ -21,16 +22,18 @@ import java.util.function.Predicate;
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     private final Level level;
+    private final ChunkPos chunkPos;
     private final LevelChunkSection delegate;
     
     @SuppressWarnings("unchecked")
-    public LevelChunkSectionWrapper(Level level, LevelChunkSection delegate) throws IllegalAccessException {
+    public LevelChunkSectionWrapper(Level level, ChunkPos chunkPos, LevelChunkSection delegate) throws IllegalAccessException {
         super(
             delegate.bottomBlockY() >> 4,
             (PalettedContainer<BlockState>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_STATES_FIELD().get(delegate),
             (PalettedContainer<Holder<Biome>>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_J_FIELD().get(delegate)
         );
         this.level = level;
+        this.chunkPos = chunkPos;
         this.delegate = delegate;
     }
     
@@ -60,12 +63,17 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     }
     
     @Override
-    public BlockState setBlockState(int i, int j, int k, BlockState iblockdata, boolean flag) {
+    public BlockState setBlockState(int relX, int relY, int relZ, BlockState iblockdata, boolean flag) {
         if (iblockdata instanceof WrapperBlockState wrappedState) {
-            WorldDataManager.INSTANCE.addOrphanBlock$nova(level, i, j, k, wrappedState.getNovaMaterial());
+            var chunkPos = this.chunkPos;
+            WorldDataManager.INSTANCE.addOrphanBlock$nova(level,
+                relX + chunkPos.getMinBlockX(),
+                relY + bottomBlockY(),
+                relZ + chunkPos.getMinBlockZ(),
+                wrappedState.getNovaMaterial());
             return Blocks.AIR.defaultBlockState();
         }
-        return delegate.setBlockState(i, j, k, iblockdata, flag);
+        return delegate.setBlockState(relX, relY, relZ, iblockdata, flag);
     }
     
     @Override

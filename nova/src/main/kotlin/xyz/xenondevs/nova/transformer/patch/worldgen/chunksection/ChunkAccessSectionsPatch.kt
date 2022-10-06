@@ -63,11 +63,13 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(ChunkAccess::class,
             dup()
             
             aLoad(9) // level
+            aLoad(0)
+            getField(ChunkAccess::class.internalName, "SRF(net.minecraft.world.level.chunk.ChunkAccess chunkPos)", "LSRC/(net.minecraft.world.level.ChunkPos);")
             aLoad(10) // sections
             iLoad(11) // i
             aaload()
             
-            invokeSpecial(wrapperClass.internalName, "<init>", "(LSRC/(net.minecraft.world.level.Level);LSRC/(net.minecraft.world.level.chunk.LevelChunkSection);)V", false)
+            invokeSpecial(wrapperClass.internalName, "<init>", "(LSRC/(net.minecraft.world.level.Level);LSRC/(net.minecraft.world.level.ChunkPos);LSRC/(net.minecraft.world.level.chunk.LevelChunkSection);)V", false)
             aastore()
             
             add(incLabel)

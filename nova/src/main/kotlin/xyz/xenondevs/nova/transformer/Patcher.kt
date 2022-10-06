@@ -13,10 +13,10 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
-import xyz.xenondevs.nova.transformer.patch.worldgen.LevelChunkSectionPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.RegistryCodecPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.WrapperBlockPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
 import java.lang.reflect.Field

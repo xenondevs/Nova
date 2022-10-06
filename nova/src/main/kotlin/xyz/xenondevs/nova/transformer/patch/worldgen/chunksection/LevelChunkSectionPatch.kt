@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.transformer.patch.worldgen
+package xyz.xenondevs.nova.transformer.patch.worldgen.chunksection
 
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
