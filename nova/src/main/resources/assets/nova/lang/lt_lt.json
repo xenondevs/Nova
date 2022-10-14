@@ -66,5 +66,10 @@
   "menu.nova.side_config.items": "Daiktai",
   "menu.nova.side_config.right": "Dešinė",
   "menu.nova.side_config.input": "Įdėjimas",
-  "menu.nova.side_config.input_output": "Įdėjimas ir išėmimas"
+  "menu.nova.side_config.input_output": "Įdėjimas ir išėmimas",
+  "menu.nova.side_config.back": "Galas",
+  "command.nova.waila.off": "Išjungta WAILA",
+  "command.nova.waila.already_off": "WAILA jau išjungta",
+  "command.nova.waila.on": "Įjungta WAILA",
+  "waila.nova.required_tool": "Įrankis: "
 }
