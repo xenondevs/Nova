@@ -73,5 +73,5 @@
   "command.nova.waila.on": "Įjungta WAILA",
   "waila.nova.required_tool": "Įrankis: ",
   "waila.nova.required_tool.none": "Nereikia jokio įrankio",
-  "waila.nova.required_tool.unbreakable": "Nesulaužomas (pala rimtai?)"
+  "waila.nova.required_tool.unbreakable": "Nesulaužomas"
 }
