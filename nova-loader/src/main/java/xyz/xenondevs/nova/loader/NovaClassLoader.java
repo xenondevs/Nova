@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.loader;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-class NovaClassLoader extends URLClassLoader {
+public class NovaClassLoader extends URLClassLoader {
     
     public NovaClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
@@ -11,9 +11,11 @@ class NovaClassLoader extends URLClassLoader {
     
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        Class<?> c;
+        
+        // check if the class is already loaded
         synchronized (getClassLoadingLock(name)) {
-            // check if class is already loaded
-            Class<?> c = findLoadedClass(name);
+            c = findLoadedClass(name);
             
             // check nova classes and libraries
             if (c == null) {
@@ -22,14 +24,30 @@ class NovaClassLoader extends URLClassLoader {
                 } catch (ClassNotFoundException ignored) {
                 }
             }
-            
-            // check parent loader
-            if (c == null) {
-                c = getParent().loadClass(name);
-            }
-            
-            if (resolve) {
+        }
+        
+        // check parent loader
+        if (c == null) {
+            c = getParent().loadClass(name);
+        }
+        
+        if (resolve) {
+            synchronized (getClassLoadingLock(name)) {
                 resolveClass(c);
+            }
+        }
+        
+        return c;
+    }
+    
+    public Class<?> loadClassNoParent(String name) throws ClassNotFoundException {
+        synchronized (getClassLoadingLock(name)) {
+            // check if the class is already loaded
+            Class<?> c = findLoadedClass(name);
+            
+            // check nova classes and libraries
+            if (c == null) {
+                c = findClass(name);
             }
             
             return c;
