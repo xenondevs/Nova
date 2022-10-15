@@ -7,12 +7,13 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.network.send
+import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.fromFixedPoint
 import xyz.xenondevs.nova.util.fromPackedByte
+import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.positionEquals
 import xyz.xenondevs.nova.util.toFixedPoint
 import xyz.xenondevs.nova.util.toPackedByte
@@ -124,7 +125,10 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         equipmentBuf = null
         
         // update the equipment array
-        equipment[slot.ordinal] = CraftItemStack.asNMSCopy(bukkitStack)
+        var nmsStack = bukkitStack.nmsCopy
+        if (PacketItems.isNovaItem(nmsStack))
+            nmsStack = PacketItems.getFakeItem(null, nmsStack)
+        equipment[slot.ordinal] = nmsStack
         
         // rebuild buf and send packet if requested
         if (sendPacket) {
