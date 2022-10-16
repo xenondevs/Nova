@@ -5,17 +5,25 @@ import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.ValueReloadable
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.options.ChargeableOptions
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.item.retrieveDataOrNull
 import xyz.xenondevs.nova.util.item.storeData
 
 private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy")
 
+@Suppress("FunctionName")
+fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable> =
+    object : ItemBehaviorFactory<Chargeable>() {
+        override fun create(material: ItemNovaMaterial): Chargeable =
+            Chargeable(ChargeableOptions.configurable(material), affectsItemDurability)
+    }
+
 class Chargeable(
-    maxEnergy: ValueReloadable<Long>,
+    val options: ChargeableOptions,
     private val affectsItemDurability: Boolean = true
 ) : ItemBehavior() {
     
@@ -23,19 +31,17 @@ class Chargeable(
         listOf(VanillaMaterialProperty.DAMAGEABLE)
     else emptyList()
     
-    val maxEnergy by maxEnergy
-    
     fun getEnergy(itemStack: ItemStack): Long {
-        val currentEnergy = itemStack.retrieveDataOrNull(ENERGY_KEY) ?: 0L
-        if (currentEnergy > maxEnergy) {
-            setEnergy(itemStack, maxEnergy)
-            return maxEnergy
+        val currentEnergy = itemStack.retrieveDataOrNull<Long>(ENERGY_KEY) ?: 0L
+        if (currentEnergy > options.maxEnergy) {
+            setEnergy(itemStack, options.maxEnergy)
+            return options.maxEnergy
         }
         return currentEnergy
     }
     
     fun setEnergy(itemStack: ItemStack, energy: Long) {
-        val coercedEnergy = energy.coerceIn(0, maxEnergy)
+        val coercedEnergy = energy.coerceIn(0, options.maxEnergy)
         itemStack.storeData(ENERGY_KEY, coercedEnergy)
     }
     
@@ -51,10 +57,15 @@ class Chargeable(
     override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
         val energy = getEnergy(itemStack)
         
-        itemData.addLore(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, maxEnergy)))
+        itemData.addLore(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, options.maxEnergy)))
         
         if (affectsItemDurability)
-            itemData.durabilityBar = energy.toDouble() / maxEnergy.toDouble()
+            itemData.durabilityBar = energy.toDouble() / options.maxEnergy.toDouble()
+    }
+    
+    companion object : ItemBehaviorFactory<Chargeable>() {
+        override fun create(material: ItemNovaMaterial): Chargeable =
+            Chargeable(ChargeableOptions.configurable(material), true)
     }
     
 }
