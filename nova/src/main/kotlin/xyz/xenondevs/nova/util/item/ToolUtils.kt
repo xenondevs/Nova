@@ -28,16 +28,6 @@ import net.minecraft.world.item.ItemStack as MojangStack
 import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
 
 /**
- * Damages the tool in the [player's][Player] main hand by [damage] amount.
- */
-fun Player.damageToolInMainHand(damage: Int = 1) {
-    val serverPlayer = serverPlayer
-    if (DamageableUtils.damageAndBreakItem(serverPlayer.mainHandItem, damage, serverPlayer) == ItemDamageResult.BROKEN) {
-        serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.MAINHAND)
-    }
-}
-
-/**
  * Damages the tool in the [player's][Player] main hand as if they've broken a block.
  */
 fun Player.damageToolBreakBlock() = damageToolInMainHand {
@@ -61,7 +51,7 @@ fun Player.damageToolAttackEntity() = damageToolInMainHand {
     } else (ToolCategory.ofItem(it.bukkitMirror) as? VanillaToolCategory)?.itemDamageOnAttackEntity ?: 0
 }
 
-internal inline fun Player.damageToolInMainHand(damageReceiver: (MojangStack) -> Int) {
+private inline fun Player.damageToolInMainHand(damageReceiver: (MojangStack) -> Int) {
     val serverPlayer = serverPlayer
     val itemStack = serverPlayer.mainHandItem
     val damage = damageReceiver(itemStack)

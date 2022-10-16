@@ -6,21 +6,55 @@ import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.stats.Stats
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.serverPlayer
 import kotlin.random.Random
+import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
+
+/**
+ * Damages the tool in the [player's][MojangPlayer] main hand by [damage] amount.
+ */
+fun Player.damageItemInMainHand(damage: Int = 1) {
+    val serverPlayer = serverPlayer
+    if (DamageableUtils.damageAndBreakItem(serverPlayer.mainHandItem, damage, serverPlayer) == ItemDamageResult.BROKEN) {
+        serverPlayer.broadcastBreakEvent(net.minecraft.world.entity.EquipmentSlot.MAINHAND)
+    }
+}
+
+/**
+ * Damages the tool in the [player's][MojangPlayer] offhand by [damage] amount.
+ */
+fun Player.damageItemInOffHand(damage: Int = 1) {
+    val serverPlayer = serverPlayer
+    if (DamageableUtils.damageAndBreakItem(serverPlayer.offhandItem, damage, serverPlayer) == ItemDamageResult.BROKEN) {
+        serverPlayer.broadcastBreakEvent(net.minecraft.world.entity.EquipmentSlot.OFFHAND)
+    }
+}
+
+/**
+ * Damages the tool in the specified [hand] by [damage] amount.
+ */
+fun Player.damageItemInHand(hand: EquipmentSlot, damage: Int = 1) {
+    when (hand) {
+        EquipmentSlot.HAND -> damageItemInMainHand(damage)
+        EquipmentSlot.OFF_HAND -> damageItemInOffHand(damage)
+        else -> throw IllegalArgumentException("Not a hand: $hand")
+    }
+}
 
 object DamageableUtils {
     
@@ -70,7 +104,7 @@ object DamageableUtils {
         var damage = damage
         
         // check for creative mode
-        if (entity is Player && entity.abilities.instabuild)
+        if (entity is MojangPlayer && entity.abilities.instabuild)
             return ItemDamageResult.UNDAMAGED
         
         // check if the item is damageable

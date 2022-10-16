@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.enumMapOf
 internal object VanillaMaterialTypes {
     
     private val MATERIAL_TYPES = enumMapOf(
-        Material.WOODEN_HOE to setOf(VanillaMaterialProperty.DAMAGEABLE),
+        Material.WOODEN_PICKAXE to setOf(VanillaMaterialProperty.DAMAGEABLE),
         Material.WOODEN_SWORD to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING),
         Material.APPLE to setOf(VanillaMaterialProperty.CONSUMABLE_NORMAL),
         Material.DRIED_KELP to setOf(VanillaMaterialProperty.CONSUMABLE_FAST),

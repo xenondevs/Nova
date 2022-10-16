@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.util
 
+import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Rotations
 import net.minecraft.network.protocol.Packet
@@ -19,6 +20,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
@@ -83,6 +85,24 @@ val InteractionHand.bukkitSlot: EquipmentSlot
         InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
     }
 
+val EquipmentSlot.interactionHand: InteractionHand
+    get() = when(this) {
+        EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
+        EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
+        else -> throw UnsupportedOperationException()
+    }
+
+val BlockFace.nmsDirection: Direction
+    get() = when (this) {
+        BlockFace.NORTH -> Direction.NORTH
+        BlockFace.EAST -> Direction.EAST
+        BlockFace.SOUTH -> Direction.SOUTH
+        BlockFace.WEST -> Direction.WEST
+        BlockFace.UP -> Direction.UP
+        BlockFace.DOWN -> Direction.DOWN
+        else -> throw UnsupportedOperationException()
+    }
+
 val Block.nmsState: BlockState
     get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))
 
@@ -131,6 +151,10 @@ fun BlockPos.setBlockStateNoUpdate(state: BlockState) {
 
 fun BlockPos.setBlockStateSilently(state: BlockState) {
     chunkSection.setBlockStateSilently(this, state)
+}
+
+fun BlockPos.setBlockState(state: BlockState) {
+    world.serverLevel.setBlock(nmsPos, state, 11)
 }
 
 fun BlockPos.getBlockState(): BlockState {

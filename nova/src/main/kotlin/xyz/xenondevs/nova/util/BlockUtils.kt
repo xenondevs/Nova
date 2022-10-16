@@ -57,6 +57,12 @@ val Block.below: Block
     get() = location.subtract(0.0, 1.0, 0.0).block
 
 /**
+ * The block that is one y-level above the current one.
+ */
+val Block.above: Block
+    get() = location.add(0.0, 1.0, 0.0).block
+
+/**
  * The hardness of this block, also considering the custom hardness of Nova blocks.
  */
 val Block.hardness: Double
