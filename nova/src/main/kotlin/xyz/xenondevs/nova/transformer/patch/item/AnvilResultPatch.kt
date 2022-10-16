@@ -10,11 +10,13 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.enchantment.Enchantment.Rarity.*
 import net.minecraft.world.item.enchantment.EnchantmentHelper
-import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory
+import org.bukkit.event.inventory.PrepareAnvilEvent
+import org.bukkit.inventory.InventoryView
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.DamageableUtils.getDamage
 import xyz.xenondevs.nova.util.item.DamageableUtils.getMaxDurability
 import xyz.xenondevs.nova.util.item.DamageableUtils.isDamageable
@@ -48,7 +50,7 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
         val inputStack = inputSlots.getItem(0)
         
         if (inputStack.isEmpty) {
-            CraftEventFactory.callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
+            callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
             menu.cost.set(-1)
             return
         }
@@ -67,7 +69,7 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
                 var repairValue = min(damageValue, maxDurability / 4)
                 
                 if (repairValue <= 0) {
-                    CraftEventFactory.callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
+                    callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
                     menu.cost.set(-1)
                     return
                 }
@@ -89,7 +91,7 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
                     && EnchantedBookItem.getEnchantments(secondStack).isNotEmpty()
                 
                 if (!isEnchantedBook && (!isSameItemType(inputStack, secondStack) || !isDamageable(inputStack))) {
-                    CraftEventFactory.callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
+                    callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
                     menu.cost.set(-1)
                     return
                 }
@@ -151,7 +153,7 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
                 }
                 
                 if (incompatibleEnchantments && !hasChanged) {
-                    CraftEventFactory.callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
+                    callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
                     menu.cost.set(-1)
                     return
                 }
@@ -208,7 +210,7 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
         menu.cost.set(totalCost)
         //</editor-fold>
         
-        CraftEventFactory.callPrepareAnvilEvent(menu.bukkitView, resultStack)
+        callPrepareAnvilEvent(menu.bukkitView, resultStack)
         menu.sendAllDataToRemote()
         menu.broadcastChanges()
     }
@@ -235,6 +237,13 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
         }
         
         return first.item == second.item
+    }
+    
+    private fun callPrepareAnvilEvent(view: InventoryView, item: ItemStack) {
+        val event = PrepareAnvilEvent(view, item.bukkitMirror)
+            .also(::callEvent)
+        
+        event.inventory.setItem(2, event.result)
     }
     
 }
