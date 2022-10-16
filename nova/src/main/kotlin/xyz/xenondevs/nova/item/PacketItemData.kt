@@ -34,7 +34,7 @@ class PacketItemData {
     /**
      * The flags that should be hidden on this item.
      */
-    var hiddenFlags: MutableList<HideableFlag>? = null
+    var hiddenFlags: MutableList<HideableFlag> = mutableListOf(HideableFlag.MODIFIERS)
     
     /**
      * Adds multiple lore lines to the current lore.
@@ -80,10 +80,7 @@ class PacketItemData {
      * Hides something from the item.
      */
     fun hide(vararg hideableFlags: HideableFlag) {
-        if (hiddenFlags == null)
-            hiddenFlags = ArrayList()
-        
-        hiddenFlags!!.addAll(hideableFlags)
+        hiddenFlags.addAll(hideableFlags)
     }
     
 }

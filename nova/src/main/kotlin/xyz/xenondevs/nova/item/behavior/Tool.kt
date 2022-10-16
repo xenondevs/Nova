@@ -10,7 +10,6 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
-import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.ToolOptions
@@ -64,8 +63,6 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
                 .appendLocalized("attribute.name.generic.attack_speed")
                 .create())
         }
-        
-        itemData.hide(HideableFlag.MODIFIERS)
     }
     
     private fun Double.toFormattedString(): String = toString().removeSuffix(".0")
