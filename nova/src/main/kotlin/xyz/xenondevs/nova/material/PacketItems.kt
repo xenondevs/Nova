@@ -288,7 +288,10 @@ internal object PacketItems : Initializable(), Listener {
         val subId = novaTag.getInt("subId")
         val novaItem = material.novaItem
         
-        val data = Resources.getModelDataOrNull(id)?.first?.get(novaItem.vanillaMaterial) ?: return getMissingItem(item, id)
+        val itemModelDataMap = Resources.getModelDataOrNull(id)?.first
+        val data = itemModelDataMap?.get(novaItem.vanillaMaterial)
+            ?: itemModelDataMap?.values?.first()
+            ?: return getMissingItem(item, id)
         
         val newItem = item.copy()
         val newItemTag = newItem.tag!!
