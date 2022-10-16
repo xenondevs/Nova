@@ -31,6 +31,10 @@ class Chargeable(
         listOf(VanillaMaterialProperty.DAMAGEABLE)
     else emptyList()
     
+    @Deprecated("Replaced by ChargeableOptions", ReplaceWith("options.maxEnergy"))
+    val maxEnergy: Long
+        get() = options.maxEnergy
+    
     fun getEnergy(itemStack: ItemStack): Long {
         val currentEnergy = itemStack.retrieveDataOrNull<Long>(ENERGY_KEY) ?: 0L
         if (currentEnergy > options.maxEnergy) {
