@@ -5,6 +5,7 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
 import org.bukkit.GameMode
 import org.bukkit.Sound
+import org.bukkit.SoundCategory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
@@ -12,6 +13,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
+import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
 import xyz.xenondevs.nova.util.getPlayersNearby
@@ -28,7 +30,6 @@ import xyz.xenondevs.nova.util.serverTick
 import kotlin.math.min
 import kotlin.random.Random
 
-private const val SOUND_DISTANCE = 18.0
 private const val PACKET_DISTANCE = 500.0
 
 data class Eater(val itemStack: ItemStack, val hand: EquipmentSlot, val startTime: Int)
@@ -85,7 +86,7 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
     }
     
     private fun playEatSound(player: Player) {
-        player.location.playSoundNearby(SOUND_DISTANCE, Sound.ENTITY_GENERIC_EAT, 1f, Random.nextDouble(0.8, 1.2).toFloat(), player)
+        player.location.playSoundNearby(Sound.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS, 1f, Random.nextDouble(0.8, 1.2).toFloat(), player)
     }
     
     private fun beginEating(player: Player, itemStack: ItemStack, hand: EquipmentSlot) {
@@ -123,8 +124,8 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
         options.effects?.forEach { player.addPotionEffect(it) }
         
         // sounds
-        player.location.playSoundNearby(SOUND_DISTANCE, Sound.ENTITY_PLAYER_BURP, 0.5f, Random.nextDouble(0.9, 1.0).toFloat())
-        player.location.playSoundNearby(SOUND_DISTANCE, Sound.ENTITY_GENERIC_EAT, 1.0f, Random.nextDouble(0.6, 1.4).toFloat())
+        player.location.playSoundNearby(Sound.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.5f, Random.nextDouble(0.9, 1.0).toFloat())
+        player.location.playSoundNearby(Sound.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS, 1.0f, Random.nextDouble(0.6, 1.4).toFloat())
         
         // take item
         if (player.gameMode != GameMode.CREATIVE)
@@ -143,6 +144,11 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
         buf.writeByte(0xff) // no more data
         
         return buf
+    }
+    
+    companion object : ItemBehaviorFactory<Consumable>() {
+        override fun create(material: ItemNovaMaterial): Consumable =
+            Consumable(FoodOptions.configurable(material))
     }
     
 }
