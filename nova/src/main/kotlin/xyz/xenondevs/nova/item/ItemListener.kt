@@ -49,7 +49,8 @@ internal object ItemListener : Initializable(), Listener {
         val player = event.player
         val item = event.item
         
-        if (event.isCompletelyDenied() || item == null || !ProtectionManager.canUseItem(player, item, player.location).get())
+        val location = event.clickedBlock?.location ?: player.location
+        if (event.isCompletelyDenied() || item == null || !ProtectionManager.canUseItem(player, item, location).get())
             return
         
         findBehaviors(event.item)?.forEach { it.handleInteract(event.player, event.item!!, event.action, event) }
