@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.initialize
 
-import com.google.common.graph.GraphBuilder
 import de.studiocode.invui.InvUI
 import de.studiocode.invui.util.InventoryUtils
 import de.studiocode.invui.virtualinventory.StackSizeProvider
@@ -79,16 +78,6 @@ internal object Initializer : Listener {
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
         BossBarOverlayManager, WailaManager
     ), Initializable::dependsOn)
-    
-    private val INITIALIZABLE_GRAPH = GraphBuilder.directed().build<String>()
-    
-    init {
-        INITIALIZABLES.forEach {
-            it.dependsOn.forEach { dependency ->
-                INITIALIZABLE_GRAPH.putEdge(it::class.simpleName, dependency::class.simpleName)
-            }
-        }
-    }
     
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())
     var isDone = false
