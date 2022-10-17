@@ -22,6 +22,7 @@ import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolLevel
 import xyz.xenondevs.nova.util.BlockFaceUtils
@@ -130,10 +131,13 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             progress += damage
         
         if (isDone) {
-            // Stop break animation and mining fatigue effect
-            stop(false)
             // break block, call event, drop items and exp, etc.
             breakBlock(clientsideDamage < 1) // If the block broke instantaneously for the client, the effects will also be played clientside
+            // check if the breaker is still done (BlockBreakEvent cancelled?)
+            if (isDone) {
+                // Stop break animation and mining fatigue effect
+                stop(false)
+            }
         } else {
             // break tick logic of subclasses (i.e. spawning particles for barrier nova blocks)
             handleBreakTick()
@@ -141,24 +145,28 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             // set the break stage
             breakMethod?.let { it.breakStage = (progress * 10).toInt() - 1 }
             
-            // give mining fatigue effect
-            val effect = player.getPotionEffect(PotionEffectType.SLOW_DIGGING)
-            val packet = if (effect != null) {
-                // The player might actually have mining fatigue.
-                // In this case, it is important to copy the hasIcon value to prevent it from disappearing.
-                val effectInstance = MobEffectInstance(
-                    MobEffect.byId(4),
-                    Int.MAX_VALUE, 255,
-                    effect.isAmbient, effect.hasParticles(), effect.hasIcon()
-                )
-                ClientboundUpdateMobEffectPacket(player.entityId, effectInstance)
-            } else {
-                // The player does not have mining fatigue, we can use the default effect instance
-                ClientboundUpdateMobEffectPacket(player.entityId, MINING_FATIGUE)
-            }
-            
-            player.send(packet)
+            // re-send mining fatigue every tick to ensure that the player actually has it
+            sendMiningFatigueEffect()
         }
+    }
+    
+    private fun sendMiningFatigueEffect() {
+        val effect = player.getPotionEffect(PotionEffectType.SLOW_DIGGING)
+        val packet = if (effect != null) {
+            // The player might actually have mining fatigue.
+            // In this case, it is important to copy the hasIcon value to prevent it from disappearing.
+            val effectInstance = MobEffectInstance(
+                MobEffect.byId(4),
+                Int.MAX_VALUE, 255,
+                effect.isAmbient, effect.hasParticles(), effect.hasIcon()
+            )
+            ClientboundUpdateMobEffectPacket(player.entityId, effectInstance)
+        } else {
+            // The player does not have mining fatigue, we can use the default effect instance
+            ClientboundUpdateMobEffectPacket(player.entityId, MINING_FATIGUE)
+        }
+    
+        player.send(packet)
     }
     
     private fun breakBlock(effects: Boolean) {
@@ -178,7 +186,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             .apply { if (drops) expToDrop = BlockUtils.getVanillaBlockExp(level, blockPos, tool.nmsCopy) }
             .also(::callEvent)
         
-        if (!event.isCancelled) {
+        if (!event.isCancelled && !ProtectionManager.isVanillaProtected(player, block.location)) {
             //<editor-fold desc="item drops", defaultstate="collapsed">
             // TODO: block drops gamerule?
             // drop items
@@ -223,6 +231,9 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             
             // remove block
             block.remove(ctx, effects, effects)
+        } else {
+            // reset progress
+            progress = 0.0
         }
         
         // send ack packet

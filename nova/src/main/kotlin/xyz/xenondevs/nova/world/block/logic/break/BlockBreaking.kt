@@ -1,21 +1,17 @@
 package xyz.xenondevs.nova.world.block.logic.`break`
 
-import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.util.concurrent.runInServerThread
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.hardness
-import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
@@ -84,8 +80,10 @@ internal object BlockBreaking {
     }
     
     private fun handleDestroyStart(player: Player, pos: BlockPos, sequence: Int): Boolean {
-        // TODO: do not run if block is from other CustomItemService
         val block = pos.block
+        if (CustomItemServiceManager.getBlockType(block) != null)
+            return false
+        
         if (block.hardness >= 0) {
             // server thread - accessing block states
             runTask {
@@ -93,26 +91,14 @@ internal object BlockBreaking {
                 val serverLevel = pos.world.serverLevel
                 val nmsPos = pos.nmsPos
                 serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
-            }
-            
-            // check protection integrations, then start breaker if allowed
-            val future = ProtectionManager.canBreak(player, player.inventory.itemInMainHand.takeUnlessAir(), pos.location)
-            future.thenRun {
-                val result = future.get()
-                if (result) {
-                    // server thread - accessing block states
-                    runInServerThread {
-                        val novaBlockState = BlockManager.getBlock(pos)
-                        val breaker = if (novaBlockState != null) 
-                            NovaBlockBreaker(player, block, novaBlockState, sequence, breakCooldowns[player] ?: 0)
-                         else VanillaBlockBreaker(player, block, sequence, breakCooldowns[player] ?: 0)
-                        
-                        playerBreakers[player] = breaker
-                    }
-                } else {
-                    // The ack packet removes client-predicted block states and shows those sent by the server
-                    player.send(ClientboundBlockChangedAckPacket(sequence))
-                }
+                
+                // start breaker
+                val novaBlockState = BlockManager.getBlock(pos)
+                val breaker = if (novaBlockState != null)
+                    NovaBlockBreaker(player, block, novaBlockState, sequence, breakCooldowns[player] ?: 0)
+                else VanillaBlockBreaker(player, block, sequence, breakCooldowns[player] ?: 0)
+                
+                playerBreakers[player] = breaker
             }
             
             return true
@@ -121,12 +107,14 @@ internal object BlockBreaking {
         return false
     }
     
-    private fun handleDestroyStop(player: Player): Boolean {
-        val breaker = playerBreakers.remove(player)
-        if (breaker != null) {
-            breaker.stop(false)
+    private fun handleDestroyStop(player: Player, pos: BlockPos): Boolean {
+        val block = pos.block
+        if (block.hardness >= 0 && CustomItemServiceManager.getBlockType(block) == null) {
+            // needs to be wrapped in runTask because otherwise the breaker might not have been started yet
+            runTask { playerBreakers.remove(player)?.stop(false) }
             return true
         }
+        
         return false
     }
     
@@ -138,7 +126,7 @@ internal object BlockBreaking {
         
         event.isCancelled = when (event.action) {
             START_DESTROY_BLOCK -> handleDestroyStart(player, blockPos, event.sequence)
-            STOP_DESTROY_BLOCK, ABORT_DESTROY_BLOCK -> handleDestroyStop(player)
+            STOP_DESTROY_BLOCK, ABORT_DESTROY_BLOCK -> handleDestroyStop(player, blockPos)
             else -> false
         }
     }

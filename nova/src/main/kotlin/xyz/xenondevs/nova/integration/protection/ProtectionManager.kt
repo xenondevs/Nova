@@ -126,7 +126,7 @@ object ProtectionManager {
         return CombinedBooleanFuture(futures)
     }
     
-    private fun isVanillaProtected(player: OfflinePlayer, location: Location): Boolean {
+    internal fun isVanillaProtected(player: OfflinePlayer, location: Location): Boolean {
         val spawnRadius = Bukkit.getServer().spawnRadius.toDouble()
         val world = location.world!!
         return world.name == "world"
