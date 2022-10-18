@@ -18,7 +18,7 @@ import java.io.FileFilter
 internal object DataFileParser: Initializable() {
     
     private val FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
-    private val DATA_DIR = File(NOVA.dataFolder, ".data")
+    private val DATA_DIR = File(NOVA.dataFolder, "data")
     
     override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = setOf(AddonsInitializer)
@@ -62,8 +62,8 @@ internal object DataFileParser: Initializable() {
         return null
     }
     
-    fun processFiles(parent: File, dirName: String, fileProcessor: (NamespacedId, File) -> Unit) {
-        parent.listFiles(FileFilter(File::isDirectory)).forEach { namespaceDir ->
+    fun processFiles(dirName: String, fileProcessor: (NamespacedId, File) -> Unit) {
+        DATA_DIR.listFiles(FileFilter(File::isDirectory)).forEach { namespaceDir ->
             val namespace = namespaceDir.name
             val dir = File(namespace, dirName)
             if (!dir.exists() || dir.isFile) return@forEach
