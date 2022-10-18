@@ -5,13 +5,6 @@ import com.mojang.serialization.Codec
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.level.ChunkPos
-import net.minecraft.world.level.LevelHeightAccessor
-import net.minecraft.world.level.biome.BiomeGenerationSettings
-import net.minecraft.world.level.biome.FeatureSorter
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.state.StateHolder
-import net.minecraft.world.level.chunk.ChunkAccess
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.item.ItemEntity
@@ -19,7 +12,14 @@ import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.ItemCombinerMenu
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.LevelHeightAccessor
+import net.minecraft.world.level.biome.BiomeGenerationSettings
+import net.minecraft.world.level.biome.FeatureSorter
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateHolder
+import net.minecraft.world.level.chunk.ChunkAccess
 import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LevelChunkSection
 import net.minecraft.world.level.chunk.LinearPalette
@@ -117,7 +117,7 @@ internal object ReflectionRegistry {
     val MAPPED_REGISTRY_FROZEN_FIELD = getField(MappedRegistry::class.java, true, "SRF(net.minecraft.core.MappedRegistry frozen)")
     val BIOME_GENERATION_SETTINGS_FEATURES_FIELD = getField(BiomeGenerationSettings::class.java, true, "SRF(net.minecraft.world.level.biome.BiomeGenerationSettings features)")
     val LEVEL_CHUNK_SECTION_STATES_FIELD = getField(LevelChunkSection::class.java, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection states)")
-    val LEVEL_CHUNK_SECTION_J_FIELD = getField(LevelChunkSection::class.java, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection j)")
+    val LEVEL_CHUNK_SECTION_J_FIELD = getField(LevelChunkSection::class.java, true, "j")
     val HOLDER_SET_DIRECT_CONTENTS_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contents)")
     val HOLDER_SET_DIRECT_CONTENTS_SET_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contentsSet)")
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class.java, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
