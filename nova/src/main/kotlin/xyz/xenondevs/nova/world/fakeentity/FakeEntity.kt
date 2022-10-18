@@ -298,12 +298,3 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     }
     
 }
-
-fun main() {
-    
-    println("--")
-    for (i in -720..720 step 45) {
-        println("$i -> " + (i.toFloat().toPackedByte().fromPackedByte()))
-    }
-    
-}
