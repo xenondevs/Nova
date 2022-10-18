@@ -8,14 +8,13 @@ import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.assets.AssetPack
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
-import xyz.xenondevs.nova.data.resources.builder.content.MaterialContent
+import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.WailaContent
@@ -83,7 +82,7 @@ internal object ResourcePackBuilder {
         
         try {
             // download minecraft assets if not present / outdated
-            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("mcassetsVersion") != Version.SERVER_VERSION) {
+            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != Version.SERVER_VERSION) {
                 MCASSETS_DIR.deleteRecursively()
                 runBlocking {
                     val downloader = MinecraftAssetsDownloader(
@@ -93,7 +92,7 @@ internal object ResourcePackBuilder {
                         logger = LOGGER
                     )
                     downloader.downloadAssets()
-                    PermanentStorage.store("mcassetsVersion", Version.SERVER_VERSION)
+                    PermanentStorage.store("minecraftAssetsVersion", Version.SERVER_VERSION)
                 }
             }
             

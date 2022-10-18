@@ -3,8 +3,12 @@ package xyz.xenondevs.nova.item
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
+import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import kotlin.reflect.KClass
@@ -13,12 +17,15 @@ import kotlin.reflect.full.superclasses
 /**
  * Handles actions performed on [ItemStack]s of a [ItemNovaMaterial]
  */
-class NovaItem(val behaviors: List<ItemBehavior>) {
+class NovaItem(holders: List<ItemBehaviorHolder<*>>) {
     
+    val behaviors by lazy { holders.map { it.get(material) } }
     private lateinit var material: ItemNovaMaterial
     private lateinit var name: Array<BaseComponent>
     
-    constructor(vararg behaviors: ItemBehavior) : this(behaviors.toList())
+    internal val vanillaMaterial: Material by lazy { VanillaMaterialTypes.getMaterial(behaviors.flatMapTo(HashSet()) { it.vanillaMaterialProperties }) }
+    
+    constructor(vararg holders: ItemBehaviorHolder<*>) : this(holders.toList())
     
     internal fun setMaterial(material: ItemNovaMaterial) {
         if (::material.isInitialized)
@@ -28,20 +35,20 @@ class NovaItem(val behaviors: List<ItemBehavior>) {
         this.name = TranslatableComponent(material.localizedName).withoutPreFormatting()
     }
     
-    fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
+    internal fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
         var builder = itemBuilder
         behaviors.forEach { builder = it.modifyItemBuilder(builder) }
         return builder
     }
     
-    fun getName(itemStack: ItemStack): Array<BaseComponent> {
-        return behaviors.firstNotNullOfOrNull { it.getName(itemStack) } ?: name
+    internal fun getPacketItemData(itemStack: ItemStack): PacketItemData {
+        val itemData = PacketItemData()
+        behaviors.forEach { it.updatePacketItemData(itemStack, itemData) }
+        return itemData.also { if (it.name == null) it.name = this.name }
     }
     
-    fun getLore(itemStack: ItemStack): List<Array<BaseComponent>> {
-        val lore = ArrayList<Array<BaseComponent>>()
-        behaviors.forEach { it.getLore(itemStack)?.also(lore::addAll) }
-        return lore
+    internal fun getAttributeModifiers(): List<AttributeModifier> {
+        return behaviors.flatMap { it.attributeModifiers }
     }
     
     @Suppress("UNCHECKED_CAST")

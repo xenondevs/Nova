@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.initialize
 
-import com.google.common.graph.GraphBuilder
 import de.studiocode.invui.InvUI
 import de.studiocode.invui.util.InventoryUtils
 import de.studiocode.invui.virtualinventory.StackSizeProvider
@@ -35,7 +34,7 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.item.ItemManager
+import xyz.xenondevs.nova.item.ItemListener
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.PacketItems
@@ -76,21 +75,11 @@ internal object Initializer : Listener {
         LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, Resources,
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeEntityManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
-        NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
+        NetworkManager, ItemListener, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
         BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser
     ), Initializable::dependsOn)
-    
-    private val INITIALIZABLE_GRAPH = GraphBuilder.directed().build<String>()
-    
-    init {
-        INITIALIZABLES.forEach {
-            it.dependsOn.forEach { dependency ->
-                INITIALIZABLE_GRAPH.putEdge(it::class.simpleName, dependency::class.simpleName)
-            }
-        }
-    }
     
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())
     var isDone = false

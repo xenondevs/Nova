@@ -1,15 +1,18 @@
 package xyz.xenondevs.nova.util
 
-import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.item.crafting.AbstractCookingRecipe
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -20,6 +23,7 @@ import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.Levelled
 import org.bukkit.block.data.type.Bed
 import org.bukkit.block.data.type.PistonHead
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.GlobalValues
@@ -30,15 +34,18 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.world.block.BlockBreaking
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
+import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
+import kotlin.math.floor
 import kotlin.random.Random
+import net.minecraft.core.BlockPos as MojangBlockPos
+import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceContext
 
 // region block info
@@ -48,6 +55,12 @@ import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceCon
  */
 val Block.below: Block
     get() = location.subtract(0.0, 1.0, 0.0).block
+
+/**
+ * The block that is one y-level above the current one.
+ */
+val Block.above: Block
+    get() = location.add(0.0, 1.0, 0.0).block
 
 /**
  * The hardness of this block, also considering the custom hardness of Nova blocks.
@@ -98,6 +111,7 @@ val Block.sourceFluidType: FluidType?
 
 /**
  * Places a block using the given [BlockPlaceContext].
+ *
  * Works for vanilla blocks, Nova blocks and blocks from custom item integrations.
  *
  * @param ctx The context to use
@@ -146,7 +160,7 @@ fun Block.placeVanilla(player: ServerPlayer, itemStack: ItemStack, playSound: Bo
         BlockHitResult(
             Vec3(location.x, location.y, location.z),
             Direction.UP,
-            BlockPos(location.blockX, location.blockY, location.blockZ),
+            MojangBlockPos(location.blockX, location.blockY, location.blockZ),
             false
         )
     )))
@@ -173,7 +187,7 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
     val tileEntityTag = itemTag.getCompound("BlockEntityTag")?.let { if (it.isEmpty) itemTag else it }
     if (tileEntityTag != null) {
         val world = this.world.serverLevel
-        world.getBlockEntity(BlockPos(x, y, z), true)?.load(tileEntityTag)
+        world.getBlockEntity(MojangBlockPos(x, y, z), true)?.load(tileEntityTag)
     }
 }
 
@@ -183,6 +197,7 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
 
 /**
  * Removes this block using the given [ctx].
+ *
  * This method works for vanilla blocks, blocks from Nova and blocks from custom item integrations.
  *
  * @param ctx The [BlockBreakContext] to be used
@@ -202,6 +217,7 @@ fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticle
 
 /**
  * Gets a list of [ItemStacks][ItemStack] containing the drops of this [Block] for the specified [BlockBreakContext].
+ *
  * Works for vanilla blocks, Nova blocks and blocks from custom item integrations.
  */
 fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
@@ -222,8 +238,13 @@ fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
         state.inventory.clear()
     }
     
-    val block = getMainHalf()
-    drops += block.getDrops(tool)
+    // don't include the actual block for creative players
+    if (ctx.source !is Player || ctx.source.gameMode != GameMode.CREATIVE) {
+        val block = getMainHalf()
+        drops += if (tool != null && ctx.source is Entity)
+            block.getDrops(tool, ctx.source)
+        else block.getDrops(tool)
+    }
     
     return drops.filterNot { it.type.isAir }
 }
@@ -243,6 +264,26 @@ private fun Block.getMainHalf(): Block {
     }
     
     return this
+}
+
+/**
+ * Gets the experience that would be dropped if the block were to be broken.
+ */
+fun Block.getExp(ctx: BlockBreakContext): Int {
+    // TODO: Nova blocks
+    
+    val serverLevel = ctx.pos.world.serverLevel
+    val mojangPos = ctx.pos.nmsPos
+    
+    var exp = BlockUtils.getVanillaBlockExp(serverLevel, mojangPos, ctx.item.nmsCopy)
+    
+    // the furnace is the only block entity that can drop exp (I think)
+    val furnace = serverLevel.getBlockEntity(mojangPos) as? AbstractFurnaceBlockEntity
+    if (furnace != null) {
+        exp += BlockUtils.getVanillaFurnaceExp(furnace)
+    }
+    
+    return exp
 }
 // endregion
 
@@ -271,8 +312,8 @@ fun Block.showBreakParticles() {
 fun Material.showBreakParticles(location: Location) {
     particleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5)) {
         texture(this@showBreakParticles)
-        offset(0.2, 0.2, 0.2)
-        amount(50)
+        offset(0.3, 0.3, 0.3)
+        amount(70)
     }.display()
 }
 
@@ -321,3 +362,29 @@ fun Block.sendDestructionPacket(entityId: Int, stage: Int) {
 }
 
 // endregion
+
+object BlockUtils {
+    
+    internal fun getVanillaBlockExp(level: ServerLevel, pos: MojangBlockPos, tool: MojangStack): Int {
+        val blockState = level.getBlockState(pos) ?: return 0
+        val block = blockState.block
+        return block.getExpDrop(blockState, level, pos, tool, true)
+    }
+    
+    internal fun getVanillaFurnaceExp(furnace: AbstractFurnaceBlockEntity): Int {
+        return furnace.recipesUsed.object2IntEntrySet().sumOf { entry ->
+            val amount = entry.intValue
+            val expPerRecipe = (minecraftServer.recipeManager.byKey(entry.key).orElse(null) as? AbstractCookingRecipe)?.experience?.toDouble() ?: 0.0
+            
+            // Minecraft's logic to calculate the furnace exp
+            var exp = floor(amount * expPerRecipe).toInt()
+            val f = (amount * expPerRecipe) % 1
+            if (f != 0.0 && Math.random() < f) {
+                exp++
+            }
+            
+            return@sumOf exp
+        }
+    }
+    
+}

@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.resources
 private val NAMESPACED_ENTRY = Regex("""^([a-z0-9._-]+):([a-z0-9/._-]+)$""")
 private val NON_NAMESPACED_ENTRY = Regex("""^([a-z0-9/._-]+)$""")
 
-internal data class ResourcePath(val namespace: String, val path: String) {
+data class ResourcePath(val namespace: String, val path: String) {
     
     private val id = "$namespace:$path"
     

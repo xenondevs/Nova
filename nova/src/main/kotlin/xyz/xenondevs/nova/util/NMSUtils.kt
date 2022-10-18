@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.util
 
 import com.mojang.serialization.JsonOps
 import net.minecraft.core.MappedRegistry
+import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
 import net.minecraft.core.Rotations
@@ -24,6 +25,7 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
@@ -39,7 +41,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
-import net.minecraft.world.item.ItemStack as NMSItemStack
+import net.minecraft.world.item.ItemStack as MojangStack
 
 val Entity.nmsEntity: MojangEntity
     get() = (this as CraftEntity).handle
@@ -47,11 +49,22 @@ val Entity.nmsEntity: MojangEntity
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
-val ItemStack.nmsStack: NMSItemStack
+@Deprecated("Misleading name", replaceWith = ReplaceWith("nmsCopy"))
+val ItemStack.nmsStack: MojangStack
     get() = CraftItemStack.asNMSCopy(this)
 
-val NMSItemStack.bukkitStack: ItemStack
+val ItemStack?.nmsCopy: MojangStack
+    get() = CraftItemStack.asNMSCopy(this)
+
+@Deprecated("Misleading name", replaceWith = ReplaceWith("bukkitCopy"))
+val MojangStack.bukkitStack: ItemStack
     get() = CraftItemStack.asBukkitCopy(this)
+
+val MojangStack.bukkitCopy: ItemStack
+    get() = CraftItemStack.asBukkitCopy(this)
+
+val MojangStack.bukkitMirror: ItemStack
+    get() = CraftItemStack.asCraftMirror(this)
 
 val Location.blockPos: MojangBlockPos
     get() = MojangBlockPos(blockX, blockY, blockZ)
@@ -76,6 +89,24 @@ val InteractionHand.bukkitSlot: EquipmentSlot
     get() = when (this) {
         InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
         InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
+    }
+
+val EquipmentSlot.interactionHand: InteractionHand
+    get() = when(this) {
+        EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
+        EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
+        else -> throw UnsupportedOperationException()
+    }
+
+val BlockFace.nmsDirection: Direction
+    get() = when (this) {
+        BlockFace.NORTH -> Direction.NORTH
+        BlockFace.EAST -> Direction.EAST
+        BlockFace.SOUTH -> Direction.SOUTH
+        BlockFace.WEST -> Direction.WEST
+        BlockFace.UP -> Direction.UP
+        BlockFace.DOWN -> Direction.DOWN
+        else -> throw UnsupportedOperationException()
     }
 
 val Block.nmsState: BlockState
@@ -126,6 +157,10 @@ fun BlockPos.setBlockStateNoUpdate(state: BlockState) {
 
 fun BlockPos.setBlockStateSilently(state: BlockState) {
     chunkSection.setBlockStateSilently(this, state)
+}
+
+fun BlockPos.setBlockState(state: BlockState) {
+    world.serverLevel.setBlock(nmsPos, state, 11)
 }
 
 fun BlockPos.getBlockState(): BlockState {

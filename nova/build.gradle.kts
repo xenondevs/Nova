@@ -16,9 +16,9 @@ dependencies {
     api(project(":nova-api"))
     spigotLoaderApi(deps.bundles.kotlin)
     novaLoaderApi(deps.bundles.cbf)
-    novaLoaderApi("de.studiocode.invui:InvUI:0.8-SNAPSHOT") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
-    novaLoaderApi("de.studiocode.invui:ResourcePack:0.8-SNAPSHOT") { exclude("de.studiocode.invui", "InvUI") }
-    novaLoaderApi("de.studiocode.invui:IA-R11:0.8-SNAPSHOT:remapped-mojang")
+    novaLoaderApi("de.studiocode.invui:InvUI:0.8.1") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
+    novaLoaderApi("de.studiocode.invui:ResourcePack:0.8.1") { exclude("de.studiocode.invui", "InvUI") }
+    novaLoaderApi("de.studiocode.invui:IA-R11:0.8.1:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.1-SNAPSHOT:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:particle:1.8")
     
@@ -99,7 +99,8 @@ remapStrings {
         "xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch",
         "xyz.xenondevs.nova.transformer.patch.worldgen.RegistryCodecPatch",
         "xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch",
-        "xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch"
+        "xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch",
+        "xyz.xenondevs.nova.transformer.patch.item.ToolPatches"
     )
 }
 

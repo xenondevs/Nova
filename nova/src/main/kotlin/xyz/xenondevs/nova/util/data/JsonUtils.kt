@@ -28,6 +28,7 @@ import xyz.xenondevs.nova.data.serialization.json.NamespacedIdTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.NamespacedKeyTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.NovaMaterialSerialization
 import xyz.xenondevs.nova.data.serialization.json.UUIDTypeAdapter
+import xyz.xenondevs.nova.data.serialization.json.VersionSerialization
 import xyz.xenondevs.nova.data.serialization.json.WorldTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.YamlConfigurationTypeAdapter
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -51,6 +52,7 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter<LootTable>(LootTableSerialization)
     .registerTypeHierarchyAdapter<LootItem>(LootItemSerialization)
     .registerTypeHierarchyAdapter<BlockModelData>(BlockModelDataSerialization)
+    .registerTypeHierarchyAdapter<Version>(VersionSerialization)
     .registerTypeAdapter<FontChar>(FontCharSerialization)
     .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
     .enableComplexMapKeySerialization()

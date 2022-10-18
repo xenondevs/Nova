@@ -19,6 +19,9 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityTracker
+import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
+import xyz.xenondevs.nova.world.block.logic.interact.BlockInteracting
+import xyz.xenondevs.nova.world.block.logic.place.BlockPlacing
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
 

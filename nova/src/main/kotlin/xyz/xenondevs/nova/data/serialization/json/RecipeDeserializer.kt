@@ -12,6 +12,8 @@ import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.SmithingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer.Companion.getRecipeKey
+import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer.Companion.parseRecipeChoice
 import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.getFloat
 import xyz.xenondevs.nova.util.data.getInt
@@ -29,24 +31,34 @@ interface RecipeDeserializer<T> {
     
     fun deserialize(json: JsonObject, file: File): T
     
-    fun parseRecipeChoice(element: JsonElement): RecipeChoice {
-        val nameList = when {
-            element is JsonArray -> element.getAllStrings()
-            element.isString() -> listOf(element.asString)
-            else -> throw IllegalArgumentException()
-        }.map { ids ->
-            // Id fallbacks
-            ids.replace(" ", "")
-                .split(';')
-                .firstOrNull { ItemUtils.isIdRegistered(it.substringBefore('{'))}
-                ?: throw IllegalArgumentException("Invalid item id(s): $ids")
+    companion object {
+        
+        fun parseRecipeChoice(element: JsonElement): RecipeChoice {
+            val list = when {
+                element is JsonArray -> element.getAllStrings()
+                element.isString() -> listOf(element.asString)
+                else -> throw IllegalArgumentException()
+            }
+            
+            return parseRecipeChoice(list)
         }
         
-        return ItemUtils.getRecipeChoice(nameList)
+        fun parseRecipeChoice(list: List<String>): RecipeChoice {
+            val names = list.map { ids ->
+                // Id fallbacks
+                ids.replace(" ", "")
+                    .split(';')
+                    .firstOrNull { ItemUtils.isIdRegistered(it.substringBefore('{')) }
+                    ?: throw IllegalArgumentException("Invalid item id(s): $ids")
+            }
+            
+            return ItemUtils.getRecipeChoice(names)
+        }
+        
+        fun getRecipeKey(file: File): NamespacedKey =
+            NamespacedKey(NOVA, "${file.parentFile.name}.${file.nameWithoutExtension}")
+        
     }
-    
-    fun getRecipeKey(file: File): NamespacedKey =
-        NamespacedKey(NOVA, "${file.parentFile.name}.${file.nameWithoutExtension}")
     
 }
 

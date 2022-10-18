@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.recipe
 
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
@@ -20,6 +21,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
@@ -31,6 +33,7 @@ import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.minecraftServer
+import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
@@ -107,10 +110,15 @@ private val ALLOW_RESULT_OVERWRITE by configReloadable { DEFAULT_CONFIG.getBoole
 
 object RecipeManager : Initializable(), Listener {
     
+    private val HARDCODED_RECIPES: Map<ResourceLocation, (ResourceLocation) -> MojangRecipe<*>> = mapOf(
+        ResourceLocation("minecraft", "repair_item") to ::RepairItemRecipe
+    )
+    
     private val shapedRecipes = HashMap<NamespacedKey, OptimizedShapedRecipe>()
     private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
     private val furnaceRecipes = HashMap<NamespacedKey, FurnaceRecipe>()
-    private val vanillaRegisteredRecipeKeys = ArrayList<NamespacedKey>()
+    private val registeredVanillaRecipeKeys = HashSet<NamespacedKey>()
+    private val customVanillaRecipeKeys = HashSet<NamespacedKey>()
     private val _clientsideRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
     private val _novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
     
@@ -127,6 +135,7 @@ object RecipeManager : Initializable(), Listener {
         registerEvents()
         registerPacketListener()
         loadRecipes()
+        loadHardcodedRecipes()
     }
     
     private fun loadRecipes() {
@@ -174,7 +183,8 @@ object RecipeManager : Initializable(), Listener {
                         else -> Bukkit.addRecipe(recipe)
                     }
                     
-                    vanillaRegisteredRecipeKeys += key
+                    registeredVanillaRecipeKeys += key
+                    customVanillaRecipeKeys += key
                 }
                 
                 is NovaRecipe -> _novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
@@ -184,13 +194,23 @@ object RecipeManager : Initializable(), Listener {
         }
     }
     
+    private fun loadHardcodedRecipes() {
+        val recipeManager = minecraftServer.recipeManager
+        HARDCODED_RECIPES.forEach { (resourceLocation, recipeConstructor) ->
+            recipeManager.removeRecipe(resourceLocation)
+            recipeManager.addRecipe(recipeConstructor(resourceLocation))
+            
+            registeredVanillaRecipeKeys += resourceLocation.namespacedKey
+        }
+    }
+    
     internal fun reload() {
-        vanillaRegisteredRecipeKeys.forEach { minecraftServer.recipeManager.removeRecipe(it.resourceLocation) }
+        customVanillaRecipeKeys.forEach { minecraftServer.recipeManager.removeRecipe(it.resourceLocation) }
         
         shapedRecipes.clear()
         shapelessRecipes.clear()
         furnaceRecipes.clear()
-        vanillaRegisteredRecipeKeys.clear()
+        customVanillaRecipeKeys.clear()
         _clientsideRecipes.clear()
         _novaRecipes.clear()
         
@@ -211,14 +231,14 @@ object RecipeManager : Initializable(), Listener {
     
     @EventHandler
     private fun handleJoin(event: PlayerJoinEvent) {
-        vanillaRegisteredRecipeKeys.forEach(event.player::discoverRecipe)
+        customVanillaRecipeKeys.forEach(event.player::discoverRecipe)
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
     private fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
         val recipe = event.recipe ?: return
         
-        var requiresContainer = recipe.key in vanillaRegisteredRecipeKeys
+        var requiresContainer = recipe.key in registeredVanillaRecipeKeys
         if (!requiresContainer && event.inventory.contents.any { it.novaMaterial != null }) {
             // prevent non-Nova recipes from using Nova items
             event.inventory.result = ItemStack(Material.AIR)

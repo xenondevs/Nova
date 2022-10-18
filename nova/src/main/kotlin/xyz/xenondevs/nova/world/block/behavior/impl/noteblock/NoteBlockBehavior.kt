@@ -8,7 +8,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.block.NotePlayEvent
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.resources.model.config.NoteBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.NoteBlockStateConfig
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaNoteBlockTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.Instrument

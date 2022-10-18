@@ -16,10 +16,10 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.ItemMergeEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
@@ -32,10 +32,12 @@ import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
+import xyz.xenondevs.nova.util.data.duplicate
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
@@ -43,25 +45,11 @@ import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
-import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
-
-/**
- * The fake durability displayed clientside, stored in the nova tag.
- * Ranges from 0.0 to 1.0
- */
-var ItemStack.clientsideDurability: Double
-    get() = (itemMeta?.unhandledTags?.get("nova") as CompoundTag?)?.getDouble("durability") ?: 1.0
-    set(value) {
-        require(value in 0.0..1.0)
-        val itemMeta = itemMeta
-        (itemMeta?.unhandledTags?.get("nova") as CompoundTag?)?.putDouble("durability", value)
-        this.itemMeta = itemMeta
-    }
 
 @Suppress("DEPRECATION")
 internal object PacketItems : Initializable(), Listener {
@@ -112,14 +100,14 @@ internal object PacketItems : Initializable(), Listener {
                 ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
                     event.isCancelled = true
                     
-                    view.setItem(rawSlot, null)
                     if (event.view.isPlayerView()) {
+                        view.setItem(rawSlot, null)
                         view.bottomInventory.addItemCorrectly(clicked)
                     } else {
                         val toInv = if (event.clickedInventory == view.topInventory)
                             view.bottomInventory else view.topInventory
                         
-                        toInv.addItemCorrectly(clicked)
+                        clicked.amount = toInv.addItemCorrectly(clicked)
                     }
                 }
                 
@@ -127,6 +115,16 @@ internal object PacketItems : Initializable(), Listener {
             }
             
         }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private fun handleMerge(event: ItemMergeEvent) {
+        val first = event.entity.itemStack
+        val second = event.target.itemStack
+        
+        val novaMaterial = first.novaMaterial ?: return
+        if (first.amount + second.amount > novaMaterial.maxStackSize)
+            event.isCancelled = true
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -258,6 +256,7 @@ internal object PacketItems : Initializable(), Listener {
             val tag = tag!!
             tag.remove("CustomModelData")
             tag.remove("Damage")
+            tag.remove("HideFlags")
             
             val display = tag.getOrNull<CompoundTag>("display")
             
@@ -287,9 +286,12 @@ internal object PacketItems : Initializable(), Listener {
         val id = novaTag.getString("id") ?: return getMissingItem(item, null)
         val material = NovaMaterialRegistry.getOrNull(id) ?: return getMissingItem(item, id)
         val subId = novaTag.getInt("subId")
-        val durabilityPercentage = if (novaTag.contains("durability")) novaTag.getDouble("durability") else null
+        val novaItem = material.novaItem
         
-        val data = Resources.getModelDataOrNull(id)?.first ?: return getMissingItem(item, id)
+        val itemModelDataMap = Resources.getModelDataOrNull(id)?.first
+        val data = itemModelDataMap?.get(novaItem.vanillaMaterial)
+            ?: itemModelDataMap?.values?.first()
+            ?: return getMissingItem(item, id)
         
         val newItem = item.copy()
         val newItemTag = newItem.tag!!
@@ -300,21 +302,42 @@ internal object PacketItems : Initializable(), Listener {
             newItemTag.getCompound("display")
         } else CompoundTag().also { newItemTag.put("display", it) }
         
-        val novaItem = material.novaItem
-        val bukkitStack = item.bukkitStack
-        if (useName && !displayTag.contains("Name"))
-            displayTag.putString("Name", novaItem.getName(bukkitStack).serialize())
+        val itemDisplayData = novaItem.getPacketItemData(item.bukkitStack)
         
+        // name
+        var itemDisplayName = itemDisplayData.name
+        if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
+            if (item.isEnchanted && itemDisplayName.size == 1) {
+                itemDisplayName = itemDisplayName.duplicate()
+                itemDisplayName[0].color = ChatColor.AQUA
+            }
+            
+            displayTag.putString("Name", itemDisplayName.serialize())
+        }
+        
+        // lore
         val loreTag = ListTag()
-        val lore = novaItem.getLore(bukkitStack)
-        lore.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
-        if (player != null && player in AdvancedTooltips.players)
+        val itemDisplayLore = itemDisplayData.lore
+        itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
+        if (player != null && player in AdvancedTooltips.players) {
+            itemDisplayData.advancedTooltipsLore?.forEach {
+                loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize())
+            }
             loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
+        }
         displayTag.put("Lore", loreTag)
         
-        if (durabilityPercentage != null) {
+        // durability
+        val itemDisplayDurabilityBar = itemDisplayData.durabilityBar
+        if (itemDisplayDurabilityBar != 1.0) {
             val maxDurability = newItem.item.maxDamage
-            newItem.damageValue = maxDurability - (maxDurability * durabilityPercentage).toInt()
+            newItem.damageValue = maxDurability - (maxDurability * itemDisplayDurabilityBar).toInt()
+        }
+        
+        // hide flags
+        val hiddenFlags = itemDisplayData.hiddenFlags
+        if (!hiddenFlags.isNullOrEmpty()) {
+            newItemTag.putInt("HideFlags", HideableFlag.toInt(hiddenFlags))
         }
         
         return newItem

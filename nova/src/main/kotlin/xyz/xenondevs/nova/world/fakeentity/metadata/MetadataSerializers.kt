@@ -17,6 +17,7 @@ import net.minecraft.world.entity.npc.VillagerData
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
+import xyz.xenondevs.nova.material.PacketItems
 import java.util.*
 
 internal interface MetadataSerializer<T> {
@@ -33,7 +34,9 @@ internal object MetadataSerializers {
     val STRING: MetadataSerializer<String> = metadataSerializer(3, FriendlyByteBuf::writeUtf)
     val COMPONENT: MetadataSerializer<Component> = metadataSerializer(4, FriendlyByteBuf::writeComponent)
     val OPT_COMPONENT: MetadataSerializer<Component?> = optionalMetadataSerializer(5, FriendlyByteBuf::writeComponent)
-    val ITEM_STACK: MetadataSerializer<ItemStack> = metadataSerializer(6, FriendlyByteBuf::writeItem)
+    val ITEM_STACK: MetadataSerializer<ItemStack> = metadataSerializer(6) { value, buf ->
+        buf.writeItem(if (PacketItems.isNovaItem(value)) PacketItems.getFakeItem(null, value) else value)
+    }
     val BOOLEAN: MetadataSerializer<Boolean> = metadataSerializer(7, FriendlyByteBuf::writeBoolean)
     val ROTATIONS: MetadataSerializer<Rotations> = metadataSerializer(8) { value, buf ->
         buf.writeFloat(value.x)
