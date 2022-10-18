@@ -1,21 +1,18 @@
 package xyz.xenondevs.nova.ui.overlay.character
 
 import net.md_5.bungee.api.chat.BaseComponent
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
-import xyz.xenondevs.nova.util.data.getResourceAsStream
 
 object DefaultFont {
     
-    private val charWidths = getResourceAsStream("char_widths.bin")!!.readAllBytes()
+    @Deprecated("Replaced by CharSizes", ReplaceWith("CharSizes.calculateStringLength(\"minecraft:default\", string)", "xyz.xenondevs.nova.data.resources.CharSizes"))
+    fun getStringLength(string: String): Int =
+        CharSizes.calculateStringLength("minecraft:default", string)
     
-    fun getStringLength(string: String): Int {
-        var size = 0
-        string.toCharArray().forEach { size += getCharWidth(it) }
-        return size
-    }
-    
+    @Deprecated("Replaced by CharSizes", ReplaceWith("CharSizes.getCharWidth(\"minecraft:default\", char)", "xyz.xenondevs.nova.data.resources.CharSizes"))
     fun getCharWidth(char: Char): Int =
-        charWidths[char.code].toInt()
+        CharSizes.getCharWidth("minecraft:default", char)
     
     fun getVerticallyMovedText(components: Array<out BaseComponent>, distance: Int): Array<out BaseComponent> {
         // Due to Minecraft's inefficient font loading, too many fonts will cause the client to crash, even though

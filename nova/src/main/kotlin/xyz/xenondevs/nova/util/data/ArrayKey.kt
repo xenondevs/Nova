@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util.data
 
+@Suppress("FunctionName")
 internal fun <T> ArrayKey(vararg items: T): ArrayKey<T> = ArrayKey(items)
 
 internal class ArrayKey<out T>(val array: Array<out T>) {

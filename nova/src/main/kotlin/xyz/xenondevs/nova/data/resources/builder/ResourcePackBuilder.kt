@@ -14,10 +14,10 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
-import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.WailaContent
+import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.Version
@@ -123,6 +123,10 @@ internal object ResourcePackBuilder {
             LOGGER.info("Writing content")
             contents.forEach(PackContent::write)
             writeMetadata(assetPacks.size, basePacks.packAmount)
+            
+            // Calculate char sizes
+            LOGGER.info("Calculating char sizes")
+            CharSizeCalculator().calculateCharSizes()
             
             // Create a zip
             val zip = createZip()
