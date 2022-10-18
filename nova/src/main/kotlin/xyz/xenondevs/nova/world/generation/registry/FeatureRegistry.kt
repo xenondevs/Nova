@@ -20,8 +20,8 @@ object FeatureRegistry : WorldGenRegistry() {
     private val placedFeatures = Object2ObjectOpenHashMap<NamespacedId, PlacedFeature>()
     
     override fun loadFiles() {
-        configuredFeatures.putAll(loadFiles("configured_feature", ConfiguredFeature.CODEC))
-        placedFeatures.putAll(loadFiles("placed_feature", PlacedFeature.CODEC))
+        configuredFeatures += loadFiles("configured_feature", ConfiguredFeature.CODEC)
+        placedFeatures += loadFiles("placed_feature", PlacedFeature.CODEC)
     }
     
     override fun register(registryAccess: RegistryAccess) {
