@@ -27,8 +27,8 @@ internal object WorldGenManager : Initializable() {
     private val CODEC_OVERRIDES by lazy { listOf(BlockStateCodecOverride) }
     
     override fun init() {
-        WORLD_GEN_REGISTRIES.forEach(WorldGenRegistry::loadFiles)
         NMS_REGISTRIES.values.forEach(NMSUtils::unfreezeRegistry)
+        WORLD_GEN_REGISTRIES.forEach(WorldGenRegistry::loadFiles)
         CODEC_OVERRIDES.forEach(CodecOverride::replace)
         WORLD_GEN_REGISTRIES.forEach { it.register(REGISTRY_ACCESS) }
         NMS_REGISTRIES.values.forEach(NMSUtils::freezeRegistry)

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.Registry
@@ -16,12 +17,29 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_GENERATION_SETTINGS_FEATURES_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 
-object BiomeInjector {
+internal object BiomeInjector {
     
     private val BIOME_REGISTRY = NMSUtils.getRegistry(Registry.BIOME_REGISTRY)
     
     private val toInject = Object2ObjectOpenHashMap<ResourceLocation, MutableList<MutableSet<Holder<PlacedFeature>>>>()
     private val patchedBiomes = IntOpenHashSet()
+    
+    fun loadInjections(injections: Iterable<BiomeInjection>) {
+        injections.forEach { biomeInjection ->
+            // get a list of all biomes that match the injection's tag
+            val biomes = biomeInjection.biomes
+            // loop through all biomes and add new injections to the toInject map
+            biomes.forEach { biome ->
+                // retrieve or create the list of injections for this biome
+                val featureList = toInject.getOrPut(biome, ::ObjectArrayList)
+                // loop through each decoration category and add the features to the set
+                biomeInjection.features.forEachIndexed { i, features ->
+                    val featureSet = featureList.getOrNull(i) ?: ObjectOpenHashSet<Holder<PlacedFeature>>().also(featureList::add)
+                    featureSet += features
+                }
+            }
+        }
+    }
     
     @Suppress("UNCHECKED_CAST", "unused")
     @JvmStatic

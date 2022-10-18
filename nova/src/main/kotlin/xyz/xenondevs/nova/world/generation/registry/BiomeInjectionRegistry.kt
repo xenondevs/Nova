@@ -6,6 +6,7 @@ import net.minecraft.core.RegistryAccess
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
+import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjector
 
 object BiomeInjectionRegistry : WorldGenRegistry() {
     
@@ -15,6 +16,7 @@ object BiomeInjectionRegistry : WorldGenRegistry() {
     
     override fun loadFiles() {
         biomeInjections += loadFiles("inject/biome", BiomeInjection.CODEC)
+        BiomeInjector.loadInjections(biomeInjections.values)
     }
     
     override fun register(registryAccess: RegistryAccess) = Unit
