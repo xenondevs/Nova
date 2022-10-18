@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.command.CommandManager
+import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.recipe.RecipeManager
@@ -78,7 +79,7 @@ internal object Initializer : Listener {
         NetworkManager, ItemManager, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
-        BossBarOverlayManager, WailaManager, WorldGenManager
+        BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser
     ), Initializable::dependsOn)
     
     private val INITIALIZABLE_GRAPH = GraphBuilder.directed().build<String>()
