@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.util.emptyEnumMap
 
 internal class VanillaContainerTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
     
+    override val type = Type.CONTAINER
     override val itemHolder: StaticVanillaItemHolder
     
     init {

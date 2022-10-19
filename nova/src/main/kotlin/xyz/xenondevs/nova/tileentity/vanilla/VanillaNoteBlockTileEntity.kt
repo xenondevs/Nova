@@ -24,6 +24,8 @@ private val SOUND_EVENT_TABLE = Instrument.values().associateWithTo(enumMapOf())
 
 internal class VanillaNoteBlockTileEntity constructor(blockState: VanillaTileEntityState) : VanillaTileEntity(blockState) {
     
+    override val type = Type.NOTE_BLOCK
+    
     var note: Int = retrieveData("note") { 0 }
         set(value) {
             if (field != value) {
