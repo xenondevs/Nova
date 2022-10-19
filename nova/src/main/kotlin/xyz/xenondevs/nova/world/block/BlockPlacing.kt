@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.facing
 import xyz.xenondevs.nova.util.isCompletelyDenied
+import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaMaterial
@@ -33,6 +34,7 @@ import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.pos
+import java.util.concurrent.CompletableFuture
 
 internal object BlockPlacing : Listener {
     
@@ -92,14 +94,24 @@ internal object BlockPlacing : Listener {
                 clicked.location
             else clicked.location.advance(event.blockFace)
         
-        val placeFuture = if (material.placeCheck != null) {
-            CombinedBooleanFuture(
-                ProtectionManager.canPlace(player, handItem, placeLoc),
-                material.placeCheck.invoke(player, handItem, placeLoc.apply { yaw = playerLocation.facing.oppositeFace.yaw })
-            )
-        } else ProtectionManager.canPlace(player, handItem, placeLoc)
+        if (!placeLoc.isInsideWorldRestrictions())
+            return
         
-        placeFuture.runIfTrue {
+        val futures = ArrayList<CompletableFuture<Boolean>>()
+        futures += ProtectionManager.canPlace(player, handItem, placeLoc)
+        material.multiBlockLoader
+            ?.invoke(placeLoc.pos)
+            ?.forEach {
+                val multiBlockLoc = it.location
+                if (!multiBlockLoc.isInsideWorldRestrictions())
+                    return
+                futures += ProtectionManager.canPlace(player, handItem, multiBlockLoc)
+            }
+        material.placeCheck
+            ?.invoke(player, handItem, placeLoc.apply { yaw = playerLocation.facing.oppositeFace.yaw })
+            ?.also(futures::add)
+        
+        CombinedBooleanFuture(futures).runIfTrue {
             if (!placeLoc.block.type.isReplaceable() || WorldDataManager.getBlockState(placeLoc.pos) != null)
                 return@runIfTrue
             
@@ -132,12 +144,14 @@ internal object BlockPlacing : Listener {
         val replaceBlock = replaceLocation.block
         
         // check if the player is allowed to place a block there
-        ProtectionManager.canPlace(player, handItem, replaceLocation).runIfTrue {
-            // check that there isn't already a block there (which is not replaceable)
-            if (replaceBlock.type.isReplaceable() && WorldDataManager.getBlockState(replaceBlock.pos) == null) {
-                val placed = replaceBlock.placeVanilla(player.serverPlayer, handItem, true)
-                if (placed && player.gameMode != GameMode.CREATIVE) {
-                    player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
+        if (replaceLocation.isInsideWorldRestrictions()) {
+            ProtectionManager.canPlace(player, handItem, replaceLocation).runIfTrue {
+                // check that there isn't already a block there (which is not replaceable)
+                if (replaceBlock.type.isReplaceable() && WorldDataManager.getBlockState(replaceBlock.pos) == null) {
+                    val placed = replaceBlock.placeVanilla(player.serverPlayer, handItem, true)
+                    if (placed && player.gameMode != GameMode.CREATIVE) {
+                        player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
+                    }
                 }
             }
         }
