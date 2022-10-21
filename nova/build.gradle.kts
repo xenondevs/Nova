@@ -43,7 +43,7 @@ dependencies {
     compileOnly("com.plotsquared:PlotSquared-Core:6.9.4") { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Bukkit:6.9.4") { isTransitive = false }
     compileOnly("com.griefdefender:api:2.0.0-SNAPSHOT") { isTransitive = false }
-    compileOnly("com.github.LoneDev6:API-ItemsAdder:3.1.0b") { isTransitive = false }
+    compileOnly("com.github.LoneDev6:API-ItemsAdder:3.2.4") { isTransitive = false }
     compileOnly("com.github.TownyAdvanced:Towny:0.97.2.0") { isTransitive = false }
     compileOnly("com.github.Th0rgal:Oraxen:2ddf3c68b7") { isTransitive = false }
     compileOnly("io.lumine:MythicLib-dist:1.3") { isTransitive = false }

@@ -6,22 +6,29 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
-import xyz.xenondevs.nova.util.data.toPlainText
+import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 
 class WailaLine(val components: Array<out BaseComponent>, val width: Int, val alignment: Alignment) {
     
-    constructor(components: Array<out BaseComponent>, player: Player, alignment: Alignment) : this(
+    constructor(components: Array<out BaseComponent>, locale: String, alignment: Alignment) : this(
         components,
-        DefaultFont.getStringLength(components.toPlainText(player.locale)),
+        CharSizes.calculateComponentLength(components, locale),
         alignment
     )
     
-    constructor(widthComponent: Pair<Array<out BaseComponent>, Int>, alignment: Alignment) : this(
-        widthComponent.first,
-        widthComponent.second,
+    constructor(components: Array<out BaseComponent>, player: Player, alignment: Alignment) : this(
+        components,
+        player.locale,
+        alignment
+    )
+    
+    constructor(builder: MovingComponentBuilder, alignment: Alignment) : this(
+        builder.create(),
+        builder.width,
         alignment
     )
     
@@ -62,3 +69,5 @@ abstract class NovaWailaInfoProvider : WailaInfoProvider<NovaBlockState> {
 }
 
 abstract class VanillaWailaInfoProvider(val materials: Set<Material>?) : WailaInfoProvider<Block>
+
+internal abstract class CustomItemServiceWailaInfoProvider(val services: Set<CustomItemService>?) : WailaInfoProvider<Block>

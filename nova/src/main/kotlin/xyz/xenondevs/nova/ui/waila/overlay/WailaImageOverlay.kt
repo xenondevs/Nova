@@ -8,7 +8,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import xyz.xenondevs.nova.data.resources.builder.content.FontChar
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
-import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
+import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 
@@ -32,7 +32,7 @@ private val overlayCache: Cache<OverlayCacheKey, OverlayData> = CacheBuilder.new
     .expireAfterAccess(5, TimeUnit.MINUTES)
     .build()
 
-private data class OverlayCacheKey(val icon: FontChar, val lines: Int, val longestLineLength: Int)
+private data class OverlayCacheKey(val icon: FontChar?, val lines: Int, val longestLineLength: Int)
 private typealias OverlayData = Triple<Array<BaseComponent>, Int, Int>
 
 internal class WailaImageOverlay : BossBarOverlay() {
@@ -52,7 +52,7 @@ internal class WailaImageOverlay : BossBarOverlay() {
      *
      * @return The x position for centering the text.
      */
-    fun update(icon: FontChar, lines: Int, longestLineLength: Int): Pair<Int, Int> {
+    fun update(icon: FontChar?, lines: Int, longestLineLength: Int): Pair<Int, Int> {
         require(lines in MIN_LINES..MAX_LINES) { "Unsupported line amount: $lines" }
         
         val (components, textBeginX, textCenterX) = overlayCache.get(OverlayCacheKey(icon, lines, longestLineLength)) {
@@ -65,23 +65,27 @@ internal class WailaImageOverlay : BossBarOverlay() {
             val actualWidth = START_TEXTURE_SIZE + partAmount * PART_SIZE + END_TEXTURE_SIZE
             val halfWidth = actualWidth / 2
             
-            val builder = ComponentBuilder()
-                .append(MoveCharacters.getMovingComponent(-halfWidth))
+            val builder = MovingComponentBuilder()
+                .move(-halfWidth)
                 .append(getComponent(lines, 0)) // start texture
-                .append(MoveCharacters.getMovingComponent(-1)) // move one back
+                .move(-1)
             
             repeat(partAmount) {
                 builder
                     .append(getComponent(lines, 1)) // part texture
-                    .append(MoveCharacters.getMovingComponent(-1)) // move one back
+                    .move(-1)
             }
             
-            val components = builder
+            builder
                 .append(getComponent(lines, 2)) // end texture
-                .append(MoveCharacters.getMovingComponent(-actualWidth - 1 + ICON_MARGIN_LEFT + START_TEXTURE_SIZE)) // move to start icon texture
-                .append(icon.char.toString()).font(icon.font) // icon texture
-                .append(MoveCharacters.getMovingComponent(-1 - icon.width - ICON_MARGIN_LEFT - START_TEXTURE_SIZE + halfWidth)) // move back to the middle
-                .create()
+                .moveTo(-halfWidth + ICON_MARGIN_LEFT + START_TEXTURE_SIZE) // move to start icon texture
+            
+            if (icon != null) 
+                builder.append(icon)
+            
+            builder.moveTo(0)
+            
+            val components = builder.create()
             
             // the min x position for text to be displayed
             val textMin = -halfWidth + START_TEXTURE_SIZE + ICON_MARGIN_LEFT + ICON_SIZE + ICON_MARGIN_RIGHT

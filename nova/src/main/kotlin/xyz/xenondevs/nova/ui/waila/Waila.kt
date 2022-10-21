@@ -67,8 +67,7 @@ internal class Waila(val player: Player) {
             val lines = info.lines
             require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
             
-            val icon = Resources.getWailaIconCharOrNull(info.icon) ?: return false
-            
+            val icon = Resources.getWailaIconCharOrNull(info.icon)
             val (beginX, centerX) = imageOverlay.update(icon, lines.size, lines.maxOf { it.width })
             
             BossBarOverlayManager.unregisterOverlays(player, lineOverlays)

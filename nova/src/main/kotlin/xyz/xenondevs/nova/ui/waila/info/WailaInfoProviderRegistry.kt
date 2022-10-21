@@ -1,9 +1,14 @@
 package xyz.xenondevs.nova.ui.waila.info
 
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.ComponentBuilder
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.waila.info.impl.BellWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CakeWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CampfireWailaInfoProvider
@@ -67,12 +72,24 @@ object WailaInfoProviderRegistry {
         } else {
             val block = pos.block
             val type = block.type
-         
-            return providers.asSequence()
-                .filterIsInstance<VanillaWailaInfoProvider>()
-                .lastOrNull { it.materials == null || type in it.materials }
-                ?.getInfo(player, block)
+            
+            return getCustomItemServiceInfo(player, block)
+                ?: providers.asSequence()
+                    .filterIsInstance<VanillaWailaInfoProvider>()
+                    .lastOrNull { it.materials == null || type in it.materials }
+                    ?.getInfo(player, block)
         }
+    }
+    
+    private fun getCustomItemServiceInfo(player: Player, block: Block): WailaInfo? {
+        val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { NamespacedId.of(it) }.getOrNull() } ?: return null
+        val blockName = CustomItemServiceManager.getName(block, player.locale) ?: return null
+        
+        val lines = ArrayList<WailaLine>()
+        lines += WailaLine(ComponentBuilder().append(blockName).color(ChatColor.WHITE).create(), player, WailaLine.Alignment.CENTERED)
+        lines += WailaLine(ComponentBuilder(blockId.toString()).color(ChatColor.DARK_GRAY).create(), player, WailaLine.Alignment.CENTERED)
+        
+        return WailaInfo(blockId, lines)
     }
     
 }

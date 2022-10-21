@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolLevel
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
-import xyz.xenondevs.nova.util.data.ComponentWidthBuilder
+import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 
@@ -38,13 +38,12 @@ object ToolLine {
         hardness: Double,
         correctToolForDrops: Boolean
     ): WailaLine {
-        val builder = ComponentWidthBuilder(player.locale)
+        val builder = MovingComponentBuilder(player.locale)
         if (hardness < 0) {
             return WailaLine(
                 builder
                     .append(TranslatableComponent("waila.nova.required_tool.unbreakable"))
-                    .color(ChatColor.RED)
-                    .create(),
+                    .color(ChatColor.RED),
                 Alignment.CENTERED
             )
         }
@@ -55,7 +54,7 @@ object ToolLine {
             builder.append(TranslatableComponent("waila.nova.required_tool")).color(ChatColor.GRAY)
             
             blockToolCategories.forEach {
-                builder.append(getToolIcon(blockToolLevel, it), 16).color(ChatColor.WHITE)
+                builder.append(getToolIcon(blockToolLevel, it)).color(ChatColor.WHITE)
             }
             
             builder.append(" ").font("default")
@@ -66,7 +65,7 @@ object ToolLine {
             builder.append(TranslatableComponent("waila.nova.required_tool.none")).color(ChatColor.GRAY)
         }
         
-        return WailaLine(builder.create(), Alignment.CENTERED)
+        return WailaLine(builder, Alignment.CENTERED)
     }
     
     private fun getToolIcon(level: ToolLevel?, category: ToolCategory): TextComponent {
