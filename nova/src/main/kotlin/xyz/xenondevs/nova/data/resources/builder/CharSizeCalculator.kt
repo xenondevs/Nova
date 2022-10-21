@@ -126,7 +126,8 @@ internal class CharSizeCalculator {
             }
         }
         
-        return ((maxX + 1) / image.width.toDouble() * fontHeight).roundToInt()
+        val rescale = fontHeight / image.height.toDouble()
+        return ((maxX + 1) * rescale).roundToInt()
     }
     
     private fun readUnicodeProvider(obj: JsonObject, table: CharSizeTable) {
