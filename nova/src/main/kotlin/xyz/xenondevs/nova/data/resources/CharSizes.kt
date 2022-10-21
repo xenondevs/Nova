@@ -40,13 +40,16 @@ object CharSizes {
     fun getCharHeight(font: String, char: Char): Int =
         getCharHeight(font, char.code)
     
-    fun calculateComponentLength(components: Array<BaseComponent>, locale: String): Int {
+    fun calculateComponentLength(components: Array<out BaseComponent>, locale: String): Int {
         return lengthCache.get(ArrayKey(components) to locale) {
             var length = 0
             for (component in components) {
                 val text = component.toPlainText(locale).removeMinecraftFormatting()
                 val font = component.font ?: "default"
-                length += text.toCharArray().sumOf { getCharWidth(font, it) + 1 }
+                length += text.toCharArray().sumOf {
+                    val width = getCharWidth(font, it)
+                    if (width < 0) width + 2 else width +1
+                }
             }
             
             return@get length
