@@ -22,12 +22,16 @@ just focus in adding content to the game.
 
 * Custom items
   * Custom wearables
+    * Custom armor, armor toughness, knockback resistance
   * Custom food
+  * Custom tools
+    * Custom tool levels and categories
+    * Custom break speed, attack speed, attack damage etc.
 * Custom GUIs
 * Custom blocks
   * Customizable break time, particles and sounds
   * Block break effect even on barrier blocks
-  * Solid blocks via noteblocks and mushroom blocks
+  * Solid blocks via note- and mushroom blocks
 * TileEntity system
 * Attachment system
 * Ability system
@@ -37,21 +41,9 @@ just focus in adding content to the game.
   * Custom cables and network types possible
 * Built-in items GUI
   * Recipe Explorer
+* Built-in WAILA (What Am I Looking At)
 * Built-in compatibility with the most popular custom item and protection plugins
-
-## Planned features
-
-* Armor with custom textures
-* Custom entities
 
 # Translating
 
 If you would like to help translate Nova, you can do so [here](https://translate.xenondevs.xyz/).
-
-# Patrons
-
-* mrakavin - €10
-* Ashwin | DarktubeNL - €10
-* Pickle - € 5
-
-Want to donate as well? Check out our [Patreon](https://www.patreon.com/xenondevs) page.
