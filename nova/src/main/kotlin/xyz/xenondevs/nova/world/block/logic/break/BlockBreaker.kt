@@ -132,7 +132,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
         
         if (isDone) {
             // break block, call event, drop items and exp, etc.
-            breakBlock(clientsideDamage < 1) // If the block broke instantaneously for the client, the effects will also be played clientside
+            breakBlock(clientsideDamage >= 1) // If the block broke instantaneously for the client, the effects will also be played clientside
             // check if the breaker is still done (BlockBreakEvent cancelled?)
             if (isDone) {
                 // Stop break animation and mining fatigue effect
@@ -165,11 +165,11 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             // The player does not have mining fatigue, we can use the default effect instance
             ClientboundUpdateMobEffectPacket(player.entityId, MINING_FATIGUE)
         }
-    
+        
         player.send(packet)
     }
     
-    private fun breakBlock(effects: Boolean) {
+    private fun breakBlock(brokenClientside: Boolean) {
         // create a block breaking context
         val ctx = BlockBreakContext(
             block.pos,
@@ -230,10 +230,12 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
                 player.damageToolBreakBlock()
             
             // remove block
-            block.remove(ctx, effects, effects)
+            block.remove(ctx, !brokenClientside, !brokenClientside)
         } else {
-            // reset progress
-            progress = 0.0
+            // If the block wasn't broken clientside, the client will keep breaking the block and not send
+            // START_DESTROY_BLOCK again. For those cases, the internal progress will be reset as well.
+            if (!brokenClientside)
+                progress = 0.0
         }
         
         // send ack packet
