@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
+import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.ExperienceOrb
@@ -71,6 +72,7 @@ internal object ReflectionRegistry {
     val EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD = getMethod(ExperienceOrb::class.java, true, "SRM(net.minecraft.world.entity.ExperienceOrb repairPlayerItems)", MojangPlayer::class.java, Int::class.java)
     val ITEM_ENTITY_PLAYER_TOUCH_METHOD = getMethod(ItemEntity::class.java, false, "SRM(net.minecraft.world.entity.item.ItemEntity playerTouch)", MojangPlayer::class.java)
     val INVENTORY_ADD_METHOD = getMethod(MojangInventory::class.java, false, "SRM(net.minecraft.world.entity.player.Inventory add)", MojangStack::class.java)
+    val ENTITY_PLAY_STEP_SOUND_METHOD = getMethod(MojangEntity::class.java, true, "SRM(net.minecraft.world.entity.Entity playStepSound)", BlockPos::class.java, BlockState::class.java)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
