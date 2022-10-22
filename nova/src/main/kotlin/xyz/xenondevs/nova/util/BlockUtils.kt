@@ -40,7 +40,6 @@ import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
-import xyz.xenondevs.nova.world.block.sound.BukkitSoundGroupWrapper
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
@@ -86,7 +85,7 @@ val Block.soundGroup: SoundGroup?
             return novaMaterial.soundGroup
         }
         
-        return BukkitSoundGroupWrapper(type.soundGroup)
+        return SoundGroup.from(type.soundGroup)
     }
 
 /**
