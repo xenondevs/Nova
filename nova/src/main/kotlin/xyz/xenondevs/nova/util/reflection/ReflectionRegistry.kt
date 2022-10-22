@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.ExperienceOrb
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.ItemCombinerMenu
@@ -73,6 +74,7 @@ internal object ReflectionRegistry {
     val ITEM_ENTITY_PLAYER_TOUCH_METHOD = getMethod(ItemEntity::class.java, false, "SRM(net.minecraft.world.entity.item.ItemEntity playerTouch)", MojangPlayer::class.java)
     val INVENTORY_ADD_METHOD = getMethod(MojangInventory::class.java, false, "SRM(net.minecraft.world.entity.player.Inventory add)", MojangStack::class.java)
     val ENTITY_PLAY_STEP_SOUND_METHOD = getMethod(MojangEntity::class.java, true, "SRM(net.minecraft.world.entity.Entity playStepSound)", BlockPos::class.java, BlockState::class.java)
+    val LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD = getMethod(LivingEntity::class.java, true, "SRM(net.minecraft.world.entity.LivingEntity playBlockFallSound)")
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
