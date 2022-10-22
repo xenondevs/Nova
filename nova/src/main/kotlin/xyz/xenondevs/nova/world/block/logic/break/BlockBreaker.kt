@@ -137,7 +137,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             progress += damage
             
             //<editor-fold desc="hit sounds", defaultstate="collapsed">
-            if (destroyTicks % 4 == 0) {
+            if (progress < 1.0 && destroyTicks % 4 == 0) {
                 if (soundGroup != null) {
                     block.pos.playSound(
                         soundGroup.hitSound,
