@@ -33,17 +33,19 @@ import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
+import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
+import xyz.xenondevs.nova.world.block.sound.BukkitSoundGroupWrapper
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.floor
-import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceContext
@@ -73,6 +75,12 @@ val Block.hardness: Double
  */
 val Block.breakTexture: Material
     get() = BlockManager.getBlock(pos)?.material?.breakParticles ?: type
+
+/**
+ * The sound group of this block, also considering custom sound groups of Nova blocks.
+ */
+val Block.soundGroup: SoundGroup
+    get() = BlockManager.getBlock(pos)?.material?.soundGroup ?: BukkitSoundGroupWrapper(type.soundGroup)
 
 /**
  * Checks if the block below has the same [type][Block.getType].
@@ -319,11 +327,10 @@ fun Material.showBreakParticles(location: Location) {
 
 /**
  * Plays the breaking sound for this block.
- * Only works with vanilla blocks.
  */
 fun Block.playBreakSound() {
-    val breakSound = blockData.soundGroup.breakSound
-    world.playSound(location, breakSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
+    val soundGroup = soundGroup
+    world.playSound(location, soundGroup.breakSound, soundGroup.volume, soundGroup.pitch)
 }
 
 /**

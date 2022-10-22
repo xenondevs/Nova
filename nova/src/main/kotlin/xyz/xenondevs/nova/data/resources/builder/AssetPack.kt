@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate", "unused", "CanBeParameter")
+
 package xyz.xenondevs.nova.data.resources.builder
 
 import xyz.xenondevs.nova.data.resources.ResourcePath
@@ -19,6 +21,7 @@ internal class AssetPack(val directory: File, val namespace: String) {
     val soundsDir = File(directory, "sounds").takeIf(File::exists)
     val langDir = File(directory, "lang").takeIf(File::exists)
     val wailaTexturesDir = File(texturesDir, "waila").takeIf(File::exists)
+    val soundsFile = File(directory, "sounds.json").takeIf(File::exists)
     
     val materialsIndex: List<RegisteredMaterial>? = if (materialsFile.exists())
         MaterialsIndexDeserializer.deserialize(namespace, materialsFile.parseJson())

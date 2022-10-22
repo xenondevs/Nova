@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.world.block.limits.TileEntityTracker
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.block.logic.interact.BlockInteracting
 import xyz.xenondevs.nova.world.block.logic.place.BlockPlacing
+import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
 
@@ -34,6 +35,7 @@ object BlockManager : Initializable(), IBlockManager {
         BlockPlacing.init()
         BlockBreaking.init()
         BlockInteracting.init()
+        BlockSoundEngine.init()
     }
     
     fun getBlock(pos: BlockPos, useLinkedStates: Boolean = true): NovaBlockState? {
@@ -58,8 +60,9 @@ object BlockManager : Initializable(), IBlockManager {
         state.handleInitialized(true)
         
         material.novaBlock.handlePlace(state, ctx)
+        
         if (playSound)
-            material.placeSound?.play(ctx.pos)
+            playPlaceSound(state, ctx)
         
         if (state is NovaTileEntityState)
             TileEntityTracker.handleBlockPlace(state.material, ctx)
@@ -78,10 +81,10 @@ object BlockManager : Initializable(), IBlockManager {
         state.handleRemoved(true)
         
         if (playSound)
-            material.novaBlock.playBreakSound(state, ctx)
+            playBreakSound(state, ctx)
         
         if (showParticles && GlobalValues.BLOCK_BREAK_EFFECTS)
-            material.novaBlock.showBreakParticles(state, ctx)
+            showBreakParticles(state, ctx)
         
         return true
     }
@@ -98,13 +101,13 @@ object BlockManager : Initializable(), IBlockManager {
         
         if (playSound) {
             if (novaBlock != null)
-                novaBlock.playBreakSound(mainState, ctx)
+                playBreakSound(mainState, ctx)
             else mainState.pos.block.playBreakSound()
         }
         
         if (showParticles && GlobalValues.BLOCK_BREAK_EFFECTS) {
             if (novaBlock != null)
-                novaBlock.showBreakParticles(mainState, ctx)
+                showBreakParticles(mainState, ctx)
             else mainState.pos.block.showBreakParticles()
         }
         
@@ -121,6 +124,24 @@ object BlockManager : Initializable(), IBlockManager {
         getDrops(ctx)?.let { ctx.pos.location.add(0.5, 0.5, 0.5).dropItems(it) }
         
         return true
+    }
+    
+    private fun playPlaceSound(state: NovaBlockState, ctx: BlockPlaceContext) {
+        val soundGroup = state.material.soundGroup
+        if (soundGroup != null) {
+            ctx.pos.playSound(soundGroup.placeSound, soundGroup.volume, soundGroup.pitch)
+        }
+    }
+    
+    private fun playBreakSound(state: NovaBlockState, ctx: BlockBreakContext) {
+        val soundGroup = state.material.soundGroup
+        if (soundGroup != null) {
+            ctx.pos.playSound(soundGroup.breakSound, soundGroup.volume, soundGroup.pitch)
+        }
+    }
+    
+    private fun showBreakParticles(state: NovaBlockState, ctx: BlockBreakContext) {
+        state.material.breakParticles?.showBreakParticles(ctx.pos.location)
     }
     
     //<editor-fold desc="NovaAPI methods">

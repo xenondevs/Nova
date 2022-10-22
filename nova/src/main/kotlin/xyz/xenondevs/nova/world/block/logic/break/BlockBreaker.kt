@@ -44,7 +44,9 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
+import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
@@ -230,7 +232,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
                 player.damageToolBreakBlock()
             
             // remove block
-            block.remove(ctx, !brokenClientside, !brokenClientside)
+            block.remove(ctx, BlockSoundEngine.overridesSound(block.soundGroup.breakSound), !brokenClientside)
         } else {
             // If the block wasn't broken clientside, the client will keep breaking the block and not send
             // START_DESTROY_BLOCK again. For those cases, the internal progress will be reset as well.

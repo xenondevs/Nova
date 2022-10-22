@@ -25,4 +25,8 @@ data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
     fun add(x: Int, y: Int, z: Int): BlockPos =
         BlockPos(world, this.x + x, this.y + y, this.z + z)
     
+    fun playSound(sound: String, volume: Float, pitch: Float) {
+        world.playSound(Location(world, x + .5, y + .5, z + .5), sound, volume, pitch)
+    }
+    
 }

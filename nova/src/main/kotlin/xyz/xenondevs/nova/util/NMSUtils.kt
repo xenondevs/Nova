@@ -11,6 +11,7 @@ import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
@@ -30,6 +31,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
@@ -86,7 +88,7 @@ val InteractionHand.bukkitSlot: EquipmentSlot
     }
 
 val EquipmentSlot.interactionHand: InteractionHand
-    get() = when(this) {
+    get() = when (this) {
         EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
         EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
         else -> throw UnsupportedOperationException()
@@ -119,6 +121,13 @@ fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
 
 fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
+
+fun SoundEvent.copy(sound: ResourceLocation): SoundEvent {
+    val newSystem = ReflectionRegistry.SOUND_EVENT_NEW_SYSTEM_FIELD.get(this) as Boolean
+    return if (newSystem) {
+        SoundEvent(sound, getRange(0f))
+    } else SoundEvent(sound)
+}
 
 val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).server
 
