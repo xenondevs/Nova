@@ -122,13 +122,6 @@ fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
 fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
 
-fun SoundEvent.copy(sound: ResourceLocation): SoundEvent {
-    val newSystem = ReflectionRegistry.SOUND_EVENT_NEW_SYSTEM_FIELD.get(this) as Boolean
-    return if (newSystem) {
-        SoundEvent(sound, getRange(0f))
-    } else SoundEvent(sound)
-}
-
 val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).server
 
 val serverTick: Int

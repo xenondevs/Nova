@@ -79,8 +79,15 @@ val Block.breakTexture: Material
 /**
  * The sound group of this block, also considering custom sound groups of Nova blocks.
  */
-val Block.soundGroup: SoundGroup
-    get() = BlockManager.getBlock(pos)?.material?.soundGroup ?: BukkitSoundGroupWrapper(type.soundGroup)
+val Block.soundGroup: SoundGroup?
+    get() {
+        val novaMaterial = BlockManager.getBlock(pos)?.material
+        if (novaMaterial != null) {
+            return novaMaterial.soundGroup
+        }
+        
+        return BukkitSoundGroupWrapper(type.soundGroup)
+    }
 
 /**
  * Checks if the block below has the same [type][Block.getType].
@@ -329,7 +336,7 @@ fun Material.showBreakParticles(location: Location) {
  * Plays the breaking sound for this block.
  */
 fun Block.playBreakSound() {
-    val soundGroup = soundGroup
+    val soundGroup = soundGroup ?: return
     world.playSound(location, soundGroup.breakSound, soundGroup.volume, soundGroup.pitch)
 }
 

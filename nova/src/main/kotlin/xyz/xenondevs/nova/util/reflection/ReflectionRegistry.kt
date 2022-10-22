@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.sounds.SoundEvent
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.item.ItemEntity
@@ -91,6 +90,5 @@ internal object ReflectionRegistry {
     val HASH_MAP_PALETTE_VALUES_FIELD = getField(HashMapPalette::class.java, true, "SRF(net.minecraft.world.level.chunk.HashMapPalette values)")
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class.java, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
     val ITEM_COMBINER_MENU_PLAYER_FIELD = getField(ItemCombinerMenu::class.java, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu player)")
-    val SOUND_EVENT_NEW_SYSTEM_FIELD = getField(SoundEvent::class.java, true, "SRF(net.minecraft.sounds.SoundEvent newSystem)")
     
 }

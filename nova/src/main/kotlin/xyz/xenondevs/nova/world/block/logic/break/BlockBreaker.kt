@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Axis
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory
@@ -45,8 +46,10 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
+import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
@@ -97,13 +100,13 @@ internal class VanillaBlockBreaker(
     
 }
 
-// TODO: break cooldown
 @Suppress("MemberVisibilityCanBePrivate")
 internal abstract class BlockBreaker(val player: Player, val block: Block, val sequence: Int, val blockedUntil: Int) {
     
     protected abstract val breakMethod: BreakMethod?
     protected abstract val requiresToolForDrops: Boolean
     
+    protected val soundGroup: SoundGroup? = block.soundGroup
     protected val hardness: Double = block.hardness
     protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessAir()
     protected val toolCategory: ToolCategory? = ToolCategory.ofItem(tool)
@@ -111,6 +114,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
     protected val correctLevel: Boolean = ToolLevel.isCorrectLevel(block, tool)
     protected val drops: Boolean by lazy { !requiresToolForDrops || (correctCategory && correctLevel) } // lazy because accessing abstract val
     
+    private var destroyTicks = 0
     private var progress = 0.0
     private val isDone: Boolean
         get() = progress >= 1
@@ -129,8 +133,24 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             return
         }
         
-        if (damage >= 1.0 || serverTick >= blockedUntil)
+        if (damage >= 1.0 || serverTick >= blockedUntil) {
             progress += damage
+            
+            //<editor-fold desc="hit sounds", defaultstate="collapsed">
+            if (destroyTicks % 4 == 0) {
+                if (soundGroup != null) {
+                    block.pos.playSound(
+                        soundGroup.hitSound,
+                        SoundCategory.BLOCKS,
+                        (soundGroup.volume + 1f) / 8f,
+                        soundGroup.pitch * .5f
+                    )
+                }
+            }
+            //</editor-fold>
+            
+            destroyTicks++
+        }
         
         if (isDone) {
             // break block, call event, drop items and exp, etc.

@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverPlayer
 
-// TODO: block hit, step and fall sounds
+// TODO: block step and fall sounds
 internal object BlockSoundEngine : Listener {
     
     private val SOUND_OVERRIDES: HashSet<String> = PermanentStorage.retrieve("soundOverrides", ::HashSet)
