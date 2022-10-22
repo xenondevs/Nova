@@ -1,16 +1,20 @@
 package xyz.xenondevs.nmsutils.network
 
 import io.netty.buffer.Unpooled
+import net.minecraft.core.Registry
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
+import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundSource
 import xyz.xenondevs.nmsutils.bossbar.operation.BossBarOperation
 import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry
 import xyz.xenondevs.nmsutils.internal.util.toPackedByte
@@ -59,6 +63,18 @@ fun ClientboundTeleportEntityPacket(entityId: Int, x: Double, y: Double, z: Doub
     buf.writeBoolean(isOnGround)
     
     return ClientboundTeleportEntityPacket(buf)
+}
+
+fun ClientboundSoundEntityPacket(sound: SoundEvent, source: SoundSource, entityId: Int, volume: Float, pitch: Float, seed: Long): ClientboundSoundEntityPacket {
+    val buf = FriendlyByteBuf(Unpooled.buffer())
+    buf.writeId(Registry.SOUND_EVENT, sound)
+    buf.writeEnum(source)
+    buf.writeVarInt(entityId)
+    buf.writeFloat(volume)
+    buf.writeFloat(pitch)
+    buf.writeLong(seed)
+
+    return ClientboundSoundEntityPacket(buf)
 }
 
 fun ServerboundPlaceRecipePacket(containerId: Int, recipe: ResourceLocation, shiftDown: Boolean): ServerboundPlaceRecipePacket {

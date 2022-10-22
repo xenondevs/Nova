@@ -10,11 +10,13 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBlockUpdatePa
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundCustomSoundPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundLevelChunkWithLightPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundMerchantOffersPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetPassengersPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundEntityPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
@@ -50,6 +52,8 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundUpdateRecipesPacketEvent)
         registerPlayerEventType(::ClientboundBlockDestructionPacketEvent)
         registerPlayerEventType(::ClientboundSoundPacketEvent)
+        registerPlayerEventType(::ClientboundSoundEntityPacketEvent)
+        registerPlayerEventType(::ClientboundCustomSoundPacketEvent)
         registerPlayerEventType(::ClientboundSetPassengersPacketEvent)
         registerPlayerEventType(::ClientboundLevelChunkWithLightPacketEvent)
         registerPlayerEventType(::ClientboundBlockUpdatePacketEvent)
