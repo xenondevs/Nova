@@ -13,13 +13,11 @@ object BiomeInjectionRegistry : WorldGenRegistry() {
     override val neededRegistries = setOf(Registry.BIOME_REGISTRY)
     
     private val biomeInjections = Object2ObjectOpenHashMap<NamespacedId, BiomeInjection>()
-    
-    override fun loadFiles() {
+
+    override fun register(registryAccess: RegistryAccess) {
         biomeInjections += loadFiles("inject/biome", BiomeInjection.CODEC)
         BiomeInjector.loadInjections(biomeInjections.values)
     }
-    
-    override fun register(registryAccess: RegistryAccess) = Unit
     
     fun registerBiomeInjection(addon: Addon, name: String, injection: BiomeInjection) {
         val id = NamespacedId(addon, name)

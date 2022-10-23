@@ -19,18 +19,15 @@ object FeatureRegistry : WorldGenRegistry() {
     private val configuredFeatures = Object2ObjectOpenHashMap<NamespacedId, ConfiguredFeature<*, *>>()
     private val placedFeatures = Object2ObjectOpenHashMap<NamespacedId, PlacedFeature>()
     
-    override fun loadFiles() {
-        configuredFeatures += loadFiles("configured_feature", ConfiguredFeature.CODEC)
-        placedFeatures += loadFiles("placed_feature", PlacedFeature.CODEC)
-    }
-    
     override fun register(registryAccess: RegistryAccess) {
         val featureTypeRegistry = registryAccess.registry(Registry.FEATURE_REGISTRY).get()
         val configuredFeatureRegistry = registryAccess.registry(Registry.CONFIGURED_FEATURE_REGISTRY).get()
         val placedFeatureRegistry = registryAccess.registry(Registry.PLACED_FEATURE_REGISTRY).get()
         
         featureTypes.forEach { (id, featureType) -> BuiltinRegistries.registerExact(featureTypeRegistry, id.toString(":"), featureType) }
+        configuredFeatures += loadFiles("configured_feature", ConfiguredFeature.CODEC)
         configuredFeatures.forEach { (id, configuredFeature) -> BuiltinRegistries.registerExact(configuredFeatureRegistry, id.toString(":"), configuredFeature) }
+        placedFeatures += loadFiles("placed_feature", PlacedFeature.CODEC)
         placedFeatures.forEach { (id, placedFeature) -> BuiltinRegistries.registerExact(placedFeatureRegistry, id.toString(":"), placedFeature) }
     }
     

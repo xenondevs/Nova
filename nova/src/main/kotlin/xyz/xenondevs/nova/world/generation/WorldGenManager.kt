@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.world.generation.inject.codec.CodecOverride
 import xyz.xenondevs.nova.world.generation.inject.codec.blockstate.BlockStateCodecOverride
 import xyz.xenondevs.nova.world.generation.registry.BiomeInjectionRegistry
 import xyz.xenondevs.nova.world.generation.registry.FeatureRegistry
-import xyz.xenondevs.nova.world.generation.registry.WorldGenRegistry
 
 internal object WorldGenManager : Initializable() {
     
@@ -28,7 +27,6 @@ internal object WorldGenManager : Initializable() {
     
     override fun init() {
         NMS_REGISTRIES.values.forEach(NMSUtils::unfreezeRegistry)
-        WORLD_GEN_REGISTRIES.forEach(WorldGenRegistry::loadFiles)
         CODEC_OVERRIDES.forEach(CodecOverride::replace)
         WORLD_GEN_REGISTRIES.forEach { it.register(REGISTRY_ACCESS) }
         NMS_REGISTRIES.values.forEach(NMSUtils::freezeRegistry)

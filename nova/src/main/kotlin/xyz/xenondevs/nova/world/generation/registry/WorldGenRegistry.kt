@@ -16,8 +16,6 @@ abstract class WorldGenRegistry internal constructor() {
     
     internal abstract val neededRegistries: Set<ResourceKey<out Registry<*>>>
     
-    internal abstract fun loadFiles()
-    
     protected fun <T : Any> loadFiles(
         dirName: String,
         codec: Codec<Holder<T>>,
