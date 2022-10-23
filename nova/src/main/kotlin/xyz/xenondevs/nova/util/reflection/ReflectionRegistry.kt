@@ -1,6 +1,10 @@
 package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
+import com.mojang.serialization.Codec
+import net.minecraft.core.BlockPos
+import net.minecraft.core.MappedRegistry
+import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.ExperienceOrb
@@ -9,10 +13,22 @@ import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.ItemCombinerMenu
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.LevelHeightAccessor
+import net.minecraft.world.level.biome.BiomeGenerationSettings
+import net.minecraft.world.level.biome.FeatureSorter
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateHolder
+import net.minecraft.world.level.chunk.ChunkAccess
 import net.minecraft.world.level.chunk.HashMapPalette
+import net.minecraft.world.level.chunk.LevelChunkSection
 import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.PalettedContainer
+import net.minecraft.world.level.chunk.UpgradeData
+import net.minecraft.world.level.levelgen.blending.BlendingData
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
 import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
@@ -25,6 +41,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getConstructor
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
+import java.security.ProtectionDomain
 import java.util.*
 import java.util.function.Consumer
 import kotlin.jvm.internal.CallableReference
@@ -79,7 +96,7 @@ internal object ReflectionRegistry {
     val ITEM_ENTITY_PLAYER_TOUCH_METHOD = getMethod(ItemEntity::class.java, false, "SRM(net.minecraft.world.entity.item.ItemEntity playerTouch)", MojangPlayer::class.java)
     val INVENTORY_ADD_METHOD = getMethod(MojangInventory::class.java, false, "SRM(net.minecraft.world.entity.player.Inventory add)", MojangStack::class.java)
     val ENTITY_PLAY_STEP_SOUND_METHOD = getMethod(MojangEntity::class.java, true, "SRM(net.minecraft.world.entity.Entity playStepSound)", BlockPos::class.java, BlockState::class.java)
-    val LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD = getMethod(LivingEntity::class.java, true, "SRM(net.minecraft.world.entity.LivingEntity playBlockFallSound)")
+    val LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD = getMethod(MojangLivingEntity::class.java, true, "SRM(net.minecraft.world.entity.LivingEntity playBlockFallSound)")
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

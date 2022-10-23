@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
+import xyz.xenondevs.nova.transformer.patch.block.BlockSoundPatches
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
 import xyz.xenondevs.nova.transformer.patch.item.DamageablePatches
 import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
@@ -36,7 +37,7 @@ internal object Patcher : Initializable() {
         sequenceOf(
             NoteBlockPatch, FieldFilterPatch, FeatureSorterPatch, LevelChunkSectionPatch,
             ChunkAccessSectionsPatch, RegistryCodecPatch, WrapperBlockPatch, DamageablePatches,
-            ToolPatches, EnchantmentPatches, AnvilResultPatch, StackSizePatch
+            ToolPatches, EnchantmentPatches, AnvilResultPatch, StackSizePatch, BlockSoundPatches
         ).filter(Transformer::shouldTransform).toSet()
     }
     
