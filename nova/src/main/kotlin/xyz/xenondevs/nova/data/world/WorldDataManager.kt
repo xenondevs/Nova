@@ -140,7 +140,10 @@ internal object WorldDataManager : Initializable(), Listener {
     
     @Synchronized
     internal fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: BlockNovaMaterial) {
-        val pos = BlockPos(world.world, x, y, z)
+        return addOrphanBlock(BlockPos(world.world, x, y, z), material)
+    }
+    
+    internal fun addOrphanBlock(pos: BlockPos, material: BlockNovaMaterial) {
         val chunk = pos.chunkPos
         if (chunk.isLoaded()) {
             placeOrphanBlock(pos, material)
