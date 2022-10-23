@@ -6,12 +6,15 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
+import xyz.xenondevs.nova.util.item.displayName
 
 internal object Oraxen : CustomItemService {
     
@@ -38,7 +41,7 @@ internal object Oraxen : CustomItemService {
     }
     
     override fun getItemType(item: ItemStack): CustomItemType? {
-        return if (MMOItems.getId(item) != null) CustomItemType.NORMAL else null
+        return if (getId(item) != null) CustomItemType.NORMAL else null
     }
     
     override fun getBlockType(block: Block): CustomBlockType? {
@@ -51,7 +54,7 @@ internal object Oraxen : CustomItemService {
     }
     
     override fun getItemTest(name: String): SingleItemTest? {
-        return ItemsAdder.getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
+        return getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     
     override fun getId(item: ItemStack): String? {
@@ -59,8 +62,26 @@ internal object Oraxen : CustomItemService {
         return "oraxen:$name"
     }
     
+    override fun getId(block: Block): String? {
+        // Missing API feature
+        return null
+    }
+    
+    override fun getName(item: ItemStack, locale: String): String? {
+        return if (OraxenItems.getIdByItem(item) != null) item.displayName else null
+    }
+    
+    override fun getName(block: Block, locale: String): String? {
+        // Missing API feature
+        return null
+    }
+    
     override fun hasRecipe(key: NamespacedKey): Boolean {
         return key.namespace == "oraxen"
+    }
+    
+    override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
+        return emptyMap()
     }
     
 }

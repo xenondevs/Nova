@@ -12,10 +12,10 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolLevel
-import xyz.xenondevs.nova.util.SoundEffect
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import java.util.concurrent.CompletableFuture
 
 typealias PlaceCheckFun = ((Player, ItemStack, Location) -> CompletableFuture<Boolean>)
@@ -39,8 +39,7 @@ open class BlockNovaMaterial internal constructor(
     val toolCategories = options.toolCategories
     val toolLevel = options.toolLevel
     val requiresToolForDrops = options.requiresToolForDrops
-    val placeSound = options.placeSound
-    val breakSound = options.breakSound
+    val soundGroup = options.soundGroup
     val breakParticles = options.breakParticles
     val showBreakAnimation = options.showBreakAnimation
     
@@ -57,8 +56,7 @@ data class BlockOptions(
     val toolCategories: List<ToolCategory>,
     val toolLevel: ToolLevel?,
     val requiresToolForDrops: Boolean,
-    val placeSound: SoundEffect? = null,
-    val breakSound: SoundEffect? = null,
+    val soundGroup: SoundGroup? = null,
     val breakParticles: Material? = null,
     val showBreakAnimation: Boolean = true
 ) {
@@ -68,8 +66,7 @@ data class BlockOptions(
         toolCategory: ToolCategory?,
         toolLevel: ToolLevel?,
         requiresToolForDrops: Boolean,
-        placeSound: SoundEffect? = null,
-        breakSound: SoundEffect? = null,
+        soundGroup: SoundGroup? = null,
         breakParticles: Material? = null,
         showBreakAnimation: Boolean = true
     ) : this(
@@ -77,8 +74,7 @@ data class BlockOptions(
         toolCategory?.let(::listOf) ?: emptyList(),
         toolLevel,
         requiresToolForDrops,
-        placeSound,
-        breakSound,
+        soundGroup,
         breakParticles,
         showBreakAnimation
     )

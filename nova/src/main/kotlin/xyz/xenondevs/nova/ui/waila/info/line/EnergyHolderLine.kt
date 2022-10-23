@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.data.ComponentWidthBuilder
+import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 
 private const val ENERGY_BAR_LENGTH = 40
 
@@ -16,32 +16,29 @@ object EnergyHolderLine {
     
     fun getEnergyBarLine(player: Player, holder: NovaEnergyHolder): WailaLine {
         return WailaLine(
-            ComponentWidthBuilder(player.locale)
-                .append(createEnergyBarString(holder.energy, holder.maxEnergy))
-                .create(),
+            MovingComponentBuilder(player.locale)
+                .append(createEnergyBarString(holder.energy, holder.maxEnergy)),
             WailaLine.Alignment.CENTERED
         )
     }
     
     fun getEnergyAmountLine(player: Player, holder: NovaEnergyHolder): WailaLine {
         return WailaLine(
-            ComponentWidthBuilder(player.locale)
+            MovingComponentBuilder(player.locale)
                 .append(NumberFormatUtils.getEnergyString(holder.energy, holder.maxEnergy))
-                .color(ChatColor.GRAY)
-                .create(),
+                .color(ChatColor.GRAY),
             WailaLine.Alignment.CENTERED
         )
     }
     
     fun getEnergyDeltaLine(player: Player, holder: NovaEnergyHolder): WailaLine {
         return WailaLine(
-            ComponentWidthBuilder(player.locale)
+            MovingComponentBuilder(player.locale)
                 .color(ChatColor.GRAY)
                 .append("+")
                 .append(TranslatableComponent("menu.nova.energy_per_tick", NumberFormatUtils.getEnergyString(holder.energyPlus)))
                 .append(" | -")
-                .append(TranslatableComponent("menu.nova.energy_per_tick", NumberFormatUtils.getEnergyString(holder.energyMinus)))
-                .create(),
+                .append(TranslatableComponent("menu.nova.energy_per_tick", NumberFormatUtils.getEnergyString(holder.energyMinus))),
             WailaLine.Alignment.CENTERED
         )
     }

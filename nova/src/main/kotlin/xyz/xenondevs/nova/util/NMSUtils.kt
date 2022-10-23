@@ -16,6 +16,7 @@ import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
@@ -92,7 +93,7 @@ val InteractionHand.bukkitSlot: EquipmentSlot
     }
 
 val EquipmentSlot.interactionHand: InteractionHand
-    get() = when(this) {
+    get() = when (this) {
         EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
         EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
         else -> throw UnsupportedOperationException()

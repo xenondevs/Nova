@@ -2,9 +2,16 @@ package xyz.xenondevs.nova.ui.overlay.character
 
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.TextComponent
 import kotlin.math.abs
 
 object MoveCharacters {
+    
+    private val FORMATTING_TEMPLATE = ComponentBuilder("")
+        .font("nova:move")
+        .bold(false)
+        .obfuscated(false)
+        .create()[0]
     
     private val componentCache = HashMap<Int, BaseComponent>()
     
@@ -21,10 +28,10 @@ object MoveCharacters {
     
     fun getMovingComponent(distance: Int): BaseComponent {
         return componentCache.getOrPut(distance) {
-            ComponentBuilder(getMovingString(distance))
-                .font("nova:move")
-                .create()[0]
-        }
+            val component = TextComponent(getMovingString(distance))
+            component.copyFormatting(FORMATTING_TEMPLATE)
+            return@getOrPut component
+        }.duplicate()
     }
     
 }

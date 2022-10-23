@@ -4,7 +4,9 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.InternalIntegration
@@ -55,12 +57,34 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.firstNotNullOfOrNull { it.getItemTest(name) }
     }
     
+    fun getId(item: ItemStack): String? {
+        return PLUGINS.firstNotNullOfOrNull { it.getId(item) }
+    }
+    
+    fun getId(block: Block): String? {
+        return PLUGINS.firstNotNullOfOrNull { it.getId(block) }
+    }
+    
+    fun getName(item: ItemStack, locale: String): String? {
+        return PLUGINS.firstNotNullOfOrNull { it.getName(item, locale) }
+    }
+    
+    fun getName(block: Block, locale: String): String? {
+        return PLUGINS.firstNotNullOfOrNull { it.getName(block, locale) }
+    }
+    
     fun getNameKey(item: ItemStack): String? {
         return PLUGINS.firstNotNullOfOrNull { it.getId(item) }
     }
     
     fun hasRecipe(key: NamespacedKey): Boolean {
         return PLUGINS.any { it.hasRecipe(key) }
+    }
+    
+    fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
+        val map = HashMap<NamespacedId, ResourcePath>()
+        PLUGINS.forEach { map += it.getBlockItemModelPaths() }
+        return map
     }
     
 }

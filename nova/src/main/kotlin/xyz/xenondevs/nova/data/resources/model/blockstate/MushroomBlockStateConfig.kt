@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.resources.model.blockstate
 
 import net.minecraft.world.level.block.Blocks
+import org.bukkit.Material
 import org.bukkit.block.BlockFace
 
 internal class RedMushroomBlockStateConfig(faces: List<BlockFace>) : SidedBlockStateConfig(faces, Blocks.RED_MUSHROOM_BLOCK) {
@@ -9,6 +10,7 @@ internal class RedMushroomBlockStateConfig(faces: List<BlockFace>) : SidedBlockS
     
     companion object : SidedBlockStateConfigType<RedMushroomBlockStateConfig>(::RedMushroomBlockStateConfig) {
         override val fileName = "red_mushroom_block"
+        override val material = Material.RED_MUSHROOM_BLOCK
     }
     
 }
@@ -19,6 +21,7 @@ internal class BrownMushroomBlockStateConfig(faces: List<BlockFace>) : SidedBloc
     
     companion object : SidedBlockStateConfigType<BrownMushroomBlockStateConfig>(::BrownMushroomBlockStateConfig) {
         override val fileName = "brown_mushroom_block"
+        override val material = Material.BROWN_MUSHROOM_BLOCK
     }
     
 }
@@ -29,6 +32,7 @@ internal class MushroomStemBlockStateConfig(faces: List<BlockFace>) : SidedBlock
     
     companion object : SidedBlockStateConfigType<MushroomStemBlockStateConfig>(::MushroomStemBlockStateConfig) {
         override val fileName = "mushroom_stem"
+        override val material = Material.MUSHROOM_STEM
     }
     
 }

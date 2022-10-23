@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.model.blockstate
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.state.BlockState
+import org.bukkit.Material
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.intValue
 
@@ -28,6 +29,7 @@ internal data class NoteBlockStateConfig(
         
         override val maxId = 799
         override val fileName = "note_block"
+        override val material = Material.NOTE_BLOCK
         
         fun getIdOf(instrument: Instrument, note: Int, powered: Boolean): Int {
             return (note shl 5) or (instrument.ordinal shl 1) or powered.intValue

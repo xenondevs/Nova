@@ -1,7 +1,13 @@
 package xyz.xenondevs.nova.world.block.logic.`break`
 
+import net.minecraft.core.Direction
+import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
+import net.minecraft.world.InteractionHand
+import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory
 import org.bukkit.entity.Player
+import org.bukkit.event.Event
+import org.bukkit.event.block.Action
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
@@ -12,6 +18,7 @@ import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
@@ -79,7 +86,7 @@ internal object BlockBreaking {
         }
     }
     
-    private fun handleDestroyStart(player: Player, pos: BlockPos, sequence: Int): Boolean {
+    private fun handleDestroyStart(player: Player, pos: BlockPos, direction: Direction, sequence: Int): Boolean {
         val block = pos.block
         if (CustomItemServiceManager.getBlockType(block) != null)
             return false
@@ -87,6 +94,21 @@ internal object BlockBreaking {
         if (block.hardness >= 0) {
             // server thread - accessing block states
             runTask {
+                // call interact event
+                val serverPlayer = player.serverPlayer
+                val event = CraftEventFactory.callPlayerInteractEvent(
+                    serverPlayer,
+                    Action.LEFT_CLICK_BLOCK,
+                    pos.nmsPos,
+                    direction,
+                    serverPlayer.inventory.getSelected(),
+                    InteractionHand.MAIN_HAND
+                )
+                if (event.useInteractedBlock() == Event.Result.DENY) {
+                    player.send(ClientboundBlockChangedAckPacket(sequence))
+                    return@runTask
+                }
+                
                 // call block state attack (i.e. teleport dragon egg, play note block sound...)
                 val serverLevel = pos.world.serverLevel
                 val nmsPos = pos.nmsPos
@@ -125,7 +147,7 @@ internal object BlockBreaking {
         val blockPos = BlockPos(event.player.world, pos.x, pos.y, pos.z)
         
         event.isCancelled = when (event.action) {
-            START_DESTROY_BLOCK -> handleDestroyStart(player, blockPos, event.sequence)
+            START_DESTROY_BLOCK -> handleDestroyStart(player, blockPos, event.direction, event.sequence)
             STOP_DESTROY_BLOCK, ABORT_DESTROY_BLOCK -> handleDestroyStop(player, blockPos)
             else -> false
         }

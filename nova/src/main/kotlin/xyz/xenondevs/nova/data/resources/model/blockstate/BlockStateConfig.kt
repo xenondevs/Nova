@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.resources.model.blockstate
 
 import net.minecraft.world.level.block.state.BlockState
+import org.bukkit.Material
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import kotlin.reflect.jvm.jvmName
 
@@ -16,6 +17,7 @@ abstract class BlockStateConfigType<T : BlockStateConfig> internal constructor()
     abstract val maxId: Int
     abstract val blockedIds: Set<Int>
     abstract val fileName: String
+    abstract val material: Material
     
     abstract fun of(id: Int): T
     abstract fun of(variantString: String): T

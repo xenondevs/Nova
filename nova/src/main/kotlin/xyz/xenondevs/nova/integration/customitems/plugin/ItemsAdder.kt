@@ -16,8 +16,10 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
@@ -133,6 +135,28 @@ internal object ItemsAdder : CustomItemService {
     
     override fun getId(item: ItemStack): String? {
         return CustomStack.byItemStack(item)?.namespacedID
+    }
+    
+    override fun getId(block: Block): String? {
+        return CustomBlock.byAlreadyPlaced(block)?.namespacedID
+    }
+    
+    override fun getName(item: ItemStack, locale: String): String? {
+        return CustomStack.byItemStack(item)?.namespace
+    }
+    
+    override fun getName(block: Block, locale: String): String? {
+        return CustomBlock.byAlreadyPlaced(block)?.displayName
+    }
+    
+    override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
+        return ItemsAdder.getAllItems()
+            .filter(CustomStack::isBlock)
+            .map(CustomStack::getNamespacedID)
+            .associateTo(HashMap()) {
+                val path = ItemsAdder.Advanced.getItemModelResourceLocation(it)!!.substringBeforeLast('.')
+                NamespacedId.of(it) to ResourcePath.of(path)
+            }
     }
     
 }

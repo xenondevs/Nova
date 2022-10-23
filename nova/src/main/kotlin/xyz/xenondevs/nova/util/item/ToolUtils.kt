@@ -137,7 +137,7 @@ object ToolUtils {
         
         val toolCategory = tool?.let(ToolCategory::ofItem)
         var speedMultiplier = 1.0
-        if (toolCategory != null && toolCategory.isCorrectToolCategoryForBlock(block)) {
+        if (toolCategory != null && toolCategory in ToolCategory.ofVanillaBlock(block)) {
             speedMultiplier = (toolCategory as VanillaToolCategory).multipliers[tool.type] ?: 1.0
             val efficiency = tool.getEnchantmentLevel(Enchantment.DIG_SPEED)
             if (efficiency > 0) {

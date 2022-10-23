@@ -4,7 +4,9 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.integration.InternalIntegration
 
 internal interface CustomItemService : InternalIntegration {
@@ -68,8 +70,30 @@ internal interface CustomItemService : InternalIntegration {
     fun getId(item: ItemStack): String?
     
     /**
+     * Gets a namespaced if from a placed [Block]
+     */
+    fun getId(block: Block): String?
+    
+    /**
+     * Gets a localized name for an [ItemStack]
+     */
+    fun getName(item: ItemStack, locale: String): String?
+    
+    /**
+     * Gets a localized name from a placed [Block]
+     */
+    fun getName(block: Block, locale: String): String?
+    
+    /**
      * Checks if this [CustomItemService] registered a recipe with that [key]
      */
     fun hasRecipe(key: NamespacedKey): Boolean
+    
+    /**
+     * Gets the paths of all item models that are blocks.
+     * 
+     * example: [minecraft:dirt -> minecraft:item/dirt]
+     */
+    fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath>
     
 }

@@ -132,6 +132,10 @@ open class ToolCategory internal constructor(
             if (novaCategories != null)
                 return novaCategories
             
+            return ofVanillaBlock(block)
+        }
+        
+        internal fun ofVanillaBlock(block: Block): List<ToolCategory> {
             val material = block.type
             val list = ArrayList<ToolCategory>()
             if (Tag.MINEABLE_SHOVEL.isTagged(material)) list.add(SHOVEL)

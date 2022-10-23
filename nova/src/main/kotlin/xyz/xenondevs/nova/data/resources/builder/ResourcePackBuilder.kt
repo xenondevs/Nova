@@ -14,10 +14,10 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
-import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.WailaContent
+import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.Version
@@ -52,6 +52,7 @@ internal object ResourcePackBuilder {
     val PACK_MCMETA_FILE = File(PACK_DIR, "pack.mcmeta")
     val RESOURCE_PACK_FILE = File(RESOURCE_PACK_DIR, "ResourcePack.zip")
     val MCASSETS_DIR = File(RESOURCE_PACK_DIR, ".mcassets")
+    val MCASSETS_ASSETS_DIR = File(MCASSETS_DIR, "assets")
     
     private val resourceFilters = buildList {
         this += CORE_RESOURCE_FILTER
@@ -103,9 +104,11 @@ internal object ResourcePackBuilder {
             // extract assets/minecraft
             extractMinecraftAssets()
             
+            val soundOverrides = BlockSoundOverrides()
+            
             // init content
             val contents = listOf(
-                MaterialContent(basePacks),
+                MaterialContent(basePacks, soundOverrides),
                 GUIContent(),
                 LanguageContent(),
                 WailaContent(),
@@ -119,9 +122,20 @@ internal object ResourcePackBuilder {
                 contents.forEach { it.addFromPack(pack) }
             }
             
-            // Write changes
+            // Write PackContent
             LOGGER.info("Writing content")
             contents.forEach(PackContent::write)
+            writeMetadata(assetPacks.size, basePacks.packAmount)
+    
+            // Write sound overrides
+            LOGGER.info("Writing sound overrides")
+            soundOverrides.write()
+            
+            // Calculate char sizes
+            LOGGER.info("Calculating char sizes")
+            CharSizeCalculator().calculateCharSizes()
+            
+            // Write metadata            
             writeMetadata(assetPacks.size, basePacks.packAmount)
             
             // Create a zip
@@ -188,8 +202,9 @@ internal object ResourcePackBuilder {
         pack.modelsDir?.copyRecursively(File(namespace, "models"))
         // Copy fonts folder
         pack.fontsDir?.copyRecursively(File(namespace, "font"))
-        // Copy sounds folder
+        // Copy sounds folder and file
         pack.soundsDir?.copyRecursively(File(namespace, "sounds"))
+        pack.soundsFile?.copyTo(File(namespace, "sounds.json"))
     }
     
     private fun writeMetadata(assetPacks: Int, basePacks: Int) {

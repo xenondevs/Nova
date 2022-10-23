@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Axis
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory
@@ -34,6 +35,7 @@ import xyz.xenondevs.nova.util.getAllDrops
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.damageToolBreakBlock
+import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsPos
@@ -44,7 +46,10 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
+import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
+import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
@@ -95,13 +100,13 @@ internal class VanillaBlockBreaker(
     
 }
 
-// TODO: break cooldown
 @Suppress("MemberVisibilityCanBePrivate")
 internal abstract class BlockBreaker(val player: Player, val block: Block, val sequence: Int, val blockedUntil: Int) {
     
     protected abstract val breakMethod: BreakMethod?
     protected abstract val requiresToolForDrops: Boolean
     
+    protected val soundGroup: SoundGroup? = block.soundGroup
     protected val hardness: Double = block.hardness
     protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessAir()
     protected val toolCategory: ToolCategory? = ToolCategory.ofItem(tool)
@@ -109,6 +114,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
     protected val correctLevel: Boolean = ToolLevel.isCorrectLevel(block, tool)
     protected val drops: Boolean by lazy { !requiresToolForDrops || (correctCategory && correctLevel) } // lazy because accessing abstract val
     
+    private var destroyTicks = 0
     private var progress = 0.0
     private val isDone: Boolean
         get() = progress >= 1
@@ -127,12 +133,28 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             return
         }
         
-        if (damage >= 1.0 || serverTick >= blockedUntil)
+        if (damage >= 1.0 || serverTick >= blockedUntil) {
             progress += damage
+            
+            //<editor-fold desc="hit sounds", defaultstate="collapsed">
+            if (progress < 1.0 && destroyTicks % 4 == 0) {
+                if (soundGroup != null) {
+                    block.pos.playSound(
+                        soundGroup.hitSound,
+                        SoundCategory.BLOCKS,
+                        (soundGroup.volume + 1f) / 8f,
+                        soundGroup.pitch * .5f
+                    )
+                }
+            }
+            //</editor-fold>
+            
+            destroyTicks++
+        }
         
         if (isDone) {
             // break block, call event, drop items and exp, etc.
-            breakBlock(clientsideDamage < 1) // If the block broke instantaneously for the client, the effects will also be played clientside
+            breakBlock(clientsideDamage >= 1) // If the block broke instantaneously for the client, the effects will also be played clientside
             // check if the breaker is still done (BlockBreakEvent cancelled?)
             if (isDone) {
                 // Stop break animation and mining fatigue effect
@@ -165,11 +187,11 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
             // The player does not have mining fatigue, we can use the default effect instance
             ClientboundUpdateMobEffectPacket(player.entityId, MINING_FATIGUE)
         }
-    
+        
         player.send(packet)
     }
     
-    private fun breakBlock(effects: Boolean) {
+    private fun breakBlock(brokenClientside: Boolean) {
         // create a block breaking context
         val ctx = BlockBreakContext(
             block.pos,
@@ -230,10 +252,12 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
                 player.damageToolBreakBlock()
             
             // remove block
-            block.remove(ctx, effects, effects)
+            block.remove(ctx, BlockSoundEngine.overridesSound(block.type.soundGroup.breakSound.key.key), !brokenClientside)
         } else {
-            // reset progress
-            progress = 0.0
+            // If the block wasn't broken clientside, the client will keep breaking the block and not send
+            // START_DESTROY_BLOCK again. For those cases, the internal progress will be reset as well.
+            if (!brokenClientside)
+                progress = 0.0
         }
         
         // send ack packet

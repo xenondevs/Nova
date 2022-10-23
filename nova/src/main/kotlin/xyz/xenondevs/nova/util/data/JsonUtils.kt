@@ -104,6 +104,17 @@ fun JsonObject.getBoolean(property: String, default: Boolean = false) = if (hasB
 
 fun JsonObject.getOrNull(property: String) = if (has(property)) get(property) else null
 
+inline fun <reified T : JsonElement> JsonObject.getOrPut(property: String, defaultValue: () -> T): T {
+    var value = getOrNull(property)
+    
+    if (value !is T) {
+        value = defaultValue()
+        set(property, value)
+    }
+    
+    return value
+}
+
 inline fun <reified T> JsonObject.getDeserialized(property: String) = GSON.fromJson<T>(get(property))
 
 inline fun <reified T> JsonObject.getDeserialized(property: String, default: () -> T) = getDeserialized(property)

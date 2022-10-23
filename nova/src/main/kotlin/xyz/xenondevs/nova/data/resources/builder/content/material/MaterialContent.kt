@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
+import xyz.xenondevs.nova.data.resources.builder.BlockSoundOverrides
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
@@ -33,7 +34,10 @@ import kotlin.collections.set
 
 private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks") }
 
-internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
+internal class MaterialContent(
+    private val basePacks: BasePacks,
+    private val soundOverrides: BlockSoundOverrides
+) : PackContent {
     
     private val novaMaterials = HashMap<String, RegisteredMaterial>()
     
@@ -110,6 +114,9 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
                     val registeredModels = customItemModels.getOrPut(material, ::HashMap)
                     val dataArray = info.models.mapToIntArray { registeredModels.getOrPut(it) { getNextCustomModelData(material) } }
                     blockModelData = ArmorStandBlockModelData(id, info.hitboxType, dataArray)
+                    
+                    // note hitbox type as used material for sound overrides
+                    soundOverrides.useMaterial(info.hitboxType)
                 } else {
                     val configs = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
                     info.models.forEach { model ->
@@ -121,6 +128,9 @@ internal class MaterialContent(private val basePacks: BasePacks) : PackContent {
                             blockStateModelsByType.getOrPut(blockConfig.type, ::HashMap)[modelDirectionPair] = blockConfig
                             
                             faceList += blockConfig
+                            
+                            // note block type as used material for sound overrides
+                            soundOverrides.useMaterial(blockConfig.type.material)
                         }
                     }
                     

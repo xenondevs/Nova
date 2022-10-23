@@ -8,10 +8,13 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
+import xyz.xenondevs.nova.util.item.displayName
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 
 internal object MMOItems : CustomItemService {
@@ -88,8 +91,27 @@ internal object MMOItems : CustomItemService {
         return "mmoitems:$id"
     }
     
+    override fun getId(block: Block): String? {
+        return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.let(::getId)
+    }
+    
+    override fun getName(item: ItemStack, locale: String): String? {
+        if (getId(item) == null)
+            return null
+        
+        return item.displayName
+    }
+    
+    override fun getName(block: Block, locale: String): String? {
+        return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.displayName
+    }
+    
     override fun hasRecipe(key: NamespacedKey): Boolean {
         return key.namespace == "mmoitems"
+    }
+    
+    override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
+        return emptyMap()
     }
     
 }

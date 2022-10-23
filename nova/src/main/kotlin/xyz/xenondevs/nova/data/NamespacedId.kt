@@ -4,6 +4,10 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
+fun NamespacedKey.toNamespacedId(): NamespacedId {
+    return NamespacedId(namespace, key)
+}
+
 @Suppress("DEPRECATION")
 class NamespacedId(override val namespace: String, override val name: String) : INamespacedId {
     

@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world
 
 import org.bukkit.Location
+import org.bukkit.SoundCategory
 import org.bukkit.World
 import org.bukkit.block.Block
 import xyz.xenondevs.nova.util.Location
@@ -27,5 +28,13 @@ data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
     
     fun add(x: Int, y: Int, z: Int): BlockPos =
         BlockPos(world, this.x + x, this.y + y, this.z + z)
+    
+    fun playSound(sound: String, volume: Float, pitch: Float) {
+        world.playSound(Location(world, x + .5, y + .5, z + .5), sound, volume, pitch)
+    }
+    
+    fun playSound(sound: String, category: SoundCategory, volume: Float, pitch: Float) {
+        world.playSound(Location(world, x + .5, y + .5, z + .5), sound, category, volume, pitch)
+    }
     
 }
