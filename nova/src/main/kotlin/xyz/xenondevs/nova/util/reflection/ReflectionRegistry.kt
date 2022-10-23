@@ -53,6 +53,7 @@ import net.minecraft.world.entity.player.Inventory as MojangInventory
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
+import java.util.function.Function as JavaFunction
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal object ReflectionRegistry {
@@ -75,8 +76,8 @@ internal object ReflectionRegistry {
     
     // Methods
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class.java)
-    val FEATURE_SORTER_BUILD_FEATURES_PER_STEP_METHOD = getMethod(FeatureSorter::class.java, true, "SRM(net.minecraft.world.level.biome.FeatureSorter buildFeaturesPerStep)", List::class.java, java.util.function.Function::class.java, Boolean::class.java)
-    val STATE_HOLDER_CODEC_METHOD = getMethod(StateHolder::class.java, true, "SRM(net.minecraft.world.level.block.state.StateHolder codec)", Codec::class.java, Function::class.java)
+    val FEATURE_SORTER_BUILD_FEATURES_PER_STEP_METHOD = getMethod(FeatureSorter::class.java, true, "SRM(net.minecraft.world.level.biome.FeatureSorter buildFeaturesPerStep)", List::class.java, JavaFunction::class.java, Boolean::class.java)
+    val STATE_HOLDER_CODEC_METHOD = getMethod(StateHolder::class.java, true, "SRM(net.minecraft.world.level.block.state.StateHolder codec)", Codec::class.java, JavaFunction::class.java)
     val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class.java, true, "SRM(net.minecraft.world.level.chunk.LevelChunkSection setBlockState)", Int::class.java, Int::class.java, Int::class.java, BlockState::class.java, Boolean::class.java)
     val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class.java, false, "getDelegate", Any::class.java)
     val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class.java, true, "defineClass", String::class.java, ByteArray::class.java, Int::class.java, Int::class.java, ProtectionDomain::class.java)
