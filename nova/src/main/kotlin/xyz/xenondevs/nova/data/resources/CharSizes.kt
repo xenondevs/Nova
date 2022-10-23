@@ -47,8 +47,11 @@ object CharSizes {
                 val text = component.toPlainText(locale).removeMinecraftFormatting()
                 val font = component.font ?: "default"
                 length += text.toCharArray().sumOf {
-                    val width = getCharWidth(font, it)
-                    if (width < 0) width + 2 else width +1
+                    var width = getCharWidth(font, it)
+                    if (width < 0) width += 1
+                    if (component.isBold) width += 1
+                    
+                    return@sumOf width
                 }
             }
             
@@ -57,7 +60,7 @@ object CharSizes {
     }
     
     fun calculateStringLength(font: String, string: String): Int {
-        return string.toCharArray().sumOf { getCharWidth(font, it) + 1 }
+        return string.toCharArray().sumOf { getCharWidth(font, it) }
     }
     
     private fun loadTable(font: String): CharSizeTable? {

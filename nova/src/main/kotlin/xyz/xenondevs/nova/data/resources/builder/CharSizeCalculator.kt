@@ -103,7 +103,7 @@ internal class CharSizeCalculator {
                     table.setSizes(
                         char,
                         intArrayOf(
-                            calculateBitmapCharWidth(height, subimage),
+                            calculateBitmapCharWidth(height, subimage) + 1, // +1 to include space between characters
                             height,
                             ascent
                         )
@@ -145,7 +145,7 @@ internal class CharSizeCalculator {
             val end = charInfo and 0xF
             val width = end - start + 1
             
-            table.setWidth(c, width)
+            table.setWidth(c, width + 1) // +1 to include space between characters
         }
     }
     
