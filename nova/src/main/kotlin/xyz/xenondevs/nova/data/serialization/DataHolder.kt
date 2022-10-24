@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.serialization
 
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.nova.data.provider.MutableProvider
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.TileEntity
 import java.lang.reflect.Type
@@ -91,7 +92,7 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
     
     /**
      * Creates a [DataAccessor] to which properties can delegate.
-     * 
+     *
      * The non-global value under the [key] is retrieved and [getAlternative] is called if there is no
      * value stored under that key.
      */
@@ -101,31 +102,51 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
     
     /**
      * Creates a [DataAccessor] to which properties can delegate.
-     * 
+     *
      * The value under the [key] is retrieved and [getAlternative] is called if there is no value
      * stored under that key.
-     * 
+     *
      * @param global If the data should also be stored in the [ItemStack] of this [TileEntity].
      */
     inline fun <reified T> storedValue(key: String, global: Boolean, getAlternative: () -> T): DataAccessor<T> {
         val initialValue = retrieveData(key, getAlternative)
-        return DataAccessor(this, key, global, initialValue).also(dataAccessors::add)
+        return DataAccessor(key, global, initialValue).also(dataAccessors::add)
     }
     
     /**
      * Creates a [DataAccessor] to which properties can delegate.
-     * 
+     *
      * The value under the [key] is retrieved and null is returned if there is no value stored under that key.
-     * 
+     *
      * @param global If the data should also be stored in the [ItemStack] of this [TileEntity].
      */
     inline fun <reified T> storedValue(key: String, global: Boolean = false): DataAccessor<T?> {
         val initialValue = retrieveDataOrNull<T>(key)
-        return DataAccessor(this, key, global, initialValue).also(dataAccessors::add)
+        return DataAccessor(key, global, initialValue).also(dataAccessors::add)
     }
     
     internal fun saveDataAccessors() {
         dataAccessors.forEach(DataAccessor<*>::save)
+    }
+    
+    inner class DataAccessor<T>(
+        private val key: String,
+        private val global: Boolean,
+        private val initialValue: T,
+    ) : MutableProvider<T>() {
+        
+        override fun loadValue(): T {
+            return initialValue
+        }
+        
+        override fun setValue(value: T) {
+            this.value = value
+        }
+        
+        fun save() {
+            storeData(key, value, global)
+        }
+        
     }
     
 }
