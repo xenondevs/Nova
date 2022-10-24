@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.transformer
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap
+import xyz.xenondevs.bytebase.ClassWrapperLoader
 import xyz.xenondevs.bytebase.INSTRUMENTATION
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.LOGGER
@@ -32,8 +33,7 @@ internal object Patcher : Initializable() {
         sequenceOf(
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, EnchantmentPatches, AnvilResultPatch,
             StackSizePatch, BlockSoundPatches
-        )
-            .filter(Transformer::shouldTransform).toSet()
+        ).filter(Transformer::shouldTransform).toSet()
     }
     
     override fun init() {
@@ -84,7 +84,14 @@ internal object Patcher : Initializable() {
         val definitions = classes.map { (clazz, computeFrames) ->
             ClassDefinition(clazz, VirtualClassPath[clazz].assemble(computeFrames))
         }.toTypedArray()
-        INSTRUMENTATION.redefineClasses(*definitions)
+        try {
+            INSTRUMENTATION.redefineClasses(*definitions)
+        } catch (ex: LinkageError) {
+            LOGGER.severe("Failed to apply patches (LinkageError: $ex)! Trying to get more information...")
+            val classLoader = ClassWrapperLoader(javaClass.classLoader)
+            classes.keys.forEach { classLoader.loadClass(VirtualClassPath[it]) }
+            throw ex
+        }
     }
     
     private fun insertPatchedLoader() {
