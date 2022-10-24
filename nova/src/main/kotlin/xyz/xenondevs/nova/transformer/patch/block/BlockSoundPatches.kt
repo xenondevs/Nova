@@ -53,7 +53,7 @@ internal object BlockSoundPatches : MultiTransformer(setOf(MojangEntity::class, 
             val newSound = soundGroup.stepSound
             val oldSound = block.type.soundGroup.stepSound.key.key
             
-            playSound(entity, oldSound, newSound, soundGroup.volume * .15f, soundGroup.pitch)
+            playSound(entity, oldSound, newSound, soundGroup.stepVolume, soundGroup.stepPitch)
         }
     }
     
@@ -81,7 +81,7 @@ internal object BlockSoundPatches : MultiTransformer(setOf(MojangEntity::class, 
                 val newSound = soundGroup.fallSound
                 val oldSound = block.type.soundGroup.fallSound.key.key
                 
-                playSound(entity, oldSound, newSound, soundGroup.volume * .5f, soundGroup.pitch * .75f)
+                playSound(entity, oldSound, newSound, soundGroup.fallVolume, soundGroup.fallPitch)
             }
         }
     }

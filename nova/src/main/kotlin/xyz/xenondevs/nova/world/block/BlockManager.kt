@@ -129,14 +129,14 @@ object BlockManager : Initializable(), IBlockManager {
     private fun playPlaceSound(state: NovaBlockState, ctx: BlockPlaceContext) {
         val soundGroup = state.material.soundGroup
         if (soundGroup != null) {
-            ctx.pos.playSound(soundGroup.placeSound, 1f, 1f)
+            ctx.pos.playSound(soundGroup.placeSound, soundGroup.placeVolume, soundGroup.placePitch)
         }
     }
     
     private fun playBreakSound(state: NovaBlockState, ctx: BlockBreakContext) {
         val soundGroup = state.material.soundGroup
         if (soundGroup != null) {
-            ctx.pos.playSound(soundGroup.breakSound, (soundGroup.volume + 1f) / 2f, soundGroup.pitch * 0.8f)
+            ctx.pos.playSound(soundGroup.breakSound, soundGroup.breakVolume, soundGroup.breakPitch)
         }
     }
     

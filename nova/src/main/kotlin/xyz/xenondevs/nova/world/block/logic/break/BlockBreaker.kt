@@ -143,8 +143,8 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val seq
                     block.pos.playSound(
                         soundGroup.hitSound,
                         SoundCategory.BLOCKS,
-                        (soundGroup.volume + 1f) / 8f,
-                        soundGroup.pitch * .5f
+                        soundGroup.hitVolume,
+                        soundGroup.hitPitch
                     )
                 }
             }
