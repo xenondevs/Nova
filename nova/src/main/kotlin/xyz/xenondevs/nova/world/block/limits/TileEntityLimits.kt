@@ -20,8 +20,8 @@ internal object TileEntityLimits {
         try {
             val blockLimits = DEFAULT_CONFIG.getConfigurationSection("performance.tile_entity_limits")
             blockLimits?.getKeys(false)?.forEach { type ->
-                val section = blockLimits.getConfigurationSection(type) ?: return@forEach
-                val limiter = BlockLimiter.createNew(type, section) ?: return@forEach
+                val cfgValue = blockLimits.get(type) ?: blockLimits.getConfigurationSection(type) ?: return@forEach
+                val limiter = BlockLimiter.createNew(type, cfgValue) ?: return@forEach
                 limiters += limiter
             }
         } catch (e: Exception) {

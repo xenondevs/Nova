@@ -109,6 +109,7 @@
   "waila.nova.required_tool.none": "No tool required",
   "waila.nova.required_tool.unbreakable": "Unbreakable",
   "waila.nova.required_tool.unknown": "Tool: Unknown",
+  "nova.tile_entity_limits.type_blacklist.deny": "You are not allowed to place any tile-entities of this type.",
   "nova.tile_entity_limits.world_blacklist.deny": "You are not allowed to place any tile-entities from Nova in this world.",
   "nova.tile_entity_limits.type_world_blacklist.deny": "You are not allowed to place this tile-entity in this world.",
   "nova.tile_entity_limits.amount_global.deny": "You cannot place more tile-entities of this type.",
