@@ -354,7 +354,7 @@ fun Material.showBreakParticles(location: Location) {
  */
 fun Block.playBreakSound() {
     val soundGroup = soundGroup ?: return
-    world.playSound(location, soundGroup.breakSound, soundGroup.volume, soundGroup.pitch)
+    world.playSound(location, soundGroup.breakSound, (soundGroup.volume + 1f) / 2f, soundGroup.pitch * 0.8f)
 }
 
 /**

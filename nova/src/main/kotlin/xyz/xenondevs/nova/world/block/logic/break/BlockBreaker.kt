@@ -259,7 +259,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val seq
                 player.damageToolBreakBlock()
             
             // remove block
-            block.remove(ctx, BlockSoundEngine.overridesSound(block.type.soundGroup.breakSound.key.key), !brokenClientside)
+            block.remove(ctx, !brokenClientside || BlockSoundEngine.overridesSound(block.type.soundGroup.breakSound.key.key), !brokenClientside)
         } else {
             // If the block wasn't broken clientside, the client will keep breaking the block and not send
             // START_DESTROY_BLOCK again. For those cases, the internal progress will be reset as well.
