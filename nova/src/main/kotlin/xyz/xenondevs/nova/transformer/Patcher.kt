@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
 import java.lang.reflect.Field
+import java.util.logging.Level
 import kotlin.reflect.jvm.jvmName
 import kotlin.system.exitProcess
 
@@ -106,8 +107,9 @@ internal object Patcher : Initializable() {
                 }
             }
             
-            if (!thrown)
-                throw ex
+            if (!thrown) {
+                LOGGER.log(Level.SEVERE, "Could not get more information, original stacktrace: ", ex)
+            }
             
             LOGGER.severe("Exiting server process...")
             exitProcess(-1)
