@@ -20,7 +20,6 @@ import org.bukkit.event.entity.ItemMergeEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
-import org.bukkit.inventory.PlayerInventory
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
@@ -42,7 +41,6 @@ import xyz.xenondevs.nova.util.data.duplicate
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
-import xyz.xenondevs.nova.util.inventory.ReorderedPlayerInventory
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
@@ -50,6 +48,7 @@ import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
+import java.util.*
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -58,6 +57,9 @@ internal object PacketItems : Initializable(), Listener {
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
+    
+    private val PLAYER_HOTBAR_BLOCKED_SLOTS = BooleanArray(36) { it < 9 }
+    private val PLAYER_NON_HOTBAR_BLOCKED_SLOTS = BooleanArray(36) { it > 8 }
     
     override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(Resources)
@@ -104,10 +106,15 @@ internal object PacketItems : Initializable(), Listener {
                     
                     if (event.view.isPlayerView()) {
                         view.setItem(rawSlot, null)
-                        val inventory = view.bottomInventory as PlayerInventory
-                        if (event.slot in 0..8)
-                            ReorderedPlayerInventory(inventory).addItemCorrectly(clicked)
-                        else inventory.addItemCorrectly(clicked)
+                        
+                        val blockedSlots = if (event.slot in 0..8)
+                            PLAYER_HOTBAR_BLOCKED_SLOTS
+                        else PLAYER_NON_HOTBAR_BLOCKED_SLOTS
+                        
+                        val leftover = view.bottomInventory.addItemCorrectly(clicked, blockedSlots)
+                        if (leftover != 0) {
+                            view.setItem(rawSlot, clicked.apply { amount = leftover })
+                        }
                     } else {
                         val toInv = if (event.clickedInventory == view.topInventory)
                             view.bottomInventory else view.topInventory

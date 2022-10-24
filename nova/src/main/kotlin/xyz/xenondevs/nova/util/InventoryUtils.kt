@@ -56,7 +56,8 @@ fun VirtualInventory.hasEmptySlot(): Boolean =
  *
  * @return The amount of items that did not fit.
  */
-fun Inventory.addItemCorrectly(itemStack: ItemStack) = InventoryUtils.addItemCorrectly(this, itemStack)
+fun Inventory.addItemCorrectly(itemStack: ItemStack, blockedSlots: BooleanArray = BooleanArray(size)) =
+    InventoryUtils.addItemCorrectly(this, itemStack, blockedSlots)
 
 /**
  * Adds [items] to the [Player's][Player] inventory or drops them on

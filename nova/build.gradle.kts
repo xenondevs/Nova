@@ -16,7 +16,7 @@ dependencies {
     api(project(":nova-api"))
     spigotLoaderApi(deps.bundles.kotlin)
     novaLoaderApi(deps.bundles.cbf)
-    novaLoaderApi("de.studiocode.invui:InvUI:0.8.1") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
+    novaLoaderApi("de.studiocode.invui:InvUI:0.8.2") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
     novaLoaderApi("de.studiocode.invui:ResourcePack:0.8.1") { exclude("de.studiocode.invui", "InvUI") }
     novaLoaderApi("de.studiocode.invui:IA-R11:0.8.1:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.2:remapped-mojang")
