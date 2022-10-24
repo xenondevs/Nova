@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap
 import xyz.xenondevs.bytebase.ClassWrapperLoader
 import xyz.xenondevs.bytebase.INSTRUMENTATION
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
@@ -22,6 +23,8 @@ import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
 import java.lang.reflect.Field
+import kotlin.reflect.jvm.jvmName
+import kotlin.system.exitProcess
 
 internal object Patcher : Initializable() {
     
@@ -84,13 +87,30 @@ internal object Patcher : Initializable() {
         val definitions = classes.map { (clazz, computeFrames) ->
             ClassDefinition(clazz, VirtualClassPath[clazz].assemble(computeFrames))
         }.toTypedArray()
+        
         try {
             INSTRUMENTATION.redefineClasses(*definitions)
         } catch (ex: LinkageError) {
             LOGGER.severe("Failed to apply patches (LinkageError: $ex)! Trying to get more information...")
+            
+            var thrown = false
             val classLoader = ClassWrapperLoader(javaClass.classLoader)
-            classes.keys.forEach { classLoader.loadClass(VirtualClassPath[it]) }
-            throw ex
+            classes.keys.forEach {
+                try {
+                    classLoader.loadClass(VirtualClassPath[it]).methods
+                } catch (e: LinkageError) {
+                    if (e.message?.contains(ClassWrapperLoader::class.jvmName) != true) {
+                        LOGGER.severe("${e::class.simpleName} for class ${it.internalName}:\n${e.message}")
+                        thrown = true
+                    }
+                }
+            }
+            
+            if (!thrown)
+                throw ex
+            
+            LOGGER.severe("Exiting server process...")
+            exitProcess(-1)
         }
     }
     

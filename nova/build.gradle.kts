@@ -28,7 +28,7 @@ dependencies {
     novaLoader(deps.bundles.minecraft.assets)
     novaLoader(deps.zip4j)
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
-    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.1")
+    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.2")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
     novaLoader("software.amazon.awssdk:s3:2.17.292")
     
