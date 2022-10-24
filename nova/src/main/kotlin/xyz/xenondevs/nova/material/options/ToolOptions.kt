@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.material.options
 
-import xyz.xenondevs.nova.data.config.provider.ConfigAccess
-import xyz.xenondevs.nova.data.config.provider.map
-import xyz.xenondevs.nova.data.config.provider.orElse
+import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.nova.data.provider.orElse
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolCategoryRegistry
 import xyz.xenondevs.nova.item.tool.ToolLevel

@@ -1,8 +1,7 @@
-package xyz.xenondevs.nova.data.config.provider
+package xyz.xenondevs.nova.data.config
 
 import org.bukkit.configuration.file.YamlConfiguration
-import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.config.Reloadable
+import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf

@@ -109,7 +109,7 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
      */
     inline fun <reified T> storedValue(key: String, global: Boolean, getAlternative: () -> T): DataAccessor<T> {
         val initialValue = retrieveData(key, getAlternative)
-        return NonNullDataAccessor(this, key, global, initialValue).also(dataAccessors::add)
+        return DataAccessor(this, key, global, initialValue).also(dataAccessors::add)
     }
     
     /**
@@ -121,7 +121,7 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
      */
     inline fun <reified T> storedValue(key: String, global: Boolean = false): DataAccessor<T?> {
         val initialValue = retrieveDataOrNull<T>(key)
-        return NullableDataAccessor(this, key, global, initialValue).also(dataAccessors::add)
+        return DataAccessor(this, key, global, initialValue).also(dataAccessors::add)
     }
     
     internal fun saveDataAccessors() {
