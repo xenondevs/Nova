@@ -47,9 +47,9 @@ import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.block.TileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.ReloadableRegion
@@ -141,6 +141,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         saveDataAccessors()
     }
     
+    /**
+     * Gets a list of [ItemStacks][ItemStack] to be dropped when this [TileEntity] is destroyed.
+     */
     override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
         val drops = ArrayList<ItemStack>()
         if (includeSelf) {
@@ -160,6 +163,11 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         _inventories.forEach { (inv, global) -> if (!global) drops += inv.items.filterNotNull() }
         return drops
     }
+    
+    /**
+     * Gets the amount of exp to be dropped when this [TileEntity] is destroyed.
+     */
+    open fun getExp(): Int = 0
     
     /**
      * Called every tick for every TileEntity that is in a loaded chunk.
@@ -322,7 +330,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     /**
      * Creates a new dynamic region with the reloadable bounds [minSize] and [maxSize] under the name "default".
      * If this [TileEntity] did not save a size under that name before, [defaultSize] is used.
-     * 
+     *
      * The configured size will be automatically saved during [TileEntity.saveData].
      */
     fun getDynamicRegion(
