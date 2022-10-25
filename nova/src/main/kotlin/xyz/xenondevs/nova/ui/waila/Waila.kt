@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.ui.waila
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProviderRegistry
@@ -68,7 +69,7 @@ internal class Waila(val player: Player) {
             require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
             
             val icon = Resources.getWailaIconCharOrNull(info.icon)
-            val (beginX, centerX) = imageOverlay.update(icon, lines.size, lines.maxOf { it.width })
+            val (beginX, centerX) = imageOverlay.update(icon, lines.size, lines.maxOf { CharSizes.calculateComponentWidth(it.components, player.locale) })
             
             BossBarOverlayManager.unregisterOverlays(player, lineOverlays)
             lineOverlays.forEachIndexed { idx, overlay ->
@@ -77,9 +78,8 @@ internal class Waila(val player: Player) {
                     return@forEachIndexed
                 }
                 
-                val (text, width, alignment) = lines[idx]
+                val (text, alignment) = lines[idx]
                 overlay.text = text
-                overlay.textWidth = width
                 overlay.centered = alignment == Alignment.CENTERED
                 overlay.x = when(alignment) {
                     Alignment.LEFT -> beginX
@@ -105,7 +105,7 @@ internal class Waila(val player: Player) {
             
             when (line.alignment) {
                 Alignment.LEFT -> return beginX
-                Alignment.CENTERED -> return centerX - line.width / 2
+                Alignment.CENTERED -> return centerX - CharSizes.calculateComponentWidth(line.components, player.locale) / 2
                 
                 Alignment.FIRST_LINE -> currentLineNumber = 0
                 Alignment.PREVIOUS_LINE -> currentLineNumber--

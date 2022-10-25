@@ -1,12 +1,10 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar
 
 import net.md_5.bungee.api.chat.BaseComponent
-import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
-import xyz.xenondevs.nova.util.data.toPlainText
 
-abstract class TextBossBarOverlay(private val player: Player) : BossBarOverlay() {
+abstract class TextBossBarOverlay : BossBarOverlay() {
     
     final override val centerX = null
     abstract val text: Array<out BaseComponent>
@@ -21,11 +19,5 @@ abstract class TextBossBarOverlay(private val player: Player) : BossBarOverlay()
             return arrayOf(MoveCharacters.getMovingComponent(x)) +
                 DefaultFont.getVerticallyMovedText(text, y % 19)
         }
-    
-    override val width: Int
-        get() = x + DefaultFont.getStringLength(text.toPlainText(player.locale))
-    
-    override val endY: Int
-        get() = y % 19
     
 }

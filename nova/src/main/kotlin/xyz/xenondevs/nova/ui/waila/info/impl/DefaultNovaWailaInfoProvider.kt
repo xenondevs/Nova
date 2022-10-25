@@ -27,8 +27,8 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
         translate.color = ChatColor.WHITE
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), player, WailaLine.Alignment.CENTERED)
-        lines += WailaLine(ComponentBuilder(material.id.toString()).color(ChatColor.DARK_GRAY).create(), player, WailaLine.Alignment.CENTERED)
+        lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(ComponentBuilder(material.id.toString()).color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block.pos.block)
         
         if (block is NovaTileEntityState && block.isInitialized) {

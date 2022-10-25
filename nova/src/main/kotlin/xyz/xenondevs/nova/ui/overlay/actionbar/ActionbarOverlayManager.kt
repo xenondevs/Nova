@@ -125,10 +125,11 @@ object ActionbarOverlayManager {
         val componentList = ArrayList<BaseComponent>()
         
         overlays[uuid]!!.forEach {
-            // add text
-            componentList.addAll(it.text)
+            val components = it.components
+            // add components
+            componentList.addAll(components)
             // move back
-            componentList.add(MoveCharacters.getMovingComponent(-it.width))
+            componentList.add(MoveCharacters.getMovingComponent(-it.getWidth(player.locale)))
         }
         
         val interceptedActionbar = interceptedActionbars[uuid]

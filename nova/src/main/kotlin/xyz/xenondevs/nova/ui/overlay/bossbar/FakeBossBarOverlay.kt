@@ -9,9 +9,9 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.bossbar.BossBar
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
-import xyz.xenondevs.nova.util.data.toPlainText
 import xyz.xenondevs.nova.util.enumMapOf
 import java.awt.Color
 import kotlin.math.roundToInt
@@ -41,8 +41,6 @@ internal class FakeBossBarOverlay(
     val bar: BossBar
 ) : BossBarOverlay() {
     
-    override val width = 0
-    override val endY = -12
     override val centerX = null
     
     private val barIdx: Int
@@ -103,7 +101,7 @@ internal class FakeBossBarOverlay(
             
             // text
             val text = bar.name
-            val textLength = DefaultFont.getStringLength(text.toPlainText(player.locale))
+            val textLength = CharSizes.calculateComponentWidth(text, player.locale)
             val halfTextLength = textLength / 2
             
             builder
@@ -114,6 +112,9 @@ internal class FakeBossBarOverlay(
             
             return builder.create()
         }
+    
+    override fun getWidth(locale: String): Int = -12
+    override fun getEndY(locale: String): Int = 0
     
     private fun getProgressComponent(font: String, progress: Float): Pair<BaseComponent, Int>? {
         require(progress in 0f..1f)

@@ -39,10 +39,8 @@ internal class WailaImageOverlay : BossBarOverlay() {
     
     override val barLevel = 0
     override val centerX = null
-    override val width = 0
     
-    override var endY = 0
-        private set
+    private var endY = 0
     
     override var components: Array<BaseComponent> = ComponentBuilder("").create()
         private set
@@ -100,6 +98,9 @@ internal class WailaImageOverlay : BossBarOverlay() {
         
         return textBeginX to textCenterX
     }
+    
+    override fun getWidth(locale: String): Int = 0
+    override fun getEndY(locale: String): Int = endY
     
     /**
      * Gets the height of the background texture for the given amount of lines.

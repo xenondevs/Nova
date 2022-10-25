@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar
 
 import net.md_5.bungee.api.chat.BaseComponent
-import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
+import xyz.xenondevs.nova.data.resources.CharSizes
 
 abstract class BossBarOverlay {
     
@@ -16,17 +16,6 @@ abstract class BossBarOverlay {
     abstract val components: Array<out BaseComponent>
     
     /**
-     * The width of the [components] in pixels.
-     * @see [DefaultFont.getStringLength]
-     */
-    abstract val width: Int
-    
-    /**
-     * The last relative y position that this [BossBarOverlay] draws at.
-     */
-    abstract val endY: Int
-    
-    /**
      * At which x-coordinate the [text][components] should be centered at.
      * Null if there should they shouldn't be centered.
      */
@@ -36,5 +25,17 @@ abstract class BossBarOverlay {
      * If the [components] have been changed and an update should be sent in the next tick.
      */
     var changed: Boolean = true
+    
+    /**
+     * The width of the [components] in pixels.
+     */
+    open fun getWidth(locale: String): Int =
+        CharSizes.calculateComponentWidth(components, locale)
+    
+    /**
+     * The last relative y position that this [BossBarOverlay] draws at.
+     */
+    open fun getEndY(locale: String): Int =
+        CharSizes.calculateComponentSize(components, locale).yRange.last
     
 }

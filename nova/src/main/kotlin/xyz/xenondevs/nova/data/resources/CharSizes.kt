@@ -14,6 +14,13 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.util.concurrent.TimeUnit
+
+data class ComponentSize(
+    val width: Int,
+    val xRange: IntRange,
+    val yRange: IntRange,
+)
 
 object CharSizes {
     
@@ -21,46 +28,108 @@ object CharSizes {
     
     private val loadedTables = HashMap<String, CharSizeTable>()
     
-    private val lengthCache: Cache<Pair<ArrayKey<BaseComponent>, String>, Int> = CacheBuilder.newBuilder()
-        .maximumSize(5000L)
+    private val componentSizeCache: Cache<Pair<ArrayKey<BaseComponent>, String>, ComponentSize> = CacheBuilder.newBuilder()
+        .expireAfterAccess(5, TimeUnit.MINUTES)
         .build()
     
+    /**
+     * Gets the width of [char] when rendered with [font].
+     *
+     * Note: This width includes the one pixel space rendered between characters.
+     */
     fun getCharWidth(font: String, char: Int): Int =
         getTable(font).getWidth(char)
     
+    /**
+     * Gets the width of [char] when rendered with [font].
+     *
+     * Note: This width includes the one pixel space rendered between characters.
+     */
     fun getCharWidth(font: String, char: Char): Int =
         getCharWidth(font, char.code)
     
+    /**
+     * Gets the width of [char] when rendered with [font].
+     */
     fun getCharHeight(font: String, char: Int): Int =
         getTable(font).getHeight(char)
     
-    fun getCharAscent(font: String, char: Int): Int =
-        getTable(font).getAscent(char)
-    
+    /**
+     * Gets the width of [char] when rendered with [font].
+     */
     fun getCharHeight(font: String, char: Char): Int =
         getCharHeight(font, char.code)
     
-    fun calculateComponentLength(components: Array<out BaseComponent>, locale: String): Int {
-        return lengthCache.get(ArrayKey(components) to locale) {
-            var length = 0
+    /**
+     * Gets the ascent of [char] when rendered with [font].
+     */
+    fun getCharAscent(font: String, char: Int): Int =
+        getTable(font).getAscent(char)
+    
+    /**
+     * Gets the ascent of [char] when rendered with [font].
+     */
+    fun getCharAscent(font: String, char: Char): Int =
+        getCharAscent(font, char.code)
+    
+    /**
+     * Calculates the width of [string] when rendered with [font].
+     */
+    fun calculateStringWidth(font: String, string: String): Int {
+        return string.toCharArray().sumOf { getCharWidth(font, it) }
+    }
+    
+    /**
+     * Calculates the width of a component array in pixels.
+     */
+    fun calculateComponentWidth(components: Array<out BaseComponent>, locale: String): Int {
+        return calculateComponentSize(components, locale).width
+    }
+    
+    /**
+     * Calculates the [ComponentSize] of the given [components] array under [locale].
+     */
+    fun calculateComponentSize(components: Array<out BaseComponent>, locale: String): ComponentSize {
+        return componentSizeCache.get(ArrayKey(components) to locale) {
+            var width = 0
+            
+            var xRangeMin = 0
+            var xRangeMax = 0
+            var yRangeMin = 0
+            var yRangeMax = 0
+            
             for (component in components) {
                 val text = component.toPlainText(locale).removeMinecraftFormatting()
                 val font = component.font ?: "default"
-                length += text.toCharArray().sumOf {
-                    var width = getCharWidth(font, it)
-                    if (width < 0) width += 1
-                    if (component.isBold) width += 1
+                for (char in text.toCharArray()) {
+                    // x
+                    var charWidth = getCharWidth(font, char)
+                    if (charWidth < 0) charWidth += 1
+                    if (component.isBold) charWidth += 1
                     
-                    return@sumOf width
+                    width += charWidth
+                    
+                    if (xRangeMin > width) xRangeMin = width
+                    if (xRangeMax < width) xRangeMax = width
+                    
+                    // ignore move font for yRange
+                    if (font == "nova:move")
+                        continue
+                    
+                    // y
+                    val charHeight = getCharHeight(font, char)
+                    val charAscent = getCharAscent(font, char)
+                    
+                    val charYMin = -charAscent
+                    val charYMax = -charAscent + charHeight
+                    
+                    if (yRangeMin > charYMin) yRangeMin = charYMin
+                    if (yRangeMax < charYMax) yRangeMax = charYMax
                 }
             }
             
-            return@get length
+            return@get ComponentSize(width, xRangeMin..xRangeMax, yRangeMin..yRangeMax)
         }
-    }
-    
-    fun calculateStringLength(font: String, string: String): Int {
-        return string.toCharArray().sumOf { getCharWidth(font, it) }
     }
     
     private fun loadTable(font: String): CharSizeTable? {

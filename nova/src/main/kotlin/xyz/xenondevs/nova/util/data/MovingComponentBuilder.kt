@@ -14,11 +14,11 @@ class MovingComponentBuilder(private val locale: String) {
     
     private val builder = ComponentBuilder()
     val width: Int
-        get() = CharSizes.calculateComponentLength(create(), locale)
+        get() = CharSizes.calculateComponentWidth(create(), locale)
     
     constructor() : this("en_us")
     
-    fun append(components: Array<BaseComponent>, retention: FormatRetention = FormatRetention.ALL): MovingComponentBuilder {
+    fun append(components: Array<out BaseComponent>, retention: FormatRetention = FormatRetention.ALL): MovingComponentBuilder {
         builder.append(components, retention)
         return this
     }
