@@ -1,8 +1,18 @@
 package xyz.xenondevs.nova.util.data
 
+import com.google.common.collect.HashBiMap
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.util.mapToIntArray
 import kotlin.math.max
+
+private val RELEASE_STAGES = HashBiMap.create<String, Int>().apply {
+    this["rc"] = -1
+    this["beta"] = -2
+    this["alpha"] = -3
+    this["snapshot"] = -4
+}
+
+private val VERSION_REGEX = Regex("""^([\d.]*)(-([a-z]*)(\d*))?$""")
 
 class Version : Comparable<Version> {
     
@@ -13,8 +23,22 @@ class Version : Comparable<Version> {
     }
     
     constructor(version: String) {
-        val split = version.removeSuffix("-SNAPSHOT").split('.')
-        this.version = split.mapToIntArray { it.toIntOrNull() ?: 0 }
+        val result = VERSION_REGEX.matchEntire(version.lowercase())
+            ?: throw IllegalArgumentException("${version.lowercase()} does not match version regex $VERSION_REGEX")
+        
+        val ver = result.groupValues[1]
+        val stage = result.groupValues[3].takeUnless(String::isBlank)
+        val stageNum = result.groupValues[4].takeUnless(String::isBlank)
+        
+        if (stage != null) {
+            this.version = buildList<Int> {
+                this += ver.split('.').map(String::toInt)
+                this += RELEASE_STAGES[stage] ?: throw IllegalArgumentException("Unknown release stage: $stage")
+                this += stageNum?.toInt() ?: 1
+            }.toIntArray()
+        } else {
+            this.version = ver.split('.').mapToIntArray { it.toIntOrNull() ?: 0 }
+        }
     }
     
     override fun toString(): String =
@@ -22,14 +46,28 @@ class Version : Comparable<Version> {
     
     fun toString(separator: String = ".", omitZeros: Boolean = false): String {
         val sb = StringBuilder()
-        for (i in 0..version.lastIndex) {
-            sb.append(version[i])
+        
+        var i = 0
+        while (i <= version.lastIndex) {
+            val v = version[i]
+            if (v < 0) {
+                val stage = RELEASE_STAGES.inverse()[v]
+                if (stage != null) {
+                    if (i > 0)
+                        sb.deleteCharAt(sb.lastIndex)
+                    sb.append("-$stage")
+                    i++
+                    sb.append(version.getOrNull(i) ?: 1)
+                } else sb.append(v)
+            } else sb.append(v)
             
-            if (i != version.lastIndex) {
+            if (i < version.lastIndex) {
                 if (omitZeros && version.copyOfRange(i + 1, version.size).all { it == 0 })
                     break
                 sb.append(separator)
             }
+            
+            i++
         }
         
         return sb.toString()
