@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
@@ -90,7 +91,11 @@ object AttachmentManager : Initializable(), Listener {
     
     @EventHandler
     private fun handleRespawn(event: PlayerRespawnEvent) {
-        activateAttachments(event.player)
+        runTaskLater(1) {
+            val player = event.player
+            if (player.isOnline && !player.isDead)
+                activateAttachments(event.player)
+        }
     }
     
     @PacketHandler
