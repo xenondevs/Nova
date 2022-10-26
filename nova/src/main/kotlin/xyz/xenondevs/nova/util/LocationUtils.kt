@@ -84,6 +84,14 @@ fun Location.isBetween(min: Location, max: Location): Boolean =
 fun Location.isBetweenXZ(min: Location, max: Location): Boolean =
     x in min.x.rangeTo(max.x)
         && z in min.z.rangeTo(max.z)
+
+/**
+ * Checks if a location is inside the world borders and in the allowed building height.
+ */
+fun Location.isInsideWorldRestrictions(): Boolean {
+    val world = world!!
+    return world.worldBorder.isInside(this) && blockY in world.minHeight until world.maxHeight
+}
 //</editor-fold>
 
 //<editor-fold desc="direction / vector", defaultstate="collapsed">

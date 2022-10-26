@@ -20,6 +20,8 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
     val isChunkLoaded
         get() = pos.chunkPos.isLoaded()
     
+    internal abstract val type: Type
+    
     internal abstract fun handleInitialized()
     
     internal abstract fun handleRemoved(unload: Boolean)
@@ -30,34 +32,37 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
         saveDataAccessors()
     }
     
-    internal enum class Type(val id: String, val constructor: VanillaTileEntityConstructor) {
+    internal fun meetsBlockStateRequirement(): Boolean {
+        return type.requirement(blockState.pos.block)
+    }
+    
+    internal enum class Type(val id: String, val constructor: VanillaTileEntityConstructor, val requirement: (Block) -> Boolean) {
         
-        CHEST("minecraft:chest", ::VanillaChestTileEntity),
-        FURNACE("minecraft:furnace", ::VanillaFurnaceTileEntity),
-        CONTAINER("minecraft:container", ::VanillaContainerTileEntity),
-        CAULDRON("minecraft:cauldron", ::VanillaCauldronTileEntity),
-        NOTE_BLOCK("minecraft:note_block", ::VanillaNoteBlockTileEntity);
+        CHEST("minecraft:chest", ::VanillaChestTileEntity, { it.state is Chest }),
+        FURNACE("minecraft:furnace", ::VanillaFurnaceTileEntity, { it.state is Furnace }),
+        CONTAINER("minecraft:container", ::VanillaContainerTileEntity, { it.state is Container }),
+        CAULDRON("minecraft:cauldron", ::VanillaCauldronTileEntity, { it.type.isCauldron() }),
+        NOTE_BLOCK("minecraft:note_block", ::VanillaNoteBlockTileEntity, { it.type == Material.NOTE_BLOCK });
         
         companion object {
-            fun of(block: Block): Type? {
-                val state = block.state
-                val type = block.type
-                return when {
-                    state is Chest -> CHEST
-                    state is Furnace -> FURNACE
-                    state is Container -> CONTAINER
-                    type.isCauldron() -> CAULDRON
-                    type == Material.NOTE_BLOCK -> NOTE_BLOCK
-                    else -> null
-                }
-            }
+            
+            fun of(block: Block): Type? =
+                Type.values().firstOrNull { it.requirement(block) }
+            
         }
         
     }
     
     internal companion object {
-        fun of(blockState: VanillaTileEntityState): VanillaTileEntity? =
-            Type.values().firstOrNull { it.id == blockState.id.toString() }?.constructor?.invoke(blockState)
+        
+        fun of(blockState: VanillaTileEntityState): VanillaTileEntity? {
+            val type = Type.values().firstOrNull { it.id == blockState.id.toString() } ?: return null
+            if (type.requirement(blockState.pos.block)) {
+                return type.constructor(blockState)
+            }
+            return null
+        }
+        
     }
     
 }

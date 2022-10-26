@@ -47,7 +47,7 @@ sealed interface NetworkNode {
      * Gets the [NetworkNode] that is connected at [face] under any [NetworkType] or null if there isn't one.
      */
     fun getConnectedNode(face: BlockFace): NetworkNode? {
-        return connectedNodes.firstNotNullOf { it.value[face] }
+        return connectedNodes.firstNotNullOfOrNull { it.value[face] }
     }
     
     /**

@@ -68,8 +68,10 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
      * for all current viewers.
      */
     fun remove() {
-        registered = false
-        FakeEntityManager.removeEntity(chunk, this)
+        if (registered) {
+            registered = false
+            FakeEntityManager.removeEntity(chunk, this)
+        }
     }
     
     /**

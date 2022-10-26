@@ -106,5 +106,15 @@
   "command.nova.waila.already_off": "WAILA já esta desativado.",
   "command.nova.waila.already_on": "WAILA já esta ativado.",
   "nova.tile_entity_limits.world_blacklist.deny": "Você não pode colocar blocos do Nova nesse mundo.",
-  "nova.outdated_version": "Você está usando uma versão desatualizada de %s.\nPor favor use a versão mais recente de %s."
+  "nova.outdated_version": "Você está usando uma versão desatualizada de %s.\nPor favor use a versão mais recente de %s.",
+  "menu.nova.items": "Items",
+  "command.nova.advanced_tooltips.already_off": "Ferramentas desativadas já estão desativadas.",
+  "command.nova.advanced_tooltips.on": "Ferramentas avançadas ativadas.",
+  "command.nova.remove_invalid_vtes.failure": "Nenhuma tile-entity invalida encontrada.",
+  "command.nova.advanced_tooltips.off": "Ferramentas avançadas desativadas.",
+  "command.nova.advanced_tooltips.already_on": "Ferramentas avançadas já estão ativadas.",
+  "command.nova.remove_invalid_vtes.success": "%s tile-entities inválidas removidas com sucesso.",
+  "nova.tile_entity_limits.amount_global.deny": "Você não pode colocar mais blocos desse tipo.",
+  "nova.tile_entity_limits.amount_per_chunk.deny": "Você não pode colocar mais blocos desse tipo nesse chunk.",
+  "nova.tile_entity_limits.amount_global_total.deny": "Você não pode colocar mais blocos."
 }

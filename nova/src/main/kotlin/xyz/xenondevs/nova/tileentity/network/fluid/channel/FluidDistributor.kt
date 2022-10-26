@@ -102,7 +102,8 @@ internal class FluidDistributor(
     }
     
     private fun giveEqually(amount: Long, type: FluidType, consumers: MutableList<FluidContainer>): Long {
-        if (amount == 0L) return amount
+        if (amount == 0L)
+            return 0
         
         var remaining = amount
         while (remaining != 0L && consumers.isNotEmpty()) {
@@ -124,7 +125,8 @@ internal class FluidDistributor(
     }
     
     private fun giveFirst(amount: Long, type: FluidType, consumers: MutableList<FluidContainer>): Long {
-        if (amount == 0L) return amount
+        if (amount == 0L)
+            return 0
         
         var remaining = amount
         consumers.forEach {

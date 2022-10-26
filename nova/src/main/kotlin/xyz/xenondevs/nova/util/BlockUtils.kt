@@ -28,6 +28,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.GlobalValues
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
@@ -52,6 +53,22 @@ import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceContext
 
 // region block info
+
+/**
+ * The [NamespacedId] of this block.
+ */
+val Block.id: NamespacedId
+    get() {
+        val pos = pos
+        val novaMaterial = BlockManager.getBlock(pos)
+        if (novaMaterial != null) {
+            return novaMaterial.id
+        }
+        
+        // TODO: Check CustomItemServiceManager
+        
+        return NamespacedId("minecraft", type.name.lowercase())
+    }
 
 /**
  * The block that is one y-level below the current one.

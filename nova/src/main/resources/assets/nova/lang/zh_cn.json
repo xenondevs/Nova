@@ -97,5 +97,19 @@
   "menu.nova.side_config.east": "东",
   "menu.nova.side_config.down": "下",
   "command.nova.network_debug.nova.item": "已为物品网络切换调试模式视角。",
-  "command.nova.update_chunk_search_id.success": "区块搜索已更新。"
+  "command.nova.update_chunk_search_id.success": "区块搜索已更新。",
+  "menu.nova.region.size": "区域大小: %s",
+  "menu.nova.region.increase": "拓展区域",
+  "menu.nova.region.decrease": "缩小区域",
+  "waila.nova.required_tool.none": "不需要任何工具",
+  "waila.nova.required_tool.unbreakable": "不可破坏",
+  "command.nova.advanced_tooltips.off": "关闭高级工具提示。",
+  "command.nova.advanced_tooltips.already_off": "高级工具提示早已被关闭。",
+  "command.nova.advanced_tooltips.on": "开启高级工具提示。",
+  "command.nova.advanced_tooltips.already_on": "高级工具提示早已被开启。",
+  "command.nova.waila.off": "禁用WAILA",
+  "command.nova.waila.already_off": "WAILA早已被禁用",
+  "command.nova.waila.on": "启用WAILA",
+  "command.nova.waila.already_on": "WAILA早已被启用",
+  "waila.nova.required_tool": "工具: "
 }

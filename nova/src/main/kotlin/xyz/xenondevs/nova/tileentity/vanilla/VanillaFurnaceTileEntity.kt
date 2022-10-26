@@ -12,6 +12,7 @@ import java.util.*
 
 internal class VanillaFurnaceTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
     
+    override val type = Type.FURNACE
     override val itemHolder = StaticVanillaItemHolder(this, getInventories(block.state as Furnace))
     
     private fun getInventories(furnace: Furnace): EnumMap<BlockFace, NetworkedInventory> {

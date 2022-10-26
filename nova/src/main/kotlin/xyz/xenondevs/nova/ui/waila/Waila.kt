@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.ui.waila
 
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.CharSizes
@@ -11,12 +12,18 @@ import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
 import xyz.xenondevs.nova.ui.waila.overlay.WailaImageOverlay
 import xyz.xenondevs.nova.ui.waila.overlay.WailaLineOverlay
+import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.pos
 
 private val POS_UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getInt("waila.pos_update_interval") }
 private val DATA_UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getInt("waila.data_update_interval") }
+
+private val BLACKLISTED_BLOCKS by configReloadable {
+    DEFAULT_CONFIG.getStringList("waila.blacklisted_blocks")
+        .mapTo(HashSet()) { NamespacedId.of(it, "minecraft") }
+}
 
 internal class Waila(val player: Player) {
     
@@ -37,7 +44,7 @@ internal class Waila(val player: Player) {
         if (active) {
             BossBarOverlayManager.registerBackgroundOverlay(player, imageOverlay)
         } else {
-            BossBarOverlayManager.unregisterOverlayIf(player) { it == imageOverlay || it in lineOverlays}
+            BossBarOverlayManager.unregisterOverlayIf(player) { it == imageOverlay || it in lineOverlays }
         }
     }
     
@@ -64,6 +71,10 @@ internal class Waila(val player: Player) {
     
     private fun tryUpdate(pos: BlockPos?): Boolean {
         if (pos != null) {
+            val blockId = pos.block.id
+            if (blockId in BLACKLISTED_BLOCKS)
+                return false
+            
             val info = WailaInfoProviderRegistry.getInfo(player, pos) ?: return false
             val lines = info.lines
             require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
@@ -81,7 +92,7 @@ internal class Waila(val player: Player) {
                 val (text, alignment) = lines[idx]
                 overlay.text = text
                 overlay.centered = alignment == Alignment.CENTERED
-                overlay.x = when(alignment) {
+                overlay.x = when (alignment) {
                     Alignment.LEFT -> beginX
                     Alignment.CENTERED -> centerX
                     Alignment.FIRST_LINE -> getBeginX(lines, 0, beginX, centerX)
