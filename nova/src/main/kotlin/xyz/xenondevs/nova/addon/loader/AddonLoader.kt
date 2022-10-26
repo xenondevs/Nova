@@ -23,10 +23,8 @@ internal class AddonLoader(val file: File) {
         description = AddonDescription.deserialize(descriptionFile.reader())
         logger = AddonLogger(description.name)
         
-        if (description.novaVersion > NOVA.version)
-            throw InitializationException("This addon is made for a newer version of Nova (v${description.novaVersion})")
-        if (description.novaVersion.compareTo(NOVA.version, 2) == -1)
-            throw InitializationException("This addon is made for an older version of Nova (v${description.novaVersion})")
+        if (description.novaVersion.compareTo(NOVA.version, 2) != 0)
+            throw InitializationException("This addon is made for a different version of Nova (v${description.novaVersion})")
     }
     
     fun load(): Addon {
