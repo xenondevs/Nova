@@ -13,6 +13,8 @@ internal class VanillaCauldronTileEntity internal constructor(
     blockState: VanillaTileEntityState
 ) : NetworkedVanillaTileEntity(blockState) {
     
+    override val type = Type.CAULDRON
+    
     private val container = CauldronFluidContainer(uuid, block)
     private val fluidHolder = NovaFluidHolder(
         this,

@@ -6,6 +6,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.item.crafting.AbstractCookingRecipe
@@ -25,7 +26,9 @@ import org.bukkit.block.data.type.Bed
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.GlobalValues
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
@@ -50,6 +53,22 @@ import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceContext
 
 // region block info
+
+/**
+ * The [NamespacedId] of this block.
+ */
+val Block.id: NamespacedId
+    get() {
+        val pos = pos
+        val novaMaterial = BlockManager.getBlock(pos)
+        if (novaMaterial != null) {
+            return novaMaterial.id
+        }
+        
+        // TODO: Check CustomItemServiceManager
+        
+        return NamespacedId("minecraft", type.name.lowercase())
+    }
 
 /**
  * The block that is one y-level below the current one.
@@ -284,7 +303,9 @@ private fun Block.getMainHalf(): Block {
  * Gets the experience that would be dropped if the block were to be broken.
  */
 fun Block.getExp(ctx: BlockBreakContext): Int {
-    // TODO: Nova blocks
+    val novaState = BlockManager.getBlock(ctx.pos)
+    if (novaState != null)
+        return novaState.material.novaBlock.getExp(novaState, ctx)
     
     val serverLevel = ctx.pos.world.serverLevel
     val mojangPos = ctx.pos.nmsPos
@@ -298,6 +319,20 @@ fun Block.getExp(ctx: BlockBreakContext): Int {
     }
     
     return exp
+}
+
+/**
+ * Spawns an experience orb of [exp] from this block after calling the [BlockExpEvent].
+ * @return The amount of exp that was actually spawned
+ */
+fun Block.spawnExpOrb(exp: Int, location: Location = this.location.add(.5, .5, .5)): Int {
+    val event = BlockExpEvent(this, exp).also(::callEvent)
+    if (event.expToDrop > 0) {
+        ExperienceOrb.award(location.world!!.serverLevel, Vec3(location.x, location.y, location.z), event.expToDrop)
+        return event.expToDrop
+    }
+    
+    return 0
 }
 // endregion
 
@@ -336,7 +371,7 @@ fun Material.showBreakParticles(location: Location) {
  */
 fun Block.playBreakSound() {
     val soundGroup = soundGroup ?: return
-    world.playSound(location, soundGroup.breakSound, soundGroup.volume, soundGroup.pitch)
+    world.playSound(location, soundGroup.breakSound, soundGroup.breakVolume, soundGroup.breakPitch)
 }
 
 /**

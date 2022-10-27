@@ -25,6 +25,10 @@ open class TileEntityBlock protected constructor(private val interactive: Boolea
         return state.tileEntity.getDrops(ctx.source !is Player || ctx.source.gameMode != GameMode.CREATIVE)
     }
     
+    override fun getExp(state: NovaTileEntityState, ctx: BlockBreakContext): Int {
+        return state.tileEntity.getExp()
+    }
+    
     companion object {
         
         val INTERACTIVE = TileEntityBlock(true)

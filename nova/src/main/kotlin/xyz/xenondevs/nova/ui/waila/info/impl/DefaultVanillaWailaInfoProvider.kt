@@ -25,8 +25,8 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
         translate.color = ChatColor.WHITE
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), player, WailaLine.Alignment.CENTERED)
-        lines += WailaLine(ComponentBuilder("minecraft:${material.name.lowercase()}").color(ChatColor.DARK_GRAY).create(), player, WailaLine.Alignment.CENTERED)
+        lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(ComponentBuilder("minecraft:${material.name.lowercase()}").color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block)
         
         return WailaInfo(NamespacedId("minecraft", mainMaterial.name.lowercase()), lines)

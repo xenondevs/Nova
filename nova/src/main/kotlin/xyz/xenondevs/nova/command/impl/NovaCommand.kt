@@ -76,6 +76,8 @@ internal object NovaCommand : Command("nova") {
                     .requiresPlayer()
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching(::removeNovaBlocks)))
+                .then(literal("removeInvalidVTEs")
+                    .executesCatching(::removeInvalidVTEs))
                 .then(literal("getTileEntityData")
                     .requiresPlayer()
                     .executesCatching(::showTileEntityData))
@@ -237,6 +239,22 @@ internal object NovaCommand : Command("nova") {
             "command.nova.remove_tile_entities.success",
             coloredText(ChatColor.AQUA, novaBlocks.count())
         ))
+    }
+    
+    private fun removeInvalidVTEs(ctx: CommandContext<CommandSourceStack>) {
+        val count = VanillaTileEntityManager.removeInvalidVTEs()
+        if (count > 0) {
+            ctx.source.sendSuccess(localized(
+                ChatColor.GRAY,
+                "command.nova.remove_invalid_vtes.success",
+                coloredText(ChatColor.AQUA, count)
+            ))
+        } else {
+            ctx.source.sendFailure(localized(
+                ChatColor.RED,
+                "command.nova.remove_invalid_vtes.failure"
+            ))
+        }
     }
     
     private fun reloadNetworks(ctx: CommandContext<CommandSourceStack>) {

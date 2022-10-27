@@ -19,6 +19,8 @@ import java.util.*
 
 internal class VanillaChestTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
     
+    override val type = Type.CHEST
+    
     private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
     private lateinit var allowedConnectionTypes: HashMap<NetworkedInventory, NetworkConnectionType>
     override val itemHolder: ItemHolder

@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.material.options
 
 import net.minecraft.world.item.enchantment.EnchantmentCategory
-import xyz.xenondevs.nova.data.config.provider.ConfigAccess
-import xyz.xenondevs.nova.data.config.provider.map
+import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 
 @HardcodedMaterialOptions

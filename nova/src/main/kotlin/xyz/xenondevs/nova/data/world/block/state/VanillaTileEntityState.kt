@@ -4,6 +4,7 @@ import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.buffer.ByteBuffer
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.world.BlockPos
@@ -17,9 +18,14 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
     
     override fun handleInitialized(placed: Boolean) {
         if (!::data.isInitialized) data = Compound()
-        tileEntity = VanillaTileEntity.of(this)!!
-        tileEntity.handleInitialized()
-        VanillaTileEntityManager.registerTileEntity(this)
+        val tileEntity = VanillaTileEntity.of(this)
+        if (tileEntity != null) {
+            this.tileEntity = tileEntity
+            tileEntity.handleInitialized()
+            VanillaTileEntityManager.registerTileEntity(this)
+        } else {
+            WorldDataManager.removeBlockState(pos)
+        }
     }
     
     override fun handleRemoved(broken: Boolean) {

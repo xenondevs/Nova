@@ -82,8 +82,8 @@ internal object FakeEntityManager : Initializable(), Listener {
     
     @Synchronized
     fun removeEntity(chunk: ChunkPos, entity: FakeEntity<*>) {
-        chunkEntities[chunk]!!.remove(entity)
-        chunkViewers[chunk]!!.forEach { entity.despawn(it) }
+        chunkEntities[chunk]?.remove(entity)
+        chunkViewers[chunk]?.forEach { entity.despawn(it) }
     }
     
     @Synchronized
@@ -94,14 +94,14 @@ internal object FakeEntityManager : Initializable(), Listener {
     @Synchronized
     fun changeEntityChunk(entity: FakeEntity<*>, previousChunk: ChunkPos, newChunk: ChunkPos) {
         // move the armor stand to the new chunk key
-        chunkEntities[previousChunk]!!.remove(entity)
+        chunkEntities[previousChunk]?.remove(entity)
         chunkEntities.getOrPut(newChunk) { mutableListOf() }.add(entity)
         
         // find all players that saw the old chunk but don't see the new one and despawn it for them
         val newChunkViewers = chunkViewers.getOrPut(newChunk) { CopyOnWriteArrayList() }
-        chunkViewers[previousChunk]!!.asSequence()
-            .filterNot { newChunkViewers.contains(it) }
-            .forEach { entity.despawn(it) }
+        chunkViewers[previousChunk]?.asSequence()
+            ?.filterNot { newChunkViewers.contains(it) }
+            ?.forEach { entity.despawn(it) }
         
         // find all players that didn't see the old chunk but should see the armor stand now and spawn it for them
         newChunkViewers.asSequence()
@@ -153,8 +153,7 @@ internal object FakeEntityManager : Initializable(), Listener {
     
     @Synchronized
     private fun removeViewer(player: Player) {
-        val currentChunks = visibleChunks[player]!!
-        currentChunks.forEach {
+        visibleChunks[player]?.forEach {
             chunkViewers[it]?.remove(player)
         }
         

@@ -15,6 +15,27 @@ data class SoundGroup(
     val fallSound: String
 ) {
     
+    val breakVolume: Float
+        get() = (volume + 1f) / 2f
+    val breakPitch: Float
+        get() = pitch * 0.8f
+    val stepVolume: Float
+        get() = volume * 0.15f
+    val stepPitch: Float
+        get() = pitch
+    val placeVolume: Float
+        get() = 1f
+    val placePitch: Float
+        get() = 1f
+    val hitVolume: Float
+        get() = (volume + 1f) / 8f
+    val hitPitch: Float
+        get() = pitch * 0.5f
+    val fallVolume: Float
+        get() = volume * 0.5f
+    val fallPitch: Float
+        get() = pitch * 0.75f
+    
     companion object {
         
         //<editor-fold desc="vanilla sound groups", defaultstate="collapsed">

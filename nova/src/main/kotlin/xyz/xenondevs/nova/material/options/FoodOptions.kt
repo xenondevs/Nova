@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.material.options
 
 import org.bukkit.potion.PotionEffect
-import xyz.xenondevs.nova.data.config.provider.ConfigAccess
-import xyz.xenondevs.nova.data.config.provider.map
-import xyz.xenondevs.nova.data.config.provider.orElse
+import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.nova.data.provider.orElse
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType

@@ -120,7 +120,7 @@ object BossBarOverlayManager : Initializable(), Listener {
         overlays.asSequence()
             .filter { it !is FakeBossBarOverlay }
             .forEach {
-                val curEndY = it.barLevel * -19 + it.endY
+                val curEndY = it.barLevel * -19 + it.getEndY(player.locale)
                 if (curEndY < endY)
                     endY = curEndY
             }
@@ -139,6 +139,7 @@ object BossBarOverlayManager : Initializable(), Listener {
     private fun remakeBars(playerUUID: UUID): Boolean {
         val overlays = overlays[playerUUID] ?: return false
         val bars = bars[playerUUID] ?: return false
+        val player = Bukkit.getPlayer(playerUUID) ?: return false
         
         // clear bars
         bars.forEach { it.nmsName = Component.literal("") }
@@ -152,7 +153,7 @@ object BossBarOverlayManager : Initializable(), Listener {
                     it.changed = false
                     
                     val centerX = it.centerX
-                    var width = it.width
+                    var width = it.getWidth(player.locale)
                     if (centerX != null) {
                         val preMove = centerX - width / 2
                         builder.append(MoveCharacters.getMovingComponent(preMove))
@@ -168,8 +169,7 @@ object BossBarOverlayManager : Initializable(), Listener {
                 bars[barLevel].name = builder.create()
             }
         
-        // send update if player is online
-        val player = Bukkit.getPlayer(playerUUID) ?: return true
+        // send update
         bars.forEach { player.send(it.updateNamePacket) }
         
         return true

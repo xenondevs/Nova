@@ -72,8 +72,11 @@ abstract class FluidContainer(
         require(this.type == type || (this.type == FluidType.NONE && type in allowedTypes)) { "Illegal fluid type: $type" }
         
         val toAdd = min(capacity - this.amount, amount)
-        this.amount += toAdd
+        if (toAdd == 0L)
+            return 0L
+        
         if (this.type == FluidType.NONE) this.type = type
+        this.amount += toAdd
         
         callUpdateHandlers()
         

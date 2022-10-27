@@ -61,6 +61,8 @@ waila:
   # The interval for updating the overlay, regardless if the player is still looking at the same block.
   # Updating the overlay under these circumstances is still required for displaying the tool matching, energy, etc. properly.
   data_update_interval: 5
+  # A list of namespaced ids representing the blocks that should not be shown in WAILA.
+  blacklisted_blocks: []
 
 # Default transfer rates for networks when tile entities are directly connected.
 network:

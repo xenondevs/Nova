@@ -44,6 +44,25 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
         tileEntityMap[pos.chunkPos]?.remove(pos)
     }
     
+    internal fun removeInvalidVTEs(): Int {
+        val invalidPositions = ArrayList<BlockPos>()
+        
+        synchronized(tileEntityMap) {
+            tileEntityMap.forEach { (_, blockMap) ->
+                synchronized(blockMap) {
+                    blockMap.forEach { (blockPos, vte) ->
+                        if (!vte.meetsBlockStateRequirement())
+                            invalidPositions += blockPos
+                    }
+                }
+            }
+        }
+        
+        invalidPositions.forEach(::handleBlockBreak)
+        
+        return invalidPositions.size
+    }
+    
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunkPos]?.get(location.pos)
     
     fun getTileEntityAt(pos: BlockPos) = tileEntityMap[pos.chunkPos]?.get(pos)

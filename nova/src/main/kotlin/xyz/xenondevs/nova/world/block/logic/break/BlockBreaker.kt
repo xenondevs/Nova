@@ -58,12 +58,13 @@ private val MINING_FATIGUE = MobEffectInstance(MobEffect.byId(4), Integer.MAX_VA
 
 internal class NovaBlockBreaker(
     player: Player,
-    block: Block, blockState: NovaBlockState,
+    block: Block,
+    val blockState: NovaBlockState,
     sequence: Int,
     blockedUntil: Int
 ) : BlockBreaker(player, block, sequence, blockedUntil) {
     
-    private val material = blockState.material
+    val material = blockState.material
     override val breakMethod: BreakMethod? = BreakMethod.of(block, material)
     override val requiresToolForDrops: Boolean = material.requiresToolForDrops
     
@@ -101,7 +102,7 @@ internal class VanillaBlockBreaker(
 }
 
 @Suppress("MemberVisibilityCanBePrivate")
-internal abstract class BlockBreaker(val player: Player, val block: Block, val sequence: Int, val blockedUntil: Int) {
+internal sealed class BlockBreaker(val player: Player, val block: Block, val sequence: Int, val blockedUntil: Int) {
     
     protected abstract val breakMethod: BreakMethod?
     protected abstract val requiresToolForDrops: Boolean
@@ -142,8 +143,8 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
                     block.pos.playSound(
                         soundGroup.hitSound,
                         SoundCategory.BLOCKS,
-                        (soundGroup.volume + 1f) / 8f,
-                        soundGroup.pitch * .5f
+                        soundGroup.hitVolume,
+                        soundGroup.hitPitch
                     )
                 }
             }
@@ -203,10 +204,16 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
         val level = block.world.serverLevel
         val blockPos = block.pos.nmsPos
         
-        // call break event
+        //<editor-fold desc="break event", defaultstate="collapsed">
         val event = BlockBreakEvent(block, player)
-            .apply { if (drops) expToDrop = BlockUtils.getVanillaBlockExp(level, blockPos, tool.nmsCopy) }
-            .also(::callEvent)
+        if (drops) {
+            event.expToDrop = when (this) {
+                is NovaBlockBreaker -> material.novaBlock.getExp(blockState, ctx)
+                is VanillaBlockBreaker -> BlockUtils.getVanillaBlockExp(level, blockPos, tool.nmsCopy)
+            }
+        }
+        callEvent(event)
+        //</editor-fold>
         
         if (!event.isCancelled && !ProtectionManager.isVanillaProtected(player, block.location)) {
             //<editor-fold desc="item drops", defaultstate="collapsed">
@@ -252,7 +259,7 @@ internal abstract class BlockBreaker(val player: Player, val block: Block, val s
                 player.damageToolBreakBlock()
             
             // remove block
-            block.remove(ctx, BlockSoundEngine.overridesSound(block.type.soundGroup.breakSound.key.key), !brokenClientside)
+            block.remove(ctx, !brokenClientside || BlockSoundEngine.overridesSound(block.type.soundGroup.breakSound.key.key), !brokenClientside)
         } else {
             // If the block wasn't broken clientside, the client will keep breaking the block and not send
             // START_DESTROY_BLOCK again. For those cases, the internal progress will be reset as well.

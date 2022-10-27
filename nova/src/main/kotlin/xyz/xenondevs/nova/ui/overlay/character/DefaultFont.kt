@@ -8,7 +8,7 @@ object DefaultFont {
     
     @Deprecated("Replaced by CharSizes", ReplaceWith("CharSizes.calculateStringLength(\"minecraft:default\", string)", "xyz.xenondevs.nova.data.resources.CharSizes"))
     fun getStringLength(string: String): Int =
-        CharSizes.calculateStringLength("minecraft:default", string)
+        CharSizes.calculateStringWidth("minecraft:default", string)
     
     @Deprecated("Replaced by CharSizes", ReplaceWith("CharSizes.getCharWidth(\"minecraft:default\", char)", "xyz.xenondevs.nova.data.resources.CharSizes"))
     fun getCharWidth(char: Char): Int =

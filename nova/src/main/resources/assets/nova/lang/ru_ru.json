@@ -116,5 +116,7 @@
   "nova.tile_entity_limits.amount_per_chunk.deny": "Достигнут лимит размещенных объектов этого типа в этом чанке.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Достигнут лимит размещенных объектов Nova в этом чанке.",
   "nova.tile_entity_limits.amount_global_total.deny": "Достигнут лимит размещенных объектов Nova.",
-  "nova.tile_entity_limits.amount_per_world_total.deny": "Достигнут лимит размещенных объектов Nova в этом мире."
+  "nova.tile_entity_limits.amount_per_world_total.deny": "Достигнут лимит размещенных объектов Nova в этом мире.",
+  "command.nova.remove_invalid_vtes.success": "Успешно удалено %s недействительных ванильных объектов.",
+  "command.nova.remove_invalid_vtes.failure": "Не найдено ни одного недействительного ванильного объекта."
 }
