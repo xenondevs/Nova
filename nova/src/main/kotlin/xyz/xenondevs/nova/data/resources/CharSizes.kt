@@ -38,7 +38,7 @@ object CharSizes {
      * Note: This width includes the one pixel space rendered between characters.
      */
     fun getCharWidth(font: String, char: Int): Int =
-        getTable(font).getWidth(char)
+        getTable(font)?.getWidth(char) ?: 0
     
     /**
      * Gets the width of [char] when rendered with [font].
@@ -52,7 +52,7 @@ object CharSizes {
      * Gets the width of [char] when rendered with [font].
      */
     fun getCharHeight(font: String, char: Int): Int =
-        getTable(font).getHeight(char)
+        getTable(font)?.getHeight(char) ?: 0
     
     /**
      * Gets the width of [char] when rendered with [font].
@@ -64,7 +64,7 @@ object CharSizes {
      * Gets the ascent of [char] when rendered with [font].
      */
     fun getCharAscent(font: String, char: Int): Int =
-        getTable(font).getAscent(char)
+        getTable(font)?.getAscent(char) ?: 0
     
     /**
      * Gets the ascent of [char] when rendered with [font].
@@ -148,10 +148,7 @@ object CharSizes {
         table.write(getFile(font))
     }
     
-    internal fun getTable(font: String): CharSizeTable =
-        getTableOrNull(font) ?: throw IllegalArgumentException("Unknown font: $font")
-    
-    internal fun getTableOrNull(font: String): CharSizeTable? {
+    internal fun getTable(font: String): CharSizeTable? {
         val namespacedFont = if (font.contains(':')) font else "minecraft:$font"
         return loadedTables[namespacedFont] ?: loadTable(namespacedFont)
     }
