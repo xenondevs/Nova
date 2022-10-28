@@ -29,6 +29,7 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentP
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.data.recipe.RecipeManager
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
@@ -62,7 +63,7 @@ internal object PacketItems : Initializable(), Listener {
     private val PLAYER_NON_HOTBAR_BLOCKED_SLOTS = BooleanArray(36) { it > 8 }
     
     override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(Resources)
+    override val dependsOn = setOf(ResourceGeneration.PreWorld)
     
     override fun init() {
         registerEvents()

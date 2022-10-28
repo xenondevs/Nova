@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -70,13 +70,13 @@ import kotlin.reflect.jvm.jvmName
 internal object Initializer : Listener {
     
     private val INITIALIZABLES = CollectionUtils.sortDependencies(listOf(
-        LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, Resources,
+        LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager,
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeEntityManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemListener, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
-        BossBarOverlayManager, WailaManager
+        BossBarOverlayManager, WailaManager, ResourceGeneration.PreWorld, ResourceGeneration.PostWorld
     ), Initializable::dependsOn)
     
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())

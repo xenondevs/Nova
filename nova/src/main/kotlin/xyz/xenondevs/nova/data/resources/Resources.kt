@@ -1,104 +1,21 @@
 package xyz.xenondevs.nova.data.resources
 
-import de.studiocode.inventoryaccess.util.DataUtils
-import kotlinx.coroutines.runBlocking
 import org.bukkit.Material
-import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.FontChar
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
-import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.initialize.Initializable
-import xyz.xenondevs.nova.initialize.InitializationStage
-import xyz.xenondevs.nova.util.data.getResourceAsStream
-import xyz.xenondevs.nova.util.data.update
-import java.security.MessageDigest
-
-private const val RESOURCES_HASH = "resourcesHash"
-private const val MODEL_DATA_LOOKUP = "modelDataLookup"
-private const val LANGUAGE_LOOKUP = "languageLookup"
-private const val TEXTURE_ICON_LOOKUP = "textureIconLookup"
-private const val GUI_DATA_LOOKUP = "guiDataLookup"
-private const val WAILA_DATA_LOOKUP = "wailaDataLookup"
-
-private val ASSET_INDEX_FILES = listOf("assets/materials.json", "assets/guis.json")
 
 typealias ModelData = Pair<Map<Material, ItemModelData>?, BlockModelData?>
 
-object Resources : Initializable() {
+object Resources {
     
-    override val initializationStage = InitializationStage.PRE_WORLD
-    override val dependsOn = setOf(AddonsLoader, AutoUploadManager)
-    
-    private lateinit var modelDataLookup: Map<String, ModelData>
-    private lateinit var guiDataLookup: Map<String, FontChar>
-    private lateinit var wailaDataLookup: Map<String, FontChar>
-    private lateinit var textureIconLookup: Map<String, FontChar>
+    internal lateinit var modelDataLookup: Map<String, ModelData>
+    internal lateinit var guiDataLookup: Map<String, FontChar>
+    internal lateinit var wailaDataLookup: Map<String, FontChar>
+    internal lateinit var textureIconLookup: Map<String, FontChar>
     internal lateinit var languageLookup: Map<String, Map<String, String>>
-    
-    override fun init() {
-        val resourcesHash = calculateResourcesHash()
-        if (
-            PermanentStorage.retrieveOrNull<String>(RESOURCES_HASH) == resourcesHash
-            && PermanentStorage.has(MODEL_DATA_LOOKUP)
-            && PermanentStorage.has(LANGUAGE_LOOKUP)
-            && PermanentStorage.has(TEXTURE_ICON_LOOKUP)
-            && PermanentStorage.has(WAILA_DATA_LOOKUP)
-            && PermanentStorage.has(GUI_DATA_LOOKUP)
-        ) {
-            // Load from PermanentStorage
-            modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, ModelData>>(MODEL_DATA_LOOKUP)!!
-            languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>(LANGUAGE_LOOKUP)!!
-            textureIconLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(TEXTURE_ICON_LOOKUP)!!
-            wailaDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(WAILA_DATA_LOOKUP)!!
-            guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(GUI_DATA_LOOKUP)!!
-        } else {
-            // Create ResourcePack
-            ResourcePackBuilder.buildPack()
-            AutoUploadManager.wasRegenerated = true
-            // Store resourcesHashCode
-            PermanentStorage.store(RESOURCES_HASH, resourcesHash)
-        }
-    }
-    
-    private fun calculateResourcesHash(): String {
-        val digest = MessageDigest.getInstance("MD5")
-        
-        // Nova version
-        digest.update(NOVA.version.toString().toByteArray())
-        // nova asset indices
-        ASSET_INDEX_FILES.forEach { getResourceAsStream(it.replace("assets/", "assets/nova/"))?.let(digest::update) }
-        
-        // Addon id, version and asset indices
-        AddonManager.loaders.forEach { (id, loader) ->
-            // id and version
-            digest.update(id.toByteArray())
-            digest.update(loader.description.version.toByteArray())
-            
-            // asset indices
-            ASSET_INDEX_FILES.forEach { getResourceAsStream(loader.file, it)?.let(digest::update) }
-        }
-        
-        return DataUtils.toHexadecimalString(digest.digest())
-    }
-    
-    internal fun createResourcePack() {
-        val file = ResourcePackBuilder.buildPack()
-        
-        if (AutoUploadManager.enabled) {
-            runBlocking {
-                val url = AutoUploadManager.uploadPack(file)
-                if (url == null)
-                    LOGGER.warning("The resource pack was not uploaded. (Misconfigured auto uploader?)")
-            }
-        }
-    }
     
     internal fun updateModelDataLookup(modelDataLookup: Map<String, ModelData>) {
         this.modelDataLookup = modelDataLookup

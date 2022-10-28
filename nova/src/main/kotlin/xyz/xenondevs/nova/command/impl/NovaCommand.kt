@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.command.sendFailure
 import xyz.xenondevs.nova.command.sendSuccess
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.RecipeManager
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -150,7 +150,7 @@ internal object NovaCommand : Command("nova") {
     private fun createResourcePack(ctx: CommandContext<CommandSourceStack>) {
         runAsyncTask {
             ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.create.start"))
-            Resources.createResourcePack()
+            ResourceGeneration.createResourcePack()
             ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.create.success"))
         }
     }

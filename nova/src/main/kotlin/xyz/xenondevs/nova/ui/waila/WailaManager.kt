@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
@@ -33,7 +33,7 @@ private val Player.isWailaEnabled: Boolean
 internal object WailaManager : Initializable(), Listener, IWailaManager {
     
     override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(Resources, AddonsInitializer)
+    override val dependsOn = setOf(ResourceGeneration.PostWorld, AddonsInitializer)
     
     private var tickTask: BukkitTask? = null
     private val overlays = HashMap<Player, Waila>()

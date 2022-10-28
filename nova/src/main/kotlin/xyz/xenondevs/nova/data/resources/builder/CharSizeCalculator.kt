@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.util.data.parseJson
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.FileNotFoundException
+import java.util.logging.Level
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
 
@@ -39,7 +40,7 @@ internal class CharSizeCalculator {
                 .forEach { file ->
                     val font = getFontName(dir.parentFile.parentFile, file)
                     
-                    val table = CharSizes.getTableOrNull(font) ?: CharSizeTable()
+                    val table = CharSizes.getTable(font) ?: CharSizeTable()
                     calculateCharSizes(file, table)
                     CharSizes.storeTable(font, table)
                 }
@@ -58,17 +59,21 @@ internal class CharSizeCalculator {
     }
     
     private fun calculateCharSizes(file: File, table: CharSizeTable) {
-        val obj = file.parseJson() as JsonObject
-        val providers = obj.getAsJsonArray("providers")
-        providers.forEach { provider ->
-            provider as JsonObject
-            when (val type = provider.getString("type")) {
-                "space" -> readSpaceProvider(provider, table)
-                "bitmap" -> readBitmapProvider(provider, table)
-                "legacy_unicode" -> readUnicodeProvider(provider, table)
-                "ttf" -> LOGGER.warning("Skipping size calculation for ttf font provider: $provider")
-                else -> LOGGER.warning("Unknown font provider type: $type")
+        try {
+            val obj = file.parseJson() as JsonObject
+            val providers = obj.getAsJsonArray("providers")
+            providers.forEach { provider ->
+                provider as JsonObject
+                when (val type = provider.getString("type")) {
+                    "space" -> readSpaceProvider(provider, table)
+                    "bitmap" -> readBitmapProvider(provider, table)
+                    "legacy_unicode" -> readUnicodeProvider(provider, table)
+                    "ttf" -> LOGGER.warning("Skipping size calculation for ttf font provider: $provider")
+                    else -> LOGGER.warning("Unknown font provider type: $type")
+                }
             }
+        } catch (e: Exception) {
+            LOGGER.log(Level.SEVERE, "Failed to calculate char sizes for $file", e)
         }
     }
     
