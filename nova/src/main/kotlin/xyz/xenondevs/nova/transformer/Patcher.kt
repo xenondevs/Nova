@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
@@ -29,6 +30,8 @@ import kotlin.system.exitProcess
 
 internal object Patcher : Initializable() {
     
+    val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("use_agent") }
+    
     override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = emptySet<Initializable>()
     
@@ -41,8 +44,10 @@ internal object Patcher : Initializable() {
     }
     
     override fun init() {
-        if (!DEFAULT_CONFIG.getBoolean("use_agent"))
+        if (!ENABLED) {
+            LOGGER.warning("Java agent is disabled. Some features will not work properly or at all.")
             return
+        }
         
         if (runCatching { INSTRUMENTATION }.isFailure) {
             LOGGER.warning("Java agents aren't supported on this server! Disabling...")

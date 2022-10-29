@@ -66,6 +66,7 @@ import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.*
 import java.util.logging.Level
 import kotlin.reflect.jvm.jvmName
+import kotlin.system.exitProcess
 
 internal object Initializer : Listener {
     
@@ -108,7 +109,7 @@ internal object Initializer : Listener {
         isDone = true
         
         if (initialized.size != toInit.size)
-            Bukkit.getPluginManager().disablePlugin(NOVA.loader)
+            performAppropriateShutdown()
     }
     
     fun initPostWorld() {
@@ -142,7 +143,7 @@ internal object Initializer : Listener {
                     LOGGER.info("Done loading")
                 }
             } else {
-                Bukkit.getPluginManager().disablePlugin(NOVA.loader)
+                performAppropriateShutdown()
             }
         }
     }
@@ -173,6 +174,15 @@ internal object Initializer : Listener {
         }
         
         NMSUtilities.disable()
+    }
+    
+    private fun performAppropriateShutdown() {
+        if (Patcher.ENABLED) {
+            LOGGER.warning("Shutting down the server...")
+            exitProcess(-1)
+        } else {
+            Bukkit.getPluginManager().disablePlugin(NOVA.loader)
+        }
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
