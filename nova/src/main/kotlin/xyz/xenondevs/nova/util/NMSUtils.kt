@@ -11,13 +11,13 @@ import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
-import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 import net.minecraft.world.level.chunk.LevelChunkSection
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.block.Block
@@ -27,17 +27,18 @@ import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.item.ItemStack as MojangStack
+import net.minecraft.world.level.block.Block as MojangBlock
 
 val Entity.nmsEntity: MojangEntity
     get() = (this as CraftEntity).handle
@@ -104,6 +105,9 @@ val BlockFace.nmsDirection: Direction
         BlockFace.DOWN -> Direction.DOWN
         else -> throw UnsupportedOperationException()
     }
+
+val Material.nmsBlock: MojangBlock
+    get() = CraftMagicNumbers.getBlock(this)
 
 val Block.nmsState: BlockState
     get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))

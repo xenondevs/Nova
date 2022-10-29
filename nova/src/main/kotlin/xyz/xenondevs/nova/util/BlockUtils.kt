@@ -10,6 +10,8 @@ import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.item.crafting.AbstractCookingRecipe
+import net.minecraft.world.level.block.DoorBlock
+import net.minecraft.world.level.block.TallFlowerBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
@@ -45,7 +47,6 @@ import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
-import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.floor
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -284,7 +285,9 @@ fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
 
 private fun Block.getMainHalf(): Block {
     val data = blockData
-    if (data is Bisected) {
+    val nmsBlock = type.nmsBlock
+    if (nmsBlock is TallFlowerBlock || nmsBlock is DoorBlock) { // 2 block tall
+        data as Bisected
         if (data.half == Bisected.Half.TOP) {
             return location.subtract(0.0, 1.0, 0.0).block
         }
