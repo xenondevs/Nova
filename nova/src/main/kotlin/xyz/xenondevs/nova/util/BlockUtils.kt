@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.TallFlowerBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.CollisionContext
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
@@ -223,6 +224,15 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
         val world = this.world.serverLevel
         world.getBlockEntity(MojangBlockPos(x, y, z), true)?.load(tileEntityTag)
     }
+}
+
+/**
+ * Checks if a block is blocked by the hitbox of an entity.
+ */
+fun Block.isUnobstructed(material: Material, player: Player? = null): Boolean {
+    val level = world.serverLevel
+    val context = player?.let { CollisionContext.of(it.nmsEntity) } ?: CollisionContext.empty()
+    return level.isUnobstructed(material.nmsBlock.defaultBlockState(), pos.nmsPos, context)
 }
 
 // endregion

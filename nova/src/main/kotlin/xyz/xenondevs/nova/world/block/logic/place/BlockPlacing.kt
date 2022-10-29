@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.facing
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
+import xyz.xenondevs.nova.util.isUnobstructed
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaMaterial
@@ -95,7 +96,7 @@ internal object BlockPlacing : Listener {
                 clicked.location
             else clicked.location.advance(event.blockFace)
         
-        if (!placeLoc.isInsideWorldRestrictions())
+        if (!placeLoc.isInsideWorldRestrictions() || !placeLoc.block.isUnobstructed(material.vanillaBlockMaterial, player))
             return
         
         val futures = ArrayList<CompletableFuture<Boolean>>()
