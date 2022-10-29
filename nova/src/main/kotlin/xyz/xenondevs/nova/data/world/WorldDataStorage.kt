@@ -4,11 +4,12 @@ import org.bukkit.World
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.world.ChunkPos
 import java.io.File
+import java.util.*
 
 internal class WorldDataStorage(val world: World) {
     
     private val regionsFolder = File(world.worldFolder, "nova_region")
-    private val regionFiles = HashMap<Long, RegionFile>()
+    private val regionFiles: MutableMap<Long, RegionFile> = Collections.synchronizedMap(HashMap())
     
     init {
         regionsFolder.mkdirs()

@@ -31,6 +31,9 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
     override val location: Location
         get() = pos.location
     
+    final override var isInitialized = false
+        private set
+    
     constructor(material: BlockNovaMaterial, ctx: BlockPlaceContext) : this(ctx.pos, material) {
         properties.values.forEach { it.init(ctx) }
     }
@@ -47,6 +50,8 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
         material.multiBlockLoader?.invoke(pos)?.forEach {
             WorldDataManager.setBlockState(it, LinkedBlockState(it, this))
         }
+        
+        isInitialized = true
     }
     
     override fun handleRemoved(broken: Boolean) {

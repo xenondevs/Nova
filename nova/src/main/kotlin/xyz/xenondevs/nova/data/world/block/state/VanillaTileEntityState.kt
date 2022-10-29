@@ -13,6 +13,8 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
     
     lateinit var data: Compound
     lateinit var tileEntity: VanillaTileEntity
+    override var isInitialized = false
+        private set
     
     constructor(pos: BlockPos, id: String) : this(pos, NamespacedId.of(id))
     
@@ -23,6 +25,8 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
             this.tileEntity = tileEntity
             tileEntity.handleInitialized()
             VanillaTileEntityManager.registerTileEntity(this)
+            
+            isInitialized = true
         } else {
             WorldDataManager.removeBlockState(pos)
         }

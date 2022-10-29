@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.world.ChunkPos
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
+import kotlin.concurrent.read
 
 private const val MAGIC = 0xB7E21337.toInt()
 private const val FILE_VERSION = 1
@@ -114,15 +115,20 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
         DataOutputStream(file.outputStream()).use { dos ->
             dos.writeInt(MAGIC)
             dos.writeByte(FILE_VERSION)
-            chunks.asSequence().filterNotNull().filterNot(RegionChunk::isEmpty).forEach {
-                dos.writeByte(1)
-                dos.writeShort(it.packedCoords)
-                val buffer = CBF.buffer()
-                it.write(buffer)
-                val bytes = buffer.toByteArray()
-                dos.writeVarInt(bytes.size)
-                dos.write(bytes)
-                dos.flush()
+            chunks.forEach { chunk ->
+                if (chunk == null || chunk.isEmpty())
+                    return@forEach
+                
+                chunk.lock.read {
+                    dos.writeByte(1)
+                    dos.writeShort(chunk.packedCoords)
+                    val buffer = CBF.buffer()
+                    chunk.write(buffer)
+                    val bytes = buffer.toByteArray()
+                    dos.writeVarInt(bytes.size)
+                    dos.write(bytes)
+                    dos.flush()
+                }
             }
             dos.writeByte(0)
         }

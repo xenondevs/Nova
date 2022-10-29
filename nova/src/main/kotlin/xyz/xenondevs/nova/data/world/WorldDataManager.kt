@@ -21,20 +21,24 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.pos
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.logging.Level
+import kotlin.concurrent.read
 import kotlin.concurrent.thread
+import kotlin.concurrent.write
 
 internal object WorldDataManager : Initializable(), Listener {
     
     override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(AddonsInitializer, LegacyFileConverter, TileEntityManager, VanillaTileEntityManager, NetworkManager)
     
-    private val worlds = HashMap<World, WorldDataStorage>()
+    private val worlds: MutableMap<World, WorldDataStorage> = Collections.synchronizedMap(HashMap())
     private val tasks = ConcurrentLinkedQueue<Task>() // TODO: Map RegionFile -> Queue
     
     override fun init() {
@@ -65,21 +69,16 @@ internal object WorldDataManager : Initializable(), Listener {
         Bukkit.getWorlds().forEach(::saveWorld)
     }
     
-    @Synchronized
     private fun loadChunk(pos: ChunkPos) {
         if (pos.isLoaded()) {
-            val blockStates = getBlockStates(pos)
-            
             runTask {
                 if (pos.isLoaded()) {
-                    ArrayList(blockStates.values).forEach { blockState ->
-                        try {
-                            blockState.handleInitialized(false)
-                        } catch (t: Throwable) {
-                            LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", t)
-                            blockStates -= blockState.pos
+                    val blockStates = readChunk(pos) { HashMap(it.blockStates) }
+                        .removeIf { (_, blockState) ->
+                            runCatching { blockState.handleInitialized(false) }
+                                .onFailure { LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", it) }
+                                .isFailure
                         }
-                    }
                     
                     val event = NovaChunkLoadedEvent(pos, blockStates)
                     Bukkit.getPluginManager().callEvent(event)
@@ -88,22 +87,22 @@ internal object WorldDataManager : Initializable(), Listener {
         }
     }
     
-    @Synchronized
     private fun unloadChunk(pos: ChunkPos) {
         val worldStorage = getWorldStorage(pos.world!!)
+        
         // The chunk might not be loaded if it was unloaded before Nova could load it
-        worldStorage.getRegionOrNull(pos)
-            ?.getChunkOrNull(pos)
-            ?.blockStates?.values
-            ?.forEach { it.handleRemoved(false) }
+        val chunk = worldStorage.getRegionOrNull(pos)
+            ?.getChunkOrNull(pos) ?: return
+        
+        chunk.lock.read {
+            chunk.blockStates.values.forEach { it.handleRemoved(false) }
+        }
     }
     
-    @Synchronized
     private fun saveWorld(world: World) {
         worlds[world]?.saveAll()
     }
     
-    @Synchronized
     private fun unloadWorld(world: World) {
         if (world in worlds) { // TODO: is this if always true?
             world.loadedChunks.forEach { unloadChunk(it.pos) }
@@ -111,35 +110,40 @@ internal object WorldDataManager : Initializable(), Listener {
         }
     }
     
-    @Synchronized
-    fun getBlockStates(pos: ChunkPos): MutableMap<BlockPos, BlockState> = getChunk(pos).blockStates
+    fun getBlockStates(pos: ChunkPos, takeUninitialized: Boolean = false): Map<BlockPos, BlockState> =
+        readChunk(pos) { chunk -> HashMap(chunk.blockStates) }.apply { if (!takeUninitialized) removeIf { !it.value.isInitialized } }
     
-    @Synchronized
-    fun getBlockState(pos: BlockPos): BlockState? = getChunk(pos.chunkPos).blockStates[pos]
+    fun getBlockState(pos: BlockPos, takeUninitialized: Boolean = false): BlockState? =
+        readChunk(pos.chunkPos) { chunk -> chunk.blockStates[pos]?.takeIf { takeUninitialized || it.isInitialized } }
     
-    @Synchronized
-    fun setBlockState(pos: BlockPos, state: BlockState) {
-        getChunk(pos.chunkPos).blockStates[pos] = state
-    }
+    fun setBlockState(pos: BlockPos, state: BlockState) =
+        writeChunk(pos.chunkPos) { it.blockStates[pos] = state }
     
-    @Synchronized
-    fun removeBlockState(pos: BlockPos) {
-        getChunk(pos.chunkPos).blockStates -= pos
-    }
+    fun removeBlockState(pos: BlockPos) =
+        writeChunk(pos.chunkPos) { it.blockStates -= pos }
     
-    @Synchronized
     private fun getWorldStorage(world: World): WorldDataStorage =
         worlds.getOrPut(world) { WorldDataStorage(world) }
     
-    @Synchronized
     private fun getRegion(pos: ChunkPos): RegionFile =
         getWorldStorage(pos.world!!).getRegion(pos)
     
-    @Synchronized
-    private fun getChunk(pos: ChunkPos): RegionChunk =
-        getWorldStorage(pos.world!!).getRegion(pos).getChunk(pos)
+    private inline fun <T> readChunk(pos: ChunkPos, read: (RegionChunk) -> T): T {
+        val region = getRegion(pos)
+        val chunk = region.getChunk(pos)
+        chunk.lock.read {
+            return read.invoke(chunk)
+        }
+    }
     
-    @Synchronized
+    private inline fun <T> writeChunk(pos: ChunkPos, write: (RegionChunk) -> T): T {
+        val region = getRegion(pos)
+        val chunk = region.getChunk(pos)
+        chunk.lock.write {
+            return write.invoke(chunk)
+        }
+    }
+    
     @EventHandler
     private fun handleWorldUnload(event: WorldUnloadEvent) {
         tasks += WorldUnloadTask(event.world)
@@ -159,7 +163,6 @@ internal object WorldDataManager : Initializable(), Listener {
         }
     }
     
-    @Synchronized
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handleWorldSave(event: WorldSaveEvent) {
         LegacyFileConverter.addConversionListener(event.world) {

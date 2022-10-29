@@ -31,9 +31,6 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
             _tileEntity = value
         }
     
-    val isInitialized: Boolean
-        get() = _tileEntity != null
-    
     constructor(pos: BlockPos, material: TileEntityNovaMaterial) : super(pos, material) {
         this.material = material
     }
@@ -59,12 +56,12 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     }
     
     override fun handleInitialized(placed: Boolean) {
-        super.handleInitialized(placed)
-        
         _tileEntity = material.tileEntityConstructor(this)
         tileEntity.handleInitialized(placed)
         
         TileEntityManager.registerTileEntity(this)
+        
+        super.handleInitialized(placed)
     }
     
     override fun handleRemoved(broken: Boolean) {

@@ -26,11 +26,14 @@ import xyz.xenondevs.nova.util.data.readUUID
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.*
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.logging.Level
 
 private val DELETE_UNKNOWN_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("world.delete_unknown_blocks") }
 
 internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChunkX: Int, relChunkZ: Int) {
+    
+    val lock = ReentrantReadWriteLock(true)
     
     private val chunkX = (regionX shl 5) + relChunkX
     private val chunkZ = (regionZ shl 5) + relChunkZ
