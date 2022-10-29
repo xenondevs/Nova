@@ -123,7 +123,7 @@ interface NetworkManager {
                 task.invoke(NETWORK_MANAGER)
             }
         }
-    
+        
         override val initializationStage = InitializationStage.POST_WORLD
         override val dependsOn = setOf(LegacyFileConverter)
         
@@ -746,7 +746,8 @@ private class NetworkManagerImpl : NetworkManager {
                     
                     if (nodeToExplore is NetworkBridge) {
                         // loop over all the nodes that that bridge is connected to
-                        for (connectedEntry in nodeToExplore.connectedNodes[networkType]!!) {
+                        val toExploreConnectedNodes = nodeToExplore.connectedNodes[networkType]
+                        if (toExploreConnectedNodes != null) for (connectedEntry in toExploreConnectedNodes) {
                             val node = connectedEntry.value
                             
                             // are we back at the beginning? prevent infinite loops
