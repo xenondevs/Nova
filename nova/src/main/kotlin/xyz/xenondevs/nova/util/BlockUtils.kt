@@ -48,6 +48,7 @@ import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
+import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.floor
 import net.minecraft.core.BlockPos as MojangBlockPos
