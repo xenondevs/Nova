@@ -13,7 +13,7 @@ import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.logging.Level
 
-internal class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
+class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
     
     val queue = ConcurrentLinkedQueue<FriendlyByteBuf>()
     var player: Player? = null
@@ -58,6 +58,22 @@ internal class PacketHandler(private val channel: Channel) : ChannelDuplexHandle
         }
         
         return msg
+    }
+    
+    fun injectIncoming(msg: Any) {
+        if (channel.eventLoop().inEventLoop()) {
+            super.channelRead(channel.pipeline().context(this), msg)
+        } else channel.eventLoop().execute {
+            super.channelRead(channel.pipeline().context(this), msg)
+        }
+    }
+    
+    fun injectOutgoing(msg: Any, promise: ChannelPromise?) {
+        if (channel.eventLoop().inEventLoop()) {
+            super.write(channel.pipeline().context(this), msg, promise)
+        } else channel.eventLoop().execute {
+            super.write(channel.pipeline().context(this), msg, promise)
+        }
     }
     
 }

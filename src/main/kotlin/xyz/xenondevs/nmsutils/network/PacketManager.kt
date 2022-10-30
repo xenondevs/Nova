@@ -19,8 +19,11 @@ import xyz.xenondevs.nmsutils.internal.util.channels
 import xyz.xenondevs.nmsutils.internal.util.connection
 import xyz.xenondevs.nmsutils.internal.util.serverPlayer
 
+val Player.packetHandler: PacketHandler?
+    get() = PacketManager.playerHandlers[name]
+
 fun Player.send(vararg bufs: FriendlyByteBuf, retain: Boolean = true, flush: Boolean = true) {
-    val queue = PacketManager.playerHandlers[name]?.queue ?: return
+    val queue = packetHandler?.queue ?: return
     bufs.forEach {
         if (retain) it.retain()
         queue += it
