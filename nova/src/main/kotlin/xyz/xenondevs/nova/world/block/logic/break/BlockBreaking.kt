@@ -93,7 +93,7 @@ internal object BlockBreaking {
         
         // pass on packet if it's for a custom item service block
         if (CustomItemServiceManager.getBlockType(block) != null) {
-            player.packetHandler.injectIncoming(packet)
+            player.packetHandler?.injectIncoming(packet)
             return
         }
         
