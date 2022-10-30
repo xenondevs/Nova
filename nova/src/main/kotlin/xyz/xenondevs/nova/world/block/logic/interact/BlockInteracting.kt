@@ -44,8 +44,7 @@ internal object BlockInteracting : Listener {
             if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos.location).get()) {
                 val material = blockState.material
                 val ctx = BlockInteractContext(pos, player, player.location, event.blockFace, event.item, event.hand)
-                val cancelled = material.novaBlock.handleInteract(blockState, ctx)
-                event.isCancelled = cancelled
+                event.isCancelled = material.novaBlock.handleInteract(blockState, ctx)
             }
         }
     }
