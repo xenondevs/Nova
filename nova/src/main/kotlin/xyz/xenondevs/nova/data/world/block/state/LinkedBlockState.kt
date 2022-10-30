@@ -6,7 +6,8 @@ import xyz.xenondevs.nova.world.BlockPos
 internal class LinkedBlockState(override val pos: BlockPos, val blockState: BlockState) : BlockState {
     
     override val id = blockState.id
-    override val isInitialized = true
+    override val isLoaded: Boolean
+        get() = blockState.isLoaded
     override fun handleInitialized(placed: Boolean) = Unit
     override fun handleRemoved(broken: Boolean) = Unit
     override fun read(buf: ByteBuffer) = throw UnsupportedOperationException()

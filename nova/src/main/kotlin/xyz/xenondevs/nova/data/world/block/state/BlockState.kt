@@ -8,7 +8,7 @@ sealed interface BlockState {
     
     val pos: BlockPos
     val id: NamespacedId
-    val isInitialized: Boolean
+    val isLoaded: Boolean
     
     fun handleInitialized(placed: Boolean)
     

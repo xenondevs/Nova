@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.util.data.readVarInt
 import xyz.xenondevs.nova.util.data.use
 import xyz.xenondevs.nova.util.data.writeVarInt
-import xyz.xenondevs.nova.util.getOrSet
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.ChunkPos
 import java.io.DataInputStream
@@ -44,7 +43,7 @@ private val CREATE_BACKUPS by configReloadable { DEFAULT_CONFIG.getBoolean("perf
  */
 internal class RegionFile(val world: World, val file: File, val regionX: Int, val regionZ: Int) {
     
-    val chunks = arrayOfNulls<RegionChunk?>(1024)
+    val chunks = Array(1024) { RegionChunk(regionX, regionZ, world, it shr 5, it and 0x1F) }
     private val backupFile = File(file.parentFile, file.name + ".backup")
     
     init {
@@ -72,34 +71,21 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
     private fun readFile(dis: DataInputStream) {
         if (dis.readInt() != MAGIC || dis.readByte() != FILE_VERSION.toByte())
             throw IllegalStateException(file.absolutePath + " is not a valid region file")
+        
+        // read chunks from file
         while (dis.readByte() == 1.toByte()) {
-            val packedPos = dis.readUnsignedShort()
-            val chunk = RegionChunk(
-                regionX,
-                regionZ,
-                world = world,
-                relChunkX = packedPos shr 5,
-                relChunkZ = packedPos and 0x1F,
-            )
+            val chunk = chunks[dis.readUnsignedShort()]
             val bytes = ByteArray(dis.readVarInt())
             dis.readFully(bytes)
             chunk.read(NettyBufferProvider.wrappedBuffer(bytes))
-            chunks[packedPos] = chunk
         }
-    }
-    
-    fun getChunkOrNull(pos: ChunkPos): RegionChunk? {
-        val dx = pos.x and 0x1F
-        val dz = pos.z and 0x1F
-        val packedCoords = dx shl 5 or dz
-        return chunks[packedCoords]
     }
     
     fun getChunk(pos: ChunkPos): RegionChunk {
         val dx = pos.x and 0x1F
         val dz = pos.z and 0x1F
         val packedCoords = dx shl 5 or dz
-        return chunks.getOrSet(packedCoords) { RegionChunk(regionX, regionZ, world, dx, dz) }
+        return chunks[packedCoords]
     }
     
     fun save() {
@@ -116,7 +102,7 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
             dos.writeInt(MAGIC)
             dos.writeByte(FILE_VERSION)
             chunks.forEach { chunk ->
-                if (chunk == null || chunk.isEmpty())
+                if (chunk.isEmpty())
                     return@forEach
                 
                 chunk.lock.read {

@@ -35,6 +35,9 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
     
     val lock = ReentrantReadWriteLock(true)
     
+    @Volatile
+    var isLoaded = false
+    
     private val chunkX = (regionX shl 5) + relChunkX
     private val chunkZ = (regionZ shl 5) + relChunkZ
     val packedCoords = (relChunkX shl 5 or relChunkZ)

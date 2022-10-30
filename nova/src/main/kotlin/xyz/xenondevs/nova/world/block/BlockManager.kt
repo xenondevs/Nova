@@ -44,8 +44,11 @@ object BlockManager : Initializable(), IBlockManager {
         if (blockState is NovaBlockState)
             return blockState
         
-        if (useLinkedStates && blockState is LinkedBlockState && blockState.blockState is NovaBlockState)
-            return blockState.blockState
+        if (useLinkedStates && blockState is LinkedBlockState) {
+            val linkedToBlockState = blockState.blockState
+            if (linkedToBlockState is NovaBlockState)
+                return linkedToBlockState
+        }
         
         return null
     }

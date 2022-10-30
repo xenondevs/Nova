@@ -5,8 +5,6 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.waila.info.impl.BellWailaInfoProvider
@@ -28,6 +26,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.RespawnAnchorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.SeaPickleWailaInfoProvider
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.BlockManager
 
 object WailaInfoProviderRegistry {
     
@@ -59,10 +58,7 @@ object WailaInfoProviderRegistry {
     }
     
     fun getInfo(player: Player, pos: BlockPos): WailaInfo? {
-        var novaState = WorldDataManager.getBlockState(pos)
-        if (novaState is LinkedBlockState)
-            novaState = novaState.blockState
-        
+        val novaState = BlockManager.getBlock(pos)
         if (novaState is NovaBlockState) {
             val material = novaState.material
             

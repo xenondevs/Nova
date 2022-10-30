@@ -11,9 +11,12 @@ import xyz.xenondevs.nova.world.BlockPos
 
 internal class VanillaTileEntityState(override val pos: BlockPos, override val id: NamespacedId) : BlockState {
     
+    @Volatile
     lateinit var data: Compound
+    @Volatile
     lateinit var tileEntity: VanillaTileEntity
-    override var isInitialized = false
+    @Volatile
+    override var isLoaded = false
         private set
     
     constructor(pos: BlockPos, id: String) : this(pos, NamespacedId.of(id))
@@ -26,7 +29,7 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
             tileEntity.handleInitialized()
             VanillaTileEntityManager.registerTileEntity(this)
             
-            isInitialized = true
+            isLoaded = true
         } else {
             WorldDataManager.removeBlockState(pos)
         }
@@ -38,6 +41,8 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
             tileEntity.handleRemoved(!broken)
             VanillaTileEntityManager.unregisterTileEntity(this)
         }
+        
+        isLoaded = false
     }
     
     override fun read(buf: ByteBuffer) {

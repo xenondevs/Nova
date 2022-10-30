@@ -31,7 +31,7 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
         lines += WailaLine(ComponentBuilder(material.id.toString()).color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block.pos.block)
         
-        if (block is NovaTileEntityState && block.isInitialized) {
+        if (block is NovaTileEntityState) {
             val tileEntity = block.tileEntity
             if (tileEntity is NetworkedTileEntity) {
                 val energyHolder = tileEntity.holders[NetworkType.ENERGY] as? NovaEnergyHolder      
