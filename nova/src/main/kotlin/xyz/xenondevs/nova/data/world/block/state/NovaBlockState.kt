@@ -56,13 +56,13 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
     }
     
     override fun handleRemoved(broken: Boolean) {
+        isLoaded = false
+        
         if (broken) {
             material.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlock(BlockBreakContext(it)) }
         }
         
         modelProvider.remove(broken)
-        
-        isLoaded = false
     }
     
     override fun read(buf: ByteBuffer) {

@@ -13,8 +13,10 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
     
     @Volatile
     lateinit var data: Compound
+    
     @Volatile
     lateinit var tileEntity: VanillaTileEntity
+    
     @Volatile
     override var isLoaded = false
         private set
@@ -36,13 +38,12 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
     }
     
     override fun handleRemoved(broken: Boolean) {
-        // The tile entity could be null when the chunk was unloaded before the WorldDataManager could call handleInitialized
+        isLoaded = false
+        
         if (::tileEntity.isInitialized) {
             tileEntity.handleRemoved(!broken)
             VanillaTileEntityManager.unregisterTileEntity(this)
         }
-        
-        isLoaded = false
     }
     
     override fun read(buf: ByteBuffer) {

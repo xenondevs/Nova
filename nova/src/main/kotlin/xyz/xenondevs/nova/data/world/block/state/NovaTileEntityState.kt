@@ -74,15 +74,14 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     }
     
     override fun handleRemoved(broken: Boolean) {
-        // The tile entity could be null when the chunk was unloaded before the WorldDataManager could call handleInitialized
+        super.handleRemoved(broken)
+        
         if (_tileEntity != null) {
             tileEntity.saveData()
             tileEntity.handleRemoved(!broken)
             TileEntityManager.unregisterTileEntity(this)
             _tileEntity = null
         }
-        
-        super.handleRemoved(broken)
     }
     
     override fun read(buf: ByteBuffer) {
