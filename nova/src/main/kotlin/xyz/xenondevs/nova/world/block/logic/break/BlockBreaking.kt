@@ -79,7 +79,8 @@ internal object BlockBreaking {
     private fun handleTick() {
         playerBreakers.removeIf { (_, breaker) ->
             try {
-                breaker.handleTick()
+                if (!breaker.isStopped)
+                    breaker.handleTick()
             } catch (e: Exception) {
                 LOGGER.log(Level.SEVERE, "An exception occurred in BlockBreaker tick", e)
             }
@@ -125,6 +126,7 @@ internal object BlockBreaking {
             else VanillaBlockBreaker(player, block, sequence, breakCooldowns[player] ?: 0)
             
             playerBreakers[player] = breaker
+            breaker.handleTick()
         }
     }
     
