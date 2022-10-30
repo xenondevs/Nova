@@ -6,6 +6,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.md_5.bungee.api.chat.BaseComponent
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.data.ArrayKey
 import xyz.xenondevs.nova.util.data.toPlainText
@@ -219,6 +220,7 @@ internal class CharSizeTable(
     companion object {
         
         fun load(file: File): CharSizeTable {
+            LOGGER.info("Loading char size table: $file")
             file.inputStream().use {
                 val din = DataInputStream(it)
                 val sizes = Int2ObjectOpenHashMap<IntArray>()
