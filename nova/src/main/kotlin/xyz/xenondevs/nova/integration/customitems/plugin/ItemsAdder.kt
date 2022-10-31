@@ -138,7 +138,8 @@ internal object ItemsAdder : CustomItemService {
     }
     
     override fun getId(block: Block): String? {
-        return CustomBlock.byAlreadyPlaced(block)?.namespacedID
+        return CustomBlock.byAlreadyPlaced(block)?.namespacedID 
+            ?: CustomCrop.byAlreadyPlaced(block)?.seed?.namespacedID
     }
     
     override fun getName(item: ItemStack, locale: String): String? {
@@ -147,11 +148,12 @@ internal object ItemsAdder : CustomItemService {
     
     override fun getName(block: Block, locale: String): String? {
         return CustomBlock.byAlreadyPlaced(block)?.displayName
+            ?: CustomCrop.byAlreadyPlaced(block)?.seed?.displayName
     }
     
     override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
         return ItemsAdder.getAllItems()
-            .filter(CustomStack::isBlock)
+            .filter { it.isBlock || CustomCrop.isSeed(it.itemStack) }
             .map(CustomStack::getNamespacedID)
             .associateTo(HashMap()) {
                 val path = ItemsAdder.Advanced.getItemModelResourceLocation(it)!!.substringBeforeLast('.')
