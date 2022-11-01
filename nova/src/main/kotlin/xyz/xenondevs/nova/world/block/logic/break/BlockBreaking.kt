@@ -15,7 +15,6 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionP
 import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
@@ -98,36 +97,34 @@ internal object BlockBreaking {
             return
         }
         
-        if (block.hardness >= 0) {
-            // call interact event
-            val serverPlayer = player.serverPlayer
-            val event = CraftEventFactory.callPlayerInteractEvent(
-                serverPlayer,
-                Action.LEFT_CLICK_BLOCK,
-                pos.nmsPos,
-                direction,
-                serverPlayer.inventory.getSelected(),
-                InteractionHand.MAIN_HAND
-            )
-            if (event.useInteractedBlock() == Event.Result.DENY) {
-                player.send(ClientboundBlockChangedAckPacket(sequence))
-                return
-            }
-            
-            // call block state attack (i.e. teleport dragon egg, play note block sound...)
-            val serverLevel = pos.world.serverLevel
-            val nmsPos = pos.nmsPos
-            serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
-            
-            // start breaker
-            val novaBlockState = BlockManager.getBlock(pos)
-            val breaker = if (novaBlockState != null)
-                NovaBlockBreaker(player, block, novaBlockState, sequence, breakCooldowns[player] ?: 0)
-            else VanillaBlockBreaker(player, block, sequence, breakCooldowns[player] ?: 0)
-            
-            playerBreakers[player] = breaker
-            breaker.handleTick()
+        // call interact event
+        val serverPlayer = player.serverPlayer
+        val event = CraftEventFactory.callPlayerInteractEvent(
+            serverPlayer,
+            Action.LEFT_CLICK_BLOCK,
+            pos.nmsPos,
+            direction,
+            serverPlayer.inventory.getSelected(),
+            InteractionHand.MAIN_HAND
+        )
+        if (event.useInteractedBlock() == Event.Result.DENY) {
+            player.send(ClientboundBlockChangedAckPacket(sequence))
+            return
         }
+        
+        // call block state attack (i.e. teleport dragon egg, play note block sound...)
+        val serverLevel = pos.world.serverLevel
+        val nmsPos = pos.nmsPos
+        serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
+        
+        // start breaker
+        val novaBlockState = BlockManager.getBlock(pos)
+        val breaker = if (novaBlockState != null)
+            NovaBlockBreaker(player, block, novaBlockState, sequence, breakCooldowns[player] ?: 0)
+        else VanillaBlockBreaker(player, block, sequence, breakCooldowns[player] ?: 0)
+        
+        playerBreakers[player] = breaker
+        breaker.handleTick()
     }
     
     private fun handleDestroyStop(player: Player) {
