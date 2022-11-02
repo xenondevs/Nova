@@ -10,14 +10,16 @@ class AttributeModifier constructor(
     val attribute: Attribute,
     val operation: Operation,
     val value: Double,
-    val slot: EquipmentSlot? = null
+    vararg slots: EquipmentSlot
 ) {
     
-    constructor(name: String, attribute: Attribute, operation: Operation, value: Double, slot: EquipmentSlot? = null) :
-        this(UUID.nameUUIDFromBytes(name.toByteArray()), name, attribute, operation, value, slot)
+    val slots = if (slots.isEmpty()) EquipmentSlot.values() else slots
     
-    constructor(attribute: Attribute, operation: Operation, value: Double, slot: EquipmentSlot? = null) :
-        this(UUID.randomUUID(), "", attribute, operation, value, slot)
+    constructor(name: String, attribute: Attribute, operation: Operation, value: Double, vararg slots: EquipmentSlot) :
+        this(UUID.nameUUIDFromBytes(name.toByteArray()), name, attribute, operation, value, *slots)
+    
+    constructor(attribute: Attribute, operation: Operation, value: Double, vararg slots: EquipmentSlot) :
+        this(UUID.randomUUID(), "", attribute, operation, value, *slots)
     
     enum class Operation {
         INCREMENT,
