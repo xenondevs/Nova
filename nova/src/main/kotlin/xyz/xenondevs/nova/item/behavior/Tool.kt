@@ -39,6 +39,7 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
         buildList {
             if (attackSpeed != null) {
                 this += AttributeModifier(
+                    "nova attack speed ${this@Tool.hashCode()}", // keeps the attribute uuid across config reloads
                     Attribute.GENERIC_ATTACK_SPEED,
                     AttributeModifier.Operation.INCREMENT,
                     options.attackSpeed!! - PLAYER_ATTACK_SPEED,
@@ -47,6 +48,7 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
             }
             if (attackDamage != null) {
                 this += AttributeModifier(
+                    "nova attack damage ${this@Tool.hashCode()}", // keeps the attribute uuid across config reloads
                     Attribute.GENERIC_ATTACK_DAMAGE,
                     AttributeModifier.Operation.INCREMENT,
                     options.attackDamage!! - PLAYER_ATTACK_DAMAGE,

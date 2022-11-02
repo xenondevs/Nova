@@ -84,7 +84,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
         attributeModifiers.forEach {
             novaModifiers.put(
                 Registry.ATTRIBUTE.get(it.attribute.key.resourceLocation),
-                AttributeModifier(it.uuid, it.uuid.toString(), it.value, AttributeModifier.Operation.values()[it.operation.ordinal])
+                AttributeModifier(it.uuid, it.name, it.value, AttributeModifier.Operation.values()[it.operation.ordinal])
             )
         }
         
