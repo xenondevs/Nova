@@ -13,6 +13,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
+import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
@@ -36,7 +37,7 @@ data class Eater(val itemStack: ItemStack, val hand: EquipmentSlot, val startTim
 
 class Consumable(private val options: FoodOptions) : ItemBehavior() {
     
-    override val vanillaMaterialProperties = listOf(options.type.vanillaMaterialProperty)
+    override val vanillaMaterialProperties = options.typeProvider.map { listOf(it.vanillaMaterialProperty) }
     
     private val eaters = HashMap<Player, Eater>()
     

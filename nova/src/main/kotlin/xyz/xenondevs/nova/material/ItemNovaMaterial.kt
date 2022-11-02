@@ -5,6 +5,8 @@ import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.provider.lazyProvider
+import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
@@ -21,6 +23,8 @@ open class ItemNovaMaterial internal constructor(
     maxStackSize: Int = 64
 ) : INovaMaterial {
     
+    val maxStackSize: Int by lazyProvider { novaItem.vanillaMaterialProvider.map { min(maxStackSize, it.maxStackSize) } }
+    
     val item: ItemModelData by lazy {
         val itemModelData = Resources.getModelData(id).first!!
         if (itemModelData.size == 1)
@@ -28,8 +32,6 @@ open class ItemNovaMaterial internal constructor(
         
         return@lazy itemModelData[novaItem.vanillaMaterial]!!
     }
-    
-    val maxStackSize: Int
     
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
@@ -66,7 +68,6 @@ open class ItemNovaMaterial internal constructor(
     
     init {
         this.novaItem.setMaterial(this)
-        this.maxStackSize = min(maxStackSize, novaItem.vanillaMaterial.maxStackSize)
     }
     
     /**

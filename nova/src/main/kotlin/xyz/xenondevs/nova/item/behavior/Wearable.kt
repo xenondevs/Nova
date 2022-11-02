@@ -30,9 +30,11 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         if (equipped) {
             player.getAttribute(Attribute.GENERIC_ARMOR)!!.baseValue += options.armor
             player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)!!.baseValue += options.armorToughness
+            player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)!!.baseValue += options.knockbackResistance
         } else {
             player.getAttribute(Attribute.GENERIC_ARMOR)!!.baseValue -= options.armor
             player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)!!.baseValue -= options.armorToughness
+            player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)!!.baseValue += options.knockbackResistance
         }
     }
     

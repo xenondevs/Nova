@@ -2,8 +2,10 @@ package xyz.xenondevs.nova.material.options
 
 import org.bukkit.potion.PotionEffect
 import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.provider.orElse
+import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
@@ -31,38 +33,25 @@ fun FoodOptions(
 
 sealed interface FoodOptions {
     
-    /**
-     * The type of food
-     */
+    val typeProvider: Provider<FoodType>
+    val consumeTimeProvider: Provider<Int>
+    val nutritionProvider: Provider<Int>
+    val saturationModifierProvider: Provider<Float>
+    val instantHealthProvider: Provider<Double>
+    val effectsProvider: Provider<List<PotionEffect>?>
+    
     val type: FoodType
-    
-    /**
-     * The time it takes for the food to be consumed, in ticks.
-     */
+        get() = typeProvider.value
     val consumeTime: Int
-    
-    /**
-     * The nutrition value this food provides.
-     */
+        get() = consumeTimeProvider.value
     val nutrition: Int
-    
-    /**
-     * The saturation modifier this food provides. The saturation is calculated like this:
-     * ```
-     * saturation = min(saturation + nutrition * saturationModifier * 2.0f, foodLevel)
-     * ```
-     */
+        get() = nutritionProvider.value
     val saturationModifier: Float
-    
-    /**
-     * The amount of health to be restored immediately.
-     */
+        get() = saturationModifierProvider.value
     val instantHealth: Double
-    
-    /**
-     * A list of effects to apply to the player when this food is consumed.
-     */
+        get() = instantHealthProvider.value
     val effects: List<PotionEffect>?
+        get() = effectsProvider.value
     
     enum class FoodType(internal val vanillaMaterialProperty: VanillaMaterialProperty) {
         
@@ -103,24 +92,31 @@ sealed interface FoodOptions {
 }
 
 private class HardcodedFoodOptions(
-    override val type: FoodType,
-    override val consumeTime: Int,
-    override val nutrition: Int,
-    override val saturationModifier: Float,
-    override val instantHealth: Double,
-    override val effects: List<PotionEffect>?
-) : FoodOptions
+     type: FoodType,
+     consumeTime: Int,
+     nutrition: Int,
+     saturationModifier: Float,
+     instantHealth: Double,
+     effects: List<PotionEffect>?
+) : FoodOptions {
+    override val typeProvider = provider(type)
+    override val consumeTimeProvider = provider(consumeTime)
+    override val nutritionProvider = provider(nutrition)
+    override val saturationModifierProvider = provider(saturationModifier)
+    override val instantHealthProvider = provider(instantHealth)
+    override val effectsProvider = provider(effects)
+}
 
 private class ConfigurableFoodOptions : ConfigAccess, FoodOptions {
     
-    override val type by getOptionalEntry<String>("food_type")
+    override val typeProvider = getOptionalEntry<String>("food_type")
         .map { FoodType.valueOf(it.uppercase()) }
         .orElse(FoodType.NORMAL)
-    override val consumeTime by getEntry<Int>("consume_time")
-    override val nutrition by getEntry<Int>("nutrition")
-    override val saturationModifier by getEntry<Float>("saturation_modifier")
-    override val instantHealth by getEntry<Double>("instant_health")
-    override val effects by getOptionalEntry<List<PotionEffect>>("effects")
+    override val consumeTimeProvider = getEntry<Int>("consume_time")
+    override val nutritionProvider = getEntry<Int>("nutrition")
+    override val saturationModifierProvider = getEntry<Float>("saturation_modifier")
+    override val instantHealthProvider = getEntry<Double>("instant_health")
+    override val effectsProvider = getOptionalEntry<List<PotionEffect>>("effects")
     
     constructor(path: String) : super(path)
     constructor(material: ItemNovaMaterial) : super(material)

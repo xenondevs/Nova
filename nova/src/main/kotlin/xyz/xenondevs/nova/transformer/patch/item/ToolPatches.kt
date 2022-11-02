@@ -72,7 +72,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangSt
     @JvmStatic
     fun modifyAttributeModifiers(itemStack: MojangStack, modifiers: Multimap<Attribute, AttributeModifier>): Multimap<Attribute, AttributeModifier> {
         val attributeModifiers = itemStack.novaMaterial?.novaItem
-            ?.getAttributeModifiers()?.takeUnless(List<*>::isEmpty)
+            ?.attributeModifiers?.takeUnless(List<*>::isEmpty)
             ?: return modifiers
         
         val novaModifiers = Multimaps.newListMultimap<Attribute, AttributeModifier>(HashMap(), ::ArrayList)

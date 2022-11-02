@@ -18,7 +18,15 @@ fun <T, R : T & Any> Provider<T?>.orElse(value: R): Provider<R> {
 }
 
 fun <T, R : T & Any> Provider<T?>.orElse(provider: Provider<R>): Provider<R> {
-    return FallbackProviderProvider(this, provider)
+    return FallbackProviderProvider(this, provider).also(::addChild)
+}
+
+fun <T, R> Provider<List<T>>.flatMap(transform: (T) -> List<R>): Provider<List<R>> {
+    return FlatMapProvider(this, transform).also(::addChild)
+}
+
+fun <T> Provider<List<List<T>>>.flatten(): Provider<List<T>> {
+    return FlatMapProvider(this) { it }.also(::addChild)
 }
 
 abstract class Provider<T> {
@@ -93,5 +101,14 @@ private class FallbackProviderProvider<T, R : T & Any>(
 ) : Provider<R>() {
     override fun loadValue(): R {
         return (provider.value ?: fallback.value) as R
+    }
+}
+
+private class FlatMapProvider<T, R>(
+    private val provider: Provider<List<T>>,
+    private val transform: (T) -> List<R>
+) : Provider<List<R>>() {
+    override fun loadValue(): List<R> {
+        return provider.value.flatMap(transform)
     }
 }

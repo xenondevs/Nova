@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.data.config
 
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.UpdateReminder
@@ -91,6 +93,7 @@ object NovaConfig : Initializable() {
         UpdateReminder.reload()
         PlayerFreezer.reload()
         ItemCategories.reload()
+        Bukkit.getOnlinePlayers().forEach(Player::updateInventory)
     }
     
     operator fun get(name: String): YamlConfiguration =
