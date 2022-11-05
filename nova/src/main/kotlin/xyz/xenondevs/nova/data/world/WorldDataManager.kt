@@ -126,11 +126,11 @@ internal object WorldDataManager : Initializable(), Listener {
                     // call event
                     val event = NovaChunkLoadedEvent(pos, blockStates)
                     Bukkit.getPluginManager().callEvent(event)
-                    
-                    // mark task as completed
-                    task.markCompleted()
-                    activeLoadTasks -= pos
                 }
+                
+                // mark task as completed
+                task.markCompleted()
+                activeLoadTasks -= pos
             }
         }
     }
