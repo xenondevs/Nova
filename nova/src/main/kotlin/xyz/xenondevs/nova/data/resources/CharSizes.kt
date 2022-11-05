@@ -25,7 +25,7 @@ data class ComponentSize(
 
 object CharSizes {
     
-    private val CHAR_SIZES_DIR = File(NOVA.dataFolder, ".data/char_sizes/")
+    private val CHAR_SIZES_DIR = File(NOVA.dataFolder, ".internal_data/char_sizes/")
     
     private val loadedTables = HashMap<String, CharSizeTable>()
     
