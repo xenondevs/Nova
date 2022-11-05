@@ -62,7 +62,7 @@ abstract class Provider<T> {
         children!!.add(provider)
     }
     
-    operator fun getValue(thisRef: Any, property: KProperty<*>): T = value
+    operator fun getValue(thisRef: Any?, property: KProperty<*>?): T = value
     
     protected abstract fun loadValue(): T
     

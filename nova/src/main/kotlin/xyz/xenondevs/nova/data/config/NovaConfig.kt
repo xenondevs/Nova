@@ -8,6 +8,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
+import xyz.xenondevs.nova.data.provider.Provider
+import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
@@ -108,46 +110,6 @@ object NovaConfig : Initializable() {
     
 }
 
-fun <T : Any> configReloadable(initializer: () -> T): ConfigReloadable<T> {
-    return ConfigReloadable(initializer)
-}
-
-fun <T : Any> notReloadable(value: T): StaticReloadable<T> = StaticReloadable(value)
-
-class ConfigReloadable<T : Any> internal constructor(val initializer: () -> T) : ValueReloadable<T> {
-    
-    private var shouldReload = true
-    private var _value: T? = null
-    override val value: T
-        get() {
-            if (shouldReload) {
-                _value = initializer()
-                shouldReload = false
-            }
-            
-            return _value!!
-        }
-    
-    init {
-        NovaConfig.reloadables += this
-    }
-    
-    override fun reload() {
-        shouldReload = true
-    }
-    
-}
-
-class StaticReloadable<T : Any> internal constructor(override val value: T) : ValueReloadable<T>
-
-interface ValueReloadable<T : Any> : Reloadable {
-    
-    val value: T
-    
-    operator fun getValue(ref: Any?, property: KProperty<*>): T = value
-    
-}
-
 interface Reloadable : Comparable<Reloadable> {
     
     fun reload() = Unit
@@ -160,3 +122,28 @@ interface Reloadable : Comparable<Reloadable> {
         }
     
 }
+
+//<editor-fold desc="config reloadable", defaultstate="collapsed">
+fun <T : Any> configReloadable(initializer: () -> T): Provider<T> = ConfigReloadable(initializer)
+
+@Deprecated("Replaced by Provider", ReplaceWith("provider(value)", "xyz.xenondevs.nova.data.provider.provider"))
+fun <T : Any> notReloadable(value: T): Provider<T> = provider(value)
+
+@Suppress("DEPRECATION")
+private class ConfigReloadable<T : Any>(val initializer: () -> T) : Provider<T>(), ValueReloadable<T> {
+    
+    init {
+        NovaConfig.reloadables += this
+    }
+    
+    override fun loadValue(): T = initializer()
+    override fun reload() = update()
+    
+}
+
+@Deprecated("Replaced by Provider", ReplaceWith("Provider<T>", "xyz.xenondevs.nova.data.provider.Provider"))
+interface ValueReloadable<T : Any> : Reloadable {
+    val value: T
+    operator fun getValue(thisRef: Any?, property: KProperty<*>?): T
+}
+//</editor-fold>

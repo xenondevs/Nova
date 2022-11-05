@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.world.region
 
-import xyz.xenondevs.nova.data.config.ValueReloadable
+import xyz.xenondevs.nova.data.provider.Provider
 import java.util.*
 
 class StaticRegion internal constructor(
     uuid: UUID,
-    size: ValueReloadable<Int>,
+    size: Provider<Int>,
     createRegion: (Int) -> Region,
 ) : ReloadableRegion(uuid, createRegion) {
     

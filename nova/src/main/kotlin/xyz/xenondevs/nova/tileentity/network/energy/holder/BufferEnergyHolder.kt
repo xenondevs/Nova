@@ -1,14 +1,14 @@
 package xyz.xenondevs.nova.tileentity.network.energy.holder
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.config.ValueReloadable
+import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import java.util.*
 
 class BufferEnergyHolder(
     endPoint: NetworkedTileEntity,
-    defaultMaxEnergy: ValueReloadable<Long>,
+    defaultMaxEnergy: Provider<Long>,
     val creative: Boolean,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : NovaEnergyHolder(endPoint, defaultMaxEnergy, null, lazyDefaultConfig) {

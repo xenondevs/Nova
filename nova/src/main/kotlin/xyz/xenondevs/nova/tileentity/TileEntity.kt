@@ -20,7 +20,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.data.config.ValueReloadable
+import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.data.world.block.property.Directional
@@ -273,7 +273,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getFluidContainer(
         name: String,
         types: Set<FluidType>,
-        capacity: ValueReloadable<Long>,
+        capacity: Provider<Long>,
         defaultAmount: Long = 0,
         updateHandler: (() -> Unit)? = null,
         upgradeHolder: UpgradeHolder? = null,
@@ -306,7 +306,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      * Creates a new [StaticRegion] with a reloadable [size] under the name "default".
      */
     fun createStaticRegion(
-        size: ValueReloadable<Int>,
+        size: Provider<Int>,
         createRegion: (Int) -> Region
     ): StaticRegion = createStaticRegion("default", size, createRegion)
     
@@ -315,7 +315,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     fun createStaticRegion(
         name: String,
-        size: ValueReloadable<Int>,
+        size: Provider<Int>,
         createRegion: (Int) -> Region
     ): StaticRegion {
         check(name !in regions) { "Another region is already registered under the name $name." }
@@ -334,8 +334,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      * The configured size will be automatically saved during [TileEntity.saveData].
      */
     fun getDynamicRegion(
-        minSize: ValueReloadable<Int>,
-        maxSize: ValueReloadable<Int>,
+        minSize: Provider<Int>,
+        maxSize: Provider<Int>,
         defaultSize: Int,
         createRegion: (Int) -> Region
     ): DynamicRegion = getDynamicRegion("default", minSize, maxSize, defaultSize, createRegion)
@@ -348,8 +348,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     fun getDynamicRegion(
         name: String,
-        minSize: ValueReloadable<Int>,
-        maxSize: ValueReloadable<Int>,
+        minSize: Provider<Int>,
+        maxSize: Provider<Int>,
         defaultSize: Int,
         createRegion: (Int) -> Region
     ): DynamicRegion {
@@ -372,8 +372,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     fun getUpgradableRegion(
         upgradeType: UpgradeType<Int>,
-        minSize: ValueReloadable<Int>,
-        maxSize: ValueReloadable<Int>,
+        minSize: Provider<Int>,
+        maxSize: Provider<Int>,
         defaultSize: Int,
         createRegion: (Int) -> Region
     ): UpgradableRegion = getUpgradableRegion("default", upgradeType, minSize, maxSize, defaultSize, createRegion)
@@ -388,8 +388,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getUpgradableRegion(
         name: String,
         upgradeType: UpgradeType<Int>,
-        minSize: ValueReloadable<Int>,
-        maxSize: ValueReloadable<Int>,
+        minSize: Provider<Int>,
+        maxSize: Provider<Int>,
         defaultSize: Int,
         createRegion: (Int) -> Region
     ): UpgradableRegion {

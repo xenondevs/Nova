@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.region
 
-import xyz.xenondevs.nova.data.config.ValueReloadable
+import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import java.util.*
@@ -9,8 +9,8 @@ class UpgradableRegion internal constructor(
     uuid: UUID,
     private val upgradeHolder: UpgradeHolder,
     private val upgradeType: UpgradeType<Int>,
-    minSize: ValueReloadable<Int>,
-    private val maxSizeCfg: ValueReloadable<Int>,
+    minSize: Provider<Int>,
+    private val maxSizeCfg: Provider<Int>,
     size: Int,
     createRegion: (Int) -> Region
 ) : DynamicRegion(uuid, minSize, maxSizeCfg, size, createRegion) {
