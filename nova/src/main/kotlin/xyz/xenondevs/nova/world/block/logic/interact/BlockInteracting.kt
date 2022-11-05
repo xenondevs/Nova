@@ -30,7 +30,7 @@ internal object BlockInteracting : Listener {
         registerEvents()
     }
     
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.LOW)
     fun handleInteract(e: WrappedPlayerInteractEvent) {
         val event = e.event
         if (event.isCompletelyDenied())
