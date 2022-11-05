@@ -9,13 +9,18 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.provider.combinedProvider
+import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.WearableOptions
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.ArmorType
 import xyz.xenondevs.nova.player.equipment.EquipMethod
 import xyz.xenondevs.nova.util.isPlayerView
+import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.nmsEquipmentSlot
 
 @Suppress("FunctionName")
 fun Wearable(type: ArmorType): ItemBehaviorFactory<Wearable> =
@@ -26,20 +31,38 @@ fun Wearable(type: ArmorType): ItemBehaviorFactory<Wearable> =
 
 class Wearable(val options: WearableOptions) : ItemBehavior() {
     
-    override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {
-        if (equipped) {
-            player.getAttribute(Attribute.GENERIC_ARMOR)!!.baseValue += options.armor
-            player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)!!.baseValue += options.armorToughness
-            player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)!!.baseValue += options.knockbackResistance
-        } else {
-            player.getAttribute(Attribute.GENERIC_ARMOR)!!.baseValue -= options.armor
-            player.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)!!.baseValue -= options.armorToughness
-            player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)!!.baseValue += options.knockbackResistance
-        }
+    override val attributeModifiers = combinedProvider(
+        options.armorTypeProvider, options.armorProvider, options.armorToughnessProvider, options.knockbackResistanceProvider
+    ).map {
+        val equipmentSlot = (it[0] as ArmorType).equipmentSlot.nmsEquipmentSlot
+        
+        return@map listOf(
+            AttributeModifier(
+                "nova armor ${this@Wearable.hashCode()}",
+                Attribute.GENERIC_ARMOR,
+                AttributeModifier.Operation.INCREMENT,
+                it[1] as Double,
+                equipmentSlot
+            ),
+            AttributeModifier(
+                "nova armor toughness ${this@Wearable.hashCode()}",
+                Attribute.GENERIC_ARMOR_TOUGHNESS,
+                AttributeModifier.Operation.INCREMENT,
+                it[2] as Double,
+                equipmentSlot
+            ),
+            AttributeModifier(
+                "nova knockback resistance ${this@Wearable.hashCode()}",
+                Attribute.GENERIC_KNOCKBACK_RESISTANCE,
+                AttributeModifier.Operation.INCREMENT,
+                it[3] as Double,
+                equipmentSlot
+            )
+        )
     }
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
-        if (event.action == Action.RIGHT_CLICK_AIR
+        if ((action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable()))
             && player.inventory.getItem(options.armorType.equipmentSlot)?.takeUnlessAir() == null
             && !callArmorEquipEvent(player, EquipMethod.RIGHT_CLICK_EQUIP, null, itemStack)
         ) {

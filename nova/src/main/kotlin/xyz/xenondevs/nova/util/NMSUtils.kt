@@ -37,6 +37,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
+import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
 
@@ -93,6 +94,16 @@ val EquipmentSlot.interactionHand: InteractionHand
         EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
         EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
         else -> throw UnsupportedOperationException()
+    }
+
+val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
+    get() = when (this) {
+        EquipmentSlot.HAND -> MojangEquipmentSlot.MAINHAND
+        EquipmentSlot.OFF_HAND -> MojangEquipmentSlot.OFFHAND
+        EquipmentSlot.FEET -> MojangEquipmentSlot.FEET
+        EquipmentSlot.LEGS -> MojangEquipmentSlot.LEGS
+        EquipmentSlot.CHEST -> MojangEquipmentSlot.CHEST
+        EquipmentSlot.HEAD -> MojangEquipmentSlot.HEAD
     }
 
 val BlockFace.nmsDirection: Direction

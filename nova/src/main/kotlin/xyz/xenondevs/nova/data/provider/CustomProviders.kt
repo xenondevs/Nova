@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.provider
 fun <T> provider(value: T): Provider<T> =
     ProviderWrapper(value)
 
-fun <T> combinedProvider(vararg providers: Provider<T>): Provider<List<T>> =
+fun <T> combinedProvider(vararg providers: Provider<out T>): Provider<List<T>> =
     CombinedProvider(providers.asList())
 
 fun <T> combinedProvider(providers: List<Provider<T>>): Provider<List<T>> =
@@ -21,14 +21,14 @@ private class ProviderWrapper<T>(private val staticValue: T) : Provider<T>() {
     }
 }
 
-private class CombinedProvider<T>(private val providers: List<Provider<T>>) : Provider<List<T>>() {
+private class CombinedProvider<T>(private val providers: List<Provider<out T>>) : Provider<List<T>>() {
     
     init {
         providers.forEach { it.addChild(this) }
     }
     
     override fun loadValue(): List<T> {
-        return providers.map(Provider<T>::value)
+        return providers.map { it.value }
     }
     
 }
