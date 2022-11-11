@@ -50,7 +50,7 @@ object CustomItemServiceManager : Initializable() {
     }
     
     fun getItemByName(name: String): ItemStack? {
-        return PLUGINS.firstNotNullOfOrNull { it.getItemByName(name) }
+        return PLUGINS.firstNotNullOfOrNull { it.getItemById(name) }
     }
     
     fun getItemTest(name: String): SingleItemTest? {
@@ -73,12 +73,12 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.firstNotNullOfOrNull { it.getName(block, locale) }
     }
     
-    fun getNameKey(item: ItemStack): String? {
-        return PLUGINS.firstNotNullOfOrNull { it.getId(item) }
-    }
-    
     fun hasRecipe(key: NamespacedKey): Boolean {
         return PLUGINS.any { it.hasRecipe(key) }
+    }
+    
+    fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
+        return PLUGINS.firstNotNullOfOrNull { it.canBreakBlock(block, tool) }
     }
     
     fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {

@@ -20,8 +20,9 @@ private const val PART_SIZE = 10
 
 private const val ICON_MARGIN_LEFT = 2
 private const val ICON_SIZE = 32
-private const val ICON_MARGIN_RIGHT = 2
+private const val ICON_MARGIN_RIGHT = 0
 
+private const val TEXT_MARGIN_LEFT = 4
 private const val TEXT_MARGIN_RIGHT = 4
 
 private const val MIN_LINES = 2
@@ -56,7 +57,9 @@ internal class WailaImageOverlay : BossBarOverlay() {
         val (components, textBeginX, textCenterX) = overlayCache.get(OverlayCacheKey(icon, lines, longestLineLength)) {
             // left margin (2) + icon size (32) + distance between icon and text + right margin (2)
             // (margins are not counting start and end textures)
-            val optimalWidth = ICON_MARGIN_LEFT + ICON_SIZE + ICON_MARGIN_RIGHT + longestLineLength + TEXT_MARGIN_RIGHT
+            var optimalWidth = TEXT_MARGIN_LEFT + longestLineLength + TEXT_MARGIN_RIGHT
+            if (icon != null)
+                optimalWidth += ICON_MARGIN_LEFT + ICON_SIZE + ICON_MARGIN_RIGHT
             
             val partAmount = ceil(optimalWidth / PART_SIZE.toDouble()).toInt()
             
@@ -86,9 +89,13 @@ internal class WailaImageOverlay : BossBarOverlay() {
             val components = builder.create()
             
             // the min x position for text to be displayed
-            val textMin = -halfWidth + START_TEXTURE_SIZE + ICON_MARGIN_LEFT + ICON_SIZE + ICON_MARGIN_RIGHT
-            // returns the middle between textMin and the end of the box, which is the center point of text
-            val textCenterX = textMin + (halfWidth - textMin - TEXT_MARGIN_RIGHT) / 2
+            var textMin = -halfWidth + TEXT_MARGIN_LEFT
+            if (icon != null)
+                textMin += ICON_MARGIN_LEFT + ICON_SIZE + ICON_MARGIN_RIGHT
+            // the max x position for the text to be displayed
+            val textMax = halfWidth - TEXT_MARGIN_RIGHT
+            // the middle between textMin and textMax, which is the center point of text
+            val textCenterX = (textMin + textMax) / 2
             
             return@get Triple(components, textMin, textCenterX)
         }

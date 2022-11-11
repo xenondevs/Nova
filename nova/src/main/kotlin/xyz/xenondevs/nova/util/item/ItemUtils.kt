@@ -280,7 +280,7 @@ object ItemUtils {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) return novaMaterial.id.toString()
         
-        val customNameKey = CustomItemServiceManager.getNameKey(itemStack)
+        val customNameKey = CustomItemServiceManager.getId(itemStack)
         if (customNameKey != null) return customNameKey
         
         return "minecraft:${itemStack.type.name.lowercase()}"

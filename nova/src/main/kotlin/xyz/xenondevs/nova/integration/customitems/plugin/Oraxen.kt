@@ -1,6 +1,12 @@
 package xyz.xenondevs.nova.integration.customitems.plugin
 
-import io.th0rgal.oraxen.items.OraxenItems
+import io.th0rgal.oraxen.api.OraxenBlocks
+import io.th0rgal.oraxen.api.OraxenItems
+import io.th0rgal.oraxen.mechanics.Mechanic
+import io.th0rgal.oraxen.mechanics.provided.gameplay.block.BlockMechanic
+import io.th0rgal.oraxen.mechanics.provided.gameplay.noteblock.NoteBlockMechanic
+import io.th0rgal.oraxen.mechanics.provided.gameplay.stringblock.StringBlockMechanic
+import io.th0rgal.oraxen.utils.drops.Drop
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -16,27 +22,41 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.displayName
 
+private val Mechanic.drop: Drop?
+    get() = when(this) {
+        is BlockMechanic -> drop
+        is NoteBlockMechanic -> drop
+        is StringBlockMechanic -> drop
+        else -> null
+    }
+
 internal object Oraxen : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Oraxen") != null
     
     override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
-        // Missing API feature
-        return false
+        return OraxenBlocks.remove(block.location, null)
     }
     
     override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
-        // Missing API feature
-        return null
+        val drop = OraxenBlocks.getOraxenBlock(block.location)?.drop ?: return null
+        val drops = ArrayList<ItemStack>()
+        if (drop.isToolEnough(tool)) {
+            // fixme: Missing API feature
+        }
+        
+        OraxenBlocks.remove(block.location, null)
+        return drops
     }
     
     override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
-        // Missing API feature
+        // fixme: Missing API feature
         return null
     }
     
     override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
-        // API for that is broken
+        val id = getId(item) ?: return false
+        OraxenBlocks.place(id, location)
         return true
     }
     
@@ -45,26 +65,23 @@ internal object Oraxen : CustomItemService {
     }
     
     override fun getBlockType(block: Block): CustomBlockType? {
-        // Missing API feature
-        return null
+        return if (OraxenBlocks.isOraxenBlock(block)) CustomBlockType.NORMAL else null
     }
     
-    override fun getItemByName(name: String): ItemStack? {
-        return OraxenItems.getItemById(name.removePrefix("oraxen:")).build()
+    override fun getItemById(id: String): ItemStack? {
+        return OraxenItems.getItemById(id.removePrefix("oraxen:")).build()
     }
     
-    override fun getItemTest(name: String): SingleItemTest? {
-        return getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
+    override fun getItemTest(id: String): SingleItemTest? {
+        return getItemById(id)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     
     override fun getId(item: ItemStack): String? {
-        val name = OraxenItems.getIdByItem(item) ?: return null
-        return "oraxen:$name"
+        return OraxenItems.getIdByItem(item)?.let { "oraxen:$it" }
     }
     
     override fun getId(block: Block): String? {
-        // Missing API feature
-        return null
+        return OraxenBlocks.getOraxenBlock(block.location)?.itemID?.let { "oraxen:$it" }
     }
     
     override fun getName(item: ItemStack, locale: String): String? {
@@ -72,12 +89,15 @@ internal object Oraxen : CustomItemService {
     }
     
     override fun getName(block: Block, locale: String): String? {
-        // Missing API feature
-        return null
+        return getId(block)?.let(::getItemById)?.displayName
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {
         return key.namespace == "oraxen"
+    }
+    
+    override fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
+        return OraxenBlocks.getOraxenBlock(block.location)?.drop?.isToolEnough(tool) ?: return null
     }
     
     override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {

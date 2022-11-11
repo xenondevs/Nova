@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.RedstoneLampWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RepeaterWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RespawnAnchorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.SeaPickleWailaInfoProvider
-import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 
@@ -85,7 +85,7 @@ object WailaInfoProviderRegistry {
         val lines = ArrayList<WailaLine>()
         lines += WailaLine(ComponentBuilder().append(blockName).color(ChatColor.WHITE).create(), WailaLine.Alignment.CENTERED)
         lines += WailaLine(ComponentBuilder(blockId.toString()).color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(arrayOf(localized(ChatColor.GRAY, "waila.nova.required_tool.unknown")), WailaLine.Alignment.CENTERED)
+        lines += ToolLine.getCustomItemServiceToolLine(player, block)
         
         return WailaInfo(blockId, lines)
     }

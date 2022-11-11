@@ -120,13 +120,13 @@ internal object ItemsAdder : CustomItemService {
         }
     }
     
-    override fun getItemByName(name: String): ItemStack? {
-        val customItem = CustomStack.getInstance(name)
+    override fun getItemById(id: String): ItemStack? {
+        val customItem = CustomStack.getInstance(id)
         return customItem?.itemStack
     }
     
-    override fun getItemTest(name: String): SingleItemTest? {
-        return getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
+    override fun getItemTest(id: String): SingleItemTest? {
+        return getItemById(id)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {
@@ -149,6 +149,11 @@ internal object ItemsAdder : CustomItemService {
     override fun getName(block: Block, locale: String): String? {
         return CustomBlock.byAlreadyPlaced(block)?.displayName
             ?: CustomCrop.byAlreadyPlaced(block)?.seed?.displayName
+    }
+    
+    override fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
+        // Missing API method
+        return null
     }
     
     override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
