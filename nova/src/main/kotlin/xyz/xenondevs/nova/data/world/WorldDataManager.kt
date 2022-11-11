@@ -12,6 +12,8 @@ import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
@@ -29,10 +31,13 @@ import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
 import kotlin.concurrent.write
+
+private val CHUNK_LOAD_TIMEOUT by configReloadable { DEFAULT_CONFIG.getLong("debug.chunk_load_timeout") }
 
 internal object WorldDataManager : Initializable(), Listener {
     
@@ -95,37 +100,41 @@ internal object WorldDataManager : Initializable(), Listener {
     //<editor-fold desc="loading / unloading chunks", defaultstate="collapsed">
     private fun loadChunk(task: ChunkLoadTask) {
         val pos = task.pos
-        if (pos.isLoaded()) {
-            // Add active task
-            activeLoadTasks[pos] = task
-            
+        if (pos.isLoaded() && !activeLoadTasks.contains(pos)) {
             // loads region from file if not already loaded
             val chunk = getRegion(pos).getChunk(pos)
             
+            // Add active task
+            activeLoadTasks[pos] = task
+            
             // the rest needs to be done in the server thread
             runTask {
-                if (pos.isLoaded()) {
-                    val blockStates = chunk.lock.write {
-                        // is RegionChunk already loaded?
-                        if (chunk.isLoaded)
-                            return@runTask
-                        
-                        // copy blockstates map, only remove failed states from the event blockstates map
-                        val blockStates = HashMap(chunk.blockStates).removeIf { (_, blockState) ->
-                            runCatching { blockState.handleInitialized(false) }
-                                .onFailure { LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", it) }
-                                .isFailure
+                try {
+                    if (pos.isLoaded()) {
+                        val blockStates = chunk.lock.write {
+                            // is RegionChunk already loaded?
+                            if (chunk.isLoaded)
+                                return@runTask
+            
+                            // copy blockstates map, only remove failed states from the event blockstates map
+                            val blockStates = HashMap(chunk.blockStates).removeIf { (_, blockState) ->
+                                runCatching { blockState.handleInitialized(false) }
+                                    .onFailure { LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", it) }
+                                    .isFailure
+                            }
+            
+                            // mark RegionChunk as loaded
+                            chunk.isLoaded = true
+            
+                            return@write blockStates
                         }
-                        
-                        // mark RegionChunk as loaded
-                        chunk.isLoaded = true
-                        
-                        return@write blockStates
+        
+                        // call event
+                        val event = NovaChunkLoadedEvent(pos, blockStates)
+                        Bukkit.getPluginManager().callEvent(event)
                     }
-                    
-                    // call event
-                    val event = NovaChunkLoadedEvent(pos, blockStates)
-                    Bukkit.getPluginManager().callEvent(event)
+                } catch (t: Throwable) {
+                    LOGGER.log(Level.SEVERE, "Failed to load chunk $pos", t)
                 }
                 
                 // mark task as completed
@@ -139,7 +148,14 @@ internal object WorldDataManager : Initializable(), Listener {
         val pos = task.pos
         
         // If there is a load task active, await its completion
-        activeLoadTasks[pos]?.awaitCompletion()
+        val activeLoadTask = activeLoadTasks[pos]
+        if (activeLoadTask != null) {
+            if (!activeLoadTask.awaitCompletion(CHUNK_LOAD_TIMEOUT, TimeUnit.MILLISECONDS)) {
+                LOGGER.severe("Chunk load timed out for $pos")
+                LOGGER.severe("Active load tasks: $activeLoadTask")
+                LOGGER.severe("Tasks: $tasks")
+            }
+        }
         
         // get chunk
         val chunk = worlds[pos.worldUUID]
