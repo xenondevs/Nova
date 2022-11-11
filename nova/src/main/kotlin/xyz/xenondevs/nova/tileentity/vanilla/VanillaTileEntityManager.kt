@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -79,16 +78,13 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun handlePhysics(event: BlockPhysicsEvent) {
-        val block = event.block
-        if (block.type == Material.AIR) {
-            handleBlockBreak(block.pos)
-        } else {
-            val pos = block.pos
-            val vte = getTileEntityAt(pos)
-            if (vte != null)
+        val pos = event.block.pos
+        val vte = getTileEntityAt(pos)
+        if (vte != null) {
+            if (vte.meetsBlockStateRequirement()) 
                 vte.handleBlockUpdate()
-            else tryCreateVTE(pos)
-        }
+             else handleBlockBreak(pos)
+        } else tryCreateVTE(pos)
     }
     
     private fun tryCreateVTE(pos: BlockPos): VanillaTileEntityState? {
