@@ -5,10 +5,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.nova.loader.library.NovaLibraryLoader;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +54,9 @@ public class NovaLoader extends JavaPlugin {
         
         try (var in = NovaLoader.class.getResourceAsStream(pathInJar)) {
             assert in != null;
-            Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            try (var out = new FileOutputStream(file)) {
+                in.transferTo(out);
+            }
         }
         
         return file;
