@@ -6,6 +6,7 @@ import io.th0rgal.oraxen.mechanics.Mechanic
 import io.th0rgal.oraxen.mechanics.provided.gameplay.block.BlockMechanic
 import io.th0rgal.oraxen.mechanics.provided.gameplay.noteblock.NoteBlockMechanic
 import io.th0rgal.oraxen.mechanics.provided.gameplay.stringblock.StringBlockMechanic
+import io.th0rgal.oraxen.utils.blocksounds.BlockSounds
 import io.th0rgal.oraxen.utils.drops.Drop
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -21,6 +22,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.displayName
+import xyz.xenondevs.nova.world.pos
 
 private val Mechanic.drop: Drop?
     get() = when(this) {
@@ -30,23 +32,34 @@ private val Mechanic.drop: Drop?
         else -> null
     }
 
+private val Mechanic.blockSounds: BlockSounds?
+    get() = when(this) {
+        is BlockMechanic -> blockSounds
+        is NoteBlockMechanic -> blockSounds
+        is StringBlockMechanic -> blockSounds
+        else -> null
+    }
+
 internal object Oraxen : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Oraxen") != null
     
     override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
-        return OraxenBlocks.remove(block.location, null)
-    }
-    
-    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
-        val drop = OraxenBlocks.getOraxenBlock(block.location)?.drop ?: return null
-        val drops = ArrayList<ItemStack>()
-        if (drop.isToolEnough(tool)) {
-            // fixme: Missing API feature
+        val location = block.location
+        val oraxenBlock = OraxenBlocks.getOraxenBlock(location)
+        if (oraxenBlock != null) {
+            if (playSound) {
+                val blockSounds = oraxenBlock.blockSounds
+                if (blockSounds != null) {
+                    block.pos.playSound(blockSounds.breakSound, blockSounds.breakVolume, blockSounds.breakPitch)
+                }
+            }
+            
+            OraxenBlocks.remove(location, null)
+            return true
         }
         
-        OraxenBlocks.remove(block.location, null)
-        return drops
+        return false
     }
     
     override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {

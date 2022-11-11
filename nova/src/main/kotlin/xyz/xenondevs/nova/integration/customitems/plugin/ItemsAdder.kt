@@ -52,30 +52,21 @@ internal object ItemsAdder : CustomItemService {
     }
     
     override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
-        val customBlock = CustomBlock.byAlreadyPlaced(block) ?: return false
-        if (playSound || showParticles) customBlock.playBreakEffect()
-        customBlock.remove()
-        return true
-    }
-    
-    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
         if (customBlock != null) {
-            val loot = customBlock.getLoot(tool, true)
             if (playSound || showParticles) customBlock.playBreakEffect()
             customBlock.remove()
-            return loot
+            return true
         }
         
         val customCrop = CustomCrop.byAlreadyPlaced(block)
         if (customCrop != null) {
-            val loot = customCrop.getLoot(tool)
             if (playSound || showParticles) block.playBreakEffects()
             block.type = Material.AIR
-            return loot
+            return true
         }
         
-        return null
+        return false
     }
     
     override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {

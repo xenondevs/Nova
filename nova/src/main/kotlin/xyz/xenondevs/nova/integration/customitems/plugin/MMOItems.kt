@@ -37,12 +37,6 @@ internal object MMOItems : CustomItemService {
         return true
     }
     
-    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
-        val customBlock = mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null) ?: return null
-        block.type = Material.AIR
-        return listOf(customBlock.item)
-    }
-    
     override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
         val block = location.block
         if (!mmoItems.customBlocks.isMushroomBlock(block.type)) {

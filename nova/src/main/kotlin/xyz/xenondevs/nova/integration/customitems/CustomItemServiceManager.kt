@@ -33,10 +33,6 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.any { it.removeBlock(block, playSound, showParticles) }
     }
     
-    fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
-        return PLUGINS.firstNotNullOfOrNull { it.breakBlock(block, tool, playSound, showParticles) }
-    }
-    
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
         return PLUGINS.firstNotNullOfOrNull { it.getDrops(block, tool) }
     }

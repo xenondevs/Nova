@@ -17,16 +17,10 @@ internal interface CustomItemService : InternalIntegration {
     fun awaitLoad() = Unit
     
     /**
-     * Remove a block from the world without handling drops
+     * Remove a block from the world
      * @return If the block was from this [CustomItemService] and has been removed successfully
      */
     fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean
-    
-    /**
-     * Breaks a block from this [CustomItemService]
-     * @return the drops or null if the block isn't from this [CustomItemService]
-     */
-    fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>?
     
     /**
      * Places an item from this [CustomItemService]

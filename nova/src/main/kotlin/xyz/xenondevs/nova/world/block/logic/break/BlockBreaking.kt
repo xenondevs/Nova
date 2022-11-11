@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
+import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import java.util.concurrent.ConcurrentHashMap
@@ -127,24 +128,28 @@ internal object BlockBreaking {
         breaker.handleTick()
     }
     
-    private fun handleDestroyStop(player: Player) {
-        playerBreakers.remove(player)?.stop(false)
+    private fun handleDestroyStop(player: Player, packet: ServerboundPlayerActionPacket) {
+        val breaker = playerBreakers.remove(player)
+        if (breaker == null) {
+            player.packetHandler?.injectIncoming(packet)
+        } else {
+            breaker.stop(false)
+        }
     }
     
     @PacketHandler
     private fun handlePlayerAction(event: ServerboundPlayerActionPacketEvent) {
         val player = event.player
-        val pos = event.pos
-        val blockPos = BlockPos(event.player.world, pos.x, pos.y, pos.z)
+        val pos = event.pos.toNovaPos(player.world)
         
         event.isCancelled = when (event.action) {
             START_DESTROY_BLOCK -> {
-                runTask { handleDestroyStart(player, event.packet, blockPos, event.direction, event.sequence) }
+                runTask { handleDestroyStart(player, event.packet, pos, event.direction, event.sequence) }
                 true
             }
             
             STOP_DESTROY_BLOCK, ABORT_DESTROY_BLOCK -> {
-                runTask { handleDestroyStop(player) }
+                runTask { handleDestroyStop(player, event.packet) }
                 true
             }
             
