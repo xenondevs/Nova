@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.util.item.displayName
 import xyz.xenondevs.nova.world.pos
 
 private val Mechanic.drop: Drop?
-    get() = when(this) {
+    get() = when (this) {
         is BlockMechanic -> drop
         is NoteBlockMechanic -> drop
         is StringBlockMechanic -> drop
@@ -33,7 +33,7 @@ private val Mechanic.drop: Drop?
     }
 
 private val Mechanic.blockSounds: BlockSounds?
-    get() = when(this) {
+    get() = when (this) {
         is BlockMechanic -> blockSounds
         is NoteBlockMechanic -> blockSounds
         is StringBlockMechanic -> blockSounds
