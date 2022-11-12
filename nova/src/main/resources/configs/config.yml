@@ -26,7 +26,8 @@ resource_pack:
   freeze_loading_players: false
 
 # If Nova should use a java agent to self-attach and redefine methods.
-# This allows Nova to change spigot's behavior and thus improve performance.
+# This option will be automatically set to false if your jdk does not support java agents.
+# Disabling this will cause many of Nova's features (such as custom tools, custom stack sizes, proper block sounds, etc.) to stop working.
 use_agent: true
 
 # The render distance for armor stands from Nova, in chunks.
