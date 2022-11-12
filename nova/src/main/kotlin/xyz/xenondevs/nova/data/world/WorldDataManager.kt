@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package xyz.xenondevs.nova.data.world
 
 import org.bukkit.Bukkit
@@ -13,6 +15,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.block.state.BlockState
+import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
@@ -29,6 +32,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.logging.Level
 import kotlin.concurrent.read
@@ -45,6 +49,8 @@ internal object WorldDataManager : Initializable(), Listener {
     private val saveTasks = ConcurrentLinkedQueue<World>()
     private val chunkTasks: MutableMap<ChunkPos, Boolean> = Collections.synchronizedMap(HashMap())
     private val chunkLocks: MutableMap<ChunkPos, Latch> = Collections.synchronizedMap(HashMap())
+    
+    private val chunkFutures: MutableMap<ChunkPos, CompletableFuture<Unit>> = Collections.synchronizedMap(HashMap())
     
     override fun init() {
         LOGGER.info("Initializing WorldDataManager")
@@ -145,6 +151,9 @@ internal object WorldDataManager : Initializable(), Listener {
                         // call event
                         val event = NovaChunkLoadedEvent(pos, blockStates)
                         Bukkit.getPluginManager().callEvent(event)
+                        
+                        // run chunk load future
+                        chunkFutures.remove(pos)?.complete(Unit)
                     }
                 } catch (t: Throwable) {
                     LOGGER.log(Level.SEVERE, "Failed to load chunk $pos", t)
@@ -189,20 +198,38 @@ internal object WorldDataManager : Initializable(), Listener {
     fun getBlockStates(pos: ChunkPos, takeUnloaded: Boolean = false): Map<BlockPos, BlockState> =
         readChunk(pos) { chunk -> HashMap(chunk.blockStates) }.apply { if (!takeUnloaded) removeIf { !it.value.isLoaded } }
     
-    fun getBlockState(pos: BlockPos, takeUnloaded: Boolean = false): BlockState? =
-        readChunk(pos.chunkPos) { chunk -> chunk.blockStates[pos]?.takeIf { takeUnloaded || it.isLoaded } }
+    fun getBlockState(pos: BlockPos, takeUnloaded: Boolean = false, resolveLinkedStates: Boolean = false): BlockState? =
+        readChunk(pos.chunkPos) { chunk ->
+            chunk.blockStates[pos]
+                ?.takeIf { takeUnloaded || it.isLoaded }
+                ?.let { if (resolveLinkedStates && it is LinkedBlockState) it.blockState else it }
+        }
     
     fun setBlockState(pos: BlockPos, state: BlockState) =
         writeChunk(pos.chunkPos) { it.blockStates[pos] = state }
     
-    fun removeBlockState(pos: BlockPos) =
-        writeChunk(pos.chunkPos) { it.blockStates -= pos }
+    fun getOrSetBlockState(pos: BlockPos, lazyState: () -> BlockState): BlockState =
+        writeChunk(pos.chunkPos) { it.blockStates.getOrPut(pos, lazyState) }
     
-    private fun getWorldStorage(world: World): WorldDataStorage =
+    fun removeBlockState(pos: BlockPos): BlockState? =
+        writeChunk(pos.chunkPos) { it.blockStates.remove(pos) }
+    
+    fun getWorldStorage(world: World): WorldDataStorage =
         worlds.getOrPut(world.uid) { WorldDataStorage(world) }
     
-    private fun getRegion(pos: ChunkPos): RegionFile =
+    fun getRegion(pos: ChunkPos): RegionFile =
         getWorldStorage(pos.world!!).getRegion(pos)
+    
+    fun isChunkLoaded(pos: ChunkPos): Boolean =
+        worlds[pos.worldUUID]?.getRegionOrNull(pos)?.getChunk(pos)?.isLoaded == true
+    
+    fun runAfterChunkLoad(pos: ChunkPos, run: () -> Unit) {
+        if (isChunkLoaded(pos)) {
+            run.invoke()
+        } else {
+            chunkFutures.getOrPut(pos, ::CompletableFuture).thenRun(run)
+        }
+    }
     
     private inline fun <T> readChunk(pos: ChunkPos, read: (RegionChunk) -> T): T {
         val region = getRegion(pos)

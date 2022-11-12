@@ -6,6 +6,7 @@ import xyz.xenondevs.cbf.buffer.ByteBuffer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.getLegacy
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
+import xyz.xenondevs.nova.integration.utp.UTPIntegration
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.LEGACY_TILE_ENTITY_KEY
@@ -69,6 +70,7 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
         tileEntity.handleInitialized(placed)
         
         TileEntityManager.registerTileEntity(this)
+        if (placed) UTPIntegration.handleTileEntityPlace(tileEntity)
         
         super.handleInitialized(placed)
     }
@@ -80,6 +82,7 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
             tileEntity.saveData()
             tileEntity.handleRemoved(!broken)
             TileEntityManager.unregisterTileEntity(this)
+            if (broken) UTPIntegration.handleTileEntityBreak(tileEntity)
             _tileEntity = null
         }
     }

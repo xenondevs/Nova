@@ -127,6 +127,18 @@ inline fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Bool
     return this
 }
 
+inline fun <reified A, reified B> Iterable<*>.filterTypeSub(crossinline mapper: (A) -> Any?): Iterable<A> =
+    filter { it is A && mapper(it) is B } as Iterable<A>
+
+inline fun <reified A, reified B> Sequence<*>.filterTypeSub(crossinline mapper: (A) -> Any?): Sequence<A> =
+    filter { it is A && mapper(it) is B } as Sequence<A>
+
+inline fun <reified A> Iterable<*>.filterTypeAnd(crossinline filter: (A) -> Boolean): Iterable<A> =
+    filter { it is A && filter(it) } as Iterable<A>
+
+inline fun <reified A> Sequence<*>.filterTypeAnd(crossinline filter: (A) -> Boolean): Sequence<A> =
+    filter { it is A && filter(it) } as Sequence<A>
+
 inline fun <K, V, R, M : MutableMap<K, R>> Map<K, V>.mapValuesNotNullTo(destination: M, valueSelector: (Map.Entry<K, V>) -> R?): M {
     for (entry in this.entries) {
         val value = valueSelector(entry)

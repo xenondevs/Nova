@@ -37,6 +37,7 @@ dependencies {
     spigotRuntime(variantOf(deps.spigot.server) { classifier("remapped-mojang") })
     
     // plugin dependencies
+    compileOnly(deps.bundles.utp)
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6")
     compileOnly("com.github.TechFortress:GriefPrevention:16.17.1") { isTransitive = false }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }

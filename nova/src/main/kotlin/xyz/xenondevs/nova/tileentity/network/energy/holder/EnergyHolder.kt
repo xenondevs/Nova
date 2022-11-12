@@ -8,5 +8,6 @@ interface EnergyHolder : EndPointDataHolder {
     val allowedConnectionType: NetworkConnectionType
     var energy: Long
     val requestedEnergy: Long
+    // TODO: providedEnergy, maxEnergy
     
 }

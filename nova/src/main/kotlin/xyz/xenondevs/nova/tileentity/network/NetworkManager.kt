@@ -7,20 +7,26 @@ import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
+import xyz.xenondevs.nova.data.world.WorldDataManager
+import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.data.world.block.state.UTPBlockState
+import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.utp.UTPIntegration
+import xyz.xenondevs.nova.integration.utp.UTPNetworkEndPoint
+import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
+import xyz.xenondevs.nova.tileentity.vanilla.NetworkedVanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.ObservableLock
 import xyz.xenondevs.nova.util.concurrent.lockAndRun
@@ -29,7 +35,7 @@ import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.filterIsInstanceValues
 import xyz.xenondevs.nova.util.flatMap
-import xyz.xenondevs.nova.util.pollFirst
+import xyz.xenondevs.nova.util.pollFirstWhere
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.serverTick
@@ -140,8 +146,8 @@ interface NetworkManager {
         }
         
         @EventHandler(priority = EventPriority.HIGHEST)
-        private fun handleChunkLoad(event: NovaChunkLoadedEvent) {
-            queueChunkLoad(event.chunkPos)
+        private fun handleChunkLoad(event: ChunkLoadEvent) {
+            queueChunkLoad(event.chunk.pos)
         }
         
         @EventHandler(priority = EventPriority.LOWEST)
@@ -206,7 +212,7 @@ private class NetworkManagerImpl : NetworkManager {
                         
                         // only load chunks if the other queues are empty
                         while (chunkLoadQueue.isNotEmpty() && asyncQueue.isEmpty() && partialTaskQueue.isEmpty()) {
-                            val pos = chunkLoadQueue.pollFirst() ?: break
+                            val pos = chunkLoadQueue.pollFirstWhere { WorldDataManager.isChunkLoaded(it) && UTPIntegration.isChunkLoaded(it) } ?: break
                             lock.lockAndRun { loadChunk(pos) }
                         }
                     }
@@ -221,11 +227,16 @@ private class NetworkManagerImpl : NetworkManager {
     }
     
     private fun getNodesInChunk(pos: ChunkPos): List<NetworkNode> {
-        val nodes = ArrayList<NetworkNode>()
-        nodes += TileEntityManager.getTileEntitiesInChunk(pos).filterIsInstance<NetworkNode>()
-        nodes += VanillaTileEntityManager.getTileEntitiesInChunk(pos).filterIsInstance<NetworkNode>()
-        
-        return nodes
+        return WorldDataManager.getBlockStates(pos)
+            .entries
+            .mapNotNull { (_, state) ->
+                when (state) {
+                    is NovaTileEntityState -> state.tileEntity as? NetworkedTileEntity
+                    is VanillaTileEntityState -> state.tileEntity as? NetworkedVanillaTileEntity
+                    is UTPBlockState -> state.utpEndPoint
+                    else -> null
+                }
+            }
     }
     
     private fun getNetwork(type: NetworkType, uuid: UUID = UUID.randomUUID(), local: Boolean = false): Network {
@@ -448,8 +459,9 @@ private class NetworkManagerImpl : NetworkManager {
                 return@networks endPoint.getNearbyNodes().mapToAllFuture endPoints@{ (face, neighborNode) ->
                     // does the endpoint want a connection at that face?
                     if (!allowedFaces.contains(face)) return@endPoints null
-                    // do not allow networks between two vanilla tile entities
-                    if (endPoint is VanillaTileEntity && neighborNode is VanillaTileEntity) return@endPoints null
+                    // do not allow local networks between two vanilla- or utp tile entities
+                    if ((endPoint is VanillaTileEntity && neighborNode is VanillaTileEntity) 
+                        || (endPoint is UTPNetworkEndPoint && neighborNode is UTPNetworkEndPoint)) return@endPoints null
                     
                     return@endPoints hasAccessPermission(endPoint, neighborNode).thenRunPartialTask(endPoint) {
                         connectEndPoint(endPoint, neighborNode, networkType, face, updateBridges)

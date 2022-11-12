@@ -13,6 +13,7 @@ dependencyResolutionManagement {
             version("ktor", "2.1.0")
             version("spigot", "1.19.2-R0.1-SNAPSHOT")
             version("cbf", "0.2")
+            version("utp", "0.1-SNAPSHOT")
             
             // lib - kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib-jdk8").versionRef("kotlin")
@@ -48,12 +49,17 @@ dependencyResolutionManagement {
             // lib - zip4j
             library("zip4j", "net.lingala.zip4j:zip4j:2.11.1")
             
+            // lib - utp
+            library("unified-core", "io.github.unifiedtechpower.unified", "unified-core").versionRef("utp")
+            library("unified-energy", "io.github.unifiedtechpower.unified", "unified-energy").versionRef("utp")
+            
             // bundles
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-netty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
             bundle("cbf", listOf("cosmic-binary-format", "cosmic-binary-format-netty-adapter"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
             bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer", "resource-pack-obfuscator"))
+            bundle("utp", listOf("unified-core", "unified-energy"))
             
             // plugins
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")

@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
 
@@ -19,7 +20,10 @@ interface NetworkEndPoint : NetworkNode {
     /**
      * Retrieves the serialized networks from internal storage or null if not present.
      */
-    fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>?
+    fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? {
+        check(this is DataHolder)
+        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
+    }
     
     /**
      * The [BlockFaces][BlockFace] at which connections are allowed for a specific [NetworkType].

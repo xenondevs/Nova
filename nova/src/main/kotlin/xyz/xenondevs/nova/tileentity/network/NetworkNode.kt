@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.getNeighboringTileEntitiesOfType
 import java.util.*
@@ -26,7 +27,10 @@ sealed interface NetworkNode {
     /**
      * Retrieves the serialized connectedNodes map from internal storage or null if not present.
      */
-    fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>?
+    fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? {
+        check(this is DataHolder)
+        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
+    }
     
     /**
      * Sets given the [node] as a connected [NetworkNode] at the given [face] for the specified [networkType].

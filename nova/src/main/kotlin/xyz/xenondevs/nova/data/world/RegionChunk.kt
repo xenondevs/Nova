@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.data.world.block.state.UTPBlockState
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.CBFLegacy
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
@@ -57,10 +58,11 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
             val dataLength = buf.readVarInt()
             
             try {
+                val isUTPBlock = type == UTPBlockState.ID.toString()
                 val isVanillaBlock = type.startsWith("minecraft:")
                 var material: BlockNovaMaterial? = null
                 
-                if (!isVanillaBlock && (NovaMaterialRegistry.getOrNull(type) as? BlockNovaMaterial)?.also { material = it } == null) {
+                if (!isVanillaBlock && !isUTPBlock && (NovaMaterialRegistry.getOrNull(type) as? BlockNovaMaterial)?.also { material = it } == null) {
                     LOGGER.severe("Could not load block at $pos: Invalid id $type")
                     if (DELETE_UNKNOWN_BLOCKS)
                         buf.readBytes(dataLength)
@@ -69,7 +71,12 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
                     continue
                 }
                 
-                val state = if (isVanillaBlock) VanillaTileEntityState(pos, type) else material!!.createBlockState(pos)
+                val state = when {
+                    isVanillaBlock -> VanillaTileEntityState(pos, type)
+                    isUTPBlock -> UTPBlockState(pos)
+                    else -> material!!.createBlockState(pos)
+                }
+                
                 state.read(buf)
                 blockStates[pos] = state
             } catch (e: Exception) {

@@ -30,10 +30,12 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.data.world.block.state.UTPBlockState
+import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.material.AdvancedTooltips
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
@@ -46,6 +48,7 @@ import xyz.xenondevs.nova.util.data.ComponentUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
@@ -281,16 +284,13 @@ internal object NovaCommand : Command("nova") {
         
         val location = player.getTargetBlockExact(8)?.location
         if (location != null) {
-            val tileEntity = TileEntityManager.getTileEntity(location, true)
-            if (tileEntity != null) {
-                sendSuccess(tileEntity.material.localizedName, tileEntity.data)
-            } else {
-                val vanillaTileEntity = VanillaTileEntityManager.getTileEntityAt(location)
-                if (vanillaTileEntity != null) sendSuccess(vanillaTileEntity.block.type.name, vanillaTileEntity.data)
-                else sendFailure()
+            when (val state = WorldDataManager.getBlockState(location.pos, takeUnloaded = false, resolveLinkedStates = true)) {
+                is NovaTileEntityState -> sendSuccess(state.tileEntity.material.localizedName, state.data)
+                is VanillaTileEntityState -> sendSuccess(location.block.type.localizedName.toString(), state.data)
+                is UTPBlockState -> sendSuccess("UTPBlockState", state.data)
+                else -> sendFailure()
             }
         } else sendFailure()
-        
     }
     
     private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType) {

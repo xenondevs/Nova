@@ -26,7 +26,6 @@ import xyz.xenondevs.nova.util.getTargetLocation
 import xyz.xenondevs.nova.util.reflection.actualDelegate
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
-import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -60,14 +59,6 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         holders.values.forEach(EndPointDataHolder::saveData)
         storeData("networks", serializeNetworks())
         storeData("connectedNodes", serializeConnectedNodes())
-    }
-    
-    override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
-    }
-    
-    override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     }
     
     final override fun handleRightClick(ctx: BlockInteractContext): Boolean {

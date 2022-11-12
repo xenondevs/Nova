@@ -10,10 +10,14 @@ import org.bukkit.block.BlockFace.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import xyz.xenondevs.nova.data.world.WorldDataManager
+import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.data.world.block.state.UTPBlockState
+import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.item.isTraversable
+import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
@@ -129,16 +133,30 @@ fun Vector(yaw: Float, pitch: Float): Vector {
 
 //<editor-fold desc="surrounding blocks / entities / etc.", defaultstate="collapsed">
 fun Location.getNeighboringTileEntities(additionalHitboxes: Boolean): Map<BlockFace, TileEntity> {
-    return getNeighboringTileEntitiesOfType(additionalHitboxes)
+    val tileEntities = enumMapOf<BlockFace, TileEntity>()
+    
+    CUBE_FACES.forEach { face ->
+        val location = blockLocation.advance(face)
+        val tileEntity = TileEntityManager.getTileEntity(location, additionalHitboxes)
+        if (tileEntity != null) tileEntities[face] = tileEntity
+    }
+    
+    return tileEntities
 }
 
-internal inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitboxes: Boolean): Map<BlockFace, T> {
-    val tileEntities = HashMap<BlockFace, T>()
-    CUBE_FACES.forEach {
-        val location = blockLocation.advance(it)
-        val tileEntity = TileEntityManager.getTileEntity(location, additionalHitboxes)
-            ?: VanillaTileEntityManager.getTileEntityAt(location)
-        if (tileEntity != null && tileEntity is T) tileEntities[it] = tileEntity as T
+internal inline fun <reified T> Location.getNeighboringTileEntitiesOfType(resolveLinkedStates: Boolean): Map<BlockFace, T> {
+    val tileEntities = enumMapOf<BlockFace, T>()
+    CUBE_FACES.forEach { face ->
+        val location = blockLocation.advance(face)
+        
+        val tileEntity = when (val state = WorldDataManager.getBlockState(location.pos, takeUnloaded = false, resolveLinkedStates = resolveLinkedStates)) {
+            is NovaTileEntityState -> state.tileEntity
+            is VanillaTileEntityState -> state.tileEntity
+            is UTPBlockState -> state.utpEndPoint
+            else -> null
+        }
+        
+        if (tileEntity != null && tileEntity is T) tileEntities[face] = tileEntity as T
     }
     
     return tileEntities
