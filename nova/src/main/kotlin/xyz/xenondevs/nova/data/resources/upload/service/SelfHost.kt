@@ -44,7 +44,7 @@ internal object SelfHost : UploadService {
         }
     
     override fun loadConfig(cfg: ConfigurationSection) {
-        startedLatch.on()
+        startedLatch.close()
         val configuredHost = cfg.getString("host")
         this.host = configuredHost ?: ConnectionUtils.SERVER_IP
         
@@ -64,7 +64,7 @@ internal object SelfHost : UploadService {
                 environment.monitor.subscribe(ApplicationStarted) {
                     thread(isDaemon = true) {
                         Thread.sleep(SELF_HOST_DELAY) // https://youtrack.jetbrains.com/issue/KTOR-4259
-                        startedLatch.off()
+                        startedLatch.open()
                     }
                 }
             }

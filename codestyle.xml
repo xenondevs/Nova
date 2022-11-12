@@ -1,4 +1,4 @@
-<code_scheme name="XenonDevs" version="173">
+<code_scheme name="Xenondevs" version="173">
     <option name="FORMATTER_TAGS_ENABLED" value="true"/>
     <JSON>
         <option name="ARRAY_WRAPPING" value="0"/>
@@ -17,6 +17,9 @@
         <option name="ALLOW_TRAILING_COMMA" value="false"/>
         <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL"/>
     </JetCodeStyleSettings>
+    <Markdown>
+        <option name="WRAP_TEXT_IF_LONG" value="false"/>
+    </Markdown>
     <XML>
         <option name="XML_TEXT_WRAP" value="0"/>
     </XML>
@@ -51,6 +54,18 @@
         <indentOptions>
             <option name="CONTINUATION_INDENT_SIZE" value="4"/>
             <option name="KEEP_INDENTS_ON_EMPTY_LINES" value="true"/>
+        </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="protobuf">
+        <indentOptions>
+            <option name="INDENT_SIZE" value="4"/>
+            <option name="TAB_SIZE" value="4"/>
+        </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="prototext">
+        <indentOptions>
+            <option name="INDENT_SIZE" value="4"/>
+            <option name="TAB_SIZE" value="4"/>
         </indentOptions>
     </codeStyleSettings>
 </code_scheme>
