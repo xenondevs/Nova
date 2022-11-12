@@ -17,8 +17,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.ItemMergeEvent
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
@@ -34,7 +32,6 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
-import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
@@ -42,7 +39,6 @@ import xyz.xenondevs.nova.util.data.duplicate
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
-import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
@@ -68,66 +64,6 @@ internal object PacketItems : Initializable(), Listener {
     override fun init() {
         registerEvents()
         registerPacketListener()
-    }
-    
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun handleClick(event: InventoryClickEvent) {
-        val view = event.view
-        val rawSlot = event.rawSlot
-        val clicked = event.currentItem ?: return
-        
-        val novaMaterial = clicked.novaMaterial
-        if (novaMaterial != null && novaMaterial.maxStackSize < SERVER_SIDE_MATERIAL.maxStackSize) {
-            when (event.click) {
-                
-                ClickType.MIDDLE -> {
-                    event.isCancelled = true
-                    event.cursor = novaMaterial.createItemStack(novaMaterial.maxStackSize)
-                }
-                
-                ClickType.LEFT -> {
-                    val cursor = event.cursor ?: return
-                    if (clicked.isSimilar(cursor)) {
-                        event.isCancelled = true
-                        
-                        val currentAmount = clicked.amount
-                        val newAmount = minOf(currentAmount + cursor.amount, novaMaterial.maxStackSize)
-                        if (newAmount > currentAmount) {
-                            clicked.amount = newAmount
-                            cursor.amount -= newAmount - currentAmount
-                        } else {
-                            view.setItem(event.rawSlot, cursor)
-                            event.cursor = clicked
-                        }
-                    }
-                }
-                
-                ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
-                    event.isCancelled = true
-                    
-                    if (event.view.isPlayerView()) {
-                        view.setItem(rawSlot, null)
-                        
-                        val blockedSlots = if (event.slot in 0..8)
-                            PLAYER_HOTBAR_BLOCKED_SLOTS
-                        else PLAYER_NON_HOTBAR_BLOCKED_SLOTS
-                        
-                        val leftover = view.bottomInventory.addItemCorrectly(clicked, blockedSlots)
-                        if (leftover != 0) {
-                            view.setItem(rawSlot, clicked.apply { amount = leftover })
-                        }
-                    } else {
-                        val toInv = if (event.clickedInventory == view.topInventory)
-                            view.bottomInventory else view.topInventory
-                        
-                        clicked.amount = toInv.addItemCorrectly(clicked)
-                    }
-                }
-                
-                else -> Unit
-            }
-            
-        }
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

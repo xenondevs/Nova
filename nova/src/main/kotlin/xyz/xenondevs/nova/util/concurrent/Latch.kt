@@ -1,29 +1,40 @@
 package xyz.xenondevs.nova.util.concurrent
 
 import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
 
 /**
  * A thread latch that can be turned on and off
  *
- * * on -> block awaiting thread
- * * off -> unblock awaiting thread
+ * * close -> block awaiting thread
+ * * open -> unblock awaiting thread
  */
-class Latch {
+internal class Latch {
     
     private val semaphore = Semaphore(1)
     
-    fun on() = semaphore.acquire()
+    fun close() = semaphore.acquire()
     
-    fun off() = semaphore.release()
+    fun open() = semaphore.release()
     
     fun await() {
         semaphore.acquire()
         semaphore.release()
     }
     
-    fun state() = semaphore.availablePermits() == 0
+    fun await(timeout: Long, unit: TimeUnit): Boolean {
+        if (semaphore.tryAcquire(timeout, unit)) {
+            semaphore.release()
+            return true
+        }
+        
+        return false
+    }
+    
+    fun isClosed(): Boolean =
+        semaphore.availablePermits() == 0
     
     fun toggle() =
-        if (state()) off() else on()
+        if (isClosed()) open() else close()
     
 }
