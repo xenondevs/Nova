@@ -96,8 +96,6 @@ debug:
   allow_craft_result_overwrite: false
   # The delay in ms to wait after the ApplicationStarted event has been fired (https://youtrack.jetbrains.com/issue/KTOR-4259)
   self_host_delay: 1000
-  # The timeout for chunk loading, in milliseconds
-  chunk_load_timeout: 120000
 
 # If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
 use_metric_prefixes: false

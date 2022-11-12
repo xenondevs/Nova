@@ -12,8 +12,6 @@ import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
@@ -22,6 +20,8 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
+import xyz.xenondevs.nova.util.concurrent.Latch
+import xyz.xenondevs.nova.util.pollFirstWhere
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
@@ -29,15 +29,11 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
 import kotlin.concurrent.write
-
-private val CHUNK_LOAD_TIMEOUT by configReloadable { DEFAULT_CONFIG.getLong("debug.chunk_load_timeout") }
 
 internal object WorldDataManager : Initializable(), Listener {
     
@@ -45,8 +41,10 @@ internal object WorldDataManager : Initializable(), Listener {
     override val dependsOn = setOf(AddonsInitializer, LegacyFileConverter, TileEntityManager, VanillaTileEntityManager, NetworkManager)
     
     private val worlds: MutableMap<UUID, WorldDataStorage> = Collections.synchronizedMap(HashMap()) // TODO: removing entries of unloaded worlds
-    private val tasks = ConcurrentLinkedQueue<Task>() // TODO: Map RegionFile -> Queue
-    private val activeLoadTasks = ConcurrentHashMap<ChunkPos, ChunkLoadTask>()
+    
+    private val saveTasks = ConcurrentLinkedQueue<World>()
+    private val chunkTasks: MutableMap<ChunkPos, Boolean> = Collections.synchronizedMap(HashMap())
+    private val chunkLocks: MutableMap<ChunkPos, Latch> = Collections.synchronizedMap(HashMap())
     
     override fun init() {
         LOGGER.info("Initializing WorldDataManager")
@@ -55,17 +53,36 @@ internal object WorldDataManager : Initializable(), Listener {
         
         thread(name = "Nova WorldDataManager", isDaemon = true) { // TODO: Use Phaser instead of Thread.sleep
             while (NOVA.isEnabled) {
-                while (this.tasks.isNotEmpty()) {
+                
+                while (saveTasks.isNotEmpty()) {
                     try {
-                        when (val task = this.tasks.poll()) {
-                            is ChunkLoadTask -> loadChunk(task)
-                            is ChunkUnloadTask -> unloadChunk(task)
-                            is SaveWorldTask -> saveWorld(task.world)
-                        }
+                        val world = saveTasks.poll()
+                        saveWorld(world)
                     } catch (t: Throwable) {
-                        LOGGER.log(Level.SEVERE, "An exception occurred in a WorldDataManager task", t)
+                        LOGGER.log(Level.SEVERE, "An exception occurred trying to save a world", t)
                     }
                 }
+                
+                while (chunkTasks.isNotEmpty()) {
+                    try {
+                        // Take the first chunk task that isn't busy
+                        val (pos, goal) = synchronized(chunkTasks) {
+                            chunkTasks.entries.pollFirstWhere { chunkLocks[it.key]?.isClosed() != true }
+                        } ?: break
+                        
+                        // Mark chunk pos as busy
+                        val latch = Latch()
+                        latch.close()
+                        chunkLocks[pos] = latch
+                        
+                        // Perform task
+                        if (goal) loadChunk(pos, latch)
+                        else unloadChunk(pos, latch)
+                    } catch (t: Throwable) {
+                        LOGGER.log(Level.SEVERE, "An exception occurred trying to load or unload a chunk", t)
+                    }
+                }
+                
                 Thread.sleep(50)
             }
         }
@@ -77,35 +94,31 @@ internal object WorldDataManager : Initializable(), Listener {
     
     //<editor-fold desc="queueing tasks", defaultstate="collapsed">
     private fun queueChunkLoad(pos: ChunkPos) {
-        this.tasks.removeIf { it is ChunkTask && it.pos == pos }
-        this.tasks.add(ChunkLoadTask(pos))
+        chunkTasks[pos] = true
     }
     
     private fun queueChunkUnload(pos: ChunkPos) {
-        this.tasks.removeIf { it is ChunkTask && it.pos == pos }
-        this.tasks.add(ChunkUnloadTask(pos))
+        chunkTasks[pos] = false
     }
     
     private fun queueWorldLoad(world: World) {
-        this.tasks.removeIf { it is ChunkTask && it.pos.worldUUID == world.uid }
-        world.loadedChunks.forEach { this.tasks.add(ChunkLoadTask(it.pos)) }
+        synchronized(chunkTasks) {
+            world.loadedChunks.forEach { chunkTasks[it.pos] = true }
+        }
     }
     
     private fun queueWorldUnload(world: World) {
-        this.tasks.removeIf { it is ChunkTask && it.pos.worldUUID == world.uid }
-        world.loadedChunks.forEach { this.tasks.add(ChunkUnloadTask(it.pos)) }
+        synchronized(chunkTasks) {
+            world.loadedChunks.forEach { chunkTasks[it.pos] = false }
+        }
     }
     //</editor-fold>
     
     //<editor-fold desc="loading / unloading chunks", defaultstate="collapsed">
-    private fun loadChunk(task: ChunkLoadTask) {
-        val pos = task.pos
-        if (pos.isLoaded() && !activeLoadTasks.contains(pos)) {
+    private fun loadChunk(pos: ChunkPos, latch: Latch) {
+        if (pos.isLoaded()) {
             // loads region from file if not already loaded
             val chunk = getRegion(pos).getChunk(pos)
-            
-            // Add active task
-            activeLoadTasks[pos] = task
             
             // the rest needs to be done in the server thread
             runTask {
@@ -115,20 +128,20 @@ internal object WorldDataManager : Initializable(), Listener {
                             // is RegionChunk already loaded?
                             if (chunk.isLoaded)
                                 return@runTask
-            
+                            
                             // copy blockstates map, only remove failed states from the event blockstates map
                             val blockStates = HashMap(chunk.blockStates).removeIf { (_, blockState) ->
                                 runCatching { blockState.handleInitialized(false) }
                                     .onFailure { LOGGER.log(Level.SEVERE, "Failed to initialize $blockState", it) }
                                     .isFailure
                             }
-            
+                            
                             // mark RegionChunk as loaded
                             chunk.isLoaded = true
-            
+                            
                             return@write blockStates
                         }
-        
+                        
                         // call event
                         val event = NovaChunkLoadedEvent(pos, blockStates)
                         Bukkit.getPluginManager().callEvent(event)
@@ -137,26 +150,16 @@ internal object WorldDataManager : Initializable(), Listener {
                     LOGGER.log(Level.SEVERE, "Failed to load chunk $pos", t)
                 }
                 
-                // mark task as completed
-                task.markCompleted()
-                activeLoadTasks -= pos
+                // task is completed
+                latch.open()
             }
         }
+        
+        // task will not run
+        latch.open()
     }
     
-    private fun unloadChunk(task: ChunkUnloadTask) {
-        val pos = task.pos
-        
-        // If there is a load task active, await its completion
-        val activeLoadTask = activeLoadTasks[pos]
-        if (activeLoadTask != null) {
-            if (!activeLoadTask.awaitCompletion(CHUNK_LOAD_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                LOGGER.severe("Chunk load timed out for $pos")
-                LOGGER.severe("Active load tasks: $activeLoadTask")
-                LOGGER.severe("Tasks: $tasks")
-            }
-        }
-        
+    private fun unloadChunk(pos: ChunkPos, latch: Latch) {
         // get chunk
         val chunk = worlds[pos.worldUUID]
             ?.getRegionOrNull(pos)
@@ -172,6 +175,9 @@ internal object WorldDataManager : Initializable(), Listener {
             // mark RegionChunk as unloaded
             chunk.isLoaded = false
         }
+        
+        // task is completed
+        latch.open()
     }
     
     private fun saveWorld(world: World) {
@@ -238,7 +244,7 @@ internal object WorldDataManager : Initializable(), Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handleWorldSave(event: WorldSaveEvent) {
         LegacyFileConverter.addConversionListener(event.world) {
-            this.tasks += SaveWorldTask(event.world)
+            saveTasks += event.world
         }
     }
     //</editor-fold>
