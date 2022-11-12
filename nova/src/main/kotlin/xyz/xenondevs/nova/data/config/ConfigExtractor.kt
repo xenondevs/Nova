@@ -45,8 +45,12 @@ internal object ConfigExtractor {
             storedCfg.set(path, internalValue)
         }
         
-        // update keys that were unchanged by the user
         internalCfg.getKeys(true).forEach { path ->
+            // reset comments
+            cfg.setComments(path, internalCfg.getComments(path))
+            cfg.setInlineComments(path, internalCfg.getInlineComments(path))
+            
+            // update keys that were unchanged by the user    
             val internalValue = internalCfg.get(path)
             if (internalValue is ConfigurationSection)
                 return@forEach
@@ -59,8 +63,6 @@ internal object ConfigExtractor {
                     (storedValue is List<*> && configuredValue is List<*> && storedValue.contentEquals(configuredValue)))
             ) {
                 cfg.set(path, internalValue)
-                cfg.setComments(path, internalCfg.getComments(path))
-                cfg.setInlineComments(path, internalCfg.getInlineComments(path))
                 storedCfg.set(path, internalValue)
             }
         }
