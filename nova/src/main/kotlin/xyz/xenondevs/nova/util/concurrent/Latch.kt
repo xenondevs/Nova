@@ -37,4 +37,8 @@ internal class Latch {
     fun toggle() =
         if (isClosed()) open() else close()
     
+    override fun toString(): String {
+        return "Latch(closed=${isClosed()})"
+    }
+    
 }

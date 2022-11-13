@@ -8,14 +8,19 @@ import net.minecraft.world.InteractionHand
 import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import xyz.xenondevs.nmsutils.network.event.PacketEventManager
+import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.nmsPos
+import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -30,14 +35,15 @@ import java.util.logging.Level
 
 private const val BREAK_COOLDOWN = 5
 
-internal object BlockBreaking {
+internal object BlockBreaking : Listener {
     
     private val breakCooldowns = ConcurrentHashMap<Player, Int>()
     private val playerBreakers = ConcurrentHashMap<Player, BlockBreaker>()
     private val internalBreakers = HashMap<Int, BreakMethod>()
     
     fun init() {
-        PacketEventManager.registerListener(this)
+        registerEvents()
+        registerPacketListener()
         runTaskTimer(0, 1, BlockBreaking::handleTick)
     }
     
@@ -150,6 +156,13 @@ internal object BlockBreaking {
             
             else -> false
         }
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    private fun handleQuit(event: PlayerQuitEvent) {
+        val player = event.player
+        breakCooldowns -= player
+        handleDestroyStop(player)
     }
     
 }
