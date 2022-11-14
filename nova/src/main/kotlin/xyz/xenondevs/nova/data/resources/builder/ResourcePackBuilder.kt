@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.WailaContent
+import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorContent
 import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.util.data.GSON
@@ -117,6 +118,7 @@ internal class ResourcePackBuilder {
             // init content
             val contents = listOf(
                 MaterialContent(basePacks, soundOverrides),
+                ArmorContent(),
                 GUIContent(),
                 LanguageContent(),
                 TextureIconContent()

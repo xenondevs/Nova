@@ -29,7 +29,7 @@ fun Wearable(type: ArmorType): ItemBehaviorFactory<Wearable> =
             Wearable(WearableOptions.semiConfigurable(type, material))
     }
 
-class Wearable(val options: WearableOptions) : ItemBehavior() {
+open class Wearable(val options: WearableOptions) : ItemBehavior() {
     
     override val attributeModifiers = combinedProvider(
         options.armorTypeProvider, options.armorProvider, options.armorToughnessProvider, options.knockbackResistanceProvider

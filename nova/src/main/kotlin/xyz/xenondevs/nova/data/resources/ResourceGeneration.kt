@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.FontChar
+import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
@@ -19,12 +20,13 @@ import java.security.MessageDigest
 
 private const val RESOURCES_HASH = "resourcesHash"
 private const val MODEL_DATA_LOOKUP = "modelDataLookup"
+private const val ARMOR_DATA_LOOKUP = "armorDataLookup"
 private const val LANGUAGE_LOOKUP = "languageLookup"
 private const val TEXTURE_ICON_LOOKUP = "textureIconLookup"
 private const val GUI_DATA_LOOKUP = "guiDataLookup"
 private const val WAILA_DATA_LOOKUP = "wailaDataLookup"
 
-private val ASSET_INDEX_FILES = listOf("assets/materials.json", "assets/guis.json")
+private val ASSET_INDEX_FILES = listOf("assets/materials.json", "assets/guis.json", "assets/armor.json")
 
 /**
  * Handles resource pack generation on startup.
@@ -52,6 +54,7 @@ internal object ResourceGeneration {
             ) {
                 // Load from PermanentStorage
                 Resources.modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, ModelData>>(MODEL_DATA_LOOKUP)!!
+                Resources.armorDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, ArmorTexture>>(ARMOR_DATA_LOOKUP)!!
                 Resources.languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>(LANGUAGE_LOOKUP)!!
                 Resources.textureIconLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(TEXTURE_ICON_LOOKUP)!!
                 Resources.wailaDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(WAILA_DATA_LOOKUP)!!

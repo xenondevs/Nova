@@ -12,7 +12,11 @@ internal object VanillaMaterialTypes {
         Material.WOODEN_SWORD to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING),
         Material.APPLE to setOf(VanillaMaterialProperty.CONSUMABLE_NORMAL),
         Material.DRIED_KELP to setOf(VanillaMaterialProperty.CONSUMABLE_FAST),
-        Material.GOLDEN_APPLE to setOf(VanillaMaterialProperty.CONSUMABLE_ALWAYS)
+        Material.GOLDEN_APPLE to setOf(VanillaMaterialProperty.CONSUMABLE_ALWAYS),
+        Material.LEATHER_HELMET to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.HELMET),
+        Material.LEATHER_CHESTPLATE to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.CHESTPLATE),
+        Material.LEATHER_LEGGINGS to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.LEGGINGS),
+        Material.LEATHER_BOOTS to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.BOOTS)
     )
     
     val DEFAULT_MATERIAL = Material.SHULKER_SHELL
@@ -22,7 +26,8 @@ internal object VanillaMaterialTypes {
         if (properties.isEmpty())
             return DEFAULT_MATERIAL
         
-        return MATERIAL_TYPES.entries.firstOrNull { (_, materialProperties) -> materialProperties.contentEquals(properties) }?.key
+        return MATERIAL_TYPES.entries.firstOrNull { (_, materialProperties) -> materialProperties.contentEquals(properties) }?.key // first, search for an exact match
+            ?: MATERIAL_TYPES.entries.firstOrNull { (_, materialProperties) -> materialProperties.containsAll(properties) }?.key // then, search for a material that might bring more properties with it
             ?: throw IllegalArgumentException("No material type for property combination: $properties")
     }
     

@@ -237,28 +237,14 @@ internal class MaterialContent(
     }
     
     private fun getModelFile(material: Material): Triple<File, JsonObject, JsonArray> {
-        val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/models/item/${material.name.lowercase()}.json")
-        if (!file.exists()) {
-            val modelObj = JsonObject()
-            
-            // fixme: This does not cover all cases
-            if (material.isBlock) {
-                modelObj.addProperty("parent", "block/${material.name.lowercase()}")
-            } else {
-                modelObj.addProperty("parent", "item/generated")
-                val textures = JsonObject().apply { addProperty("layer0", "item/${material.name.lowercase()}") }
-                modelObj.add("textures", textures)
-            }
-            
-            val overrides = JsonArray().also { modelObj.add("overrides", it) }
-            
-            return Triple(file, modelObj, overrides)
-        } else {
-            val modelObj = file.parseJson() as JsonObject
-            val overrides = (modelObj.get("overrides") as? JsonArray) ?: JsonArray().also { modelObj.add("overrides", it) }
-            
-            return Triple(file, modelObj, overrides)
-        }
+        val path = "minecraft/models/item/${material.name.lowercase()}.json"
+        val destFile = File(ResourcePackBuilder.ASSETS_DIR, path)
+        val sourceFile = destFile.takeIf(File::exists) ?: File(ResourcePackBuilder.MCASSETS_ASSETS_DIR, path)
+        require(sourceFile.exists()) { "Source model file does not exist: $sourceFile" }
+        
+        val modelObj = sourceFile.parseJson() as JsonObject
+        val overrides = (modelObj.get("overrides") as? JsonArray) ?: JsonArray().also { modelObj.add("overrides", it) }
+        return Triple(destFile, modelObj, overrides)
     }
     
     private fun getBlockStateFile(type: BlockStateConfigType<*>): Triple<File, JsonObject, JsonObject> {

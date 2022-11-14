@@ -251,7 +251,7 @@ internal object PacketItems : Initializable(), Listener {
             newItemTag.getCompound("display")
         } else CompoundTag().also { newItemTag.put("display", it) }
         
-        val itemDisplayData = novaItem.getPacketItemData(item.bukkitStack)
+        val itemDisplayData = novaItem.getPacketItemData(item.bukkitStack, newItemTag)
         
         // name
         var itemDisplayName = itemDisplayData.name

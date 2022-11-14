@@ -5,6 +5,7 @@ package xyz.xenondevs.nova.item
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -60,8 +61,8 @@ class NovaItem(holders: List<ItemBehaviorHolder<*>>) {
         return builder
     }
     
-    internal fun getPacketItemData(itemStack: ItemStack): PacketItemData {
-        val itemData = PacketItemData()
+    internal fun getPacketItemData(itemStack: ItemStack, nbt: CompoundTag): PacketItemData {
+        val itemData = PacketItemData(nbt)
         behaviors.forEach { it.updatePacketItemData(itemStack, itemData) }
         return itemData.also { if (it.name == null) it.name = this.name }
     }
