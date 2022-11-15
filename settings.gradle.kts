@@ -41,7 +41,7 @@ dependencyResolutionManagement {
             library("maven-resolver-transport-http", "org.apache.maven.resolver:maven-resolver-transport-http:1.8.2")
             
             // lib - minecraft assets
-            library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.1")
+            library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.2")
             library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.2")
             library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:0.1")
             
