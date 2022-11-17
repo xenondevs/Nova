@@ -118,5 +118,7 @@
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "你不能在这个区块再放置更多的方块了.",
   "nova.tile_entity_limits.amount_global.deny": "你不能再放置更多这种类型的方块了.",
   "nova.tile_entity_limits.amount_per_chunk.deny": "你不能在这个区块再放置更多这种类型的方块了.",
-  "nova.tile_entity_limits.amount_global_total.deny": "你不能再放置更多的方块了."
+  "nova.tile_entity_limits.amount_global_total.deny": "你不能再放置更多的方块了.",
+  "waila.nova.required_tool.unknown": "工具: 未知",
+  "nova.tile_entity_limits.type_blacklist.deny": "你无权放置更多这种类型的方块实体."
 }
