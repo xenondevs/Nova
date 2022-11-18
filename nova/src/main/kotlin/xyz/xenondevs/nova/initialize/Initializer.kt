@@ -66,7 +66,6 @@ import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.*
 import java.util.logging.Level
 import kotlin.reflect.jvm.jvmName
-import kotlin.system.exitProcess
 
 internal object Initializer : Listener {
     
@@ -83,6 +82,8 @@ internal object Initializer : Listener {
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())
     var isDone = false
         private set
+    
+    private var failedPreWorld = false
     
     fun initPreWorld() {
         registerEvents()
@@ -106,13 +107,13 @@ internal object Initializer : Listener {
         
         toInit.forEach { it.initialization.get() }
         
-        isDone = true
-        
-        if (initialized.size != toInit.size)
+        if (initialized.size != toInit.size) {
+            failedPreWorld = true
             performAppropriateShutdown()
+        }
     }
     
-    fun initPostWorld() {
+    private fun initPostWorld() {
         runAsyncTask {
             val toInit = INITIALIZABLES.filter { it.initializationStage != InitializationStage.PRE_WORLD }
             
@@ -133,6 +134,7 @@ internal object Initializer : Listener {
             toInit.forEach { it.initialization.get() }
             
             if (initialized.size == INITIALIZABLES.size) {
+                isDone = true
                 callEvent(NovaLoadDataEvent())
                 
                 runTask {
@@ -179,7 +181,7 @@ internal object Initializer : Listener {
     private fun performAppropriateShutdown() {
         if (Patcher.ENABLED) {
             LOGGER.warning("Shutting down the server...")
-            exitProcess(-1)
+            Bukkit.shutdown()
         } else {
             Bukkit.getPluginManager().disablePlugin(NOVA.loader)
         }
@@ -194,7 +196,9 @@ internal object Initializer : Listener {
     
     @EventHandler
     private fun handleServerStarted(event: ServerLoadEvent) {
-        initPostWorld()
+        if (!failedPreWorld) {
+            initPostWorld()
+        } else LOGGER.warning("Skipping post world initialization")
     }
     
     private fun setupMetrics() {
