@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.JsonParseException
 import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import com.google.gson.reflect.TypeToken
@@ -61,7 +62,13 @@ val GSON: Gson = GSON_BUILDER.create()
 
 val PRETTY_GSON: Gson = GSON_BUILDER.setPrettyPrinting().create()
 
-fun File.parseJson(): JsonElement = reader().use(JsonParser::parseReader)
+fun File.parseJson(): JsonElement {
+    try {
+        return reader().use(JsonParser::parseReader)
+    } catch(e: Exception) {
+        throw JsonParseException("Could not parse json file: $this", e)
+    }
+}
 
 fun JsonObject.hasString(property: String) =
     has(property) && this[property].isString()
