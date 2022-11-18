@@ -13,10 +13,14 @@ import java.io.File
 import java.nio.file.Path
 import java.util.logging.Level
 
-private val WHITELISTED_FILE_TYPES = hashSetOf(
+private val DEFAULT_WHITELISTED_FILE_TYPES: Set<String> = hashSetOf(
     "json", "png", "mcmeta", "ogg", "txt", "bin", "fsh", "vsh", "glsl", // vanilla
     "properties" // optifine
 )
+
+private val WHITELISTED_FILE_TYPES: Set<String> by configReloadable {
+    DEFAULT_CONFIG.getStringList("resource_pack.whitelisted_file_types").mapTo(HashSet()) { it.lowercase() } + DEFAULT_WHITELISTED_FILE_TYPES
+}
 
 private val BASE_PACKS by configReloadable { DEFAULT_CONFIG.getStringList("resource_pack.base_packs").map(::File) }
 
