@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
+import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.WearableOptions
@@ -144,6 +145,11 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
     }
     
     override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
+        val textureColor = textureColor
+        if (textureColor != null) {
+            itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", textureColor)
+            itemData.hide(HideableFlag.DYE)
+        }
         textureColor?.let { itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", it) }
     }
     
