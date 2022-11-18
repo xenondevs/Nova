@@ -26,7 +26,7 @@ internal class ArmorContent : PackContent {
     private val textures = HashMap<RegisteredArmor, Array<List<BufferedImage>?>>()
     private val emissivityMaps = HashMap<RegisteredArmor, Array<List<BufferedImage>?>>()
     
-    private var currentColor = 1
+    private var color = 0
     
     override fun addFromPack(pack: AssetPack) {
         pack.armorIndex?.forEach { armor ->
@@ -45,10 +45,8 @@ internal class ArmorContent : PackContent {
     }
     
     private fun nextColor(): Int {
-        check(currentColor <= 0xFFFFFF)
-        val color = currentColor
-        currentColor += 2 // only use odd color values and leave the rest for vanilla armor colors
-        return color or (0xFF shl 24)
+        check(color <= 0xFFFFFF)
+        return color++ or (0xFF shl 24)
     }
     
     override fun write() {

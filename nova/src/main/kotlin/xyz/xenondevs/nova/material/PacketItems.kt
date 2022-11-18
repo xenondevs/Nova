@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.material
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -31,7 +32,9 @@ import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
+import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
@@ -91,8 +94,11 @@ internal object PacketItems : Initializable(), Listener {
         
         items.forEachIndexed { i, item ->
             val newItem = getClientsideItemOrNull(player, item, fromCreative = false)
-            if (newItem != null)
+            if (newItem != null) {
                 items[i] = newItem
+            } else if (isIllegallyColoredArmor(item)) {
+                items[i] = getColorCorrectedArmor(item)
+            }
         }
         
         if (isNovaItem(carriedItem))
@@ -104,8 +110,11 @@ internal object PacketItems : Initializable(), Listener {
         val packet = event.packet
         val item = packet.item
         val newItem = getClientsideItemOrNull(event.player, item, fromCreative = false)
-        if (newItem != null)
+        if (newItem != null) {
             event.item = newItem
+        } else if (isIllegallyColoredArmor(item)) {
+            event.item = getColorCorrectedArmor(item)
+        }
     }
     
     @PacketHandler
@@ -129,9 +138,14 @@ internal object PacketItems : Initializable(), Listener {
         val packet = event.packet
         val slots = packet.slots
         
-        slots.forEachIndexed { i, slot ->
-            if (isNovaItem(slot.second))
-                slots[i] = MojangPair(slot.first, getFakeItem(player, slot.second))
+        slots.forEachIndexed { i, pair ->
+            val slot = pair.first
+            val itemStack = pair.second
+            if (isNovaItem(itemStack)) {
+                slots[i] = MojangPair(slot, getFakeItem(player, itemStack))
+            } else if (isIllegallyColoredArmor(itemStack)) {
+                slots[i] = MojangPair(slot, getColorCorrectedArmor(itemStack))
+            }
         }
     }
     
@@ -139,10 +153,13 @@ internal object PacketItems : Initializable(), Listener {
     private fun handleCreativeSetItem(event: ServerboundSetCreativeModeSlotPacketEvent) {
         val packet = event.packet
         val item = packet.item
-        if (isContainerItem(item))
+        if (isContainerItem(item)) {
             event.item = filterContainerItems(item, fromCreative = true)
-        else if (isFakeItem(item))
+        } else if (isFakeItem(item)) {
             event.item = getNovaItem(item)
+        } else if (isIllegallyColoredArmor(item)) {
+            event.item = getColorCorrectedArmor(item)
+        }
     }
     
     @PacketHandler
@@ -196,6 +213,24 @@ internal object PacketItems : Initializable(), Listener {
     private fun isContainerItem(item: MojangStack): Boolean {
         return item.item == Items.BUNDLE
             || item.item in ItemUtils.SHULKER_BOX_ITEMS
+    }
+    
+    private fun isIllegallyColoredArmor(itemStack: MojangStack): Boolean {
+        val item = itemStack.item
+        if (item == Items.LEATHER_BOOTS
+            || item == Items.LEATHER_LEGGINGS
+            || item == Items.LEATHER_CHESTPLATE
+            || item == Items.LEATHER_HELMET
+        ) {
+            val color = itemStack.tag?.getOrNull<CompoundTag>("display")?.getOrNull<IntTag>("color")?.asInt
+            // custom textures use colors with mask 0xFF << 24
+            if (color != null && (color ushr 24 == 0xFF)) {
+                // allow armor from custom item services to have any color
+                return CustomItemServiceManager.getId(itemStack.bukkitMirror) == null
+            }
+        }
+        
+        return false
     }
     
     private fun getNovaItem(item: MojangStack): MojangStack {
@@ -285,10 +320,17 @@ internal object PacketItems : Initializable(), Listener {
         
         // hide flags
         val hiddenFlags = itemDisplayData.hiddenFlags
-        if (!hiddenFlags.isNullOrEmpty()) {
+        if (hiddenFlags.isNotEmpty()) {
             newItemTag.putInt("HideFlags", HideableFlag.toInt(hiddenFlags))
         }
         
+        return newItem
+    }
+    
+    private fun getColorCorrectedArmor(item: MojangStack): MojangStack {
+        val newItem = item.copy()
+        val display = newItem.tag!!.getCompound("display")
+        display.putInt("color", display.getInt("color") and 0xFFFFFF)
         return newItem
     }
     
