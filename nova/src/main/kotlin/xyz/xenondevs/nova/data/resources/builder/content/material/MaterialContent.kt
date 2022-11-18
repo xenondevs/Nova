@@ -4,8 +4,10 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.ModelData
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.BlockSoundOverrides
@@ -39,7 +41,7 @@ internal class MaterialContent(
     private val soundOverrides: BlockSoundOverrides
 ) : PackContent {
     
-    private val novaMaterials = HashMap<String, RegisteredMaterial>()
+    private val novaMaterials = HashMap<NamespacedId, RegisteredMaterial>()
     
     private val modelDataPosition = HashMap<Material, Int>()
     
@@ -76,7 +78,7 @@ internal class MaterialContent(
     @Suppress("ReplaceWithEnumMap")
     override fun write() {
         // the general lookup later passed to Resources
-        val modelDataLookup = HashMap<String, Pair<HashMap<Material, ItemModelData>?, BlockModelData?>>()
+        val modelDataLookup = HashMap<NamespacedId, ModelData>()
         
         // stores the custom model id overrides, used to prevent duplicate registration of armor stand models and for writing to the respective file
         val customItemModels = HashMap<Material, HashMap<String, Int>>()
@@ -90,7 +92,7 @@ internal class MaterialContent(
             val info = regMat.itemInfo
             // create map containing all ItemModelData instances for each vanilla material of this item
             val materialsMap: HashMap<Material, ItemModelData> = HashMap()
-            modelDataLookup[id] = materialsMap to null
+            modelDataLookup[id] = ModelData(materialsMap, null, regMat.armor)
             // register that item model under the required vanilla materials
             val materials = info.material?.let(::listOf) ?: VanillaMaterialTypes.MATERIALS
             materials.forEach { material ->
@@ -105,7 +107,7 @@ internal class MaterialContent(
             .sortedByDescending { it.value.blockInfo.priority }
             .forEach { (id, regMat) ->
                 val info = regMat.blockInfo
-                val itemModelData = modelDataLookup[id]!!.first
+                val modelData = modelDataLookup[id]!!
                 
                 val blockModelData: BlockModelData
                 if (getRemainingBlockStateIdAmount(info.type) < info.models.size) {
@@ -137,7 +139,7 @@ internal class MaterialContent(
                     blockModelData = BlockStateBlockModelData(id, configs)
                 }
                 
-                modelDataLookup[id] = itemModelData to blockModelData
+                modelDataLookup[id] = modelData.copy(block = blockModelData)
             }
         
         // pass modelDataLookup to Resources

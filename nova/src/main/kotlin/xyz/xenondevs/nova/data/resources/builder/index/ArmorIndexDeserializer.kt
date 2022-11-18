@@ -67,7 +67,7 @@ internal object ArmorIndexDeserializer {
                 layer1EmissivityMap?.let { ArmorEmissivityMapPath(ResourcePath.of(it, namespace)) },
                 layer2EmissivityMap?.let { ArmorEmissivityMapPath(ResourcePath.of(it, namespace)) },
                 interpolationMode,
-                (fps * 24).roundToInt()
+                fps,
             )
         }
         

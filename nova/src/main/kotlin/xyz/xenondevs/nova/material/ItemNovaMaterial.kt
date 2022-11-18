@@ -30,7 +30,7 @@ open class ItemNovaMaterial internal constructor(
     val maxStackSize: Int by lazyProvider { novaItem.vanillaMaterialProvider.map { min(maxStackSize, it.maxStackSize) } }
     
     val item: ItemModelData by lazy {
-        val itemModelData = Resources.getModelData(id).first!!
+        val itemModelData = Resources.getModelData(id).item!!
         if (itemModelData.size == 1)
             return@lazy itemModelData.values.first()
         

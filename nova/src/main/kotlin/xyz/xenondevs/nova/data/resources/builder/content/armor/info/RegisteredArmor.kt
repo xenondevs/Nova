@@ -16,7 +16,7 @@ internal data class RegisteredArmor(
     val layer1EmissivityMap: ArmorEmissivityMapPath?,
     val layer2EmissivityMap: ArmorEmissivityMapPath?,
     val interpolationMode: InterpolationMode,
-    val animationSpeed: Int
+    val fps: Double
 ) {
     
     enum class InterpolationMode {

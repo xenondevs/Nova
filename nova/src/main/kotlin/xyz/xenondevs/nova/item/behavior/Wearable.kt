@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item.behavior
 
+import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
@@ -10,13 +11,18 @@ import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.provider.combinedProvider
+import xyz.xenondevs.nova.data.provider.lazyProviderWrapper
 import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
+import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.WearableOptions
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.ArmorType
 import xyz.xenondevs.nova.player.equipment.EquipMethod
+import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.takeUnlessAir
@@ -29,7 +35,26 @@ fun Wearable(type: ArmorType): ItemBehaviorFactory<Wearable> =
             Wearable(WearableOptions.semiConfigurable(type, material))
     }
 
-open class Wearable(val options: WearableOptions) : ItemBehavior() {
+class Wearable(val options: WearableOptions) : ItemBehavior() {
+    
+    private val textureColor: Int? by lazy {
+        Resources.getModelData(novaMaterial.id).armor
+            ?.let { Resources.getArmorData(it) }?.color
+    }
+    
+    override val vanillaMaterialProperties = lazyProviderWrapper {
+        if (textureColor == null)
+            return@lazyProviderWrapper emptyList()
+        
+        return@lazyProviderWrapper listOf(
+            when (options.armorType) {
+                ArmorType.HELMET -> VanillaMaterialProperty.HELMET
+                ArmorType.CHESTPLATE -> VanillaMaterialProperty.CHESTPLATE
+                ArmorType.LEGGINGS -> VanillaMaterialProperty.LEGGINGS
+                ArmorType.BOOTS -> VanillaMaterialProperty.BOOTS
+            }
+        )
+    }
     
     override val attributeModifiers = combinedProvider(
         options.armorTypeProvider, options.armorProvider, options.armorToughnessProvider, options.knockbackResistanceProvider
@@ -116,6 +141,10 @@ open class Wearable(val options: WearableOptions) : ItemBehavior() {
         val event = ArmorEquipEvent(player, method, previous, now)
         Bukkit.getPluginManager().callEvent(event)
         return event.isCancelled
+    }
+    
+    override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
+        textureColor?.let { itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", it) }
     }
     
     companion object : ItemBehaviorFactory<Wearable>() {

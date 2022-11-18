@@ -35,7 +35,7 @@ open class BlockNovaMaterial internal constructor(
     val multiBlockLoader: MultiBlockLoader?
 ) : ItemNovaMaterial(id, localizedName, novaItem, maxStackSize) {
     
-    val block: BlockModelData by lazy { Resources.getModelData(id).second!! }
+    val block: BlockModelData by lazy { Resources.getModelData(id).block!! }
     
     val hardness = options.hardness
     val toolCategories = options.toolCategories

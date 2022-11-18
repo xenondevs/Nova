@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.resources.builder.content.material.info
 
 import org.bukkit.Material
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.enumMapOf
@@ -34,7 +35,7 @@ internal object VanillaMaterialTypes {
 }
 
 internal class ItemModelInformation(
-    override val id: String,
+    override val id: NamespacedId,
     override val models: List<String>,
     val material: Material? = null
 ) : ModelInformation {

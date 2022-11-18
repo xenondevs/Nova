@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockDirection
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelInformation
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelType
@@ -29,7 +30,8 @@ internal object MaterialsIndexDeserializer {
         json.entrySet().forEach { (name, element) ->
             val itemInfo: ItemModelInformation?
             val blockInfo: BlockModelInformation?
-            val id = name.addNamespace(namespace)
+            val armorInfo: NamespacedId?
+            val id = NamespacedId(namespace, name)
             
             if (element is JsonObject) {
                 val item = element.get("item")
@@ -62,12 +64,15 @@ internal object MaterialsIndexDeserializer {
                         }
                 } else null
                 
+                armorInfo = element.getString("armor")?.let { NamespacedId.of(it, namespace) }
+                
             } else if (element.isString()) {
                 itemInfo = ItemModelInformation(id, listOf(element.asString.addNamespace(namespace)))
                 blockInfo = null
+                armorInfo = null
             } else throw UnsupportedOperationException()
             
-            index += RegisteredMaterial(id, itemInfo, blockInfo ?: itemInfo.toBlockInfo())
+            index += RegisteredMaterial(id, itemInfo, blockInfo ?: itemInfo.toBlockInfo(), armorInfo)
         }
         
         return index

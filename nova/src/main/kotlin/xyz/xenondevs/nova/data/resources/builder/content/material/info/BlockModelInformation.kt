@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.resources.builder.content.material.info
 
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig
@@ -40,7 +41,7 @@ internal enum class BlockDirection(val char: Char, val x: Int, val y: Int) {
 }
 
 internal class BlockModelInformation(
-    override val id: String,
+    override val id: NamespacedId,
     type: BlockModelType?,
     hitboxType: Material?,
     override val models: List<String>,

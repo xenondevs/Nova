@@ -8,7 +8,11 @@ import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 
-typealias ModelData = Pair<Map<Material, ItemModelData>?, BlockModelData?>
+data class ModelData(
+    val item: Map<Material, ItemModelData>? = null,
+    val block: BlockModelData? = null,
+    val armor: NamespacedId? = null
+)
 
 object Resources {
     
@@ -19,14 +23,14 @@ object Resources {
     internal lateinit var textureIconLookup: Map<String, FontChar>
     internal lateinit var languageLookup: Map<String, Map<String, String>>
     
-    internal fun updateModelDataLookup(modelDataLookup: Map<String, ModelData>) {
-        this.modelDataLookup = modelDataLookup
-        PermanentStorage.store("modelDataLookup", modelDataLookup)
+    internal fun updateModelDataLookup(modelDataLookup: Map<NamespacedId, ModelData>) {
+        this.modelDataLookup = modelDataLookup.mapKeysTo(HashMap()) { it.key.toString() }
+        PermanentStorage.store("modelDataLookup", this.modelDataLookup)
     }
     
-    internal fun updateArmorDataLookup(armorDataLookup: Map<String, ArmorTexture>) {
-        this.armorDataLookup = armorDataLookup
-        PermanentStorage.store("armorDataLookup", armorDataLookup)
+    internal fun updateArmorDataLookup(armorDataLookup: Map<NamespacedId, ArmorTexture>) {
+        this.armorDataLookup = armorDataLookup.mapKeysTo(HashMap()) { it.key.toString() }
+        PermanentStorage.store("armorDataLookup", this.armorDataLookup)
     }
     
     internal fun updateGuiDataLookup(guiDataLookup: Map<String, FontChar>) {
