@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
 import java.io.File
 import java.nio.file.Path
+import java.util.logging.Level
 
 private val WHITELISTED_FILE_TYPES = hashSetOf(
     "json", "png", "mcmeta", "ogg", "txt", "bin", "fsh", "vsh", "glsl", // vanilla
@@ -59,7 +60,11 @@ internal class BasePacks {
                 packFile.parentFile.mkdirs()
                 val fileMerger = mergers.firstOrNull { relPath.startsWith(it.path) }
                 if (fileMerger != null) {
-                    fileMerger.merge(file, packFile)
+                    try {
+                        fileMerger.merge(file, packFile)
+                    } catch (t: Throwable) {
+                        LOGGER.log(Level.SEVERE, "An exception occurred trying to merge base pack file \"$file\" with \"$packFile\"", t)
+                    }
                 } else if (!packFile.exists()) {
                     file.copyTo(packFile)
                 } else {
