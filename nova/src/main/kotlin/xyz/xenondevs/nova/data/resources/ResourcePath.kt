@@ -1,7 +1,6 @@
-package xyz.xenondevs.nova.data.resources
+@file:Suppress("MemberVisibilityCanBePrivate")
 
-private val NAMESPACED_ENTRY = Regex("""^([a-z0-9._-]+):([a-z0-9/._-]+)$""")
-private val NON_NAMESPACED_ENTRY = Regex("""^([a-z0-9/._-]+)$""")
+package xyz.xenondevs.nova.data.resources
 
 data class ResourcePath(val namespace: String, val path: String) {
     
@@ -20,6 +19,9 @@ data class ResourcePath(val namespace: String, val path: String) {
     }
     
     companion object {
+        
+        val NAMESPACED_ENTRY = Regex("""^([a-z0-9._-]+):([a-z0-9/._-]+)$""")
+        val NON_NAMESPACED_ENTRY = Regex("""^([a-z0-9/._-]+)$""")
         
         fun of(id: String, fallbackNamespace: String = "minecraft"): ResourcePath {
             return if (NON_NAMESPACED_ENTRY.matches(id)) {

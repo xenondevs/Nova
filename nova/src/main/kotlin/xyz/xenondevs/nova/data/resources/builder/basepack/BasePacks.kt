@@ -5,6 +5,7 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
@@ -52,8 +53,15 @@ internal class BasePacks {
         packDir.walkTopDown()
             .filter(File::isFile)
             .forEach { file ->
+                // Validate file extension
                 if (file.extension.lowercase() !in WHITELISTED_FILE_TYPES) {
                     LOGGER.info("Skipping file $file as it is not a resource pack file")
+                    return@forEach
+                }
+                
+                // Validate file name
+                if (!ResourcePath.NON_NAMESPACED_ENTRY.matches(file.name)) {
+                    LOGGER.info("Skipping file $file as its name does not match regex ${ResourcePath.NON_NAMESPACED_ENTRY}")
                     return@forEach
                 }
                 
