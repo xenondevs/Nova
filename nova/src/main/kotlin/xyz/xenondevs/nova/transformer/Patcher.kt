@@ -36,7 +36,7 @@ internal object Patcher : Initializable() {
     override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = emptySet<Initializable>()
     
-    private val extraOpens = setOf("java.lang", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
+    private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
         sequenceOf(
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
@@ -59,8 +59,9 @@ internal object Patcher : Initializable() {
         
         LOGGER.info("Applying patches...")
         VirtualClassPath.classLoaders += NOVA.loader.javaClass.classLoader.parent
-        redefineModule()
+        redefineModuleAddNovaOpens()
         runTransformers()
+        redefineModuleAddEveryoneOpens()
         insertPatchedLoader()
     }
     
@@ -69,13 +70,32 @@ internal object Patcher : Initializable() {
             removePatchedLoader()
     }
     
-    private fun redefineModule() {
-        val myModule = setOf(Nova::class.java.module)
+    private fun redefineModuleAddNovaOpens() {
+        val novaModule = setOf(Nova::class.java.module)
+        val javaBase = Field::class.java.module
+        
         INSTRUMENTATION.redefineModule(
-            Field::class.java.module, // java.base module
+            javaBase,
             emptySet(),
             emptyMap(),
-            extraOpens.associateWith { myModule },
+            extraOpens.associateWith { novaModule },
+            emptySet(),
+            emptyMap()
+        )
+    }
+    
+    // Due to the FieldFilterPatch, other plugins might now discover fields that they previously didn't have access to.
+    // To prevent any issues with those plugins now trying to access fields which aren't accessible due to module restrictions,
+    // we open those packages to all modules. (See: https://github.com/xenondevs/Nova/issues/200)
+    private fun redefineModuleAddEveryoneOpens() {
+        val everyoneModule = setOf(ReflectionUtils.getField(Module::class.java, true, "EVERYONE_MODULE").get(null) as Module)
+        val javaBase = Field::class.java.module
+        
+        INSTRUMENTATION.redefineModule(
+            javaBase,
+            emptySet(),
+            emptyMap(),
+            extraOpens.associateWith { everyoneModule },
             emptySet(),
             emptyMap()
         )
