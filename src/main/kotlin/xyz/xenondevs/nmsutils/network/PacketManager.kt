@@ -18,15 +18,19 @@ import xyz.xenondevs.nmsutils.internal.util.DEDICATED_SERVER
 import xyz.xenondevs.nmsutils.internal.util.channels
 import xyz.xenondevs.nmsutils.internal.util.connection
 import xyz.xenondevs.nmsutils.internal.util.serverPlayer
+import net.minecraft.world.entity.player.Player as MojangPlayer
 
 val Player.packetHandler: PacketHandler?
     get() = PacketManager.playerHandlers[name]
 
+val MojangPlayer.packetHandler: PacketHandler?
+    get() = PacketManager.playerHandlers[scoreboardName]
+
 fun Player.send(vararg bufs: FriendlyByteBuf, retain: Boolean = true, flush: Boolean = true) {
-    val queue = packetHandler?.queue ?: return
+    val packetHandler = packetHandler ?: return
     bufs.forEach {
         if (retain) it.retain()
-        queue += it
+        packetHandler.queueByteBuf(it)
     }
     
     if (flush) connection.connection.channel.flush()

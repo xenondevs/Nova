@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package xyz.xenondevs.nmsutils.network
 
 import io.netty.channel.Channel
@@ -7,15 +9,31 @@ import io.netty.channel.ChannelPromise
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.login.ServerboundHelloPacket
+import net.minecraft.resources.ResourceKey
 import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.LOGGER
+import xyz.xenondevs.nmsutils.internal.util.DEDICATED_SERVER
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.logging.Level
+import net.minecraft.world.entity.player.Player as MojangPlayer
 
-class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
+private typealias PacketCondition = (Packet<*>) -> Boolean
+
+private interface PacketDropRequest {
+    val condition: PacketCondition
+}
+
+private class IndefinitePacketDropRequest(override val condition: PacketCondition) : PacketDropRequest
+
+private class LimitedPacketDropRequest(override val condition: PacketCondition, var n: Int) : PacketDropRequest
+
+class PacketHandler internal constructor(private val channel: Channel) : ChannelDuplexHandler() {
     
-    val queue = ConcurrentLinkedQueue<FriendlyByteBuf>()
+    private val queue = ConcurrentLinkedQueue<FriendlyByteBuf>()
+    private val incomingDropQueue = CopyOnWriteArrayList<PacketDropRequest>()
+    private val outgoingDropQueue = CopyOnWriteArrayList<PacketDropRequest>()
     var player: Player? = null
     
     constructor(channel: Channel, player: Player) : this(channel) {
@@ -24,6 +42,9 @@ class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
     }
     
     override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
+        if (shouldDrop(msg, outgoingDropQueue))
+            return
+        
         val packet = callEvent(msg) ?: return
         super.write(ctx, packet, promise)
     }
@@ -33,9 +54,32 @@ class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
             PacketManager.playerHandlers[msg.name] = this
             super.channelRead(ctx, msg)
         } else {
+            if (shouldDrop(msg, incomingDropQueue))
+                return
+            
             val packet = callEvent(msg) ?: return
             super.channelRead(ctx, packet)
         }
+    }
+    
+    private fun shouldDrop(msg: Any?, list: MutableList<PacketDropRequest>): Boolean {
+        if (msg !is Packet<*> || list.isEmpty())
+            return false
+        
+        val iterator = list.iterator()
+        for (request in iterator) {
+            if (request.condition.invoke(msg)) {
+                if (request is LimitedPacketDropRequest) {
+                    request.n--
+                    if (request.n <= 0)
+                        iterator.remove()
+                }
+                
+                return true
+            }
+        }
+        
+        return false
     }
     
     override fun flush(ctx: ChannelHandlerContext?) {
@@ -60,6 +104,26 @@ class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
         return msg
     }
     
+    fun queueByteBuf(buf: FriendlyByteBuf) {
+        queue += buf
+    }
+    
+    fun dropNextIncoming(n: Int, condition: PacketCondition) {
+        incomingDropQueue += LimitedPacketDropRequest(condition, n)
+    }
+    
+    fun dropAllIncoming(condition: PacketCondition) {
+        incomingDropQueue += IndefinitePacketDropRequest(condition)
+    }
+    
+    fun dropNextOutgoing(n: Int, condition: PacketCondition) {
+        outgoingDropQueue += LimitedPacketDropRequest(condition, n)
+    }
+    
+    fun dropAllOutgoing(condition: PacketCondition) {
+        outgoingDropQueue += IndefinitePacketDropRequest(condition)
+    }
+    
     fun injectIncoming(msg: Any) {
         if (channel.eventLoop().inEventLoop()) {
             super.channelRead(channel.pipeline().context(this), msg)
@@ -74,6 +138,24 @@ class PacketHandler(private val channel: Channel) : ChannelDuplexHandler() {
         } else channel.eventLoop().execute {
             super.write(channel.pipeline().context(this), msg, promise)
         }
+    }
+    
+    companion object {
+        
+        @Suppress("DEPRECATION")
+        fun preventLevelBroadcast(player: MojangPlayer?, x: Double, y: Double, z: Double, maxDistance: Double, dimension: ResourceKey<*>, n: Int, condition: (Packet<*>) -> Boolean) {
+            DEDICATED_SERVER.playerList.players.forEach {
+                if (it != player && it.level.dimension() == dimension && (player == null || it.bukkitEntity.canSee(player.bukkitEntity))) {
+                    val dx = x - it.x
+                    val dy = y - it.y
+                    val dz = z - it.z
+                    if (dx * dx + dy * dy + dz * dz < maxDistance * maxDistance) {
+                        it.packetHandler!!.dropNextOutgoing(n, condition)
+                    }
+                }
+            }
+        }
+        
     }
     
 }

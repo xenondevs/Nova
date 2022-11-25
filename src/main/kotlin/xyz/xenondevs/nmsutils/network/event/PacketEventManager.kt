@@ -12,6 +12,7 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetC
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundCustomSoundPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundLevelChunkWithLightPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundLevelEventPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundMerchantOffersPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentPacketEvent
@@ -64,6 +65,7 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundBlockEventPacketEvent)
         registerPlayerEventType(::ClientboundBossEventPacketEvent)
         registerPlayerEventType(::ClientboundMerchantOffersPacketEvent)
+        registerPlayerEventType(::ClientboundLevelEventPacketEvent)
         
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)
