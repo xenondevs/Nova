@@ -19,7 +19,7 @@ dependencies {
     novaLoaderApi("de.studiocode.invui:InvUI:0.8.2") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
     novaLoaderApi("de.studiocode.invui:ResourcePack:0.8.1") { exclude("de.studiocode.invui", "InvUI") }
     novaLoaderApi("de.studiocode.invui:IA-R11:0.8.1:remapped-mojang")
-    novaLoaderApi("xyz.xenondevs:nms-utilities:0.3:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs:nms-utilities:0.4:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:particle:1.8")
     
     // internal dependencies

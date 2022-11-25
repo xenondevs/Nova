@@ -35,20 +35,18 @@ import xyz.xenondevs.nova.util.getAllDrops
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.damageToolBreakBlock
-import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.particleBuilder
-import xyz.xenondevs.nova.util.remove
+import xyz.xenondevs.nova.util.removeInternal
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
-import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
@@ -259,7 +257,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val seq
                 player.damageToolBreakBlock()
             
             // remove block
-            block.remove(ctx, !brokenClientside || BlockSoundEngine.overridesSound(block.type.soundGroup.breakSound.key.key), !brokenClientside)
+            block.removeInternal(ctx, true, !brokenClientside)
         } else {
             // If the block wasn't broken clientside, the client will keep breaking the block and not send
             // START_DESTROY_BLOCK again. For those cases, the internal progress will be reset as well.

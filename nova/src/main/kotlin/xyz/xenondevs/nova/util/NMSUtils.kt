@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST")
+@file:Suppress("unused")
 
 package xyz.xenondevs.nova.util
 
@@ -12,9 +12,12 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 import net.minecraft.world.level.chunk.LevelChunkSection
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -32,6 +35,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
@@ -69,6 +73,12 @@ val Location.blockPos: MojangBlockPos
 
 val BlockPos.nmsPos: MojangBlockPos
     get() = MojangBlockPos(x, y, z)
+
+val MojangBlockPos.vec3: Vec3
+    get() = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
+
+val MojangBlockPos.center: Vec3
+    get() = Vec3(x + 0.5, y + 0.5, z + 0.5)
 
 val World.serverLevel: ServerLevel
     get() = (this as CraftWorld).handle
@@ -142,6 +152,7 @@ val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).serve
 val serverTick: Int
     get() = minecraftServer.tickCount
 
+@Suppress("FunctionName")
 fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
     val nonNullList: NonNullList<E>
     if (default == null) {
@@ -190,6 +201,44 @@ fun LevelChunkSection.setBlockStateSilently(pos: BlockPos, state: BlockState) {
 
 fun LevelChunkSection.getBlockState(pos: BlockPos): BlockState {
     return getBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF)
+}
+
+inline fun Level.captureDrops(run: () -> Unit): List<ItemEntity> {
+    val captureDrops = ArrayList<ItemEntity>()
+    this.captureDrops = captureDrops
+    try {
+        run.invoke()
+        return captureDrops
+    } finally {
+        this.captureDrops = null
+    }
+}
+
+fun preventPacketBroadcast(run: () -> Unit) {
+    BroadcastPacketPatch.dropAll = true
+    try {
+        run.invoke()
+    } finally {
+        BroadcastPacketPatch.dropAll = false
+    }
+}
+
+fun replaceBroadcastExclusion(exclude: ServerPlayer, run: () -> Unit) {
+    BroadcastPacketPatch.exclude = exclude
+    try {
+        run.invoke()
+    } finally {
+        BroadcastPacketPatch.exclude = null
+    }
+}
+
+fun forcePacketBroadcast(run: () -> Unit) {
+    BroadcastPacketPatch.ignoreExcludedPlayer = true
+    try {
+        run.invoke()
+    } finally {
+        BroadcastPacketPatch.ignoreExcludedPlayer = false
+    }
 }
 
 object NMSUtils {

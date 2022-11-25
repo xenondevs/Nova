@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
+import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
 import java.lang.reflect.Field
@@ -40,7 +41,7 @@ internal object Patcher : Initializable() {
     private val transformers by lazy {
         sequenceOf(
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
-            StackSizePatch, BlockSoundPatches
+            StackSizePatch, BlockSoundPatches, BroadcastPacketPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

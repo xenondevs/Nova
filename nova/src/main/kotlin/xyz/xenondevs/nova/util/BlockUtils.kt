@@ -3,8 +3,11 @@ package xyz.xenondevs.nova.util
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
+import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.item.BlockItem
@@ -32,7 +35,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.config.GlobalValues
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
@@ -46,12 +48,15 @@ import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
+import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.floor
+import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos
+import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceContext
 
@@ -76,14 +81,20 @@ val Block.id: NamespacedId
 /**
  * The block that is one y-level below the current one.
  */
-val Block.below: Block
-    get() = location.subtract(0.0, 1.0, 0.0).block
+inline val Block.below: Block
+    get() = world.getBlockAt(x, y - 1, z)
 
 /**
  * The block that is one y-level above the current one.
  */
-val Block.above: Block
-    get() = location.add(0.0, 1.0, 0.0).block
+inline val Block.above: Block
+    get() = world.getBlockAt(x, y + 1, z)
+
+/**
+ * The location at the center of this block.
+ */
+inline val Block.center: Location
+    get() = Location(world, x + 0.5, y + 0.5, z + 0.5)
 
 /**
  * The hardness of this block, also considering the custom hardness of Nova blocks.
@@ -249,15 +260,81 @@ fun Block.isUnobstructed(material: Material, player: Player? = null): Boolean {
  * @param playSound If block breaking sounds should be played
  * @param showParticles If block break particles should be displayed
  */
-fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true) {
-    if (CustomItemServiceManager.removeBlock(this, playSound, showParticles))
+@Deprecated("Break sound and particles are not independent from one another", ReplaceWith("remove(ctx, showParticles || playSound)"))
+fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true) =
+    remove(ctx, showParticles || playSound)
+
+/**
+ * Removes this block using the given [ctx].
+ *
+ * This method works for vanilla blocks, blocks from Nova and blocks from custom item services.
+ *
+ * @param ctx The [BlockBreakContext] to be used
+ * @param breakEffects If break effects should be displayed (i.e. sounds and particle effects).
+ * For vanilla blocks, this also includes some breaking logic (ice turning to water, unstable
+ * tnt exploding, angering piglins, etc.)
+ */
+fun Block.remove(
+    ctx: BlockBreakContext,
+    breakEffects: Boolean
+) = removeInternal(ctx, breakEffects, true)
+
+internal fun Block.removeInternal(ctx: BlockBreakContext, breakEffects: Boolean, sendEffectsToBreaker: Boolean) {
+    if (CustomItemServiceManager.removeBlock(this, breakEffects, breakEffects))
         return
-    if (BlockManager.removeBlock(ctx, playSound, showParticles))
+    if (BlockManager.removeBlock(ctx, breakEffects, breakEffects))
         return
     
-    if (playSound) playBreakSound()
-    if (showParticles && GlobalValues.BLOCK_BREAK_EFFECTS) showBreakParticles()
-    getMainHalf().type = Material.AIR
+    val nmsPlayer = (ctx.source as? Player)?.serverPlayer
+        ?: ctx.source as? MojangPlayer
+        ?: EntityUtils.DUMMY_PLAYER
+    
+    val level = world.serverLevel
+    val pos = pos.nmsPos
+    val state = nmsState
+    val block = state.block
+    val blockEntity = level.getBlockEntity(pos)
+    
+    level.captureDrops {
+        // calls game and level events (includes break effects), angers piglins, ignites unstable tnt, etc.
+        val willDestroy = { block.playerWillDestroy(level, pos, state, nmsPlayer) }
+        if (breakEffects) {
+            if (sendEffectsToBreaker) {
+                forcePacketBroadcast(willDestroy)
+            } else willDestroy()
+            
+            // Send custom break sound if its overwritten
+            val soundGroup = SoundGroup.from(type.soundGroup)
+            if (BlockSoundEngine.overridesSound(soundGroup.breakSound)) {
+                val pitch = soundGroup.breakPitch
+                val volume = soundGroup.breakVolume
+                minecraftServer.playerList.broadcast(
+                    null,
+                    x + 0.5, y + 0.5, z + 0.5,
+                    if (volume > 1.0) 16.0 * volume else 16.0,
+                    level.dimension(),
+                    ClientboundCustomSoundPacket(
+                        ResourceLocation(soundGroup.breakSound),
+                        SoundSource.BLOCKS,
+                        pos.center,
+                        volume, pitch,
+                        Random.nextLong()
+                    )
+                )
+            }
+        } else {
+            preventPacketBroadcast(willDestroy)
+        }
+        
+        val removed = level.removeBlock(pos, false)
+        if (removed) {
+            block.destroy(level, pos, state)
+            
+            if (!nmsPlayer.isCreative) {
+                block.playerDestroy(level, nmsPlayer, pos, state, blockEntity, ctx.item.nmsCopy)
+            }
+        }
+    }
 }
 
 /**
