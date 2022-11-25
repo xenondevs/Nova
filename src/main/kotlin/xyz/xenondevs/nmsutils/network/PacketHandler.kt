@@ -9,15 +9,12 @@ import io.netty.channel.ChannelPromise
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.login.ServerboundHelloPacket
-import net.minecraft.resources.ResourceKey
 import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.LOGGER
-import xyz.xenondevs.nmsutils.internal.util.DEDICATED_SERVER
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.logging.Level
-import net.minecraft.world.entity.player.Player as MojangPlayer
 
 private typealias PacketCondition = (Packet<*>) -> Boolean
 
@@ -138,24 +135,6 @@ class PacketHandler internal constructor(private val channel: Channel) : Channel
         } else channel.eventLoop().execute {
             super.write(channel.pipeline().context(this), msg, promise)
         }
-    }
-    
-    companion object {
-        
-        @Suppress("DEPRECATION")
-        fun preventLevelBroadcast(player: MojangPlayer?, x: Double, y: Double, z: Double, maxDistance: Double, dimension: ResourceKey<*>, n: Int, condition: (Packet<*>) -> Boolean) {
-            DEDICATED_SERVER.playerList.players.forEach {
-                if (it != player && it.level.dimension() == dimension && (player == null || it.bukkitEntity.canSee(player.bukkitEntity))) {
-                    val dx = x - it.x
-                    val dy = y - it.y
-                    val dz = z - it.z
-                    if (dx * dx + dy * dy + dz * dz < maxDistance * maxDistance) {
-                        it.packetHandler!!.dropNextOutgoing(n, condition)
-                    }
-                }
-            }
-        }
-        
     }
     
 }
