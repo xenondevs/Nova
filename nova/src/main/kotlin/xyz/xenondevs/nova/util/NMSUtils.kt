@@ -11,6 +11,7 @@ import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
+import net.minecraft.server.players.PlayerList
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.Level
@@ -42,6 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
 
@@ -133,6 +135,9 @@ val Material.nmsBlock: MojangBlock
 val Block.nmsState: BlockState
     get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))
 
+val BlockState.id: Int
+    get() = MojangBlock.getId(this)
+
 fun MojangBlockPos.toNovaPos(world: World): BlockPos =
     BlockPos(world, x, y, z)
 
@@ -213,6 +218,18 @@ inline fun Level.captureDrops(run: () -> Unit): List<ItemEntity> {
         this.captureDrops = null
     }
 }
+
+fun PlayerList.broadcast(exclude: MojangPlayer?, location: Location, maxDistance: Double, packet: Packet<*>) =
+    broadcast(exclude, location.x, location.y, location.z, maxDistance, location.world!!.serverLevel.dimension(), packet)
+
+fun PlayerList.broadcast(exclude: MojangPlayer?, block: Block, maxDistance: Double, packet: Packet<*>) =
+    broadcast(exclude, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
+
+fun PlayerList.broadcast(exclude: Player?, location: Location, maxDistance: Double, packet: Packet<*>) =
+    broadcast(exclude?.serverPlayer, location.x, location.y, location.z, maxDistance, location.world!!.serverLevel.dimension(), packet)
+
+fun PlayerList.broadcast(exclude: Player?, block: Block, maxDistance: Double, packet: Packet<*>) =
+    broadcast(exclude?.serverPlayer, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
 
 fun preventPacketBroadcast(run: () -> Unit) {
     BroadcastPacketPatch.dropAll = true

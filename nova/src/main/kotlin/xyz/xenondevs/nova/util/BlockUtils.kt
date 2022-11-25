@@ -4,6 +4,8 @@ import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -59,6 +61,7 @@ import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.context.BlockPlaceContext as MojangBlockPlaceContext
+import net.minecraft.world.level.block.Block as MojangBlock
 
 // region block info
 
@@ -261,8 +264,7 @@ fun Block.isUnobstructed(material: Material, player: Player? = null): Boolean {
  * @param showParticles If block break particles should be displayed
  */
 @Deprecated("Break sound and particles are not independent from one another", ReplaceWith("remove(ctx, showParticles || playSound)"))
-fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true) =
-    remove(ctx, showParticles || playSound)
+fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true) = remove(ctx, showParticles || playSound)
 
 /**
  * Removes this block using the given [ctx].
@@ -282,7 +284,7 @@ fun Block.remove(
 internal fun Block.removeInternal(ctx: BlockBreakContext, breakEffects: Boolean, sendEffectsToBreaker: Boolean) {
     if (CustomItemServiceManager.removeBlock(this, breakEffects, breakEffects))
         return
-    if (BlockManager.removeBlock(ctx, breakEffects, breakEffects))
+    if (BlockManager.removeBlockInternal(ctx, breakEffects, sendEffectsToBreaker))
         return
     
     val nmsPlayer = (ctx.source as? Player)?.serverPlayer
@@ -434,14 +436,16 @@ fun Block.spawnExpOrb(exp: Int, location: Location = this.location.add(.5, .5, .
  * Only works with vanilla blocks.
  */
 fun Block.playBreakEffects() {
-    showBreakParticles()
-    playBreakSound()
+    val packet = ClientboundLevelEventPacket(2001, pos.nmsPos, MojangBlock.getId(nmsState), false)
+    minecraftServer.playerList.broadcast(null as MojangPlayer?, this, 64.0, packet)
 }
 
 /**
  * Displays the break particles for this block.
  * Only works with vanilla blocks.
  */
+@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+@Deprecated("Not real break particles. Consider using Block#playBreakEffects.")
 fun Block.showBreakParticles() {
     type.showBreakParticles(this.location)
 }
@@ -449,12 +453,24 @@ fun Block.showBreakParticles() {
 /**
  * Displays the break particles for this [Material] at the given [location].
  */
+@Deprecated("Not real break particles. Consider using Block#playBreakEffects.")
 fun Material.showBreakParticles(location: Location) {
     particleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5)) {
         texture(this@showBreakParticles)
         offset(0.3, 0.3, 0.3)
         amount(70)
     }.display()
+}
+
+/**
+ * Creates a [ClientboundLevelParticlesPacket] mimicking the particle effects of a block breaking.
+ */
+fun Material.getBreakParticlesPacket(location: Location): ClientboundLevelParticlesPacket {
+    return particleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5)) {
+        texture(this@getBreakParticlesPacket)
+        offset(0.3, 0.3, 0.3)
+        amount(70)
+    }.packet as ClientboundLevelParticlesPacket
 }
 
 /**
