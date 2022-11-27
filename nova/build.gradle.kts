@@ -2,9 +2,10 @@ group = "xyz.xenondevs.nova"
 
 val mojangMapped = System.getProperty("mojang-mapped") != null
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     java
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version libs.versions.kotlin
     id("xyz.xenondevs.jar-loader-gradle-plugin")
     id("xyz.xenondevs.specialsource-gradle-plugin") version "1.0.0"
     id("xyz.xenondevs.string-remapper-gradle-plugin") version "1.0.0"
@@ -14,8 +15,8 @@ plugins {
 dependencies {
     // api dependencies
     api(project(":nova-api"))
-    spigotLoaderApi(deps.bundles.kotlin)
-    novaLoaderApi(deps.bundles.cbf)
+    spigotLoaderApi(libs.bundles.kotlin)
+    novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi("de.studiocode.invui:InvUI:0.8.2") { for (i in 1..11) exclude("de.studiocode.invui", "IA-R$i") }
     novaLoaderApi("de.studiocode.invui:ResourcePack:0.8.1") { exclude("de.studiocode.invui", "InvUI") }
     novaLoaderApi("de.studiocode.invui:IA-R11:0.8.1:remapped-mojang")
@@ -24,24 +25,24 @@ dependencies {
     
     // internal dependencies
     compileOnly(project(":nova-loader"))
-    novaLoader(deps.bundles.ktor)
-    novaLoader(deps.bundles.minecraft.assets)
-    novaLoader(deps.zip4j)
+    novaLoader(libs.bundles.ktor)
+    novaLoader(libs.bundles.minecraft.assets)
+    novaLoader(libs.zip4j)
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.2")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
-    novaLoader("software.amazon.awssdk:s3:2.17.292")
+    novaLoader("software.amazon.awssdk:s3:2.18.21")
     
     // spigot runtime dependencies
-    spigotRuntime(deps.bundles.maven.resolver)
-    spigotRuntime(variantOf(deps.spigot.server) { classifier("remapped-mojang") })
+    spigotRuntime(libs.bundles.maven.resolver)
+    spigotRuntime(variantOf(libs.spigot.server) { classifier("remapped-mojang") })
     
     // plugin dependencies
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6")
     compileOnly("com.github.TechFortress:GriefPrevention:16.17.1") { isTransitive = false }
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
-    compileOnly("com.plotsquared:PlotSquared-Core:6.10.1") { isTransitive = false }
-    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.10.1") { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Core:6.10.4") { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.10.4") { isTransitive = false }
     compileOnly("com.griefdefender:api:2.0.0-SNAPSHOT") { isTransitive = false }
     compileOnly("com.github.LoneDev6:API-ItemsAdder:3.2.4") { isTransitive = false }
     compileOnly("com.github.TownyAdvanced:Towny:0.97.2.0") { isTransitive = false }
@@ -53,8 +54,7 @@ dependencies {
     compileOnly("com.bekvon:Residence:5.0.1.6") { isTransitive = false }
     
     // test dependencies
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.20")
+    testImplementation(libs.bundles.test)
 }
 
 sourceSets {
@@ -83,14 +83,14 @@ tasks {
 }
 
 spigotRemap {
-    spigotVersion.set(deps.versions.spigot.get().substringBefore('-'))
+    spigotVersion.set(libs.versions.spigot.get().substringBefore('-'))
     sourceJarTask.set(tasks.jar)
     spigotJarClassifier.set("")
 }
 
 remapStrings {
     remapGoal.set(if (mojangMapped) "mojang" else "spigot")
-    spigotVersion.set(deps.versions.spigot.get())
+    spigotVersion.set(libs.versions.spigot.get())
     classes.set(listOf(
         "xyz.xenondevs.nova.util.reflection.ReflectionRegistry",
         "xyz.xenondevs.nova.util.NMSUtils",
