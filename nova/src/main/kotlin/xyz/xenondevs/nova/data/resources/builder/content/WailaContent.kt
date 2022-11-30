@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.builder.content
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
@@ -165,11 +166,15 @@ private val TEXTURES = setOf(
 private const val SIZE = 32
 private const val ASCENT = -4
 
+private val WAILA_ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
+
 internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(Resources::updateWailaDataLookup) {
     
     init {
-        writeHardcodedTextures()
-        renderCustomItemServiceBlocks()
+        if (WAILA_ENABLED) {
+            writeHardcodedTextures()
+            renderCustomItemServiceBlocks()
+        }
     }
     
     private fun renderCustomItemServiceBlocks() {
@@ -223,7 +228,7 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
         
         if (!wailaDir.exists())
             return
-        if (!DEFAULT_CONFIG.getBoolean("waila.enabled")) {
+        if (!WAILA_ENABLED) {
             wailaDir.deleteRecursively()
             return
         }

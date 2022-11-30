@@ -93,7 +93,7 @@ interface BlockManager {
      * @param source The source of the block removal.
      * @return If there was a Nova block at that location and the removal was successful.
      */
-    fun removeBlock(location: Location, source: Any?) = removeBlock(location, source, playSound = true, showParticles = true)
+    fun removeBlock(location: Location, source: Any?) = removeBlock(location, source, true)
     
     /**
      * Removes the Nova block at that [location] as if it was destroyed by [source].
@@ -104,6 +104,18 @@ interface BlockManager {
      * @param showParticles If block breaking particles should be displayed.
      * @return If there was a Nova block at that location and the removal was successful.
      */
-    fun removeBlock(location: Location, source: Any?, playSound: Boolean, showParticles: Boolean): Boolean
+    @Deprecated("Break sound and particles are not independent from one another", ReplaceWith("removeBlock(location, source, playSound || showParticles)"))
+    fun removeBlock(location: Location, source: Any?, playSound: Boolean, showParticles: Boolean): Boolean =
+        removeBlock(location, source, playSound || showParticles)
+    
+    /**
+     * Removes the Nova block at that [location] as if it was destroyed by [source].
+     *
+     * @param location The location of the block to remove.
+     * @param source The source of the block removal.
+     * @param breakEffects If break effects such as sounds and particles should be played.
+     * @return If there was a Nova block at that location and the removal was successful.
+     */
+    fun removeBlock(location: Location, source: Any?, breakEffects: Boolean): Boolean
     
 }

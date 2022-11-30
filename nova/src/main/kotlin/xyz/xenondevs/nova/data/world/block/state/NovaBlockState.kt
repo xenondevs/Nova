@@ -59,7 +59,7 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
         isLoaded = false
         
         if (broken) {
-            material.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlock(BlockBreakContext(it)) }
+            material.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlock(BlockBreakContext(it), breakEffects = true) }
         }
         
         modelProvider.remove(broken)

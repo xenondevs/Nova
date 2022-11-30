@@ -1,8 +1,11 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 package xyz.xenondevs.nova.world.block.sound
 
 import net.minecraft.world.level.block.SoundType
+import org.bukkit.Location
+import org.bukkit.block.Block
+import xyz.xenondevs.nova.util.center
 import org.bukkit.SoundGroup as BukkitSoundGroup
 
 data class SoundGroup(
@@ -35,6 +38,46 @@ data class SoundGroup(
         get() = volume * 0.5f
     val fallPitch: Float
         get() = pitch * 0.75f
+    
+    fun playBreakSound(block: Block) {
+        playBreakSound(block.center)
+    }
+    
+    fun playBreakSound(location: Location) {
+        location.world!!.playSound(location, breakSound, breakVolume, breakPitch)
+    }
+    
+    fun playStepSound(block: Block) {
+        playStepSound(block.center)
+    }
+    
+    fun playStepSound(location: Location) {
+        location.world!!.playSound(location, stepSound, stepVolume, stepPitch)
+    }
+    
+    fun playPlaceSound(block: Block) {
+        playPlaceSound(block.center)
+    }
+    
+    fun playPlaceSound(location: Location) {
+        location.world!!.playSound(location, placeSound, placeVolume, placePitch)
+    }
+    
+    fun playHitSound(block: Block) {
+        playHitSound(block.center)
+    }
+    
+    fun playHitSound(location: Location) {
+        location.world!!.playSound(location, hitSound, hitVolume, hitPitch)
+    }
+    
+    fun playFallSound(block: Block) {
+        playFallSound(block.center)
+    }
+    
+    fun playFallSound(location: Location) {
+        location.world!!.playSound(location, fallSound, fallVolume, fallPitch)
+    }
     
     companion object {
         

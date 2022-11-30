@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    compileOnly(deps.spigot.api)
-    compileOnly(deps.bundles.maven.resolver)
+    compileOnly(libs.spigot.api)
+    compileOnly(libs.bundles.maven.resolver)
 }

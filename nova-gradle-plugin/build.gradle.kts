@@ -1,15 +1,16 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
     `maven-publish`
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version libs.versions.kotlin
     id("com.gradle.plugin-publish") version "0.14.0"
 }
 
 dependencies {
-    implementation(deps.bundles.minecraft.assets)
-    implementation(deps.spigot.api)
-    implementation(deps.zip4j)
+    implementation(libs.bundles.minecraft.assets)
+    implementation(libs.spigot.api)
+    implementation(libs.zip4j)
 }
 
 tasks {
