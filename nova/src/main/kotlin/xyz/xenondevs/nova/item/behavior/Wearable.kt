@@ -117,6 +117,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
     override fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
         if ((event.click == ClickType.SHIFT_LEFT || event.click == ClickType.SHIFT_RIGHT)
             && event.view.isPlayerView()
+            && event.clickedInventory != event.view.topInventory
             && player.inventory.getItem(options.armorType.equipmentSlot)?.takeUnlessAir() == null
             && !callArmorEquipEvent(player, EquipMethod.SHIFT_CLICK, null, itemStack)
         ) {

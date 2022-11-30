@@ -1,13 +1,14 @@
 description = "nova-api"
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version libs.versions.kotlin
     `maven-publish`
 }
 
 dependencies {
     compileOnly(project(":nova-loader"))
-    compileOnly(deps.spigot.api)
+    compileOnly(libs.spigot.api)
 }
 
 tasks {

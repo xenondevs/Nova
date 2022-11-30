@@ -118,5 +118,7 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Достигнут лимит размещенных объектов Nova.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Достигнут лимит размещенных объектов Nova в этом мире.",
   "command.nova.remove_invalid_vtes.success": "Успешно удалено %s недействительных ванильных объектов.",
-  "command.nova.remove_invalid_vtes.failure": "Не найдено ни одного недействительного ванильного объекта."
+  "command.nova.remove_invalid_vtes.failure": "Не найдено ни одного недействительного ванильного объекта.",
+  "nova.tile_entity_limits.type_blacklist.deny": "Вам не разрешено размещать объекты этого типа.",
+  "waila.nova.required_tool.unknown": "Инструмент: Неизвестно"
 }

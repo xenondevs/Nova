@@ -43,6 +43,8 @@ val Entity.eyeInWater: Boolean
 
 object EntityUtils {
     
+    internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), UUID.randomUUID(), "Nova Dummy Player")
+    
     /**
      * Gets a list of all passengers of this [Entity], including passengers of passengers.
      */

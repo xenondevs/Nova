@@ -1,7 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version libs.versions.kotlin
     id("xyz.xenondevs.jar-loader-gradle-plugin")
     `maven-publish`
 }
@@ -38,7 +39,7 @@ subprojects {
     tasks.withType<KotlinCompile>().all {
         kotlinOptions {
             jvmTarget = "17"
-            freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all"
+            freeCompilerArgs = listOf("-Xjvm-default=all")
         }
     }
 }

@@ -16,6 +16,8 @@ resource_pack:
   # Resource packs that should be merged with Nova's resource pack.
   # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
   base_packs: []
+  # A list of file extensions that shouldn't be excluded from the resource pack, even though they're not vanilla resource pack files.
+  whitelisted_file_types: []
   # Defines what content is included in the generated resource pack.
   # Excluding content will decrease the size of your resource pack but might also break some features.
   content_filters: []
@@ -30,8 +32,8 @@ resource_pack:
 # Disabling this will cause many of Nova's features (such as custom tools, custom stack sizes, proper block sounds, etc.) to stop working.
 use_agent: true
 
-# The render distance for armor stands from Nova, in chunks.
-# Note that the render distance is limited by the entity render distance of the client.
+# The render distance for fake (packet-based) entities from Nova, in chunks.
+# Note that the render distance is also limited by the entity render distance of the client.
 entity_render_distance:
   min: 1
   max: 6
