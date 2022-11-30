@@ -36,7 +36,7 @@ internal object BlockSoundEngine : Listener {
             event.isCancelled = true
             event.player.send(
                 ClientboundCustomSoundPacket(
-                    ResourceLocation("nova", location.path),
+                    getNovaSound(location.path),
                     event.source,
                     Vec3(event.x, event.y, event.z),
                     event.volume,
@@ -57,7 +57,7 @@ internal object BlockSoundEngine : Listener {
                 if (entity != null) {
                     event.player.send(
                         ClientboundCustomSoundPacket(
-                            ResourceLocation("nova", location.path),
+                            getNovaSound(location.path),
                             event.source,
                             entity.position(),
                             event.volume,
@@ -75,8 +75,10 @@ internal object BlockSoundEngine : Listener {
     private fun handleSoundPacket(event: ClientboundCustomSoundPacketEvent) {
         val location = event.name
         if (location.namespace == "minecraft" && location.path in SOUND_OVERRIDES) {
-            event.name = ResourceLocation("nova", location.path)
+            event.name = getNovaSound(location.path)
         }
     }
+    
+    private fun getNovaSound(path: String) = ResourceLocation("nova", path)
     
 }

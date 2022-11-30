@@ -5,6 +5,8 @@ package xyz.xenondevs.nova.util.reflection
 import com.google.gson.reflect.TypeToken
 import jdk.internal.misc.Unsafe
 import org.bukkit.Bukkit
+import org.checkerframework.checker.units.qual.C
+import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CALLABLE_REFERENCE_RECEIVER_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.K_PROPERTY_1_GET_DELEGATE_METHOD
@@ -97,11 +99,20 @@ object ReflectionUtils {
         return Class.forName(getCB(name))
     }
     
+    fun getMethod(clazz: KClass<*>, declared: Boolean, methodName: String, vararg args: KClass<*>): Method =
+        getMethod(clazz.java, declared, methodName, *args.mapToArray(KClass<*>::java))
+    
+    fun getMethod(clazz: Class<*>, declared: Boolean, methodName: String, vararg args: KClass<*>): Method =
+        getMethod(clazz, declared, methodName, *args.mapToArray(KClass<*>::java))
+    
     fun getMethod(clazz: Class<*>, declared: Boolean, methodName: String, vararg args: Class<*>): Method {
         val method = if (declared) clazz.getDeclaredMethod(methodName, *args) else clazz.getMethod(methodName, *args)
         if (declared) method.isAccessible = true
         return method
     }
+    
+    fun getMethodByName(clazz: KClass<*>, declared: Boolean, methodName: String): Method =
+        getMethodByName(clazz.java, declared, methodName)
     
     fun getMethodByName(clazz: Class<*>, declared: Boolean, methodName: String): Method {
         val method = if (declared) clazz.declaredMethods.first { it.name == methodName } else clazz.methods.first { it.name == methodName }
@@ -109,11 +120,20 @@ object ReflectionUtils {
         return method
     }
     
+    fun <C : Any> getConstructor(clazz: KClass<C>, declared: Boolean, vararg args: KClass<*>): Constructor<C> =
+        getConstructor(clazz.java, declared, *args.mapToArray(KClass<*>::java))
+    
+    fun <C : Any> getConstructor(clazz: Class<C>, declared: Boolean, vararg args: KClass<*>): Constructor<C> =
+        getConstructor(clazz, declared, *args.mapToArray(KClass<*>::java))
+    
     fun <C> getConstructor(clazz: Class<C>, declared: Boolean, vararg args: Class<*>): Constructor<C> {
         val constructor = if (declared) clazz.getDeclaredConstructor(*args) else clazz.getConstructor(*args)
         if (declared) constructor.isAccessible = true
         return constructor
     }
+    
+    fun getField(clazz: KClass<*>, declared: Boolean, name: String): Field =
+        getField(clazz.java, declared, name)
     
     fun getField(clazz: Class<*>, declared: Boolean, name: String): Field {
         val field = if (declared) clazz.getDeclaredField(name) else clazz.getField(name)

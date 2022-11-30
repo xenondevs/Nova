@@ -22,6 +22,8 @@ import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
+import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
+import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
 import java.lang.reflect.Field
@@ -36,13 +38,15 @@ internal object Patcher : Initializable() {
     override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = emptySet<Initializable>()
     
-    private val extraOpens = setOf("java.lang", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
+    private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
         sequenceOf(
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
-            StackSizePatch, BlockSoundPatches
+            StackSizePatch, BlockSoundPatches, BroadcastPacketPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
+    
+    private lateinit var classLoaderParentField: Field
     
     override fun init() {
         if (!ENABLED) {
@@ -61,7 +65,9 @@ internal object Patcher : Initializable() {
         VirtualClassPath.classLoaders += NOVA.loader.javaClass.classLoader.parent
         redefineModule()
         runTransformers()
+        classLoaderParentField = ReflectionUtils.getField(ClassLoader::class.java, true, "parent")
         insertPatchedLoader()
+        undoReversiblePatches()
     }
     
     override fun disable() {
@@ -70,12 +76,14 @@ internal object Patcher : Initializable() {
     }
     
     private fun redefineModule() {
-        val myModule = setOf(Nova::class.java.module)
+        val novaModule = setOf(Nova::class.java.module)
+        val javaBase = Field::class.java.module
+        
         INSTRUMENTATION.redefineModule(
-            Field::class.java.module, // java.base module
+            javaBase,
             emptySet(),
             emptyMap(),
-            extraOpens.associateWith { myModule },
+            extraOpens.associateWith { novaModule },
             emptySet(),
             emptyMap()
         )
@@ -95,28 +103,39 @@ internal object Patcher : Initializable() {
             ClassDefinition(clazz, VirtualClassPath[clazz].assemble(computeFrames))
         }.toTypedArray()
         
+        redefineClasses(definitions)
+    }
+    
+    private fun undoReversiblePatches() {
+        val definitions = transformers.filterIsInstance<ReversibleClassTransformer>()
+            .mapToArray { ClassDefinition(it.clazz.java, it.initialBytecode) }
+        
+        redefineClasses(definitions)
+    }
+    
+    private fun redefineClasses(definitions: Array<ClassDefinition>) {
         try {
             INSTRUMENTATION.redefineClasses(*definitions)
         } catch (ex: LinkageError) {
             LOGGER.severe("Failed to apply patches (LinkageError: $ex)! Trying to get more information...")
-            
+        
             var thrown = false
             val classLoader = ClassWrapperLoader(javaClass.classLoader)
-            classes.keys.forEach {
+            definitions.forEach {
                 try {
-                    classLoader.loadClass(VirtualClassPath[it]).methods
+                    classLoader.loadClass(VirtualClassPath[it.javaClass]).methods
                 } catch (e: LinkageError) {
                     if (e.message?.contains(ClassWrapperLoader::class.jvmName) != true) {
-                        LOGGER.severe("${e::class.simpleName} for class ${it.internalName}:\n${e.message}")
+                        LOGGER.severe("${e::class.simpleName} for class ${it.javaClass.internalName}:\n${e.message}")
                         thrown = true
                     }
                 }
             }
-            
+        
             if (!thrown) {
                 LOGGER.log(Level.SEVERE, "Could not get more information, original stacktrace: ", ex)
             }
-            
+        
             LOGGER.severe("Exiting server process...")
             exitProcess(-1)
         }
@@ -124,14 +143,12 @@ internal object Patcher : Initializable() {
     
     private fun insertPatchedLoader() {
         val spigotLoader = NOVA.loader.javaClass.classLoader.parent
-        val parentField = ReflectionUtils.getField(ClassLoader::class.java, true, "parent")
-        ReflectionUtils.setFinalField(parentField, spigotLoader, PatchedClassLoader())
+        ReflectionUtils.setFinalField(classLoaderParentField, spigotLoader, PatchedClassLoader())
     }
     
     private fun removePatchedLoader() {
         val spigotLoader = NOVA.loader.javaClass.classLoader.parent
-        val parentField = ReflectionUtils.getField(ClassLoader::class.java, true, "parent")
-        ReflectionUtils.setFinalField(parentField, spigotLoader, spigotLoader.parent.parent)
+        ReflectionUtils.setFinalField(classLoaderParentField, spigotLoader, spigotLoader.parent.parent)
     }
     
 }

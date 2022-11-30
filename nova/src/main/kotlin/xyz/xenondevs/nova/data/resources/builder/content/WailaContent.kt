@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.builder.content
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
@@ -165,11 +166,15 @@ private val TEXTURES = setOf(
 private const val SIZE = 32
 private const val ASCENT = -4
 
+private val WAILA_ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
+
 internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(Resources::updateWailaDataLookup) {
     
     init {
-        writeHardcodedTextures()
-        renderCustomItemServiceBlocks()
+        if (WAILA_ENABLED) {
+            writeHardcodedTextures()
+            renderCustomItemServiceBlocks()
+        }
     }
     
     private fun renderCustomItemServiceBlocks() {
@@ -180,13 +185,17 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
                 listOf(ResourcePackBuilder.MCASSETS_DIR, ResourcePackBuilder.PACK_DIR),
                 true
             )
-    
+            
             CustomItemServiceManager.getBlockItemModelPaths().forEach { (id, path) ->
-                LOGGER.info("Rendering $id ($path)")
-                val file = File(ResourcePackBuilder.PACK_DIR, "assets/nova/textures/waila_generated/${id.namespace}/${id.name}.png")
-                file.parentFile.mkdirs()
-                renderer.renderModelToFile(path.toString(), file)
-                addFontEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"))
+                try {
+                    val file = File(ResourcePackBuilder.PACK_DIR, "assets/nova/textures/waila_generated/${id.namespace}/${id.name}.png")
+                    file.parentFile.mkdirs()
+                    renderer.renderModelToFile(path.toString(), file)
+                    addFontEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"))
+                    LOGGER.info("Rendered $id ($path)")
+                } catch (e: Exception) {
+                    LOGGER.log(Level.WARNING, "Failed to render $id ($path) ", e)
+                }
             }
         } catch (e: Exception) {
             LOGGER.log(Level.SEVERE, "Failed to render WAILA textures for custom item services. (Misconfigured base packs?)", e)
@@ -199,16 +208,16 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
             val name = path.path.substringAfterLast('/')
             val to = File(ResourcePackBuilder.PACK_DIR, "assets/nova/textures/waila_generated/$name")
             from.copyTo(to, overwrite = true)
-        
+            
             return ResourcePath("nova", "waila_generated/$name")
         }
-    
+        
         MATERIAL_TEXTURES.forEach { (material, texture) ->
             val name = material.name.lowercase()
             val path = ResourcePath.of((texture ?: "block/$name") + ".png")
             addFontEntry("minecraft:$name", copyMCTexture(path))
         }
-    
+        
         TEXTURES.forEach {
             addFontEntry("minecraft:$it", copyMCTexture(ResourcePath("minecraft", "block/$it.png")))
         }
@@ -219,7 +228,7 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
         
         if (!wailaDir.exists())
             return
-        if (!DEFAULT_CONFIG.getBoolean("waila.enabled")) {
+        if (!WAILA_ENABLED) {
             wailaDir.deleteRecursively()
             return
         }

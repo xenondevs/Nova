@@ -19,7 +19,7 @@ internal interface CustomItemService : InternalIntegration {
     /**
      * Remove a block from the world without handling drops
      * @return If the block was from this [CustomItemService] and has been removed successfully
-     */
+     */ // TODO: combine playSound and showParticles to breakEffects
     fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean
     
     /**

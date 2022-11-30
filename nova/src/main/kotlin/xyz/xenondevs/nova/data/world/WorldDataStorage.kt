@@ -35,9 +35,11 @@ internal class WorldDataStorage(val world: World) {
     }
     
     fun saveAll() {
-        regionFiles.removeIf { (_, regionFile) ->
-            regionFile.save()
-            return@removeIf !regionFile.isAnyChunkLoaded()
+        synchronized(regionFiles) {
+            regionFiles.removeIf { (_, regionFile) ->
+                regionFile.save()
+                return@removeIf !regionFile.isAnyChunkLoaded()
+            }
         }
     }
     

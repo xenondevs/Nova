@@ -4,7 +4,11 @@ import org.bukkit.Location
 import org.bukkit.SoundCategory
 import org.bukkit.World
 import org.bukkit.block.Block
+import org.bukkit.block.BlockState
 import xyz.xenondevs.nova.util.Location
+import xyz.xenondevs.nova.util.serverLevel
+import net.minecraft.core.BlockPos as MojangBlockPos
+import net.minecraft.world.level.block.state.BlockState as MojangBlockState
 
 val Location.pos: BlockPos
     get() = BlockPos(world!!, blockX, blockY, blockZ)
@@ -14,11 +18,20 @@ val Block.pos: BlockPos
 
 data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
     
+    val nmsPos: MojangBlockPos
+        get() = MojangBlockPos(x, y, z)
+    
     val location: Location
         get() = Location(world, x, y, z)
     
     val block: Block
         get() = world.getBlockAt(x, y, z)
+    
+    val blockState: BlockState
+        get() = world.getBlockState(x, y, z)
+    
+    val nmsBlockState: MojangBlockState
+        get() = world.serverLevel.getBlockState(nmsPos)
     
     val chunkPos: ChunkPos
         get() = ChunkPos(world.uid, x shr 4, z shr 4)
