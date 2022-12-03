@@ -118,5 +118,7 @@
   "nova.tile_entity_limits.amount_global_total.deny": "你不能再放置更多實體",
   "nova.tile_entity_limits.amount_per_world_total.deny": "你在這個世界不能再放置更多實體",
   "command.nova.remove_invalid_vtes.success": "成功的移除了 %s 個無效的原版實體",
-  "command.nova.remove_invalid_vtes.failure": "未發現無效的原版實體"
+  "command.nova.remove_invalid_vtes.failure": "未發現無效的原版實體",
+  "waila.nova.required_tool.unknown": "工具: 未知",
+  "nova.tile_entity_limits.type_blacklist.deny": "你無法放置任何此類型的實體"
 }
