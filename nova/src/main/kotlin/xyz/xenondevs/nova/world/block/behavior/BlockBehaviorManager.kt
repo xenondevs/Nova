@@ -63,7 +63,7 @@ internal object BlockBehaviorManager : Initializable(), Listener {
         behaviors.map { it.blockStatePredicate }
     
     override fun init() {
-        if (!DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks"))
+        if (!DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks"))
             return
         
         LOGGER.info("Using block behaviors: ${behaviors.joinToString { it::class.simpleName!! }}")

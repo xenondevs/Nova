@@ -31,7 +31,8 @@ dependencies {
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.2")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
-    novaLoader("software.amazon.awssdk:s3:2.18.21")
+    novaLoader("software.amazon.awssdk:s3:2.18.24")
+    novaLoader("com.google.jimfs:jimfs:1.2")
     
     // spigot runtime dependencies
     spigotRuntime(libs.bundles.maven.resolver)

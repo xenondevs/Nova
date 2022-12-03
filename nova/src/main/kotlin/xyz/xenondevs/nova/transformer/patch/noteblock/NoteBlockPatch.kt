@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 internal object NoteBlockPatch : ClassTransformer(NoteBlock::class, computeFrames = true) {
     
     override fun shouldTransform(): Boolean =
-        DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks")
+        DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks")
     
     override fun transform() {
         val patchesClass = NoteBlockMethods::class.java

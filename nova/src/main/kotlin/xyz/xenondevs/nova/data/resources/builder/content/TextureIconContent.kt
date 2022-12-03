@@ -1,10 +1,19 @@
 package xyz.xenondevs.nova.data.resources.builder.content
 
+import net.lingala.zip4j.model.FileHeader
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import java.io.File
+import xyz.xenondevs.nova.util.data.listFileHeaders
+import xyz.xenondevs.nova.util.data.path
+import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isDirectory
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 
 private const val HEIGHT = 16
 private const val ASCENT = 12
@@ -13,28 +22,46 @@ internal class TextureIconContent : FontContent<FontChar, TextureIconContent.Tex
     Resources::updateTextureIconLookup, true
 ) {
     
-    init {
-        val texturesDir = File(ResourcePackBuilder.MCASSETS_DIR, "assets/minecraft/textures/")
-        if (texturesDir.exists())
-            exploreTexturesDir("minecraft", texturesDir)
+    companion object {
+        const val FONT_NAME_START = "nova:texture_icons"
     }
     
-    override fun addFromPack(pack: AssetPack) {
-        pack.texturesDir?.let { exploreTexturesDir(pack.namespace, it) }
+    override fun write() {
+        val texturesDir = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/textures/")
+        if (texturesDir.exists()) {
+            exploreTextures(
+                "minecraft",
+                texturesDir,
+                texturesDir.walk()
+                    .filter { !it.isDirectory() && it.extension == "png" }
+            )
+        }
+        
+        super.write()
     }
     
-    private fun exploreTexturesDir(namespace: String, texturesDir: File) {
-        (File(texturesDir, "block").walkTopDown() + File(texturesDir, "item").walkTopDown())
-            .forEach { file ->
-                if (file.isDirectory || !file.extension.equals("png", true))
-                    return@forEach
-                
-                val relPath = file.relativeTo(texturesDir).path.replace('\\', '/')
-                addFontEntry(
-                    "${namespace}:${relPath.substringBeforeLast('.')}",
-                    ResourcePath(namespace, relPath)
-                )
-            }
+    override fun includePack(pack: AssetPack) {
+        val texturesDir = pack.texturesDir ?: return
+        exploreTextures(
+            pack.namespace,
+            texturesDir.path,
+            pack.zip.listFileHeaders(texturesDir)
+                .filterNot(FileHeader::isDirectory)
+                .map(FileHeader::path)
+        )
+    }
+    
+    private fun exploreTextures(namespace: String, basePath: Path, textures: Sequence<Path>) {
+        textures.forEach { texture ->
+            val relPath = texture.relativeTo(basePath).invariantSeparatorsPathString
+            if ((!relPath.startsWith("block/") && !relPath.startsWith("item/")) || !relPath.endsWith(".png"))
+                return@forEach
+            
+            addFontEntry(
+                "${namespace}:${relPath.substringBeforeLast('.')}",
+                ResourcePath(namespace, relPath)
+            )
+        }
     }
     
     override fun createFontData(id: Int, char: Char, path: ResourcePath): TextureFontData =
@@ -44,10 +71,6 @@ internal class TextureIconContent : FontContent<FontChar, TextureIconContent.Tex
         override val height = HEIGHT
         override val ascent = ASCENT
         override fun toFontInfo() = FontChar("$font/0", char, width)
-    }
-    
-    companion object {
-        const val FONT_NAME_START = "nova:texture_icons"
     }
     
 }

@@ -12,8 +12,9 @@ import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.data.writeToFile
 import xyz.xenondevs.nova.util.item.soundGroup
-import java.io.File
+import java.nio.file.Path
 import java.util.logging.Level
+import kotlin.io.path.exists
 
 /**
  * Removes the break, hit, step and fall sounds for blocks used by Nova to display custom blocks (note block, mushroom blocks,
@@ -43,14 +44,14 @@ class BlockSoundOverrides {
         try {
             // an index of all vanilla sounds
             val vanillaIndex = createSoundsIndex(
-                File(ResourcePackBuilder.MCASSETS_ASSETS_DIR, "minecraft/sounds.json")
+                ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/sounds.json")
                     .parseJson() as JsonObject
             )
             
             // merge the sound.json files
             val merged = mergeSoundJsons(
-                File(ResourcePackBuilder.MCASSETS_ASSETS_DIR, "minecraft/sounds.json"),
-                File(ResourcePackBuilder.ASSETS_DIR, "minecraft/sounds.json")
+                ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/sounds.json"),
+                ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/sounds.json")
             )
             
             // an index of all sounds (vanilla and base packs)
@@ -62,7 +63,7 @@ class BlockSoundOverrides {
                 val soundEventObj = index[soundEvent]!!
                 novaSoundIndex.add(soundEvent, soundEventObj)
             }
-            novaSoundIndex.writeToFile(File(ResourcePackBuilder.ASSETS_DIR, "nova/sounds.json"))
+            novaSoundIndex.writeToFile(ResourcePackBuilder.ASSETS_DIR.resolve("nova/sounds.json"))
             
             val mcSoundIndex = JsonObject()
             index.forEach { (soundEvent, soundEventObj) ->
@@ -84,7 +85,7 @@ class BlockSoundOverrides {
                     mcSoundIndex.add(soundEvent, soundEventObj)
                 }
             }
-            mcSoundIndex.writeToFile(File(ResourcePackBuilder.ASSETS_DIR, "minecraft/sounds.json"))
+            mcSoundIndex.writeToFile(ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/sounds.json"))
             
             // write overridden sound events to permanent storage
             PermanentStorage.store("soundOverrides", soundEvents)
@@ -97,8 +98,8 @@ class BlockSoundOverrides {
         return obj.entrySet().associateTo(HashMap()) { it.key to it.value as JsonObject }
     }
     
-    private fun mergeSoundJsons(vararg files: File): JsonObject {
-        val jsonObjects = files.mapNotNull { it.takeIf(File::exists)?.parseJson() as? JsonObject }
+    private fun mergeSoundJsons(vararg files: Path): JsonObject {
+        val jsonObjects = files.mapNotNull { it.takeIf(Path::exists)?.parseJson() as? JsonObject }
         return if (jsonObjects.size > 1) {
             mergeSoundJsons(jsonObjects)
         } else jsonObjects[0]

@@ -29,12 +29,15 @@ import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.mapToIntArray
-import java.io.File
+import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.writeText
 
-private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks") }
+private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks") }
 
 internal class MaterialContent(
     private val basePacks: BasePacks,
@@ -48,7 +51,7 @@ internal class MaterialContent(
     private val blockStatePosition = HashMap<BlockStateConfigType<*>, Int>()
     private val remainingBlockStates = HashMap<BlockStateConfigType<*>, Int>()
     
-    override fun addFromPack(pack: AssetPack) {
+    override fun includePack(pack: AssetPack) {
         val materialsIndex = pack.materialsIndex ?: return
         
         materialsIndex.forEach { registeredMaterial ->
@@ -60,18 +63,18 @@ internal class MaterialContent(
     private fun createDefaultModelFiles(pack: AssetPack, info: ModelInformation) {
         info.models.forEach {
             val namespace = pack.namespace
-            val file = File(ResourcePackBuilder.ASSETS_DIR, "$namespace/models/${it.removePrefix("$namespace:")}.json")
+            val file = ResourcePackBuilder.ASSETS_DIR.resolve("$namespace/models/${it.removePrefix("$namespace:")}.json")
             if (!file.exists())
                 createDefaultModelFile(file, it)
         }
     }
     
-    private fun createDefaultModelFile(file: File, texturePath: String) {
+    private fun createDefaultModelFile(file: Path, texturePath: String) {
         val modelObj = JsonObject()
         modelObj.addProperty("parent", "item/generated")
         modelObj.add("textures", JsonObject().apply { addProperty("layer0", texturePath) })
         
-        file.parentFile.mkdirs()
+        file.parent.createDirectories()
         file.writeText(GSON.toJson(modelObj))
     }
     
@@ -158,7 +161,7 @@ internal class MaterialContent(
             
             modelObj.add("overrides", ModelFileMerger.sortOverrides(overrides))
             
-            file.parentFile.mkdirs()
+            file.parent.createDirectories()
             file.writeText(GSON.toJson(modelObj))
         }
         
@@ -175,7 +178,7 @@ internal class MaterialContent(
                 variants.add(cfg.variantString, variant)
             }
             
-            file.parentFile.mkdirs()
+            file.parent.createDirectories()
             file.writeText(GSON.toJson(mainObj))
         }
     }
@@ -238,10 +241,10 @@ internal class MaterialContent(
         }
     }
     
-    private fun getModelFile(material: Material): Triple<File, JsonObject, JsonArray> {
+    private fun getModelFile(material: Material): Triple<Path, JsonObject, JsonArray> {
         val path = "minecraft/models/item/${material.name.lowercase()}.json"
-        val destFile = File(ResourcePackBuilder.ASSETS_DIR, path)
-        val sourceFile = destFile.takeIf(File::exists) ?: File(ResourcePackBuilder.MCASSETS_ASSETS_DIR, path)
+        val destFile = ResourcePackBuilder.ASSETS_DIR.resolve(path)
+        val sourceFile = destFile.takeIf(Path::exists) ?: ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve(path)
         require(sourceFile.exists()) { "Source model file does not exist: $sourceFile" }
         
         val modelObj = sourceFile.parseJson() as JsonObject
@@ -249,8 +252,8 @@ internal class MaterialContent(
         return Triple(destFile, modelObj, overrides)
     }
     
-    private fun getBlockStateFile(type: BlockStateConfigType<*>): Triple<File, JsonObject, JsonObject> {
-        val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/blockstates/${type.fileName}.json")
+    private fun getBlockStateFile(type: BlockStateConfigType<*>): Triple<Path, JsonObject, JsonObject> {
+        val file = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/blockstates/${type.fileName}.json")
         
         val mainObj: JsonObject
         val variants: JsonObject
