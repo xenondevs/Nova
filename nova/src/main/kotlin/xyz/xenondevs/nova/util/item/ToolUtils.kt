@@ -154,7 +154,7 @@ object ToolUtils {
         if (underWater) speedMultiplier /= 5.0
         if (!onGround) speedMultiplier /= 5.0
         
-        return speedMultiplier / hardness / if (isCorrectToolForDropsVanilla(tool?.type, block)) 30.0 else 100.0
+        return (speedMultiplier / hardness / if (isCorrectToolForDropsVanilla(tool?.type, block)) 30.0 else 100.0).roundToDecimalPlaces(3)
     }
     //</editor-fold>
     
@@ -224,7 +224,7 @@ object ToolUtils {
         if (underWater) speedMultiplier /= 5.0
         if (!onGround) speedMultiplier /= 5.0
         
-        return speedMultiplier / hardness / if (correctForDrops) 30.0 else 100.0
+        return (speedMultiplier / hardness / if (correctForDrops) 30.0 else 100.0).roundToDecimalPlaces(3)
     }
     //</editor-fold>
     

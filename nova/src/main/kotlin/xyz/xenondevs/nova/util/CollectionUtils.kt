@@ -154,6 +154,19 @@ inline fun <K, V, M : MutableMap<K, V>> Iterable<K>.associateWithNotNullTo(desti
     return destination
 }
 
+inline fun <K, V> Array<K>.associateWithNotNull(valueSelector: (K) -> V?): Map<K, V> {
+    return associateWithNotNullTo(LinkedHashMap(), valueSelector)
+}
+
+inline fun <K, V, M : MutableMap<K, V>> Array<K>.associateWithNotNullTo(destination: M, valueSelector: (K) -> V?): M {
+    for (element in this) {
+        val value = valueSelector(element)
+        if (value != null) destination[element] = value
+    }
+    
+    return destination
+}
+
 fun <K, V> Map<K, V>.getValues(keys: Iterable<K>): List<V> {
     val values = ArrayList<V>()
     for (key in keys) {
