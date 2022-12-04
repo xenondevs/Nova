@@ -118,5 +118,7 @@
   "nova.tile_entity_limits.amount_per_chunk.deny": "Du darfst nicht noch mehr Tile Entities dieser Art in diesem Chunk setzen.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Du darfst nicht noch mehr Tile Entities in dieser Welt setzen.",
   "nova.tile_entity_limits.amount_global_total.deny": "Du darfst nicht noch mehr Tile Entities setzen.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Du darfst nicht noch mehr Tile Entities in diesem Chunk setzen."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Du darfst nicht noch mehr Tile Entities in diesem Chunk setzen.",
+  "waila.nova.required_tool.unknown": "Werkzeug: Unbekannt",
+  "nova.tile_entity_limits.type_blacklist.deny": "Du bist nicht dazu berechtigt Tile-Entitäten von diesem Typ zu platzieren."
 }
