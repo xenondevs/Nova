@@ -1,5 +1,8 @@
 package xyz.xenondevs.nova.util
 
+import kotlin.math.pow
+import kotlin.math.round
+
 val Boolean.intValue: Int
     get() = if (this) 1 else 0
 
@@ -10,6 +13,16 @@ fun Short.fromFixedPoint(): Double = this / 4096.0
 internal fun Float.toPackedByte(): Byte = (this * 256.0f / 360.0f).toInt().toByte()
 
 internal fun Byte.fromPackedByte(): Float = this * 360.0f / 256.0f
+
+internal fun Float.roundToDecimalPlaces(n: Int): Float {
+    val multiplier = 10.0.pow(n.toDouble())
+    return (round(this * multiplier) / multiplier).toFloat()
+}
+
+internal fun Double.roundToDecimalPlaces(n: Int): Double {
+    val multiplier = 10.0.pow(n.toDouble())
+    return round(this * multiplier) / multiplier
+}
 
 fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Long): Long {
     return try {

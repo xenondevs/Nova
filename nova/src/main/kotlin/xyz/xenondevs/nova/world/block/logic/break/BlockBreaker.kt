@@ -37,7 +37,6 @@ import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.damageToolBreakBlock
 import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.nmsCopy
-import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.nova.util.removeInternal
