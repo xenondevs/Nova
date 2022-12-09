@@ -11,6 +11,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.data.provider.map
@@ -137,7 +138,7 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
         val isOffHand = hand == EquipmentSlot.OFF_HAND
         
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x4D) // ClientboundSetEntityDataPacket
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_ENTITY_DATA_PACKET)
         buf.writeVarInt(entityId) // entity id
         buf.writeByte(8) // type for eating animation
         buf.writeVarInt(0) // following is byte

@@ -3,15 +3,14 @@ package xyz.xenondevs.nova.util.item
 import com.mojang.brigadier.StringReader
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.minecraft.commands.arguments.item.ItemParser
-import net.minecraft.core.HolderLookup.RegistryLookup
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.world.item.Items
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
@@ -271,7 +270,7 @@ object ItemUtils {
     }
     
     fun toItemStack(s: String): ItemStack {
-        val holder = ItemParser.parseForItem(RegistryLookup(Registry.ITEM), StringReader(s))
+        val holder = ItemParser.parseForItem(BuiltInRegistries.ITEM.asLookup(), StringReader(s))
         val nmsStack = MojangStack(holder.item, 1).apply { tag = holder.nbt }
         return CraftItemStack.asBukkitCopy(nmsStack)
     }

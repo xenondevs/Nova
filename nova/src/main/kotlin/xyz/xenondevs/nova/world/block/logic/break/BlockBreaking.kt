@@ -5,7 +5,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import net.minecraft.world.InteractionHand
-import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler

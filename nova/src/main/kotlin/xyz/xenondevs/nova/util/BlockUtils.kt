@@ -1,14 +1,16 @@
 package xyz.xenondevs.nova.util
 
 import net.minecraft.core.Direction
+import net.minecraft.core.Holder
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
-import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ExperienceOrb
@@ -200,7 +202,7 @@ fun Block.place(ctx: BlockPlaceContext, playSound: Boolean = true): Boolean {
  */
 fun Block.placeVanilla(player: ServerPlayer, itemStack: ItemStack, playSound: Boolean = true): Boolean {
     val location = location
-    val nmsStack = itemStack.nmsStack
+    val nmsStack = itemStack.nmsCopy
     val blockItem = nmsStack.item as BlockItem
     val result = blockItem.place(MojangBlockPlaceContext(UseOnContext(
         world.serverLevel,
@@ -315,10 +317,12 @@ internal fun Block.removeInternal(ctx: BlockBreakContext, breakEffects: Boolean,
                     x + 0.5, y + 0.5, z + 0.5,
                     if (volume > 1.0) 16.0 * volume else 16.0,
                     level.dimension(),
-                    ClientboundCustomSoundPacket(
-                        ResourceLocation(soundGroup.breakSound),
+                    ClientboundSoundPacket(
+                        Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(soundGroup.breakSound))),
                         SoundSource.BLOCKS,
-                        pos.center,
+                        pos.x + 0.5,
+                        pos.y + 0.5,
+                        pos.z + 0.5,
                         volume, pitch,
                         Random.nextLong()
                     )

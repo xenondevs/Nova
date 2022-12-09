@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.pos
+import org.bukkit.Instrument as BukkitInstrument
 
 internal object PacketNoteBlockBehavior : Listener {
     
@@ -64,7 +65,7 @@ internal object PacketNoteBlockBehavior : Listener {
     private fun handleNotePlay(event: NotePlayEvent) {
         val vnb = VanillaTileEntityManager.getTileEntityAt(event.block.pos) as? VanillaNoteBlockTileEntity ?: return
         event.note = Note(vnb.note)
-        event.instrument = vnb.instrument.bukkitInstrument
+        event.instrument = vnb.instrument.bukkitInstrument ?: BukkitInstrument.PIANO
     }
     
     /**

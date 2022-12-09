@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.block.behavior.impl.noteblock
 
-import org.bukkit.Material
 import org.bukkit.Note
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -15,9 +14,11 @@ import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.send
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.pos
+import org.bukkit.Instrument as BukkitInstrument
 
 internal object NoteBlockBehavior : BlockBehavior(NoteBlockStateConfig, false), Listener {
     
@@ -38,7 +39,7 @@ internal object NoteBlockBehavior : BlockBehavior(NoteBlockStateConfig, false), 
     fun playNote(vnb: VanillaNoteBlockTileEntity) {
         val pos = vnb.pos
         
-        val event = NotePlayEvent(vnb.block, vnb.instrument.bukkitInstrument, Note(vnb.note))
+        val event = NotePlayEvent(vnb.block, vnb.instrument.bukkitInstrument ?: BukkitInstrument.PIANO, Note(vnb.note))
         callEvent(event)
         
         if (event.isCancelled)
@@ -60,14 +61,16 @@ internal object NoteBlockBehavior : BlockBehavior(NoteBlockStateConfig, false), 
         val block = event.block
         val pos = block.pos
         
-        val above = pos.copy(y = pos.y + 1)
-        if (above.block.type == Material.NOTE_BLOCK) {
-            // is this actually a vanilla note block?
-            val vnb = VanillaTileEntityManager.getTileEntityAt(above) as? VanillaNoteBlockTileEntity ?: return
-            
-            // update instrument
-            vnb.instrument = Instrument.byBlockType(pos)
-        }
+        tryUpdateNoteBlock(pos.add(0, 1, 0))
+        tryUpdateNoteBlock(pos.add(0, -1, 0))
+    }
+    
+    private fun tryUpdateNoteBlock(pos: BlockPos) {
+        // is this actually a vanilla note block?
+        val vnb = VanillaTileEntityManager.getTileEntityAt(pos) as? VanillaNoteBlockTileEntity ?: return
+        
+        // update instrument
+        vnb.instrument = Instrument.byBlockAbove(pos.add(0, 1, 0)) ?: Instrument.byBlockBelow(pos.add(0, -1, 0))
     }
     
 }

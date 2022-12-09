@@ -2,8 +2,10 @@
 
 package xyz.xenondevs.nova.transformer.patch.block
 
-import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket
+import net.minecraft.core.Holder
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.entity.player.Player
 import xyz.xenondevs.bytebase.asm.buildInsnList
@@ -91,10 +93,13 @@ internal object BlockSoundPatches : MultiTransformer(setOf(MojangEntity::class, 
         val level = entity.level
         val player = if (BlockSoundEngine.overridesSound(oldSound)) null else entity as? Player
         
-        val packet = ClientboundCustomSoundPacket(
-            ResourceLocation(newSound),
+        val pos = entity.position()
+        val packet = ClientboundSoundPacket(
+            Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(newSound))),
             entity.soundSource,
-            entity.position(),
+            pos.x,
+            pos.y,
+            pos.z,
             volume, pitch,
             level.random.nextLong()
         )

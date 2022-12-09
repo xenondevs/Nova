@@ -5,7 +5,7 @@ import io.lumine.mythic.utils.config.properties.Property.Material
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import kotlin.random.Random

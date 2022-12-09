@@ -1,9 +1,11 @@
 package xyz.xenondevs.nova.world.block
 
+import net.minecraft.core.Holder
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -18,7 +20,6 @@ import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.getBreakParticlesPacket
 import xyz.xenondevs.nova.util.id
@@ -152,10 +153,12 @@ object BlockManager : Initializable(), IBlockManager {
         }
         
         fun broadcastBreakSound(soundGroup: SoundGroup) {
-            val soundPacket = ClientboundCustomSoundPacket(
-                ResourceLocation(soundGroup.breakSound),
+            val soundPacket = ClientboundSoundPacket(
+                Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(soundGroup.breakSound))),
                 SoundSource.BLOCKS,
-                nmsPos.center,
+                nmsPos.x + 0.5,
+                nmsPos.y + 0.5,
+                nmsPos.z + 0.5,
                 soundGroup.breakVolume,
                 soundGroup.breakPitch,
                 Random.nextLong()

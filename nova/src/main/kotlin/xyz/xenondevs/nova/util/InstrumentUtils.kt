@@ -1,10 +1,14 @@
 package xyz.xenondevs.nova.util
 
+import net.minecraft.core.Holder
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import xyz.xenondevs.nova.world.BlockPos
 import org.bukkit.Instrument as BukkitInstrument
 
-enum class Instrument(val bukkitInstrument: BukkitInstrument, val nmsInstrument: NoteBlockInstrument) {
+// TODO: Add BukkitInstruments when available
+
+enum class Instrument(val bukkitInstrument: BukkitInstrument?, val nmsInstrument: NoteBlockInstrument) {
     
     HARP(BukkitInstrument.PIANO, NoteBlockInstrument.HARP),
     BASEDRUM(BukkitInstrument.BASS_DRUM, NoteBlockInstrument.BASEDRUM),
@@ -21,12 +25,25 @@ enum class Instrument(val bukkitInstrument: BukkitInstrument, val nmsInstrument:
     DIDGERIDOO(BukkitInstrument.DIDGERIDOO, NoteBlockInstrument.DIDGERIDOO),
     BIT(BukkitInstrument.BIT, NoteBlockInstrument.BIT),
     BANJO(BukkitInstrument.BANJO, NoteBlockInstrument.BANJO),
-    PLING(BukkitInstrument.PLING, NoteBlockInstrument.PLING);
+    PLING(BukkitInstrument.PLING, NoteBlockInstrument.PLING),
+    ZOMBIE(null, NoteBlockInstrument.ZOMBIE),
+    SKELETON(null, NoteBlockInstrument.SKELETON),
+    CREEPER(null, NoteBlockInstrument.CREEPER),
+    DRAGON(null, NoteBlockInstrument.DRAGON),
+    WITHER_SKELETON(null, NoteBlockInstrument.WITHER_SKELETON),
+    PIGLIN(null, NoteBlockInstrument.PIGLIN),
+    CUSTOM_HEAD(null, NoteBlockInstrument.CUSTOM_HEAD);
+    
+    val soundEvent: Holder<SoundEvent> = nmsInstrument.soundEvent
     
     companion object {
         
-        fun byBlockType(pos: BlockPos): Instrument {
-            return NoteBlockInstrument.byState(pos.world.serverLevel.getBlockState(pos.nmsPos)).instrument
+        fun byBlockAbove(pos: BlockPos): Instrument? {
+            return NoteBlockInstrument.byStateAbove(pos.world.serverLevel.getBlockState(pos.nmsPos)).orElse(null)?.instrument
+        }
+        
+        fun byBlockBelow(pos: BlockPos): Instrument {
+            return NoteBlockInstrument.byStateBelow(pos.world.serverLevel.getBlockState(pos.nmsPos)).instrument
         }
         
     }
@@ -71,4 +88,11 @@ internal val NoteBlockInstrument.instrument: Instrument
         NoteBlockInstrument.BIT -> Instrument.BIT
         NoteBlockInstrument.BANJO -> Instrument.BANJO
         NoteBlockInstrument.PLING -> Instrument.PLING
+        NoteBlockInstrument.ZOMBIE -> Instrument.ZOMBIE
+        NoteBlockInstrument.SKELETON -> Instrument.SKELETON
+        NoteBlockInstrument.CREEPER -> Instrument.CREEPER
+        NoteBlockInstrument.DRAGON -> Instrument.DRAGON
+        NoteBlockInstrument.WITHER_SKELETON -> Instrument.WITHER_SKELETON
+        NoteBlockInstrument.PIGLIN -> Instrument.PIGLIN
+        NoteBlockInstrument.CUSTOM_HEAD -> Instrument.CUSTOM_HEAD
     }

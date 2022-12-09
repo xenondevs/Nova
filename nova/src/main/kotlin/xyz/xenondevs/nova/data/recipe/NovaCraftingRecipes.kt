@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.data.recipe
 
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.CraftingContainer
+import net.minecraft.world.item.crafting.CookingBookCategory
+import net.minecraft.world.item.crafting.CraftingBookCategory
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
@@ -10,7 +12,7 @@ import org.bukkit.inventory.Recipe
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.nmsIngredient
-import xyz.xenondevs.nova.util.nmsStack
+import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.removeFirstWhere
 import xyz.xenondevs.nova.util.resourceLocation
 import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
@@ -20,10 +22,11 @@ import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
 internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : ShapedRecipe(
     optimizedRecipe.recipe.key.resourceLocation,
     "",
+    CraftingBookCategory.MISC, // TODO: Allow customization
     3,
     3,
     NonNullList(optimizedRecipe.choiceMatrix.map { it.nmsIngredient }),
-    optimizedRecipe.recipe.result.nmsStack
+    optimizedRecipe.recipe.result.nmsCopy
 ) {
     
     private val bukkitRecipe = optimizedRecipe.recipe
@@ -47,7 +50,8 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
 internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
     bukkitRecipe.key.resourceLocation,
     "",
-    bukkitRecipe.result.nmsStack,
+    CraftingBookCategory.MISC, // TODO: Allow customization
+    bukkitRecipe.result.nmsCopy,
     NonNullList(bukkitRecipe.choiceList.map { it.nmsIngredient })
 ) {
     
@@ -71,8 +75,9 @@ internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessReci
 internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) : SmeltingRecipe(
     bukkitRecipe.key.resourceLocation,
     "",
+    CookingBookCategory.MISC, // TODO: Allow customization
     bukkitRecipe.inputChoice.nmsIngredient,
-    bukkitRecipe.result.nmsStack,
+    bukkitRecipe.result.nmsCopy,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {

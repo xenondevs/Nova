@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.util
 
+import com.mojang.datafixers.util.Either
 import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Rotations
@@ -26,12 +27,12 @@ import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -217,6 +218,10 @@ inline fun Level.captureDrops(run: () -> Unit): List<ItemEntity> {
     } finally {
         this.captureDrops = null
     }
+}
+
+fun <T> Either<T, T>.take(): T {
+    return left().orElse(null) ?: right().get()
 }
 
 fun PlayerList.broadcast(exclude: MojangPlayer?, location: Location, maxDistance: Double, packet: Packet<*>) =

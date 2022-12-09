@@ -10,7 +10,7 @@ dependencyResolutionManagement {
             // versions
             version("kotlin", "1.7.21")
             version("ktor", "2.1.3")
-            version("spigot", "1.19.2-R0.1-SNAPSHOT")
+            version("spigot", "1.19.3-R0.1-SNAPSHOT")
             version("cbf", "0.2")
             
             // lib - kotlin

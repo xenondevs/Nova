@@ -19,7 +19,7 @@ import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.PalettedContainer
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
+import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
 import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent

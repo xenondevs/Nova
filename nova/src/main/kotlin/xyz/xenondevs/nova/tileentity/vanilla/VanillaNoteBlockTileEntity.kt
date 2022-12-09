@@ -1,26 +1,19 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
-import net.minecraft.core.Registry
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundSource
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.util.Instrument
-import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.particle.ParticleEffect
 import xyz.xenondevs.particle.data.color.NoteColor
 
-private val PITCH_TABLE = floatArrayOf(
+private val PITCH_TABLE: FloatArray = floatArrayOf(
     0.5f, 0.53f, 0.56f, 0.59f, 0.63f, 0.67f, 0.71f, 0.75f, 0.79f, 0.84f,
     0.89f, 0.94f, 1.0f, 1.06f, 1.12f, 1.19f, 1.26f, 1.33f, 1.41f, 1.5f,
     1.59f, 1.68f, 1.78f, 1.89f, 2.0f
 )
-
-private val SOUND_EVENT_TABLE = Instrument.values().associateWithTo(enumMapOf()) {
-    Registry.SOUND_EVENT.get(ResourceLocation("minecraft:block.note_block.${it.name.lowercase()}"))
-}
 
 internal class VanillaNoteBlockTileEntity constructor(blockState: VanillaTileEntityState) : VanillaTileEntity(blockState) {
     
@@ -36,7 +29,7 @@ internal class VanillaNoteBlockTileEntity constructor(blockState: VanillaTileEnt
             }
         }
     
-    var instrument: Instrument = retrieveData("instrument") { Instrument.byBlockType(pos.add(0, -1, 0)) }
+    var instrument: Instrument = retrieveData("instrument") { Instrument.byBlockAbove(pos.add(0, 1, 0)) ?: Instrument.byBlockBelow(pos.add(0, -1, 0)) }
         set(value) {
             if (field != value) {
                 field = value
@@ -74,8 +67,9 @@ internal class VanillaNoteBlockTileEntity constructor(blockState: VanillaTileEnt
     }
     
     private fun updateSoundPacket() {
+        // TODO: Add support for custom player head sounds
         _soundPacket = ClientboundSoundPacket(
-            SOUND_EVENT_TABLE[instrument],
+            instrument.soundEvent,
             SoundSource.RECORDS,
             pos.x + 0.5,
             pos.y + 0.5,

@@ -30,7 +30,7 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegi
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
-private val REQUIRED_SERVER_VERSION = Version("1.19.1")..Version("1.19.2")
+private val REQUIRED_SERVER_VERSION = Version("1.19.3")..Version("1.19.3")
 
 internal lateinit var NOVA: Nova
     private set

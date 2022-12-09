@@ -5,8 +5,8 @@ package xyz.xenondevs.nova.util.item
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.eyeInWater
-import xyz.xenondevs.nova.util.nmsStack
+import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.roundToDecimalPlaces
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -98,7 +98,7 @@ object ToolUtils {
     internal fun calculateDamageVanilla(player: Player, block: Block): Double {
         val serverTool = player.inventory.getItem(EquipmentSlot.HAND)?.takeUnlessAir()
         val tool = serverTool?.let {
-            val nmsStack = it.nmsStack
+            val nmsStack = it.nmsCopy
             return@let if (PacketItems.isNovaItem(nmsStack))
                 PacketItems.getFakeItem(player, nmsStack).bukkitMirror
             else it
