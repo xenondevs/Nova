@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nmsutils.particle
 
-import com.mojang.math.Vector3f
 import net.minecraft.core.particles.BlockParticleOption
 import net.minecraft.core.particles.DustColorTransitionOptions
 import net.minecraft.core.particles.DustParticleOptions
@@ -23,6 +22,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import org.joml.Vector3f
 import xyz.xenondevs.nmsutils.internal.util.blockPos
 import xyz.xenondevs.nmsutils.internal.util.nmsBlock
 import xyz.xenondevs.nmsutils.internal.util.nmsEntity

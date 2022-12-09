@@ -6,7 +6,6 @@ import io.netty.channel.ChannelFuture
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
@@ -30,6 +29,7 @@ import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_19_R2.potion.CraftPotionUtil
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
+import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
