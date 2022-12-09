@@ -4,10 +4,14 @@ import net.minecraft.world.item.crafting.Ingredient
 import org.bukkit.Keyed
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
+import org.bukkit.inventory.recipe.CookingBookCategory
+import org.bukkit.inventory.recipe.CraftingBookCategory
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.resourceLocation
+import net.minecraft.world.item.crafting.CookingBookCategory as MojangCookingBookCategory
+import net.minecraft.world.item.crafting.CraftingBookCategory as MojangCraftingBookCategory
 import net.minecraft.world.item.crafting.ShapedRecipe as MojangShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe as MojangShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe as MojangFurnaceRecipe
@@ -41,6 +45,21 @@ internal val RecipeChoice?.nmsIngredient: Ingredient
         this is RecipeChoice.MaterialChoice -> Ingredient(choices.stream().map { Ingredient.ItemValue(ItemStack(it).nmsCopy) })
         this is RecipeChoice.ExactChoice -> Ingredient(choices.stream().map { Ingredient.ItemValue(it.nmsCopy) })
         else -> throw UnsupportedOperationException("Unsupported RecipeChoice type")
+    }
+
+internal val CraftingBookCategory.nmsCategory: MojangCraftingBookCategory
+    get() = when (this) {
+        CraftingBookCategory.BUILDING -> MojangCraftingBookCategory.BUILDING
+        CraftingBookCategory.EQUIPMENT -> MojangCraftingBookCategory.EQUIPMENT
+        CraftingBookCategory.REDSTONE -> MojangCraftingBookCategory.REDSTONE
+        CraftingBookCategory.MISC -> MojangCraftingBookCategory.MISC
+    }
+
+internal val CookingBookCategory.nmsCategory: MojangCookingBookCategory
+    get() = when (this) {
+        CookingBookCategory.FOOD -> MojangCookingBookCategory.FOOD
+        CookingBookCategory.BLOCKS -> MojangCookingBookCategory.BLOCKS
+        CookingBookCategory.MISC -> MojangCookingBookCategory.MISC
     }
 
 internal fun Ingredient.clientsideCopy(): Ingredient {
