@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.getBreakParticlesPacket
 import xyz.xenondevs.nova.util.id
+import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.serverLevel
@@ -180,7 +181,7 @@ object BlockManager : Initializable(), IBlockManager {
             // send sound and break particles manually for armor stand blocks
             if (soundGroup != null) broadcastBreakSound(soundGroup)
             val breakParticles = state.material.breakParticles?.getBreakParticlesPacket(pos.location)
-            if (breakParticles != null) broadcast(breakParticles, sendEffectsToBreaker)
+            if (breakParticles != null) broadcast(breakParticles, sendEffectsToBreaker || pos.block.type.hasNoBreakParticles())
         }
     }
     

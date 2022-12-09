@@ -34,6 +34,8 @@ fun Material.isFluid() = this == Material.WATER || this == Material.BUBBLE_COLUM
 
 fun Material.isCauldron() = this == Material.CAULDRON || this == Material.WATER_CAULDRON || this == Material.LAVA_CAULDRON || this == Material.POWDER_SNOW_CAULDRON
 
+fun Material.hasNoBreakParticles() = this == Material.BARRIER || this == Material.STRUCTURE_VOID || this == Material.LIGHT
+
 fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmount(amount).get()
 
 /**
