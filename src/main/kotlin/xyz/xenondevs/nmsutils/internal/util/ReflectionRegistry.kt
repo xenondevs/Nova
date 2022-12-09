@@ -4,6 +4,7 @@ import net.minecraft.advancements.Advancement
 import net.minecraft.advancements.critereon.EntityPredicate
 import net.minecraft.advancements.critereon.LighthingBoltPredicate
 import net.minecraft.advancements.critereon.MinMaxBounds
+import net.minecraft.network.ConnectionProtocol
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
@@ -14,12 +15,14 @@ import org.bukkit.craftbukkit.v1_19_R2.tag.CraftTag
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getClass
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getConstructor
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getField
+import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getMethod
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal object ReflectionRegistry {
     
     // Classes
+    val CONNECTION_PROTOCOL_PACKET_SET_CLASS = getClass("SRC(net.minecraft.network.ConnectionProtocol\$PacketSet)")
     val STATE_PROPERTIES_PREDICATE_CLASS = getClass("SRC(net.minecraft.advancements.critereon.StatePropertiesPredicate)")
     val EXACT_PROPERTY_MATCHER_CLASS = getClass("SRC(net.minecraft.advancements.critereon.StatePropertiesPredicate\$ExactPropertyMatcher)")
     val RANGED_PROPERTY_MATCHER_CLASS = getClass("SRC(net.minecraft.advancements.critereon.StatePropertiesPredicate\$RangedPropertyMatcher)")
@@ -43,12 +46,16 @@ internal object ReflectionRegistry {
     val BOSS_BAR_UPDATE_STYLE_OPERATION_CONSTRUCTOR = getConstructor(BOSS_BAR_UPDATE_STYLE_OPERATION_CLASS, true, BossBarColor::class.java, BossBarOverlay::class.java)
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CONSTRUCTOR = getConstructor(BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS, true, Boolean::class.java, Boolean::class.java, Boolean::class.java)
     
+    // Methods
+    val PACKET_SET_GET_ID_METHOD = getMethod(CONNECTION_PROTOCOL_PACKET_SET_CLASS, true, "SRM(net.minecraft.network.ConnectionProtocol\$PacketSet getId)", Class::class.java)
+    
     // Fields
     val CRAFT_TAG_TAG_KEY_FIELD = getField(CraftTag::class.java, true, "tag")
     val SERVER_CONNECTION_LISTENER_CHANNELS_FIELD = getField(ServerConnectionListener::class.java, true, "SRF(net.minecraft.server.network.ServerConnectionListener channels)")
     val CLIENTBOUND_BOSS_EVENT_PACKET_ID_FIELD = getField(ClientboundBossEventPacket::class.java, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket id)")
     val CLIENTBOUND_BOSS_EVENT_PACKET_OPERATION_FIELD = getField(ClientboundBossEventPacket::class.java, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket operation)")
     val CLIENTBOUND_BOSS_EVENT_PACKET_REMOVE_OPERATION_FIELD = getField(ClientboundBossEventPacket::class.java, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket REMOVE_OPERATION)")
+    val CONNECTION_PROTOCOL_FLOWS_FIELD = getField(ConnectionProtocol::class.java, true, "SRF(net.minecraft.network.ConnectionProtocol flows)")
     val BOSS_BAR_ADD_OPERATION_NAME_FIELD = getField(BOSS_BAR_ADD_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$AddOperation name)")
     val BOSS_BAR_ADD_OPERATION_PROGRESS_FIELD = getField(BOSS_BAR_ADD_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$AddOperation progress)")
     val BOSS_BAR_ADD_OPERATION_COLOR_FIELD = getField(BOSS_BAR_ADD_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$AddOperation color)")
@@ -63,5 +70,5 @@ internal object ReflectionRegistry {
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_DARKEN_SCREEN_FIELD = getField(BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdatePropertiesOperation darkenScreen)")
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_PLAY_MUSIC_FIELD = getField(BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdatePropertiesOperation playMusic)")
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CREATE_WORLD_FOG_FIELD = getField(BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdatePropertiesOperation createWorldFog)")
-
+    
 }
