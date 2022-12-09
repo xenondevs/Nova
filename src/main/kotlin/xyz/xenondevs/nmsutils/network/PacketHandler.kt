@@ -39,23 +39,31 @@ class PacketHandler internal constructor(private val channel: Channel) : Channel
     }
     
     override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
-        if (shouldDrop(msg, outgoingDropQueue))
-            return
-        
-        val packet = callEvent(msg) ?: return
-        super.write(ctx, packet, promise)
-    }
-    
-    override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
-        if (msg is ServerboundHelloPacket) {
-            PacketManager.playerHandlers[msg.name] = this
-            super.channelRead(ctx, msg)
-        } else {
-            if (shouldDrop(msg, incomingDropQueue))
+        try {
+            if (shouldDrop(msg, outgoingDropQueue))
                 return
             
             val packet = callEvent(msg) ?: return
-            super.channelRead(ctx, packet)
+            super.write(ctx, packet, promise)
+        } catch (t: Throwable) {
+            LOGGER.log(Level.SEVERE, "An exception occurred while handling a clientbound packet.", t)
+        }
+    }
+    
+    override fun channelRead(ctx: ChannelHandlerContext?, msg: Any?) {
+        try {
+            if (msg is ServerboundHelloPacket) {
+                PacketManager.playerHandlers[msg.name] = this
+                super.channelRead(ctx, msg)
+            } else {
+                if (shouldDrop(msg, incomingDropQueue))
+                    return
+                
+                val packet = callEvent(msg) ?: return
+                super.channelRead(ctx, packet)
+            }
+        } catch (t: Throwable) {
+            LOGGER.log(Level.SEVERE, "An exception occurred while handling a serverbound packet.", t)
         }
     }
     
@@ -87,8 +95,8 @@ class PacketHandler internal constructor(private val channel: Channel) : Channel
                 }
             }
             super.flush(ctx)
-        } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "An exception occurred trying to flush packets", e)
+        } catch (t: Throwable) {
+            LOGGER.log(Level.SEVERE, "An exception occurred trying to flush packets", t)
         }
     }
     
