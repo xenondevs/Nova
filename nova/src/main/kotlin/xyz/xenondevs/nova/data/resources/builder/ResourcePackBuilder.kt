@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.data.resources.builder.content.AtlasContent
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
@@ -119,7 +120,8 @@ internal class ResourcePackBuilder {
                 MaterialContent(basePacks, soundOverrides),
                 GUIContent(),
                 LanguageContent(),
-                TextureIconContent()
+                TextureIconContent(),
+                AtlasContent()
             )
             
             // include asset packs

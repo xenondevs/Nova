@@ -20,6 +20,7 @@ internal class AssetPack(val directory: File, val namespace: String) {
     val fontsDir = File(directory, "fonts").takeIf(File::exists)
     val soundsDir = File(directory, "sounds").takeIf(File::exists)
     val langDir = File(directory, "lang").takeIf(File::exists)
+    val atlasesDir = File(directory, "atlases").takeIf(File::exists)
     val wailaTexturesDir = File(texturesDir, "waila").takeIf(File::exists)
     val soundsFile = File(directory, "sounds.json").takeIf(File::exists)
     
