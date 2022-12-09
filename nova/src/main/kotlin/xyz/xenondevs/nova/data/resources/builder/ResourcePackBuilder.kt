@@ -235,7 +235,7 @@ internal class ResourcePackBuilder {
     private fun writeMetadata(assetPacks: Int, basePacks: Int) {
         val packMcmetaObj = JsonObject()
         val packObj = JsonObject().also { packMcmetaObj.add("pack", it) }
-        packObj.addProperty("pack_format", 11)
+        packObj.addProperty("pack_format", 12)
         packObj.addProperty("description", "Nova ($assetPacks asset pack(s), $basePacks base pack(s))")
         
         PACK_MCMETA_FILE.parentFile.mkdirs()
