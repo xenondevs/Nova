@@ -73,7 +73,7 @@ fun ClientboundSoundEntityPacket(sound: SoundEvent, source: SoundSource, entityI
     buf.writeFloat(volume)
     buf.writeFloat(pitch)
     buf.writeLong(seed)
-
+    
     return ClientboundSoundEntityPacket(buf)
 }
 
