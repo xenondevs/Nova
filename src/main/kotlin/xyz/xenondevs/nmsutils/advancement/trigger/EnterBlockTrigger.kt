@@ -1,7 +1,7 @@
 package xyz.xenondevs.nmsutils.advancement.trigger
 
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import xyz.xenondevs.nmsutils.adapter.Adapter
 import xyz.xenondevs.nmsutils.advancement.predicate.EntityPredicate
 import xyz.xenondevs.nmsutils.advancement.predicate.StatePropertiesPredicate

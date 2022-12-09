@@ -1,17 +1,16 @@
 package xyz.xenondevs.nmsutils.network
 
 import io.netty.buffer.Unpooled
-import net.minecraft.core.Registry
+import net.minecraft.core.Holder
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
-import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
@@ -41,13 +40,6 @@ fun ClientboundRotateHeadPacket(entity: Int, yaw: Float): ClientboundRotateHeadP
     return ClientboundRotateHeadPacket(buffer)
 }
 
-fun ClientboundSetEntityDataPacket(id: Int, packedData: List<SynchedEntityData.DataItem<*>>?): ClientboundSetEntityDataPacket {
-    val buffer = FriendlyByteBuf(Unpooled.buffer())
-    buffer.writeVarInt(id)
-    SynchedEntityData.pack(packedData, buffer)
-    return ClientboundSetEntityDataPacket(buffer)
-}
-
 fun ClientboundBossEventPacket(id: UUID, operation: BossBarOperation): ClientboundBossEventPacket {
     return ReflectionRegistry.CLIENTBOUND_BOSS_EVENT_PACKET_CONSTRUCTOR.newInstance(id, operation.toNMS())
 }
@@ -65,9 +57,9 @@ fun ClientboundTeleportEntityPacket(entityId: Int, x: Double, y: Double, z: Doub
     return ClientboundTeleportEntityPacket(buf)
 }
 
-fun ClientboundSoundEntityPacket(sound: SoundEvent, source: SoundSource, entityId: Int, volume: Float, pitch: Float, seed: Long): ClientboundSoundEntityPacket {
+fun ClientboundSoundEntityPacket(sound: Holder<SoundEvent>, source: SoundSource, entityId: Int, volume: Float, pitch: Float, seed: Long): ClientboundSoundEntityPacket {
     val buf = FriendlyByteBuf(Unpooled.buffer())
-    buf.writeId(Registry.SOUND_EVENT, sound)
+    buf.writeId(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), sound) { soundEvent, buffer -> buffer.writeToNetwork(soundEvent) }
     buf.writeEnum(source)
     buf.writeVarInt(entityId)
     buf.writeFloat(volume)

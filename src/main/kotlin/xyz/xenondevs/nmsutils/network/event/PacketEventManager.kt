@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nmsutils.network.event
 
 import net.minecraft.network.protocol.Packet
@@ -10,7 +12,6 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBlockUpdatePa
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundCustomSoundPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundLevelChunkWithLightPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundLevelEventPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundMerchantOffersPacketEvent
@@ -34,7 +35,6 @@ import kotlin.reflect.KClass
 
 private data class Listener(val instance: Any, val method: Method, val priority: EventPriority, val ignoreIfCancelled: Boolean)
 
-@Suppress("UNCHECKED_CAST")
 object PacketEventManager {
     
     private val LOCK = ReentrantReadWriteLock()
@@ -58,7 +58,6 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundBlockDestructionPacketEvent)
         registerPlayerEventType(::ClientboundSoundPacketEvent)
         registerPlayerEventType(::ClientboundSoundEntityPacketEvent)
-        registerPlayerEventType(::ClientboundCustomSoundPacketEvent)
         registerPlayerEventType(::ClientboundSetPassengersPacketEvent)
         registerPlayerEventType(::ClientboundLevelChunkWithLightPacketEvent)
         registerPlayerEventType(::ClientboundBlockUpdatePacketEvent)

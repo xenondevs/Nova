@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.server.network.ServerConnectionListener
 import net.minecraft.world.BossEvent.BossBarColor
 import net.minecraft.world.BossEvent.BossBarOverlay
-import org.bukkit.craftbukkit.v1_19_R1.tag.CraftTag
+import org.bukkit.craftbukkit.v1_19_R2.tag.CraftTag
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getClass
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getConstructor
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getField

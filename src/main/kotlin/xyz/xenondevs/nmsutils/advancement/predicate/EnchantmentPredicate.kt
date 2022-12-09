@@ -1,6 +1,6 @@
 package xyz.xenondevs.nmsutils.advancement.predicate
 
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import org.bukkit.enchantments.Enchantment
 import xyz.xenondevs.nmsutils.adapter.NonNullAdapter
 import xyz.xenondevs.nmsutils.adapter.impl.IntBoundsAdapter
@@ -17,7 +17,7 @@ class EnchantmentPredicate(
         
         override fun convert(value: EnchantmentPredicate): MojangEnchantmentPredicate {
             return MojangEnchantmentPredicate(
-                Registry.ENCHANTMENT.get(value.enchantment.key.resourceLocation),
+                BuiltInRegistries.ENCHANTMENT.get(value.enchantment.key.resourceLocation),
                 IntBoundsAdapter.toNMS(value.level)
             )
         }
