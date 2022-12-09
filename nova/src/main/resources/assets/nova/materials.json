@@ -96,49 +96,49 @@
     "gui_bar_blue": {
         "item": {
             "models": {
-                "gui/bar/blue/%s": [0, 16]
+                "item/gui/bar/blue/%s": [0, 16]
             }
         }
     },
     "gui_bar_green": {
         "item": {
             "models": {
-                "gui/bar/green/%s": [0, 16]
+                "item/gui/bar/green/%s": [0, 16]
             }
         }
     },
     "gui_bar_red": {
         "item": {
             "models": {
-                "gui/bar/red/%s": [0, 16]
+                "item/gui/bar/red/%s": [0, 16]
             }
         }
     },
     "gui_bar_orange": {
         "item": {
             "models": {
-                "gui/bar/orange/%s": [0, 16]
+                "item/gui/bar/orange/%s": [0, 16]
             }
         }
     },
     "gui_tp_bar_blue": {
         "item": {
             "models": {
-                "gui/bar/tp_blue/%s": [0, 16]
+                "item/gui/bar/tp_blue/%s": [0, 16]
             }
         }
     },
     "gui_tp_bar_orange": {
         "item": {
             "models": {
-                "gui/bar/tp_orange/%s": [0, 16]
+                "item/gui/bar/tp_orange/%s": [0, 16]
             }
         }
     },
     "gui_number": {
         "item": {
             "models": {
-                "gui/number/%s": [0, 999]
+                "item/gui/number/%s": [0, 999]
             }
         }
     },
