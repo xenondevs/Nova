@@ -1,6 +1,6 @@
 package xyz.xenondevs.nmsutils.advancement.predicate
 
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.TagKey
 import org.bukkit.Fluid
 import org.bukkit.Tag
@@ -22,7 +22,7 @@ class FluidPredicate(
         override fun convert(value: FluidPredicate): MojangFluidPredicate {
             return MojangFluidPredicate(
                 value.tag?.tagKey as TagKey<net.minecraft.world.level.material.Fluid>?,
-                value.fluid?.let { Registry.FLUID.get(it.key.resourceLocation) },
+                value.fluid?.let { BuiltInRegistries.FLUID.get(it.key.resourceLocation) },
                 StatePropertiesPredicate.toNMS(value.properties)
             )
         }

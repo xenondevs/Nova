@@ -1,12 +1,12 @@
 package xyz.xenondevs.nmsutils.advancement.trigger
 
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import xyz.xenondevs.nmsutils.adapter.Adapter
 import xyz.xenondevs.nmsutils.adapter.impl.IntBoundsAdapter
 import xyz.xenondevs.nmsutils.advancement.predicate.EntityPredicate
 import xyz.xenondevs.nmsutils.advancement.predicate.ItemPredicate
-import net.minecraft.advancements.critereon.BeeNestDestroyedTrigger as MojangBeeNestDestryedTrigger
+import net.minecraft.advancements.critereon.BeeNestDestroyedTrigger as MojangBeeNestDestroyedTrigger
 
 class BeeNestDestroyedTrigger(
     val player: EntityPredicate?,
@@ -15,10 +15,10 @@ class BeeNestDestroyedTrigger(
     val beesInside: IntRange?
 ) : Trigger {
     
-    companion object : Adapter<BeeNestDestroyedTrigger, MojangBeeNestDestryedTrigger.TriggerInstance> {
+    companion object : Adapter<BeeNestDestroyedTrigger, MojangBeeNestDestroyedTrigger.TriggerInstance> {
         
-        override fun toNMS(value: BeeNestDestroyedTrigger): MojangBeeNestDestryedTrigger.TriggerInstance {
-            return MojangBeeNestDestryedTrigger.TriggerInstance(
+        override fun toNMS(value: BeeNestDestroyedTrigger): MojangBeeNestDestroyedTrigger.TriggerInstance {
+            return MojangBeeNestDestroyedTrigger.TriggerInstance(
                 EntityPredicate.EntityPredicateCompositeAdapter.toNMS(value.player),
                 CraftMagicNumbers.getBlock(value.block),
                 ItemPredicate.toNMS(value.item),

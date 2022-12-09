@@ -2,7 +2,6 @@ package xyz.xenondevs.nmsutils.network.event.clientbound
 
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
 import org.bukkit.entity.Player
-import xyz.xenondevs.nmsutils.network.ClientboundSetEntityDataPacket
 import xyz.xenondevs.nmsutils.network.event.PlayerPacketEvent
 
 class ClientboundSetEntityDataPacketEvent(
@@ -15,14 +14,14 @@ class ClientboundSetEntityDataPacketEvent(
             field = value
             changed = true
         }
-    var unpackedData = packet.unpackedData
+    var packedItems = packet.packedItems
         set(value) {
             field = value
             changed = true
         }
     
     override fun buildChangedPacket(): ClientboundSetEntityDataPacket {
-        return ClientboundSetEntityDataPacket(id, unpackedData)
+        return ClientboundSetEntityDataPacket(id, packedItems)
     }
     
 }

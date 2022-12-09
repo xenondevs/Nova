@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nmsutils.internal.util
 
 import io.netty.channel.ChannelFuture
@@ -5,6 +7,7 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
+import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.ResourceKey
@@ -20,14 +23,13 @@ import net.minecraft.world.item.alchemy.Potion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import org.bukkit.*
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R1.potion.CraftPotionUtil
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
-import org.bukkit.entity.Entity
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R2.potion.CraftPotionUtil
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -83,7 +85,7 @@ internal val Material.nmsBlock: Block
     get() = CraftMagicNumbers.getBlock(this)
 
 internal val World.resourceKey: ResourceKey<Level>
-    get() = ResourceKey.create(Registry.DIMENSION_REGISTRY, name.resourceLocation!!)
+    get() = ResourceKey.create(Registries.DIMENSION, name.resourceLocation!!)
 
 internal val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle

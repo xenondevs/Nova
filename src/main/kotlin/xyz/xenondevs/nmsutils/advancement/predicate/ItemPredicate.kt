@@ -2,7 +2,7 @@ package xyz.xenondevs.nmsutils.advancement.predicate
 
 import org.bukkit.Material
 import org.bukkit.Tag
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect

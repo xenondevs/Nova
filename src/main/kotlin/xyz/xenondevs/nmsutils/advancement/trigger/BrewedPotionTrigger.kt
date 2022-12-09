@@ -1,6 +1,6 @@
 package xyz.xenondevs.nmsutils.advancement.trigger
 
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import xyz.xenondevs.nmsutils.adapter.Adapter
 import xyz.xenondevs.nmsutils.advancement.predicate.EntityPredicate
 import xyz.xenondevs.nmsutils.internal.util.resourceLocation
@@ -16,7 +16,7 @@ class BrewedPotionTrigger(
         override fun toNMS(value: BrewedPotionTrigger): MojangBrewedPotionTrigger.TriggerInstance {
             return MojangBrewedPotionTrigger.TriggerInstance(
                 EntityPredicate.EntityPredicateCompositeAdapter.toNMS(value.player),
-                value.id?.resourceLocation?.let(Registry.POTION::get)
+                value.id?.resourceLocation?.let(BuiltInRegistries.POTION::get)
             )
         }
         

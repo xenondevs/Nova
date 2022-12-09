@@ -1,6 +1,6 @@
 package xyz.xenondevs.nmsutils.advancement.predicate
 
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import org.bukkit.NamespacedKey
 import org.bukkit.World
@@ -123,8 +123,8 @@ class LocationPredicate(
                 DoubleBoundsAdapter.toNMS(value.x),
                 DoubleBoundsAdapter.toNMS(value.y),
                 DoubleBoundsAdapter.toNMS(value.z),
-                value.biome?.let { ResourceKey.create(Registry.BIOME_REGISTRY, it.resourceLocation) },
-                value.feature?.let { ResourceKey.create(Registry.STRUCTURE_REGISTRY, it.resourceLocation) },
+                value.biome?.let { ResourceKey.create(Registries.BIOME, it.resourceLocation) },
+                value.feature?.let { ResourceKey.create(Registries.STRUCTURE, it.resourceLocation) },
                 value.world?.resourceKey,
                 value.smokey,
                 LightPredicate.toNMS(value.light),
