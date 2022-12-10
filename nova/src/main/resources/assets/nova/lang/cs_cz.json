@@ -80,7 +80,7 @@
   "nova.tile_entity_limits.amount_per_world.deny": "Nemáš dovoleno položit více entit tohoto typu v tomto světě.",
   "nova.outdated_version": "Používáte zastaralou verzi %s.\nProsím stáhněte si nejnovější verzi na %s.",
   "item.nova.wrench.mode.nova.energy": "Režim: Energie",
-  "item.nova.wrench.mode.nova.items": "Režim: Předměty",
+  "item.nova.wrench.mode.nova.item": "Režim: Předměty",
   "item.nova.wrench.mode.nova.fluid": "Režím: Kapaliny",
   "command.nova.network_debug.nova.fluid": "Zapnout režim ladění pro Kapalinové Sítě.",
   "command.nova.network_debug.nova.energy": "Zapnout režim ladění pro Energetické Sítě.",

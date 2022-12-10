@@ -70,7 +70,7 @@
   "command.nova.recipe.no-recipe": "此物品沒有合成表",
   "command.nova.usage.no-usage": "此物品沒有用途",
   "item.nova.wrench.mode.nova.energy": "模式: 能量",
-  "item.nova.wrench.mode.nova.items": "模式: 物品",
+  "item.nova.wrench.mode.nova.item": "模式: 物品",
   "item.nova.wrench.mode.nova.fluid": "模式: 流體",
   "command.nova.network_debug.nova.energy": "切換能量網路的除錯模式",
   "command.nova.network_debug.nova.fluid": "切換流體網路的除錯模式",

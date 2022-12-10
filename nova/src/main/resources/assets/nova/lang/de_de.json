@@ -79,7 +79,7 @@
   "menu.nova.upgrades": "Upgrades",
   "command.nova.network_reload.success": "Alle aktiven Netzwerke wurden neu geladen.",
   "nova.tile_entity_limits.world_blacklist.deny": "Du darfst keine Tile-Entitäten von Nova in dieser Welt platzieren.",
-  "item.nova.wrench.mode.nova.items": "Modus: Items",
+  "item.nova.wrench.mode.nova.item": "Modus: Items",
   "item.nova.wrench.mode.nova.fluid": "Modus: Flüssigkeiten",
   "command.nova.network_debug.nova.fluid": "Debug-Ansicht für Flüssigkeits-Netzwerke umgeschaltet.",
   "item.nova.wrench.mode.nova.energy": "Modus: Energie",

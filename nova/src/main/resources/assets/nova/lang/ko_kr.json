@@ -1,7 +1,7 @@
 {
   "item.nova.wrench": "렌치",
   "item.nova.wrench.mode.nova.energy": "모드: 에너지",
-  "item.nova.wrench.mode.nova.items": "모드: 아이템",
+  "item.nova.wrench.mode.nova.item": "모드: 아이템",
   "item.nova.wrench.mode.nova.fluid": "모드: 유체",
   "item.nova.speed_upgrade": "속도 업그레이드",
   "item.nova.efficiency_upgrade": "효율 업그레이드",

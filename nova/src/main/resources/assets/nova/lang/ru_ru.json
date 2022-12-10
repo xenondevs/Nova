@@ -87,7 +87,7 @@
   "nova.tile_entity_limits.world_blacklist.deny": "Вам не разрешается размещать какие-либо объекты из Nova в этом мире.",
   "nova.tile_entity_limits.type_world_blacklist.deny": "Вам не разрешено размещать этот объект в этом мире.",
   "item.nova.wrench.mode.nova.energy": "Режим: Энергия",
-  "item.nova.wrench.mode.nova.items": "Режим: Предметы",
+  "item.nova.wrench.mode.nova.item": "Режим: Предметы",
   "command.nova.network_reload.success": "Все активные сети были перезагружены.",
   "command.nova.resource_pack.create.start": "Создание ресурс-пака... Пожалуйста подождите",
   "menu.nova.side_config.east": "Восток",
