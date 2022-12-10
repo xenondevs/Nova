@@ -5,6 +5,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import net.minecraft.world.InteractionHand
+import org.bukkit.GameMode
 import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -18,7 +19,6 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionP
 import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.removeIf
@@ -119,9 +119,11 @@ internal object BlockBreaking : Listener {
         }
         
         // call block state attack (i.e. teleport dragon egg, play note block sound...)
-        val serverLevel = pos.world.serverLevel
-        val nmsPos = pos.nmsPos
-        serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
+        if (player.gameMode != GameMode.CREATIVE) {
+            val serverLevel = pos.world.serverLevel
+            val nmsPos = pos.nmsPos
+            serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
+        }
         
         // start breaker
         val novaBlockState = BlockManager.getBlock(pos)
