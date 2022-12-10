@@ -35,6 +35,8 @@ enum class Instrument(val bukkitInstrument: BukkitInstrument?, val nmsInstrument
     CUSTOM_HEAD(null, NoteBlockInstrument.CUSTOM_HEAD);
     
     val soundEvent: Holder<SoundEvent> = nmsInstrument.soundEvent
+    val isTunable: Boolean = nmsInstrument.isTunable
+    val requiresAirAbove: Boolean = nmsInstrument.requiresAirAbove()
     
     companion object {
         
