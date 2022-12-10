@@ -216,4 +216,8 @@ fun ParticleBuilder<ShriekParticleOption>.shriek(delay: Int) = options {
     ShriekParticleOption(delay)
 }
 
+fun ParticleBuilder<SimpleParticleType>.noteColor(note: Int) {
+    offsetX(note / 24f)
+}
+
 //</editor-fold>
