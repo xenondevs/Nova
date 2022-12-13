@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.generation
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.DataFileParser
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.Patcher
@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.world.generation.registry.FeatureRegistry
 internal object WorldGenManager : Initializable() {
     
     override val initializationStage = InitializationStage.PRE_WORLD
-    override val dependsOn = setOf(Patcher, Resources, AddonsInitializer, DataFileParser)
+    override val dependsOn = setOf(Patcher, ResourceGeneration.PreWorld, AddonsInitializer, DataFileParser)
     
     private val WORLD_GEN_REGISTRIES = listOf(FeatureRegistry, BiomeInjectionRegistry)
     private val NMS_REGISTRIES = WORLD_GEN_REGISTRIES.asSequence()

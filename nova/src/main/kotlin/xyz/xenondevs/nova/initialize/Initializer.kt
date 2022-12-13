@@ -7,6 +7,7 @@ import de.studiocode.invui.util.InventoryUtils
 import de.studiocode.invui.virtualinventory.StackSizeProvider
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -68,7 +69,6 @@ import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.*
 import java.util.logging.Level
 import kotlin.reflect.jvm.jvmName
-import kotlin.system.exitProcess
 
 internal object Initializer : Listener {
     

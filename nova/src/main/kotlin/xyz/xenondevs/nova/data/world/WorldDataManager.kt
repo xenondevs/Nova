@@ -39,8 +39,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.logging.Level
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
-import net.minecraft.world.level.Level as MojangWorld
 import kotlin.concurrent.write
+import net.minecraft.world.level.Level as MojangWorld
 
 internal object WorldDataManager : Initializable(), Listener {
     
@@ -215,10 +215,6 @@ internal object WorldDataManager : Initializable(), Listener {
     fun removeBlockState(pos: BlockPos) =
         writeChunk(pos.chunkPos) { it.blockStates -= pos }
     
-    fun getWorldStorage(world: World): WorldDataStorage =
-        worlds.getOrPut(world.uid) { WorldDataStorage(world) }
-    
-    fun getRegion(pos: ChunkPos): RegionFile =
     @Synchronized
     internal fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: BlockNovaMaterial) {
         return addOrphanBlock(BlockPos(world.world, x, y, z), material)
@@ -244,7 +240,7 @@ internal object WorldDataManager : Initializable(), Listener {
     
     @Synchronized
     private fun getWorldStorage(world: World): WorldDataStorage =
-        worlds.getOrPut(world) { WorldDataStorage(world) }
+        worlds.getOrPut(world.uid) { WorldDataStorage(world) }
     
     @Synchronized
     private fun getRegion(pos: ChunkPos): RegionFile =

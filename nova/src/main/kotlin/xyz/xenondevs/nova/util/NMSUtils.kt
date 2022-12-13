@@ -3,8 +3,8 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.serialization.JsonOps
-import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Direction
+import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
 import net.minecraft.core.Rotations
@@ -42,6 +42,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
