@@ -35,7 +35,6 @@ object StructureRegistry : WorldGenRegistry() {
     private val structureSets = Object2ObjectOpenHashMap<NamespacedId, StructureSet>()
     private val structureTypes = Object2ObjectOpenHashMap<NamespacedId, StructureType<*>>()
     
-    
     fun registerStructure(addon: Addon, name: String, structure: Structure) {
         val id = NamespacedId(addon, name)
         require(id !in structures) { "Duplicate structure $id" }
@@ -77,7 +76,6 @@ object StructureRegistry : WorldGenRegistry() {
         require(id !in structureTypes) { "Duplicate structure type $id" }
         structureTypes[id] = structureType
     }
-    
     
     override fun register(registryAccess: RegistryAccess) {
         loadFiles("structure", Structure.CODEC, structures)

@@ -14,15 +14,15 @@ object BiomeInjectionRegistry : WorldGenRegistry() {
     
     private val biomeInjections = Object2ObjectOpenHashMap<NamespacedId, BiomeInjection>()
 
-    override fun register(registryAccess: RegistryAccess) {
-        biomeInjections += loadFiles("inject/biome", BiomeInjection.CODEC)
-        BiomeInjector.loadInjections(biomeInjections.values)
-    }
-    
     fun registerBiomeInjection(addon: Addon, name: String, injection: BiomeInjection) {
         val id = NamespacedId(addon, name)
         require(id !in biomeInjections) { "Duplicate biome injection $id" }
         biomeInjections[id] = injection
+    }
+    
+    override fun register(registryAccess: RegistryAccess) {
+        loadFiles("inject/biome", BiomeInjection.CODEC, biomeInjections)
+        BiomeInjector.loadInjections(biomeInjections.values)
     }
     
 }
