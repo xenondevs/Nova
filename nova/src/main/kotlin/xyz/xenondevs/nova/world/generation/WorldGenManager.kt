@@ -12,14 +12,21 @@ import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
 import xyz.xenondevs.nova.world.generation.inject.codec.CodecOverride
 import xyz.xenondevs.nova.world.generation.inject.codec.blockstate.BlockStateCodecOverride
 import xyz.xenondevs.nova.world.generation.registry.BiomeInjectionRegistry
+import xyz.xenondevs.nova.world.generation.registry.BiomeRegistry
+import xyz.xenondevs.nova.world.generation.registry.CarverRegistry
+import xyz.xenondevs.nova.world.generation.registry.DimensionRegistry
 import xyz.xenondevs.nova.world.generation.registry.FeatureRegistry
+import xyz.xenondevs.nova.world.generation.registry.NoiseRegistry
+import xyz.xenondevs.nova.world.generation.registry.StructureRegistry
 
 internal object WorldGenManager : Initializable() {
     
     override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = setOf(Patcher, ResourceGeneration.PreWorld, AddonsInitializer, DataFileParser)
     
-    private val WORLD_GEN_REGISTRIES = listOf(FeatureRegistry, BiomeInjectionRegistry)
+    private val WORLD_GEN_REGISTRIES = listOf(
+        FeatureRegistry, NoiseRegistry, CarverRegistry, StructureRegistry, BiomeRegistry, BiomeInjectionRegistry, DimensionRegistry
+    )
     private val NMS_REGISTRIES = WORLD_GEN_REGISTRIES.asSequence()
         .flatMap { it.neededRegistries }
         .associateWithTo(Object2ObjectOpenHashMap()) { REGISTRY_ACCESS.registry(it).get() }
