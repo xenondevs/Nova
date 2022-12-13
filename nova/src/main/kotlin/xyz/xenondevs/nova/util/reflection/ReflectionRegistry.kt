@@ -6,9 +6,14 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.ResourceKey
+import net.minecraft.server.players.PlayerList
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.ItemCombinerMenu
 import net.minecraft.world.item.enchantment.EnchantmentCategory
@@ -49,7 +54,6 @@ import kotlin.reflect.KProperty1
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
-import net.minecraft.world.entity.player.Inventory as MojangInventory
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -68,49 +72,51 @@ internal object ReflectionRegistry {
     val HOLDER_SET_DIRECT_CLASS = getClass("SRC(net.minecraft.core.HolderSet\$Direct)")
     
     // Constructors
-    val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class.java, false, Class::class.java)
-    val MEMORY_SECTION_CONSTRUCTOR = getConstructor(MemorySection::class.java, true, ConfigurationSection::class.java, String::class.java)
+    val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class, false, Class::class)
+    val MEMORY_SECTION_CONSTRUCTOR = getConstructor(MemorySection::class, true, ConfigurationSection::class, String::class)
+    val SECTION_PATH_DATA_CONSTRUCTOR = getConstructor(SECTION_PATH_DATA_CLASS, true, Any::class)
     val CHUNK_ACCESS_CONSTRUCTOR = getConstructor(ChunkAccess::class.java, false, ChunkPos::class.java, UpgradeData::class.java, LevelHeightAccessor::class.java, Registry::class.java, Long::class.java, Array<LevelChunkSection>::class.java, BlendingData::class.java)
-    val SECTION_PATH_DATA_CONSTRUCTOR = getConstructor(SECTION_PATH_DATA_CLASS, true, Any::class.java)
     val TARGET_BLOCK_STATE_CONSTRUCTOR = getConstructor(TargetBlockState::class.java, true, RuleTest::class.java, BlockState::class.java)
     
     // Methods
-    val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class.java)
+    val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class)
     val FEATURE_SORTER_BUILD_FEATURES_PER_STEP_METHOD = getMethod(FeatureSorter::class.java, true, "SRM(net.minecraft.world.level.biome.FeatureSorter buildFeaturesPerStep)", List::class.java, JavaFunction::class.java, Boolean::class.java)
     val STATE_HOLDER_CODEC_METHOD = getMethod(StateHolder::class.java, true, "SRM(net.minecraft.world.level.block.state.StateHolder codec)", Codec::class.java, JavaFunction::class.java)
     val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class.java, true, "SRM(net.minecraft.world.level.chunk.LevelChunkSection setBlockState)", Int::class.java, Int::class.java, Int::class.java, BlockState::class.java, Boolean::class.java)
-    val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class.java, false, "getDelegate", Any::class.java)
+    val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class, false, "getDelegate", Any::class)
     val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class.java, true, "defineClass", String::class.java, ByteArray::class.java, Int::class.java, Int::class.java, ProtectionDomain::class.java)
-    val CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlock::class.java, true, "isPreferredTool", BlockState::class.java, MojangStack::class.java)
-    val ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack getAttributeModifiers)", MojangEquipmentSlot::class.java)
-    val ITEM_STACK_HURT_AND_BREAK_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack hurtAndBreak)", Int::class.java, MojangLivingEntity::class.java, Consumer::class.java)
-    val ITEM_STACK_HURT_ENTITY_METHOD = getMethod(MojangStack::class.java, false, "SRM(net.minecraft.world.item.ItemStack hurtEnemy)", MojangLivingEntity::class.java, MojangPlayer::class.java)
-    val PLAYER_ATTACK_METHOD = getMethod(MojangPlayer::class.java, false, "SRM(net.minecraft.world.entity.player.Player attack)", MojangEntity::class.java)
-    val ANVIL_MENU_CREATE_RESULT_METHOD = getMethod(AnvilMenu::class.java, false, "SRM(net.minecraft.world.inventory.AnvilMenu createResult)")
-    val ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD = getMethod(EnchantmentHelper::class.java, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getAvailableEnchantmentResults)", Int::class.java, MojangStack::class.java, Boolean::class.java)
-    val ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD = getMethod(EnchantmentHelper::class.java, true, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getEnchantmentCost)", RandomSource::class.java, Int::class.java, Int::class.java, MojangStack::class.java)
-    val ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD = getMethod(EnchantmentHelper::class.java, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper selectEnchantment)", RandomSource::class.java, MojangStack::class.java, Int::class.java, Boolean::class.java)
-    val ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD = getMethod(EnchantmentCategory::class.java, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentCategory canEnchant)", MojangItem::class.java)
-    val ITEM_IS_ENCHANTABLE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item isEnchantable)", MojangStack::class.java)
-    val ITEM_GET_ENCHANTMENT_VALUE_METHOD = getMethod(MojangItem::class.java, false, "SRM(net.minecraft.world.item.Item getEnchantmentValue)")
-    val EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD = getMethod(ExperienceOrb::class.java, true, "SRM(net.minecraft.world.entity.ExperienceOrb repairPlayerItems)", MojangPlayer::class.java, Int::class.java)
+    val CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlock::class, true, "isPreferredTool", BlockState::class, MojangStack::class)
+    val ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getAttributeModifiers)", MojangEquipmentSlot::class)
+    val ITEM_STACK_HURT_AND_BREAK_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack hurtAndBreak)", Int::class, MojangLivingEntity::class, Consumer::class)
+    val ITEM_STACK_HURT_ENTITY_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack hurtEnemy)", MojangLivingEntity::class, MojangPlayer::class)
+    val PLAYER_ATTACK_METHOD = getMethod(MojangPlayer::class, false, "SRM(net.minecraft.world.entity.player.Player attack)", MojangEntity::class)
+    val ANVIL_MENU_CREATE_RESULT_METHOD = getMethod(AnvilMenu::class, false, "SRM(net.minecraft.world.inventory.AnvilMenu createResult)")
+    val ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD = getMethod(EnchantmentHelper::class, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getAvailableEnchantmentResults)", Int::class, MojangStack::class, Boolean::class)
+    val ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD = getMethod(EnchantmentHelper::class, true, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getEnchantmentCost)", RandomSource::class, Int::class, Int::class, MojangStack::class)
+    val ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD = getMethod(EnchantmentHelper::class, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper selectEnchantment)", RandomSource::class, MojangStack::class, Int::class, Boolean::class)
+    val ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD = getMethod(EnchantmentCategory::class, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentCategory canEnchant)", MojangItem::class)
+    val ITEM_IS_ENCHANTABLE_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item isEnchantable)", MojangStack::class)
+    val ITEM_GET_ENCHANTMENT_VALUE_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item getEnchantmentValue)")
+    val EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD = getMethod(ExperienceOrb::class, true, "SRM(net.minecraft.world.entity.ExperienceOrb repairPlayerItems)", MojangPlayer::class, Int::class)
     val ITEM_ENTITY_PLAYER_TOUCH_METHOD = getMethod(ItemEntity::class.java, false, "SRM(net.minecraft.world.entity.item.ItemEntity playerTouch)", MojangPlayer::class.java)
-    val INVENTORY_ADD_METHOD = getMethod(MojangInventory::class.java, false, "SRM(net.minecraft.world.entity.player.Inventory add)", MojangStack::class.java)
-    val ENTITY_PLAY_STEP_SOUND_METHOD = getMethod(MojangEntity::class.java, true, "SRM(net.minecraft.world.entity.Entity playStepSound)", BlockPos::class.java, BlockState::class.java)
-    val LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD = getMethod(MojangLivingEntity::class.java, true, "SRM(net.minecraft.world.entity.LivingEntity playBlockFallSound)")
+    val INVENTORY_ADD_METHOD = getMethod(Inventory::class.java, false, "SRM(net.minecraft.world.entity.player.Inventory add)", MojangStack::class.java)
+    val ENTITY_PLAY_STEP_SOUND_METHOD = getMethod(MojangEntity::class, true, "SRM(net.minecraft.world.entity.Entity playStepSound)", BlockPos::class, BlockState::class)
+    val LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD = getMethod(LivingEntity::class, true, "SRM(net.minecraft.world.entity.LivingEntity playBlockFallSound)")
+    val ITEM_STACK_GET_MAX_STACK_SIZE_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getMaxStackSize)")
+    val PLAYER_LIST_BROADCAST_METHOD = getMethod(PlayerList::class, false, "SRM(net.minecraft.server.players.PlayerList broadcast)", MojangPlayer::class, Double::class, Double::class, Double::class, Double::class, ResourceKey::class, Packet::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
-    val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class.java, true, "children")
-    val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class.java, true, "literals")
-    val COMMAND_NODE_ARGUMENTS_FIELD = getField(CommandNode::class.java, true, "arguments")
-    val CALLABLE_REFERENCE_RECEIVER_FIELD = getField(CallableReference::class.java, true, "receiver")
-    val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = getField(PrepareItemCraftEvent::class.java, true, "matrix")
-    val MEMORY_SECTION_MAP_FIELD = getField(MemorySection::class.java, true, "map")
-    val HANDLER_LIST_HANDLERS_FIELD = getField(HandlerList::class.java, true, "handlers")
-    val HANDLER_LIST_HANDLER_SLOTS_FIELD = getField(HandlerList::class.java, true, "handlerslots")
-    val BLOCK_PHYSICS_EVENT_CHANGED_FIELD = getField(BlockPhysicsEvent::class.java, true, "changed")
-    val PALETTED_CONTAINER_DATA_FIELD = getField(PalettedContainer::class.java, true, "SRF(net.minecraft.world.level.chunk.PalettedContainer data)")
+    val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class, true, "children")
+    val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class, true, "literals")
+    val COMMAND_NODE_ARGUMENTS_FIELD = getField(CommandNode::class, true, "arguments")
+    val CALLABLE_REFERENCE_RECEIVER_FIELD = getField(CallableReference::class, true, "receiver")
+    val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = getField(PrepareItemCraftEvent::class, true, "matrix")
+    val MEMORY_SECTION_MAP_FIELD = getField(MemorySection::class, true, "map")
+    val HANDLER_LIST_HANDLERS_FIELD = getField(HandlerList::class, true, "handlers")
+    val HANDLER_LIST_HANDLER_SLOTS_FIELD = getField(HandlerList::class, true, "handlerslots")
+    val BLOCK_PHYSICS_EVENT_CHANGED_FIELD = getField(BlockPhysicsEvent::class, true, "changed")
+    val PALETTED_CONTAINER_DATA_FIELD = getField(PalettedContainer::class, true, "SRF(net.minecraft.world.level.chunk.PalettedContainer data)")
     val PALETTED_CONTAINER_DATA_PALETTE_FIELD = getField(PALETTED_CONTAINER_DATA_CLASS, true, "SRF(net.minecraft.world.level.chunk.PalettedContainer\$Data palette)")
     val PALETTED_CONTAINER_DATA_STORAGE_FIELD = getField(PALETTED_CONTAINER_DATA_CLASS, true, "SRF(net.minecraft.world.level.chunk.PalettedContainer\$Data storage)")
     val LINEAR_PALETTE_VALUES_FIELD = getField(LinearPalette::class.java, true, "SRF(net.minecraft.world.level.chunk.LinearPalette values)")

@@ -116,5 +116,9 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Nemáš dovoleno položit žádné další entity.",
   "nova.tile_entity_limits.amount_per_chunk.deny": "Nemáš dovoleno položit více entit tohoto typu v tomto chunku.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Nemáš dovoleno položit více entit v tomto světě.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Nemáš dovoleno položit více entit v tomto chunku."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Nemáš dovoleno položit více entit v tomto chunku.",
+  "command.nova.remove_invalid_vtes.success": "Bylo úspěšně odebráno %s chybných entit.",
+  "command.nova.remove_invalid_vtes.failure": "Žádné chybné entity nebyly nalezeny.",
+  "waila.nova.required_tool.unknown": "Nástroj: Neznámý",
+  "nova.tile_entity_limits.type_blacklist.deny": "Nemáš dovoleno pokládat entity tohoto typu."
 }

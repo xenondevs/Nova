@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network.energy.holder
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.config.ValueReloadable
+import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
@@ -14,7 +14,7 @@ import kotlin.reflect.KProperty
 
 sealed class NovaEnergyHolder(
     final override val endPoint: NetworkedTileEntity,
-    defaultMaxEnergy: ValueReloadable<Long>,
+    defaultMaxEnergy: Provider<Long>,
     protected val upgradeHolder: UpgradeHolder?,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : EnergyHolder {

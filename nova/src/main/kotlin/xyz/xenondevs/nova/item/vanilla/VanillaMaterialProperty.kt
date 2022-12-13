@@ -25,6 +25,26 @@ enum class VanillaMaterialProperty {
     /**
      * The item can always be consumed.
      */
-    CONSUMABLE_ALWAYS
+    CONSUMABLE_ALWAYS,
+    
+    /**
+     * The item can render a custom helmet texture.
+     */
+    HELMET,
+    
+    /**
+     * The item can render a custom chestplate texture.
+     */
+    CHESTPLATE,
+    
+    /**
+     * The item can render a custom leggings texture.
+     */
+    LEGGINGS,
+    
+    /**
+     * The item can render a custom boots texture.
+     */
+    BOOTS
     
 }

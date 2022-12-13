@@ -20,20 +20,26 @@ import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     
     override val material: TileEntityNovaMaterial
+    
+    @Volatile
     lateinit var uuid: UUID
+    
+    @Volatile
     var ownerUUID: UUID? = null
+    
+    @Volatile
     lateinit var data: Compound
+    
+    @Volatile
     internal var legacyData: LegacyCompound? = null
     
+    @Volatile
     private var _tileEntity: TileEntity? = null
     override var tileEntity: TileEntity
         get() = _tileEntity ?: throw IllegalStateException("TileEntity is not initialized")
         internal set(value) {
             _tileEntity = value
         }
-    
-    val isInitialized: Boolean
-        get() = _tileEntity != null
     
     constructor(pos: BlockPos, material: TileEntityNovaMaterial) : super(pos, material) {
         this.material = material
@@ -60,18 +66,17 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     }
     
     override fun handleInitialized(placed: Boolean) {
-        super.handleInitialized(placed)
-        
         _tileEntity = material.tileEntityConstructor(this)
         tileEntity.handleInitialized(placed)
         
         TileEntityManager.registerTileEntity(this)
+        
+        super.handleInitialized(placed)
     }
     
     override fun handleRemoved(broken: Boolean) {
         super.handleRemoved(broken)
         
-        // The tile entity could be null when the chunk was unloaded before the WorldDataManager could call handleInitialized
         if (_tileEntity != null) {
             tileEntity.saveData()
             tileEntity.handleRemoved(!broken)

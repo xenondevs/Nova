@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.region
 
-import xyz.xenondevs.nova.data.config.ValueReloadable
+import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
@@ -8,8 +8,8 @@ import java.util.*
 
 open class DynamicRegion internal constructor(
     uuid: UUID,
-    minSize: ValueReloadable<Int>,
-    maxSize: ValueReloadable<Int>,
+    minSize: Provider<Int>,
+    maxSize: Provider<Int>,
     size: Int,
     createRegion: (Int) -> Region,
 ) : ReloadableRegion(uuid, createRegion) {

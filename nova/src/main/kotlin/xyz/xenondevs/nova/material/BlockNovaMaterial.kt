@@ -6,7 +6,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
@@ -33,7 +35,7 @@ open class BlockNovaMaterial internal constructor(
     val multiBlockLoader: MultiBlockLoader?
 ) : ItemNovaMaterial(id, localizedName, novaItem, maxStackSize) {
     
-    val block: BlockModelData by lazy { Resources.getModelData(id).second!! }
+    val block: BlockModelData by lazy { Resources.getModelData(id).block!! }
     
     val hardness = options.hardness
     val toolCategories = options.toolCategories
@@ -42,6 +44,12 @@ open class BlockNovaMaterial internal constructor(
     val soundGroup = options.soundGroup
     val breakParticles = options.breakParticles
     val showBreakAnimation = options.showBreakAnimation
+    
+    internal val vanillaBlockMaterial: Material
+        get() = when (val block = block) {
+            is ArmorStandBlockModelData -> block.hitboxType
+            is BlockStateBlockModelData -> block[0].type.material
+        }
     
     internal open fun createBlockState(pos: BlockPos): NovaBlockState =
         NovaBlockState(pos, this)

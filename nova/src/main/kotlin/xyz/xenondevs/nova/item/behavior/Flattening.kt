@@ -16,7 +16,7 @@ private val FLATTENABLES: Set<Material> = hashSetOf(
     Material.GRASS_BLOCK,
     Material.DIRT,
     Material.PODZOL,
-    Material.COARSE_DIRT, 
+    Material.COARSE_DIRT,
     Material.MYCELIUM,
     Material.ROOTED_DIRT
 )
@@ -25,10 +25,10 @@ object Flattening : ItemBehavior() {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
-            event.isCancelled = true
-            
             val block = event.clickedBlock!!
             if (block.type in FLATTENABLES) {
+                event.isCancelled = true
+                
                 block.type = Material.DIRT_PATH
                 block.location.playSoundNearby(Sound.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1f, 1f)
                 player.damageItemInMainHand()

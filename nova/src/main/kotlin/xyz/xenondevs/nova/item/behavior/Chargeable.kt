@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -28,8 +29,8 @@ class Chargeable(
 ) : ItemBehavior() {
     
     override val vanillaMaterialProperties = if (affectsItemDurability)
-        listOf(VanillaMaterialProperty.DAMAGEABLE)
-    else emptyList()
+        provider(listOf(VanillaMaterialProperty.DAMAGEABLE))
+    else provider(emptyList())
     
     @Deprecated("Replaced by ChargeableOptions", ReplaceWith("options.maxEnergy"))
     val maxEnergy: Long

@@ -1,11 +1,15 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
 package xyz.xenondevs.nova.data.resources
 
-private val NAMESPACED_ENTRY = Regex("""^([a-z0-9._-]+):([a-z0-9/._-]+)$""")
-private val NON_NAMESPACED_ENTRY = Regex("""^([a-z0-9/._-]+)$""")
+import java.io.File
 
 data class ResourcePath(val namespace: String, val path: String) {
     
     private val id = "$namespace:$path"
+    
+    fun getFile(assetsDir: File, extraPath: String, extension: String? = null): File {
+        return File(assetsDir, "$namespace/$extraPath/$path" + if (extension != null) ".$extension" else "")
+    }
     
     override fun equals(other: Any?): Boolean {
         return other is ResourcePath && other.id == id
@@ -20,6 +24,9 @@ data class ResourcePath(val namespace: String, val path: String) {
     }
     
     companion object {
+        
+        val NAMESPACED_ENTRY = Regex("""^([a-z0-9._-]+):([a-z0-9/._-]+)$""")
+        val NON_NAMESPACED_ENTRY = Regex("""^([a-z0-9/._-]+)$""")
         
         fun of(id: String, fallbackNamespace: String = "minecraft"): ResourcePath {
             return if (NON_NAMESPACED_ENTRY.matches(id)) {

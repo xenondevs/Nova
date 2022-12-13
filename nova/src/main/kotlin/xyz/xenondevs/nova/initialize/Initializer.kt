@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -73,18 +73,21 @@ import kotlin.system.exitProcess
 internal object Initializer : Listener {
     
     private val INITIALIZABLES = CollectionUtils.sortDependencies(listOf(
-        LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager, Resources,
+        LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager,
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeEntityManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
         NetworkManager, ItemListener, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
-        BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser, WorldEditIntegration
+        BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser, WorldEditIntegration, ResourceGeneration.PreWorld,
+        ResourceGeneration.PostWorld
     ), Initializable::dependsOn)
     
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())
     var isDone = false
         private set
+    
+    private var failedPreWorld = false
     
     fun initPreWorld() {
         registerEvents()
@@ -108,15 +111,13 @@ internal object Initializer : Listener {
         
         toInit.forEach { it.initialization.get() }
         
-        isDone = true
-        
         if (initialized.size != toInit.size) {
-            LOGGER.log(Level.SEVERE, "Failed to initialize. Shutting down...")
-            exitProcess(1)
+            failedPreWorld = true
+            performAppropriateShutdown()
         }
     }
     
-    fun initPostWorld() {
+    private fun initPostWorld() {
         runAsyncTask {
             val toInit = INITIALIZABLES.filter { it.initializationStage != InitializationStage.PRE_WORLD }
             
@@ -137,6 +138,7 @@ internal object Initializer : Listener {
             toInit.forEach { it.initialization.get() }
             
             if (initialized.size == INITIALIZABLES.size) {
+                isDone = true
                 callEvent(NovaLoadDataEvent())
                 
                 runTask {
@@ -147,8 +149,7 @@ internal object Initializer : Listener {
                     LOGGER.info("Done loading")
                 }
             } else {
-                LOGGER.log(Level.SEVERE, "Failed to initialize. Shutting down...")
-                exitProcess(1)
+                performAppropriateShutdown()
             }
         }
     }
@@ -181,6 +182,15 @@ internal object Initializer : Listener {
         NMSUtilities.disable()
     }
     
+    private fun performAppropriateShutdown() {
+        if (Patcher.ENABLED) {
+            LOGGER.warning("Shutting down the server...")
+            Bukkit.shutdown()
+        } else {
+            Bukkit.getPluginManager().disablePlugin(NOVA.loader)
+        }
+    }
+    
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handleLogin(event: PlayerLoginEvent) {
         if (!isDone && !IS_DEV_SERVER) {
@@ -190,7 +200,9 @@ internal object Initializer : Listener {
     
     @EventHandler
     private fun handleServerStarted(event: ServerLoadEvent) {
-        initPostWorld()
+        if (!failedPreWorld) {
+            initPostWorld()
+        } else LOGGER.warning("Skipping post world initialization")
     }
     
     private fun setupMetrics() {

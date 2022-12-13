@@ -41,8 +41,6 @@ object Tilling : ItemBehavior() {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
-            event.isCancelled = true
-            
             val serverPlayer = player.serverPlayer
             val block = event.clickedBlock!!
             val level = block.world.serverLevel
@@ -51,6 +49,8 @@ object Tilling : ItemBehavior() {
             
             val (check, newState, drops) = TILLABLES[block.nmsState.block] ?: return
             if (check.invoke(event)) {
+                event.isCancelled = true
+                
                 // play sound
                 level.playSound(null, pos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1f, 1f)
                 // update block

@@ -28,8 +28,8 @@ import xyz.xenondevs.nova.material.ItemCategory
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
-import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
+import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
 import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.runTask

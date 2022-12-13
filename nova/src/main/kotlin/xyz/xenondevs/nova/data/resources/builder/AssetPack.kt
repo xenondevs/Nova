@@ -3,7 +3,9 @@
 package xyz.xenondevs.nova.data.resources.builder
 
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.RegisteredMaterial
+import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.GUIsIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MaterialsIndexDeserializer
 import xyz.xenondevs.nova.util.data.parseJson
@@ -13,6 +15,7 @@ internal class AssetPack(val directory: File, val namespace: String) {
     
     val materialsFile = File(directory, "materials.json")
     val guisFile = File(directory, "guis.json")
+    val armorFile = File(directory, "armor.json")
     
     // Sub-folders
     val modelsDir = File(directory, "models").takeIf(File::exists)
@@ -29,6 +32,10 @@ internal class AssetPack(val directory: File, val namespace: String) {
     
     val guisIndex: Map<String, ResourcePath>? = if (guisFile.exists())
         GUIsIndexDeserializer.deserialize(namespace, guisFile.parseJson())
+    else null
+    
+    val armorIndex: List<RegisteredArmor>? = if (armorFile.exists())
+        ArmorIndexDeserializer.deserialize(namespace, armorFile.parseJson())
     else null
     
 }

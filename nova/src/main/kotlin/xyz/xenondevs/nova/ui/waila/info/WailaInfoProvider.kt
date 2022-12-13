@@ -8,7 +8,6 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 
@@ -60,5 +59,3 @@ abstract class NovaWailaInfoProvider : WailaInfoProvider<NovaBlockState> {
 }
 
 abstract class VanillaWailaInfoProvider(val materials: Set<Material>?) : WailaInfoProvider<Block>
-
-internal abstract class CustomItemServiceWailaInfoProvider(val services: Set<CustomItemService>?) : WailaInfoProvider<Block>

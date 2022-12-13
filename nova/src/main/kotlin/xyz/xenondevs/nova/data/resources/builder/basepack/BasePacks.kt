@@ -5,17 +5,23 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
 import java.io.File
 import java.nio.file.Path
+import java.util.logging.Level
 
-private val WHITELISTED_FILE_TYPES = hashSetOf(
+private val DEFAULT_WHITELISTED_FILE_TYPES: Set<String> = hashSetOf(
     "json", "png", "mcmeta", "ogg", "txt", "bin", "fsh", "vsh", "glsl", // vanilla
     "properties" // optifine
 )
+
+private val WHITELISTED_FILE_TYPES: Set<String> by configReloadable {
+    DEFAULT_CONFIG.getStringList("resource_pack.whitelisted_file_types").mapTo(HashSet()) { it.lowercase() } + DEFAULT_WHITELISTED_FILE_TYPES
+}
 
 private val BASE_PACKS by configReloadable { DEFAULT_CONFIG.getStringList("resource_pack.base_packs").map(::File) }
 
@@ -47,8 +53,15 @@ internal class BasePacks {
         packDir.walkTopDown()
             .filter(File::isFile)
             .forEach { file ->
+                // Validate file extension
                 if (file.extension.lowercase() !in WHITELISTED_FILE_TYPES) {
                     LOGGER.info("Skipping file $file as it is not a resource pack file")
+                    return@forEach
+                }
+                
+                // Validate file name
+                if (!ResourcePath.NON_NAMESPACED_ENTRY.matches(file.name)) {
+                    LOGGER.info("Skipping file $file as its name does not match regex ${ResourcePath.NON_NAMESPACED_ENTRY}")
                     return@forEach
                 }
                 
@@ -59,7 +72,11 @@ internal class BasePacks {
                 packFile.parentFile.mkdirs()
                 val fileMerger = mergers.firstOrNull { relPath.startsWith(it.path) }
                 if (fileMerger != null) {
-                    fileMerger.merge(file, packFile)
+                    try {
+                        fileMerger.merge(file, packFile)
+                    } catch (t: Throwable) {
+                        LOGGER.log(Level.SEVERE, "An exception occurred trying to merge base pack file \"$file\" with \"$packFile\"", t)
+                    }
                 } else if (!packFile.exists()) {
                     file.copyTo(packFile)
                 } else {

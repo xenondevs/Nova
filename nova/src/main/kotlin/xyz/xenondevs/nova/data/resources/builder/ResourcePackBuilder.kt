@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.WailaContent
+import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorContent
 import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.util.data.GSON
@@ -36,32 +37,38 @@ private val OBFUSCATE by configReloadable { DEFAULT_CONFIG.getBoolean("resource_
 private val CORRUPT_ENTRIES by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.protection.corrupt_entries") }
 
 @Suppress("MemberVisibilityCanBePrivate")
-internal object ResourcePackBuilder {
+internal class ResourcePackBuilder {
     
-    val RESOURCE_PACK_DIR = File(NOVA.dataFolder, "resource_pack")
-    val RESOURCE_PACK_BUILD_DIR = File(RESOURCE_PACK_DIR, ".build")
-    val BASE_PACKS_DIR = File(RESOURCE_PACK_DIR, "base_packs")
-    val TEMP_BASE_PACKS_DIR = File(RESOURCE_PACK_BUILD_DIR, "base_packs")
-    val ASSET_PACKS_DIR = File(RESOURCE_PACK_BUILD_DIR, "asset_packs")
-    val PACK_DIR = File(RESOURCE_PACK_BUILD_DIR, "pack")
-    val ASSETS_DIR = File(PACK_DIR, "assets")
-    val MINECRAFT_ASSETS_DIR = File(ASSETS_DIR, "minecraft")
-    val LANGUAGE_DIR = File(ASSETS_DIR, "minecraft/lang")
-    val FONT_DIR = File(ASSETS_DIR, "nova/font")
-    val GUIS_FILE = File(FONT_DIR, "gui.json")
-    val PACK_MCMETA_FILE = File(PACK_DIR, "pack.mcmeta")
-    val RESOURCE_PACK_FILE = File(RESOURCE_PACK_DIR, "ResourcePack.zip")
-    val MCASSETS_DIR = File(RESOURCE_PACK_DIR, ".mcassets")
-    val MCASSETS_ASSETS_DIR = File(MCASSETS_DIR, "assets")
-    
-    private val resourceFilters = buildList {
-        this += CORE_RESOURCE_FILTER
-        this += CONFIG_RESOURCE_FILTER
-        AddonManager.addons.values.forEach {
-            val filter = it.resourceFilter ?: return@forEach
-            this += filter
+    companion object {
+        val RESOURCE_PACK_DIR = File(NOVA.dataFolder, "resource_pack")
+        val RESOURCE_PACK_BUILD_DIR = File(RESOURCE_PACK_DIR, ".build")
+        val BASE_PACKS_DIR = File(RESOURCE_PACK_DIR, "base_packs")
+        val TEMP_BASE_PACKS_DIR = File(RESOURCE_PACK_BUILD_DIR, "base_packs")
+        val ASSET_PACKS_DIR = File(RESOURCE_PACK_BUILD_DIR, "asset_packs")
+        val PACK_DIR = File(RESOURCE_PACK_BUILD_DIR, "pack")
+        val ASSETS_DIR = File(PACK_DIR, "assets")
+        val MINECRAFT_ASSETS_DIR = File(ASSETS_DIR, "minecraft")
+        val LANGUAGE_DIR = File(ASSETS_DIR, "minecraft/lang")
+        val FONT_DIR = File(ASSETS_DIR, "nova/font")
+        val GUIS_FILE = File(FONT_DIR, "gui.json")
+        val PACK_MCMETA_FILE = File(PACK_DIR, "pack.mcmeta")
+        val RESOURCE_PACK_FILE = File(RESOURCE_PACK_DIR, "ResourcePack.zip")
+        val MCASSETS_DIR = File(RESOURCE_PACK_DIR, ".mcassets")
+        val MCASSETS_ASSETS_DIR = File(MCASSETS_DIR, "assets")
+        
+        private val resourceFilters = buildList {
+            this += CORE_RESOURCE_FILTER
+            this += CONFIG_RESOURCE_FILTER
+            AddonManager.addons.values.forEach {
+                val filter = it.resourceFilter ?: return@forEach
+                this += filter
+            }
         }
     }
+    
+    private val soundOverrides = BlockSoundOverrides()
+    private lateinit var basePacks: BasePacks
+    private lateinit var assetPacks: List<AssetPack>
     
     init {
         // delete legacy resource pack files
@@ -78,9 +85,13 @@ internal object ResourcePackBuilder {
         BASE_PACKS_DIR.mkdirs()
     }
     
-    fun buildPack(): File {
+    fun buildPackCompletely() {
         LOGGER.info("Building resource pack")
-        
+        buildPackPreWorld()
+        buildPackPostWorld()
+    }
+    
+    fun buildPackPreWorld() {
         try {
             // download minecraft assets if not present / outdated
             if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != Version.SERVER_VERSION) {
@@ -98,50 +109,66 @@ internal object ResourcePackBuilder {
             }
             
             // extract files
-            val basePacks = BasePacks().also(BasePacks::include)
-            val assetPacks = extractAssetPacks()
+            basePacks = BasePacks().also(BasePacks::include)
+            assetPacks = extractAssetPacks()
             
             // extract assets/minecraft
             extractMinecraftAssets()
             
-            val soundOverrides = BlockSoundOverrides()
-            
             // init content
             val contents = listOf(
                 MaterialContent(basePacks, soundOverrides),
+                ArmorContent(),
                 GUIContent(),
                 LanguageContent(),
-                WailaContent(),
                 TextureIconContent()
             )
             
-            // Include asset packs
+            // include asset packs
             assetPacks.forEach { pack ->
                 LOGGER.info("Including asset pack ${pack.namespace}")
                 copyBasicAssets(pack)
                 contents.forEach { it.addFromPack(pack) }
             }
             
-            // Write PackContent
+            // write PackContent
             LOGGER.info("Writing content")
             contents.forEach(PackContent::write)
             writeMetadata(assetPacks.size, basePacks.packAmount)
+        } catch (t: Throwable) {
+            // Only delete build dir in case of exception as building is continued in buildPostWorld()
+            RESOURCE_PACK_BUILD_DIR.deleteRecursively()
+            throw t
+        }
+    }
     
-            // Write sound overrides
+    fun buildPackPostWorld() {
+        try {
+            LOGGER.info("Writing WAILA content")
+            
+            // init content
+            val contents = listOf(WailaContent())
+            assetPacks.forEach { pack ->
+                contents.forEach { it.addFromPack(pack) }
+            }
+            
+            // write content
+            contents.forEach(PackContent::write)
+            
+            // write sound overrides
             LOGGER.info("Writing sound overrides")
             soundOverrides.write()
             
-            // Calculate char sizes
+            // calculate char sizes
             LOGGER.info("Calculating char sizes")
             CharSizeCalculator().calculateCharSizes()
             
-            // Write metadata            
+            // write metadata            
             writeMetadata(assetPacks.size, basePacks.packAmount)
             
-            // Create a zip
-            val zip = createZip()
+            // create zip
+            createZip()
             LOGGER.info("ResourcePack created.")
-            return zip
         } finally {
             RESOURCE_PACK_BUILD_DIR.deleteRecursively()
         }
@@ -217,7 +244,7 @@ internal object ResourcePackBuilder {
         PACK_MCMETA_FILE.writeText(GSON.toJson(packMcmetaObj))
     }
     
-    private fun createZip(): File {
+    private fun createZip() {
         resourceFilters.forEach(ResourceFilter::performFilterEvaluations)
         
         // filter files
@@ -241,8 +268,6 @@ internal object ResourcePackBuilder {
             PACK_DIR, RESOURCE_PACK_FILE,
             MCASSETS_DIR
         ).packZip()
-        
-        return RESOURCE_PACK_FILE
     }
     
 }

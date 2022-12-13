@@ -30,7 +30,7 @@ internal object BlockInteracting : Listener {
         registerEvents()
     }
     
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.LOW)
     fun handleInteract(e: WrappedPlayerInteractEvent) {
         val event = e.event
         if (event.isCompletelyDenied())
@@ -44,8 +44,7 @@ internal object BlockInteracting : Listener {
             if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos.location).get()) {
                 val material = blockState.material
                 val ctx = BlockInteractContext(pos, player, player.location, event.blockFace, event.item, event.hand)
-                val cancelled = material.novaBlock.handleInteract(blockState, ctx)
-                event.isCancelled = cancelled
+                event.isCancelled = material.novaBlock.handleInteract(blockState, ctx)
             }
         }
     }

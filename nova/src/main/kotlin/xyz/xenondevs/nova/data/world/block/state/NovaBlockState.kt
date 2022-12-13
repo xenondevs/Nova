@@ -31,6 +31,10 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
     override val location: Location
         get() = pos.location
     
+    @Volatile
+    final override var isLoaded = false
+        private set
+    
     constructor(material: BlockNovaMaterial, ctx: BlockPlaceContext) : this(ctx.pos, material) {
         properties.values.forEach { it.init(ctx) }
     }
@@ -47,11 +51,15 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
         material.multiBlockLoader?.invoke(pos)?.forEach {
             WorldDataManager.setBlockState(it, LinkedBlockState(it, this))
         }
+        
+        isLoaded = true
     }
     
     override fun handleRemoved(broken: Boolean) {
+        isLoaded = false
+        
         if (broken) {
-            material.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlock(BlockBreakContext(it)) }
+            material.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlock(BlockBreakContext(it), breakEffects = true) }
         }
         
         modelProvider.remove(broken)

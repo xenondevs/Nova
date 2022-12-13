@@ -34,7 +34,7 @@ internal object LegacyFileConverter : Initializable(), Listener {
     
     private val converters = TreeMap<VersionRange, VersionConverter>()
     
-    private val futures = HashMap<World, CompletableFuture<Unit>>()
+    private val futures: MutableMap<World, CompletableFuture<Unit>> = Collections.synchronizedMap(HashMap())
     
     override fun init() {
         registerEvents()

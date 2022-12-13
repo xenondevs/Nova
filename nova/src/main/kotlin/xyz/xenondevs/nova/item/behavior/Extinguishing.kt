@@ -27,11 +27,11 @@ object Extinguishing : ItemBehavior() {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
-            event.isCancelled = true
-            
             val block = event.clickedBlock!!
             val state = block.nmsState
             if (state.block == Blocks.CAMPFIRE && state.getValue(CampfireBlock.LIT)) {
+                event.isCancelled = true
+                
                 val serverPlayer = player.serverPlayer
                 val level = block.world.serverLevel
                 val pos = block.pos.nmsPos

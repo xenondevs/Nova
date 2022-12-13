@@ -5,7 +5,7 @@ import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.config.ValueReloadable
+import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.tool.ToolLevelRegistry.register
 import xyz.xenondevs.nova.util.item.novaMaterial
@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.world.pos
 
 class ToolLevel(
     val id: NamespacedId,
-    levelValue: ValueReloadable<Double>
+    levelValue: Provider<Double>
 ) : Comparable<ToolLevel> {
     
     internal val levelValue by levelValue

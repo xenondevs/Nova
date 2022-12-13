@@ -5,10 +5,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.nova.loader.library.NovaLibraryLoader;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +21,7 @@ public class NovaLoader extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
-            var novaJarFile = extractNovaJar("/nova.jar");
+            var novaJarFile = extractNovaJar(this, "/nova.jar");
             
             var classpath = NovaLibraryLoader.loadLibraries(logger);
             classpath.add(novaJarFile.toURI().toURL());
@@ -46,14 +46,17 @@ public class NovaLoader extends JavaPlugin {
         return nova;
     }
     
-    public static File extractNovaJar(String pathInJar) throws IOException {
-        var path = Files.createTempFile("nova", ".jar");
-        var file = path.toFile();
-        file.deleteOnExit();
+    public static File extractNovaJar(NovaLoader loader, String pathInJar) throws IOException {
+        var file = new File(loader.getDataFolder(), ".internal_data/bundler/Nova-" + loader.getDescription().getVersion() + ".jar");
+        var parentFile = file.getParentFile();
+        parentFile.mkdirs();
+        Arrays.stream(parentFile.listFiles()).forEach(File::delete);
         
         try (var in = NovaLoader.class.getResourceAsStream(pathInJar)) {
             assert in != null;
-            Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+            try (var out = new FileOutputStream(file)) {
+                in.transferTo(out);
+            }
         }
         
         return file;

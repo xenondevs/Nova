@@ -53,20 +53,18 @@ object Stripping : ItemBehavior() {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
-            event.isCancelled = true
-            
             val block = event.clickedBlock!!
-            stripBlock(
+            event.isCancelled = stripBlock(
                 player.serverPlayer,
                 event.hand!!.interactionHand,
                 block.nmsState,
-                block.world.serverLevel, 
+                block.world.serverLevel,
                 block.pos.nmsPos
             )
         }
     }
     
-    private fun stripBlock(player: MojangPlayer, hand: InteractionHand, state: BlockState, level: ServerLevel, pos: BlockPos) {
+    private fun stripBlock(player: MojangPlayer, hand: InteractionHand, state: BlockState, level: ServerLevel, pos: BlockPos): Boolean {
         val block = state.block
         val itemStack = player.getItemInHand(hand)
         
@@ -80,7 +78,7 @@ object Stripping : ItemBehavior() {
         if (stripped != null) {
             level.playSound(null, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1f, 1f)
             setNewState(stripped)
-            return
+            return true
         }
         
         val copper = WeatheringCopper.getPrevious(state).orElse(null)
@@ -88,7 +86,7 @@ object Stripping : ItemBehavior() {
             level.playSound(null, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1f, 1f)
             level.levelEvent(player, SCRAPE_OXIDATION_LEVEL_EVENT, pos, 0)
             setNewState(copper)
-            return
+            return true
         }
         
         val honeycomb = HoneycombItem.WAX_OFF_BY_BLOCK.get()[block]?.withPropertiesOf(state)
@@ -96,8 +94,10 @@ object Stripping : ItemBehavior() {
             level.playSound(null, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1f, 1f)
             level.levelEvent(player, REMOVE_WAX_LEVEL_EVENT, pos, 0)
             setNewState(honeycomb)
-            return
+            return true
         }
+        
+        return false
     }
     
 }

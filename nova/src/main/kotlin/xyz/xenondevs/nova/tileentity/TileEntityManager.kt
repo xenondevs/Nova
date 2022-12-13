@@ -67,7 +67,7 @@ object TileEntityManager : Initializable(), ITileEntityManager {
     
     fun getTileEntity(pos: BlockPos, additionalHitboxes: Boolean = true): TileEntity? {
         val blockState = BlockManager.getBlock(pos, additionalHitboxes)
-        return if (blockState is NovaTileEntityState && blockState.isInitialized) blockState.tileEntity else null
+        return if (blockState is NovaTileEntityState) blockState.tileEntity else null
     }
     
     @Synchronized

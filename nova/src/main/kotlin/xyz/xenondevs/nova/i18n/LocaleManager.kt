@@ -6,6 +6,7 @@ import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.Initializable
@@ -19,7 +20,7 @@ import java.io.File
 object LocaleManager : Initializable() {
     
     override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = setOf(Resources)
+    override val dependsOn = setOf(ResourceGeneration.PreWorld)
     
     private val loadedLangs = HashSet<String>()
     private val loadingLangs = HashSet<String>()

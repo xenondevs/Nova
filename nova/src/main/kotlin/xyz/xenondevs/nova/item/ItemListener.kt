@@ -43,7 +43,7 @@ internal object ItemListener : Initializable(), Listener {
         registerPacketListener()
     }
     
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.NORMAL)
     private fun handleInteract(e: WrappedPlayerInteractEvent) {
         val event = e.event
         val player = event.player
@@ -96,7 +96,7 @@ internal object ItemListener : Initializable(), Listener {
         findBehaviors(equippedItem)?.forEach { it.handleEquip(player, equippedItem!!, true, event) }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private fun handleInteract(event: InventoryClickEvent) {
         val player = event.whoClicked as Player
         val clickedItem = event.currentItem

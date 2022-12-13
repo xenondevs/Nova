@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST")
+@file:Suppress("unused")
 
 package xyz.xenondevs.nova.util
 
@@ -16,13 +16,17 @@ import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
-import net.minecraft.sounds.SoundEvent
+import net.minecraft.server.players.PlayerList
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 import net.minecraft.world.level.chunk.LevelChunkSection
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.block.Block
@@ -32,17 +36,21 @@ import org.bukkit.craftbukkit.v1_19_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
+import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
+import net.minecraft.world.level.block.Block as MojangBlock
 
 val Entity.nmsEntity: MojangEntity
     get() = (this as CraftEntity).handle
@@ -73,6 +81,12 @@ val Location.blockPos: MojangBlockPos
 val BlockPos.nmsPos: MojangBlockPos
     get() = MojangBlockPos(x, y, z)
 
+val MojangBlockPos.vec3: Vec3
+    get() = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
+
+val MojangBlockPos.center: Vec3
+    get() = Vec3(x + 0.5, y + 0.5, z + 0.5)
+
 val World.serverLevel: ServerLevel
     get() = (this as CraftWorld).handle
 
@@ -99,6 +113,16 @@ val EquipmentSlot.interactionHand: InteractionHand
         else -> throw UnsupportedOperationException()
     }
 
+val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
+    get() = when (this) {
+        EquipmentSlot.HAND -> MojangEquipmentSlot.MAINHAND
+        EquipmentSlot.OFF_HAND -> MojangEquipmentSlot.OFFHAND
+        EquipmentSlot.FEET -> MojangEquipmentSlot.FEET
+        EquipmentSlot.LEGS -> MojangEquipmentSlot.LEGS
+        EquipmentSlot.CHEST -> MojangEquipmentSlot.CHEST
+        EquipmentSlot.HEAD -> MojangEquipmentSlot.HEAD
+    }
+
 val BlockFace.nmsDirection: Direction
     get() = when (this) {
         BlockFace.NORTH -> Direction.NORTH
@@ -110,8 +134,14 @@ val BlockFace.nmsDirection: Direction
         else -> throw UnsupportedOperationException()
     }
 
+val Material.nmsBlock: MojangBlock
+    get() = CraftMagicNumbers.getBlock(this)
+
 val Block.nmsState: BlockState
     get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))
+
+val BlockState.id: Int
+    get() = MojangBlock.getId(this)
 
 fun MojangBlockPos.toNovaPos(world: World): BlockPos =
     BlockPos(world, x, y, z)
@@ -132,6 +162,7 @@ val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).serve
 val serverTick: Int
     get() = minecraftServer.tickCount
 
+@Suppress("FunctionName")
 fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
     val nonNullList: NonNullList<E>
     if (default == null) {
@@ -180,6 +211,56 @@ fun LevelChunkSection.setBlockStateSilently(pos: BlockPos, state: BlockState) {
 
 fun LevelChunkSection.getBlockState(pos: BlockPos): BlockState {
     return getBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF)
+}
+
+inline fun Level.captureDrops(run: () -> Unit): List<ItemEntity> {
+    val captureDrops = ArrayList<ItemEntity>()
+    this.captureDrops = captureDrops
+    try {
+        run.invoke()
+        return captureDrops
+    } finally {
+        this.captureDrops = null
+    }
+}
+
+fun PlayerList.broadcast(exclude: MojangPlayer?, location: Location, maxDistance: Double, packet: Packet<*>) =
+    broadcast(exclude, location.x, location.y, location.z, maxDistance, location.world!!.serverLevel.dimension(), packet)
+
+fun PlayerList.broadcast(exclude: MojangPlayer?, block: Block, maxDistance: Double, packet: Packet<*>) =
+    broadcast(exclude, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
+
+fun PlayerList.broadcast(exclude: Player?, location: Location, maxDistance: Double, packet: Packet<*>) =
+    broadcast(exclude?.serverPlayer, location.x, location.y, location.z, maxDistance, location.world!!.serverLevel.dimension(), packet)
+
+fun PlayerList.broadcast(exclude: Player?, block: Block, maxDistance: Double, packet: Packet<*>) =
+    broadcast(exclude?.serverPlayer, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
+
+fun preventPacketBroadcast(run: () -> Unit) {
+    BroadcastPacketPatch.dropAll = true
+    try {
+        run.invoke()
+    } finally {
+        BroadcastPacketPatch.dropAll = false
+    }
+}
+
+fun replaceBroadcastExclusion(exclude: ServerPlayer, run: () -> Unit) {
+    BroadcastPacketPatch.exclude = exclude
+    try {
+        run.invoke()
+    } finally {
+        BroadcastPacketPatch.exclude = null
+    }
+}
+
+fun forcePacketBroadcast(run: () -> Unit) {
+    BroadcastPacketPatch.ignoreExcludedPlayer = true
+    try {
+        run.invoke()
+    } finally {
+        BroadcastPacketPatch.ignoreExcludedPlayer = false
+    }
 }
 
 object NMSUtils {

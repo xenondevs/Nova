@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.addon.loader.LibraryLoaderPools
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.InitializationStage
@@ -29,7 +29,7 @@ internal object AddonsLoader : Initializable() {
 internal object AddonsInitializer : Initializable() {
     
     override val initializationStage = InitializationStage.PRE_WORLD
-    override val dependsOn = setOf(NovaConfig, Resources)
+    override val dependsOn = setOf(NovaConfig, ResourceGeneration.PreWorld)
     
     override fun init() {
         LOGGER.info("Initializing Addons...")

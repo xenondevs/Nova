@@ -15,8 +15,8 @@ import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.send
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.pos
 
 internal object NoteBlockBehavior : BlockBehavior(NoteBlockStateConfig, false), Listener {

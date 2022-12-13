@@ -8,6 +8,8 @@ import net.minecraft.world.entity.MobType
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.attribute.Attribute
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.provider.combinedProvider
+import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
@@ -22,28 +24,37 @@ private const val PLAYER_ATTACK_DAMAGE = 1.0
 
 class Tool(val options: ToolOptions) : ItemBehavior() {
     
-    override val vanillaMaterialProperties = buildList {
-        this += VanillaMaterialProperty.DAMAGEABLE
-        if (!options.canBreakBlocksInCreative)
-            this += VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING
+    override val vanillaMaterialProperties = options.canBreakBlocksInCreativeProvider.map { canBreakBlocksInCreative ->
+        buildList {
+            this += VanillaMaterialProperty.DAMAGEABLE
+            if (!canBreakBlocksInCreative)
+                this += VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING
+        }
     }
     
-    override val attributeModifiers = buildList {
-        if (options.attackSpeed != null) {
-            this += AttributeModifier(
-                Attribute.GENERIC_ATTACK_SPEED,
-                AttributeModifier.Operation.INCREMENT,
-                options.attackSpeed!! - PLAYER_ATTACK_SPEED,
-                EquipmentSlot.MAINHAND
-            )
-        }
-        if (options.attackDamage != null) {
-            this += AttributeModifier(
-                Attribute.GENERIC_ATTACK_DAMAGE,
-                AttributeModifier.Operation.INCREMENT,
-                options.attackDamage!! - PLAYER_ATTACK_DAMAGE,
-                EquipmentSlot.MAINHAND
-            )
+    override val attributeModifiers = combinedProvider(options.attackSpeedProvider, options.attackDamageProvider).map {
+        val attackSpeed = it[0]
+        val attackDamage = it[1]
+        
+        buildList {
+            if (attackSpeed != null) {
+                this += AttributeModifier(
+                    "nova attack speed ${this@Tool.hashCode()}", // keeps the attribute uuid across config reloads
+                    Attribute.GENERIC_ATTACK_SPEED,
+                    AttributeModifier.Operation.INCREMENT,
+                    options.attackSpeed!! - PLAYER_ATTACK_SPEED,
+                    EquipmentSlot.MAINHAND
+                )
+            }
+            if (attackDamage != null) {
+                this += AttributeModifier(
+                    "nova attack damage ${this@Tool.hashCode()}", // keeps the attribute uuid across config reloads
+                    Attribute.GENERIC_ATTACK_DAMAGE,
+                    AttributeModifier.Operation.INCREMENT,
+                    options.attackDamage!! - PLAYER_ATTACK_DAMAGE,
+                    EquipmentSlot.MAINHAND
+                )
+            }
         }
     }
     

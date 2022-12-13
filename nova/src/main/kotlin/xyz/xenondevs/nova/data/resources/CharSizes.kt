@@ -6,6 +6,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.md_5.bungee.api.chat.BaseComponent
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.data.ArrayKey
 import xyz.xenondevs.nova.util.data.toPlainText
@@ -24,7 +25,7 @@ data class ComponentSize(
 
 object CharSizes {
     
-    private val CHAR_SIZES_DIR = File(NOVA.dataFolder, ".data/char_sizes/")
+    private val CHAR_SIZES_DIR = File(NOVA.dataFolder, ".internal_data/char_sizes/")
     
     private val loadedTables = HashMap<String, CharSizeTable>()
     
@@ -38,7 +39,7 @@ object CharSizes {
      * Note: This width includes the one pixel space rendered between characters.
      */
     fun getCharWidth(font: String, char: Int): Int =
-        getTable(font).getWidth(char)
+        getTable(font)?.getWidth(char) ?: 0
     
     /**
      * Gets the width of [char] when rendered with [font].
@@ -52,7 +53,7 @@ object CharSizes {
      * Gets the width of [char] when rendered with [font].
      */
     fun getCharHeight(font: String, char: Int): Int =
-        getTable(font).getHeight(char)
+        getTable(font)?.getHeight(char) ?: 0
     
     /**
      * Gets the width of [char] when rendered with [font].
@@ -64,7 +65,7 @@ object CharSizes {
      * Gets the ascent of [char] when rendered with [font].
      */
     fun getCharAscent(font: String, char: Int): Int =
-        getTable(font).getAscent(char)
+        getTable(font)?.getAscent(char) ?: 0
     
     /**
      * Gets the ascent of [char] when rendered with [font].
@@ -148,10 +149,7 @@ object CharSizes {
         table.write(getFile(font))
     }
     
-    internal fun getTable(font: String): CharSizeTable =
-        getTableOrNull(font) ?: throw IllegalArgumentException("Unknown font: $font")
-    
-    internal fun getTableOrNull(font: String): CharSizeTable? {
+    internal fun getTable(font: String): CharSizeTable? {
         val namespacedFont = if (font.contains(':')) font else "minecraft:$font"
         return loadedTables[namespacedFont] ?: loadTable(namespacedFont)
     }
@@ -222,6 +220,7 @@ internal class CharSizeTable(
     companion object {
         
         fun load(file: File): CharSizeTable {
+            LOGGER.info("Loading char size table: $file")
             file.inputStream().use {
                 val din = DataInputStream(it)
                 val sizes = Int2ObjectOpenHashMap<IntArray>()

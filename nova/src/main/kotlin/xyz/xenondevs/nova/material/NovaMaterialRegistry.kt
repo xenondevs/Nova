@@ -1,3 +1,5 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate", "DEPRECATION")
+
 package xyz.xenondevs.nova.material
 
 import org.bukkit.inventory.ItemStack
@@ -8,9 +10,11 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Consumable
-import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
+import xyz.xenondevs.nova.material.builder.BlockNovaMaterialBuilder
+import xyz.xenondevs.nova.material.builder.ItemNovaMaterialBuilder
+import xyz.xenondevs.nova.material.builder.TileEntityNovaMaterialBuilder
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -31,6 +35,46 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     override fun get(item: ItemStack): ItemNovaMaterial = getOrNull(item)!!
     override fun getNonNamespaced(name: String): List<ItemNovaMaterial> = materialsByName[name.lowercase()] ?: emptyList()
     
+    fun tileEntity(addon: Addon, name: String, tileEntity: TileEntityConstructor) =
+        TileEntityNovaMaterialBuilder(addon, name, tileEntity)
+    
+    fun block(addon: Addon, name: String): BlockNovaMaterialBuilder =
+        BlockNovaMaterialBuilder(addon, name)
+    
+    fun item(addon: Addon, name: String): ItemNovaMaterialBuilder =
+        ItemNovaMaterialBuilder(addon, name)
+    
+    fun registerItem(
+        addon: Addon,
+        name: String,
+        vararg behaviors: ItemBehaviorHolder<*>,
+        localizedName: String = "item.${addon.description.id}.$name",
+        maxStackSize: Int = 64
+    ): ItemNovaMaterial {
+        val namespace = addon.description.id
+        return register(ItemNovaMaterial(
+            NamespacedId(namespace, name),
+            localizedName,
+            NovaItem(*behaviors),
+            maxStackSize
+        ))
+    }
+    
+    fun registerUnnamedItem(
+        addon: Addon,
+        name: String
+    ) : ItemNovaMaterial {
+        val namespace = addon.description.id
+        return register(ItemNovaMaterial(
+            NamespacedId(namespace, name),
+            "",
+            NovaItem()
+        ))
+    }
+    
+    //<editor-fold desc="deprecated", defaultstate="collapsed">
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("Builder functions should be used")
     fun registerTileEntity(
         addon: Addon,
         name: String,
@@ -42,12 +86,13 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         properties: List<BlockPropertyType<*>> = emptyList()
     ): TileEntityNovaMaterial {
         return registerTileEntity(
-            addon, name, options, tileEntityConstructor, NovaItem(TileEntityItemBehavior), 64,
+            addon, name, options, tileEntityConstructor, NovaItem(TileEntityItemBehavior()), 64,
             if (isInteractive) TileEntityBlock.INTERACTIVE else TileEntityBlock.NON_INTERACTIVE,
             properties, placeCheck, multiBlockLoader
         )
     }
     
+    @Deprecated("Builder functions should be used")
     fun registerTileEntity(
         addon: Addon,
         name: String,
@@ -68,6 +113,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(material)
     }
     
+    @Deprecated("Builder functions should be used")
     fun registerBlock(
         addon: Addon,
         name: String,
@@ -87,23 +133,11 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         return register(material)
     }
     
-    fun registerItem(addon: Addon, name: String, localizedName: String = "", novaItem: NovaItem = NovaItem(), maxStackSize: Int = 64): ItemNovaMaterial {
-        return register(ItemNovaMaterial(
-            NamespacedId(addon.description.id, name),
-            localizedName,
-            novaItem,
-            maxStackSize
-        ))
-    }
+    @Deprecated("Misleading name", ReplaceWith("registerItem(addon, name, *itemBehaviors)", "xyz.xenondevs.nova.material.NovaMaterialRegistry.registerItem"))
+    fun registerDefaultItem(addon: Addon, name: String, vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial =
+        registerItem(addon, name, *itemBehaviors)
     
-    fun registerItem(addon: Addon, name: String, localizedName: String = "", vararg itemBehaviors: ItemBehavior): ItemNovaMaterial {
-        return register(ItemNovaMaterial(
-            NamespacedId(addon.description.id, name),
-            localizedName,
-            NovaItem(*itemBehaviors)
-        ))
-    }
-    
+    @Deprecated("Misleading name, Item behavior holders should be specified directly", ReplaceWith("registerItem(addon, name)", "xyz.xenondevs.nova.material.NovaMaterialRegistry.registerItem"))
     fun registerDefaultItem(addon: Addon, name: String, novaItem: NovaItem = NovaItem(), maxStackSize: Int = 64): ItemNovaMaterial {
         val namespace = addon.description.id
         return register(ItemNovaMaterial(
@@ -114,15 +148,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         ))
     }
     
-    fun registerDefaultItem(addon: Addon, name: String, vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial {
-        val namespace = addon.description.id
-        return register(ItemNovaMaterial(
-            NamespacedId(namespace, name),
-            "item.$namespace.$name",
-            NovaItem(*itemBehaviors)
-        ))
-    }
-    
+    @Deprecated("Item behavior holders should be specified directly", ReplaceWith("registerDefaultItem(addon, name, Consumable(options))", "xyz.xenondevs.nova.item.behavior.Consumable"))
     fun registerFood(addon: Addon, name: String, options: FoodOptions): ItemNovaMaterial {
         val namespace = addon.description.id
         return register(ItemNovaMaterial(
@@ -131,7 +157,9 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
             NovaItem(Consumable(options))
         ))
     }
+    //</editor-fold>
     
+    //<editor-fold desc="internal", defaultstate="collapsed">
     internal fun registerDefaultCoreItem(name: String, vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial {
         return register(ItemNovaMaterial(
             NamespacedId("nova", name),
@@ -147,8 +175,9 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
             NovaItem(*itemBehaviors)
         ))
     }
+    //</editor-fold>
     
-    private fun <T : ItemNovaMaterial> register(material: T): T {
+    internal fun <T : ItemNovaMaterial> register(material: T): T {
         val id = material.id
         val idStr = material.id.toString()
         require(idStr !in materialsById) { "Duplicate NovaMaterial id: $id" }

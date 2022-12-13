@@ -9,10 +9,10 @@ import net.minecraft.world.item.ItemStack
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.network.send
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.fromFixedPoint
-import xyz.xenondevs.nova.util.fromPackedByte
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.positionEquals
 import xyz.xenondevs.nova.util.toFixedPoint
@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.util.toPackedByte
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.metadata.Metadata
 import java.util.*
+import java.util.logging.Level
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 /**
@@ -58,9 +59,10 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
      * @throws IllegalStateException If this [FakeEntity] is already registered.
      */
     fun register() {
-        if (registered) throw IllegalStateException("This FakeEntity is already registered")
-        FakeEntityManager.addEntity(chunk, this)
-        registered = true
+        if (!registered) {
+            FakeEntityManager.addEntity(chunk, this)
+            registered = true
+        } else LOGGER.log(Level.WARNING, "Duplicate FakeEntity registration", Exception())
     }
     
     /**

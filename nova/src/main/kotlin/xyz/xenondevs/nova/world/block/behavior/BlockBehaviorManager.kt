@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.flatMap
 import xyz.xenondevs.nova.util.nmsState
@@ -126,9 +127,13 @@ internal object BlockBehaviorManager : Initializable(), Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handlePhysics(event: BlockPhysicsEvent) {
-        val blockState = event.block.nmsState
+        val block = event.block
+        if (CustomItemServiceManager.getBlockType(block) != null)
+            return
+        
+        val blockState = block.nmsState
         val behavior = behaviors.firstOrNull { blockState.block == it.defaultState.block } ?: return
-        val pos = event.block.pos
+        val pos = block.pos
         
         val task = {
             val correctState = behavior.getCorrectBlockState(pos)

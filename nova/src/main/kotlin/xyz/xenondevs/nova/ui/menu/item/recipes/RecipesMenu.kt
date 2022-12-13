@@ -42,7 +42,7 @@ fun Player.showRecipes(id: String): Boolean {
     val recipes = RecipeRegistry.CREATION_RECIPES[id]
     val info = RecipeRegistry.creationInfo[id]
     if (recipes != null) {
-        RecipesWindow(this, recipes, info).show()
+        RecipesWindow(this, "recipes:$id".hashCode(), recipes, info).show()
         return true
     } else if (info != null) {
         closeInventory()
@@ -58,7 +58,7 @@ fun Player.showUsages(id: String): Boolean {
     val recipes = RecipeRegistry.USAGE_RECIPES[id]
     val info = RecipeRegistry.usageInfo[id]
     if (recipes != null) {
-        RecipesWindow(this, recipes, info).show()
+        RecipesWindow(this, "usages:$id".hashCode(), recipes, info).show()
         return true
     } else if (info != null) {
         closeInventory()
@@ -71,7 +71,12 @@ fun Player.showUsages(id: String): Boolean {
 /**
  * A menu that displays the given list of recipes.
  */
-private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeContainer>>, info: String? = null) : ItemMenu {
+private class RecipesWindow(
+    player: Player,
+    private val id: Int,
+    recipes: Map<RecipeGroup, Iterable<RecipeContainer>>,
+    info: String? = null
+) : ItemMenu {
     
     private val recipesGuiStructure = Structure(
         "< . . . . . . . >",
@@ -148,6 +153,14 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
         window.changeTitle(getCurrentTitle())
     }
     
+    override fun equals(other: Any?): Boolean {
+        return other is RecipesWindow && id == other.id
+    }
+    
+    override fun hashCode(): Int {
+        return id
+    }
+    
     private inner class CraftingTabItem(private val recipeGroup: RecipeGroup, tab: Int) : TabItem(tab) {
         
         override fun getItemProvider(gui: TabGUI) = recipeGroup.icon
@@ -159,7 +172,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
                 updateTitle()
             } else if (clickType == ClickType.RIGHT) {
                 val recipes = RecipeRegistry.RECIPES_BY_TYPE[recipeGroup]
-                if (recipes != null) RecipesWindow(player, mapOf(recipeGroup to recipes)).show()
+                if (recipes != null) RecipesWindow(player, "group:$recipeGroup".hashCode(), mapOf(recipeGroup to recipes)).show()
             }
         }
         
