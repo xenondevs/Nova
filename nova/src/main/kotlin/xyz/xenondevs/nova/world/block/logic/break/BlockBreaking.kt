@@ -110,6 +110,7 @@ internal object BlockBreaking : Listener {
         // pass packet to vanilla packet handler if the player is in creative mode
         if (player.gameMode == GameMode.CREATIVE) {
             serverPlayer.connection.handlePlayerAction(packet)
+            return
         }
         
         // call interact event
