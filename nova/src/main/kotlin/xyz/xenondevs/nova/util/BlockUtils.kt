@@ -1,17 +1,13 @@
 package xyz.xenondevs.nova.util
 
 import net.minecraft.core.Direction
-import net.minecraft.core.Holder
+import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
-import net.minecraft.network.protocol.game.ClientboundSoundPacket
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.sounds.SoundEvent
-import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.item.BlockItem
@@ -38,6 +34,8 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nmsutils.particle.block
+import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
@@ -52,13 +50,10 @@ import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
-import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
-import xyz.xenondevs.particle.ParticleEffect
 import java.util.*
 import kotlin.math.floor
-import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -82,6 +77,12 @@ val Block.id: NamespacedId
         
         return NamespacedId("minecraft", type.name.lowercase())
     }
+
+/**
+ * The [BlockNovaMaterial] of this block.
+ */
+val Block.novaMaterial: BlockNovaMaterial?
+    get() = BlockManager.getBlock(pos)?.material
 
 /**
  * The block that is one y-level below the current one.
@@ -306,28 +307,6 @@ internal fun Block.removeInternal(ctx: BlockBreakContext, breakEffects: Boolean,
             if (sendEffectsToBreaker) {
                 forcePacketBroadcast(willDestroy)
             } else willDestroy()
-            
-            // Send custom break sound if its overwritten
-            val soundGroup = SoundGroup.from(type.soundGroup)
-            if (BlockSoundEngine.overridesSound(soundGroup.breakSound)) {
-                val pitch = soundGroup.breakPitch
-                val volume = soundGroup.breakVolume
-                minecraftServer.playerList.broadcast(
-                    null,
-                    x + 0.5, y + 0.5, z + 0.5,
-                    if (volume > 1.0) 16.0 * volume else 16.0,
-                    level.dimension(),
-                    ClientboundSoundPacket(
-                        Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(soundGroup.breakSound))),
-                        SoundSource.BLOCKS,
-                        pos.x + 0.5,
-                        pos.y + 0.5,
-                        pos.z + 0.5,
-                        volume, pitch,
-                        Random.nextLong()
-                    )
-                )
-            }
         } else {
             preventPacketBroadcast(willDestroy)
         }
@@ -457,24 +436,21 @@ fun Block.showBreakParticles() {
 /**
  * Displays the break particles for this [Material] at the given [location].
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated("Not real break particles. Consider using Block#playBreakEffects.")
 fun Material.showBreakParticles(location: Location) {
-    particleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5)) {
-        texture(this@showBreakParticles)
-        offset(0.3, 0.3, 0.3)
-        amount(70)
-    }.display()
+    minecraftServer.playerList.broadcast(location, 64.0, getBreakParticlesPacket(location))
 }
 
 /**
  * Creates a [ClientboundLevelParticlesPacket] mimicking the particle effects of a block breaking.
  */
 fun Material.getBreakParticlesPacket(location: Location): ClientboundLevelParticlesPacket {
-    return particleBuilder(ParticleEffect.BLOCK_CRACK, location.add(0.5, 0.5, 0.5)) {
-        texture(this@getBreakParticlesPacket)
+    return particle(ParticleTypes.BLOCK, location.add(0.5, 0.5, 0.5)) {
+        block(this@getBreakParticlesPacket)
         offset(0.3, 0.3, 0.3)
         amount(70)
-    }.packet as ClientboundLevelParticlesPacket
+    }
 }
 
 /**
@@ -516,8 +492,22 @@ fun Block.setBreakStage(entityId: Int, stage: Int) {
  */
 fun Block.sendDestructionPacket(entityId: Int, stage: Int) {
     val packet = ClientboundBlockDestructionPacket(entityId, location.blockPos, stage)
-    location.getPlayersNearby(32.0)
-        .forEach { it.send(packet) }
+    minecraftServer.playerList.broadcast(location, 32.0, packet)
+}
+
+/**
+ * Sends the [ClientboundBlockDestructionPacket] to all players in a 1-chunk-range
+ * with the entity id of the given [player] and breaking [stage]. Might not work with some Nova blocks.
+ *
+ * @param player The player breaking the block. The packet will not be sent to this player.
+ * @param stage The breaking stage between 0-9 (both inclusive).
+ * A different number will cause the breaking texture to disappear.
+ *
+ * @see Block.setBreakStage
+ */
+fun Block.sendDestructionPacket(player: Player, stage: Int) {
+    val packet = ClientboundBlockDestructionPacket(player.entityId, location.blockPos, stage)
+    minecraftServer.playerList.broadcast(player, location, 32.0, packet)
 }
 
 // endregion

@@ -18,6 +18,8 @@ import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
@@ -33,13 +35,13 @@ import xyz.xenondevs.nova.world.block.BlockManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 
-private const val BREAK_COOLDOWN = 5
+private val BREAK_COOLDOWN by configReloadable { DEFAULT_CONFIG.getInt("world.block_breaking.break_cooldown") }
 
 internal object BlockBreaking : Listener {
     
     private val breakCooldowns = ConcurrentHashMap<Player, Int>()
     private val playerBreakers = ConcurrentHashMap<Player, BlockBreaker>()
-    private val internalBreakers = HashMap<Int, BreakMethod>()
+    private val internalBreakers = HashMap<Int, VisibleBreakMethod>()
     
     fun init() {
         registerEvents()
@@ -69,7 +71,7 @@ internal object BlockBreaking : Listener {
         
         // create a new break method if there isn't one
         if (method == null) {
-            method = BreakMethod.of(block, blockState.material, entityId) ?: return
+            method = BreakMethod.of(block, blockState.material, entityId) as? VisibleBreakMethod ?: return
             internalBreakers[entityId] = method
         }
         
@@ -97,14 +99,20 @@ internal object BlockBreaking : Listener {
     private fun handleDestroyStart(player: Player, packet: ServerboundPlayerActionPacket, pos: BlockPos, direction: Direction, sequence: Int) {
         val block = pos.block
         
-        // pass on packet if it's for a custom item service block
+        // pass packet further down the pipeline if the block is from a custom item service
         if (CustomItemServiceManager.getBlockType(block) != null) {
             player.packetHandler?.injectIncoming(packet)
             return
         }
         
-        // call interact event
         val serverPlayer = player.serverPlayer
+        
+        // pass packet to vanilla packet handler if the player is in creative mode
+        if (player.gameMode == GameMode.CREATIVE) {
+            serverPlayer.connection.handlePlayerAction(packet)
+        }
+        
+        // call interact event
         val event = CraftEventFactory.callPlayerInteractEvent(
             serverPlayer,
             Action.LEFT_CLICK_BLOCK,
@@ -135,8 +143,27 @@ internal object BlockBreaking : Listener {
         breaker.handleTick()
     }
     
-    private fun handleDestroyStop(player: Player) {
-        playerBreakers.remove(player)?.stop(false)
+    private fun handleDestroyAbort(player: Player, packet: ServerboundPlayerActionPacket) {
+        val breaker = playerBreakers.remove(player)
+        if (breaker != null) {
+            breaker.stop(packet.sequence)
+        } else {
+            player.packetHandler?.injectIncoming(packet)
+        }
+    }
+    
+    private fun handleDestroyStop(player: Player, packet: ServerboundPlayerActionPacket) {
+        val breaker = playerBreakers.remove(player)
+        if (breaker != null) {
+            if (breaker.progress > 0.7) {
+                breaker.breakBlock(true, packet.sequence)
+                breaker.stop()
+            } else {
+                breaker.stop(packet.sequence)
+            }
+        } else {
+            player.packetHandler?.injectIncoming(packet)
+        }
     }
     
     @PacketHandler
@@ -151,8 +178,13 @@ internal object BlockBreaking : Listener {
                 true
             }
             
-            STOP_DESTROY_BLOCK, ABORT_DESTROY_BLOCK -> {
-                runTask { handleDestroyStop(player) }
+            ABORT_DESTROY_BLOCK -> {
+                runTask { handleDestroyAbort(player, event.packet) }
+                true
+            }
+            
+            STOP_DESTROY_BLOCK -> {
+                runTask { handleDestroyStop(player, event.packet) }
                 true
             }
             
@@ -163,8 +195,9 @@ internal object BlockBreaking : Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     private fun handleQuit(event: PlayerQuitEvent) {
         val player = event.player
+        
         breakCooldowns -= player
-        handleDestroyStop(player)
+        playerBreakers.remove(player)?.stop()
     }
     
 }

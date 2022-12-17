@@ -224,6 +224,12 @@ fun <T> Either<T, T>.take(): T {
     return left().orElse(null) ?: right().get()
 }
 
+fun PlayerList.broadcast(location: Location, maxDistance: Double, packet: Packet<*>) =
+    broadcast(null, location.x, location.y, location.z, maxDistance, location.world!!.serverLevel.dimension(), packet)
+
+fun PlayerList.broadcast(block: Block, maxDistance: Double, packet: Packet<*>) =
+    broadcast(null, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
+
 fun PlayerList.broadcast(exclude: MojangPlayer?, location: Location, maxDistance: Double, packet: Packet<*>) =
     broadcast(exclude, location.x, location.y, location.z, maxDistance, location.world!!.serverLevel.dimension(), packet)
 

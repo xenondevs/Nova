@@ -6,10 +6,14 @@ import net.minecraft.core.Holder
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundSource
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import org.objectweb.asm.Opcodes
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.minecraftServer
@@ -20,16 +24,19 @@ import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
 import kotlin.math.floor
+import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
+import net.minecraft.world.level.block.Block as MojangBlock
 import net.minecraft.world.level.block.state.BlockState as MojangBlockState
 
-internal object BlockSoundPatches : MultiTransformer(setOf(MojangEntity::class, MojangLivingEntity::class), computeFrames = true) {
+internal object BlockSoundPatches : MultiTransformer(setOf(MojangEntity::class, MojangLivingEntity::class, MojangBlock::class), computeFrames = true) {
     
     override fun transform() {
         transformEntityPlayStepSound()
         transformLivingEntityPlayBlockFallSound()
+        transformBlockPlayerWillDestroy()
     }
     
     private fun transformEntityPlayStepSound() {
@@ -105,6 +112,43 @@ internal object BlockSoundPatches : MultiTransformer(setOf(MojangEntity::class, 
         )
         
         minecraftServer.playerList.broadcast(player, entity.x, entity.y, entity.z, 16.0, level.dimension(), packet)
+    }
+    
+    private fun transformBlockPlayerWillDestroy() {
+        VirtualClassPath[ReflectionRegistry.BLOCK_PLAYER_WILL_DESTROY_METHOD].instructions.replaceFirst(0, 0, buildInsnList {
+            aLoad(1)
+            aLoad(2)
+            invokeStatic(ReflectionUtils.getMethodByName(BlockSoundPatches::class.java, false, "playBreakSound"))
+            _return()
+        }) { it.opcode == Opcodes.RETURN }
+    }
+    
+    @JvmStatic
+    fun playBreakSound(level: Level, pos: MojangBlockPos) {
+        val novaPos = pos.toNovaPos(level.world)
+        val soundGroup = novaPos.block.soundGroup ?: return
+        val oldSound = novaPos.block.type.soundGroup.breakSound.key.key
+        
+        // send custom break sound if it's overridden
+        if (BlockSoundEngine.overridesSound(oldSound)) {
+            val pitch = soundGroup.breakPitch
+            val volume = soundGroup.breakVolume
+            minecraftServer.playerList.broadcast(
+                null,
+                pos.x + 0.5, pos.y + 0.5, pos.z + 0.5,
+                if (volume > 1.0) 16.0 * volume else 16.0,
+                level.dimension(),
+                ClientboundSoundPacket(
+                    Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(soundGroup.breakSound))),
+                    SoundSource.BLOCKS,
+                    pos.x + 0.5,
+                    pos.y + 0.5,
+                    pos.z + 0.5,
+                    volume, pitch,
+                    Random.nextLong()
+                )
+            )
+        }
     }
     
 }
