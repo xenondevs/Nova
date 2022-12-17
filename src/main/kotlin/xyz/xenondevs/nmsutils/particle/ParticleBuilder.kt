@@ -38,9 +38,10 @@ import net.minecraft.world.level.block.Block as MojangBlock
 import net.minecraft.world.level.block.state.BlockState as MojangBlockState
 import org.bukkit.Color as BukkitColor
 
-class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>, private val location: Location) {
+class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>) {
     
     private lateinit var options: T
+    private lateinit var location: Location
     private var longDistance: Boolean = true
     private var offsetX: Float = 0f
     private var offsetY: Float = 0f
@@ -48,11 +49,17 @@ class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>
     private var speed: Float = 1f
     private var amount: Int = 0
     
+    constructor(particle: ParticleType<T>, location: Location) : this(particle) {
+        this.location = location
+    }
+    
     init {
         @Suppress("UNCHECKED_CAST") // T is always SimpleParticleType
         if (particle is SimpleParticleType)
             options = particle as T
     }
+    
+    fun location(location: Location) = apply { this.location = location }
     
     fun longDistance(longDistance: Boolean) = apply { this.longDistance = longDistance }
     
@@ -98,11 +105,19 @@ class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>
         this.offsetZ = offset.z()
     }
     
+    fun offset(axis: Axis, offset: Float) = apply {
+        when (axis) {
+            Axis.X -> offsetX = offset
+            Axis.Y -> offsetY = offset
+            Axis.Z -> offsetZ = offset
+        }
+    }
+    
     fun offset(axis: Axis, offset: Double) = apply {
         when (axis) {
-            Axis.X -> offsetX(offset)
-            Axis.Y -> offsetY(offset)
-            Axis.Z -> offsetZ(offset)
+            Axis.X -> offsetX = offset.toFloat()
+            Axis.Y -> offsetY = offset.toFloat()
+            Axis.Z -> offsetZ = offset.toFloat()
         }
     }
     
@@ -167,6 +182,9 @@ class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>
 
 fun <T : ParticleOptions> particle(particle: ParticleType<T>, location: Location, config: ParticleBuilder<T>.() -> Unit) =
     ParticleBuilder(particle, location).apply(config).build()
+
+fun <T : ParticleOptions> particle(particle: ParticleType<T>, config: ParticleBuilder<T>.() -> Unit) =
+    ParticleBuilder(particle).apply(config).build()
 
 //<editor-fold desc="Options extension functions" defaultstate="collapsed">
 
