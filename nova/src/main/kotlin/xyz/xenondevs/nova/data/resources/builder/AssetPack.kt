@@ -23,6 +23,7 @@ internal class AssetPack(val namespace: String, val zip: ZipFile, val assetsPath
     val soundsDir: FileHeader? = zip[assetsPath, "sounds/"]
     val soundsFile: FileHeader? = zip[assetsPath, "sounds.json"]
     val wailaTexturesDir: FileHeader? = zip[assetsPath, "textures/waila/"]
+    val atlasesDir: FileHeader? = zip[assetsPath, "atlases/"]
     
     val materialsIndex: List<RegisteredMaterial>? = zip[assetsPath, "materials.json"]
         ?.let { MaterialsIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }

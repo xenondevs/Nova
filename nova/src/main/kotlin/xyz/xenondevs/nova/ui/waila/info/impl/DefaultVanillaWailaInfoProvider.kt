@@ -53,6 +53,17 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.MANGROVE_WALL_SIGN -> Material.MANGROVE_SIGN
             Material.CRIMSON_WALL_SIGN -> Material.CRIMSON_SIGN
             Material.WARPED_WALL_SIGN -> Material.WARPED_SIGN
+            Material.BAMBOO_WALL_SIGN -> Material.BAMBOO_SIGN
+            Material.OAK_WALL_HANGING_SIGN -> Material.OAK_HANGING_SIGN
+            Material.SPRUCE_WALL_HANGING_SIGN -> Material.SPRUCE_HANGING_SIGN
+            Material.BIRCH_WALL_HANGING_SIGN -> Material.BIRCH_HANGING_SIGN
+            Material.JUNGLE_WALL_HANGING_SIGN -> Material.JUNGLE_HANGING_SIGN
+            Material.ACACIA_WALL_HANGING_SIGN -> Material.ACACIA_HANGING_SIGN
+            Material.DARK_OAK_WALL_HANGING_SIGN -> Material.DARK_OAK_HANGING_SIGN
+            Material.MANGROVE_WALL_HANGING_SIGN -> Material.MANGROVE_HANGING_SIGN
+            Material.CRIMSON_WALL_HANGING_SIGN -> Material.CRIMSON_HANGING_SIGN
+            Material.WARPED_WALL_HANGING_SIGN -> Material.WARPED_HANGING_SIGN
+            Material.BAMBOO_WALL_HANGING_SIGN -> Material.BAMBOO_HANGING_SIGN
             
             // plant
             Material.WEEPING_VINES_PLANT -> Material.WEEPING_VINES

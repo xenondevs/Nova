@@ -68,7 +68,7 @@
   "command.nova.modeldata.no-nova-item": "Segure um item do Nova na sua mão e tente novamente.",
   "command.nova.recipe.no-recipe": "Este item não possui uma receita.",
   "command.nova.usage.no-usage": "Este item não tem usos.",
-  "item.nova.wrench.mode.nova.items": "Modo: Items",
+  "item.nova.wrench.mode.nova.item": "Modo: Items",
   "item.nova.wrench.mode.nova.fluid": "Modo: Fluidos",
   "menu.nova.energy_per_tick": "%s / tick",
   "menu.nova.side_config.east": "Leste",

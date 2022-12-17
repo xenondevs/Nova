@@ -6,13 +6,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
-import net.minecraft.network.syncher.EntityDataAccessor
-import net.minecraft.network.syncher.SynchedEntityData.DataItem
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -121,13 +121,11 @@ internal object PacketItems : Initializable(), Listener {
     private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val player = event.player
         val packet = event.packet
-        val data = packet.unpackedData ?: return
-        data.forEachIndexed { i, d ->
-            val value = d.value
+        val data = packet.packedItems ?: return
+        data.forEachIndexed { idx, dataValue ->
+            val value = dataValue.value
             if (value is MojangStack && isNovaItem(value)) {
-                @Suppress("UNCHECKED_CAST") // Has to be <MojangStack> since the value is a MojangStack
-                val newDataItem = DataItem(d.accessor as EntityDataAccessor<MojangStack>, getFakeItem(player, value, false))
-                data[i] = newDataItem
+                data[idx] = DataValue(dataValue.id, EntityDataSerializers.ITEM_STACK, getFakeItem(player, value, false))
             }
         }
     }

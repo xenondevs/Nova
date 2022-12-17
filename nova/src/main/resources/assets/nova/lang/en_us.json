@@ -1,7 +1,7 @@
 {
   "item.nova.wrench": "Wrench",
   "item.nova.wrench.mode.nova.energy": "Mode: Energy",
-  "item.nova.wrench.mode.nova.items": "Mode: Items",
+  "item.nova.wrench.mode.nova.item": "Mode: Items",
   "item.nova.wrench.mode.nova.fluid": "Mode: Fluid",
   "item.nova.speed_upgrade": "Speed Upgrade",
   "item.nova.efficiency_upgrade": "Efficiency Upgrade",

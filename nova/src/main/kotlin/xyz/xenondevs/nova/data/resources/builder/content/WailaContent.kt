@@ -45,6 +45,19 @@ private val MATERIAL_TEXTURES = enumMapOf(
     Material.MANGROVE_SIGN to "item/mangrove_sign",
     Material.CRIMSON_SIGN to "item/crimson_sign",
     Material.WARPED_SIGN to "item/warped_sign",
+    Material.BAMBOO_SIGN to "item/bamboo_sign",
+    
+    // hanging signs
+    Material.OAK_HANGING_SIGN to "item/oak_hanging_sign",
+    Material.SPRUCE_HANGING_SIGN to "item/spruce_hanging_sign",
+    Material.BIRCH_HANGING_SIGN to "item/birch_hanging_sign",
+    Material.JUNGLE_HANGING_SIGN to "item/jungle_hanging_sign",
+    Material.ACACIA_HANGING_SIGN to "item/acacia_hanging_sign",
+    Material.DARK_OAK_HANGING_SIGN to "item/dark_oak_hanging_sign",
+    Material.MANGROVE_HANGING_SIGN to "item/mangrove_hanging_sign",
+    Material.CRIMSON_HANGING_SIGN to "item/crimson_hanging_sign",
+    Material.WARPED_HANGING_SIGN to "item/warped_hanging_sign",
+    Material.BAMBOO_HANGING_SIGN to "item/bamboo_hanging_sign",
     
     // foliage
     Material.OAK_SAPLING to null,
@@ -156,7 +169,8 @@ private val MATERIAL_TEXTURES = enumMapOf(
     Material.STRUCTURE_VOID to "item/structure_void",
     Material.POINTED_DRIPSTONE to "item/pointed_dripstone",
     Material.RAIL to null,
-    Material.REDSTONE_WIRE to "item/redstone"
+    Material.REDSTONE_WIRE to "item/redstone",
+    Material.BELL to "item/bell"
 )
 
 private val TEXTURES = setOf(

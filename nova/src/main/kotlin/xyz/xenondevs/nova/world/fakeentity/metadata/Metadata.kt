@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.fakeentity.metadata
 
 import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
+import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 
 abstract class Metadata internal constructor() {
     
@@ -9,7 +10,7 @@ abstract class Metadata internal constructor() {
     
     internal fun packDirty(entityId: Int): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x50)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_ENTITY_DATA_PACKET)
         buf.writeVarInt(entityId)
         
         entries.forEach { 
@@ -25,7 +26,7 @@ abstract class Metadata internal constructor() {
     
     internal fun pack(entityId: Int): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x50)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_ENTITY_DATA_PACKET)
         buf.writeVarInt(entityId)
         
         entries.forEach { 

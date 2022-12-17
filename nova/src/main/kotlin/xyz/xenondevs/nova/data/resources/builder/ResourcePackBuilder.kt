@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.data.resources.builder.content.AtlasContent
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
@@ -149,7 +150,8 @@ internal class ResourcePackBuilder {
                 ArmorContent(),
                 GUIContent(),
                 LanguageContent(),
-                TextureIconContent()
+                TextureIconContent(),
+                AtlasContent()
             )
             
             // extract resources
@@ -245,7 +247,7 @@ internal class ResourcePackBuilder {
     private fun writeMetadata(assetPacks: Int, basePacks: Int) {
         val packMcmetaObj = JsonObject()
         val packObj = JsonObject().also { packMcmetaObj.add("pack", it) }
-        packObj.addProperty("pack_format", 9)
+        packObj.addProperty("pack_format", 12)
         packObj.addProperty("description", PACK_DESCRIPTION.format(assetPacks, basePacks))
         
         PACK_MCMETA_FILE.parent.createDirectories()

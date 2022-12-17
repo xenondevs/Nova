@@ -5,7 +5,7 @@ import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.world.entity.EquipmentSlot
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.util.nmsStack
+import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.send
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -33,7 +33,7 @@ class HideDownItemAttachment(
             hidden = true
         } else if (hidden && pitch < pitchThreshold) {
             // show armor stand again
-            val packet = ClientboundSetEquipmentPacket(armorStand.entityId, mutableListOf(Pair(EquipmentSlot.HEAD, itemStack.nmsStack)))
+            val packet = ClientboundSetEquipmentPacket(armorStand.entityId, mutableListOf(Pair(EquipmentSlot.HEAD, itemStack.nmsCopy)))
             player.send(packet)
             
             hidden = false

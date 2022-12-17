@@ -1,0 +1,6 @@
+{
+  "parent": "nova:item/gui/gui_item_stretched_tp",
+  "textures": {
+    "1": "nova:item/gui/bar/blue/16"
+  }
+}

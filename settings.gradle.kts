@@ -8,9 +8,9 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // versions
-            version("kotlin", "1.7.21")
+            version("kotlin", "1.7.22")
             version("ktor", "2.1.3")
-            version("spigot", "1.19.2-R0.1-SNAPSHOT")
+            version("spigot", "1.19.3-R0.1-SNAPSHOT")
             version("cbf", "0.2")
             
             // lib - kotlin
@@ -45,7 +45,7 @@ dependencyResolutionManagement {
             // lib - minecraft assets
             library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.3")
             library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.2")
-            library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:0.3")
+            library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:0.4")
             
             // lib - zip4j
             library("zip4j", "net.lingala.zip4j:zip4j:2.11.2")
