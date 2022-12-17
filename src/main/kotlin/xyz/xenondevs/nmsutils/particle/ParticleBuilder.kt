@@ -13,11 +13,14 @@ import net.minecraft.core.particles.ShriekParticleOption
 import net.minecraft.core.particles.SimpleParticleType
 import net.minecraft.core.particles.VibrationParticleOption
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.world.item.Item
 import net.minecraft.world.level.gameevent.BlockPositionSource
 import net.minecraft.world.level.gameevent.EntityPositionSource
 import net.minecraft.world.phys.Vec3
+import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -93,6 +96,14 @@ class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>
         this.offsetX = offset.x()
         this.offsetY = offset.y()
         this.offsetZ = offset.z()
+    }
+    
+    fun offset(axis: Axis, offset: Double) = apply {
+        when (axis) {
+            Axis.X -> offsetX(offset)
+            Axis.Y -> offsetY(offset)
+            Axis.Z -> offsetZ(offset)
+        }
     }
     
     fun offset(color: Color) = apply {
@@ -202,6 +213,14 @@ fun ParticleBuilder<ItemParticleOption>.item(itemStack: ItemStack) = options {
 
 fun ParticleBuilder<ItemParticleOption>.item(itemStack: MojangStack) = options {
     ItemParticleOption(it, itemStack)
+}
+
+fun ParticleBuilder<ItemParticleOption>.item(material: Material) = options {
+    ItemParticleOption(it, MojangStack(CraftMagicNumbers.getItem(material)))
+}
+
+fun ParticleBuilder<ItemParticleOption>.item(item: Item) = options {
+    ItemParticleOption(it, MojangStack(item))
 }
 
 fun ParticleBuilder<VibrationParticleOption>.vibration(destination: Entity, ticks: Int, yOffset: Float = 0f) = options {
