@@ -8,8 +8,8 @@ import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -141,7 +141,7 @@ object EntityUtils {
         val server = (Bukkit.getServer() as CraftServer).server
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
-        val serverPlayer = object : ServerPlayer(server, world, gameProfile, null) {
+        val serverPlayer = object : ServerPlayer(server, world, gameProfile) {
             override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: MojangEntity?) = Unit
         }
         serverPlayer.advancements.stopListening()

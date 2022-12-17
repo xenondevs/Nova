@@ -26,7 +26,7 @@
   "container.nova.lava_tank": "溶岩タンク",
   "container.nova.water_tank": "貯水タンク",
   "item.nova.wrench.mode.nova.energy": "モード: エネルギー",
-  "item.nova.wrench.mode.nova.items": "モード: アイテム",
+  "item.nova.wrench.mode.nova.item": "モード: アイテム",
   "item.nova.wrench.mode.nova.fluid": "モード: 液体",
   "command.nova.network_debug.nova.fluid": "液体ネットワークのデバッグ表示を切り替えました。",
   "command.nova.network_debug.nova.energy": "エネルギーネットワークのデバッグ表示を切り替えました。",

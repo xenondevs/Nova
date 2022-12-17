@@ -10,6 +10,7 @@ import org.gradle.api.internal.artifacts.repositories.DefaultMavenLocalArtifactR
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
 import xyz.xenondevs.novagradle.util.TaskUtils
@@ -43,6 +44,7 @@ abstract class AddonTask : DefaultTask() {
     abstract val softdepend: ListProperty<String>
     
     @get:Input
+    @get:Optional
     abstract val spigotResourceId: Property<Int>
     
     @get:Input
