@@ -147,6 +147,19 @@ fun Player.send(vararg packets: Packet<*>) {
     packets.forEach { connection.send(it) }
 }
 
+fun Player.send(packets: Iterable<Packet<*>>) {
+    val connection = connection
+    packets.forEach { connection.send(it) }
+}
+
+fun Packet<*>.sendTo(vararg players: Player) {
+    players.forEach { it.send(this) }
+}
+
+fun Packet<*>.sendTo(players: Iterable<Player>) {
+    players.forEach { it.send(this) }
+}
+
 fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
     Rotations(x ?: this.x, y ?: this.y, z ?: this.z)
 

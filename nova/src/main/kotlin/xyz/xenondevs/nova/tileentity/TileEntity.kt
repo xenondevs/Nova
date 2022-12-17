@@ -7,6 +7,7 @@ import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import de.studiocode.invui.virtualinventory.event.UpdateReason
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
+import net.minecraft.network.protocol.Packet
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
@@ -97,7 +98,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     abstract val gui: Lazy<TileEntityGUI>?
     
     internal val multiModels = ArrayList<MultiModel>()
-    internal val particleTasks = ArrayList<TileEntityParticleTask>()
+    internal val packetTasks = ArrayList<TileEntityPacketTask>()
     private val regions = HashMap<String, ReloadableRegion>()
     
     private val _inventories = HashMap<VirtualInventory, Boolean>()
@@ -200,7 +201,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         if (gui?.isInitialized() == true) gui!!.value.closeWindows()
         
         multiModels.forEach { it.close() }
-        particleTasks.forEach { it.stop() }
+        packetTasks.forEach { it.stop() }
         regions.values.forEach { VisualRegion.removeRegion(it.uuid) }
     }
     
@@ -414,13 +415,13 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     /**
-     * Creates a new [TileEntityParticleTask] for this [TileEntity].
-     * When the [TileEntity] is removed, the [TileEntityParticleTask]
-     * will automatically be stopped as well.
+     * Creates a new [TileEntityPacketTask] for this [TileEntity].
+     * All [packets] will be sent to this [TileEntity's][TileEntity] [viewers][getViewers] every [interval] ticks.
+     * When the [TileEntity] is removed, the [TileEntityPacketTask] will automatically be stopped as well.
      */
-    fun createParticleTask(particles: List<Any>, tickDelay: Int): TileEntityParticleTask {
-        val task = TileEntityParticleTask(this, particles, tickDelay)
-        particleTasks += task
+    fun createPacketTask(packets: List<Packet<*>>, interval: Long): TileEntityPacketTask {
+        val task = TileEntityPacketTask(this, packets, interval)
+        packetTasks += task
         return task
     }
     

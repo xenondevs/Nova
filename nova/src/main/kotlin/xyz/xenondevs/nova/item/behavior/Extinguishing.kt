@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.item.behavior
 
+import net.minecraft.core.particles.ParticleType
+import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.CampfireBlock
 import net.minecraft.world.level.gameevent.GameEvent
@@ -9,16 +11,15 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.util.item.damageItemInHand
-import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.nmsState
-import xyz.xenondevs.nova.util.particleBuilder
 import xyz.xenondevs.nova.util.runTaskLater
+import xyz.xenondevs.nova.util.sendTo
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.pos
-import xyz.xenondevs.particle.ParticleEffect
 import kotlin.random.Random
 
 private const val EXTINGUISH_CAMPFIRE_LEVEL_EVENT = 1009
@@ -39,7 +40,7 @@ object Extinguishing : ItemBehavior() {
                 CampfireBlock.dowse(player.serverPlayer, level, pos, state)
                 displayCampfireExtinguishParticles(
                     block.location,
-                    if (state.getValue(CampfireBlock.SIGNAL_FIRE)) ParticleEffect.CAMPFIRE_SIGNAL_SMOKE else ParticleEffect.CAMPFIRE_COSY_SMOKE
+                    if (state.getValue(CampfireBlock.SIGNAL_FIRE)) ParticleTypes.CAMPFIRE_SIGNAL_SMOKE else ParticleTypes.CAMPFIRE_COSY_SMOKE
                 )
                 
                 val newState = state.setValue(CampfireBlock.LIT, false)
@@ -54,26 +55,26 @@ object Extinguishing : ItemBehavior() {
         }
     }
     
-    private fun displayCampfireExtinguishParticles(loc: Location, effect: ParticleEffect) {
+    private fun displayCampfireExtinguishParticles(loc: Location, type: ParticleType<*>) {
         val players = Bukkit.getOnlinePlayers().filter { it.location.world == loc.world && it.location.distance(loc) <= 100 }
         repeat(20) {
-            particleBuilder(effect) {
+            particle(type) {
                 location(loc.clone().add(
                     0.5 + Random.nextDouble(-0.33, 0.33),
                     0.5 + Random.nextDouble(-0.33, 0.33),
                     0.5 + Random.nextDouble(-0.33, 0.33),
                 ))
                 offsetY(0.07f)
-            }.display(players)
+            }.sendTo(players)
             
-            particleBuilder(ParticleEffect.SMOKE_NORMAL) {
+            particle(ParticleTypes.SMOKE) {
                 location(loc.clone().add(
                     0.5 + Random.nextDouble(-0.25, 0.25),
                     0.5 + Random.nextDouble(-0.25, 0.25),
                     0.5 + Random.nextDouble(-0.25, 0.25),
                 ))
                 offsetY(0.005f)
-            }.display(players)
+            }.sendTo(players)
         }
     }
     
