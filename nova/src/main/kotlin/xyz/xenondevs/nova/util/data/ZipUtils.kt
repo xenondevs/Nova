@@ -68,3 +68,11 @@ fun ZipFile.listFileHeaders(directory: FileHeader): Sequence<FileHeader> {
 fun ZipFile.getInputStream(path: String): InputStream? {
     return getInputStream(getFileHeader(path))
 }
+
+fun ZipFile.walk(directory: FileHeader, includeDirectories: Boolean = true): Sequence<FileHeader> {
+    require(directory.isDirectory) { "File header is not a directory" }
+    
+    return fileHeaders.asSequence()
+        .filter { it.fileName.startsWith(directory.fileName) && it != directory }
+        .filter { includeDirectories || !it.isDirectory }
+}
