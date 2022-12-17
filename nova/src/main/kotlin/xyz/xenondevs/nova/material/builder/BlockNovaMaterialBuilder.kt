@@ -20,7 +20,7 @@ import xyz.xenondevs.nova.world.block.TileEntityBlock
 
 private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0, null, null, false)
 
-abstract class AbstractBlockNovaMaterialBuilder<S : AbstractBlockNovaMaterialBuilder<S, T>, T : NovaBlockState> internal constructor(addon: Addon, name: String) : ItemNovaMaterialBuilder(addon, name) {
+abstract class AbstractBlockNovaMaterialBuilder<S : AbstractBlockNovaMaterialBuilder<S, T>, T : NovaBlockState> internal constructor(addon: Addon, name: String) : NovaMaterialBuilder<S>(addon, name) {
     
     override var localizedName = "block.${id.namespace}.$name"
     protected abstract var block: NovaBlock<T>
@@ -53,8 +53,6 @@ abstract class AbstractBlockNovaMaterialBuilder<S : AbstractBlockNovaMaterialBui
         this.multiBlockLoader = multiBlockLoader
         return getThis()
     }
-    
-    protected abstract fun getThis(): S
     
     abstract override fun register(): BlockNovaMaterial
     
