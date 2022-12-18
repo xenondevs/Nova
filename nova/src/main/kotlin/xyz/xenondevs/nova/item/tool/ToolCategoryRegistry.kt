@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.item.tool
 import org.bukkit.Material
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.config.ConfigExtractor
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.util.associateWithNotNullTo
 import xyz.xenondevs.nova.util.enumMapOf
@@ -81,7 +80,6 @@ object ToolCategoryRegistry {
                     null -> "item/wooden_$name"
                     else -> "item/${it.id.name}_${name}"
                 }
-                ConfigExtractor::class.property
                 ResourcePath("minecraft", path)
             }
         )
