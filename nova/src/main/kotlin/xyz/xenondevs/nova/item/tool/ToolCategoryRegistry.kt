@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.item.tool
 import org.bukkit.Material
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.config.ConfigExtractor
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.util.associateWithNotNullTo
 import xyz.xenondevs.nova.util.enumMapOf
@@ -75,9 +76,13 @@ object ToolCategoryRegistry {
             genericMultipliers,
             specialMultipliers,
             getIcon ?: {
-                if (it != null)
-                    ResourcePath(it.id.namespace, "item/${it.id.name}_$name")
-                else ResourcePath("minecraft", "item/wooden_$name")
+                val path = when (it) {
+                    ToolTier.WOOD, ToolTier.GOLD -> "item/${it.id.name}en_$name"
+                    null -> "item/wooden_$name"
+                    else -> "item/${it.id.name}_${name}"
+                }
+                ConfigExtractor::class.property
+                ResourcePath("minecraft", path)
             }
         )
         
