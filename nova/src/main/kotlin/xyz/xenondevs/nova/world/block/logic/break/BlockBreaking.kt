@@ -156,12 +156,8 @@ internal object BlockBreaking : Listener {
     private fun handleDestroyStop(player: Player, packet: ServerboundPlayerActionPacket) {
         val breaker = playerBreakers.remove(player)
         if (breaker != null) {
-            if (breaker.progress > 0.7) {
-                breaker.breakBlock(true, packet.sequence)
-                breaker.stop()
-            } else {
-                breaker.stop(packet.sequence)
-            }
+            breaker.breakBlock(true, packet.sequence)
+            breaker.stop()
         } else {
             player.packetHandler?.injectIncoming(packet)
         }

@@ -114,7 +114,12 @@ internal class VanillaBlockBreaker(
 @Suppress("MemberVisibilityCanBePrivate")
 internal sealed class BlockBreaker(val player: Player, val block: Block, val startSequence: Int, val blockedUntil: Int) {
     
-    protected val breakMethod: BreakMethod by lazy { createBreakMethod(CLIENTSIDE_PREDICTIONS && calculateDamage() == calculateClientsideDamage()) }
+    protected val breakMethod: BreakMethod by lazy {
+        val damage = calculateDamage()
+        val clientsideDamage = calculateClientsideDamage()
+        // Clientside predictions are turned of for blocks broken instantaneously, as there is no second packet being sent.
+        createBreakMethod(CLIENTSIDE_PREDICTIONS && clientsideDamage == damage && damage < 1.0)
+    }
     protected abstract val requiresToolForDrops: Boolean
     
     protected val soundGroup: SoundGroup? = block.soundGroup
