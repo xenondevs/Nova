@@ -5,29 +5,35 @@ import com.google.gson.JsonObject
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.util.data.parseJson
+import xyz.xenondevs.nova.util.data.walk
 import xyz.xenondevs.nova.util.data.writeToFile
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
 
 internal class AtlasContent : PackContent {
     
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
     private val sources = HashMap<String, JsonArray>()
     
-    override fun addFromPack(pack: AssetPack) {
-        pack.atlasesDir?.listFiles()?.forEach { 
-            val atlasName = it.nameWithoutExtension
+    override fun includePack(pack: AssetPack) {
+        val atlasesDir = pack.atlasesDir ?: return
+        pack.zip.walk(atlasesDir, false).forEach {
+            val atlasName = it.fileName.substringAfterLast('/').substringBefore('.')
             val atlasSources = sources.getOrPut(atlasName, ::JsonArray)
-            atlasSources.addAll((it.parseJson() as JsonObject).getAsJsonArray("sources"))
+            atlasSources.addAll((pack.zip.getInputStream(it).parseJson() as JsonObject).getAsJsonArray("sources"))
         }
     }
     
     override fun write() {
-        sources.forEach { 
-            val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/atlases/${it.key}.json")
-            file.parentFile.mkdirs()
-            val atlasesObj = file.takeIf(File::exists)?.parseJson() as? JsonObject ?: JsonObject()
+        sources.forEach {
+            val file = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/atlases/${it.key}.json")
+            file.parent.createDirectories()
+            val atlasesObj = file.takeIf(Path::exists)?.parseJson() as? JsonObject ?: JsonObject()
             atlasesObj.add("sources", it.value)
             atlasesObj.writeToFile(file)
         }
     }
-
+    
 }

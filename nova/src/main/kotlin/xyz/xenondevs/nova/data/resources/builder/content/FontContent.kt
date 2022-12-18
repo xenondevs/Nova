@@ -7,10 +7,13 @@ import net.md_5.bungee.api.chat.TextComponent
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.util.data.readImage
 import java.awt.image.BufferedImage
-import java.io.File
 import java.io.FileNotFoundException
-import javax.imageio.ImageIO
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.writeText
 import kotlin.math.roundToInt
 
 private const val START_CHAR = '\uF000'
@@ -36,18 +39,18 @@ internal abstract class FontContent<C : FontChar, D : FontContent.FontData<C>>(
         }
     }
     
-    fun getFile(path: ResourcePath): File {
-        var file = File(ResourcePackBuilder.ASSETS_DIR, "${path.namespace}/textures/${path.path}")
+    fun getFile(path: ResourcePath): Path {
+        var file = ResourcePackBuilder.ASSETS_DIR.resolve("${path.namespace}/textures/${path.path}")
         if (!file.exists() && path.namespace == "minecraft") {
-            file = File(ResourcePackBuilder.MCASSETS_DIR, "assets/minecraft/textures/${path.path}")
+            file = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/textures/${path.path}")
         }
         if (!file.exists())
-            throw FileNotFoundException("Missing texture file: ${file.absolutePath}")
+            throw FileNotFoundException("Missing texture file: $file")
         return file
     }
     
     fun getWidth(fontHeight: Int, path: ResourcePath): Int {
-        return getWidth(fontHeight, ImageIO.read(getFile(path)))
+        return getWidth(fontHeight, getFile(path).readImage())
     }
     
     fun getWidth(fontHeight: Int, image: BufferedImage): Int {
@@ -76,19 +79,19 @@ internal abstract class FontContent<C : FontChar, D : FontContent.FontData<C>>(
             .forEach { (font, entries) ->
                 val dataList = entries.map { it.value }
                 if (generateMovedVariations) {
-                    val dir = File(ResourcePackBuilder.FONT_DIR, font.substringAfter(':'))
+                    val dir = ResourcePackBuilder.FONT_DIR.resolve(font.substringAfter(':'))
                     for (i in -20..0) {
-                        val file = File(dir, "$i.json")
+                        val file = dir.resolve("$i.json")
                         writeFont(file, dataList, i)
                     }
                 } else {
-                    val file = File(ResourcePackBuilder.FONT_DIR, "${font.substringAfter(':')}.json")
+                    val file = ResourcePackBuilder.FONT_DIR.resolve("${font.substringAfter(':')}.json")
                     writeFont(file, dataList, 0)
                 }
             }
     }
     
-    private fun writeFont(file: File, dataList: List<D>, ascent: Int) {
+    private fun writeFont(file: Path, dataList: List<D>, ascent: Int) {
         val fontObj = JsonObject()
         val providers = JsonArray().also { fontObj.add("providers", it) }
         
@@ -104,7 +107,7 @@ internal abstract class FontContent<C : FontChar, D : FontContent.FontData<C>>(
             provider.add("chars", JsonArray().apply { add(char) })
         }
         
-        file.parentFile.mkdirs()
+        file.parent.createDirectories()
         file.writeText(GSON.toJson(fontObj))
     }
     

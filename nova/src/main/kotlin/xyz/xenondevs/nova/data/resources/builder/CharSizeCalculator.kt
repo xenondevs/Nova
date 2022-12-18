@@ -3,53 +3,73 @@ package xyz.xenondevs.nova.data.resources.builder
 import com.google.gson.JsonObject
 import io.netty.buffer.Unpooled
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.CharSizeTable
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.util.data.HashUtils
+import xyz.xenondevs.nova.util.data.encodeWithBase64
 import xyz.xenondevs.nova.util.data.getAllStrings
 import xyz.xenondevs.nova.util.data.getInt
 import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.data.parseJson
+import xyz.xenondevs.nova.util.data.readImage
 import java.awt.image.BufferedImage
-import java.io.File
 import java.io.FileNotFoundException
+import java.nio.file.Path
 import java.util.logging.Level
-import javax.imageio.ImageIO
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isDirectory
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.pathString
+import kotlin.io.path.readBytes
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.math.roundToInt
 
 private val FONT_NAME_REGEX = Regex("""^([a-z0-9._-]+)/font/([a-z0-9/._-]+)$""")
 
 internal class CharSizeCalculator {
     
+    private val fontHashes: HashMap<String, String> = PermanentStorage.retrieve("fontHashes", ::HashMap)
+    
     private val bitmaps = HashMap<ResourcePath, BufferedImage>()
     private val glyphSizes = HashMap<ResourcePath, ByteArray>()
     
     fun calculateCharSizes() {
-        CharSizes.deleteTables()
-        
-        val fontDirs = ArrayList<File>()
-        fontDirs += ResourcePackBuilder.ASSETS_DIR.listFiles()
-            ?.mapNotNull { File(it, "font/").takeIf(File::exists) }
-            ?: emptyList()
+        val fontDirs = ArrayList<Path>()
+        fontDirs += ResourcePackBuilder.ASSETS_DIR.listDirectoryEntries()
+            .mapNotNull { it.resolve("font/").takeIf(Path::exists) }
         // order is required: vanilla fonts need to be loaded after custom fonts in order to keep overridden values
-        fontDirs += File(ResourcePackBuilder.MCASSETS_DIR, "assets/minecraft/font/")
+        fontDirs.add(ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/font/"))
         
         fontDirs.forEach { dir ->
-            dir.walkTopDown()
-                .filter { it.isFile && it.extension == "json" }
-                .forEach { file ->
-                    val font = getFontName(dir.parentFile.parentFile, file)
+            dir.walk()
+                .filter { !it.isDirectory() && it.extension == "json" }
+                .forEach inner@{ file ->
+                    val font = getFontName(dir.parent.parent, file)
+                    
+                    val fileHash = HashUtils.getFileHash(file, "MD5").encodeWithBase64()
+                    if (fontHashes[font] == fileHash) 
+                        return@inner
+                    
+                    CharSizes.deleteTable(font)
+                    fontHashes[font] = fileHash
                     
                     val table = CharSizes.getTable(font) ?: CharSizeTable()
                     calculateCharSizes(file, table)
                     CharSizes.storeTable(font, table)
                 }
         }
+        
+        PermanentStorage.store("fontHashes", fontHashes)
     }
     
-    private fun getFontName(base: File, file: File): String {
+    private fun getFontName(base: Path, file: Path): String {
         val relPath = file.relativeTo(base)
-            .invariantSeparatorsPath
+            .invariantSeparatorsPathString
             .substringBeforeLast('.') // example: minecraft/font/default
         
         val result = FONT_NAME_REGEX.matchEntire(relPath)
@@ -58,7 +78,7 @@ internal class CharSizeCalculator {
         return "${result.groupValues[1]}:${result.groupValues[2]}"
     }
     
-    private fun calculateCharSizes(file: File, table: CharSizeTable) {
+    private fun calculateCharSizes(file: Path, table: CharSizeTable) {
         try {
             val obj = file.parseJson() as JsonObject
             val providers = obj.getAsJsonArray("providers")
@@ -194,7 +214,7 @@ internal class CharSizeCalculator {
     private fun getBitmap(path: ResourcePath): BufferedImage {
         return bitmaps.getOrPut(path) {
             val file = getAssetFile("${path.namespace}/textures/${path.path}")
-            return@getOrPut ImageIO.read(file)
+            return@getOrPut file.readImage()
         }
     }
     
@@ -205,12 +225,12 @@ internal class CharSizeCalculator {
         }
     }
     
-    private fun getAssetFile(path: String): File {
-        var file = File(ResourcePackBuilder.ASSETS_DIR, path)
+    private fun getAssetFile(path: String): Path {
+        var file = ResourcePackBuilder.ASSETS_DIR.resolve(path)
         if (!file.exists()) {
-            file = File(ResourcePackBuilder.MCASSETS_DIR, "assets/$path")
+            file = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/$path")
             if (!file.exists())
-                throw FileNotFoundException(file.path)
+                throw FileNotFoundException(file.pathString)
         }
         
         return file

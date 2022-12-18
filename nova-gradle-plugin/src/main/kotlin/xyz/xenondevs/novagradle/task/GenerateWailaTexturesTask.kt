@@ -40,7 +40,7 @@ abstract class GenerateWailaTexturesTask : DefaultTask() {
         val renderer = MinecraftModelRenderer(
             512, 512,
             128, 128,
-            listOf(mcAssetsDir),
+            listOf(mcAssetsDir.toPath()),
             true
         )
         
@@ -48,7 +48,7 @@ abstract class GenerateWailaTexturesTask : DefaultTask() {
         val novaJar = project.configurations.detachedConfiguration(
             project.dependencies.create("xyz.xenondevs.nova:nova:${novaVersion.get()}")
         ).files.first()
-        renderer.loader.resourcePacks += ZipResourcePack(novaJar)
+        renderer.loader.resourcePacks += ZipResourcePack(novaJar.toPath())
         
         // add addon resource pack
         renderer.loader.resourcePacks += AddonResourcePack(project, addonId.get())

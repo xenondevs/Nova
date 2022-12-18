@@ -8,13 +8,17 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
+import xyz.xenondevs.nova.util.data.readImage
+import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.util.isNotNullOrEmpty
 import java.awt.Color
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
-import java.io.File
+import java.nio.file.Path
 import javax.imageio.ImageIO
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -22,24 +26,29 @@ private val EMPTY_TEXTURE = BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB)
 
 internal class ArmorContent : PackContent {
     
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
     private val armor = HashMap<NamespacedId, Pair<Int, RegisteredArmor>>()
     private val textures = HashMap<RegisteredArmor, Array<List<BufferedImage>?>>()
     private val emissivityMaps = HashMap<RegisteredArmor, Array<List<BufferedImage>?>>()
     
     private var color = 0
     
-    override fun addFromPack(pack: AssetPack) {
+    override fun excludesPath(path: ResourcePath): Boolean =
+        path.path.startsWith("textures/armor/")
+    
+    override fun includePack(pack: AssetPack) {
         pack.armorIndex?.forEach { armor ->
             this.armor[armor.id] = nextColor() to armor
             
             textures[armor] = arrayOf(
-                armor.layer1?.let { extractFrames(it.resourcePath) },
-                armor.layer2?.let { extractFrames(it.resourcePath) }
+                armor.layer1?.let { extractFrames(pack, it.resourcePath) },
+                armor.layer2?.let { extractFrames(pack, it.resourcePath) }
             )
             
             emissivityMaps[armor] = arrayOf(
-                armor.layer1EmissivityMap?.let { extractFrames(it.resourcePath) },
-                armor.layer2EmissivityMap?.let { extractFrames(it.resourcePath) }
+                armor.layer1EmissivityMap?.let { extractFrames(pack, it.resourcePath) },
+                armor.layer2EmissivityMap?.let { extractFrames(pack, it.resourcePath) }
             )
         }
     }
@@ -57,14 +66,14 @@ internal class ArmorContent : PackContent {
     }
     
     private fun writeLeatherArmorAtlas() {
-        val layer1File = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/textures/models/armor/leather_layer_1.png")
-        val layer2File = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/textures/models/armor/leather_layer_2.png")
+        val layer1File = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/textures/models/armor/leather_layer_1.png")
+        val layer2File = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/textures/models/armor/leather_layer_2.png")
         
-        val layer1 = buildTexture(ImageIO.read(layer1File), 0)
-        val layer2 = buildTexture(ImageIO.read(layer2File), 1)
+        val layer1 = buildTexture(layer1File.readImage(), 0)
+        val layer2 = buildTexture(layer2File.readImage(), 1)
         
-        ImageIO.write(layer1, "PNG", layer1File)
-        ImageIO.write(layer2, "PNG", layer2File)
+        layer1File.writeImage(layer1, "PNG")
+        layer2File.writeImage(layer2, "PNG")
     }
     
     // Nova uses a modified version of the "Fancy Pants" shader by Ancientkingg: https://github.com/Ancientkingg/fancyPants
@@ -136,11 +145,11 @@ internal class ArmorContent : PackContent {
         return texture
     }
     
-    private fun extractFrames(resourcePath: ResourcePath): List<BufferedImage> {
-        val file = resourcePath.getFile(ResourcePackBuilder.ASSETS_DIR, "textures", "png")
-        require(file.exists()) { "Armor file does not exist: $file" }
+    private fun extractFrames(pack: AssetPack, resourcePath: ResourcePath): List<BufferedImage> {
+        val ins = pack.getInputStream("textures/${resourcePath.path}.png")
+            ?: throw IllegalArgumentException("Armor file does not exist: $resourcePath")
         
-        val image = ImageIO.read(file)
+        val image = ImageIO.read(ins)
         
         val width = image.width // by default: 64
         val height = image.height // by default: 32
@@ -158,13 +167,13 @@ internal class ArmorContent : PackContent {
     
     private fun writeMCPatcherArmor() {
         armor.forEach { id, (color, armor) ->
-            val citDir = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/optifine/cit/${id.namespace}/armor/${id.name}/")
-                .apply(File::mkdirs)
-            val animDir = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/optifine/anim/${id.namespace}/armor/${id.name}/")
-                .apply(File::mkdirs)
+            val citDir = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/optifine/cit/${id.namespace}/armor/${id.name}/")
+                .apply(Path::createDirectories)
+            val animDir = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/optifine/anim/${id.namespace}/armor/${id.name}/")
+                .apply(Path::createDirectories)
             
             // write properties file
-            val armorPropertiesFile = File(citDir, "${id.name}.properties")
+            val armorPropertiesFile = citDir.resolve("${id.name}.properties")
             val armorProperties = HashMap<String, Any>()
             armorProperties["type"] = "armor"
             armorProperties["items"] = "leather_helmet leather_chestplate leather_leggings leather_boots"
@@ -183,12 +192,12 @@ internal class ArmorContent : PackContent {
             
             // write textures
             val layer1 = layer1Frames?.get(0) // [armor] [layer (0)] [frame (0)]
-            val layer1File = File(citDir, "layer_1.png")
-            ImageIO.write(layer1 ?: EMPTY_TEXTURE, "PNG", layer1File)
+            val layer1File = citDir.resolve("layer_1.png")
+            layer1File.writeImage(layer1 ?: EMPTY_TEXTURE, "PNG")
             
             val layer2 = layer2Frames?.get(0) // [armor] [layer (1)] [frame (0)]
-            val layer2File = File(citDir, "layer_2.png")
-            ImageIO.write(layer2 ?: EMPTY_TEXTURE, "PNG", layer2File)
+            val layer2File = citDir.resolve("layer_2.png")
+            layer2File.writeImage(layer2 ?: EMPTY_TEXTURE, "PNG")
             
             // TODO: Drop frames if frame rate above 20 fps to prevent slowing down the animation
             // write texture animations
@@ -197,9 +206,9 @@ internal class ArmorContent : PackContent {
                 val graphics = animatedTexture.createGraphics()
                 frames.forEachIndexed { idx, img -> graphics.drawImage(img, 0, img.height * idx, img.width, img.height, null) }
                 graphics.dispose()
-                ImageIO.write(animatedTexture, "PNG", File(animDir, "layer_$layer.png"))
+                animDir.resolve("layer_$layer.png").writeImage(animatedTexture, "PNG")
                 
-                val animationPropertiesFile = File(animDir, "layer_$layer.properties")
+                val animationPropertiesFile = animDir.resolve("layer_$layer.properties")
                 val animationProperties = HashMap<String, Any>()
                 animationProperties["from"] = "./layer_$layer.png"
                 animationProperties["to"] = "optifine/cit/${id.namespace}/armor/${id.name}/layer_$layer.png"
@@ -220,7 +229,7 @@ internal class ArmorContent : PackContent {
         }
     }
     
-    private fun File.writeProperties(properties: Map<String, Any>) {
+    private fun Path.writeProperties(properties: Map<String, Any>) {
         writeText(properties.entries.joinToString("\n") { (key, value) -> "$key=$value" })
     }
     
