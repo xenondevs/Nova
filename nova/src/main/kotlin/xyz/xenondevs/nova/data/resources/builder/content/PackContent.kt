@@ -2,8 +2,14 @@ package xyz.xenondevs.nova.data.resources.builder.content
 
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 
 internal interface PackContent {
+    
+    /**
+     * The resource pack building stage at which [includePack] and [write] will be called.
+     */
+    val stage: ResourcePackBuilder.BuildingStage
     
     /**
      * Checks if the given [path] is excluded due to this pack content.

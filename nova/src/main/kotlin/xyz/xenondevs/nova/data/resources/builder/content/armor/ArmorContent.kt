@@ -26,6 +26,8 @@ private val EMPTY_TEXTURE = BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB)
 
 internal class ArmorContent : PackContent {
     
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
     private val armor = HashMap<NamespacedId, Pair<Int, RegisteredArmor>>()
     private val textures = HashMap<RegisteredArmor, Array<List<BufferedImage>?>>()
     private val emissivityMaps = HashMap<RegisteredArmor, Array<List<BufferedImage>?>>()

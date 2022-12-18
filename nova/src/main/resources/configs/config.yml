@@ -26,11 +26,11 @@ resource_pack:
       corrupt_entries: false
     # A list of file extensions that shouldn't be excluded from the resource pack, even though they're not vanilla resource pack files.
     whitelisted_file_types: []
-    # Defines what content is included in the generated resource pack.
-    # Excluding content will decrease the size of your resource pack but might also break some features.
-    content_filters: []
+    # Excludes files from the resource pack. Excluding files will decrease the size of your resource pack but might also break some features.
+    # More information about resource filters can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/configuration/#resource-filters
+    resource_filters: []
     # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
-    # Please read the following documentation page before change this value:  https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
+    # Please read the following documentation page before change this value: https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
     use_solid_blocks: true
   # If players currently loading the resource pack should be frozen.
   freeze_loading_players: false

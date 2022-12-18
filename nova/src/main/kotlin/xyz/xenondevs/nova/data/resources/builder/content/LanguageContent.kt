@@ -20,6 +20,8 @@ import kotlin.io.path.writeText
 
 internal class LanguageContent : PackContent {
     
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
     private val languageLookup = HashMap<String, HashMap<String, String>>()
     
     init {

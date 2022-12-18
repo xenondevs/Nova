@@ -13,6 +13,8 @@ import kotlin.io.path.exists
 
 internal class AtlasContent : PackContent {
     
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
     private val sources = HashMap<String, JsonArray>()
     
     override fun includePack(pack: AssetPack) {

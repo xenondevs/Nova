@@ -1,49 +1,57 @@
 package xyz.xenondevs.nova.data.resources.builder
 
+import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.util.data.WildcardUtils
 
-abstract class ResourceFilter internal constructor() {
-    abstract fun test(path: String): Boolean
-    internal open fun performFilterEvaluations() = Unit
-}
-
-class SimpleResourceFilter(
-    private val exclusions: List<Regex>
-) : ResourceFilter() {
+class ResourceFilter(
+    val stage: Stage,
+    val type: Type,
+    val filter: Regex,
+    val directory: String? = null
+) {
     
-    override fun test(path: String): Boolean {
-        return exclusions.none { it.matches(path) }
+    constructor(stage: Stage, type: Type, filterWildcard: String, directory: String? = null) :
+        this(stage, type, WildcardUtils.toRegex(filterWildcard), directory)
+    
+    fun allows(path: String): Boolean =
+        when (type) {
+            Type.WHITELIST -> (directory != null && !path.startsWith(directory)) || filter.matches(path)
+            Type.BLACKLIST -> (directory != null && !path.startsWith(directory)) || !filter.matches(path)
+        }
+    
+    companion object {
+        
+        fun of(cfg: ConfigurationSection): ResourceFilter {
+            val stage = cfg.getString("stage")?.let { Stage.valueOf(it.uppercase()) }
+                ?: throw IllegalArgumentException("Missing property 'stage' in content filter")
+            val type = cfg.getString("type")?.let { Type.valueOf(it.uppercase()) }
+                ?: throw IllegalArgumentException("Missing property 'type' in content filter")
+            val patternType = cfg.getString("pattern_type")
+                ?: throw IllegalArgumentException("Missing property 'pattern_type' in content filter")
+            val filter = cfg.getString("filter")
+                ?: throw IllegalArgumentException("Missing property 'filter' in content filter")
+            
+            val directory = cfg.getString("directory")
+            
+            val regex = when (patternType) {
+                "wildcard" -> WildcardUtils.toRegex(filter)
+                "regex" -> Regex(filter)
+                else -> throw UnsupportedOperationException("Unsupported pattern type: $patternType")
+            }
+            
+            return ResourceFilter(stage, type, regex, directory)
+        }
+        
+    }
+    
+    enum class Stage {
+        ASSET_PACK,
+        RESOURCE_PACK
+    }
+    
+    enum class Type {
+        WHITELIST,
+        BLACKLIST
     }
     
 }
-
-class ConditionalResourceFilter(
-    private val exclusions: Map<Regex, () -> Boolean>
-) : ResourceFilter() {
-    
-    private var evaluatedExclusions: Set<Regex>? = null
-    
-    override fun performFilterEvaluations() {
-        evaluatedExclusions = exclusions.mapNotNullTo(HashSet()) { (regex, condition) -> regex.takeUnless { condition.invoke() } }
-    }
-    
-    override fun test(path: String): Boolean {
-        val evaluatedFilters = evaluatedExclusions
-        check(evaluatedFilters != null) { "Exclusions have not been evaluated yet" }
-        return evaluatedFilters.none { it.matches(path) }
-    }
-    
-}
-
-fun resourceFilterOf(vararg exclusions: Pair<Regex, () -> Boolean>): ConditionalResourceFilter =
-    ConditionalResourceFilter(exclusions.toMap())
-
-@JvmName("resourceFilterOf1")
-fun resourceFilterOf(vararg exclusions: Pair<String, () -> Boolean>): ConditionalResourceFilter =
-    ConditionalResourceFilter(exclusions.toMap().mapKeys { WildcardUtils.toRegex(it.key) })
-
-fun resourceFilterOf(vararg exclusions: Regex): SimpleResourceFilter =
-    SimpleResourceFilter(exclusions.asList())
-
-fun resourceFilterOf(vararg exclusions: String): SimpleResourceFilter =
-    SimpleResourceFilter(exclusions.map(WildcardUtils::toRegex))

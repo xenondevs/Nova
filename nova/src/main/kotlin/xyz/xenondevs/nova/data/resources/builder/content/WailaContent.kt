@@ -191,6 +191,8 @@ private val WAILA_ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila
 
 internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(Resources::updateWailaDataLookup) {
     
+    override val stage = ResourcePackBuilder.BuildingStage.POST_WORLD
+    
     init {
         if (WAILA_ENABLED) {
             writeHardcodedTextures()
@@ -269,7 +271,13 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
     }
     
     override fun excludesPath(path: ResourcePath): Boolean {
-        return !WAILA_ENABLED && path.path.startsWith("textures/waila/")
+        if (!WAILA_ENABLED) {
+            if (path.path.startsWith("textures/waila/"))
+                return true
+            if (path.toString().startsWith("nova:font/waila"))
+                return true
+        }
+        return false
     }
     
     override fun createFontData(id: Int, char: Char, path: ResourcePath): WailaIconData =

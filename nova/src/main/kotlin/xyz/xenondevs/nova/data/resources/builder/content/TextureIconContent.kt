@@ -22,6 +22,8 @@ internal class TextureIconContent : FontContent<FontChar, TextureIconContent.Tex
     Resources::updateTextureIconLookup, true
 ) {
     
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
     companion object {
         const val FONT_NAME_START = "nova:texture_icons"
     }

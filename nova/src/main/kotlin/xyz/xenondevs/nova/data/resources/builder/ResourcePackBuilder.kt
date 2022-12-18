@@ -14,8 +14,12 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.provider.Provider
+import xyz.xenondevs.nova.data.provider.combinedProvider
+import xyz.xenondevs.nova.data.provider.flatten
 import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Stage
+import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.AtlasContent
 import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
@@ -29,6 +33,8 @@ import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.extractDirectory
 import xyz.xenondevs.nova.util.data.extractFile
+import xyz.xenondevs.nova.util.data.fileExtension
+import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.resourcepackobfuscator.ResourcePackObfuscator
 import java.io.File
@@ -42,7 +48,16 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
 import kotlin.io.path.writeText
 
-private val CONFIG_RESOURCE_FILTER by configReloadable { resourceFilterOf(*DEFAULT_CONFIG.getStringList("resource_pack.generation.content_filters").toTypedArray()) }
+private val CONFIG_RESOURCE_FILTERS = configReloadable { DEFAULT_CONFIG.getConfigurationSectionList("resource_pack.generation.resource_filters").map(ResourceFilter::of) }
+private val CORE_RESOURCE_FILTERS = configReloadable {
+    buildList {
+        if (!DEFAULT_CONFIG.getBoolean("overlay.bossbar.enabled")) {
+            this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/bars.png")
+            this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar/*")
+            this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
+        }
+    }
+}
 
 private val OBFUSCATE by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.protection.obfuscate") }
 private val CORRUPT_ENTRIES by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.protection.corrupt_entries") }
@@ -86,13 +101,9 @@ internal class ResourcePackBuilder {
         val PACK_MCMETA_FILE: Path by PACK_MCMETA_FILE_PROVIDER
         //</editor-fold>
         
-        private val resourceFilters = buildList {
-            this += CONFIG_RESOURCE_FILTER
-            AddonManager.addons.values.forEach {
-                val filter = it.resourceFilter ?: return@forEach
-                this += filter
-            }
-        }
+        private val RESOURCE_FILTERS: Map<Stage, List<ResourceFilter>> by combinedProvider(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS)
+            .flatten()
+            .map { filters -> filters.groupBy { filter -> filter.stage } }
         
     }
     
@@ -151,7 +162,8 @@ internal class ResourcePackBuilder {
                 GUIContent(),
                 LanguageContent(),
                 TextureIconContent(),
-                AtlasContent()
+                AtlasContent(),
+                WailaContent()
             )
             
             // extract resources
@@ -160,11 +172,11 @@ internal class ResourcePackBuilder {
             assetPacks.forEach(::extractResources)
             
             // write pre-world content
-            assetPacks.forEach { pack -> contents.forEach { it.includePack(pack) } }
+            LOGGER.info("Writing pre-world content")
+            val preWorldContents = contents.filter { it.stage == BuildingStage.PRE_WORLD }
+            assetPacks.forEach { pack -> preWorldContents.forEach { it.includePack(pack) } }
+            preWorldContents.forEach(PackContent::write)
             
-            // write pre-world PackContent
-            LOGGER.info("Writing content")
-            contents.forEach(PackContent::write)
             writeMetadata(assetPacks.size, basePacks.packAmount)
         } catch (t: Throwable) {
             // Only delete build dir in case of exception as building is continued in buildPostWorld()
@@ -175,12 +187,11 @@ internal class ResourcePackBuilder {
     
     fun buildPackPostWorld() {
         try {
-            // init post-world content (only content that requires other plugins to be loaded)
-            val contents = listOf(WailaContent())
-            assetPacks.forEach { pack -> contents.forEach { it.includePack(pack) } }
-            
             // write post-world content
-            contents.forEach(PackContent::write)
+            LOGGER.info("Writing post-world content")
+            val postWorldContents = contents.filter { it.stage == BuildingStage.POST_WORLD }
+            assetPacks.forEach { pack -> postWorldContents.forEach { it.includePack(pack) } }
+            postWorldContents.forEach(PackContent::write)
             
             // write sound overrides
             LOGGER.info("Writing sound overrides")
@@ -216,32 +227,43 @@ internal class ResourcePackBuilder {
         }
     }
     
-    // TODO: PNGMetadataRemover
     private fun extractMinecraftAssets() {
         val zip = ZipFile(NOVA.pluginFile)
-        zip.extractDirectory("assets/minecraft/", MINECRAFT_ASSETS_DIR)
+        zip.extractDirectory(
+            "assets/minecraft/",
+            MINECRAFT_ASSETS_DIR,
+            { _, relPath -> RESOURCE_FILTERS[Stage.ASSET_PACK]?.all { filter -> filter.allows("minecraft/$relPath") } ?: true },
+            { fh, ins, out -> if (fh.fileExtension == "png") PNGMetadataRemover.remove(ins, out) else ins.transferTo(out) }
+        )
     }
     
-    private fun loadAssetPacks(): List<AssetPack> =
-        (AddonManager.loaders.asSequence().map { (id, loader) -> Triple(id, loader.file, "assets/") }
-            + Triple("nova", NOVA.pluginFile, "assets/nova/"))
-            .mapTo(ArrayList()) { (namespace, file, assetsPath) -> AssetPack(namespace, ZipFile(file), assetsPath) }
+    private fun loadAssetPacks(): List<AssetPack> {
+        return buildList<Triple<String, File, String>> {
+            this += AddonManager.loaders.map { (id, loader) -> Triple(id, loader.file, "assets/") }
+            this += Triple("nova", NOVA.pluginFile, "assets/nova/")
+        }.map { (namespace, file, assetsPath) -> AssetPack(namespace, ZipFile(file), assetsPath) }
+    }
     
-    // TODO: PNGMetadataRemover
     private fun extractResources(pack: AssetPack) {
-        val namespace = ASSETS_DIR.resolve(pack.namespace)
+        val namespace = pack.namespace
+        val namespaceDir = ASSETS_DIR.resolve(namespace)
         
         fun extractZipDir(fileHeader: FileHeader, directory: String) {
-            pack.zip.extractDirectory(fileHeader, namespace.resolve(directory)) { _, relPath ->
-                contents.none { it.excludesPath(ResourcePath(pack.namespace, "$directory/$relPath")) }
-            }
+            pack.zip.extractDirectory(
+                fileHeader, namespaceDir.resolve(directory),
+                { _, relPath ->
+                    contents.none { it.excludesPath(ResourcePath(namespace, "$directory/$relPath")) }
+                        && RESOURCE_FILTERS[Stage.ASSET_PACK]?.all { filter -> filter.allows("$namespace/$directory/$relPath") } ?: true
+                },
+                { fh, ins, out -> if (fh.fileExtension == "png") PNGMetadataRemover.remove(ins, out) else ins.transferTo(out) }
+            )
         }
         
         pack.texturesDir?.let { extractZipDir(it, "textures") }
         pack.modelsDir?.let { extractZipDir(it, "models") }
         pack.fontsDir?.let { extractZipDir(it, "font") }
         pack.soundsDir?.let { extractZipDir(it, "sounds") }
-        pack.soundsFile?.let { pack.zip.extractFile(it, namespace.resolve("sounds.json")) }
+        pack.soundsFile?.let { pack.zip.extractFile(it, namespaceDir.resolve("sounds.json")) }
     }
     
     private fun writeMetadata(assetPacks: Int, basePacks: Int) {
@@ -255,8 +277,6 @@ internal class ResourcePackBuilder {
     }
     
     private fun createZip() {
-        resourceFilters.forEach(ResourceFilter::performFilterEvaluations)
-        
         // delete old zip file
         RESOURCE_PACK_FILE.delete()
         
@@ -267,8 +287,15 @@ internal class ResourcePackBuilder {
             PACK_DIR, RESOURCE_PACK_FILE.toPath(),
             MCASSETS_DIR.toFile()
         ) { file ->
-            resourceFilters.any { filter -> !filter.test(file.relativeTo(PACK_DIR).invariantSeparatorsPathString) }
+            RESOURCE_FILTERS[Stage.RESOURCE_PACK]
+                ?.all { filter -> filter.allows(file.relativeTo(ASSETS_DIR).invariantSeparatorsPathString) }
+                ?: true
         }.packZip(COMPRESSION_LEVEL)
+    }
+    
+    enum class BuildingStage {
+        PRE_WORLD,
+        POST_WORLD
     }
     
 }

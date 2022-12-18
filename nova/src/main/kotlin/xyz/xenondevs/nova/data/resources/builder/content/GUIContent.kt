@@ -3,11 +3,14 @@ package xyz.xenondevs.nova.data.resources.builder.content
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.util.data.readImage
 
 private const val ASCENT = 13
 
 internal class GUIContent : FontContent<FontChar, GUIContent.GUIData>(Resources::updateGuiDataLookup) {
+    
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
     
     override fun includePack(pack: AssetPack) {
         pack.guisIndex?.forEach { (id, path) -> addFontEntry(id, path) }

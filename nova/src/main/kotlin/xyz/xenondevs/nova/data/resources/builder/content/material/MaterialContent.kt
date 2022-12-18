@@ -44,6 +44,8 @@ internal class MaterialContent(
     private val soundOverrides: BlockSoundOverrides
 ) : PackContent {
     
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
     private val novaMaterials = HashMap<NamespacedId, RegisteredMaterial>()
     
     private val modelDataPosition = HashMap<Material, Int>()
