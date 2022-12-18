@@ -32,6 +32,7 @@ object ToolCategoryRegistry {
         )
     }
     
+    @Suppress("DEPRECATION")
     @JvmName("registerVanilla1")
     internal fun registerVanilla(
         name: String,
@@ -42,9 +43,11 @@ object ToolCategoryRegistry {
         getIcon: ((ToolTier?) -> ResourcePath)? = null
     ): VanillaToolCategory {
         val flatSpecialMultipliers = specialMultipliers.mapValuesTo(enumMapOf()) { (_, map) ->
-            Material.values().associateWithNotNullTo(enumMapOf()) { material ->
-                map.entries.firstOrNull { it.key.test(material) }?.value
-            }
+            Material.values()
+                .filter { it.isBlock && !it.isLegacy }
+                .associateWithNotNullTo(enumMapOf()) { material ->
+                    map.entries.firstOrNull { it.key.test(material) }?.value
+                }
         }
         
         return registerVanilla(
