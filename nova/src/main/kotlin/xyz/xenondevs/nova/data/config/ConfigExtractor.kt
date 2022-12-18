@@ -79,7 +79,7 @@ internal object ConfigExtractor {
      * Checks if the [configuredValue] differs from the [internalValue] but was not changed by the user by cross-referencing it with [storedValue].
      */
     private fun checkNoUserChanges(internalValue: Any?, configuredValue: Any?, storedValue: Any?): Boolean =
-        internalValue != configuredValue && (checkEquality(storedValue, configuredValue))
+        internalValue != configuredValue && checkEquality(storedValue, configuredValue)
     
     /**
      * Checks if [value1] and [value2] are equal or if they're lists and have the same content.
