@@ -20,7 +20,7 @@ object ToolCategoryRegistry {
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
         genericMultipliers: Map<Material, Double>,
-        getIcon: ((ToolLevel?) -> ResourcePath)? = null
+        getIcon: ((ToolTier?) -> ResourcePath)? = null
     ): VanillaToolCategory {
         return registerVanilla(
             name,
@@ -39,7 +39,7 @@ object ToolCategoryRegistry {
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
         genericMultipliers: Map<Material, Double>,
         specialMultipliers: Map<Material, Map<Predicate<Material>, Double>>,
-        getIcon: ((ToolLevel?) -> ResourcePath)? = null
+        getIcon: ((ToolTier?) -> ResourcePath)? = null
     ): VanillaToolCategory {
         val flatSpecialMultipliers = specialMultipliers.mapValuesTo(enumMapOf()) { (_, map) ->
             Material.values().associateWithNotNullTo(enumMapOf()) { material ->
@@ -63,7 +63,7 @@ object ToolCategoryRegistry {
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
         genericMultipliers: Map<Material, Double>,
         specialMultipliers: Map<Material, Map<Material, Double>>,
-        getIcon: ((ToolLevel?) -> ResourcePath)? = null
+        getIcon: ((ToolTier?) -> ResourcePath)? = null
     ): VanillaToolCategory {
         val id = NamespacedId("minecraft", name)
         check(id !in _categories) { "A ToolCategory is already registered under that id." }
@@ -87,7 +87,7 @@ object ToolCategoryRegistry {
     
     fun register(
         addon: Addon, name: String,
-        getIcon: (ToolLevel?) -> ResourcePath
+        getIcon: (ToolTier?) -> ResourcePath
     ): ToolCategory {
         val id = NamespacedId(addon, name)
         check(id !in _categories) { "A ToolCategory is already registered under that id." }

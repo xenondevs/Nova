@@ -30,7 +30,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.ToolLevel
+import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.advance
@@ -117,7 +117,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     protected val breakMethod: BreakMethod by lazy {
         val damage = calculateDamage()
         val clientsideDamage = calculateClientsideDamage()
-        // Clientside predictions are turned of for blocks broken instantaneously, as there is no second packet being sent.
+        // Clientside predictions are turned off for blocks broken instantaneously, as there is no second packet being sent.
         createBreakMethod(CLIENTSIDE_PREDICTIONS && clientsideDamage == damage && damage < 1.0)
     }
     protected abstract val requiresToolForDrops: Boolean
@@ -127,7 +127,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessAir()
     protected val toolCategory: ToolCategory? = ToolCategory.ofItem(tool)
     protected val correctCategory: Boolean = toolCategory != null && toolCategory.isCorrectToolCategoryForBlock(block)
-    protected val correctLevel: Boolean = ToolLevel.isCorrectLevel(block, tool)
+    protected val correctLevel: Boolean = ToolTier.isCorrectLevel(block, tool)
     protected val drops: Boolean by lazy { !requiresToolForDrops || (correctCategory && correctLevel) } // lazy because accessing abstract val
     
     var destroyTicks = 0
