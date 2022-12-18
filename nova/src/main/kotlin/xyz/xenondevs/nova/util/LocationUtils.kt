@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.util
 
 import com.google.common.base.Preconditions
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import org.bukkit.Axis
 import org.bukkit.Chunk
 import org.bukkit.Location
@@ -10,12 +12,12 @@ import org.bukkit.block.BlockFace.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import xyz.xenondevs.nmsutils.particle.ParticleBuilder
+import xyz.xenondevs.nmsutils.particle.color
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.item.isTraversable
-import xyz.xenondevs.particle.ParticleBuilder
-import xyz.xenondevs.particle.ParticleEffect
 import java.awt.Color
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -167,6 +169,14 @@ fun Location.getPlayersNearby(maxDistance: Double, vararg excluded: Player): Seq
         .asSequence()
         .filter { it !in excluded }
         .filter { distanceSquared(it.location) <= maxDistanceSquared }
+}
+
+fun Iterable<Player>.filterInRange(location: Location, maxDistance: Double): List<Player> {
+    val maxDistanceSquared = maxDistance * maxDistance
+    return filter {
+        val otherLocation = it.location
+        location.world == otherLocation.world && location.distanceSquared(otherLocation) <= maxDistanceSquared
+    }
 }
 //</editor-fold>
 
@@ -349,8 +359,8 @@ fun World.dropItemsNaturally(location: Location, items: Iterable<ItemStack>) {
 //</editor-fold>
 
 //<editor-fold desc="particles">
-fun Location.createColoredParticle(color: Color): Any =
-    ParticleBuilder(ParticleEffect.REDSTONE, this).setColor(color).toPacket()
+fun Location.createColoredParticle(color: Color): ClientboundLevelParticlesPacket =
+    ParticleBuilder(ParticleTypes.DUST, this).color(color).build()
 //</editor-fold>
 
 object LocationUtils {

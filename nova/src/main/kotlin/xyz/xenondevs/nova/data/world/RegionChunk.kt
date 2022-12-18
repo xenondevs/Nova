@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.MultiModel
-import xyz.xenondevs.nova.tileentity.TileEntityParticleTask
+import xyz.xenondevs.nova.tileentity.TileEntityPacketTask
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.util.data.readUUID
@@ -139,7 +139,7 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
                     val tileEntity = (material as TileEntityNovaMaterial).tileEntityConstructor(state)
                     state.tileEntity = tileEntity
                     tileEntity.multiModels.forEach(MultiModel::close)
-                    tileEntity.particleTasks.forEach(TileEntityParticleTask::stop)
+                    tileEntity.packetTasks.forEach(TileEntityPacketTask::stop)
                     runCatching { tileEntity.handleRemoved(true) }
                 } else {
                     state = VanillaTileEntityState(pos, type)

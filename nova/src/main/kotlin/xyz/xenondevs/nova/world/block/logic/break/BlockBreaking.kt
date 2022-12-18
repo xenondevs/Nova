@@ -110,6 +110,7 @@ internal object BlockBreaking : Listener {
         // pass packet to vanilla packet handler if the player is in creative mode
         if (player.gameMode == GameMode.CREATIVE) {
             serverPlayer.connection.handlePlayerAction(packet)
+            return
         }
         
         // call interact event
@@ -155,12 +156,8 @@ internal object BlockBreaking : Listener {
     private fun handleDestroyStop(player: Player, packet: ServerboundPlayerActionPacket) {
         val breaker = playerBreakers.remove(player)
         if (breaker != null) {
-            if (breaker.progress > 0.7) {
-                breaker.breakBlock(true, packet.sequence)
-                breaker.stop()
-            } else {
-                breaker.stop(packet.sequence)
-            }
+            breaker.breakBlock(true, packet.sequence)
+            breaker.stop()
         } else {
             player.packetHandler?.injectIncoming(packet)
         }

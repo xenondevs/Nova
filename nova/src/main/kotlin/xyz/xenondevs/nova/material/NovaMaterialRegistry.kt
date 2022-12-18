@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.material.builder.BlockNovaMaterialBuilder
 import xyz.xenondevs.nova.material.builder.ItemNovaMaterialBuilder
 import xyz.xenondevs.nova.material.builder.TileEntityNovaMaterialBuilder
+import xyz.xenondevs.nova.material.options.BlockOptions
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.NovaBlock
