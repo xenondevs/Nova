@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.util.bukkitCopy
+import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.util.nmsCopy
 import kotlin.math.min
@@ -54,7 +54,9 @@ open class ItemNovaMaterial internal constructor(
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            ItemWrapper(PacketItems.getFakeItem(null, itemStack.nmsCopy).bukkitCopy)
+            val clientsideItemStack = PacketItems.getFakeItem(null, itemStack.nmsCopy)
+            clientsideItemStack.tag?.remove("nova")
+            ItemWrapper(clientsideItemStack.bukkitMirror)
         }
     }
     
