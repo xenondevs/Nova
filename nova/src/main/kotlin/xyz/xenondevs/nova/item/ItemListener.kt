@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.bukkitSlot
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.novaMaterial
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 
@@ -115,7 +115,7 @@ internal object ItemListener : Initializable(), Listener {
     @PacketHandler(priority = EventPriority.HIGHEST, ignoreIfCancelled = true)
     private fun handleUseItem(event: ServerboundUseItemPacketEvent) {
         val player = event.player
-        val item = player.inventory.getItem(event.hand.bukkitSlot)?.takeUnlessAir()
+        val item = player.inventory.getItem(event.hand.bukkitSlot)?.takeUnlessEmpty()
         if (item != null)
             usedItems[player] = item
         else usedItems -= player

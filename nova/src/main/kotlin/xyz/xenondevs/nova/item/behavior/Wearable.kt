@@ -26,7 +26,7 @@ import xyz.xenondevs.nova.player.equipment.EquipMethod
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 
 @Suppress("FunctionName")
@@ -89,7 +89,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if ((action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable()))
-            && player.inventory.getItem(options.armorType.equipmentSlot)?.takeUnlessAir() == null
+            && player.inventory.getItem(options.armorType.equipmentSlot)?.takeUnlessEmpty() == null
             && !callArmorEquipEvent(player, EquipMethod.RIGHT_CLICK_EQUIP, null, itemStack)
         ) {
             event.isCancelled = true
@@ -118,7 +118,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         if ((event.click == ClickType.SHIFT_LEFT || event.click == ClickType.SHIFT_RIGHT)
             && event.view.isPlayerView()
             && event.clickedInventory != event.view.topInventory
-            && player.inventory.getItem(options.armorType.equipmentSlot)?.takeUnlessAir() == null
+            && player.inventory.getItem(options.armorType.equipmentSlot)?.takeUnlessEmpty() == null
             && !callArmorEquipEvent(player, EquipMethod.SHIFT_CLICK, null, itemStack)
         ) {
             event.isCancelled = true

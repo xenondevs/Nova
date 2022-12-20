@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedVirtualInve
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.flatMap
 import xyz.xenondevs.nova.util.isFull
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 private fun Array<ItemStack?>.deepClone() =
     Array(size) { get(it)?.clone() }
@@ -95,21 +96,22 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
             UPDATE_REASON,
             slot,
             itemStack,
-            itemStack?.clone()?.apply { amount-- }
+            itemStack?.clone()?.apply { amount-- }?.takeUnlessEmpty()
         )
         
-        return !event.isCancelled && event.newItemStack?.amount == itemStack.amount - 1
+        return !event.isCancelled && (event.newItemStack?.amount ?: 0) == itemStack.amount - 1
     }
     
     override fun decrementByOne(slot: Int) {
         if(virtualInventory.addItemAmount(UpdateReason.SUPPRESSED, slot, -1) != -1)
             throwNetworkException()
         
+        val itemStack = virtualInventory.getUnsafeItemStack(slot)
         virtualInventory.callAfterUpdateEvent(
             UPDATE_REASON,
             slot,
-            virtualInventory.getUnsafeItemStack(slot),
-            virtualInventory.getUnsafeItemStack(slot)?.clone()?.apply { amount-- }
+            itemStack,
+            itemStack?.clone()?.apply { amount-- }?.takeUnlessEmpty()
         )
     }
     
@@ -183,10 +185,10 @@ class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<VirtualInventory
             UPDATE_REASON,
             invSlot,
             itemStack,
-            itemStack?.clone()?.apply { amount-- }
+            itemStack?.clone()?.apply { amount-- }?.takeUnlessEmpty()
         )
         
-        return !event.isCancelled && event.newItemStack?.amount == itemStack.amount - 1
+        return !event.isCancelled && (event.newItemStack?.amount ?: 0) == itemStack.amount - 1
     }
     
     override fun decrementByOne(slot: Int) {
@@ -198,7 +200,7 @@ class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<VirtualInventory
             UPDATE_REASON,
             invSlot,
             inv.getUnsafeItemStack(invSlot),
-            inv.getUnsafeItemStack(invSlot)?.clone()?.apply { amount-- }
+            inv.getUnsafeItemStack(invSlot)?.clone()?.apply { amount-- }?.takeUnlessEmpty()
         )
     }
     

@@ -40,7 +40,7 @@ import xyz.xenondevs.nova.util.getAllDrops
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.damageToolBreakBlock
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.removeInternal
@@ -124,7 +124,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     
     protected val soundGroup: SoundGroup? = block.soundGroup
     protected val hardness: Double = block.hardness
-    protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessAir()
+    protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
     protected val toolCategory: ToolCategory? = ToolCategory.ofItem(tool)
     protected val correctCategory: Boolean = toolCategory != null && toolCategory.isCorrectToolCategoryForBlock(block)
     protected val correctLevel: Boolean = ToolTier.isCorrectLevel(block, tool)
