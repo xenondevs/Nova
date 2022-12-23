@@ -31,7 +31,7 @@ internal object MMOItems : CustomItemService {
         }
     }
     
-    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
+    override fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
         if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) return false
         block.type = Material.AIR
         return true

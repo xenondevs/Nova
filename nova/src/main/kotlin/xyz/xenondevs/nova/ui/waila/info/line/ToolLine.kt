@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
 import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 private const val CHECK_MARK = "✔"
 private const val CROSS = "❌"
@@ -23,7 +23,7 @@ private const val CROSS = "❌"
 object ToolLine {
     
     fun getToolLine(player: Player, block: Block): WailaLine {
-        val tool = player.inventory.itemInMainHand.takeUnlessAir()
+        val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
         return getToolLine(
             player,
             ToolCategory.ofBlock(block),
@@ -34,10 +34,10 @@ object ToolLine {
     }
     
     fun getCustomItemServiceToolLine(player: Player, block: Block): WailaLine {
-        val tool = player.inventory.itemInMainHand.takeUnlessAir()
+        val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
         return getToolLine(
             player,
-            null,
+            emptyList(),
             null,
             block.hardness,
             CustomItemServiceManager.canBreakBlock(block, tool)

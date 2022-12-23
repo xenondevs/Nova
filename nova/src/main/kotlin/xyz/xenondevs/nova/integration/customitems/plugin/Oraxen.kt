@@ -11,6 +11,7 @@ import io.th0rgal.oraxen.utils.drops.Drop
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
+import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
@@ -23,6 +24,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.displayName
 import xyz.xenondevs.nova.world.pos
+import kotlin.random.Random
 
 private val Mechanic.drop: Drop?
     get() = when (this) {
@@ -44,14 +46,14 @@ internal object Oraxen : CustomItemService {
     
     override val isInstalled = Bukkit.getPluginManager().getPlugin("Oraxen") != null
     
-    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
+    override fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
         val location = block.location
         val oraxenBlock = OraxenBlocks.getOraxenBlock(location)
         if (oraxenBlock != null) {
-            if (playSound) {
+            if (breakEffects) {
                 val blockSounds = oraxenBlock.blockSounds
                 if (blockSounds != null) {
-                    block.pos.playSound(blockSounds.breakSound, blockSounds.breakVolume, blockSounds.breakPitch)
+                    block.pos.playSound(blockSounds.breakSound, SoundCategory.BLOCKS, blockSounds.breakVolume, blockSounds.breakPitch)
                 }
             }
             
@@ -63,8 +65,20 @@ internal object Oraxen : CustomItemService {
     }
     
     override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
-        // fixme: Missing API feature
-        return null
+        val loots = OraxenBlocks.getOraxenBlock(block.location).drop
+            ?.takeUnless { it.isToolEnough(tool) }
+            ?.loots
+            ?: return emptyList()
+        
+        val drops = ArrayList<ItemStack>()
+        loots.forEach { loot -> 
+            repeat(loot.maxAmount) {
+                if (Random.nextInt(loot.probability) == 0)
+                    drops.add(loot.itemStack)
+            }
+        }
+        
+        return drops
     }
     
     override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {

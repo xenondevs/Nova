@@ -29,8 +29,8 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.any { it.placeBlock(item, location, playSound) }
     }
     
-    fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
-        return PLUGINS.any { it.removeBlock(block, playSound, showParticles) }
+    fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
+        return PLUGINS.any { it.removeBlock(block, breakEffects) }
     }
     
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {

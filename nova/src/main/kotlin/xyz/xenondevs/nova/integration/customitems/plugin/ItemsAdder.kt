@@ -51,17 +51,17 @@ internal object ItemsAdder : CustomItemService {
         loaded.get()
     }
     
-    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
+    override fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
         if (customBlock != null) {
-            if (playSound || showParticles) customBlock.playBreakEffect()
+            if (breakEffects) customBlock.playBreakEffect()
             customBlock.remove()
             return true
         }
         
         val customCrop = CustomCrop.byAlreadyPlaced(block)
         if (customCrop != null) {
-            if (playSound || showParticles) block.playBreakEffects()
+            if (breakEffects) block.playBreakEffects()
             block.type = Material.AIR
             return true
         }
