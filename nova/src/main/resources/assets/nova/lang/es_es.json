@@ -68,6 +68,6 @@
   "command.nova.recipe.no-recipe": "Este item no tiene una receta.",
   "command.nova.usage.no-usage": "Este item no tiene ningún uso.",
   "item.nova.wrench.mode.nova.energy": "Modo: Energía",
-  "item.nova.wrench.mode.nova.items": "Modo: Items",
+  "item.nova.wrench.mode.nova.item": "Modo: Items",
   "item.nova.wrench.mode.nova.fluid": "Modo: Fluido"
 }

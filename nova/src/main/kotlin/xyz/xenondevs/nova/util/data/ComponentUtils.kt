@@ -11,7 +11,7 @@ import net.md_5.bungee.api.chat.TranslatableComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.network.chat.Component
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
 import org.bukkit.entity.Entity
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.util.item.localizedName

@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.transformer.patch.item
 
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
+import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.TypeInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList

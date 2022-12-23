@@ -7,6 +7,11 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.intValue
 
+// The base of the number system - i.e. how many values each property can have
+private const val NOTE_BASE = 25
+private const val INSTRUMENT_BASE = 23
+private const val POWERED_BASE = 2
+
 internal data class NoteBlockStateConfig(
     val instrument: Instrument,
     val note: Int,
@@ -27,19 +32,19 @@ internal data class NoteBlockStateConfig(
     
     companion object : DynamicDefaultingBlockStateConfigType<NoteBlockStateConfig>() {
         
-        override val maxId = 799
+        override val maxId = 1149
         override val fileName = "note_block"
         override val material = Material.NOTE_BLOCK
         
         fun getIdOf(instrument: Instrument, note: Int, powered: Boolean): Int {
-            return (note shl 5) or (instrument.ordinal shl 1) or powered.intValue
+            return instrument.ordinal * NOTE_BASE * POWERED_BASE + note * POWERED_BASE + powered.intValue
         }
         
         override fun of(id: Int): NoteBlockStateConfig {
             return NoteBlockStateConfig(
-                Instrument.values()[id shr 1 and 0xF],
-                id shr 5,
-                id and 1 == 1,
+                 Instrument.values()[id / POWERED_BASE / NOTE_BASE % INSTRUMENT_BASE],
+                id / POWERED_BASE % NOTE_BASE,
+                id % POWERED_BASE == 1
             )
         }
         

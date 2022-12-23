@@ -1,9 +1,10 @@
 package xyz.xenondevs.nova.data.recipe.impl
 
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.CraftingBookCategory
 import net.minecraft.world.item.enchantment.Enchantment
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.level.Level
@@ -16,7 +17,7 @@ import kotlin.math.max
 import kotlin.math.min
 import net.minecraft.world.item.crafting.RepairItemRecipe as MojangRepairItemRecipe
 
-internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(id) {
+internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(id, CraftingBookCategory.MISC) {
     
     override fun matches(container: CraftingContainer, level: Level): Boolean {
         var firstStack: ItemStack? = null
@@ -65,7 +66,7 @@ internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(i
             // keep curse enchantments
             val enchantsA = EnchantmentHelper.getEnchantments(itemStackA)
             val enchantsB = EnchantmentHelper.getEnchantments(itemStackB)
-            Registry.ENCHANTMENT.asSequence()
+            BuiltInRegistries.ENCHANTMENT.asSequence()
                 .filter(Enchantment::isCurse)
                 .forEach {
                     val level = max(enchantsA.getOrDefault(it, 0), enchantsB.getOrDefault(it, 0))

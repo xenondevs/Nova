@@ -4,6 +4,9 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.util.associateWithNotNullTo
+import xyz.xenondevs.nova.util.enumMapOf
+import java.util.function.Predicate
 
 object ToolCategoryRegistry {
     
@@ -11,11 +14,58 @@ object ToolCategoryRegistry {
     val categories: Collection<ToolCategory>
         get() = _categories.values
     
+    @JvmName("registerVanilla1")
     internal fun registerVanilla(
         name: String,
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
-        multipliers: Map<Material, Double>,
+        genericMultipliers: Map<Material, Double>,
+        getIcon: ((ToolLevel?) -> ResourcePath)? = null
+    ): VanillaToolCategory {
+        return registerVanilla(
+            name,
+            canDoSweepAttack, canBreakBlocksInCreative,
+            itemDamageOnAttackEntity, itemDamageOnBreakBlock,
+            genericMultipliers,
+            emptyMap<Material, Map<Material, Double>>(),
+            getIcon
+        )
+    }
+    
+    @Suppress("DEPRECATION")
+    @JvmName("registerVanilla1")
+    internal fun registerVanilla(
+        name: String,
+        canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
+        itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
+        genericMultipliers: Map<Material, Double>,
+        specialMultipliers: Map<Material, Map<Predicate<Material>, Double>>,
+        getIcon: ((ToolLevel?) -> ResourcePath)? = null
+    ): VanillaToolCategory {
+        val flatSpecialMultipliers = specialMultipliers.mapValuesTo(enumMapOf()) { (_, map) ->
+            Material.values()
+                .filter { it.isBlock && !it.isLegacy }
+                .associateWithNotNullTo(enumMapOf()) { material ->
+                    map.entries.firstOrNull { it.key.test(material) }?.value
+                }
+        }
+        
+        return registerVanilla(
+            name,
+            canDoSweepAttack, canBreakBlocksInCreative,
+            itemDamageOnAttackEntity, itemDamageOnBreakBlock,
+            genericMultipliers,
+            flatSpecialMultipliers,
+            getIcon
+        )
+    }
+    
+    internal fun registerVanilla(
+        name: String,
+        canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
+        itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
+        genericMultipliers: Map<Material, Double>,
+        specialMultipliers: Map<Material, Map<Material, Double>>,
         getIcon: ((ToolLevel?) -> ResourcePath)? = null
     ): VanillaToolCategory {
         val id = NamespacedId("minecraft", name)
@@ -25,7 +75,8 @@ object ToolCategoryRegistry {
             id,
             canDoSweepAttack, canBreakBlocksInCreative,
             itemDamageOnAttackEntity, itemDamageOnBreakBlock,
-            multipliers,
+            genericMultipliers,
+            specialMultipliers,
             getIcon ?: {
                 if (it != null)
                     ResourcePath(it.id.namespace, "item/${it.id.name}_$name")

@@ -5,8 +5,8 @@ package xyz.xenondevs.nova.util.item
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -19,7 +19,8 @@ import xyz.xenondevs.nova.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.eyeInWater
-import xyz.xenondevs.nova.util.nmsStack
+import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.roundToDecimalPlaces
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
@@ -97,7 +98,7 @@ object ToolUtils {
     internal fun calculateDamageVanilla(player: Player, block: Block): Double {
         val serverTool = player.inventory.getItem(EquipmentSlot.HAND)?.takeUnlessAir()
         val tool = serverTool?.let {
-            val nmsStack = it.nmsStack
+            val nmsStack = it.nmsCopy
             return@let if (PacketItems.isNovaItem(nmsStack))
                 PacketItems.getFakeItem(player, nmsStack).bukkitMirror
             else it
@@ -138,7 +139,9 @@ object ToolUtils {
         val toolCategory = tool?.let(ToolCategory::ofItem)
         var speedMultiplier = 1.0
         if (toolCategory != null && toolCategory in ToolCategory.ofVanillaBlock(block)) {
-            speedMultiplier = (toolCategory as VanillaToolCategory).multipliers[tool.type] ?: 1.0
+            toolCategory as VanillaToolCategory
+            val toolType = tool.type
+            speedMultiplier = toolCategory.specialMultipliers[toolType]?.get(blockType) ?: toolCategory.genericMultipliers[toolType] ?: 1.0
             val efficiency = tool.getEnchantmentLevel(Enchantment.DIG_SPEED)
             if (efficiency > 0) {
                 speedMultiplier += efficiency * efficiency + 1
@@ -151,7 +154,7 @@ object ToolUtils {
         if (underWater) speedMultiplier /= 5.0
         if (!onGround) speedMultiplier /= 5.0
         
-        return speedMultiplier / hardness / if (isCorrectToolForDropsVanilla(tool?.type, block)) 30.0 else 100.0
+        return (speedMultiplier / hardness / if (isCorrectToolForDropsVanilla(tool?.type, block)) 30.0 else 100.0).roundToDecimalPlaces(3)
     }
     //</editor-fold>
     
@@ -185,7 +188,7 @@ object ToolUtils {
             hardness,
             correctCategory,
             correctForDrops,
-            getToolSpeedMultiplier(tool),
+            getToolSpeedMultiplier(tool, block),
             tool?.getEnchantmentLevel(Enchantment.DIG_SPEED) ?: 0,
             player.isOnGround,
             player.eyeInWater && player.inventory.helmet?.containsEnchantment(Enchantment.WATER_WORKER) != true,
@@ -221,16 +224,31 @@ object ToolUtils {
         if (underWater) speedMultiplier /= 5.0
         if (!onGround) speedMultiplier /= 5.0
         
-        return speedMultiplier / hardness / if (correctForDrops) 30.0 else 100.0
+        return (speedMultiplier / hardness / if (correctForDrops) 30.0 else 100.0).roundToDecimalPlaces(3)
     }
     //</editor-fold>
     
-    private fun getToolSpeedMultiplier(itemStack: ItemStack?): Double {
+    private fun getToolSpeedMultiplier(itemStack: ItemStack?, block: Block): Double {
         if (itemStack == null)
             return 1.0
-        return itemStack.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.breakSpeed
-            ?: (ToolCategory.ofItem(itemStack) as? VanillaToolCategory)?.multipliers?.get(itemStack.type)
-            ?: 1.0
+        
+        val novaMaterial = itemStack.novaMaterial
+        if (novaMaterial != null)
+            return novaMaterial.novaItem.getBehavior(Tool::class)?.options?.breakSpeed ?: 1.0
+        
+        val vanillaToolCategory = ToolCategory.ofItem(itemStack) as? VanillaToolCategory
+        if (vanillaToolCategory != null) {
+            val itemType = itemStack.type
+            if (BlockManager.getBlock(block.pos) == null) {
+                val specialMultiplier = vanillaToolCategory.specialMultipliers[itemType]?.get(block.type)
+                if (specialMultiplier != null)
+                    return specialMultiplier
+            }
+            
+            return vanillaToolCategory.genericMultipliers[itemType] ?: 1.0
+        }
+        
+        return 1.0
     }
     
     private fun getFatigueMultiplier(level: Int): Double =

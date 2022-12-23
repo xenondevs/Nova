@@ -11,7 +11,7 @@
   "command.nova.recipe.no-recipe": "Šitas daiktas neturi recepto",
   "command.nova.usage.no-usage": "šitas daiktas neturi jokių naudojimo prasmių",
   "item.nova.wrench.mode.nova.energy": "Rėžimas: Energija",
-  "item.nova.wrench.mode.nova.items": "Rėžimas: Daiktų",
+  "item.nova.wrench.mode.nova.item": "Rėžimas: Daiktų",
   "item.nova.speed_upgrade": "Greičio patobulinimas",
   "item.nova.efficiency_upgrade": "Efektyvumo patobulinimas",
   "item.nova.energy_upgrade": "Energijos patobulinimas",
