@@ -74,7 +74,13 @@ internal class MaterialContent(
     private fun createDefaultModelFile(file: Path, texturePath: String) {
         val modelObj = JsonObject()
         modelObj.addProperty("parent", "item/generated")
-        modelObj.add("textures", JsonObject().apply { addProperty("layer0", texturePath) })
+        modelObj.add(
+            "textures",
+            JsonObject().apply {
+                addProperty("layer0", "item/empty") // this fixes issues with leather armor colors
+                addProperty("layer1", texturePath)
+            }
+        )
         
         file.parent.createDirectories()
         file.writeText(GSON.toJson(modelObj))
