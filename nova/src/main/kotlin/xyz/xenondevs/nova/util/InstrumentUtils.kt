@@ -6,9 +6,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import xyz.xenondevs.nova.world.BlockPos
 import org.bukkit.Instrument as BukkitInstrument
 
-// TODO: Add BukkitInstruments when available
-
-enum class Instrument(val bukkitInstrument: BukkitInstrument?, val nmsInstrument: NoteBlockInstrument) {
+enum class Instrument(val bukkitInstrument: BukkitInstrument, val nmsInstrument: NoteBlockInstrument) {
     
     HARP(BukkitInstrument.PIANO, NoteBlockInstrument.HARP),
     BASEDRUM(BukkitInstrument.BASS_DRUM, NoteBlockInstrument.BASEDRUM),
@@ -26,13 +24,13 @@ enum class Instrument(val bukkitInstrument: BukkitInstrument?, val nmsInstrument
     BIT(BukkitInstrument.BIT, NoteBlockInstrument.BIT),
     BANJO(BukkitInstrument.BANJO, NoteBlockInstrument.BANJO),
     PLING(BukkitInstrument.PLING, NoteBlockInstrument.PLING),
-    ZOMBIE(null, NoteBlockInstrument.ZOMBIE),
-    SKELETON(null, NoteBlockInstrument.SKELETON),
-    CREEPER(null, NoteBlockInstrument.CREEPER),
-    DRAGON(null, NoteBlockInstrument.DRAGON),
-    WITHER_SKELETON(null, NoteBlockInstrument.WITHER_SKELETON),
-    PIGLIN(null, NoteBlockInstrument.PIGLIN),
-    CUSTOM_HEAD(null, NoteBlockInstrument.CUSTOM_HEAD);
+    ZOMBIE(BukkitInstrument.ZOMBIE, NoteBlockInstrument.ZOMBIE),
+    SKELETON(BukkitInstrument.SKELETON, NoteBlockInstrument.SKELETON),
+    CREEPER(BukkitInstrument.CREEPER, NoteBlockInstrument.CREEPER),
+    DRAGON(BukkitInstrument.DRAGON, NoteBlockInstrument.DRAGON),
+    WITHER_SKELETON(BukkitInstrument.WITHER_SKELETON, NoteBlockInstrument.WITHER_SKELETON),
+    PIGLIN(BukkitInstrument.PIGLIN, NoteBlockInstrument.PIGLIN),
+    CUSTOM_HEAD(BukkitInstrument.CUSTOM_HEAD, NoteBlockInstrument.CUSTOM_HEAD);
     
     val soundEvent: Holder<SoundEvent> = nmsInstrument.soundEvent
     val isTunable: Boolean = nmsInstrument.isTunable
@@ -70,6 +68,13 @@ internal val BukkitInstrument.instrument: Instrument
         BukkitInstrument.BIT -> Instrument.BIT
         BukkitInstrument.BANJO -> Instrument.BANJO
         BukkitInstrument.PLING -> Instrument.PLING
+        BukkitInstrument.ZOMBIE -> Instrument.ZOMBIE
+        BukkitInstrument.SKELETON -> Instrument.SKELETON
+        BukkitInstrument.CREEPER -> Instrument.CREEPER
+        BukkitInstrument.DRAGON -> Instrument.DRAGON
+        BukkitInstrument.WITHER_SKELETON -> Instrument.WITHER_SKELETON
+        BukkitInstrument.PIGLIN -> Instrument.PIGLIN
+        BukkitInstrument.CUSTOM_HEAD -> Instrument.CUSTOM_HEAD
     }
 
 internal val NoteBlockInstrument.instrument: Instrument
