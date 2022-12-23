@@ -110,7 +110,7 @@ abstract class AddonTask : DefaultTask() {
     }
     
     private fun getArtifactCoords(dependency: DefaultExternalModuleDependency): String {
-        val artifact = dependency.artifacts.first()
+        val artifact = dependency.artifacts.firstOrNull()
         return if (artifact != null)
             "${dependency.group}:${dependency.name}:${artifact.extension}:${artifact.classifier}:${dependency.version}"
         else "${dependency.group}:${dependency.name}:${dependency.version}"
