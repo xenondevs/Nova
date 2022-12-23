@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.data.writeToFile
 import java.io.File
@@ -25,7 +26,8 @@ internal class AtlasContent : PackContent {
             val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/atlases/${it.key}.json")
             file.parentFile.mkdirs()
             val atlasesObj = file.takeIf(File::exists)?.parseJson() as? JsonObject ?: JsonObject()
-            atlasesObj.add("sources", it.value)
+            val sourcesJson = atlasesObj.getOrPut("sources", ::JsonArray)
+            sourcesJson.addAll(it.value)
             atlasesObj.writeToFile(file)
         }
     }
