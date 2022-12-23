@@ -5,9 +5,10 @@ import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
-import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
+import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor.InterpolationMode
 import xyz.xenondevs.nova.util.data.readImage
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.intValue
@@ -24,45 +25,73 @@ import kotlin.math.roundToInt
 
 private val EMPTY_TEXTURE = BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB)
 
-internal class ArmorContent : PackContent {
+internal class ArmorData(
+    val id: NamespacedId,
+    val color: Int,
+    val textureLayers: Array<List<BufferedImage>?>,
+    val emissivityMapsLayers: Array<List<BufferedImage>?>,
+    val interpolationMode: InterpolationMode,
+    val fps: Double
+)
+
+// TODO: Create converter for black and white emissivity maps
+internal class ArmorContent(
+    private val basePacks: BasePacks
+) : PackContent {
     
     override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
     
-    private val armor = HashMap<NamespacedId, Pair<Int, RegisteredArmor>>()
-    private val textures = HashMap<RegisteredArmor, Array<List<BufferedImage>?>>()
-    private val emissivityMaps = HashMap<RegisteredArmor, Array<List<BufferedImage>?>>()
+    private val armor = ArrayList<ArmorData>()
+    private var color = -1
     
-    private var color = 0
+    init {
+        armor += basePacks.customArmor.values
+    }
     
     override fun excludesPath(path: ResourcePath): Boolean =
         path.path.startsWith("textures/armor/")
     
     override fun includePack(pack: AssetPack) {
         pack.armorIndex?.forEach { armor ->
-            this.armor[armor.id] = nextColor() to armor
-            
-            textures[armor] = arrayOf(
-                armor.layer1?.let { extractFrames(pack, it.resourcePath) },
-                armor.layer2?.let { extractFrames(pack, it.resourcePath) }
-            )
-            
-            emissivityMaps[armor] = arrayOf(
-                armor.layer1EmissivityMap?.let { extractFrames(pack, it.resourcePath) },
-                armor.layer2EmissivityMap?.let { extractFrames(pack, it.resourcePath) }
+            this.armor += ArmorData(
+                armor.id,
+                nextColor(),
+                arrayOf(
+                    armor.layer1?.let { extractFrames(pack, it.resourcePath) },
+                    armor.layer2?.let { extractFrames(pack, it.resourcePath) }
+                ),
+                arrayOf(
+                    armor.layer1EmissivityMap?.let { extractFrames(pack, it.resourcePath) },
+                    armor.layer2EmissivityMap?.let { extractFrames(pack, it.resourcePath) }
+                ),
+                armor.interpolationMode,
+                armor.fps
             )
         }
     }
     
     private fun nextColor(): Int {
         check(color <= 0xFFFFFF)
-        return color++ or (0xFF shl 24)
+        
+        // only use odd numbers
+        color += 2
+        
+        // skip colors that are already in use by base packs
+        while (color in basePacks.customArmor.keys) {
+            color += 2
+            check(color <= 0xFFFFFF)
+        }
+        
+        return color
     }
     
     override fun write() {
         writeLeatherArmorAtlas()
         writeMCPatcherArmor()
         
-        Resources.updateArmorDataLookup(armor.entries.associateTo(HashMap()) { it.key to ArmorTexture(it.value.first) })
+        Resources.updateArmorDataLookup(
+            armor.associateTo(HashMap()) { it.id to ArmorTexture(it.color) }
+        )
     }
     
     private fun writeLeatherArmorAtlas() {
@@ -80,13 +109,15 @@ internal class ArmorContent : PackContent {
     private fun buildTexture(defaultLayer: BufferedImage, layer: Int): BufferedImage {
         //<editor-fold desc="loading and creating empty texture", defaultstate="collapsed">
         // calculate width and height of the individual textures
-        val texRes = max(textures.values.mapNotNull { it[layer] }.maxOfOrNull { images -> images.maxOf { it.width / 4 } } ?: 0, 16)
+        val texRes = armor
+            .maxOf { armorData -> armorData.textureLayers.maxOf { textureLayer -> textureLayer?.maxOf { texture -> texture.width } ?: 0 } }
+            .coerceAtLeast(64) / 4
         val width = texRes * 4
         val height = texRes * 2
         
         // calculate width and height of the leather armor texture
-        val totalWidth = (armor.values.sumOf { (if (emissivityMaps[it.second]!![layer] != null) 2 else 1) as Int } + 1) * width
-        val totalHeight = max(textures.values.filterNotNull().maxOfOrNull { it.size * height } ?: 0, height)
+        val totalWidth = (armor.sumOf { armorData -> (if (armorData.emissivityMapsLayers[layer] != null) 2 else 1 as Int) } + 1) * width
+        val totalHeight = (armor.mapNotNull { it.textureLayers[layer] }.maxOfOrNull { it.size * height } ?: 0).coerceAtLeast(height)
         
         // create texture image
         val texture = BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_INT_ARGB)
@@ -97,9 +128,11 @@ internal class ArmorContent : PackContent {
         // draw textures to texture image
         graphics.drawImage(defaultLayer, 0, 0, width, height, null)
         var textureIdx = 1
-        armor.forEach { _, (color, armor) ->
-            val textureFrames = textures[armor]!![layer]
-            val emissivityMapFrames = emissivityMaps[armor]!![layer]
+        armor.forEach { armorData ->
+            val color = armorData.color
+            
+            val textureFrames = armorData.textureLayers[layer]
+            val emissivityMapFrames = armorData.emissivityMapsLayers[layer]
             
             // draw texture frames
             textureFrames?.forEachIndexed { frameIdx, frame ->
@@ -108,13 +141,13 @@ internal class ArmorContent : PackContent {
             
             //<editor-fold desc="armor texture metadata">
             // color marker
-            texture.setRGB(textureIdx * width, 0, color)
+            texture.setRGB(textureIdx * width, 0, color or (0xFF shl 24))
             
             // animation marker
             val animationMarker =
                 // rgb(frame amount, speed, interpolation)
                 if (textureFrames != null && textureFrames.size > 1) {
-                    Color(textureFrames.size, (armor.fps * 24).roundToInt(), armor.interpolationMode.ordinal)
+                    Color(textureFrames.size, (armorData.fps * 24).roundToInt(), armorData.interpolationMode.ordinal)
                 } else Color(0, 0, 0, 0)
             texture.setRGB(textureIdx * width + 1, 0, animationMarker.rgb)
             
@@ -166,7 +199,11 @@ internal class ArmorContent : PackContent {
     }
     
     private fun writeMCPatcherArmor() {
-        armor.forEach { id, (color, armor) ->
+        armor.forEach { armorData ->
+            val id = armorData.id
+            if (id.namespace == "base_packs")
+                return
+            
             val citDir = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/optifine/cit/${id.namespace}/armor/${id.name}/")
                 .apply(Path::createDirectories)
             val animDir = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/optifine/anim/${id.namespace}/armor/${id.name}/")
@@ -187,8 +224,8 @@ internal class ArmorContent : PackContent {
             armorPropertiesFile.writeProperties(armorProperties)
             
             // get textures
-            val layer1Frames = textures[armor]!![0]
-            val layer2Frames = textures[armor]!![1]
+            val layer1Frames = armorData.textureLayers[0]
+            val layer2Frames = armorData.textureLayers[1]
             
             // write textures
             val layer1 = layer1Frames?.get(0) // [armor] [layer (0)] [frame (0)]
@@ -216,8 +253,8 @@ internal class ArmorContent : PackContent {
                 animationProperties["y"] = "0"
                 animationProperties["w"] = frames[0].width
                 animationProperties["h"] = frames[0].height
-                animationProperties["duration"] = max((20 / armor.fps).roundToInt(), 1)
-                animationProperties["interpolate"] = armor.interpolationMode != RegisteredArmor.InterpolationMode.NONE
+                animationProperties["duration"] = max((20 / armorData.fps).roundToInt(), 1)
+                animationProperties["interpolate"] = armorData.interpolationMode != InterpolationMode.NONE
                 animationPropertiesFile.writeProperties(animationProperties)
             }
             

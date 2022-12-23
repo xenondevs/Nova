@@ -158,7 +158,7 @@ internal class ResourcePackBuilder {
             // init pre-world content
             contents = listOf(
                 MaterialContent(basePacks, soundOverrides),
-                ArmorContent(),
+                ArmorContent(basePacks),
                 GUIContent(),
                 LanguageContent(),
                 TextureIconContent(),

@@ -10,7 +10,7 @@ import kotlin.io.path.copyTo
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
 
-internal class LangFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/lang") {
+internal class LangFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/lang") {
     
     override fun merge(source: Path, destination: Path) {
         if (!destination.exists()) {

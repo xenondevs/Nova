@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
+import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorData
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.data.extractAll
@@ -18,7 +19,6 @@ import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.extension
-import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 import kotlin.io.path.relativeTo
@@ -43,11 +43,12 @@ internal class BasePacks {
     val packAmount = packs.size
     val occupiedModelData = HashMap<Material, HashSet<Int>>()
     val occupiedSolidIds = HashMap<BlockStateConfigType<*>, HashSet<Int>>()
+    val customArmor = HashMap<Int, ArmorData>()
     
     fun include() {
         packs.map {
             if (it.isFile && it.extension.equals("zip", true)) {
-                val dir = ResourcePackBuilder.TEMP_BASE_PACKS_DIR.resolve(it.nameWithoutExtension + StringUtils.randomString(10))
+                val dir = ResourcePackBuilder.TEMP_BASE_PACKS_DIR.resolve("${it.nameWithoutExtension}-${StringUtils.randomString(5)}")
                 dir.createDirectories()
                 ZipFile(it).extractAll(dir)
                 
@@ -79,10 +80,10 @@ internal class BasePacks {
                 val packFile = ResourcePackBuilder.PACK_DIR.resolve(relPath)
                 
                 packFile.parent.createDirectories()
-                val fileMerger = mergers.firstOrNull { relPath.invariantSeparatorsPathString.startsWith(it.path) }
+                val fileMerger = mergers.firstOrNull { it.acceptsFile(relPath) }
                 if (fileMerger != null) {
                     try {
-                        fileMerger.merge(file, packFile)
+                        fileMerger.merge(file, packFile, relPath)
                     } catch (t: Throwable) {
                         LOGGER.log(Level.SEVERE, "An exception occurred trying to merge base pack file \"$file\" with \"$packFile\"", t)
                     }

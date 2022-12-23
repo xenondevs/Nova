@@ -221,8 +221,8 @@ internal object PacketItems : Initializable(), Listener {
             || item == Items.LEATHER_HELMET
         ) {
             val color = itemStack.tag?.getOrNull<CompoundTag>("display")?.getOrNull<IntTag>("color")?.asInt
-            // custom textures use colors with mask 0xFF << 24
-            if (color != null && (color ushr 24 == 0xFF)) {
+            // custom armor only uses odd color codes
+            if (color != null && color % 2 != 0) {
                 // allow armor from custom item services to have any color
                 return CustomItemServiceManager.getId(itemStack.bukkitMirror) == null
             }

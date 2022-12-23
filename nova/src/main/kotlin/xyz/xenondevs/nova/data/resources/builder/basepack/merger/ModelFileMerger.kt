@@ -17,7 +17,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.writeText
 
-internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/models") {
+internal class ModelFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/models") {
     
     override fun merge(source: Path, destination: Path) {
         if (destination.exists()) {

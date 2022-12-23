@@ -8,7 +8,7 @@ import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.exists
 
-internal class AtlasFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/atlases") {
+internal class AtlasFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/atlases") {
     
     override fun merge(source: Path, destination: Path) {
         if (destination.exists()) {

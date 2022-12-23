@@ -31,7 +31,7 @@ private val MERGEABLE_STATE_CONFIGS = listOf(
     MushroomStemBlockStateConfig
 )
 
-internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/blockstates") {
+internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/blockstates") {
     
     override fun merge(source: Path, destination: Path) {
         val configType = MERGEABLE_STATE_CONFIGS.firstOrNull { it.fileName == source.nameWithoutExtension }
