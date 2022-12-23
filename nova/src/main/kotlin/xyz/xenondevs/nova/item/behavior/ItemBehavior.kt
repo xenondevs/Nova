@@ -23,6 +23,9 @@ import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 
 abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     
+    lateinit var novaMaterial: ItemNovaMaterial
+        internal set
+    
     open val vanillaMaterialProperties: Provider<List<VanillaMaterialProperty>> = provider(emptyList())
     open val attributeModifiers: Provider<List<AttributeModifier>> = provider(emptyList())
     
@@ -41,13 +44,23 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     open fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) = Unit
     
-    final override fun get(material: ItemNovaMaterial): ItemBehavior = this
+    final override fun get(material: ItemNovaMaterial): ItemBehavior {
+        setMaterial(material)
+        return this
+    }
+    
+    internal fun setMaterial(material: ItemNovaMaterial) {
+        if (::novaMaterial.isInitialized)
+            throw IllegalStateException("The same item behavior instance cannot be used for multiple materials")
+        
+        novaMaterial = material
+    }
     
 }
 
 abstract class ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder<T>() {
     internal abstract fun create(material: ItemNovaMaterial): T
-    final override fun get(material: ItemNovaMaterial) = create(material)
+    final override fun get(material: ItemNovaMaterial) = create(material).apply { setMaterial(material) }
 }
 
 abstract class ItemBehaviorHolder<T : ItemBehavior> internal constructor() {

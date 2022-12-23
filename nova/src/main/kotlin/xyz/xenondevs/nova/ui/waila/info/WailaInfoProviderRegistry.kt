@@ -7,7 +7,6 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.ui.waila.info.impl.BellWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CakeWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CampfireWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CandleWailaInfoProvider
@@ -48,7 +47,6 @@ object WailaInfoProviderRegistry {
         registerProvider(RespawnAnchorWailaInfoProvider)
         registerProvider(LanternWailaInfoProvider)
         registerProvider(DaylightDetectorWailaInfoProvider)
-        registerProvider(BellWailaInfoProvider)
         registerProvider(CocoaWailaInfoProvider)
         registerProvider(RedstoneLampWailaInfoProvider)
     }

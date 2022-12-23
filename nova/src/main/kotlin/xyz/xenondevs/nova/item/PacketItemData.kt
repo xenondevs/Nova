@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.item
 
 import net.md_5.bungee.api.chat.BaseComponent
+import net.minecraft.nbt.CompoundTag
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 
 /**
@@ -9,7 +10,7 @@ import xyz.xenondevs.nova.item.vanilla.HideableFlag
  * Note that all values contained in this class are only for display purposes and do not affect gameplay.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-class PacketItemData {
+class PacketItemData internal constructor(val nbt: CompoundTag) {
     
     /**
      * The displayed name of this item.

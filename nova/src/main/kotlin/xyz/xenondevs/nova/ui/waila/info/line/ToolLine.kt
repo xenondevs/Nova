@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.ToolLevel
+import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
 import xyz.xenondevs.nova.util.data.MovingComponentBuilder
@@ -27,7 +27,7 @@ object ToolLine {
         return getToolLine(
             player,
             ToolCategory.ofBlock(block),
-            ToolLevel.ofBlock(block),
+            ToolTier.ofBlock(block),
             block.hardness,
             ToolUtils.isCorrectToolForDrops(block, tool)
         )
@@ -46,8 +46,8 @@ object ToolLine {
     
     fun getToolLine(
         player: Player,
-        blockToolCategories: List<ToolCategory>?,
-        blockToolLevel: ToolLevel?,
+        blockToolCategories: List<ToolCategory>,
+        blockToolLevel: ToolTier?,
         hardness: Double,
         correctToolForDrops: Boolean?
     ): WailaLine {
@@ -84,7 +84,7 @@ object ToolLine {
         return WailaLine(builder, Alignment.CENTERED)
     }
     
-    private fun getToolIcon(level: ToolLevel?, category: ToolCategory): TextComponent {
+    private fun getToolIcon(level: ToolTier?, category: ToolCategory): TextComponent {
         val fontChar = Resources.getTextureIconChar(category.getIcon(level))
         return TextComponent(fontChar.char.toString()).apply { color = ChatColor.WHITE; font = fontChar.font }
     }

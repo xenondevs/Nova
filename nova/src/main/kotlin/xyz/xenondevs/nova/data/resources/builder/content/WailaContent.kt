@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.builder.content
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
@@ -10,8 +11,15 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.renderer.MinecraftModelRenderer
-import java.io.File
 import java.util.logging.Level
+import kotlin.io.path.copyTo
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
+import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.walk
 
 //<editor-fold desc="Hardcoded Textures", defaultstate="collapsed">
 private val MATERIAL_TEXTURES = enumMapOf(
@@ -37,6 +45,19 @@ private val MATERIAL_TEXTURES = enumMapOf(
     Material.MANGROVE_SIGN to "item/mangrove_sign",
     Material.CRIMSON_SIGN to "item/crimson_sign",
     Material.WARPED_SIGN to "item/warped_sign",
+    Material.BAMBOO_SIGN to "item/bamboo_sign",
+    
+    // hanging signs
+    Material.OAK_HANGING_SIGN to "item/oak_hanging_sign",
+    Material.SPRUCE_HANGING_SIGN to "item/spruce_hanging_sign",
+    Material.BIRCH_HANGING_SIGN to "item/birch_hanging_sign",
+    Material.JUNGLE_HANGING_SIGN to "item/jungle_hanging_sign",
+    Material.ACACIA_HANGING_SIGN to "item/acacia_hanging_sign",
+    Material.DARK_OAK_HANGING_SIGN to "item/dark_oak_hanging_sign",
+    Material.MANGROVE_HANGING_SIGN to "item/mangrove_hanging_sign",
+    Material.CRIMSON_HANGING_SIGN to "item/crimson_hanging_sign",
+    Material.WARPED_HANGING_SIGN to "item/warped_hanging_sign",
+    Material.BAMBOO_HANGING_SIGN to "item/bamboo_hanging_sign",
     
     // foliage
     Material.OAK_SAPLING to null,
@@ -148,7 +169,8 @@ private val MATERIAL_TEXTURES = enumMapOf(
     Material.STRUCTURE_VOID to "item/structure_void",
     Material.POINTED_DRIPSTONE to "item/pointed_dripstone",
     Material.RAIL to null,
-    Material.REDSTONE_WIRE to "item/redstone"
+    Material.REDSTONE_WIRE to "item/redstone",
+    Material.BELL to "item/bell"
 )
 
 private val TEXTURES = setOf(
@@ -165,14 +187,21 @@ private val TEXTURES = setOf(
 private const val SIZE = 32
 private const val ASCENT = -4
 
+private val WAILA_ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
+
 internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(Resources::updateWailaDataLookup) {
     
+    override val stage = ResourcePackBuilder.BuildingStage.POST_WORLD
+    
     init {
-        writeHardcodedTextures()
-        renderCustomItemServiceBlocks()
+        if (WAILA_ENABLED) {
+            writeHardcodedTextures()
+            renderCustomItemServiceBlocks()
+        }
     }
     
     private fun renderCustomItemServiceBlocks() {
+        var count = 0
         try {
             val renderer = MinecraftModelRenderer(
                 512, 512,
@@ -180,52 +209,57 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
                 listOf(ResourcePackBuilder.MCASSETS_DIR, ResourcePackBuilder.PACK_DIR),
                 true
             )
-    
+            
             CustomItemServiceManager.getBlockItemModelPaths().forEach { (id, path) ->
-                LOGGER.info("Rendering $id ($path)")
-                val file = File(ResourcePackBuilder.PACK_DIR, "assets/nova/textures/waila_generated/${id.namespace}/${id.name}.png")
-                file.parentFile.mkdirs()
-                renderer.renderModelToFile(path.toString(), file)
-                addFontEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"))
+                try {
+                    val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace}/${id.name}.png")
+                    file.parent.createDirectories()
+                    renderer.renderModelToFile(path.toString(), file)
+                    addFontEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"))
+                    count++
+                } catch (e: Exception) {
+                    LOGGER.log(Level.WARNING, "Failed to render $id ($path) ", e)
+                }
             }
         } catch (e: Exception) {
             LOGGER.log(Level.SEVERE, "Failed to render WAILA textures for custom item services. (Misconfigured base packs?)", e)
+        } finally {
+            LOGGER.info("Rendered $count WAILA textures")
         }
     }
     
     private fun writeHardcodedTextures() {
         fun copyMCTexture(path: ResourcePath): ResourcePath {
-            val from = File(ResourcePackBuilder.MCASSETS_DIR, "assets/${path.namespace}/textures/${path.path}")
+            val from = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/${path.namespace}/textures/${path.path}")
             val name = path.path.substringAfterLast('/')
-            val to = File(ResourcePackBuilder.PACK_DIR, "assets/nova/textures/waila_generated/$name")
+            val to = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/$name")
+            to.parent.createDirectories()
             from.copyTo(to, overwrite = true)
-        
+            
             return ResourcePath("nova", "waila_generated/$name")
         }
-    
+        
         MATERIAL_TEXTURES.forEach { (material, texture) ->
             val name = material.name.lowercase()
             val path = ResourcePath.of((texture ?: "block/$name") + ".png")
             addFontEntry("minecraft:$name", copyMCTexture(path))
         }
-    
+        
         TEXTURES.forEach {
             addFontEntry("minecraft:$it", copyMCTexture(ResourcePath("minecraft", "block/$it.png")))
         }
     }
     
-    override fun addFromPack(pack: AssetPack) {
-        val wailaDir = File(ResourcePackBuilder.ASSETS_DIR, "${pack.namespace}/textures/waila/")
+    override fun includePack(pack: AssetPack) {
+        if (!WAILA_ENABLED)
+            return
         
+        val wailaDir = ResourcePackBuilder.ASSETS_DIR.resolve("${pack.namespace}/textures/waila/")
         if (!wailaDir.exists())
             return
-        if (!DEFAULT_CONFIG.getBoolean("waila.enabled")) {
-            wailaDir.deleteRecursively()
-            return
-        }
         
-        wailaDir.walkTopDown().forEach { file ->
-            if (file.isDirectory || !file.extension.equals("png", true))
+        wailaDir.walk().forEach { file ->
+            if (file.isDirectory() || !file.extension.equals("png", true))
                 return@forEach
             
             val idNamespace = pack.namespace.takeUnless { it == "nova" } ?: "minecraft" // all textures form "nova" asset pack are for minecraft blocks
@@ -234,6 +268,16 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
             
             addFontEntry(id, path)
         }
+    }
+    
+    override fun excludesPath(path: ResourcePath): Boolean {
+        if (!WAILA_ENABLED) {
+            if (path.path.startsWith("textures/waila/"))
+                return true
+            if (path.toString().startsWith("nova:font/waila"))
+                return true
+        }
+        return false
     }
     
     override fun createFontData(id: Int, char: Char, path: ResourcePath): WailaIconData =

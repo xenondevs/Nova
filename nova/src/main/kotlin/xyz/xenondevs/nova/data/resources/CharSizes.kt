@@ -154,9 +154,9 @@ object CharSizes {
         return loadedTables[namespacedFont] ?: loadTable(namespacedFont)
     }
     
-    internal fun deleteTables() {
-        loadedTables.clear()
-        CHAR_SIZES_DIR.deleteRecursively()
+    internal fun deleteTable(font: String) {
+        loadedTables -= font
+        getFile(font).delete()
     }
     
     private fun getFile(font: String): File {

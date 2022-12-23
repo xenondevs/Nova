@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.transformer.patch.item
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
@@ -50,7 +50,7 @@ internal object AttributePatch : MethodTransformer(ReflectionRegistry.ITEM_STACK
         // add new nova modifiers
         attributeModifiers.forEach {
             novaModifiers.put(
-                Registry.ATTRIBUTE.get(it.attribute.key.resourceLocation),
+                BuiltInRegistries.ATTRIBUTE.get(it.attribute.key.resourceLocation),
                 AttributeModifier(it.uuid, it.name, it.value, AttributeModifier.Operation.values()[it.operation.ordinal])
             )
         }

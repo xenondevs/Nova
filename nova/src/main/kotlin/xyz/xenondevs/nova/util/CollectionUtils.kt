@@ -5,12 +5,32 @@ package xyz.xenondevs.nova.util
 import de.studiocode.invui.item.Item
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import java.util.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 fun <E> List<E>.contentEquals(other: List<E>) = size == other.size && containsAll(other)
 
 fun <E> Set<E>.contentEquals(other: Set<E>) = size == other.size && containsAll(other)
 
 fun <E> Collection<E>.takeUnlessEmpty(): Collection<E>? = ifEmpty { null }
+
+@OptIn(ExperimentalContracts::class)
+fun Collection<*>?.isNotNullOrEmpty(): Boolean {
+    contract {
+        returns(true) implies(this@isNotNullOrEmpty != null)
+    }
+    
+    return this != null && isNotEmpty()
+}
+
+@OptIn(ExperimentalContracts::class)
+fun Map<*, *>?.isNotNullOrEmpty(): Boolean  {
+    contract { 
+        returns(true) implies(this@isNotNullOrEmpty != null)
+    }
+    
+    return this != null && isNotEmpty()
+}
 
 fun <E> MutableIterable<E>.removeFirstWhere(test: (E) -> Boolean): Boolean {
     val iterator = iterator()
@@ -146,6 +166,19 @@ inline fun <K, V, R, M : MutableMap<R, V>> Map<K, V>.mapKeysNotNullTo(destinatio
 }
 
 inline fun <K, V, M : MutableMap<K, V>> Iterable<K>.associateWithNotNullTo(destination: M, valueSelector: (K) -> V?): M {
+    for (element in this) {
+        val value = valueSelector(element)
+        if (value != null) destination[element] = value
+    }
+    
+    return destination
+}
+
+inline fun <K, V> Array<K>.associateWithNotNull(valueSelector: (K) -> V?): Map<K, V> {
+    return associateWithNotNullTo(LinkedHashMap(), valueSelector)
+}
+
+inline fun <K, V, M : MutableMap<K, V>> Array<K>.associateWithNotNullTo(destination: M, valueSelector: (K) -> V?): M {
     for (element in this) {
         val value = valueSelector(element)
         if (value != null) destination[element] = value

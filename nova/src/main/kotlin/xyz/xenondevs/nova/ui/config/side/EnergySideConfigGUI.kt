@@ -3,13 +3,12 @@ package xyz.xenondevs.nova.ui.config.side
 import de.studiocode.invui.gui.structure.Structure
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.BlockSide
 
 internal class EnergySideConfigGUI(
-    private val energyHolder: EnergyHolder
-) : BaseSideConfigGUI(energyHolder) {
+    holder: EnergyHolder
+) : BaseSideConfigGUI<EnergyHolder>(holder) {
     
     private val structure = Structure("" +
         "# # # # u # # # #" +
@@ -26,28 +25,8 @@ internal class EnergySideConfigGUI(
         applyStructure(structure)
     }
     
-    override fun changeConnectionType(blockFace: BlockFace, forward: Boolean): Boolean {
-        NetworkManager.execute { // TODO: runSync / runAsync ?
-            it.removeEndPoint(energyHolder.endPoint, false)
-            
-            val allowedTypes = energyHolder.allowedConnectionType.included
-            val currentType = energyHolder.connectionConfig[blockFace]!!
-            var index = allowedTypes.indexOf(currentType)
-            if (forward) index++ else index--
-            if (index < 0) index = allowedTypes.lastIndex
-            else if (index == allowedTypes.size) index = 0
-            energyHolder.connectionConfig[blockFace] = allowedTypes[index]
-            
-            it.addEndPoint(energyHolder.endPoint, false)
-                .thenRun { energyHolder.endPoint.updateNearbyBridges() }
-        }
-        
-        return true
-    }
-    
-    override fun getConnectionType(blockFace: BlockFace): NetworkConnectionType {
-        // TODO: surround with NetworkManager lock
-        return energyHolder.connectionConfig[blockFace]!!
+    override fun getAllowedConnectionTypes(blockFace: BlockFace): List<NetworkConnectionType> {
+        return holder.allowedConnectionType.included
     }
     
 }

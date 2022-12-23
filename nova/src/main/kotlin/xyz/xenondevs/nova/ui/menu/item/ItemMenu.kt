@@ -12,6 +12,9 @@ internal interface ItemMenu {
         
         fun addToHistory(uuid: UUID, menu: ItemMenu) {
             val userHistory = itemMenuHistory.getOrPut(uuid) { LinkedList() }
+            if (userHistory.peekLast() == menu)
+                return
+            
             userHistory += menu
             if (userHistory.size >= 10) userHistory.removeFirst()
         }

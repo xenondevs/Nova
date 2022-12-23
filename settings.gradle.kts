@@ -4,20 +4,22 @@ include("nova-api")
 include("nova-loader")
 include("nova-gradle-plugin")
 
-enableFeaturePreview("VERSION_CATALOGS")
 dependencyResolutionManagement {
     versionCatalogs {
-        create("deps") {
+        create("libs") {
             // versions
-            version("kotlin", "1.7.10")
-            version("ktor", "2.1.0")
-            version("spigot", "1.19.2-R0.1-SNAPSHOT")
+            version("kotlin", "1.7.22")
+            version("ktor", "2.1.3")
+            version("spigot", "1.19.3-R0.1-SNAPSHOT")
             version("cbf", "0.2")
             
             // lib - kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib-jdk8").versionRef("kotlin")
             library("kotlin-reflect", "org.jetbrains.kotlin", "kotlin-reflect").versionRef("kotlin")
+            
+            // lib - test
             library("kotlin-test-junit", "org.jetbrains.kotlin", "kotlin-test-junit").versionRef("kotlin")
+            library("junit-jupiter", "org.junit.jupiter:junit-jupiter:5.9.0")
             
             // lib - ktor
             library("ktor-server-core-jvm", "io.ktor", "ktor-server-core-jvm").versionRef("ktor")
@@ -41,15 +43,16 @@ dependencyResolutionManagement {
             library("maven-resolver-transport-http", "org.apache.maven.resolver:maven-resolver-transport-http:1.8.2")
             
             // lib - minecraft assets
-            library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.1")
+            library("minecraft-model-renderer", "xyz.xenondevs:minecraft-model-renderer:1.3")
             library("minecraft-asset-downloader", "xyz.xenondevs:minecraft-asset-downloader:1.2")
-            library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:0.1")
+            library("resource-pack-obfuscator", "xyz.xenondevs:resource-pack-obfuscator:0.4.1")
             
             // lib - zip4j
-            library("zip4j", "net.lingala.zip4j:zip4j:2.11.1")
+            library("zip4j", "net.lingala.zip4j:zip4j:2.11.2")
             
             // bundles
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
+            bundle("test", listOf("kotlin-test-junit", "junit-jupiter"))
             bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-netty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
             bundle("cbf", listOf("cosmic-binary-format", "cosmic-binary-format-netty-adapter"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
@@ -64,6 +67,7 @@ dependencyResolutionManagement {
 pluginManagement {
     repositories {
         mavenLocal()
+        mavenCentral()
         gradlePluginPortal()
         maven("https://repo.xenondevs.xyz/releases/")
     }

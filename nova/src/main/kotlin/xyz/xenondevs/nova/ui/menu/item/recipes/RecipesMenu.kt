@@ -21,7 +21,6 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -34,6 +33,7 @@ import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.playClickSound
 import java.util.*
 
 fun Player.showRecipes(item: ItemStack) = showRecipes(ItemUtils.getId(item))
@@ -42,7 +42,7 @@ fun Player.showRecipes(id: String): Boolean {
     val recipes = RecipeRegistry.CREATION_RECIPES[id]
     val info = RecipeRegistry.creationInfo[id]
     if (recipes != null) {
-        RecipesWindow(this, recipes, info).show()
+        RecipesWindow(this, "recipes:$id".hashCode(), recipes, info).show()
         return true
     } else if (info != null) {
         closeInventory()
@@ -58,7 +58,7 @@ fun Player.showUsages(id: String): Boolean {
     val recipes = RecipeRegistry.USAGE_RECIPES[id]
     val info = RecipeRegistry.usageInfo[id]
     if (recipes != null) {
-        RecipesWindow(this, recipes, info).show()
+        RecipesWindow(this, "usages:$id".hashCode(), recipes, info).show()
         return true
     } else if (info != null) {
         closeInventory()
@@ -71,7 +71,12 @@ fun Player.showUsages(id: String): Boolean {
 /**
  * A menu that displays the given list of recipes.
  */
-private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<RecipeContainer>>, info: String? = null) : ItemMenu {
+private class RecipesWindow(
+    player: Player,
+    private val id: Int,
+    recipes: Map<RecipeGroup, Iterable<RecipeContainer>>,
+    info: String? = null
+) : ItemMenu {
     
     private val recipesGuiStructure = Structure(
         "< . . . . . . . >",
@@ -148,6 +153,14 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
         window.changeTitle(getCurrentTitle())
     }
     
+    override fun equals(other: Any?): Boolean {
+        return other is RecipesWindow && id == other.id
+    }
+    
+    override fun hashCode(): Int {
+        return id
+    }
+    
     private inner class CraftingTabItem(private val recipeGroup: RecipeGroup, tab: Int) : TabItem(tab) {
         
         override fun getItemProvider(gui: TabGUI) = recipeGroup.icon
@@ -159,7 +172,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
                 updateTitle()
             } else if (clickType == ClickType.RIGHT) {
                 val recipes = RecipeRegistry.RECIPES_BY_TYPE[recipeGroup]
-                if (recipes != null) RecipesWindow(player, mapOf(recipeGroup to recipes)).show()
+                if (recipes != null) RecipesWindow(player, "group:$recipeGroup".hashCode(), mapOf(recipeGroup to recipes)).show()
             }
         }
         
@@ -186,7 +199,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.hasPageBefore()) {
-                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                player.playClickSound()
                 gui.goBack()
                 updateTitle()
             }
@@ -202,7 +215,7 @@ private class RecipesWindow(player: Player, recipes: Map<RecipeGroup, Iterable<R
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.hasNextPage()) {
-                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                player.playClickSound()
                 gui.goForward()
                 updateTitle()
             }

@@ -13,7 +13,7 @@ internal typealias ItemFilterList = ArrayList<ItemFilter>
 
 internal class AttachedInventoryConfiguration(itemHolder: ItemHolder, face: BlockFace, type: NetworkConnectionType) {
     
-    val inventory: NetworkedInventory = itemHolder.inventories[face]!!
+    val inventory: NetworkedInventory = itemHolder.containerConfig[face]!!
     
     val priority = when (type) {
         NetworkConnectionType.INSERT -> itemHolder.insertPriorities[face]!!
@@ -38,11 +38,11 @@ internal class FilteredNetworkedInventory(
     private val filters: ItemFilterList
 ) : NetworkedInventory by inventory {
     
-    fun allowsItem(itemStack: ItemStack) = filters.isEmpty() || filters.all { it.allowsItem(itemStack) }
+    fun allowsItem(itemStack: ItemStack): Boolean = filters.isEmpty() || filters.all { it.allowsItem(itemStack) }
     
-    fun deniesItem(itemStack: ItemStack) = filters.isNotEmpty() && filters.any { !it.allowsItem(itemStack) }
+    fun deniesItem(itemStack: ItemStack): Boolean = filters.isNotEmpty() && filters.any { !it.allowsItem(itemStack) }
     
-    fun isSameInventory(other: FilteredNetworkedInventory) = inventory == other.inventory
+    fun canExchangeItemsWith(other: FilteredNetworkedInventory): Boolean = inventory.canExchangeItemsWith(other.inventory)
     
 }
 
@@ -78,6 +78,7 @@ internal class ItemNetworkChannel {
                 addConsumer(holder, face)
                 addProvider(holder, face)
             }
+            
             else -> throw UnsupportedOperationException()
         }
         

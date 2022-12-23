@@ -4,22 +4,33 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.content.FontChar
+import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 
-typealias ModelData = Pair<Map<Material, ItemModelData>?, BlockModelData?>
+data class ModelData(
+    val item: Map<Material, ItemModelData>? = null,
+    val block: BlockModelData? = null,
+    val armor: NamespacedId? = null
+)
 
 object Resources {
     
     internal lateinit var modelDataLookup: Map<String, ModelData>
+    internal lateinit var armorDataLookup: Map<String, ArmorTexture>
     internal lateinit var guiDataLookup: Map<String, FontChar>
     internal lateinit var wailaDataLookup: Map<String, FontChar>
     internal lateinit var textureIconLookup: Map<String, FontChar>
     internal lateinit var languageLookup: Map<String, Map<String, String>>
     
-    internal fun updateModelDataLookup(modelDataLookup: Map<String, ModelData>) {
-        this.modelDataLookup = modelDataLookup
-        PermanentStorage.store("modelDataLookup", modelDataLookup)
+    internal fun updateModelDataLookup(modelDataLookup: Map<NamespacedId, ModelData>) {
+        this.modelDataLookup = modelDataLookup.mapKeysTo(HashMap()) { it.key.toString() }
+        PermanentStorage.store("modelDataLookup", this.modelDataLookup)
+    }
+    
+    internal fun updateArmorDataLookup(armorDataLookup: Map<NamespacedId, ArmorTexture>) {
+        this.armorDataLookup = armorDataLookup.mapKeysTo(HashMap()) { it.key.toString() }
+        PermanentStorage.store("armorDataLookup", this.armorDataLookup)
     }
     
     internal fun updateGuiDataLookup(guiDataLookup: Map<String, FontChar>) {
@@ -64,6 +75,30 @@ object Resources {
     
     fun getModelDataOrNull(id: String): ModelData? {
         return modelDataLookup[id]
+    }
+    
+    fun getArmorData(id: NamespacedId): ArmorTexture {
+        return armorDataLookup[id.toString()]!!
+    }
+    
+    fun getArmorData(path: ResourcePath): ArmorTexture {
+        return armorDataLookup[path.toString()]!!
+    }
+    
+    fun getArmorData(id: String): ArmorTexture {
+        return armorDataLookup[id]!!
+    }
+    
+    fun getArmorDataOrNull(id: NamespacedId): ArmorTexture? {
+        return armorDataLookup[id.toString()]
+    }
+    
+    fun getArmorDataOrNull(path: ResourcePath): ArmorTexture? {
+        return armorDataLookup[path.toString()]
+    }
+    
+    fun getArmorDataOrNull(id: String): ArmorTexture? {
+        return armorDataLookup[id]
     }
     
     fun getGUIChar(id: NamespacedId): FontChar {

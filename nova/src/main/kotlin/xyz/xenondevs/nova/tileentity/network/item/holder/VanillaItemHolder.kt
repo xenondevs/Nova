@@ -16,11 +16,13 @@ internal abstract class VanillaItemHolder(
     final override val endPoint: ItemStorageVanillaTileEntity
 ) : ItemHolder {
     
+    override val mergedInventory: NetworkedInventory? = null
+    
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
         endPoint.retrieveData("itemConfig") { CUBE_FACES.associateWithTo(emptyEnumMap()) { NetworkConnectionType.INSERT } }
     
     override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType> by lazy {
-        inventories.entries.associate { (_, inv) -> inv to NetworkConnectionType.BUFFER }
+        containerConfig.entries.associate { (_, inv) -> inv to NetworkConnectionType.BUFFER }
     }
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
@@ -51,7 +53,7 @@ internal abstract class VanillaItemHolder(
 
 internal class StaticVanillaItemHolder(
     endPoint: ItemStorageVanillaTileEntity,
-    override val inventories: MutableMap<BlockFace, NetworkedInventory>
+    override val containerConfig: MutableMap<BlockFace, NetworkedInventory>
 ) : VanillaItemHolder(endPoint)
 
 internal class DynamicVanillaItemHolder(
@@ -60,7 +62,7 @@ internal class DynamicVanillaItemHolder(
     val allowedConnectionTypesGetter: () -> Map<NetworkedInventory, NetworkConnectionType>
 ) : VanillaItemHolder(endPoint) {
     
-    override val inventories: MutableMap<BlockFace, NetworkedInventory>
+    override val containerConfig: MutableMap<BlockFace, NetworkedInventory>
         get() = inventoriesGetter()
     
     override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType>

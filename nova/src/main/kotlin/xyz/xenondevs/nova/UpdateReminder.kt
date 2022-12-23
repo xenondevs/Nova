@@ -19,7 +19,6 @@ import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
-import java.io.IOException
 import java.net.URL
 
 internal object UpdateReminder : Initializable(), Listener {
@@ -99,7 +98,7 @@ internal object UpdateReminder : Initializable(), Listener {
             val newVersion = Version(URL("https://api.spigotmc.org/legacy/update.php?resource=$id").readText())
             if (newVersion > currentVersion)
                 needsUpdate += addon
-        } catch (e: IOException) {
+        } catch (ignored: Throwable) {
             LOGGER.warning("Failed to connect to SpigotMC while trying to check for updates")
         }
     }

@@ -15,7 +15,6 @@ import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.formatSafely
 import xyz.xenondevs.nova.util.runAsyncTask
-import java.io.File
 
 object LocaleManager : Initializable() {
     
@@ -40,7 +39,7 @@ object LocaleManager : Initializable() {
         loadingLangs += lang
         
         if (NOVA.isEnabled) runAsyncTask {
-            val file = File(ResourcePackBuilder.MCASSETS_DIR, "assets/minecraft/lang/$lang.json")
+            val file = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/lang/$lang.json")
             val json = file.parseJson() as JsonObject
             val translations = json.entrySet().associateTo(HashMap()) { it.key to it.value.asString }
             

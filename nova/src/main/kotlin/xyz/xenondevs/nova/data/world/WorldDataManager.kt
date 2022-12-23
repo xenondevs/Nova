@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package xyz.xenondevs.nova.data.world
 
 import org.bukkit.Bukkit
@@ -148,36 +150,40 @@ internal object WorldDataManager : Initializable(), Listener {
                     }
                 } catch (t: Throwable) {
                     LOGGER.log(Level.SEVERE, "Failed to load chunk $pos", t)
+                } finally {
+                    // task is completed
+                    latch.open()
                 }
-                
-                // task is completed
-                latch.open()
             }
+        } else {
+            // task will not run
+            latch.open()
         }
-        
-        // task will not run
-        latch.open()
     }
     
     private fun unloadChunk(pos: ChunkPos, latch: Latch) {
-        // get chunk
-        val chunk = worlds[pos.worldUUID]
-            ?.getRegionOrNull(pos)
-            ?.getChunk(pos)
-            ?: return
-        
-        chunk.lock.write {
-            // check that the RegionChunk is actually loaded
-            if (!chunk.isLoaded)
-                return
-            // unload all block states
-            chunk.blockStates.values.forEach { it.handleRemoved(false) }
-            // mark RegionChunk as unloaded
-            chunk.isLoaded = false
+        try {
+            // get chunk
+            val chunk = worlds[pos.worldUUID]
+                ?.getRegionOrNull(pos)
+                ?.getChunk(pos)
+                ?: return
+            
+            chunk.lock.write {
+                // check that the RegionChunk is actually loaded
+                if (!chunk.isLoaded)
+                    return
+                // unload all block states
+                chunk.blockStates.values.forEach { it.handleRemoved(false) }
+                // mark RegionChunk as unloaded
+                chunk.isLoaded = false
+            }
+        } catch (t: Throwable) {
+            LOGGER.log(Level.SEVERE, "Failed to unload chunk $pos", t)
+        } finally {
+            // task is completed
+            latch.open()
         }
-        
-        // task is completed
-        latch.open()
     }
     
     private fun saveWorld(world: World) {
@@ -198,13 +204,13 @@ internal object WorldDataManager : Initializable(), Listener {
     fun removeBlockState(pos: BlockPos) =
         writeChunk(pos.chunkPos) { it.blockStates -= pos }
     
-    private fun getWorldStorage(world: World): WorldDataStorage =
+    fun getWorldStorage(world: World): WorldDataStorage =
         worlds.getOrPut(world.uid) { WorldDataStorage(world) }
     
-    private fun getRegion(pos: ChunkPos): RegionFile =
+    fun getRegion(pos: ChunkPos): RegionFile =
         getWorldStorage(pos.world!!).getRegion(pos)
     
-    private inline fun <T> readChunk(pos: ChunkPos, read: (RegionChunk) -> T): T {
+    inline fun <T> readChunk(pos: ChunkPos, read: (RegionChunk) -> T): T {
         val region = getRegion(pos)
         val chunk = region.getChunk(pos)
         chunk.lock.read {
@@ -212,7 +218,7 @@ internal object WorldDataManager : Initializable(), Listener {
         }
     }
     
-    private inline fun <T> writeChunk(pos: ChunkPos, write: (RegionChunk) -> T): T {
+    inline fun <T> writeChunk(pos: ChunkPos, write: (RegionChunk) -> T): T {
         val region = getRegion(pos)
         val chunk = region.getChunk(pos)
         chunk.lock.write {
