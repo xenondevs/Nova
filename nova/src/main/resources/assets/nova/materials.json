@@ -21,7 +21,7 @@
     "gui_horizontal_line": "item/gui/horizontal_line",
     "gui_horizontal_up": "item/gui/horizontal_up",
     "gui_inventory_part": "item/gui/inventory_part",
-    "gui_invisible": "item/gui/empty",
+    "gui_invisible": "item/empty",
     "gui_light_arrow_1_down": "item/gui/light_arrow_1_down",
     "gui_light_arrow_1_left": "item/gui/light_arrow_1_left",
     "gui_light_arrow_1_right": "item/gui/light_arrow_1_right",

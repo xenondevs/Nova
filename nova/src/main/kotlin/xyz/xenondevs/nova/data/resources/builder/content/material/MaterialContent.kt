@@ -77,7 +77,7 @@ internal class MaterialContent(
         modelObj.add(
             "textures",
             JsonObject().apply {
-                addProperty("layer0", "item/empty") // this fixes issues with leather armor colors
+                addProperty("layer0", "nova:item/empty") // this fixes issues with leather armor colors
                 addProperty("layer1", texturePath)
             }
         )
