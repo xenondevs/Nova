@@ -26,7 +26,6 @@ import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
-import org.bukkit.Instrument as BukkitInstrument
 
 private val PITCH_TABLE: FloatArray = floatArrayOf(
     0.5f, 0.53f, 0.56f, 0.59f, 0.63f, 0.67f, 0.71f, 0.75f, 0.79f, 0.84f,
@@ -51,7 +50,7 @@ internal object NoteBlockBehavior : BlockBehavior(NoteBlockStateConfig, false), 
     }
     
     fun playNote(vnb: VanillaNoteBlockTileEntity) {
-        val event = NotePlayEvent(vnb.block, vnb.instrument.bukkitInstrument ?: BukkitInstrument.PIANO, Note(vnb.note))
+        val event = NotePlayEvent(vnb.block, vnb.instrument.bukkitInstrument, Note(vnb.note))
         callEvent(event)
         
         if (event.isCancelled)

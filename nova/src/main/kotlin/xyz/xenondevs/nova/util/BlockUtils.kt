@@ -23,8 +23,11 @@ import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.Campfire
 import org.bukkit.block.Chest
 import org.bukkit.block.Container
+import org.bukkit.block.Jukebox
+import org.bukkit.block.Lectern
 import org.bukkit.block.ShulkerBox
 import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.Levelled
@@ -44,6 +47,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.soundGroup
+import xyz.xenondevs.nova.util.item.takeUnlessAir
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
@@ -337,12 +341,21 @@ fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
     
     val drops = ArrayList<ItemStack>()
     val state = state
-    if (state is Chest) {
-        drops += state.blockInventory.contents.filterNotNull()
-        state.blockInventory.clear()
-    } else if (state is Container && state !is ShulkerBox) {
-        drops += state.inventory.contents.filterNotNull()
-        state.inventory.clear()
+    when {
+        state is Chest ->
+            drops += state.blockInventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
+        
+        state is Container && state !is ShulkerBox ->
+            drops += state.inventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
+        
+        state is Lectern ->
+            drops += state.inventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
+        
+        state is Jukebox ->
+            state.record.takeUnlessAir()?.clone()?.also(drops::add)
+        
+        state is Campfire ->
+            repeat(4) { state.getItem(it)?.clone()?.also(drops::add) }
     }
     
     // don't include the actual block for creative players
