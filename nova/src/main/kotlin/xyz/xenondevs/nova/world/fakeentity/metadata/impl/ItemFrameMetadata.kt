@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.world.fakeentity.metadata.MetadataSerializers
 
 class ItemFrameMetadata : EntityMetadata() {
     
-    var item by entry(8, MetadataSerializers.ITEM_STACK, ItemStack.EMPTY)
+    var item: ItemStack by entry(8, MetadataSerializers.ITEM_STACK, ItemStack.EMPTY)
     var rotation: Int by entry(9, MetadataSerializers.VAR_INT, 0)
     
 }
