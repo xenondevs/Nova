@@ -5,11 +5,14 @@ import com.google.gson.JsonObject
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.parseJson
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.copyTo
+import kotlin.io.path.exists
+import kotlin.io.path.writeText
 
-internal class FontFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/lang") {
+internal class FontFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/lang") {
     
-    override fun merge(source: File, destination: File) {
+    override fun merge(source: Path, destination: Path) {
         if (!destination.exists()) {
             source.copyTo(destination)
             return

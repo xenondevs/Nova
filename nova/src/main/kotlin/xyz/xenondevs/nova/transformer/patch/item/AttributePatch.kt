@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.transformer.patch.item
 
 import com.google.common.collect.Multimap
 import com.google.common.collect.Multimaps
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
@@ -15,12 +14,11 @@ import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import xyz.xenondevs.nova.util.resourceLocation
 
 internal object AttributePatch : MethodTransformer(ReflectionRegistry.ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD, computeFrames = true) {
     
     /**
-     * Patches the ItemStack#getAttributeModifiers to return to correct modifiers for Nova's tools.
+     * Patches the ItemStack#getAttributeModifiers to return to correct modifiers for Nova's items.
      */
     override fun transform() {
         methodNode
@@ -50,7 +48,7 @@ internal object AttributePatch : MethodTransformer(ReflectionRegistry.ITEM_STACK
         // add new nova modifiers
         attributeModifiers.forEach {
             novaModifiers.put(
-                BuiltInRegistries.ATTRIBUTE.get(it.attribute.key.resourceLocation),
+                it.attribute,
                 AttributeModifier(it.uuid, it.name, it.value, AttributeModifier.Operation.values()[it.operation.ordinal])
             )
         }

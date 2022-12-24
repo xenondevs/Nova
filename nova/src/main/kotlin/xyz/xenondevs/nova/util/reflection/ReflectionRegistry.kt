@@ -7,8 +7,10 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.players.PlayerList
 import net.minecraft.util.RandomSource
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.ItemCombinerMenu
 import net.minecraft.world.item.enchantment.EnchantmentCategory
@@ -79,6 +81,7 @@ internal object ReflectionRegistry {
     val ITEM_STACK_GET_MAX_STACK_SIZE_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getMaxStackSize)")
     val PLAYER_LIST_BROADCAST_METHOD = getMethod(PlayerList::class, false, "SRM(net.minecraft.server.players.PlayerList broadcast)", MojangPlayer::class, Double::class, Double::class, Double::class, Double::class, ResourceKey::class, Packet::class)
     val BLOCK_PLAYER_WILL_DESTROY_METHOD = getMethod(MojangBlock::class, false, "SRM(net.minecraft.world.level.block.Block playerWillDestroy)", Level::class, BlockPos::class, BlockState::class, MojangPlayer::class)
+    val INVENTORY_HURT_ARMOR_METHOD = getMethod(Inventory::class, false, "SRM(net.minecraft.world.entity.player.Inventory hurtArmor)", DamageSource::class, Float::class, IntArray::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

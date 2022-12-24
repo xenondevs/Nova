@@ -20,7 +20,7 @@ object ToolCategoryRegistry {
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
         genericMultipliers: Map<Material, Double>,
-        getIcon: ((ToolLevel?) -> ResourcePath)? = null
+        getIcon: ((ToolTier?) -> ResourcePath)? = null
     ): VanillaToolCategory {
         return registerVanilla(
             name,
@@ -40,7 +40,7 @@ object ToolCategoryRegistry {
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
         genericMultipliers: Map<Material, Double>,
         specialMultipliers: Map<Material, Map<Predicate<Material>, Double>>,
-        getIcon: ((ToolLevel?) -> ResourcePath)? = null
+        getIcon: ((ToolTier?) -> ResourcePath)? = null
     ): VanillaToolCategory {
         val flatSpecialMultipliers = specialMultipliers.mapValuesTo(enumMapOf()) { (_, map) ->
             Material.values()
@@ -66,7 +66,7 @@ object ToolCategoryRegistry {
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
         genericMultipliers: Map<Material, Double>,
         specialMultipliers: Map<Material, Map<Material, Double>>,
-        getIcon: ((ToolLevel?) -> ResourcePath)? = null
+        getIcon: ((ToolTier?) -> ResourcePath)? = null
     ): VanillaToolCategory {
         val id = NamespacedId("minecraft", name)
         check(id !in _categories) { "A ToolCategory is already registered under that id." }
@@ -78,9 +78,12 @@ object ToolCategoryRegistry {
             genericMultipliers,
             specialMultipliers,
             getIcon ?: {
-                if (it != null)
-                    ResourcePath(it.id.namespace, "item/${it.id.name}_$name")
-                else ResourcePath("minecraft", "item/wooden_$name")
+                val path = when (it) {
+                    ToolTier.WOOD, ToolTier.GOLD -> "item/${it.id.name}en_$name"
+                    null -> "item/wooden_$name"
+                    else -> "item/${it.id.name}_${name}"
+                }
+                ResourcePath("minecraft", path)
             }
         )
         
@@ -90,7 +93,7 @@ object ToolCategoryRegistry {
     
     fun register(
         addon: Addon, name: String,
-        getIcon: (ToolLevel?) -> ResourcePath
+        getIcon: (ToolTier?) -> ResourcePath
     ): ToolCategory {
         val id = NamespacedId(addon, name)
         check(id !in _categories) { "A ToolCategory is already registered under that id." }

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.addon.loader
 
+import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonDescription
@@ -23,7 +24,7 @@ internal class AddonLoader(val file: File) {
         description = AddonDescription.deserialize(descriptionFile.reader())
         logger = AddonLogger(description.name)
         
-        if (description.novaVersion.compareTo(NOVA.version, 2) != 0)
+        if (!IS_DEV_SERVER && description.novaVersion.compareTo(NOVA.version, 2) != 0)
             throw InitializationException("This addon is made for a different version of Nova (v${description.novaVersion})")
     }
     

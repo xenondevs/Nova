@@ -8,7 +8,6 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -18,20 +17,19 @@ import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.enumMapOf
+import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.yaw
 
-internal abstract class BaseSideConfigGUI(
-    val holder: EndPointDataHolder
+internal abstract class BaseSideConfigGUI<H : EndPointDataHolder>(
+    val holder: H
 ) : SimpleGUI(9, 3) {
     
     private val configItems = enumMapOf<BlockFace, MutableList<Item>>()
-    
-    protected abstract fun changeConnectionType(blockFace: BlockFace, forward: Boolean): Boolean
-    protected abstract fun getConnectionType(blockFace: BlockFace): NetworkConnectionType
     
     fun registerConfigItem(blockFace: BlockFace, item: Item) {
         configItems.getOrPut(blockFace, ::ArrayList) += item
@@ -62,10 +60,30 @@ internal abstract class BaseSideConfigGUI(
         configItems[blockFace]?.forEach(Item::notifyWindows)
     }
     
+    private fun changeConnectionType(blockFace: BlockFace, forward: Boolean): Boolean {
+        NetworkManager.execute { // TODO: runSync / runAsync ?
+            it.removeEndPoint(holder.endPoint, false)
+            
+            val allowedTypes = getAllowedConnectionTypes(blockFace)
+            val currentType = holder.connectionConfig[blockFace]!!
+            var index = allowedTypes.indexOf(currentType)
+            index = (index + if (forward) 1 else -1).mod(allowedTypes.size)
+            holder.connectionConfig[blockFace] = allowedTypes[index]
+            
+            it.addEndPoint(holder.endPoint, false)
+                .thenRun { holder.endPoint.updateNearbyBridges() }
+        }
+        
+        return true
+    }
+    
+    protected abstract fun getAllowedConnectionTypes(blockFace: BlockFace): List<NetworkConnectionType>
+    
     inner class ConnectionConfigItem(blockSide: BlockSide) : ConfigItem(blockSide) {
         
         override fun getItemProvider(): ItemProvider {
-            return when (getConnectionType(blockFace)) {
+            val connectionType = holder.connectionConfig[blockFace]!! // fixme: Unsafe network value access. Should only be accessed from NetworkManager thread.
+            return when (connectionType) {
                 NetworkConnectionType.NONE ->
                     CoreGUIMaterial.GRAY_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GRAY, "menu.nova.side_config.none")
                 NetworkConnectionType.EXTRACT ->
@@ -79,7 +97,7 @@ internal abstract class BaseSideConfigGUI(
     
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (changeConnectionType(blockFace, clickType.isLeftClick)) {
-                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                player.playClickSound()
                 updateConfigItems(blockFace)
             }
         }

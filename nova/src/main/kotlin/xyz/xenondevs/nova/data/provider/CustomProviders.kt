@@ -15,10 +15,15 @@ fun <T> lazyProvider(initializer: () -> Provider<T>): Provider<T> =
 fun <T> combinedLazyProvider(initializer: () -> List<Provider<T>>): Provider<List<T>> =
     LazyProvider { CombinedProvider(initializer()) }
 
+fun <T> lazyProviderWrapper(initializer: () -> T): Provider<T> =
+    LazyProvider { ProviderWrapper(initializer()) }
+
 private class ProviderWrapper<T>(private val staticValue: T) : Provider<T>() {
+    
     override fun loadValue(): T {
         return staticValue
     }
+    
 }
 
 private class CombinedProvider<T>(private val providers: List<Provider<out T>>) : Provider<List<T>>() {

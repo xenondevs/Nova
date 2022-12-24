@@ -10,12 +10,16 @@ import xyz.xenondevs.nova.util.data.getInt
 import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.data.set
-import java.io.File
+import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.copyTo
+import kotlin.io.path.exists
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.writeText
 
-internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/models") {
+internal class ModelFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/models") {
     
-    override fun merge(source: File, destination: File) {
+    override fun merge(source: Path, destination: Path) {
         if (destination.exists()) {
             val sourceObj = source.parseJson() as? JsonObject ?: return
             val sourceOverrides = sourceObj.get("overrides") as? JsonArray ?: return
@@ -37,13 +41,13 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "as
         processOverrides(destination)
     }
     
-    private fun processOverrides(file: File) {
+    private fun processOverrides(file: Path) {
         val obj = file.parseJson() as? JsonObject ?: return
         val array = obj.get("overrides") as? JsonArray ?: return
         processOverrides(file, array)
     }
     
-    private fun processOverrides(file: File, array: JsonArray): JsonArray {
+    private fun processOverrides(file: Path, array: JsonArray): JsonArray {
         val matName = file.nameWithoutExtension.uppercase()
         val material = Material.values().firstOrNull { it.name == matName } ?: return array
         

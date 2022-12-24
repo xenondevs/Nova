@@ -77,9 +77,8 @@ val Block.id: NamespacedId
             return novaMaterial.id
         }
         
-        // TODO: Check CustomItemServiceManager
-        
-        return NamespacedId("minecraft", type.name.lowercase())
+        return CustomItemServiceManager.getId(this)?.let(NamespacedId::of)
+            ?: NamespacedId("minecraft", type.name.lowercase())
     }
 
 /**
@@ -271,7 +270,7 @@ fun Block.isUnobstructed(material: Material, player: Player? = null): Boolean {
  * @param showParticles If block break particles should be displayed
  */
 @Deprecated("Break sound and particles are not independent from one another", ReplaceWith("remove(ctx, showParticles || playSound)"))
-fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true) = remove(ctx, showParticles || playSound)
+fun Block.remove(ctx: BlockBreakContext, playSound: Boolean, showParticles: Boolean) = remove(ctx, showParticles || playSound)
 
 /**
  * Removes this block using the given [ctx].
@@ -280,16 +279,14 @@ fun Block.remove(ctx: BlockBreakContext, playSound: Boolean = true, showParticle
  *
  * @param ctx The [BlockBreakContext] to be used
  * @param breakEffects If break effects should be displayed (i.e. sounds and particle effects).
- * For vanilla blocks, this also includes some breaking logic (ice turning to water, unstable
- * tnt exploding, angering piglins, etc.)
  */
 fun Block.remove(
     ctx: BlockBreakContext,
-    breakEffects: Boolean
+    breakEffects: Boolean = true
 ) = removeInternal(ctx, breakEffects, true)
 
 internal fun Block.removeInternal(ctx: BlockBreakContext, breakEffects: Boolean, sendEffectsToBreaker: Boolean) {
-    if (CustomItemServiceManager.removeBlock(this, breakEffects, breakEffects))
+    if (CustomItemServiceManager.removeBlock(this, breakEffects))
         return
     if (BlockManager.removeBlockInternal(ctx, breakEffects, sendEffectsToBreaker))
         return

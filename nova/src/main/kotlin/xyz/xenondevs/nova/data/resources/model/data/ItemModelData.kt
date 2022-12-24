@@ -5,11 +5,12 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.unhandledTags
 
-open class ItemModelData(val id: String, val material: Material, val dataArray: IntArray) {
+open class ItemModelData(val id: NamespacedId, val material: Material, val dataArray: IntArray) {
     
     val data: Int
         get() = dataArray[0]
@@ -26,7 +27,7 @@ open class ItemModelData(val id: String, val material: Material, val dataArray: 
     
     private fun modifyNBT(itemStack: ItemStack, subId: Int): ItemStack {
         val novaCompound = CompoundTag()
-        novaCompound.putString("id", id)
+        novaCompound.putString("id", id.toString())
         novaCompound.putInt("subId", subId)
         
         val meta = itemStack.itemMeta!!

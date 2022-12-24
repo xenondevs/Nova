@@ -31,16 +31,10 @@ internal object MMOItems : CustomItemService {
         }
     }
     
-    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
+    override fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
         if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) return false
         block.type = Material.AIR
         return true
-    }
-    
-    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
-        val customBlock = mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null) ?: return null
-        block.type = Material.AIR
-        return listOf(customBlock.item)
     }
     
     override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
@@ -73,17 +67,17 @@ internal object MMOItems : CustomItemService {
         return if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) null else CustomBlockType.NORMAL
     }
     
-    override fun getItemByName(name: String): ItemStack? {
-        if (name.startsWith("mmoitems:")) {
-            val itemName = name.removePrefix("mmoitems:").uppercase()
+    override fun getItemById(id: String): ItemStack? {
+        if (id.startsWith("mmoitems:")) {
+            val itemName = id.removePrefix("mmoitems:").uppercase()
             return itemTypes.firstNotNullOfOrNull { mmoItems.getItem(it, itemName) }
         }
         
         return null
     }
     
-    override fun getItemTest(name: String): SingleItemTest? {
-        return getItemByName(name)?.let { MMOItemTest(name, it) }
+    override fun getItemTest(id: String): SingleItemTest? {
+        return getItemById(id)?.let { MMOItemTest(id, it) }
     }
     
     override fun getId(item: ItemStack): String? {
@@ -108,6 +102,10 @@ internal object MMOItems : CustomItemService {
     
     override fun hasRecipe(key: NamespacedKey): Boolean {
         return key.namespace == "mmoitems"
+    }
+    
+    override fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
+        return null
     }
     
     override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {

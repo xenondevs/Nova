@@ -11,7 +11,6 @@ import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -23,6 +22,7 @@ import xyz.xenondevs.nova.ui.item.ScrollLeftItem
 import xyz.xenondevs.nova.ui.item.ScrollRightItem
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 
 class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Unit) {
@@ -125,7 +125,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
 class OpenUpgradesItem(private val upgradeHolder: UpgradeHolder) : SimpleItem(CoreGUIMaterial.UPGRADES_BTN.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+        player.playClickSound()
         upgradeHolder.gui.openWindow(player)
     }
     

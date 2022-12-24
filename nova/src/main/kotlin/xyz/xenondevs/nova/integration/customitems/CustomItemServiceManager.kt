@@ -29,12 +29,8 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.any { it.placeBlock(item, location, playSound) }
     }
     
-    fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
-        return PLUGINS.any { it.removeBlock(block, playSound, showParticles) }
-    }
-    
-    fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
-        return PLUGINS.firstNotNullOfOrNull { it.breakBlock(block, tool, playSound, showParticles) }
+    fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
+        return PLUGINS.any { it.removeBlock(block, breakEffects) }
     }
     
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
@@ -50,7 +46,7 @@ object CustomItemServiceManager : Initializable() {
     }
     
     fun getItemByName(name: String): ItemStack? {
-        return PLUGINS.firstNotNullOfOrNull { it.getItemByName(name) }
+        return PLUGINS.firstNotNullOfOrNull { it.getItemById(name) }
     }
     
     fun getItemTest(name: String): SingleItemTest? {
@@ -73,12 +69,12 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.firstNotNullOfOrNull { it.getName(block, locale) }
     }
     
-    fun getNameKey(item: ItemStack): String? {
-        return PLUGINS.firstNotNullOfOrNull { it.getId(item) }
-    }
-    
     fun hasRecipe(key: NamespacedKey): Boolean {
         return PLUGINS.any { it.hasRecipe(key) }
+    }
+    
+    fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
+        return PLUGINS.firstNotNullOfOrNull { it.canBreakBlock(block, tool) }
     }
     
     fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {

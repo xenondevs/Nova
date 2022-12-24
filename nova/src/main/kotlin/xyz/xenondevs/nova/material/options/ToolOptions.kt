@@ -7,24 +7,24 @@ import xyz.xenondevs.nova.data.provider.orElse
 import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolCategoryRegistry
-import xyz.xenondevs.nova.item.tool.ToolLevel
-import xyz.xenondevs.nova.item.tool.ToolLevelRegistry
+import xyz.xenondevs.nova.item.tool.ToolTier
+import xyz.xenondevs.nova.item.tool.ToolTierRegistry
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 
 @HardcodedMaterialOptions
 fun ToolOptions(
-    level: ToolLevel,
+    tier: ToolTier,
     category: ToolCategory,
     breakSpeed: Double,
     attackDamage: Double? = null,
     attackSpeed: Double? = null,
     canSweepAttack: Boolean = false,
     canBreakBlocksInCreative: Boolean = category != ToolCategory.SWORD
-): ToolOptions = HardcodedToolOptions(level, category, breakSpeed, attackDamage, attackSpeed, canSweepAttack, canBreakBlocksInCreative)
+): ToolOptions = HardcodedToolOptions(tier, category, breakSpeed, attackDamage, attackSpeed, canSweepAttack, canBreakBlocksInCreative)
 
 sealed interface ToolOptions {
     
-     val levelProvider: Provider<ToolLevel>
+     val tierProvider: Provider<ToolTier>
      val categoryProvider: Provider<ToolCategory>
      val breakSpeedProvider: Provider<Double>
      val attackDamageProvider: Provider<Double?>
@@ -32,8 +32,8 @@ sealed interface ToolOptions {
      val canSweepAttackProvider: Provider<Boolean>
      val canBreakBlocksInCreativeProvider: Provider<Boolean>
     
-    val level: ToolLevel
-        get() = levelProvider.value
+    val tier: ToolTier
+        get() = tierProvider.value
     val category: ToolCategory
         get() = categoryProvider.value
     val breakSpeed: Double
@@ -60,16 +60,16 @@ sealed interface ToolOptions {
 }
 
 private class HardcodedToolOptions(
-     level: ToolLevel,
-     category: ToolCategory,
-     breakSpeed: Double,
-     attackDamage: Double?,
-     attackSpeed: Double?,
-     canSweepAttack: Boolean,
-     canBreakBlocksInCreative: Boolean
+    tier: ToolTier,
+    category: ToolCategory,
+    breakSpeed: Double,
+    attackDamage: Double?,
+    attackSpeed: Double?,
+    canSweepAttack: Boolean,
+    canBreakBlocksInCreative: Boolean
 ) : ToolOptions {
     
-    override val levelProvider = provider(level)
+    override val tierProvider = provider(tier)
     override val categoryProvider = provider(category)
     override val breakSpeedProvider = provider(breakSpeed)
     override val attackDamageProvider = provider(attackDamage)
@@ -81,7 +81,7 @@ private class HardcodedToolOptions(
 
 private class ConfigurableToolOptions : ConfigAccess, ToolOptions {
     
-    override val levelProvider = getEntry<String>("tool_level").map { ToolLevelRegistry.of(it)!! }
+    override val tierProvider = getEntry<String>("tool_tier", "tool_level").map { ToolTierRegistry.of(it)!! }
     override val categoryProvider = getEntry<String>("tool_category").map { ToolCategoryRegistry.of(it)!! }
     override val breakSpeedProvider = getEntry<Double>("break_speed")
     override val attackDamageProvider = getOptionalEntry<Double>("attack_damage")

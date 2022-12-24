@@ -4,11 +4,13 @@ import com.google.gson.JsonObject
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.data.writeToFile
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.copyTo
+import kotlin.io.path.exists
 
-internal class AtlasFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/atlases") {
+internal class AtlasFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/atlases") {
     
-    override fun merge(source: File, destination: File) {
+    override fun merge(source: Path, destination: Path) {
         if (destination.exists()) {
             val destJson = destination.parseJson() as JsonObject
             val sourceAtlasSources = (source.parseJson() as JsonObject).getAsJsonArray("sources")

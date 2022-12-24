@@ -14,12 +14,12 @@ import java.util.function.Predicate
 
 /**
  * @param id The [NamespacedId] of this [ToolCategory]
- * @param getIcon Retrieves the icon for this [ToolCategory] with a given [ToolLevel]. An example id would
+ * @param getIcon Retrieves the icon for this [ToolCategory] with a given [ToolTier]. An example id would
  * be `minecraft:item/diamond_pickaxe` for the `minecraft:pickaxe` category and `minecraft:diamond` level.
  */
 open class ToolCategory internal constructor(
     val id: NamespacedId,
-    val getIcon: (ToolLevel?) -> ResourcePath
+    val getIcon: (ToolTier?) -> ResourcePath
 ) {
     
     fun isCorrectToolCategoryForBlock(block: Block): Boolean {
@@ -176,5 +176,5 @@ class VanillaToolCategory internal constructor(
     val itemDamageOnBreakBlock: Int,
     val genericMultipliers: Map<Material, Double>,
     val specialMultipliers: Map<Material, Map<Material, Double>>,
-    getIcon: (ToolLevel?) -> ResourcePath
+    getIcon: (ToolTier?) -> ResourcePath
 ) : ToolCategory(id, getIcon)

@@ -1,10 +1,15 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
-
 package xyz.xenondevs.nova.data.resources
+
+import java.io.File
 
 data class ResourcePath(val namespace: String, val path: String) {
     
     private val id = "$namespace:$path"
+    
+    fun getFile(assetsDir: File, extraPath: String, extension: String? = null): File {
+        return File(assetsDir, "$namespace/$extraPath/$path" + if (extension != null) ".$extension" else "")
+    }
     
     override fun equals(other: Any?): Boolean {
         return other is ResourcePath && other.id == id

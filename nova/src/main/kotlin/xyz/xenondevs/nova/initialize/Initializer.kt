@@ -62,7 +62,6 @@ import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.loot.LootConfigHandler
 import xyz.xenondevs.nova.world.loot.LootGeneration
-import xyz.xenondevs.particle.utils.ReflectionUtils
 import java.util.*
 import java.util.logging.Level
 import kotlin.reflect.jvm.jvmName
@@ -88,7 +87,6 @@ internal object Initializer : Listener {
     fun initPreWorld() {
         registerEvents()
         
-        ReflectionUtils.setPlugin(NOVA)
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
         

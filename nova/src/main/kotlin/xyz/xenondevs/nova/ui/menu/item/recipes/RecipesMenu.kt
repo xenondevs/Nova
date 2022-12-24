@@ -21,7 +21,6 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -34,6 +33,7 @@ import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.playClickSound
 import java.util.*
 
 fun Player.showRecipes(item: ItemStack) = showRecipes(ItemUtils.getId(item))
@@ -199,7 +199,7 @@ private class RecipesWindow(
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.hasPageBefore()) {
-                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                player.playClickSound()
                 gui.goBack()
                 updateTitle()
             }
@@ -215,7 +215,7 @@ private class RecipesWindow(
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.hasNextPage()) {
-                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+                player.playClickSound()
                 gui.goForward()
                 updateTitle()
             }

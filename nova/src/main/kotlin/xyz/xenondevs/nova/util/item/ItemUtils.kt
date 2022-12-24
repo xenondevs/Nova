@@ -96,8 +96,12 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     return first.isSimilar(second)
 }
 
+@Deprecated("Replaced by ItemStack.takeUnlessEmpty", ReplaceWith("takeUnlessEmpty()"))
 fun ItemStack.takeUnlessAir(): ItemStack? =
     if (type.isAir) null else this
+
+fun ItemStack.takeUnlessEmpty(): ItemStack? =
+    if (type.isAir || amount <= 0) null else this
 
 inline fun <reified K> ItemStack.retrieveData(key: NamespacedKey, getAlternative: () -> K): K {
     val persistentDataContainer = itemMeta?.persistentDataContainer ?: return getAlternative()
@@ -279,7 +283,7 @@ object ItemUtils {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) return novaMaterial.id.toString()
         
-        val customNameKey = CustomItemServiceManager.getNameKey(itemStack)
+        val customNameKey = CustomItemServiceManager.getId(itemStack)
         if (customNameKey != null) return customNameKey
         
         return "minecraft:${itemStack.type.name.lowercase()}"

@@ -4,6 +4,7 @@ import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.data.config.ConfigAccess
 import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.nova.data.provider.orElse
 import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -60,8 +61,8 @@ private class HardcodedDamageableOptions(
 private class ConfigurableDamageableOptions : ConfigAccess, DamageableOptions {
     
     override val maxDurabilityProvider = getEntry<Int>("max_durability")
-    override val itemDamageOnAttackEntityProvider = getEntry<Int>("item_damage_on_attack_entity")
-    override val itemDamageOnBreakBlockProvider = getEntry<Int>("item_damage_on_break_block")
+    override val itemDamageOnAttackEntityProvider = getOptionalEntry<Int>("item_damage_on_attack_entity").orElse(0)
+    override val itemDamageOnBreakBlockProvider = getOptionalEntry<Int>("item_damage_on_break_block").orElse(0)
     override val repairIngredientProvider = getOptionalEntry<Any>("repair_ingredient").map {
         val list = when (it) {
             is String -> listOf(it)

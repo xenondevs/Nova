@@ -13,13 +13,12 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.tileentity.network.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
-import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
-import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.isRightClick
@@ -61,8 +60,7 @@ internal object WrenchBehavior : ItemBehavior() {
                             
                             when (mode) {
                                 NetworkType.ENERGY -> cycleEnergyConfig(holder as EnergyHolder, face)
-                                NetworkType.ITEMS -> cycleItemConfig(holder as ItemHolder, face)
-                                NetworkType.FLUID -> cycleFluidConfig(holder as FluidHolder, face)
+                                NetworkType.ITEMS, NetworkType.FLUID -> cycleContainerConfig(holder as ContainerEndPointDataHolder<*>, face)
                             }
                             
                             it.addEndPoint(endPoint, false).thenRun {
@@ -90,24 +88,14 @@ internal object WrenchBehavior : ItemBehavior() {
         energyHolder.connectionConfig[face] = allowedTypes[i]
     }
     
-    private fun cycleItemConfig(itemHolder: ItemHolder, face: BlockFace) {
-        val currentType = itemHolder.connectionConfig[face]!!
-        val inventory = itemHolder.inventories[face]!!
-        val allowedTypes = itemHolder.allowedConnectionTypes[inventory]!!.included
+    private fun cycleContainerConfig(holder: ContainerEndPointDataHolder<*>, face: BlockFace) {
+        val currentType = holder.connectionConfig[face]!!
+        val inventory = holder.containerConfig[face]!!
+        val allowedTypes = holder.allowedConnectionTypes[inventory]!!.included
         
         val i = (allowedTypes.indexOf(currentType) + 1) % allowedTypes.size
         
-        itemHolder.connectionConfig[face] = allowedTypes[i]
-    }
-    
-    private fun cycleFluidConfig(fluidHolder: FluidHolder, face: BlockFace) {
-        val currentType = fluidHolder.connectionConfig[face]!!
-        val container = fluidHolder.containerConfig[face]!!
-        val allowedTypes = fluidHolder.allowedConnectionTypes[container]!!.included
-        
-        val i = (allowedTypes.indexOf(currentType) + 1) % allowedTypes.size
-        
-        fluidHolder.connectionConfig[face] = allowedTypes[i]
+        holder.connectionConfig[face] = allowedTypes[i]
     }
     
 }

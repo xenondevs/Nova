@@ -13,12 +13,28 @@ fun <T, R> Provider<T?>.map(transform: (T & Any) -> R): Provider<R?> {
     return MapOrNullProvider(this, transform).also(::addChild)
 }
 
-fun <T, R : T & Any> Provider<T?>.orElse(value: R): Provider<R> {
+fun <T> Provider<T?>.orElse(value: T & Any): Provider<T & Any> {
     return FallbackValueProvider(this, value).also(::addChild)
 }
 
-fun <T, R : T & Any> Provider<T?>.orElse(provider: Provider<R>): Provider<R> {
+fun <T> Provider<T?>.orElseNullable(value: T?): Provider<T?> {
+    return NullableFallbackValueProvider(this, value).also(::addChild)
+}
+
+fun <T> Provider<T?>.orElse(provider: Provider<T & Any>): Provider<T & Any> {
     return FallbackProviderProvider(this, provider).also(::addChild)
+}
+
+@JvmName("else1")
+fun <T> Provider<T?>.orElse(provider: Provider<T?>): Provider<T?> {
+    return NullableFallbackProviderProvider(this, provider).also(::addChild)
+}
+
+fun <T> Provider<T?>.requireNonNull(message: String): Provider<T & Any> {
+    return MapEverythingProvider(this) {
+        check(it != null) { message }
+        it
+    }.also(::addChild)
 }
 
 fun <T, R> Provider<List<T>>.flatMap(transform: (T) -> List<R>): Provider<List<R>> {
@@ -86,21 +102,39 @@ private class MapOrNullProvider<T, R>(
     }
 }
 
-private class FallbackValueProvider<T, R : T & Any>(
+private class FallbackValueProvider<T>(
     private val provider: Provider<T>,
-    private val fallback: R
-) : Provider<R>() {
-    override fun loadValue(): R {
-        return (provider.value ?: fallback) as R
+    private val fallback: T & Any
+) : Provider<T & Any>() {
+    override fun loadValue(): T & Any {
+        return provider.value ?: fallback
     }
 }
 
-private class FallbackProviderProvider<T, R : T & Any>(
+private class NullableFallbackValueProvider<T>(
+    private val provider: Provider<T>,
+    private val fallback: T?
+) : Provider<T?>() {
+    override fun loadValue(): T? {
+        return provider.value ?: fallback
+    }
+}
+
+private class FallbackProviderProvider<T>(
     private val provider: Provider<T?>,
-    private val fallback: Provider<R>
-) : Provider<R>() {
-    override fun loadValue(): R {
-        return (provider.value ?: fallback.value) as R
+    private val fallback: Provider<T & Any>
+) : Provider<T & Any>() {
+    override fun loadValue(): T & Any {
+        return (provider.value ?: fallback.value)
+    }
+}
+
+private class NullableFallbackProviderProvider<T>(
+    private val provider: Provider<T?>,
+    private val fallback: Provider<T?>
+) : Provider<T?>() {
+    override fun loadValue(): T? {
+        return (provider.value) ?: fallback.value
     }
 }
 

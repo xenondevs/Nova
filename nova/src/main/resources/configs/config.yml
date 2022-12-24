@@ -7,23 +7,31 @@ resource_pack:
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:
     enabled: false
-  # Protection settings for the resource pack
-  protection:
-    # Renames resource pack textures and models
-    obfuscate: false
-    # Protects the zip from being opened in normal zip programs.
-    corrupt_entries: false
-  # Resource packs that should be merged with Nova's resource pack.
-  # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
-  base_packs: []
-  # A list of file extensions that shouldn't be excluded from the resource pack, even though they're not vanilla resource pack files.
-  whitelisted_file_types: []
-  # Defines what content is included in the generated resource pack.
-  # Excluding content will decrease the size of your resource pack but might also break some features.
-  content_filters: []
-  # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
-  # Please read the following documentation page before change this value:  https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
-  use_solid_blocks: true
+  # Settings affecting how the resource pack is generated.
+  generation:
+    # The resource pack description.
+    description: "Nova (%s asset pack(s), %s base pack(s))"
+    # Resource packs that should be merged with Nova's resource pack.
+    # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
+    base_packs: []
+    # The zip compression level, ranging from 0 (no compression) to 9 (best compression) or -1 for default.
+    compression_level: -1
+    # If the generation process should take place entirely in memory. This increases memory usage but improves generation speed.
+    in_memory: true
+    # Protection settings for the resource pack.
+    protection:
+      # Renames resource pack textures and models.
+      obfuscate: false
+      # Protects the zip from being opened in normal zip programs.
+      corrupt_entries: false
+    # A list of file extensions that shouldn't be excluded from the resource pack, even though they're not vanilla resource pack files.
+    whitelisted_file_types: []
+    # Excludes files from the resource pack. Excluding files will decrease the size of your resource pack but might also break some features.
+    # More information about resource filters can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/configuration/#resource-filters
+    resource_filters: []
+    # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
+    # Please read the following documentation page before change this value: https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
+    use_solid_blocks: true
   # If players currently loading the resource pack should be frozen.
   freeze_loading_players: false
 
