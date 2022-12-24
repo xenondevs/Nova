@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.NamespacedKey
+import org.bukkit.inventory.CookingRecipe
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -107,7 +108,7 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
     
     override fun deserialize(json: JsonObject, file: File): ShapelessRecipe {
         val resultKey = json.getString("result")!!
-        
+
         val result = getItemBuilder(resultKey)
             .setAmount(json.getInt("amount", default = 1))
             .get()
@@ -187,19 +188,22 @@ abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
     
 }
 
-internal object FurnaceRecipeDeserializer : ConversionRecipeDeserializer<FurnaceRecipe>() {
-    
-    override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): FurnaceRecipe {
+@Suppress("FINITE_BOUNDS_VIOLATION_IN_JAVA")
+internal class CookingRecipeDeserializer<T : CookingRecipe<T>>(
+    val ctor: (key: NamespacedKey, result: ItemStack, input: RecipeChoice, experience: Float, time: Int) -> T
+) : ConversionRecipeDeserializer<T>() {
+
+    override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): T {
         val experience = json.getFloat("experience")!!
-        
-        val recipe = FurnaceRecipe(key, result, input, experience, time)
-        
+
+        val recipe = ctor(key, result, input, experience, time)
+
         val category = json.getString("category")
             ?.let { CookingBookCategory.valueOf(it.uppercase()) }
             ?: CookingBookCategory.MISC
         recipe.category = category
-        
+
         return recipe
     }
-    
+
 }

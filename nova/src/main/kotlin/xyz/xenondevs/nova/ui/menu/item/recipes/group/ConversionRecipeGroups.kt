@@ -7,7 +7,7 @@ import de.studiocode.invui.item.Item
 import de.studiocode.invui.item.ItemWrapper
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
-import org.bukkit.inventory.FurnaceRecipe
+import org.bukkit.inventory.CookingRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.StonecuttingRecipe
@@ -23,8 +23,8 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
     
     override fun createGUI(container: RecipeContainer): GUI =
         when (container.type) {
-            RecipeType.FURNACE -> {
-                val recipe = container.recipe as FurnaceRecipe
+            RecipeType.FURNACE, RecipeType.BLAST_FURNACE, RecipeType.SMOKER, RecipeType.CAMPFIRE -> {
+                val recipe = container.recipe as CookingRecipe<*>
                 createConversionRecipeGUI(recipe.inputChoice, recipe.result, recipe.cookingTime)
             }
             RecipeType.STONECUTTER -> {
@@ -69,6 +69,21 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
 internal object SmeltingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.FURNACE))
+    override val texture = CoreGUITexture.RECIPE_SMELTING
+}
+internal object BlastingRecipeGroup : ConversionRecipeGroup() {
+    override val priority = 1
+    override val icon = ItemWrapper(ItemStack(Material.BLAST_FURNACE))
+    override val texture = CoreGUITexture.RECIPE_SMELTING
+}
+internal object SmokingRecipeGroup : ConversionRecipeGroup() {
+    override val priority = 1
+    override val icon = ItemWrapper(ItemStack(Material.SMOKER))
+    override val texture = CoreGUITexture.RECIPE_SMELTING
+}
+internal object CampfireRecipeGroup : ConversionRecipeGroup() {
+    override val priority = 1
+    override val icon = ItemWrapper(ItemStack(Material.CAMPFIRE))
     override val texture = CoreGUITexture.RECIPE_SMELTING
 }
 

@@ -117,6 +117,9 @@ object RecipeManager : Initializable(), Listener {
     private val shapedRecipes = HashMap<NamespacedKey, OptimizedShapedRecipe>()
     private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
     private val furnaceRecipes = HashMap<NamespacedKey, FurnaceRecipe>()
+    private val blastFurnaceRecipes = HashMap<NamespacedKey, BlastingRecipe>()
+    private val smokerRecipes = HashMap<NamespacedKey, SmokingRecipe>()
+    private val campfireRecipes = HashMap<NamespacedKey, CampfireRecipe>()
     private val registeredVanillaRecipeKeys = HashSet<NamespacedKey>()
     private val customVanillaRecipeKeys = HashSet<NamespacedKey>()
     private val _clientsideRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
@@ -164,13 +167,40 @@ object RecipeManager : Initializable(), Listener {
                             
                             _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                         }
-                        
+
                         is FurnaceRecipe -> {
                             furnaceRecipes[key] = recipe
-                            
+
                             val nmsRecipe = NovaFurnaceRecipe(recipe)
                             minecraftServer.recipeManager.addRecipe(nmsRecipe)
-                            
+
+                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
+                        }
+
+                        is BlastingRecipe -> {
+                            blastFurnaceRecipes[key] = recipe
+
+                            val nmsRecipe = NovaBlastFurnaceRecipe(recipe)
+                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
+
+                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
+                        }
+
+                        is SmokingRecipe -> {
+                            smokerRecipes[key] = recipe
+
+                            val nmsRecipe = NovaSmokerRecipe(recipe)
+                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
+
+                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
+                        }
+
+                        is CampfireRecipe -> {
+                            campfireRecipes[key] = recipe
+
+                            val nmsRecipe = NovaCampfireRecipe(recipe)
+                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
+
                             _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                         }
                         
