@@ -15,9 +15,10 @@ import java.io.File
 import java.io.InputStreamReader
 
 private const val MAVEN_CENTRAL = "https://repo1.maven.org/maven2/"
-private val MOJANG_MAPPED = System.getProperty("mojang-mapped") != null
 
 abstract class BuildLoaderJarTask : DefaultTask() {
+    
+    private val mojangMapped = project.hasProperty("mojang-mapped") || System.getProperty("mojang-mapped") != null
     
     @get:Input
     lateinit var nova: Project
@@ -71,8 +72,10 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         apiZip.close()
         
         // copy to custom output directory
-        val customOutDir = System.getProperty("outDir")?.let(::File) ?: return
-        customOutDir.mkdirs()
+        val customOutDir = (project.findProperty("outDir") as? String)?.let(::File)
+            ?: System.getProperty("outDir")?.let(::File)
+            ?: return
+        customOutDir.mkdirs() 
         val copyTo = File(customOutDir, outFile.name)
         outFile.inputStream().use { ins -> copyTo.outputStream().use { out -> ins.copyTo(out) } }
     }
@@ -125,7 +128,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     }
     
     private fun getArtifactCoords(dependency: DefaultExternalModuleDependency): String {
-        val artifact = dependency.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && !MOJANG_MAPPED }
+        val artifact = dependency.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && !mojangMapped }
         return if (artifact != null)
             "${dependency.group}:${dependency.name}:${artifact.extension}:${artifact.classifier}:${dependency.version}"
         else "${dependency.group}:${dependency.name}:${dependency.version}"
