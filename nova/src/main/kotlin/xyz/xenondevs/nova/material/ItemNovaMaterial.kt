@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.material
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
-import net.minecraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
@@ -40,7 +39,7 @@ open class ItemNovaMaterial internal constructor(
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            val itemDisplayData = novaItem.getPacketItemData(itemStack, CompoundTag())
+            val itemDisplayData = novaItem.getPacketItemData(null, itemStack.nmsCopy)
             ItemWrapper(
                 item.createClientsideItemBuilder(
                     itemDisplayData.name,
@@ -78,7 +77,7 @@ open class ItemNovaMaterial internal constructor(
      * It does not have a display name, lore, or any special nbt data.
      */
     fun createClientsideItemBuilder(): ItemBuilder =
-        item.createClientsideItemBuilder()
+        item.createClientsideItemBuilder().addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
     
     /**
      * Creates an [ItemStack] for this [ItemNovaMaterial].

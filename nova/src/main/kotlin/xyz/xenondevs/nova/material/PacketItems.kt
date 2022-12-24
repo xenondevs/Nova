@@ -35,7 +35,6 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.duplicate
@@ -284,7 +283,7 @@ internal object PacketItems : Initializable(), Listener {
             newItemTag.getCompound("display")
         } else CompoundTag().also { newItemTag.put("display", it) }
         
-        val itemDisplayData = novaItem.getPacketItemData(item.bukkitStack, newItemTag)
+        val itemDisplayData = novaItem.getPacketItemData(player, newItem)
         
         // name
         var itemDisplayName = itemDisplayData.name

@@ -1,8 +1,9 @@
 package xyz.xenondevs.nova.item.behavior
 
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
+import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.Bukkit
-import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.inventory.ClickType
@@ -64,24 +65,27 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         
         return@map listOf(
             AttributeModifier(
-                "nova armor ${this@Wearable.hashCode()}",
-                Attribute.GENERIC_ARMOR,
-                AttributeModifier.Operation.INCREMENT,
+                "Nova Armor",
+                Attributes.ARMOR,
+                Operation.ADDITION,
                 it[1] as Double,
+                true,
                 equipmentSlot
             ),
             AttributeModifier(
-                "nova armor toughness ${this@Wearable.hashCode()}",
-                Attribute.GENERIC_ARMOR_TOUGHNESS,
-                AttributeModifier.Operation.INCREMENT,
+                "Nova Armor Toughness",
+                Attributes.ARMOR_TOUGHNESS,
+                Operation.ADDITION,
                 it[2] as Double,
+                true,
                 equipmentSlot
             ),
             AttributeModifier(
-                "nova knockback resistance ${this@Wearable.hashCode()}",
-                Attribute.GENERIC_KNOCKBACK_RESISTANCE,
-                AttributeModifier.Operation.INCREMENT,
+                "Nova Knockback Resistance",
+                Attributes.KNOCKBACK_RESISTANCE,
+                Operation.ADDITION,
                 it[3] as Double,
+                true,
                 equipmentSlot
             )
         )

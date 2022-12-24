@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.server.players.PlayerList
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
@@ -25,6 +26,8 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.World
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer
@@ -44,6 +47,8 @@ import java.util.concurrent.atomic.AtomicInteger
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.entity.ai.attributes.Attribute as MojangAttribute
+import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttributeModifier
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
@@ -128,6 +133,30 @@ val BlockFace.nmsDirection: Direction
         BlockFace.UP -> Direction.UP
         BlockFace.DOWN -> Direction.DOWN
         else -> throw UnsupportedOperationException()
+    }
+
+val Attribute.nmsAttribute: MojangAttribute
+    get() = when(this) {
+        Attribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
+        Attribute.GENERIC_FOLLOW_RANGE -> Attributes.FOLLOW_RANGE
+        Attribute.GENERIC_KNOCKBACK_RESISTANCE -> Attributes.KNOCKBACK_RESISTANCE
+        Attribute.GENERIC_MOVEMENT_SPEED -> Attributes.MOVEMENT_SPEED
+        Attribute.GENERIC_FLYING_SPEED -> Attributes.FLYING_SPEED
+        Attribute.GENERIC_ATTACK_DAMAGE -> Attributes.ATTACK_DAMAGE
+        Attribute.GENERIC_ATTACK_KNOCKBACK -> Attributes.ATTACK_KNOCKBACK
+        Attribute.GENERIC_ATTACK_SPEED -> Attributes.ATTACK_SPEED
+        Attribute.GENERIC_ARMOR -> Attributes.ARMOR
+        Attribute.GENERIC_ARMOR_TOUGHNESS -> Attributes.ARMOR_TOUGHNESS
+        Attribute.GENERIC_LUCK -> Attributes.LUCK
+        Attribute.HORSE_JUMP_STRENGTH -> Attributes.JUMP_STRENGTH
+        Attribute.ZOMBIE_SPAWN_REINFORCEMENTS -> Attributes.SPAWN_REINFORCEMENTS_CHANCE
+    }
+
+val AttributeModifier.Operation.nmsOperation: MojangAttributeModifier.Operation
+    get() = when(this) {
+        AttributeModifier.Operation.ADD_NUMBER -> MojangAttributeModifier.Operation.ADDITION
+        AttributeModifier.Operation.ADD_SCALAR -> MojangAttributeModifier.Operation.MULTIPLY_BASE
+        AttributeModifier.Operation.MULTIPLY_SCALAR_1 -> MojangAttributeModifier.Operation.MULTIPLY_TOTAL
     }
 
 val Material.nmsBlock: MojangBlock
