@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SoundGroup</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>nova</span>
+            </a>
+    </div>
+    <div>
+0.12.10    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="nova::xyz.xenondevs.nova.world.block.sound/SoundGroup///PointingToDeclaration//1737632851">
+  <div class="breadcrumbs"><a href="../../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.block.sound</a><span class="delimiter">/</span><span class="current">SoundGroup</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Sound</span><wbr></wbr><span><span>Group</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">SoundGroup</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>volume<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>pitch<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>breakSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>stepSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>placeSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>hitSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fallSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section-body">
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="1208010896%2FConstructors%2F1737632851" anchor-label="SoundGroup" id="1208010896%2FConstructors%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-sound-group.html"><span>Sound</span><wbr></wbr><span><span>Group</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1208010896%2FConstructors%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-sound-group.html"><span class="token function">SoundGroup</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">volume<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">pitch<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">breakSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">stepSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">placeSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">hitSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">fallSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="2040784073%2FClasslikes%2F1737632851" anchor-label="Companion" id="2040784073%2FClasslikes%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2040784073%2FClasslikes%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="1677623260%2FFunctions%2F1737632851" anchor-label="playBreakSound" id="1677623260%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="play-break-sound.html"><span>play</span><wbr></wbr><span>Break</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1677623260%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-break-sound.html"><span class="token function">playBreakSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-break-sound.html"><span class="token function">playBreakSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">location<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1878732638%2FFunctions%2F1737632851" anchor-label="playFallSound" id="1878732638%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="play-fall-sound.html"><span>play</span><wbr></wbr><span>Fall</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1878732638%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-fall-sound.html"><span class="token function">playFallSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-fall-sound.html"><span class="token function">playFallSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">location<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="2034675012%2FFunctions%2F1737632851" anchor-label="playHitSound" id="2034675012%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="play-hit-sound.html"><span>play</span><wbr></wbr><span>Hit</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2034675012%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-hit-sound.html"><span class="token function">playHitSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-hit-sound.html"><span class="token function">playHitSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">location<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="599355372%2FFunctions%2F1737632851" anchor-label="playPlaceSound" id="599355372%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="play-place-sound.html"><span>play</span><wbr></wbr><span>Place</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="599355372%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-place-sound.html"><span class="token function">playPlaceSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-place-sound.html"><span class="token function">playPlaceSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">location<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1547219262%2FFunctions%2F1737632851" anchor-label="playStepSound" id="1547219262%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="play-step-sound.html"><span>play</span><wbr></wbr><span>Step</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1547219262%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-step-sound.html"><span class="token function">playStepSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="play-step-sound.html"><span class="token function">playStepSound</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">location<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="-2107969993%2FProperties%2F1737632851" anchor-label="breakPitch" id="-2107969993%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="break-pitch.html"><span>break</span><wbr></wbr><span><span>Pitch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2107969993%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-2107969993%2FProperties%2F1737632851" anchor-label="breakPitch" id="-2107969993%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="break-pitch.html">breakPitch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-601374904%2FProperties%2F1737632851" anchor-label="breakSound" id="-601374904%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="break-sound.html"><span>break</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-601374904%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-601374904%2FProperties%2F1737632851" anchor-label="breakSound" id="-601374904%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="break-sound.html">breakSound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1355079529%2FProperties%2F1737632851" anchor-label="breakVolume" id="1355079529%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="break-volume.html"><span>break</span><wbr></wbr><span><span>Volume</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1355079529%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="1355079529%2FProperties%2F1737632851" anchor-label="breakVolume" id="1355079529%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="break-volume.html">breakVolume</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1915867805%2FProperties%2F1737632851" anchor-label="fallPitch" id="1915867805%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="fall-pitch.html"><span>fall</span><wbr></wbr><span><span>Pitch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1915867805%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="1915867805%2FProperties%2F1737632851" anchor-label="fallPitch" id="1915867805%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="fall-pitch.html">fallPitch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-872504402%2FProperties%2F1737632851" anchor-label="fallSound" id="-872504402%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="fall-sound.html"><span>fall</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-872504402%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-872504402%2FProperties%2F1737632851" anchor-label="fallSound" id="-872504402%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="fall-sound.html">fallSound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1539999683%2FProperties%2F1737632851" anchor-label="fallVolume" id="1539999683%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="fall-volume.html"><span>fall</span><wbr></wbr><span><span>Volume</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1539999683%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="1539999683%2FProperties%2F1737632851" anchor-label="fallVolume" id="1539999683%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="fall-volume.html">fallVolume</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-760813429%2FProperties%2F1737632851" anchor-label="hitPitch" id="-760813429%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="hit-pitch.html"><span>hit</span><wbr></wbr><span><span>Pitch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-760813429%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-760813429%2FProperties%2F1737632851" anchor-label="hitPitch" id="-760813429%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="hit-pitch.html">hitPitch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="745781660%2FProperties%2F1737632851" anchor-label="hitSound" id="745781660%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="hit-sound.html"><span>hit</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="745781660%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="745781660%2FProperties%2F1737632851" anchor-label="hitSound" id="745781660%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="hit-sound.html">hitSound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="167260053%2FProperties%2F1737632851" anchor-label="hitVolume" id="167260053%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="hit-volume.html"><span>hit</span><wbr></wbr><span><span>Volume</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="167260053%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="167260053%2FProperties%2F1737632851" anchor-label="hitVolume" id="167260053%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="hit-volume.html">hitVolume</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1436689090%2FProperties%2F1737632851" anchor-label="pitch" id="1436689090%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="pitch.html"><span><span>pitch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1436689090%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="1436689090%2FProperties%2F1737632851" anchor-label="pitch" id="1436689090%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="pitch.html">pitch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1325641791%2FProperties%2F1737632851" anchor-label="placePitch" id="1325641791%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="place-pitch.html"><span>place</span><wbr></wbr><span><span>Pitch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1325641791%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="1325641791%2FProperties%2F1737632851" anchor-label="placePitch" id="1325641791%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="place-pitch.html">placePitch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1462730416%2FProperties%2F1737632851" anchor-label="placeSound" id="-1462730416%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="place-sound.html"><span>place</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1462730416%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-1462730416%2FProperties%2F1737632851" anchor-label="placeSound" id="-1462730416%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="place-sound.html">placeSound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="422862433%2FProperties%2F1737632851" anchor-label="placeVolume" id="422862433%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="place-volume.html"><span>place</span><wbr></wbr><span><span>Volume</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="422862433%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="422862433%2FProperties%2F1737632851" anchor-label="placeVolume" id="422862433%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="place-volume.html">placeVolume</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="2116230702%2FProperties%2F1737632851" anchor-label="stepPitch" id="2116230702%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="step-pitch.html"><span>step</span><wbr></wbr><span><span>Pitch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2116230702%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="2116230702%2FProperties%2F1737632851" anchor-label="stepPitch" id="2116230702%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="step-pitch.html">stepPitch</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-672141505%2FProperties%2F1737632851" anchor-label="stepSound" id="-672141505%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="step-sound.html"><span>step</span><wbr></wbr><span><span>Sound</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-672141505%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-672141505%2FProperties%2F1737632851" anchor-label="stepSound" id="-672141505%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="step-sound.html">stepSound</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-838685102%2FProperties%2F1737632851" anchor-label="stepVolume" id="-838685102%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="step-volume.html"><span>step</span><wbr></wbr><span><span>Volume</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-838685102%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-838685102%2FProperties%2F1737632851" anchor-label="stepVolume" id="-838685102%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="step-volume.html">stepVolume</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-429638594%2FProperties%2F1737632851" anchor-label="volume" id="-429638594%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="volume.html"><span><span>volume</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-429638594%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-429638594%2FProperties%2F1737632851" anchor-label="volume" id="-429638594%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="volume.html">volume</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>

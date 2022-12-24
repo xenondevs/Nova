@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>ObservableLock</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>nova</span>
+            </a>
+    </div>
+    <div>
+0.12.10    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="nova::xyz.xenondevs.nova.util.concurrent/ObservableLock///PointingToDeclaration//1737632851">
+  <div class="breadcrumbs"><a href="../../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.util.concurrent</a><span class="delimiter">/</span><span class="current">ObservableLock</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Observable</span><wbr></wbr><span><span>Lock</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">ObservableLock</a> : <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/ReentrantLock.html">ReentrantLock</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Extensions">Extensions</button></div>
+    <div class="tabs-section-body">
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="393484823%2FConstructors%2F1737632851" anchor-label="ObservableLock" id="393484823%2FConstructors%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-observable-lock.html"><span>Observable</span><wbr></wbr><span><span>Lock</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="393484823%2FConstructors%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-observable-lock.html"><span class="token function">ObservableLock</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="212836430%2FFunctions%2F1737632851" anchor-label="getHoldCount" id="212836430%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#212836430%2FFunctions%2F1737632851"><span>get</span><wbr></wbr><span>Hold</span><wbr></wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="212836430%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#212836430%2FFunctions%2F1737632851"><span class="token function">getHoldCount</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1148759848%2FFunctions%2F1737632851" anchor-label="getOwner" id="1148759848%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get-owner.html"><span>get</span><wbr></wbr><span><span>Owner</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1148759848%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="get-owner.html"><span class="token function">getOwner</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html">Thread</a><span class="token operator">?</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1818773977%2FFunctions%2F1737632851" anchor-label="getQueueLength" id="-1818773977%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-1818773977%2FFunctions%2F1737632851"><span>get</span><wbr></wbr><span>Queue</span><wbr></wbr><span><span>Length</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1818773977%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1818773977%2FFunctions%2F1737632851"><span class="token function">getQueueLength</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="945880798%2FFunctions%2F1737632851" anchor-label="getWaitQueueLength" id="945880798%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#945880798%2FFunctions%2F1737632851"><span>get</span><wbr></wbr><span>Wait</span><wbr></wbr><span>Queue</span><wbr></wbr><span><span>Length</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="945880798%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#945880798%2FFunctions%2F1737632851"><span class="token function">getWaitQueueLength</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/Condition.html">Condition</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1340367965%2FFunctions%2F1737632851" anchor-label="hasQueuedThread" id="1340367965%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#1340367965%2FFunctions%2F1737632851"><span>has</span><wbr></wbr><span>Queued</span><wbr></wbr><span><span>Thread</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1340367965%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#1340367965%2FFunctions%2F1737632851"><span class="token function">hasQueuedThread</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html">Thread</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="216371116%2FFunctions%2F1737632851" anchor-label="hasQueuedThreads" id="216371116%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#216371116%2FFunctions%2F1737632851"><span>has</span><wbr></wbr><span>Queued</span><wbr></wbr><span><span>Threads</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="216371116%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#216371116%2FFunctions%2F1737632851"><span class="token function">hasQueuedThreads</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1824742829%2FFunctions%2F1737632851" anchor-label="hasWaiters" id="-1824742829%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-1824742829%2FFunctions%2F1737632851"><span>has</span><wbr></wbr><span><span>Waiters</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1824742829%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1824742829%2FFunctions%2F1737632851"><span class="token function">hasWaiters</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/Condition.html">Condition</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-53021574%2FFunctions%2F1737632851" anchor-label="isFair" id="-53021574%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-53021574%2FFunctions%2F1737632851"><span>is</span><wbr></wbr><span><span>Fair</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-53021574%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-53021574%2FFunctions%2F1737632851"><span class="token function">isFair</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2067917755%2FFunctions%2F1737632851" anchor-label="isHeldByCurrentThread" id="-2067917755%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-2067917755%2FFunctions%2F1737632851"><span>is</span><wbr></wbr><span>Held</span><wbr></wbr><span>By</span><wbr></wbr><span>Current</span><wbr></wbr><span><span>Thread</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2067917755%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-2067917755%2FFunctions%2F1737632851"><span class="token function">isHeldByCurrentThread</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1988799724%2FFunctions%2F1737632851" anchor-label="isLocked" id="-1988799724%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-1988799724%2FFunctions%2F1737632851"><span>is</span><wbr></wbr><span><span>Locked</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1988799724%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="index.html#-1988799724%2FFunctions%2F1737632851"><span class="token function">isLocked</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="97812509%2FFunctions%2F1737632851" anchor-label="lock" id="97812509%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#97812509%2FFunctions%2F1737632851"><span><span>lock</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="97812509%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#97812509%2FFunctions%2F1737632851"><span class="token function">lock</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-89184684%2FFunctions%2F1737632851" anchor-label="lockInterruptibly" id="-89184684%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-89184684%2FFunctions%2F1737632851"><span>lock</span><wbr></wbr><span><span>Interruptibly</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-89184684%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-89184684%2FFunctions%2F1737632851"><span class="token function">lockInterruptibly</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1982859501%2FFunctions%2F1737632851" anchor-label="newCondition" id="1982859501%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#1982859501%2FFunctions%2F1737632851"><span>new</span><wbr></wbr><span><span>Condition</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1982859501%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#1982859501%2FFunctions%2F1737632851"><span class="token function">newCondition</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/Condition.html">Condition</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-98033540%2FFunctions%2F1737632851" anchor-label="toString" id="-98033540%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-98033540%2FFunctions%2F1737632851"><span>to</span><wbr></wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-98033540%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-98033540%2FFunctions%2F1737632851"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1100402184%2FFunctions%2F1737632851" anchor-label="tryLock" id="1100402184%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-1178549780%2FFunctions%2F1737632851"><span>try</span><wbr></wbr><span><span>Lock</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1100402184%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-1178549780%2FFunctions%2F1737632851"><span class="token function">tryLock</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#1855826344%2FFunctions%2F1737632851"><span class="token function">tryLock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/TimeUnit.html">TimeUnit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-590109340%2FFunctions%2F1737632851" anchor-label="unlock" id="-590109340%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="index.html#-590109340%2FFunctions%2F1737632851"><span><span>unlock</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-590109340%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-590109340%2FFunctions%2F1737632851"><span class="token function">unlock</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="tabbedcontent">Extensions</h2>
+      <div class="table" data-togglable="Extensions"><a data-name="-476661300%2FExtensions%2F1737632851" anchor-label="lockAndRun" id="-476661300%2FExtensions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../lock-and-run.html"><span>lock</span><wbr></wbr><span>And</span><wbr></wbr><span><span>Run</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-476661300%2FExtensions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="index.html">ObservableLock</a><span class="token punctuation">.</span><a href="../lock-and-run.html"><span class="token function">lockAndRun</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">run<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1607236771%2FExtensions%2F1737632851" anchor-label="tryLockAndRun" id="-1607236771%2FExtensions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../try-lock-and-run.html"><span>try</span><wbr></wbr><span>Lock</span><wbr></wbr><span>And</span><wbr></wbr><span><span>Run</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1607236771%2FExtensions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="index.html">ObservableLock</a><span class="token punctuation">.</span><a href="../try-lock-and-run.html"><span class="token function">tryLockAndRun</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">run<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>

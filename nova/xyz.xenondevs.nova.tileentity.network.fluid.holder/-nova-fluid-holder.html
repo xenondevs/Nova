@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>NovaFluidHolder</title>
+    <link href="../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../index.html">
+                    <span>nova</span>
+            </a>
+    </div>
+    <div>
+0.12.10    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="nova::xyz.xenondevs.nova.tileentity.network.fluid.holder//NovaFluidHolder/#TypeParam(bounds=[xyz.xenondevs.nova.tileentity.network.NetworkEndPoint, xyz.xenondevs.nova.data.serialization.DataHolder])#kotlin.Pair[xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer,xyz.xenondevs.nova.tileentity.network.NetworkConnectionType]#kotlin.Array[kotlin.Pair[xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer,xyz.xenondevs.nova.tileentity.network.NetworkConnectionType]]#kotlin.Function0[kotlin.collections.MutableMap[[Error type: Unresolved type for BlockFace],xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer]]#kotlin.Function0[java.util.EnumMap[[Error type: Unresolved type for BlockFace],xyz.xenondevs.nova.tileentity.network.NetworkConnectionType]]?/PointingToDeclaration//1737632851">
+  <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="index.html">xyz.xenondevs.nova.tileentity.network.fluid.holder</a><span class="delimiter">/</span><span class="current">NovaFluidHolder</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Nova</span><wbr></wbr><span>Fluid</span><wbr></wbr><span><span>Holder</span></span></h1>
+  </div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-nova-fluid-holder.html">T</a><span class="token operator"> : </span><a href="../xyz.xenondevs.nova.tileentity.network/-network-end-point/index.html">NetworkEndPoint</a>, <a href="../xyz.xenondevs.nova.data.serialization/-data-holder/index.html">DataHolder</a><span class="token operator">&gt; </span><a href="-nova-fluid-holder.html"><span class="token function">NovaFluidHolder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="-nova-fluid-holder.html">T</a><span class="token punctuation">, </span></span><span class="parameter ">defaultContainer<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network.fluid.container/-fluid-container/index.html">FluidContainer</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>otherContainers<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network.fluid.container/-fluid-container/index.html">FluidContainer</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultContainerConfig<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network.fluid.container/-fluid-container/index.html">FluidContainer</a><span class="token operator">&gt;</span><span class="token operator"> = </span>{ CUBE_FACES.associateWithToEnumMap { defaultContainer.first } }<span class="token punctuation">, </span></span><span class="parameter ">defaultConnectionConfig<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/EnumMap.html">EnumMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-nova-fluid-holder/index.html">NovaFluidHolder</a></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-nova-fluid-holder.html">T</a><span class="token operator"> : </span><a href="../xyz.xenondevs.nova.tileentity.network/-network-end-point/index.html">NetworkEndPoint</a>, <a href="../xyz.xenondevs.nova.data.serialization/-data-holder/index.html">DataHolder</a><span class="token operator">&gt; </span><a href="-nova-fluid-holder.html"><span class="token function">NovaFluidHolder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="-nova-fluid-holder.html">T</a><span class="token punctuation">, </span></span><span class="parameter ">availableContainers<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network.fluid.container/-fluid-container/index.html">FluidContainer</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">allowedConnectionTypes<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network.fluid.container/-fluid-container/index.html">FluidContainer</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultContainerConfig<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network.fluid.container/-fluid-container/index.html">FluidContainer</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultConnectionConfig<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/EnumMap.html">EnumMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-nova-fluid-holder/index.html">NovaFluidHolder</a></div></div></div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>

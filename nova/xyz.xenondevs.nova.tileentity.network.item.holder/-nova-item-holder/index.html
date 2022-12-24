@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>NovaItemHolder</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>nova</span>
+            </a>
+    </div>
+    <div>
+0.12.10    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="nova::xyz.xenondevs.nova.tileentity.network.item.holder/NovaItemHolder///PointingToDeclaration//1737632851">
+  <div class="breadcrumbs"><a href="../../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.tileentity.network.item.holder</a><span class="delimiter">/</span><span class="current">NovaItemHolder</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Nova</span><wbr></wbr><span>Item</span><wbr></wbr><span><span>Holder</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">NovaItemHolder</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.tileentity/-networked-tile-entity/index.html">NetworkedTileEntity</a><span class="token punctuation">, </span></span><span class="parameter ">availableInventories<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="../../xyz.xenondevs.nova.tileentity.network.item.inventory/-networked-inventory/index.html">NetworkedInventory</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>allowedConnectionTypes<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network.item.inventory/-networked-inventory/index.html">NetworkedInventory</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultInvConfig<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/EnumMap.html">EnumMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultConnectionConfig<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/EnumMap.html">EnumMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span> : <a href="../-item-holder/index.html">ItemHolder</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section-body">
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="1572613079%2FConstructors%2F1737632851" anchor-label="NovaItemHolder" id="1572613079%2FConstructors%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-nova-item-holder.html"><span>Nova</span><wbr></wbr><span>Item</span><wbr></wbr><span><span>Holder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1572613079%2FConstructors%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-nova-item-holder.html"><span class="token function">NovaItemHolder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.tileentity/-networked-tile-entity/index.html">NetworkedTileEntity</a><span class="token punctuation">, </span></span><span class="parameter ">availableInventories<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="../../xyz.xenondevs.nova.tileentity.network.item.inventory/-networked-inventory/index.html">NetworkedInventory</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">allowedConnectionTypes<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network.item.inventory/-networked-inventory/index.html">NetworkedInventory</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultInvConfig<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/EnumMap.html">EnumMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultConnectionConfig<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/EnumMap.html">EnumMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="1897175%2FFunctions%2F1737632851" anchor-label="compareTo" id="1897175%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../../xyz.xenondevs.nova.data.config/-reloadable/compare-to.html"><span>compare</span><wbr></wbr><span><span>To</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1897175%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../../xyz.xenondevs.nova.data.config/-reloadable/compare-to.html"><span class="token function">compareTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.data.config/-reloadable/index.html">Reloadable</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1312238334%2FFunctions%2F1737632851" anchor-label="getNetworkedInventory" id="1312238334%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="get-networked-inventory.html"><span>get</span><wbr></wbr><span>Networked</span><wbr></wbr><span><span>Inventory</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1312238334%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-networked-inventory.html"><span class="token function">getNetworkedInventory</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">virtualInventory<span class="token operator">: </span><span data-unresolved-link="de.studiocode.invui.virtualinventory/VirtualInventory///PointingToDeclaration/">VirtualInventory</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.tileentity.network.item.inventory/-networked-inventory/index.html">NetworkedInventory</a></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-networked-inventory.html"><span class="token function">getNetworkedInventory</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">uuid<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.tileentity.network.item.inventory/-networked-inventory/index.html">NetworkedInventory</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1307791040%2FFunctions%2F1737632851" anchor-label="isExtract" id="-1307791040%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-item-holder/is-extract.html"><span>is</span><wbr></wbr><span><span>Extract</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1307791040%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-item-holder/is-extract.html"><span class="token function">isExtract</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="443298140%2FFunctions%2F1737632851" anchor-label="isInsert" id="443298140%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../-item-holder/is-insert.html"><span>is</span><wbr></wbr><span><span>Insert</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="443298140%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../-item-holder/is-insert.html"><span class="token function">isInsert</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1314772398%2FFunctions%2F1737632851" anchor-label="reload" id="1314772398%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../../xyz.xenondevs.nova.data.config/-reloadable/reload.html"><span><span>reload</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1314772398%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="../../xyz.xenondevs.nova.data.config/-reloadable/reload.html"><span class="token function">reload</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1474948826%2FFunctions%2F1737632851" anchor-label="saveData" id="1474948826%2FFunctions%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="save-data.html"><span>save</span><wbr></wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1474948826%2FFunctions%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="save-data.html"><span class="token function">saveData</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Saves the data.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="-870868306%2FProperties%2F1737632851" anchor-label="allowedConnectionTypes" id="-870868306%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="allowed-connection-types.html"><span>allowed</span><wbr></wbr><span>Connection</span><wbr></wbr><span><span>Types</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-870868306%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-870868306%2FProperties%2F1737632851" anchor-label="allowedConnectionTypes" id="-870868306%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="allowed-connection-types.html">allowedConnectionTypes</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network.item.inventory/-networked-inventory/index.html">NetworkedInventory</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="464259788%2FProperties%2F1737632851" anchor-label="allowedFaces" id="464259788%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="../../xyz.xenondevs.nova.tileentity.network/-end-point-data-holder/allowed-faces.html"><span>allowed</span><wbr></wbr><span><span>Faces</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="464259788%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="464259788%2FProperties%2F1737632851" anchor-label="allowedFaces" id="464259788%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../../xyz.xenondevs.nova.tileentity.network/-end-point-data-holder/allowed-faces.html">allowedFaces</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><a data-name="464259788%2FProperties%2F1737632851" anchor-label="allowedFaces" id="464259788%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><p class="paragraph">A set of BlockFace where connections are allowed.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1675130353%2FProperties%2F1737632851" anchor-label="channels" id="1675130353%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="channels.html"><span><span>channels</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1675130353%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="1675130353%2FProperties%2F1737632851" anchor-label="channels" id="1675130353%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="channels.html">channels</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1127011329%2FProperties%2F1737632851" anchor-label="connectionConfig" id="1127011329%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="connection-config.html"><span>connection</span><wbr></wbr><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1127011329%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="1127011329%2FProperties%2F1737632851" anchor-label="connectionConfig" id="1127011329%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="connection-config.html">connectionConfig</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a><span class="token operator">&gt;</span></div><div class="brief "><a data-name="1127011329%2FProperties%2F1737632851" anchor-label="connectionConfig" id="1127011329%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><p class="paragraph">A map of BlockFace and the configured <a href="../../xyz.xenondevs.nova.tileentity.network/-network-connection-type/index.html">NetworkConnectionType</a>.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="473374700%2FProperties%2F1737632851" anchor-label="endPoint" id="473374700%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="end-point.html"><span>end</span><wbr></wbr><span><span>Point</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="473374700%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="473374700%2FProperties%2F1737632851" anchor-label="endPoint" id="473374700%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="end-point.html">endPoint</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.tileentity/-networked-tile-entity/index.html">NetworkedTileEntity</a></div><div class="brief "><a data-name="473374700%2FProperties%2F1737632851" anchor-label="endPoint" id="473374700%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><p class="paragraph">The NetworkEndPoint of this EndPointDataHolder.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1450347065%2FProperties%2F1737632851" anchor-label="extractFilters" id="-1450347065%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="extract-filters.html"><span>extract</span><wbr></wbr><span><span>Filters</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1450347065%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-1450347065%2FProperties%2F1737632851" anchor-label="extractFilters" id="-1450347065%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="extract-filters.html">extractFilters</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network.item/-item-filter/index.html">ItemFilter</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-738063114%2FProperties%2F1737632851" anchor-label="extractPriorities" id="-738063114%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="extract-priorities.html"><span>extract</span><wbr></wbr><span><span>Priorities</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-738063114%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-738063114%2FProperties%2F1737632851" anchor-label="extractPriorities" id="-738063114%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="extract-priorities.html">extractPriorities</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1226266999%2FProperties%2F1737632851" anchor-label="insertFilters" id="1226266999%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="insert-filters.html"><span>insert</span><wbr></wbr><span><span>Filters</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1226266999%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="1226266999%2FProperties%2F1737632851" anchor-label="insertFilters" id="1226266999%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="insert-filters.html">insertFilters</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network.item/-item-filter/index.html">ItemFilter</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2091300026%2FProperties%2F1737632851" anchor-label="insertPriorities" id="-2091300026%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="insert-priorities.html"><span>insert</span><wbr></wbr><span><span>Priorities</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2091300026%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-2091300026%2FProperties%2F1737632851" anchor-label="insertPriorities" id="-2091300026%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="insert-priorities.html">insertPriorities</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-2102635649%2FProperties%2F1737632851" anchor-label="inventories" id="-2102635649%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a>
+        <div class="table-row" data-filterable-current=":nova:dokkaHtml/main" data-filterable-set=":nova:dokkaHtml/main">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="inventories.html"><span><span>inventories</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2102635649%2FProperties%2F1737632851"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtml/main"><a data-name="-2102635649%2FProperties%2F1737632851" anchor-label="inventories" id="-2102635649%2FProperties%2F1737632851" data-filterable-set=":nova:dokkaHtml/main"></a><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="inventories.html">inventories</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="/&amp;lt;Error class: unknown class&amp;gt;///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.tileentity.network.item.inventory/-networked-inventory/index.html">NetworkedInventory</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
