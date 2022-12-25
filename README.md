@@ -52,3 +52,8 @@ If you would like to help translate Nova, you can do so [here](https://translate
 
 To build Nova, run the `loaderJar` gradle task.  
 You can specify an output directory with the VM option `"-DoutDir<path>"` and build a mojang-mapped jar with `-Dmojang-mapped`.
+
+# Plugin- and Addon API
+
+If you're planning to make your own plugin compatible with Nova, you might be interested in our [Plugin API documentation](https://xenondevs.xyz/docs/nova/api).   
+If you're interested in creating a Nova addon, check out our [Addon API documentation](https://xenondevs.xyz/docs/nova/addon/) and the [Nova-Addon-Template](https://github.com/xenondevs/Nova-Addon-Template).
