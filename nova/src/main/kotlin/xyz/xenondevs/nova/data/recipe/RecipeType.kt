@@ -10,11 +10,14 @@ import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.recipe.RecipeTypeRegistry.register
-import xyz.xenondevs.nova.data.serialization.json.CookingRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.BlastingRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.CampfireRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.FurnaceRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.ShapedRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.ShapelessRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.SmithingRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.SmokingRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.StonecutterRecipeDeserializer
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.BlastingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.CampfireRecipeGroup
@@ -67,10 +70,10 @@ class RecipeType<T : Any> internal constructor(
     companion object {
         val SHAPED = register("minecraft/shaped", ShapedRecipe::class, TableRecipeGroup, ShapedRecipeDeserializer)
         val SHAPELESS = register("minecraft/shapeless", ShapelessRecipe::class, TableRecipeGroup, ShapelessRecipeDeserializer)
-        val FURNACE = register("minecraft/furnace", FurnaceRecipe::class, SmeltingRecipeGroup, CookingRecipeDeserializer(::FurnaceRecipe))
-        val BLAST_FURNACE = register("minecraft/blast_furnace", BlastingRecipe::class, BlastingRecipeGroup, CookingRecipeDeserializer(::BlastingRecipe))
-        val SMOKER = register("minecraft/smoker", SmokingRecipe::class, SmokingRecipeGroup, CookingRecipeDeserializer(::SmokingRecipe))
-        val CAMPFIRE = register("minecraft/campfire", CampfireRecipe::class, CampfireRecipeGroup, CookingRecipeDeserializer(::CampfireRecipe))
+        val FURNACE = register("minecraft/furnace", FurnaceRecipe::class, SmeltingRecipeGroup, FurnaceRecipeDeserializer)
+        val BLAST_FURNACE = register("minecraft/blast_furnace", BlastingRecipe::class, BlastingRecipeGroup, BlastingRecipeDeserializer)
+        val SMOKER = register("minecraft/smoker", SmokingRecipe::class, SmokingRecipeGroup, SmokingRecipeDeserializer)
+        val CAMPFIRE = register("minecraft/campfire", CampfireRecipe::class, CampfireRecipeGroup, CampfireRecipeDeserializer)
         val SMITHING = register("minecraft/smithing", SmithingRecipe::class, SmithingRecipeGroup, SmithingRecipeDeserializer)
         val STONECUTTER = register("minecraft/stonecutter", StonecuttingRecipe::class, StonecutterRecipeGroup, StonecutterRecipeDeserializer)
         
