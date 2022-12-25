@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.integration.customitems
 
+import net.md_5.bungee.api.chat.BaseComponent
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
@@ -71,12 +72,12 @@ internal interface CustomItemService : InternalIntegration {
     /**
      * Gets a localized name for an [ItemStack]
      */
-    fun getName(item: ItemStack, locale: String): String?
+    fun getName(item: ItemStack, locale: String): Array<BaseComponent>?
     
     /**
      * Gets a localized name from a placed [Block]
      */
-    fun getName(block: Block, locale: String): String?
+    fun getName(block: Block, locale: String): Array<BaseComponent>?
     
     /**
      * Checks if this [CustomItemService] registered a recipe with that [key]

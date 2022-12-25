@@ -6,6 +6,8 @@ import dev.lone.itemsadder.api.CustomStack
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent.Cause
 import dev.lone.itemsadder.api.ItemsAdder
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -133,13 +135,14 @@ internal object ItemsAdder : CustomItemService {
             ?: CustomCrop.byAlreadyPlaced(block)?.seed?.namespacedID
     }
     
-    override fun getName(item: ItemStack, locale: String): String? {
-        return CustomStack.byItemStack(item)?.namespace
+    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
+        return TextComponent.fromLegacyText(CustomStack.byItemStack(item)?.displayName)
     }
     
-    override fun getName(block: Block, locale: String): String? {
-        return CustomBlock.byAlreadyPlaced(block)?.displayName
-            ?: CustomCrop.byAlreadyPlaced(block)?.seed?.displayName
+    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
+        return (CustomBlock.byAlreadyPlaced(block)?.displayName
+            ?: CustomCrop.byAlreadyPlaced(block)?.seed?.displayName)
+            ?.let(TextComponent::fromLegacyText)
     }
     
     override fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {

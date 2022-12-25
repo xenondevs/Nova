@@ -81,7 +81,7 @@ object WailaInfoProviderRegistry {
         val blockName = CustomItemServiceManager.getName(block, player.locale) ?: return null
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(ComponentBuilder().append(blockName).color(ChatColor.WHITE).create(), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(ComponentBuilder().append(blockName).create(), WailaLine.Alignment.CENTERED)
         lines += WailaLine(ComponentBuilder(blockId.toString()).color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getCustomItemServiceToolLine(player, block)
         

@@ -37,16 +37,16 @@ object ToolLine {
         val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
         return getToolLine(
             player,
-            emptyList(),
             null,
-            block.hardness,
+            null,
+            1.0,
             CustomItemServiceManager.canBreakBlock(block, tool)
         )
     }
     
     fun getToolLine(
         player: Player,
-        blockToolCategories: List<ToolCategory>,
+        blockToolCategories: List<ToolCategory>?,
         blockToolLevel: ToolTier?,
         hardness: Double,
         correctToolForDrops: Boolean?
@@ -71,7 +71,6 @@ object ToolLine {
         }
         
         if (blockToolCategories == null) {
-            builder.append(TranslatableComponent("waila.nova.required_tool.unknown")).color(ChatColor.GRAY)
             appendCanBreak()
         } else if (blockToolCategories.isNotEmpty()) {
             builder.append(TranslatableComponent("waila.nova.required_tool")).color(ChatColor.GRAY)

@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.integration.customitems.plugin
 
 import io.lumine.mythic.lib.api.item.NBTItem
 import net.Indyuce.mmoitems.api.Type
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -89,15 +91,17 @@ internal object MMOItems : CustomItemService {
         return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.let(::getId)
     }
     
-    override fun getName(item: ItemStack, locale: String): String? {
+    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
         if (getId(item) == null)
             return null
         
-        return item.displayName
+        return TextComponent.fromLegacyText(item.displayName)
     }
     
-    override fun getName(block: Block, locale: String): String? {
-        return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.displayName
+    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
+        return TextComponent.fromLegacyText(
+            mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.displayName
+        )
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {
