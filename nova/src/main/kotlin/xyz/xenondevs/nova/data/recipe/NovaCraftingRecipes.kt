@@ -108,18 +108,19 @@ internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRe
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
-
+    
     private val choice = bukkitRecipe.inputChoice
-
+    
     override fun matches(container: Container, level: Level): Boolean {
         return choice.test(container.getItem(0).bukkitCopy)
     }
-
+    
     override fun toBukkitRecipe(): Recipe {
         return bukkitRecipe
     }
-
+    
 }
+
 internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) : SmokingRecipe(
     bukkitRecipe.key.resourceLocation,
     "",
@@ -129,18 +130,19 @@ internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) :
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
-
+    
     private val choice = bukkitRecipe.inputChoice
-
+    
     override fun matches(container: Container, level: Level): Boolean {
         return choice.test(container.getItem(0).bukkitCopy)
     }
-
+    
     override fun toBukkitRecipe(): Recipe {
         return bukkitRecipe
     }
-
+    
 }
+
 internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe) : CampfireCookingRecipe(
     bukkitRecipe.key.resourceLocation,
     "",
@@ -150,15 +152,15 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
-
+    
     private val choice = bukkitRecipe.inputChoice
-
+    
     override fun matches(container: Container, level: Level): Boolean {
         return choice.test(container.getItem(0).bukkitCopy)
     }
-
+    
     override fun toBukkitRecipe(): Recipe {
         return bukkitRecipe
     }
-
+    
 }

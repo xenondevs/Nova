@@ -87,16 +87,19 @@ internal fun MojangFurnaceRecipe.clientsideCopy(): MojangFurnaceRecipe {
     val ingredient = ingredients.first().clientsideCopy()
     return MojangFurnaceRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }
+
 internal fun MojangBlastFurnaceRecipe.clientsideCopy(): MojangBlastFurnaceRecipe {
     val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
     val ingredient = ingredients.first().clientsideCopy()
     return MojangBlastFurnaceRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }
+
 internal fun MojangSmokerRecipe.clientsideCopy(): MojangSmokerRecipe {
     val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
     val ingredient = ingredients.first().clientsideCopy()
     return MojangSmokerRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }
+
 internal fun MojangCampfireRecipe.clientsideCopy(): MojangCampfireRecipe {
     val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
     val ingredient = ingredients.first().clientsideCopy()

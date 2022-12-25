@@ -27,10 +27,12 @@ abstract class ConversionRecipeGroup : RecipeGroup() {
                 val recipe = container.recipe as CookingRecipe<*>
                 createConversionRecipeGUI(recipe.inputChoice, recipe.result, recipe.cookingTime)
             }
+            
             RecipeType.STONECUTTER -> {
                 val recipe = container.recipe as StonecuttingRecipe
                 createConversionRecipeGUI(recipe.inputChoice, recipe.result, 0)
             }
+            
             else -> {
                 val recipe = container.recipe as ConversionNovaRecipe
                 createConversionRecipeGUI(recipe.input.getInputStacks(), recipe.result, recipe.time)
@@ -71,16 +73,19 @@ internal object SmeltingRecipeGroup : ConversionRecipeGroup() {
     override val icon = ItemWrapper(ItemStack(Material.FURNACE))
     override val texture = CoreGUITexture.RECIPE_SMELTING
 }
+
 internal object BlastingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.BLAST_FURNACE))
     override val texture = CoreGUITexture.RECIPE_SMELTING
 }
+
 internal object SmokingRecipeGroup : ConversionRecipeGroup() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.SMOKER))
     override val texture = CoreGUITexture.RECIPE_SMELTING
 }
+
 internal object CampfireRecipeGroup : ConversionRecipeGroup() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.CAMPFIRE))
