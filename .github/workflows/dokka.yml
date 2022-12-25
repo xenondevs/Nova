@@ -22,6 +22,9 @@ jobs:
           java-version: 17
           distribution: adopt
 
+      - name: Run BuildTools
+        run: . .github/scripts/buildtools.sh
+
       - name: Run Dokka
         run: ./gradlew dokkaHtmlMultiModule
 
