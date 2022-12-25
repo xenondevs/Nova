@@ -6,7 +6,9 @@ import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
 import net.minecraft.world.level.Level
+import org.bukkit.Material.*
 import org.bukkit.inventory.Recipe
+import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.nmsCategory
@@ -22,24 +24,47 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
     optimizedRecipe.recipe.key.resourceLocation,
     "",
     optimizedRecipe.recipe.category.nmsCategory,
-    3,
-    3,
+    optimizedRecipe.recipe.shape[0].length,
+    optimizedRecipe.recipe.shape.size,
     NonNullList(optimizedRecipe.choiceMatrix.map { it.nmsIngredient }),
     optimizedRecipe.recipe.result.nmsCopy
 ) {
-    
     private val bukkitRecipe = optimizedRecipe.recipe
-    
-    override fun matches(container: CraftingContainer, level: Level): Boolean {
-        // loop over all items in the crafting grid
-        return container.width == width && container.height == height &&
-            container.contents.withIndex().all { (index, matrixStack) ->
-                // check if the item stack matches with the given recipe choice
-                val choice = optimizedRecipe.choiceMatrix[index] ?: return@all matrixStack.isEmpty
-                return@all matrixStack != null && choice.test(matrixStack.bukkitCopy)
+
+    override fun matches(inventorycrafting: CraftingContainer, world: Level?): Boolean {
+        for (i in 0..inventorycrafting.width - width) {
+            for (j in 0..inventorycrafting.height - height) {
+                if (matches(inventorycrafting, i, j, true)
+                    || matches(inventorycrafting, i, j, true)
+                ) {
+                    return true
+                }
             }
+        }
+        return false
     }
-    
+
+    private fun matches(inventorycrafting: CraftingContainer, i: Int, j: Int, inverted: Boolean): Boolean {
+        for (k in 0 until inventorycrafting.width) {
+            for (l in 0 until inventorycrafting.height) {
+                val i1 = k - i
+                val j1 = l - j
+                var recipeitemstack: RecipeChoice? = null
+                if (i1 >= 0 && j1 >= 0 && i1 < width && j1 < height) {
+                    recipeitemstack = if (inverted)
+                        optimizedRecipe.choiceMatrix[width - i1 - 1 + j1 * width]
+                    else
+                        optimizedRecipe.choiceMatrix[i1 + j1 * width]
+
+                }
+                val item = inventorycrafting.getItem(k + l * inventorycrafting.width).bukkitCopy
+                if (!((recipeitemstack == null && item.type == AIR) || recipeitemstack?.test(item) == true)) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
     override fun toBukkitRecipe(): BukkitShapedRecipe {
         return bukkitRecipe
     }
