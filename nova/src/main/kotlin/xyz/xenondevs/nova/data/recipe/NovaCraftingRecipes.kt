@@ -54,9 +54,9 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
                 // If relX and relY are in the shape, it will be the RecipeChoice at that position, or null otherwise
                 val choice = if ((0 until width).contains(relX) && (0 until height).contains(relY))
                     optimizedRecipe.choiceMatrix.getOrNull(
-                    if (horizontalFlip) width * (relY + 1) - relX - 1
-                    else relX + relY * width
-                ) else null
+                        if (horizontalFlip) width * (relY + 1) - relX - 1
+                        else relX + relY * width
+                    ) else null
                 // If choice is null, treat it as an air RecipeChoice.
                 if (choice == null) {
                     if (!item.isEmpty) return false
