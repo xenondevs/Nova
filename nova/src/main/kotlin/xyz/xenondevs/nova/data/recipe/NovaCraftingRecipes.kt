@@ -6,10 +6,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
 import net.minecraft.world.level.Level
-import org.bukkit.Material.*
 import org.bukkit.inventory.Recipe
-import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.nmsCategory
@@ -52,7 +49,7 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
                 val relY = absY - y
                 val item = container.getItem(absX + absY * container.width)
                 // If relX and relY are in the shape, it will be the RecipeChoice at that position, or null otherwise
-                val choice = if ((0 until width).contains(relX) && (0 until height).contains(relY))
+                val choice = if (relX in (0 until width) && relY in (0 until height))
                     optimizedRecipe.choiceMatrix.getOrNull(
                         if (horizontalFlip) width * (relY + 1) - relX - 1
                         else relX + relY * width
