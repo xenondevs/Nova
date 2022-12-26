@@ -340,7 +340,7 @@ internal class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
     
     init {
         val flatShape = recipe.shape.joinToString("")
-        choiceMatrix = Array(9) { recipe.choiceMap[flatShape[it]] }
+        choiceMatrix = Array(flatShape.length) { recipe.choiceMap[flatShape[it]] }
         requiredChoices = flatShape.mapNotNull { recipe.choiceMap[it] }
         key = (recipe as Keyed).key.toString()
     }

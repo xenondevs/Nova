@@ -22,22 +22,44 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
     optimizedRecipe.recipe.key.resourceLocation,
     "",
     optimizedRecipe.recipe.category.nmsCategory,
-    3,
-    3,
+    optimizedRecipe.recipe.shape[0].length,
+    optimizedRecipe.recipe.shape.size,
     NonNullList(optimizedRecipe.choiceMatrix.map { it.nmsIngredient }),
     optimizedRecipe.recipe.result.nmsCopy
 ) {
-    
     private val bukkitRecipe = optimizedRecipe.recipe
     
-    override fun matches(container: CraftingContainer, level: Level): Boolean {
-        // loop over all items in the crafting grid
-        return container.width == width && container.height == height &&
-            container.contents.withIndex().all { (index, matrixStack) ->
-                // check if the item stack matches with the given recipe choice
-                val choice = optimizedRecipe.choiceMatrix[index] ?: return@all matrixStack.isEmpty
-                return@all matrixStack != null && choice.test(matrixStack.bukkitCopy)
+    override fun matches(container: CraftingContainer, world: Level): Boolean {
+        // Iterate through all the top-left positions of all possible placements of the recipe shape.
+        for (startX in 0..container.width - width) {
+            for (startY in 0..container.height - height) {
+                // Check if the recipe is valid at that position
+                if (matchesAt(container, startX, startY, false)
+                    || matchesAt(container, startX, startY, true)) return true
             }
+        }
+        return false
+    }
+    
+    private fun matchesAt(container: CraftingContainer, x: Int, y: Int, horizontalFlip: Boolean): Boolean {
+        for (absX in 0 until container.width)
+            for (absY in 0 until container.height) {
+                // relX and relY is the position relative to the recipe shape
+                val relX = absX - x
+                val relY = absY - y
+                val item = container.getItem(absX + absY * container.width)
+                // If relX and relY are in the shape, it will be the RecipeChoice at that position, or null otherwise
+                val choice = if (relX in (0 until width) && relY in (0 until height))
+                    optimizedRecipe.choiceMatrix.getOrNull(
+                        if (horizontalFlip) width * (relY + 1) - relX - 1
+                        else relX + relY * width
+                    ) else null
+                // If choice is null, treat it as an air RecipeChoice.
+                if (choice == null) {
+                    if (!item.isEmpty) return false
+                } else if (!choice.test(item.bukkitCopy)) return false
+            }
+        return true
     }
     
     override fun toBukkitRecipe(): BukkitShapedRecipe {
