@@ -117,7 +117,7 @@ internal data class CategoryPriority(val addonId: String, val preferredPosition:
     
 }
 
-internal data class ItemCategory(val name: String, val icon: ItemProvider, val items: List<CategorizedItem>) {
+internal data class ItemCategory(val name: String, val icon: ItemProvider, val items: List<CategorizedItem>, val hidden: Boolean) {
     
     companion object {
         fun deserialize(element: ConfigurationSection): ItemCategory? {
@@ -127,8 +127,9 @@ internal data class ItemCategory(val name: String, val icon: ItemProvider, val i
                     .setDisplayName(TranslatableComponent(name))
                     .get()
                 val items = element.getStringList("items").map(::CategorizedItem)
+                val hidden = element.getBoolean("hidden", false)
                 
-                return ItemCategory(name, ItemWrapper(icon), items)
+                return ItemCategory(name, ItemWrapper(icon), items, hidden)
             } catch (e: Exception) {
                 LOGGER.log(Level.SEVERE, "Could not deserialize item category", e)
             }

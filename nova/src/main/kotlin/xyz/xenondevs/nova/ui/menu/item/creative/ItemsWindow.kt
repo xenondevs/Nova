@@ -114,6 +114,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     init {
         val tabButtons = ItemCategories.CATEGORIES
+            .filter { !it.hidden }
             .withIndex()
             .map { (index, category) -> CreativeTabItem(index, category).apply { setGui(mainGUI) } }
         tabPagesGUI.setItems(tabButtons)
