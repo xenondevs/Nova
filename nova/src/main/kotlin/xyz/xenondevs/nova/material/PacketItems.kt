@@ -37,7 +37,7 @@ import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.duplicate
-import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.ItemUtils
@@ -198,7 +198,9 @@ internal object PacketItems : Initializable(), Listener {
     }
     
     private fun getNovaItem(item: MojangStack): MojangStack {
-        return ItemStack.of(item.tag!!.getCompound("nova").getCompound("internalItem"))
+        val serversideStack = ItemStack(SERVER_SIDE_ITEM, item.count)
+        serversideStack.tag = item.tag!!.getCompound("nova").getCompound("serversideTag")
+        return serversideStack
     }
     
     private fun getClientsideItemOrNull(player: Player?, item: MojangStack, fromCreative: Boolean, useName: Boolean = true) =
@@ -225,13 +227,11 @@ internal object PacketItems : Initializable(), Listener {
         
         val newItem = item.copy()
         val newItemTag = newItem.tag!!
-        newItemTag.getCompound("nova").put("internalItem", item.save(CompoundTag()))
+        newItemTag.getCompound("nova").put("serversideTag", itemTag)
         newItem.item = CraftMagicNumbers.getItem(data.material)
         newItemTag.putInt("CustomModelData", data.dataArray[subId])
         
-        val displayTag: CompoundTag = if (newItemTag.contains("display")) {
-            newItemTag.getCompound("display")
-        } else CompoundTag().also { newItemTag.put("display", it) }
+        val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
         
         val itemDisplayData = novaItem.getPacketItemData(item.bukkitStack)
         
@@ -247,7 +247,7 @@ internal object PacketItems : Initializable(), Listener {
         }
         
         // lore
-        val loreTag = displayTag.getOrNull("Lore") ?: ListTag()
+        val loreTag = displayTag.getOrPut("Lore", ::ListTag)
         val itemDisplayLore = itemDisplayData.lore
         itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
         if (player != null && player in AdvancedTooltips.players) {
@@ -256,7 +256,6 @@ internal object PacketItems : Initializable(), Listener {
             }
             loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
         }
-        displayTag.put("Lore", loreTag)
         
         // durability
         val itemDisplayDurabilityBar = itemDisplayData.durabilityBar
@@ -267,8 +266,8 @@ internal object PacketItems : Initializable(), Listener {
         
         // hide flags
         val hiddenFlags = itemDisplayData.hiddenFlags
-        if (!hiddenFlags.isNullOrEmpty()) {
-            newItemTag.putInt("HideFlags", (newItemTag.getOrNull("HideFlags") ?: 0) or HideableFlag.toInt(hiddenFlags))
+        if (hiddenFlags.isNotEmpty()) {
+            newItemTag.putInt("HideFlags", newItemTag.getInt("HideFlags") or HideableFlag.toInt(hiddenFlags))
         }
         
         return newItem
