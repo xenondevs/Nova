@@ -20,9 +20,9 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ComplexTest
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
-import xyz.xenondevs.nova.data.recipe.MultiModelDataTest
 import xyz.xenondevs.nova.data.recipe.NovaIdTest
 import xyz.xenondevs.nova.data.recipe.NovaNameTest
+import xyz.xenondevs.nova.data.recipe.TagTest
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -179,11 +179,10 @@ object ItemUtils {
                 if (id.startsWith("#")) {
                     val tagName = NamespacedKey.fromString(id.substringAfter('#'))
                         ?: throw IllegalArgumentException("Malformed tag: $id")
-                    val tagValues = Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java)?.values
+                    val tag = Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java)
                         ?: throw IllegalArgumentException("Invalid tag: $id")
-                    return@map MultiModelDataTest(tagValues, intArrayOf(0), tagValues.map(::ItemStack))
+                    return@map TagTest(tag, intArrayOf(0))
                 }
-                
                 
                 if (id.contains("{"))
                     return@map ComplexTest(toItemStack(id))

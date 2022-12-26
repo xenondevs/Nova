@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Tag
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -64,10 +65,10 @@ class ModelDataTest(private val type: Material, private val data: IntArray, over
     
 }
 
-class MultiModelDataTest(private val types: Set<Material>, private val data: IntArray, override val examples: List<ItemStack>) : MultiItemTest {
+class TagTest(private val tag: Tag<Material>, private val data: IntArray, override val examples: List<ItemStack> = tag.values.map(::ItemStack)) : MultiItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return item.type in types && item.customModelData in data
+        return tag.isTagged(item.type) && item.customModelData in data
     }
     
 }
