@@ -86,6 +86,7 @@ internal class ArmorContent(
     }
     
     override fun write() {
+        if (armor.isEmpty()) return
         writeLeatherArmorAtlas()
         writeMCPatcherArmor()
         
