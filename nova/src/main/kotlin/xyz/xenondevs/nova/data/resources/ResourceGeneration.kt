@@ -47,6 +47,7 @@ internal object ResourceGeneration {
             if (
                 PermanentStorage.retrieveOrNull<String>(RESOURCES_HASH) == resourcesHash
                 && PermanentStorage.has(MODEL_DATA_LOOKUP)
+                && PermanentStorage.has(ARMOR_DATA_LOOKUP)
                 && PermanentStorage.has(LANGUAGE_LOOKUP)
                 && PermanentStorage.has(TEXTURE_ICON_LOOKUP)
                 && PermanentStorage.has(WAILA_DATA_LOOKUP)
