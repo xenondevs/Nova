@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.world.item.Items
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
@@ -19,6 +20,7 @@ import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ComplexTest
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
+import xyz.xenondevs.nova.data.recipe.MultiModelDataTest
 import xyz.xenondevs.nova.data.recipe.NovaIdTest
 import xyz.xenondevs.nova.data.recipe.NovaNameTest
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
@@ -173,6 +175,17 @@ object ItemUtils {
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {
         val tests = nameList.map { id ->
             try {
+                if (id.startsWith("#")) {
+                    val tagValues = Bukkit.getTag(
+                        org.bukkit.Tag.REGISTRY_ITEMS,
+                        NamespacedKey.fromString(id.substringAfter('#'))
+                            ?: throw IllegalArgumentException("Malformed tag: $id"),
+                        Material::class.java
+                    )?.values ?: throw IllegalArgumentException("Invalid tag: $id")
+                    return@map MultiModelDataTest(tagValues, intArrayOf(0), tagValues.map(::ItemStack).toList())
+                }
+                
+                
                 if (id.contains("{"))
                     return@map ComplexTest(toItemStack(id))
                 

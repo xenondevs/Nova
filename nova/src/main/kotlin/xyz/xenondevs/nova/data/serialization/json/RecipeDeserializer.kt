@@ -3,7 +3,10 @@ package xyz.xenondevs.nova.data.serialization.json
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Tag
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -44,13 +47,22 @@ interface RecipeDeserializer<T> {
             
             return parseRecipeChoice(list)
         }
-        
+    
         fun parseRecipeChoice(list: List<String>): RecipeChoice {
             val names = list.map { ids ->
                 // Id fallbacks
                 ids.replace(" ", "")
                     .split(';')
-                    .firstOrNull { ItemUtils.isIdRegistered(it.substringBefore('{')) }
+                    .firstOrNull {
+                        if (it.startsWith('#'))
+                            Bukkit.getTag(
+                                Tag.REGISTRY_ITEMS,
+                                NamespacedKey.fromString(it.substringAfter('#'))
+                                    ?: throw IllegalArgumentException("Malformed tag: $it"),
+                                Material::class.java
+                            ) != null
+                        else ItemUtils.isIdRegistered(it.substringBefore('{'))
+                    }
                     ?: throw IllegalArgumentException("Invalid item id(s): $ids")
             }
             
@@ -92,7 +104,7 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
         val recipe = ShapedRecipe(getRecipeKey(file), result)
         recipe.shape(*shape.toTypedArray())
         ingredientMap.forEach { (key, material) -> recipe.setIngredient(key, material) }
-    
+        
         val category = json.getString("category")
             ?.let { CraftingBookCategory.valueOf(it.uppercase()) }
             ?: CraftingBookCategory.MISC
@@ -136,7 +148,7 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
                 recipe.addIngredient(material)
             }
         }
-    
+        
         val category = json.getString("category")
             ?.let { CraftingBookCategory.valueOf(it.uppercase()) }
             ?: CraftingBookCategory.MISC

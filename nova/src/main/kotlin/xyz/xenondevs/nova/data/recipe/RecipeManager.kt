@@ -64,6 +64,14 @@ class ModelDataTest(private val type: Material, private val data: IntArray, over
     
 }
 
+class MultiModelDataTest(private val types: Set<Material>, private val data: IntArray, override val examples: List<ItemStack>) : MultiItemTest {
+    
+    override fun test(item: ItemStack): Boolean {
+        return item.type in types && item.customModelData in data
+    }
+    
+}
+
 class NovaIdTest(private val id: String, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
