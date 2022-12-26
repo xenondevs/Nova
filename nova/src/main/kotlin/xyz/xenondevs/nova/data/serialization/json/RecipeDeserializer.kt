@@ -47,23 +47,19 @@ interface RecipeDeserializer<T> {
             
             return parseRecipeChoice(list)
         }
-    
+        
         fun parseRecipeChoice(list: List<String>): RecipeChoice {
             val names = list.map { ids ->
                 // Id fallbacks
                 ids.replace(" ", "")
                     .split(';')
                     .firstOrNull {
-                        if (it.startsWith('#'))
-                            Bukkit.getTag(
-                                Tag.REGISTRY_ITEMS,
-                                NamespacedKey.fromString(it.substringAfter('#'))
-                                    ?: throw IllegalArgumentException("Malformed tag: $it"),
-                                Material::class.java
-                            ) != null
-                        else ItemUtils.isIdRegistered(it.substringBefore('{'))
-                    }
-                    ?: throw IllegalArgumentException("Invalid item id(s): $ids")
+                        if (it.startsWith('#')) {
+                            val tagName = NamespacedKey.fromString(it.substringAfter('#'))
+                                ?: throw IllegalArgumentException("Malformed tag: $it")
+                            return@firstOrNull Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java) != null
+                        } else ItemUtils.isIdRegistered(it.substringBefore('{'))
+                    } ?: throw IllegalArgumentException("Invalid item id(s): $ids")
             }
             
             return ItemUtils.getRecipeChoice(names)

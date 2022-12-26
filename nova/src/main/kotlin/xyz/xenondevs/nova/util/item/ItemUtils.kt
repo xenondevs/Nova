@@ -6,11 +6,11 @@ import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
-import net.minecraft.nbt.Tag
 import net.minecraft.world.item.Items
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Tag
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import net.minecraft.nbt.Tag as NBTTag
 import net.minecraft.world.item.ItemStack as MojangStack
 
 val ItemStack.novaMaterial: ItemNovaMaterial?
@@ -82,8 +83,8 @@ val ItemStack.novaMaxStackSize: Int
     get() = novaMaterial?.maxStackSize ?: type.maxStackSize
 
 @Suppress("UNCHECKED_CAST")
-val ItemMeta.unhandledTags: MutableMap<String, Tag>
-    get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, Tag>
+val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
+    get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>
 
 val ItemStack.canDestroy: List<Material>
     get() {
@@ -176,13 +177,11 @@ object ItemUtils {
         val tests = nameList.map { id ->
             try {
                 if (id.startsWith("#")) {
-                    val tagValues = Bukkit.getTag(
-                        org.bukkit.Tag.REGISTRY_ITEMS,
-                        NamespacedKey.fromString(id.substringAfter('#'))
-                            ?: throw IllegalArgumentException("Malformed tag: $id"),
-                        Material::class.java
-                    )?.values ?: throw IllegalArgumentException("Invalid tag: $id")
-                    return@map MultiModelDataTest(tagValues, intArrayOf(0), tagValues.map(::ItemStack).toList())
+                    val tagName = NamespacedKey.fromString(id.substringAfter('#'))
+                        ?: throw IllegalArgumentException("Malformed tag: $id")
+                    val tagValues = Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java)?.values
+                        ?: throw IllegalArgumentException("Invalid tag: $id")
+                    return@map MultiModelDataTest(tagValues, intArrayOf(0), tagValues.map(::ItemStack))
                 }
                 
                 
