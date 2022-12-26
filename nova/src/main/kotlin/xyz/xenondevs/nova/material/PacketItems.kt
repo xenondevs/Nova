@@ -314,12 +314,10 @@ internal object PacketItems : Initializable(), Listener {
         val stream = NBTUtils.convertListToStream(list)
         stream.forEach { contentItem ->
             val compound = CompoundTag()
-            
             if (isContainerItem(contentItem)) {
                 filterContainerItems(contentItem, fromCreative).save(compound)
-            } else if (fromCreative) {
-                if (isFakeItem(contentItem)) // Don't collapse if statement to prevent isNovaItem call
-                    getNovaItem(contentItem).save(compound)
+            } else if (fromCreative && isFakeItem(contentItem)) {
+                getNovaItem(contentItem).save(compound)
             } else if (isNovaItem(contentItem)) {
                 getFakeItem(null, contentItem).save(compound)
             } else {
