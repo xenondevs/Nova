@@ -32,7 +32,7 @@ internal class AddonClassLoader(private val loader: AddonLoader, parent: ClassLo
             
             // Load class from addon dependencies
             if (c == null) {
-                c = addonDependencies?.firstNotNullOfOrNull { it.loadClass(name, true) }
+                c = addonDependencies?.firstNotNullOfOrNull { runCatching { it.loadClass(name, true) }.getOrNull() }
             }
             
             // load class from parent (nova classloader)

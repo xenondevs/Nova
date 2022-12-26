@@ -1,11 +1,12 @@
 group = "xyz.xenondevs.nova"
 
-val mojangMapped = System.getProperty("mojang-mapped") != null
+val mojangMapped = project.hasProperty("mojang-mapped") || System.getProperty("mojang-mapped") != null
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     java
     kotlin("jvm") version libs.versions.kotlin
+    id("org.jetbrains.dokka") version "1.7.20"
     id("xyz.xenondevs.jar-loader-gradle-plugin")
     id("xyz.xenondevs.specialsource-gradle-plugin") version "1.0.0"
     id("xyz.xenondevs.string-remapper-gradle-plugin") version "1.0.0"

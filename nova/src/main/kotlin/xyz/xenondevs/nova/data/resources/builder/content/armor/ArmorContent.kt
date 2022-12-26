@@ -71,21 +71,19 @@ internal class ArmorContent(
     }
     
     private fun nextColor(): Int {
-        check(color <= 0xFFFFFF)
-        
-        // only use odd numbers
-        color += 2
-        
-        // skip colors that are already in use by base packs
-        while (color in basePacks.customArmor.keys) {
+        do {
+            // only use odd numbers
             color += 2
-            check(color <= 0xFFFFFF)
-        }
-        
+            
+            // skip colors that are already in use by base packs
+        } while (color in basePacks.customArmor.keys)
+    
+        check(color <= 0xFFFFFF)
         return color
     }
     
     override fun write() {
+        if (armor.isEmpty()) return
         writeLeatherArmorAtlas()
         writeMCPatcherArmor()
         
