@@ -7,7 +7,6 @@ import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
@@ -198,7 +197,7 @@ internal object PacketItems : Initializable(), Listener {
     }
     
     private fun getNovaItem(item: MojangStack): MojangStack {
-        val serversideStack = ItemStack(SERVER_SIDE_ITEM, item.count)
+        val serversideStack = MojangStack(SERVER_SIDE_ITEM, item.count)
         serversideStack.tag = item.tag!!.getCompound("nova").getCompound("serversideTag")
         return serversideStack
     }
