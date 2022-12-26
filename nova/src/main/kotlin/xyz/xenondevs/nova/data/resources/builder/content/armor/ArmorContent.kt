@@ -77,15 +77,16 @@ internal class ArmorContent(
             
             // skip colors that are already in use by base packs
         } while (color in basePacks.customArmor.keys)
-    
+        
         check(color <= 0xFFFFFF)
         return color
     }
     
     override fun write() {
-        if (armor.isEmpty()) return
-        writeLeatherArmorAtlas()
-        writeMCPatcherArmor()
+        if (armor.isNotEmpty()) {
+            writeLeatherArmorAtlas()
+            writeMCPatcherArmor()
+        }
         
         Resources.updateArmorDataLookup(
             armor.associateTo(HashMap()) { it.id to ArmorTexture(it.color) }
