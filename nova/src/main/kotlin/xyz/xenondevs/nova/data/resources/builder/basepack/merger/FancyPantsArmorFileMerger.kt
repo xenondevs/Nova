@@ -66,8 +66,7 @@ internal class FancyPantsArmorFileMerger(basePacks: BasePacks) : FileMerger(base
                 var fps = 0.0
                 var interpolationMode: InterpolationMode = InterpolationMode.NONE
                 var frames: List<BufferedImage>
-                
-                val color = image.getRGB(armorSection * TEXTURE_WIDTH, 0)
+                val color = image.getRGB(armorSection * TEXTURE_WIDTH, 0) and 0xFFFFFF
                 val animationMarker = image.getRGB(armorSection * TEXTURE_WIDTH + 1, 0) // rgb(frameAmount, speed, interpolate)
                 val extraProperties = image.getRGB(armorSection * TEXTURE_WIDTH + 2, 0).asColor() // rgb(emissivity, tint, N/A)
                 
