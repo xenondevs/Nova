@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Keyed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Tag
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -60,6 +61,14 @@ class ModelDataTest(private val type: Material, private val data: IntArray, over
     
     override fun test(item: ItemStack): Boolean {
         return item.type == type && item.customModelData in data
+    }
+    
+}
+
+class TagTest(private val tag: Tag<Material>, override val examples: List<ItemStack> = tag.values.map(::ItemStack)) : MultiItemTest {
+    
+    override fun test(item: ItemStack): Boolean {
+        return tag.isTagged(item.type) && item.customModelData == 0
     }
     
 }
@@ -361,7 +370,7 @@ internal class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
     
     init {
         val flatShape = recipe.shape.joinToString("")
-        choiceMatrix = Array(9) { recipe.choiceMap[flatShape[it]] }
+        choiceMatrix = Array(flatShape.length) { recipe.choiceMap[flatShape[it]] }
         requiredChoices = flatShape.mapNotNull { recipe.choiceMap[it] }
         key = (recipe as Keyed).key.toString()
     }

@@ -6,6 +6,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.*
 import org.bukkit.inventory.recipe.CookingBookCategory
 import org.bukkit.inventory.recipe.CraftingBookCategory
+import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.nmsCopy

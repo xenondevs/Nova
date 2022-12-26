@@ -3,7 +3,10 @@ package xyz.xenondevs.nova.data.serialization.json
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Tag
 import org.bukkit.inventory.BlastingRecipe
 import org.bukkit.inventory.CampfireRecipe
 import org.bukkit.inventory.CookingRecipe
@@ -54,8 +57,13 @@ interface RecipeDeserializer<T> {
                 // Id fallbacks
                 ids.replace(" ", "")
                     .split(';')
-                    .firstOrNull { ItemUtils.isIdRegistered(it.substringBefore('{')) }
-                    ?: throw IllegalArgumentException("Invalid item id(s): $ids")
+                    .firstOrNull {
+                        if (it.startsWith('#')) {
+                            val tagName = NamespacedKey.fromString(it.substringAfter('#'))
+                                ?: throw IllegalArgumentException("Malformed tag: $it")
+                            return@firstOrNull Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java) != null
+                        } else ItemUtils.isIdRegistered(it.substringBefore('{'))
+                    } ?: throw IllegalArgumentException("Invalid item id(s): $ids")
             }
             
             return ItemUtils.getRecipeChoice(names)
