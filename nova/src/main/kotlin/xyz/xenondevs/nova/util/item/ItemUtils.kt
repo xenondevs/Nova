@@ -181,7 +181,7 @@ object ItemUtils {
                         ?: throw IllegalArgumentException("Malformed tag: $id")
                     val tag = Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java)
                         ?: throw IllegalArgumentException("Invalid tag: $id")
-                    return@map TagTest(tag, intArrayOf(0))
+                    return@map TagTest(tag)
                 }
                 
                 if (id.contains("{"))

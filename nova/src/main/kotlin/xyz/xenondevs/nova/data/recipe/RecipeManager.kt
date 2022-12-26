@@ -65,10 +65,10 @@ class ModelDataTest(private val type: Material, private val data: IntArray, over
     
 }
 
-class TagTest(private val tag: Tag<Material>, private val data: IntArray, override val examples: List<ItemStack> = tag.values.map(::ItemStack)) : MultiItemTest {
+class TagTest(private val tag: Tag<Material>, override val examples: List<ItemStack> = tag.values.map(::ItemStack)) : MultiItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return tag.isTagged(item.type) && item.customModelData in data
+        return tag.isTagged(item.type) && item.customModelData == 0
     }
     
 }
