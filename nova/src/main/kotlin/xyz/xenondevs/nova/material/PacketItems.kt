@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.material
 
 import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
@@ -333,12 +332,19 @@ internal object PacketItems : Initializable(), Listener {
         val newItem = item.copy()
         newItem.item = Items.BARRIER
         val tag = newItem.tag!!
+        
+        // remove custom model data
         tag.putInt("CustomModelData", 0)
         
-        val displayTag = tag.getCompound("display").also { tag.put("display", it) }
-        displayTag.put("Lore", NBTUtils.createStringList(
-            listOf(ComponentSerializer.toString(coloredText(ChatColor.RED, "Missing model for $id").withoutPreFormatting()))
-        ))
+        // store serversideTag
+        tag.getCompound("nova").put("serversideTag", item.tag!!)
+        
+        // overwrite display tag with "missing model" name
+        val displayTag = CompoundTag().also { tag.put("display", it) }
+        displayTag.putString(
+            "Name",
+            coloredText(ChatColor.RED, "Missing model for $id").withoutPreFormatting().serialize()
+        )
         
         return newItem
     }
