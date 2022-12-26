@@ -75,25 +75,25 @@ internal object SmeltingRecipeGroup : ConversionRecipeGroup() {
 }
 
 internal object BlastingRecipeGroup : ConversionRecipeGroup() {
-    override val priority = 1
+    override val priority = 2
     override val icon = ItemWrapper(ItemStack(Material.BLAST_FURNACE))
     override val texture = CoreGUITexture.RECIPE_SMELTING
 }
 
 internal object SmokingRecipeGroup : ConversionRecipeGroup() {
-    override val priority = 1
+    override val priority = 3
     override val icon = ItemWrapper(ItemStack(Material.SMOKER))
     override val texture = CoreGUITexture.RECIPE_SMELTING
 }
 
 internal object CampfireRecipeGroup : ConversionRecipeGroup() {
-    override val priority = 1
+    override val priority = 4
     override val icon = ItemWrapper(ItemStack(Material.CAMPFIRE))
     override val texture = CoreGUITexture.RECIPE_SMELTING
 }
 
 internal object StonecutterRecipeGroup : ConversionRecipeGroup() {
-    override val priority = 2
+    override val priority = 5
     override val icon = ItemWrapper(ItemStack(Material.STONECUTTER))
     override val texture = CoreGUITexture.RECIPE_CONVERSION
 }
