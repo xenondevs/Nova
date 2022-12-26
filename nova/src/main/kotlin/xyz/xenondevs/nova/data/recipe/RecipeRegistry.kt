@@ -2,11 +2,14 @@ package xyz.xenondevs.nova.data.recipe
 
 import org.bukkit.Bukkit
 import org.bukkit.Keyed
+import org.bukkit.inventory.BlastingRecipe
+import org.bukkit.inventory.CampfireRecipe
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.SmithingRecipe
+import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.Initializable
@@ -128,7 +131,7 @@ object RecipeRegistry : Initializable() {
                 val namespace = key.namespace
                 
                 (namespace == "minecraft" || namespace == "nova" || CustomItemServiceManager.hasRecipe(key)) // do not allow recipes from unsupported plugins to show up
-                    && (it is ShapedRecipe || it is ShapelessRecipe || it is FurnaceRecipe || it is StonecuttingRecipe || it is SmithingRecipe)
+                    && (it is ShapedRecipe || it is ShapelessRecipe || it is FurnaceRecipe || it is StonecuttingRecipe || it is SmithingRecipe || it is BlastingRecipe || it is CampfireRecipe || it is SmokingRecipe)
             }
     }
     

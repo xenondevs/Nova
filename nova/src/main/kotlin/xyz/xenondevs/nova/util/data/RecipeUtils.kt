@@ -15,6 +15,9 @@ import net.minecraft.world.item.crafting.CraftingBookCategory as MojangCraftingB
 import net.minecraft.world.item.crafting.ShapedRecipe as MojangShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe as MojangShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe as MojangFurnaceRecipe
+import net.minecraft.world.item.crafting.BlastingRecipe as MojangBlastFurnaceRecipe
+import net.minecraft.world.item.crafting.SmokingRecipe as MojangSmokerRecipe
+import net.minecraft.world.item.crafting.CampfireCookingRecipe as MojangCampfireRecipe
 import net.minecraft.world.item.crafting.StonecutterRecipe as MojangStonecuttingRecipe
 
 val Recipe.key: NamespacedKey
@@ -25,7 +28,7 @@ fun Recipe.getInputStacks(): List<ItemStack> =
         
         is ShapedRecipe -> choiceMap.values.mapNotNull { choice -> choice?.getInputStacks() }.flatten()
         is ShapelessRecipe -> choiceList.map { it.getInputStacks() }.flatten()
-        is FurnaceRecipe -> inputChoice.getInputStacks()
+        is CookingRecipe<*> -> inputChoice.getInputStacks()
         is StonecuttingRecipe -> inputChoice.getInputStacks()
         is SmithingRecipe -> base.getInputStacks() + addition.getInputStacks()
         
@@ -83,6 +86,24 @@ internal fun MojangFurnaceRecipe.clientsideCopy(): MojangFurnaceRecipe {
     val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
     val ingredient = ingredients.first().clientsideCopy()
     return MojangFurnaceRecipe(id, group, category(), ingredient, result, experience, cookingTime)
+}
+
+internal fun MojangBlastFurnaceRecipe.clientsideCopy(): MojangBlastFurnaceRecipe {
+    val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
+    val ingredient = ingredients.first().clientsideCopy()
+    return MojangBlastFurnaceRecipe(id, group, category(), ingredient, result, experience, cookingTime)
+}
+
+internal fun MojangSmokerRecipe.clientsideCopy(): MojangSmokerRecipe {
+    val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
+    val ingredient = ingredients.first().clientsideCopy()
+    return MojangSmokerRecipe(id, group, category(), ingredient, result, experience, cookingTime)
+}
+
+internal fun MojangCampfireRecipe.clientsideCopy(): MojangCampfireRecipe {
+    val result = if (PacketItems.isNovaItem(resultItem)) PacketItems.getFakeItem(null, resultItem) else resultItem
+    val ingredient = ingredients.first().clientsideCopy()
+    return MojangCampfireRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }
 
 internal fun StonecuttingRecipe.clientsideCopy(): MojangStonecuttingRecipe {
