@@ -26,6 +26,9 @@ resource_pack:
   use_solid_blocks: true
   # If players currently loading the resource pack should be frozen.
   freeze_loading_players: false
+  # Whether Minecraft assets should be downloaded from GitHub or Mojang's API.
+  # GitHub is faster since it's a single zip file. If you're unable to access GitHub, change this to "mojang".
+  minecraft_assets_source: github
 
 # If Nova should use a java agent to self-attach and redefine methods.
 # This option will be automatically set to false if your jdk does not support java agents.

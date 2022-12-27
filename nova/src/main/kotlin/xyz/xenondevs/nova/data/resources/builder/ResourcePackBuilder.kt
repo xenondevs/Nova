@@ -96,11 +96,19 @@ internal class ResourcePackBuilder {
             // download minecraft assets if not present / outdated
             if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != Version.SERVER_VERSION) {
                 MCASSETS_DIR.deleteRecursively()
+                
+                val mode =
+                    when (DEFAULT_CONFIG.getString("resource_pack.minecraft_assets_source")!!.lowercase()) {
+                        "github" -> ExtractionMode.GITHUB
+                        "mojang" -> ExtractionMode.MOJANG_ALL
+                        else -> throw IllegalArgumentException("Invalid minecraft_assets_source (must be \"github\" or \"mojang\")")
+                    }
+                
                 runBlocking {
                     val downloader = MinecraftAssetsDownloader(
                         version = Version.SERVER_VERSION.toString(omitZeros = true),
                         outputDirectory = MCASSETS_DIR,
-                        mode = ExtractionMode.GITHUB,
+                        mode = mode,
                         logger = LOGGER
                     )
                     downloader.downloadAssets()
