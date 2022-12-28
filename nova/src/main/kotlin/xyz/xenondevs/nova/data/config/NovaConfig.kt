@@ -42,7 +42,7 @@ object NovaConfig : Initializable() {
     private val configs = HashMap<String, YamlConfiguration>()
     internal val reloadables = arrayListOf<Reloadable>()
     
-    fun loadDefaultConfig() {
+    internal fun loadDefaultConfig() {
         LOGGER.info("Loading default config")
         
         configs["config"] = ConfigExtractor.extract(

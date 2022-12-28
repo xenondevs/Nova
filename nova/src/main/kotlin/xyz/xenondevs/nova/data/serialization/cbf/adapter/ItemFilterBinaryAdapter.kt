@@ -7,7 +7,7 @@ import xyz.xenondevs.cbf.buffer.ByteBuffer
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import java.lang.reflect.Type
 
-object ItemFilterBinaryAdapter : BinaryAdapter<ItemFilter> {
+internal object ItemFilterBinaryAdapter : BinaryAdapter<ItemFilter> {
     
     override fun read(type: Type, buf: ByteBuffer): ItemFilter {
         val whitelist = buf.readBoolean()

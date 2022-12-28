@@ -31,7 +31,7 @@ object ActionbarOverlayManager {
         reload()
     }
     
-    fun reload() {
+    internal fun reload() {
         if (tickTask != null) {
             tickTask?.cancel()
             PacketEventManager.unregisterListener(this)

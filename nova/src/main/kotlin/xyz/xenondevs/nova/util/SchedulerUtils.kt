@@ -68,7 +68,7 @@ fun runAsyncTaskTimerSynchronized(lock: Any, delay: Long, period: Long, run: () 
 fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit) =
     Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA.loader, run, delay, period)
 
-object AsyncExecutor {
+internal object AsyncExecutor {
     
     private val THREADS = DEFAULT_CONFIG.getInt("performance.nova_executor.threads")
     

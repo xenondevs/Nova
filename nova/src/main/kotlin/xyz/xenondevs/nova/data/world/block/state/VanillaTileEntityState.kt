@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.world.BlockPos
 
-internal class VanillaTileEntityState(override val pos: BlockPos, override val id: NamespacedId) : BlockState {
+internal class VanillaTileEntityState(override val pos: BlockPos, override val id: NamespacedId) : BlockState() {
     
     @Volatile
     lateinit var data: Compound

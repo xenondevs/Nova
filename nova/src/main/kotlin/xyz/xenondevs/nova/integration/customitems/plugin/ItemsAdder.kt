@@ -162,7 +162,7 @@ internal object ItemsAdder : CustomItemService {
     
 }
 
-class ItemsAdderLoadListener(private val run: () -> Unit) : Listener {
+private class ItemsAdderLoadListener(private val run: () -> Unit) : Listener {
     
     @EventHandler
     fun handleItemsAdderLoadData(event: ItemsAdderLoadDataEvent) {

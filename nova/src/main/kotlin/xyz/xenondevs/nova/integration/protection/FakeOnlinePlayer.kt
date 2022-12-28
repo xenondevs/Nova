@@ -76,7 +76,7 @@ import java.util.*
  * This [Player] is also granted access to the [hasPermission]
  * method via Vault.
  */
-class FakeOnlinePlayer(
+internal class FakeOnlinePlayer(
     private val offlinePlayer: OfflinePlayer,
     private val location: Location
 ) : Player, OfflinePlayer by offlinePlayer {

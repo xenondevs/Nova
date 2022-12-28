@@ -20,7 +20,7 @@ import kotlin.io.path.exists
  * Removes the break, hit, step and fall sounds for blocks used by Nova to display custom blocks (note block, mushroom blocks,
  * specified armor stand hitbox blocks) and copies them to the Nova namespace, so that they can be completely controlled by the server.
  */
-class BlockSoundOverrides {
+internal class BlockSoundOverrides {
     
     private val soundGroups = HashSet<SoundGroup>()
     private val soundEvents = ArrayList<String>()

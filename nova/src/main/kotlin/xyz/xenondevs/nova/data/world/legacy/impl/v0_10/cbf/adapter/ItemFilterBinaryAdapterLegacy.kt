@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import java.lang.reflect.Type
 
-object ItemFilterBinaryAdapterLegacy : BinaryAdapterLegacy<ItemFilter> {
+internal object ItemFilterBinaryAdapterLegacy : BinaryAdapterLegacy<ItemFilter> {
     
     override fun write(obj: ItemFilter, buf: ByteBuf) {
         val compound = LegacyCompound().also {

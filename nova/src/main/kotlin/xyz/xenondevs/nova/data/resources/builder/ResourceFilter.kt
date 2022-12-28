@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.resources.builder
 import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.util.data.WildcardUtils
 
-class ResourceFilter(
+internal class ResourceFilter(
     val stage: Stage,
     val type: Type,
     val filter: Regex,

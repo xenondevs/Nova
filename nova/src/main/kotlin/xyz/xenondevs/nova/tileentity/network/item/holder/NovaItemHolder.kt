@@ -96,13 +96,13 @@ class NovaItemHolder internal constructor(
     override val channels: MutableMap<BlockFace, Int> =
         endPoint.retrieveData("channels") { CUBE_FACES.associateWithToEnumMap { 0 } }
     
-    fun getNetworkedInventory(virtualInventory: VirtualInventory) =
+    fun getNetworkedInventory(virtualInventory: VirtualInventory): NetworkedInventory =
         availableInventories[virtualInventory.uuid]!!
     
-    fun getNetworkedInventory(uuid: UUID) =
+    fun getNetworkedInventory(uuid: UUID): NetworkedInventory =
         availableInventories[uuid]!!
     
-    private fun findUUID(networkedInventory: NetworkedInventory) =
+    private fun findUUID(networkedInventory: NetworkedInventory): UUID? =
         availableInventories.firstNotNullOfOrNull { if (it.value == networkedInventory) it.key else null }
     
     override fun saveData() {

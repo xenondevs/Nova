@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import org.bukkit.NamespacedKey
 
-object NamespacedKeyTypeAdapter : TypeAdapter<NamespacedKey?>() {
+internal object NamespacedKeyTypeAdapter : TypeAdapter<NamespacedKey?>() {
     
     override fun write(writer: JsonWriter, value: NamespacedKey?) {
         if (value != null)

@@ -51,7 +51,7 @@ object BossBarOverlayManager : Initializable(), Listener {
     
     override fun init() = reload()
     
-    fun reload() {
+    internal fun reload() {
         // was previously enabled?
         if (tickTask != null) {
             unregisterEvents()

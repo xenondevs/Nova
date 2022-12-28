@@ -44,7 +44,7 @@ private val ATTRIBUTE_DECIMAL_FORMAT = DecimalFormat("#.##")
 /**
  * Handles actions performed on [ItemStack]s of a [ItemNovaMaterial]
  */
-class NovaItem(holders: List<ItemBehaviorHolder<*>>) {
+class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     
     val behaviors by lazy { holders.map { it.get(material) } }
     private lateinit var material: ItemNovaMaterial
@@ -64,7 +64,7 @@ class NovaItem(holders: List<ItemBehaviorHolder<*>>) {
     internal val vanillaMaterial: Material by vanillaMaterialProvider
     internal val attributeModifiers: Map<EquipmentSlot, List<AttributeModifier>> by attributeModifiersProvider
     
-    constructor(vararg holders: ItemBehaviorHolder<*>) : this(holders.toList())
+    internal constructor(vararg holders: ItemBehaviorHolder<*>) : this(holders.toList())
     
     @Suppress("UNCHECKED_CAST")
     fun <T : ItemBehavior> getBehavior(type: KClass<T>): T? {

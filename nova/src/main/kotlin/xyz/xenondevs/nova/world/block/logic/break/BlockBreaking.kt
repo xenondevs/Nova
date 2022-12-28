@@ -50,7 +50,7 @@ internal object BlockBreaking : Listener {
         runTaskTimer(0, 1, BlockBreaking::handleTick)
     }
     
-    internal fun setBreakStage(pos: BlockPos, entityId: Int, stage: Int) {
+    fun setBreakStage(pos: BlockPos, entityId: Int, stage: Int) {
         val blockState = BlockManager.getBlock(pos) ?: return
         
         val block = pos.block
@@ -80,7 +80,7 @@ internal object BlockBreaking : Listener {
         method.breakStage = stage
     }
     
-    internal fun setBreakCooldown(player: Player) {
+    fun setBreakCooldown(player: Player) {
         breakCooldowns[player] = serverTick + BREAK_COOLDOWN
     }
     

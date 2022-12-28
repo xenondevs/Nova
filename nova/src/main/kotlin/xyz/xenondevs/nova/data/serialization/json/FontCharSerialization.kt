@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.util.data.getInt
 import xyz.xenondevs.nova.util.data.getString
 import java.lang.reflect.Type
 
-object FontCharSerialization : JsonSerializer<FontChar>, JsonDeserializer<FontChar> {
+internal object FontCharSerialization : JsonSerializer<FontChar>, JsonDeserializer<FontChar> {
     
     override fun serialize(src: FontChar, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         return JsonObject().apply {

@@ -46,7 +46,7 @@ typealias NetworkManagerTask = (NetworkManager) -> Unit
 
 private typealias PartialTask = () -> Unit
 
-class NoNetworkDataException(override val message: String? = null) : Exception()
+private class NoNetworkDataException(override val message: String? = null) : Exception()
 
 private var NETWORK_MANAGER = NetworkManagerImpl()
 

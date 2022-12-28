@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.world.fakeentity.impl.FakeArmorStand
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 
-interface BreakMethod {
+internal interface BreakMethod {
     
     val hasClientsidePrediction: Boolean
     var breakStage: Int

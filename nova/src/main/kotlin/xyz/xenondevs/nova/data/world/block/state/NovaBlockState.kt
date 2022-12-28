@@ -21,7 +21,7 @@ import kotlin.reflect.full.superclasses
 import xyz.xenondevs.nova.api.block.NovaBlockState as INovaBlockState
 
 @Suppress("CanBePrimaryConstructorProperty", "UNCHECKED_CAST")
-open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMaterial) : BlockState, INovaBlockState {
+open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMaterial) : BlockState(), INovaBlockState {
     
     override val id = material.id
     override val material = material

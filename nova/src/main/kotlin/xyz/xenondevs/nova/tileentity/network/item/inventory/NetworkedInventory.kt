@@ -74,7 +74,7 @@ interface NetworkedInventory : EndPointContainer {
 /**
  * A [NetworkedInventory] wrapper for [VirtualInventory]
  */
-class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : NetworkedInventory {
+class NetworkedVirtualInventory internal constructor(val virtualInventory: VirtualInventory) : NetworkedInventory {
     
     override val size: Int
         get() = virtualInventory.size
@@ -145,7 +145,7 @@ class NetworkedVirtualInventory(val virtualInventory: VirtualInventory) : Networ
     
 }
 
-class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<VirtualInventory, NetworkConnectionType>>) : NetworkedInventory {
+internal class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<VirtualInventory, NetworkConnectionType>>) : NetworkedInventory {
     
     val inventories: List<VirtualInventory> =
         inventories.map { it.first }.sortedByDescending { it.guiShiftPriority }
@@ -255,7 +255,7 @@ class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<VirtualInventory
 /**
  * A [NetworkedInventory] wrapper for [Inventory]
  */
-open class NetworkedBukkitInventory(val inventory: Inventory) : NetworkedInventory {
+internal open class NetworkedBukkitInventory(val inventory: Inventory) : NetworkedInventory {
     
     override val size = inventory.size
     override val items: Array<ItemStack?>
@@ -291,7 +291,7 @@ open class NetworkedBukkitInventory(val inventory: Inventory) : NetworkedInvento
  * A [NetworkedInventory] specifically for chests. This implementation compares the inventory location
  * instead of the inventories themselves, so double chest inventories are seen as the same inventory.
  */
-class NetworkedChestInventory(inventory: Inventory) : NetworkedBukkitInventory(inventory) {
+internal class NetworkedChestInventory(inventory: Inventory) : NetworkedBukkitInventory(inventory) {
     
     override fun equals(other: Any?) =
         other is NetworkedChestInventory && other.inventory.location == inventory.location
@@ -305,7 +305,7 @@ class NetworkedChestInventory(inventory: Inventory) : NetworkedBukkitInventory(i
  * A [NetworkedInventory] specifically for shulker boxes. This implementation prevents the insertion
  * of other shulker boxes into the shulker box inventory.
  */
-class NetworkedShulkerBoxInventory(inventory: Inventory) : NetworkedBukkitInventory(inventory) {
+internal class NetworkedShulkerBoxInventory(inventory: Inventory) : NetworkedBukkitInventory(inventory) {
     
     override fun addItem(item: ItemStack): Int {
         return if (item.type.name.contains("SHULKER_BOX")) item.amount
@@ -320,7 +320,7 @@ class NetworkedShulkerBoxInventory(inventory: Inventory) : NetworkedBukkitInvent
  * Useful for splitting different slots inside vanilla TileEntities into multiple [NetworkedInventory]s
  * such as one for the input and one for the output of that TileEntity.
  */
-class NetworkedRangedBukkitInventory(
+internal class NetworkedRangedBukkitInventory(
     private val inventory: Inventory,
     private vararg val slots: Int
 ) : NetworkedInventory {
