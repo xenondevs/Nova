@@ -167,25 +167,23 @@ object RecipeManager : Initializable(), Listener {
     //<editor-fold desc="hardcoded recipes", defaultstate="collapsed">
     @HardcodedRecipes
     fun registerHardcodedRecipe(recipe: NovaRecipe) {
-        loadRecipe(recipe)
         hardcodedRecipes += recipe
     }
     
     @HardcodedRecipes
+    @JvmName("registerHardcodedRecipes1")
     fun registerHardcodedRecipes(recipes: Iterable<NovaRecipe>) {
-        recipes.forEach(::loadRecipe)
         hardcodedRecipes.addAll(recipes)
     }
     
     @HardcodedRecipes
     fun registerHardcodedRecipe(recipe: BukkitRecipe) {
-        loadRecipe(recipe)
         hardcodedRecipes += recipe
     }
     
     @HardcodedRecipes
+    @JvmName("registerHardcodedRecipes2")
     fun registerHardcodedRecipes(recipes: Iterable<BukkitRecipe>) {
-        recipes.forEach(::loadRecipe)
         hardcodedRecipes.addAll(recipes)
     }
     //</editor-fold>
