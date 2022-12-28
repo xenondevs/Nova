@@ -31,8 +31,8 @@ import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.AdvancedTooltips
-import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -63,12 +63,14 @@ internal object NovaCommand : Command("nova") {
                 .requiresPermission("nova.command.give")
                 .then(argument("player", EntityArgument.players())
                     .apply {
-                        ItemCategories.OBTAINABLE_MATERIALS.forEach { material ->
-                            then(literal(material.id.toString())
-                                .executesCatching { giveTo(it, material, 1) }
-                                .then(argument("amount", IntegerArgumentType.integer())
-                                    .executesCatching { giveTo(it, material) }))
-                        }
+                        NovaMaterialRegistry.values.asSequence()
+                            .filterNot { it.isHidden }
+                            .forEach { material ->
+                                then(literal(material.id.toString())
+                                    .executesCatching { giveTo(it, material, 1) }
+                                    .then(argument("amount", IntegerArgumentType.integer())
+                                        .executesCatching { giveTo(it, material) }))
+                            }
                     }))
             .then(literal("debug")
                 .requiresPermission("nova.command.debug")

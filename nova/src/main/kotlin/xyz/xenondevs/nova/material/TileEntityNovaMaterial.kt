@@ -19,6 +19,7 @@ class TileEntityNovaMaterial internal constructor(
     localizedName: String,
     novaItem: NovaItem,
     maxStackSize: Int,
+    isHidden: Boolean,
     novaBlock: NovaBlock<NovaTileEntityState>,
     options: BlockOptions,
     internal val tileEntityConstructor: TileEntityConstructor,
@@ -30,6 +31,7 @@ class TileEntityNovaMaterial internal constructor(
     localizedName,
     novaItem,
     maxStackSize,
+    isHidden,
     novaBlock as NovaBlock<NovaBlockState>, // fixme: users could cast to BlockNovaMaterial and then call methods on the NovaBlock with a BlockState that is not a NovaTileEntityState
     options,
     properties,

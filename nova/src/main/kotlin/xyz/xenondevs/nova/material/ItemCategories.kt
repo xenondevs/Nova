@@ -36,8 +36,6 @@ internal object ItemCategories : Initializable() {
     
     lateinit var CATEGORIES: List<ItemCategory>
         private set
-    lateinit var OBTAINABLE_MATERIALS: Set<ItemNovaMaterial>
-        private set
     lateinit var OBTAINABLE_ITEMS: List<CategorizedItem>
         private set
     
@@ -78,11 +76,6 @@ internal object ItemCategories : Initializable() {
             .mapNotNull(ItemCategory::deserialize)
         
         OBTAINABLE_ITEMS = CATEGORIES.flatMap { it.items }
-        
-        OBTAINABLE_MATERIALS = OBTAINABLE_ITEMS.mapNotNullTo(HashSet()) {
-            NovaMaterialRegistry.getOrNull(it.id)
-                ?: NovaMaterialRegistry.getNonNamespaced(it.id.removePrefix("nova:")).firstOrNull()
-        }
     }
     
     private fun loadCategories(categories: MutableMap<String, Pair<CategoryPriority, ConfigurationSection>>, addonId: String, stream: InputStream) {

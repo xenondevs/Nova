@@ -23,7 +23,8 @@ open class ItemNovaMaterial internal constructor(
     final override val id: NamespacedId,
     val localizedName: String,
     val novaItem: NovaItem,
-    maxStackSize: Int = 64
+    maxStackSize: Int = 64,
+    val isHidden: Boolean = false
 ) : INovaMaterial {
     
     val maxStackSize: Int by lazyProvider { novaItem.vanillaMaterialProvider.map { min(maxStackSize, it.maxStackSize) } }

@@ -11,6 +11,7 @@ abstract class NovaMaterialBuilder<S: NovaMaterialBuilder<S>> internal construct
     protected val itemBehaviors = ArrayList<ItemBehaviorHolder<*>>()
     protected open var localizedName = "item.${id.namespace}.$name"
     protected var maxStackSize = 64
+    protected var isHidden = false
     
     fun localizedName(localizedName: String): S {
         this.localizedName = localizedName
@@ -24,6 +25,11 @@ abstract class NovaMaterialBuilder<S: NovaMaterialBuilder<S>> internal construct
     
     fun itemBehaviors(vararg itemBehaviors: ItemBehaviorHolder<*>): S {
         this.itemBehaviors += itemBehaviors
+        return getThis()
+    }
+    
+    fun hidden(hidden: Boolean): S {
+        this.isHidden = hidden
         return getThis()
     }
     
