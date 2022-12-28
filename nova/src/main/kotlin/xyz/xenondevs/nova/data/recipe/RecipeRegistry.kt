@@ -36,6 +36,7 @@ object RecipeRegistry : Initializable() {
     fun addHardcodedRecipes(recipes: List<NovaRecipe>) {
         check(!isInitialized) { "Recipes are already initialized" }
         hardcodedRecipes += recipes
+        recipes.forEach(RecipeManager::loadRecipe)
     }
     
     fun addCreationInfo(info: Map<String, String>) {
@@ -133,7 +134,7 @@ object RecipeRegistry : Initializable() {
     }
     
     private fun getAllNovaRecipes(): Sequence<NovaRecipe> {
-        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + hardcodedRecipes.asSequence()
+        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values }
     }
     
     private fun getCreationNovaRecipeSequence(): Sequence<ResultingRecipe> {

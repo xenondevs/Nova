@@ -148,58 +148,60 @@ object RecipeManager : Initializable(), Listener {
     }
     
     private fun loadRecipes() {
-        RecipesLoader.loadRecipes().forEach { recipe ->
-            when (recipe) {
-                is Recipe -> {
-                    val key = (recipe as Keyed).key
+        RecipesLoader.loadRecipes().forEach(::loadRecipe)
+    }
+    
+    fun loadRecipe(recipe: Any) {
+        when (recipe) {
+            is Recipe -> {
+                val key = (recipe as Keyed).key
+            
+                when (recipe) {
+                
+                    is ShapedRecipe -> {
+                        val optimizedRecipe = OptimizedShapedRecipe(recipe)
+                        shapedRecipes[key] = optimizedRecipe
                     
-                    when (recipe) {
-                        
-                        is ShapedRecipe -> {
-                            val optimizedRecipe = OptimizedShapedRecipe(recipe)
-                            shapedRecipes[key] = optimizedRecipe
-                            
-                            val nmsRecipe = NovaShapedRecipe(optimizedRecipe)
-                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
-                            
-                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                        }
-                        
-                        is ShapelessRecipe -> {
-                            shapelessRecipes[key] = recipe
-                            
-                            val nmsRecipe = NovaShapelessRecipe(recipe)
-                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
-                            
-                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                        }
-                        
-                        is FurnaceRecipe -> {
-                            furnaceRecipes[key] = recipe
-                            
-                            val nmsRecipe = NovaFurnaceRecipe(recipe)
-                            minecraftServer.recipeManager.addRecipe(nmsRecipe)
-                            
-                            _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                        }
-                        
-                        is StonecuttingRecipe -> {
-                            Bukkit.addRecipe(recipe)
-                            
-                            _clientsideRecipes[key] = recipe.clientsideCopy()
-                        }
-                        
-                        else -> Bukkit.addRecipe(recipe)
+                        val nmsRecipe = NovaShapedRecipe(optimizedRecipe)
+                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                    
+                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                     }
+                
+                    is ShapelessRecipe -> {
+                        shapelessRecipes[key] = recipe
                     
-                    registeredVanillaRecipeKeys += key
-                    customVanillaRecipeKeys += key
+                        val nmsRecipe = NovaShapelessRecipe(recipe)
+                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                    
+                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
+                    }
+                
+                    is FurnaceRecipe -> {
+                        furnaceRecipes[key] = recipe
+                    
+                        val nmsRecipe = NovaFurnaceRecipe(recipe)
+                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                    
+                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
+                    }
+                
+                    is StonecuttingRecipe -> {
+                        Bukkit.addRecipe(recipe)
+                    
+                        _clientsideRecipes[key] = recipe.clientsideCopy()
+                    }
+                
+                    else -> Bukkit.addRecipe(recipe)
                 }
-                
-                is NovaRecipe -> _novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
-                
-                else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
+            
+                registeredVanillaRecipeKeys += key
+                customVanillaRecipeKeys += key
             }
+        
+            is NovaRecipe -> _novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
+        
+            else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
         }
     }
     
