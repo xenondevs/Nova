@@ -65,7 +65,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         
         return@map listOf(
             AttributeModifier(
-                "Nova Armor",
+                "Nova Armor (${novaMaterial.id}})",
                 Attributes.ARMOR,
                 Operation.ADDITION,
                 it[1] as Double,
@@ -73,7 +73,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 equipmentSlot
             ),
             AttributeModifier(
-                "Nova Armor Toughness",
+                "Nova Armor Toughness (${novaMaterial.id}})",
                 Attributes.ARMOR_TOUGHNESS,
                 Operation.ADDITION,
                 it[2] as Double,
@@ -81,7 +81,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 equipmentSlot
             ),
             AttributeModifier(
-                "Nova Knockback Resistance",
+                "Nova Knockback Resistance (${novaMaterial.id}})",
                 Attributes.KNOCKBACK_RESISTANCE,
                 Operation.ADDITION,
                 it[3] as Double,
