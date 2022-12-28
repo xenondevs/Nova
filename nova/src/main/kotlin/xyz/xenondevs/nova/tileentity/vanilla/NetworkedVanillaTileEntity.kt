@@ -12,8 +12,9 @@ import java.util.*
 
 internal abstract class NetworkedVanillaTileEntity internal constructor(state: VanillaTileEntityState) : VanillaTileEntity(state), NetworkEndPoint {
     
-    override val location = blockState.pos.location
-    override val uuid = HashUtils.getUUID(blockState.pos)
+    final override val location = blockState.pos.location
+    final override val uuid = HashUtils.getUUID(blockState.pos)
+    final override var isNetworkInitialized = false
     
     final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = HashMap()
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = HashMap()
@@ -35,8 +36,8 @@ internal abstract class NetworkedVanillaTileEntity internal constructor(state: V
     override fun saveData() {
         super.saveData()
         
-        storeData("networks", serializeNetworks())
-        storeData("connectedNodes", serializeConnectedNodes())
+        serializeNetworks()
+        serializeConnectedNodes()
     }
     
 }

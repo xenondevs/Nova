@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.data.serialization.DataHolder
 import java.util.*
 
 /**
@@ -31,15 +32,10 @@ interface NetworkBridge : NetworkNode {
     /**
      * Called when a network update occurs. This includes [NetworkNodes][NetworkNode] being
      * placed or broken next to this [NetworkBridge] as well as the placement of this bridge itself.
-     * 
+     *
      * This method is not called when adjacent [NetworkNodes][NetworkNode] are loaded / unloaded.
      */
     fun handleNetworkUpdate() // TODO: Should be in NetworkNode
-    
-    /**
-     * Retrieves the serialized networks map from internal storage.
-     */
-    fun retrieveSerializedNetworks(): Map<NetworkType, UUID>?
     
     fun setNetwork(networkType: NetworkType, network: Network) {
         networks[networkType] = network
@@ -63,9 +59,24 @@ interface NetworkBridge : NetworkNode {
     }
     
     /**
-     * Converts the [networks] map to a serializable version.
+     * Serializes and writes the [networks] map to internal storage.
      */
-    fun serializeNetworks(): HashMap<NetworkType, UUID> =
-        networks.entries.associateTo(HashMap()) { it.key to it.value.uuid }
+    fun serializeNetworks() {
+        require(this is DataHolder)
+        
+        if (!isNetworkInitialized)
+            return
+        
+        val serializedNetworks = networks.entries.associateTo(HashMap()) { it.key to it.value.uuid }
+        storeData("networks", serializedNetworks)
+    }
+    
+    /**
+     * Retrieves the serialized networks map from internal storage.
+     */
+    fun retrieveSerializedNetworks(): Map<NetworkType, UUID>? {
+        require(this is DataHolder)
+        return retrieveDataOrNull<HashMap<NetworkType, UUID>>("networks")
+    }
     
 }
