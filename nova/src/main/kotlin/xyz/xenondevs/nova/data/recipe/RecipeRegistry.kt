@@ -32,13 +32,21 @@ object RecipeRegistry : Initializable() {
     override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = setOf(RecipeManager)
     
-    private val hardcodedRecipes = ArrayList<NovaRecipe>()
+    private val fakeRecipes = ArrayList<NovaRecipe>()
     val creationInfo = HashMap<String, String>()
     val usageInfo = HashMap<String, String>()
     
-    fun addHardcodedRecipes(recipes: List<NovaRecipe>) {
+    @Deprecated("Misleading name, does not register any recipes.", ReplaceWith("addFakeRecipes(recipes)"))
+    fun addHardcodedRecipes(recipes: List<NovaRecipe>) = addFakeRecipes(recipes)
+    
+    fun addFakeRecipes(recipes: List<NovaRecipe>) {
         check(!isInitialized) { "Recipes are already initialized" }
-        hardcodedRecipes += recipes
+        fakeRecipes += recipes
+    }
+    
+    fun addFakeRecipe(recipe: NovaRecipe) {
+        check(!isInitialized) { "Recipes are already initialized" }
+        fakeRecipes += recipe
     }
     
     fun addCreationInfo(info: Map<String, String>) {
@@ -136,7 +144,7 @@ object RecipeRegistry : Initializable() {
     }
     
     private fun getAllNovaRecipes(): Sequence<NovaRecipe> {
-        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + hardcodedRecipes.asSequence()
+        return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + fakeRecipes.asSequence()
     }
     
     private fun getCreationNovaRecipeSequence(): Sequence<ResultingRecipe> {
