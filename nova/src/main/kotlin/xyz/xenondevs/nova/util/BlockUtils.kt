@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ExperienceOrb
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.item.crafting.AbstractCookingRecipe
@@ -44,6 +45,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.soundGroup
@@ -58,6 +60,7 @@ import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 import kotlin.math.floor
+import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -280,16 +283,22 @@ fun Block.remove(ctx: BlockBreakContext, playSound: Boolean, showParticles: Bool
  * @param ctx The [BlockBreakContext] to be used
  * @param breakEffects If break effects should be displayed (i.e. sounds and particle effects).
  */
-fun Block.remove(
-    ctx: BlockBreakContext,
-    breakEffects: Boolean = true
-) = removeInternal(ctx, breakEffects, true)
+fun Block.remove(ctx: BlockBreakContext, breakEffects: Boolean = true) {
+    removeInternal(ctx, ToolUtils.isCorrectToolForDrops(this, ctx.item), breakEffects, true)
+}
 
-internal fun Block.removeInternal(ctx: BlockBreakContext, breakEffects: Boolean, sendEffectsToBreaker: Boolean) {
-    if (CustomItemServiceManager.removeBlock(this, breakEffects))
-        return
-    if (BlockManager.removeBlockInternal(ctx, breakEffects, sendEffectsToBreaker))
-        return
+internal fun Block.removeInternal(ctx: BlockBreakContext, drops: Boolean, breakEffects: Boolean, sendEffectsToBreaker: Boolean): List<ItemEntity> {
+    if (CustomItemServiceManager.getId(this) != null) {
+        val itemEntities = CustomItemServiceManager.getDrops(this, ctx.item)!!.let(::createDroppedItemEntities)
+        CustomItemServiceManager.removeBlock(this, breakEffects)
+        return itemEntities
+    }
+    
+    if (BlockManager.getBlock(pos) != null) {
+        val itemEntities = BlockManager.getDrops(this.location, ctx.source, ctx.item)!!.let(::createDroppedItemEntities)
+        BlockManager.removeBlockInternal(ctx, breakEffects, sendEffectsToBreaker)
+        return itemEntities
+    }
     
     val nmsPlayer = (ctx.source as? Player)?.serverPlayer
         ?: ctx.source as? MojangPlayer
@@ -301,7 +310,7 @@ internal fun Block.removeInternal(ctx: BlockBreakContext, breakEffects: Boolean,
     val block = state.block
     val blockEntity = level.getBlockEntity(pos)
     
-    level.captureDrops {
+    return level.captureDrops {
         // calls game and level events (includes break effects), angers piglins, ignites unstable tnt, etc.
         val willDestroy = { block.playerWillDestroy(level, pos, state, nmsPlayer) }
         if (breakEffects) {
@@ -316,10 +325,22 @@ internal fun Block.removeInternal(ctx: BlockBreakContext, breakEffects: Boolean,
         if (removed) {
             block.destroy(level, pos, state)
             
-            if (!nmsPlayer.isCreative) {
+            if (!nmsPlayer.isCreative && drops) {
                 block.playerDestroy(level, nmsPlayer, pos, state, blockEntity, ctx.item.nmsCopy)
             }
         }
+    }
+}
+
+internal fun Block.createDroppedItemEntities(items: Iterable<ItemStack>): List<ItemEntity> {
+    return items.map {
+        ItemEntity(
+            world.serverLevel,
+            x + 0.5 + Random.nextDouble(-0.25, 0.25),
+            y + 0.5 + Random.nextDouble(-0.25, 0.25),
+            z + 0.5 + Random.nextDouble(-0.25, 0.25),
+            it.nmsCopy
+        ).apply(ItemEntity::setDefaultPickUpDelay)
     }
 }
 

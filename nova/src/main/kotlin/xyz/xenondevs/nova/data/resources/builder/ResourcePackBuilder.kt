@@ -48,6 +48,15 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
 import kotlin.io.path.writeText
 
+
+private val EXTRACTION_MODE by configReloadable {
+    when (DEFAULT_CONFIG.getString("resource_pack.generation.minecraft_assets_source")!!.lowercase()) {
+        "github" -> ExtractionMode.GITHUB
+        "mojang" -> ExtractionMode.MOJANG_ALL
+        else -> throw IllegalArgumentException("Invalid minecraft_assets_source (must be \"github\" or \"mojang\")")
+    }
+}
+
 private val CONFIG_RESOURCE_FILTERS = configReloadable { DEFAULT_CONFIG.getConfigurationSectionList("resource_pack.generation.resource_filters").map(ResourceFilter::of) }
 private val CORE_RESOURCE_FILTERS = configReloadable {
     buildList {
@@ -142,7 +151,7 @@ internal class ResourcePackBuilder {
                     val downloader = MinecraftAssetsDownloader(
                         version = Version.SERVER_VERSION.toString(omitZeros = true),
                         outputDirectory = MCASSETS_DIR.toFile(),
-                        mode = ExtractionMode.GITHUB,
+                        mode = EXTRACTION_MODE,
                         logger = LOGGER
                     )
                     downloader.downloadAssets()

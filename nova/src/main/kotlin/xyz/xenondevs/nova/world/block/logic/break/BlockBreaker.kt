@@ -7,7 +7,6 @@ import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.ExperienceOrb
-import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.phys.Vec3
@@ -36,7 +35,6 @@ import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.axis
 import xyz.xenondevs.nova.util.callEvent
-import xyz.xenondevs.nova.util.getAllDrops
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.damageToolBreakBlock
@@ -52,7 +50,6 @@ import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
-import kotlin.random.Random
 
 private val CLIENTSIDE_PREDICTIONS by configReloadable { DEFAULT_CONFIG.getBoolean("world.block_breaking.clientside_predictions") }
 private val MINING_FATIGUE = MobEffectInstance(MobEffect.byId(4), Integer.MAX_VALUE, 255, false, false, false)
@@ -240,21 +237,6 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         
         if (!event.isCancelled && !ProtectionManager.isVanillaProtected(player, block.location)) {
             //<editor-fold desc="item drops", defaultstate="collapsed">
-            // TODO: block drops gamerule?
-            // drop items
-            if (event.isDropItems && (player.gameMode == GameMode.CREATIVE || drops)) {
-                val itemEntities = block.getAllDrops(ctx).map {
-                    ItemEntity(
-                        level,
-                        block.x + 0.5 + Random.nextDouble(-0.25, 0.25),
-                        block.y + 0.5 + Random.nextDouble(-0.25, 0.25),
-                        block.z + 0.5 + Random.nextDouble(-0.25, 0.25),
-                        it.nmsCopy
-                    ).apply(ItemEntity::setDefaultPickUpDelay)
-                }
-                CraftEventFactory.handleBlockDropItemEvent(block, block.state, player.serverPlayer, itemEntities)
-            }
-            //</editor-fold>
             //<editor-fold desc="exp drops", defaultstate="collapsed">
             if (level.gameRules.getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
                 val exp = event.expToDrop
@@ -282,7 +264,12 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
                 player.damageToolBreakBlock()
             
             // remove block
-            block.removeInternal(ctx, true, !brokenClientside)
+            val itemEntities = block.removeInternal(ctx, event.isDropItems && drops, true, !brokenClientside)
+            
+            // drop items
+            if (event.isDropItems) {
+                CraftEventFactory.handleBlockDropItemEvent(block, block.state, player.serverPlayer, itemEntities)
+            }
         } else {
             // If the block wasn't broken clientside, the client will keep breaking the block and not send
             // START_DESTROY_BLOCK again. For those cases, the internal progress will be reset as well.
