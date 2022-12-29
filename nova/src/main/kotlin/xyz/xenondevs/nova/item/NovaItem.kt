@@ -8,6 +8,8 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.MobType
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
@@ -16,6 +18,9 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.provider.combinedLazyProvider
 import xyz.xenondevs.nova.data.provider.flatten
 import xyz.xenondevs.nova.data.provider.map
@@ -27,13 +32,18 @@ import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.appendLocalized
+import xyz.xenondevs.nova.util.data.getConfigurationSectionList
+import xyz.xenondevs.nova.util.data.getDoubleOrNull
 import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.takeUnlessEmpty
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
+import java.util.logging.Level
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -46,14 +56,15 @@ private val ATTRIBUTE_DECIMAL_FORMAT = DecimalFormat("#.##")
  */
 class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     
-    val behaviors by lazy { holders.map { it.get(material) } }
+    val behaviors: List<ItemBehavior> by lazy { holders.map { it.get(material) } }
     private lateinit var material: ItemNovaMaterial
     private lateinit var name: Array<BaseComponent>
     
     internal val vanillaMaterialProvider = combinedLazyProvider { behaviors.map(ItemBehavior::vanillaMaterialProperties) }
         .flatten()
         .map { VanillaMaterialTypes.getMaterial(it.toHashSet()) }
-    internal val attributeModifiersProvider = combinedLazyProvider { behaviors.map(ItemBehavior::attributeModifiers) }
+    internal val configuredAttributeModifiersProvider by lazy { configReloadable(::loadConfiguredAttributeModifiers) }
+    internal val attributeModifiersProvider = combinedLazyProvider { behaviors.map(ItemBehavior::attributeModifiers) + configuredAttributeModifiersProvider }
         .flatten()
         .map { modifiers ->
             val map = enumMapOf<EquipmentSlot, ArrayList<AttributeModifier>>()
@@ -98,6 +109,56 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         if (itemData.name == null) itemData.name = this.name
         
         return itemData
+    }
+    
+    private fun loadConfiguredAttributeModifiers(): List<AttributeModifier> {
+        val section = NovaConfig.getOrNull(material)
+            ?.getConfigurationSection("attribute_modifiers")
+        ?: return emptyList()
+        
+        val modifiers = ArrayList<AttributeModifier>()
+        
+        section.getKeys(false)
+            .forEach { key ->
+                try {
+                    val slot = EquipmentSlot.values().firstOrNull { it.name == key.uppercase() }
+                        ?: throw IllegalArgumentException("Unknown equipment slot: $key")
+                    val attributeSections = section.getConfigurationSectionList(key).takeUnlessEmpty()
+                        ?: throw IllegalArgumentException("No attribute modifiers defined for slot $key")
+    
+                    attributeSections.forEachIndexed { idx, attributeSection ->
+                        try {
+                            val attributeStr = attributeSection.getString("attribute")
+                                ?: throw IllegalArgumentException("Missing value 'attribute'")
+                            val operationStr = attributeSection.getString("operation")
+                                ?: throw IllegalArgumentException("Missing value 'operation'")
+                            val value = attributeSection.getDoubleOrNull("value")
+                                ?: throw IllegalArgumentException("Missing value 'value'")
+                            val hidden = attributeSection.getBoolean("hidden", false)
+                            
+                            val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation(attributeStr))
+                                ?: throw IllegalArgumentException("Unknown attribute: $attributeStr")
+                            val operation = Operation.values().firstOrNull { it.name == operationStr.uppercase() }
+                                ?: throw IllegalArgumentException("Unknown operation: $operationStr")
+            
+                            modifiers += AttributeModifier(
+                                "Nova Configured Attribute Modifier ($slot, $idx)",
+                                attribute,
+                                operation,
+                                value,
+                                !hidden,
+                                slot
+                            )
+                        } catch (e: Exception) {
+                            LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $material, $slot with index $idx", e)
+                        }
+                    }
+                } catch(e: Exception) {
+                    LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $material", e)
+                }
+            }
+        
+        return modifiers
     }
     
     private fun generateAttributeModifiersTooltip(player: Player?, itemStack: MojangStack): List<Array<BaseComponent>> {
