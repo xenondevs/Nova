@@ -34,7 +34,6 @@ internal class ArmorData(
     val fps: Double
 )
 
-// TODO: Create converter for black and white emissivity maps
 internal class ArmorContent(
     private val basePacks: BasePacks
 ) : PackContent {
@@ -61,8 +60,8 @@ internal class ArmorContent(
                     armor.layer2?.let { extractFrames(pack, it.resourcePath) }
                 ),
                 arrayOf(
-                    armor.layer1EmissivityMap?.let { extractFrames(pack, it.resourcePath) },
-                    armor.layer2EmissivityMap?.let { extractFrames(pack, it.resourcePath) }
+                    armor.layer1EmissivityMap?.let { extractFrames(pack, it.resourcePath).map(::convertEmissivityMap) },
+                    armor.layer2EmissivityMap?.let { extractFrames(pack, it.resourcePath).map(::convertEmissivityMap) }
                 ),
                 armor.interpolationMode,
                 armor.fps
@@ -195,6 +194,22 @@ internal class ArmorContent(
         }
         
         return frames
+    }
+    
+    private fun convertEmissivityMap(image: BufferedImage): BufferedImage {
+        val width = image.width
+        val height = image.height
+        
+        val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                val color = Color(image.getRGB(x, y), true)
+                val newAlpha = (color.red + color.green + color.blue) * color.alpha / 255 / 3
+                newImage.setRGB(x, y, Color(255, 255, 255, newAlpha).rgb)
+            }
+        }
+        
+        return newImage
     }
     
     private fun writeMCPatcherArmor() {
