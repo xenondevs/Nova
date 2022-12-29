@@ -28,7 +28,6 @@ import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.mapToIntArray
 import java.io.File
-import java.nio.charset.StandardCharsets
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -252,7 +251,7 @@ internal class MaterialContent(
                     val textures = JsonObject().apply { addProperty("layer0", "item/${material.name.lowercase()}") }
                     modelObj.add("textures", textures)
                 } else {
-                    modelObj = GSON.fromJson(vanillaModel.reader(StandardCharsets.UTF_8), JsonObject::class.java)
+                    modelObj = vanillaModel.parseJson() as JsonObject
                 }
             }
             
