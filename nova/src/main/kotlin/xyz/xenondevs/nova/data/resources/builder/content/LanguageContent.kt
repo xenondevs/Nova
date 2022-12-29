@@ -24,7 +24,7 @@ internal class LanguageContent : PackContent {
     
     private val languageLookup = HashMap<String, HashMap<String, String>>()
     
-    init {
+    override fun init() {
         try {
             ResourcePackBuilder.LANGUAGE_DIR.walk()
                 .filter { !it.isDirectory() && it.extension == "json" }

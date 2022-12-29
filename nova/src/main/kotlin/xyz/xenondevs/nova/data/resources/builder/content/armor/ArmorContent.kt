@@ -44,7 +44,7 @@ internal class ArmorContent(
     private val armor = ArrayList<ArmorData>()
     private var color = -1
     
-    init {
+    override fun init() {
         armor += basePacks.customArmor.values
     }
     

@@ -193,7 +193,7 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
     
     override val stage = ResourcePackBuilder.BuildingStage.POST_WORLD
     
-    init {
+    override fun init() {
         if (WAILA_ENABLED) {
             writeHardcodedTextures()
             renderCustomItemServiceBlocks()

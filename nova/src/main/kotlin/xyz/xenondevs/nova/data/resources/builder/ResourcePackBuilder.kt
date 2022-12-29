@@ -165,6 +165,8 @@ internal class ResourcePackBuilder {
                 AtlasContent(),
                 WailaContent()
             )
+            val preWorldContents = contents.filter { it.stage == BuildingStage.PRE_WORLD }
+            preWorldContents.forEach(PackContent::init)
             
             // extract resources
             LOGGER.info("Extracting resources")
@@ -173,7 +175,6 @@ internal class ResourcePackBuilder {
             
             // write pre-world content
             LOGGER.info("Writing pre-world content")
-            val preWorldContents = contents.filter { it.stage == BuildingStage.PRE_WORLD }
             assetPacks.forEach { pack -> preWorldContents.forEach { it.includePack(pack) } }
             preWorldContents.forEach(PackContent::write)
             
@@ -190,6 +191,7 @@ internal class ResourcePackBuilder {
             // write post-world content
             LOGGER.info("Writing post-world content")
             val postWorldContents = contents.filter { it.stage == BuildingStage.POST_WORLD }
+            postWorldContents.forEach(PackContent::init)
             assetPacks.forEach { pack -> postWorldContents.forEach { it.includePack(pack) } }
             postWorldContents.forEach(PackContent::write)
             

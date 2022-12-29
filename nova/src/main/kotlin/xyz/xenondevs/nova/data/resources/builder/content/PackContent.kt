@@ -12,6 +12,11 @@ internal interface PackContent {
     val stage: ResourcePackBuilder.BuildingStage
     
     /**
+     * Initializes this [PackContent].
+     */
+    fun init() = Unit
+    
+    /**
      * Checks if the given [path] is excluded due to this pack content.
      */
     fun excludesPath(path: ResourcePath): Boolean = false
