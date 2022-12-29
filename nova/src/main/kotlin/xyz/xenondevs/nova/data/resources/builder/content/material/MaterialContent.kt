@@ -28,6 +28,7 @@ import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.mapToIntArray
 import java.io.File
+import java.nio.charset.StandardCharsets
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -239,15 +240,20 @@ internal class MaterialContent(
     private fun getModelFile(material: Material): Triple<File, JsonObject, JsonArray> {
         val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/models/item/${material.name.lowercase()}.json")
         if (!file.exists()) {
-            val modelObj = JsonObject()
+            var modelObj = JsonObject()
             
             // fixme: This does not cover all cases
             if (material.isBlock) {
                 modelObj.addProperty("parent", "block/${material.name.lowercase()}")
             } else {
-                modelObj.addProperty("parent", "item/generated")
-                val textures = JsonObject().apply { addProperty("layer0", "item/${material.name.lowercase()}") }
-                modelObj.add("textures", textures)
+                val vanillaModel = File(ResourcePackBuilder.MCASSETS_ASSETS_DIR, "minecraft/models/item/${material.name.lowercase()}.json")
+                if (!vanillaModel.exists()) {
+                    modelObj.addProperty("parent", "item/generated")
+                    val textures = JsonObject().apply { addProperty("layer0", "item/${material.name.lowercase()}") }
+                    modelObj.add("textures", textures)
+                } else {
+                    modelObj = GSON.fromJson(vanillaModel.reader(StandardCharsets.UTF_8), JsonObject::class.java)
+                }
             }
             
             val overrides = JsonArray().also { modelObj.add("overrides", it) }
