@@ -29,14 +29,14 @@ resource_pack:
     # Excludes files from the resource pack. Excluding files will decrease the size of your resource pack but might also break some features.
     # More information about resource filters can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/configuration/#resource-filters
     resource_filters: []
+    # Whether Minecraft assets should be downloaded from GitHub or Mojang's API.
+    # GitHub is faster since it's a single zip file. If you're unable to access GitHub, change this to "mojang".
+    minecraft_assets_source: github
     # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
     # Please read the following documentation page before change this value: https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
     use_solid_blocks: true
   # If players currently loading the resource pack should be frozen.
   freeze_loading_players: false
-  # Whether Minecraft assets should be downloaded from GitHub or Mojang's API.
-  # GitHub is faster since it's a single zip file. If you're unable to access GitHub, change this to "mojang".
-  minecraft_assets_source: github
 
 # If Nova should use a java agent to self-attach and redefine methods.
 # This option will be automatically set to false if your jdk does not support java agents.
