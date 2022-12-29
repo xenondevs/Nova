@@ -20,13 +20,15 @@ internal class ItemSideConfigGUI(
 ) : ContainerSideConfigGUI<NetworkedInventory, ItemHolder>(holder, inventories) {
     
     override val hasSimpleVersion: Boolean = mergedInventory != null
+    override val hasAdvancedVersion: Boolean = mergedInventory == null || inventories.size > 2
     
     init {
+        require(inventories.isNotEmpty())
         initGUI()
     }
     
     override fun isSimpleConfiguration(): Boolean {
-        return hasSimpleVersion && holder.containerConfig.values.all { it == mergedInventory }
+        return !hasAdvancedVersion || (hasSimpleVersion && holder.containerConfig.values.all { it == mergedInventory })
     }
     
 }

@@ -7,7 +7,6 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -30,6 +29,7 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
 ) : BaseSideConfigGUI<H>(holder) {
     
     protected abstract val hasSimpleVersion: Boolean
+    protected abstract val hasAdvancedVersion: Boolean
     
     private val containers = containers.map { it.first }
     
@@ -47,11 +47,10 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
     
     private val simpleGUI = GUIBuilder(GUIType.NORMAL)
         .setStructure(
-            "# # # # u # # # a",
+            "# # # # u # # # #",
             "# # # l f r # # #",
             "# # # # d b # # #"
         )
-        .addIngredient('a', SimplicityModeItem(false))
         .addIngredient('u', ConnectionConfigItem(BlockSide.TOP))
         .addIngredient('l', ConnectionConfigItem(BlockSide.LEFT))
         .addIngredient('f', ConnectionConfigItem(BlockSide.FRONT))
@@ -81,10 +80,12 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
         .build()
     
     fun initGUI() {
-        if (hasSimpleVersion) {
-            val btn = SimplicityModeItem(true)
-            advancedGUI.setItem(8, 0, btn)
-            simpleModeBtn = btn
+        if (hasSimpleVersion && hasAdvancedVersion) {
+            simpleModeBtn = SimplicityModeItem(true)
+            advancedGUI.setItem(8, 0, simpleModeBtn)
+            
+            val advancedModeBtn = SimplicityModeItem(false)
+            simpleGUI.setItem(8, 0, advancedModeBtn)
         }
         
         switchSimplicity(isSimpleConfiguration())

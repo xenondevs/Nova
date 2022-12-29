@@ -8,10 +8,13 @@ internal class FluidSideConfigGUI(
     containers: List<Pair<FluidContainer, String>>
 ) : ContainerSideConfigGUI<FluidContainer, FluidHolder>(holder, containers) {
     
-    override val hasSimpleVersion = false
-    override fun isSimpleConfiguration() = false
+    override val hasSimpleVersion = containers.size == 1
+    override val hasAdvancedVersion = containers.size > 1
+    
+    override fun isSimpleConfiguration() = !hasAdvancedVersion
     
     init {
+        require(containers.isNotEmpty())
         initGUI()
     }
     
