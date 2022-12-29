@@ -27,7 +27,7 @@ open class ItemNovaMaterial internal constructor(
     val isHidden: Boolean = false
 ) : INovaMaterial {
     
-    val maxStackSize: Int by lazyProvider { novaItem.vanillaMaterialProvider.map { min(maxStackSize, it.maxStackSize) } }
+    override val maxStackSize: Int by lazyProvider { novaItem.vanillaMaterialProvider.map { min(maxStackSize, it.maxStackSize) } }
     
     val item: ItemModelData by lazy {
         val itemModelData = Resources.getModelData(id).item!!
@@ -80,11 +80,11 @@ open class ItemNovaMaterial internal constructor(
     fun createClientsideItemBuilder(): ItemBuilder =
         item.createClientsideItemBuilder().addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
     
-    /**
-     * Creates an [ItemStack] for this [ItemNovaMaterial].
-     */
-    fun createItemStack(amount: Int = 1): ItemStack =
+    override fun createItemStack(amount: Int): ItemStack =
         createItemBuilder().setAmount(amount).get()
+    
+    override fun createClientsideItemStack(amount: Int): ItemStack =
+        createClientsideItemBuilder().setAmount(amount).get()
     
     override fun getLocalizedName(locale: String): String =
         LocaleManager.getTranslatedName(locale, this)
