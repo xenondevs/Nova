@@ -115,7 +115,7 @@ private class ConfigurableFoodOptions : ConfigAccess, FoodOptions {
     override val consumeTimeProvider = getEntry<Int>("consume_time")
     override val nutritionProvider = getEntry<Int>("nutrition")
     override val saturationModifierProvider = getEntry<Float>("saturation_modifier")
-    override val instantHealthProvider = getEntry<Double>("instant_health")
+    override val instantHealthProvider = getOptionalEntry<Double>("instant_health").orElse(0.0)
     override val effectsProvider = getOptionalEntry<List<PotionEffect>>("effects")
     
     constructor(path: String) : super(path)

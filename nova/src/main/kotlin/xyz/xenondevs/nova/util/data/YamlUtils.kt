@@ -54,7 +54,7 @@ fun ConfigurationSection.getConfigurationSectionListOrNull(path: String): List<C
     if (isSet(path)) getMapList(path).map { ConfigurationSection(this, path, it as Map<String, Any>) } else null
 
 fun ConfigurationSection.getConfigurationSectionList(path: String): List<ConfigurationSection> =
-     getConfigurationSectionListOrNull(path) ?: emptyList()
+    getConfigurationSectionListOrNull(path) ?: emptyList()
 
 fun ConfigurationSection.getBooleanListOrNull(path: String): List<Boolean>? =
     if (isSet(path)) getBooleanList(path) else null
@@ -112,6 +112,12 @@ fun ConfigurationSection.getShort(path: String, def: Short = 0): Short =
 
 fun ConfigurationSection.getFloat(path: String, def: Float = 0f): Float =
     getFloatOrNull(path) ?: def
+
+@Suppress("UNCHECKED_CAST")
+fun ConfigurationSection.toMap(): Map<String, Any> {
+    val sectionPathMap = ReflectionRegistry.MEMORY_SECTION_MAP_FIELD.get(this) as MutableMap<String, Any>
+    return sectionPathMap.mapValues { ReflectionRegistry.SECTION_PATH_DATA_DATA_FIELD.get(it) }
+}
 
 fun ConfigurationSection(parent: ConfigurationSection, path: String, map: Map<String, Any>): ConfigurationSection {
     val memorySection = ReflectionRegistry.MEMORY_SECTION_CONSTRUCTOR.newInstance(parent, path)

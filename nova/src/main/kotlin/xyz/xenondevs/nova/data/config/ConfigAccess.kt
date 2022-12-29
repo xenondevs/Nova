@@ -6,18 +6,10 @@ import org.bukkit.configuration.file.YamlConfiguration
 import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.provider.orElse
 import xyz.xenondevs.nova.data.provider.requireNonNull
+import xyz.xenondevs.nova.data.serialization.yaml.getLazilyEvaluated
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubclassOf
-
-private val NUMBER_CONVERTER_MAP: Map<KClass<*>, (Number) -> Number> = mapOf(
-    Byte::class to { it.toByte() },
-    Short::class to { it.toShort() },
-    Int::class to { it.toInt() },
-    Long::class to { it.toLong() },
-    Float::class to { it.toFloat() },
-    Double::class to { it.toDouble() }
-)
+import xyz.xenondevs.nova.util.reflection.type
+import java.lang.reflect.Type
 
 abstract class ConfigAccess(private val configReceiver: () -> YamlConfiguration) {
     
@@ -28,64 +20,45 @@ abstract class ConfigAccess(private val configReceiver: () -> YamlConfiguration)
     
     constructor(material: ItemNovaMaterial) : this({ NovaConfig[material] })
     
-    protected fun <T : Any> getEntry(key: String): Provider<T> {
-        return RequiredConfigEntryAccessor<T>(key)
-            .also(ConfigEntryAccessor<*>::reload)
+    protected inline fun <reified T : Any> getEntry(key: String): Provider<T> {
+        return RequiredConfigEntryAccessor<T>(key, type<T>()).also(ConfigEntryAccessor<*>::reload)
     }
     
-    protected fun <T : Any> getEntry(key: String, vararg fallbackKeys: String): Provider<T> {
-        var provider: Provider<T?> = NullableConfigEntryAccessor(key)
-        fallbackKeys.forEach { provider = provider.orElse(NullableConfigEntryAccessor(it)) }
+    protected inline fun <reified T : Any> getEntry(key: String, vararg fallbackKeys: String): Provider<T> {
+        val type = type<T>()
+        var provider: Provider<T?> = NullableConfigEntryAccessor(key, type)
+        fallbackKeys.forEach { provider = provider.orElse(NullableConfigEntryAccessor(it, type)) }
         return provider
             .requireNonNull("No such config entries: $key, ${fallbackKeys.joinToString()}")
             .also(Provider<*>::update)
     }
     
     protected inline fun <reified T : Any> getOptionalEntry(key: String): Provider<T?> {
-        val typeClass = T::class
-        return getNullableConfigEntryAccessor<T>(typeClass, key)
-            .also(Provider<*>::update)
+        return NullableConfigEntryAccessor<T>(key, type<T>()).also(Provider<*>::update)
     }
     
     protected inline fun <reified T : Any> getOptionalEntry(key: String, vararg fallbackKeys: String): Provider<T?> {
-        val typeClass = T::class
-        var provider: Provider<T?> = getNullableConfigEntryAccessor(typeClass, key)
-        fallbackKeys.forEach { provider = provider.orElse(getNullableConfigEntryAccessor(typeClass, it)) }
+        val type = type<T>()
+        var provider: Provider<T?> = NullableConfigEntryAccessor(key, type)
+        fallbackKeys.forEach { provider = provider.orElse(NullableConfigEntryAccessor(it, type)) }
         return provider.also(Provider<*>::update)
     }
     
-    @PublishedApi
-    internal fun <T : Any> getNullableConfigEntryAccessor(typeClass: KClass<*>, key: String): Provider<T?> {
-        return if (typeClass.isSubclassOf(Number::class)) {
-            val numberConverter = NUMBER_CONVERTER_MAP[typeClass] as (Number) -> T
-            NullableConfigNumberEntryAccessor(key, numberConverter)
-        } else NullableConfigEntryAccessor(key)
-    }
-    
-    protected inner class RequiredConfigEntryAccessor<T : Any>(key: String) : ConfigEntryAccessor<T>(key) {
+    protected inner class RequiredConfigEntryAccessor<T : Any>(key: String, type: Type) : ConfigEntryAccessor<T>(key, type) {
         override fun loadValue(): T {
             check(key in cfg) { "No such config entry: $key" }
-            return cfg.get(key) as T
+            return cfg.getLazilyEvaluated(key, type)!!
         }
     }
     
-    protected inner class NullableConfigEntryAccessor<T : Any>(key: String) : ConfigEntryAccessor<T?>(key) {
+    protected inner class NullableConfigEntryAccessor<T : Any>(key: String, type: Type) : ConfigEntryAccessor<T?>(key, type) {
         override fun loadValue(): T? {
-            return cfg.get(key) as? T
-        }
-    }
-    
-    protected inner class NullableConfigNumberEntryAccessor<T : Any>(
-        key: String,
-        private val converter: (Number) -> T
-    ) : ConfigEntryAccessor<T?>(key) {
-        override fun loadValue(): T? {
-            return (cfg.get(key) as? Number)?.let(converter)
+            return cfg.getLazilyEvaluated(key, type)
         }
     }
     
     @Suppress("LeakingThis")
-    protected abstract class ConfigEntryAccessor<T>(protected val key: String) : Provider<T>(), Reloadable {
+    protected abstract class ConfigEntryAccessor<T>(protected val key: String, protected val type: Type) : Provider<T>(), Reloadable {
         
         init {
             NovaConfig.reloadables += this
