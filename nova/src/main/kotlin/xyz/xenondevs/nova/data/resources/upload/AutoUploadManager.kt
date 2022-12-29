@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
+import xyz.xenondevs.nova.data.resources.upload.service.OraxenUpload
 import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
@@ -26,7 +27,7 @@ internal object AutoUploadManager : Initializable() {
     override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = setOf(NovaConfig, ResourceGeneration.PostWorld)
     
-    private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost, CustomMultiPart, S3)
+    private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost, CustomMultiPart, S3, OraxenUpload)
     
     private val config by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!! }
     
