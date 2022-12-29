@@ -33,7 +33,7 @@ interface NovaMaterial {
     fun createItemStack(): ItemStack = createItemStack(1)
     
     /**
-     * Creates the client-side [ItemStack] for this [NovaMaterial].
+     * Creates the client-side [ItemStack] for this [NovaMaterial] with the given [amount].
      */
     fun createClientsideItemStack(amount: Int): ItemStack
     
