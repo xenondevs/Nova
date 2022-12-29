@@ -291,10 +291,17 @@ fun Block.remove(ctx: BlockBreakContext, breakEffects: Boolean) {
 }
 
 internal fun Block.removeInternal(ctx: BlockBreakContext, drops: Boolean, breakEffects: Boolean, sendEffectsToBreaker: Boolean): List<ItemEntity> {
-    if (CustomItemServiceManager.removeBlock(this, breakEffects, breakEffects))
-        return CustomItemServiceManager.getDrops(this, ctx.item)!!.let(::dropItemsNaturallyInternal)
-    if (BlockManager.removeBlockInternal(ctx, breakEffects, sendEffectsToBreaker))
-        return BlockManager.getDrops(this.location, ctx.item)!!.let(::dropItemsNaturallyInternal)
+    if (CustomItemServiceManager.getId(this) != null) {
+        val itemEntities = CustomItemServiceManager.getDrops(this, ctx.item)!!.let(::createDroppedItemEntities)
+        CustomItemServiceManager.removeBlock(this, breakEffects, breakEffects)
+        return itemEntities
+    }
+    
+    if (BlockManager.getBlock(pos) != null) {
+        val itemEntities = BlockManager.getDrops(this.location, ctx.source, ctx.item)!!.let(::createDroppedItemEntities)
+        BlockManager.removeBlockInternal(ctx, breakEffects, sendEffectsToBreaker)
+        return itemEntities
+    }
     
     val nmsPlayer = (ctx.source as? Player)?.serverPlayer
         ?: ctx.source as? MojangPlayer
@@ -328,7 +335,7 @@ internal fun Block.removeInternal(ctx: BlockBreakContext, drops: Boolean, breakE
     }
 }
 
-internal fun Block.dropItemsNaturallyInternal(items: Iterable<ItemStack>): List<ItemEntity> {
+internal fun Block.createDroppedItemEntities(items: Iterable<ItemStack>): List<ItemEntity> {
     return items.map {
         ItemEntity(
             world.serverLevel,
