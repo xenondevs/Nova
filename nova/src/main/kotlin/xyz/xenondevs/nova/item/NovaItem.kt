@@ -11,6 +11,7 @@ import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.Tag
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.MobType
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
@@ -32,6 +33,7 @@ import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
@@ -108,7 +110,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         val bukkitStack = itemStack.bukkitCopy
         
         behaviors.forEach { it.updatePacketItemData(bukkitStack, itemData) }
-        itemData.addLore(generateAttributeModifiersTooltip(player, itemStack))
+        itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer ?: EntityUtils.DUMMY_PLAYER, itemStack))
         if (itemData.name == null) itemData.name = this.name
         
         return itemData
@@ -164,7 +166,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         return modifiers
     }
     
-    private fun generateAttributeModifiersTooltip(player: Player?, itemStack: MojangStack): List<Array<BaseComponent>> {
+    private fun generateAttributeModifiersTooltip(player: ServerPlayer?, itemStack: MojangStack): List<Array<BaseComponent>> {
         if (HideableFlag.MODIFIERS.isHidden(itemStack.tag?.getInt("HideFlags") ?: 0))
             return emptyList()
         
@@ -190,16 +192,15 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
                     var isBaseModifier = false
                     
                     if (player != null) {
-                        val serverPlayer = player.serverPlayer
                         when (modifier.uuid) {
                             Tool.BASE_ATTACK_DAMAGE_UUID -> {
-                                value += serverPlayer.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)
+                                value += player.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)
                                 value += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED)
                                 isBaseModifier = true
                             }
                             
                             Tool.BASE_ATTACK_SPEED_UUID -> {
-                                value += serverPlayer.getAttributeBaseValue(Attributes.ATTACK_SPEED)
+                                value += player.getAttributeBaseValue(Attributes.ATTACK_SPEED)
                                 isBaseModifier = true
                             }
                         }
