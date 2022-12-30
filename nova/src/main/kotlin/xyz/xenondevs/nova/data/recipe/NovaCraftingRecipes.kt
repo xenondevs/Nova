@@ -22,9 +22,9 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
     optimizedRecipe.recipe.key.resourceLocation,
     "",
     optimizedRecipe.recipe.category.nmsCategory,
-    optimizedRecipe.recipe.shape[0].length,
-    optimizedRecipe.recipe.shape.size,
-    NonNullList(optimizedRecipe.choiceMatrix.map { it.nmsIngredient }),
+    optimizedRecipe.width,
+    optimizedRecipe.height,
+    NonNullList(optimizedRecipe.flatChoices.map { it.nmsIngredient }),
     optimizedRecipe.recipe.result.nmsCopy
 ) {
     private val bukkitRecipe = optimizedRecipe.recipe
@@ -49,11 +49,9 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
                 val relY = absY - y
                 val item = container.getItem(absX + absY * container.width)
                 // If relX and relY are in the shape, it will be the RecipeChoice at that position, or null otherwise
-                val choice = if (relX in (0 until width) && relY in (0 until height))
-                    optimizedRecipe.choiceMatrix.getOrNull(
-                        if (horizontalFlip) width * (relY + 1) - relX - 1
-                        else relX + relY * width
-                    ) else null
+                val choice = if (relX in (0 until width) && relY in (0 until height)) {
+                    optimizedRecipe.getChoice(if (horizontalFlip) width - relX - 1 else relX, relY)
+                } else null
                 // If choice is null, treat it as an air RecipeChoice.
                 if (choice == null) {
                     if (!item.isEmpty) return false
