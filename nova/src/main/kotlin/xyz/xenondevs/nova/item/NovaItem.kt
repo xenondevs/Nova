@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.Tag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.MobType
@@ -29,6 +30,7 @@ import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
+import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.appendLocalized
@@ -38,6 +40,7 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.enumMapOf
+import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.takeUnlessEmpty
 import java.text.DecimalFormat
@@ -114,7 +117,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     private fun loadConfiguredAttributeModifiers(): List<AttributeModifier> {
         val section = NovaConfig.getOrNull(material)
             ?.getConfigurationSection("attribute_modifiers")
-        ?: return emptyList()
+            ?: return emptyList()
         
         val modifiers = ArrayList<AttributeModifier>()
         
@@ -125,7 +128,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
                         ?: throw IllegalArgumentException("Unknown equipment slot: $key")
                     val attributeSections = section.getConfigurationSectionList(key).takeUnlessEmpty()
                         ?: throw IllegalArgumentException("No attribute modifiers defined for slot $key")
-    
+                    
                     attributeSections.forEachIndexed { idx, attributeSection ->
                         try {
                             val attributeStr = attributeSection.getString("attribute")
@@ -140,7 +143,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
                                 ?: throw IllegalArgumentException("Unknown attribute: $attributeStr")
                             val operation = Operation.values().firstOrNull { it.name == operationStr.uppercase() }
                                 ?: throw IllegalArgumentException("Unknown operation: $operationStr")
-            
+                            
                             modifiers += AttributeModifier(
                                 "Nova Configured Attribute Modifier ($slot, $idx)",
                                 attribute,
@@ -153,7 +156,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
                             LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $material, $slot with index $idx", e)
                         }
                     }
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $material", e)
                 }
             }
@@ -162,10 +165,19 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     }
     
     private fun generateAttributeModifiersTooltip(player: Player?, itemStack: MojangStack): List<Array<BaseComponent>> {
-        val lore = ArrayList<Array<BaseComponent>>()
+        if (HideableFlag.MODIFIERS.isHidden(itemStack.tag?.getInt("HideFlags") ?: 0))
+            return emptyList()
         
-        attributeModifiers.forEach { (slot, modifiers) ->
-            if (modifiers.none { it.showInLore && it.value != 0.0 })
+        // if the item has custom modifiers set, all default modifiers are ignored
+        val customModifiers = itemStack.tag?.contains("AttributeModifiers", Tag.TAG_LIST.toInt()) == true
+        
+        val lore = ArrayList<Array<BaseComponent>>()
+        EquipmentSlot.values().forEach { slot ->
+            val modifiers = if (customModifiers)
+                ItemUtils.getCustomAttributeModifiers(itemStack, slot)
+            else attributeModifiers[slot] ?: emptyList()
+            
+            if (modifiers.isEmpty() || modifiers.none { it.showInLore && it.value != 0.0 })
                 return@forEach
             
             lore += arrayOf(TextComponent(" "))
