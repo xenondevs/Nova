@@ -9,6 +9,9 @@ import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState
 
+/**
+ * Safety patch to prevent [WrapperBlockState]s from being saved in the worlds palette.
+ */
 internal object LevelChunkSectionPatch : MethodTransformer(ReflectionRegistry.LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD, true) {
     
     private val WRAPPER_INTERNAL_NAME = WrapperBlockState::class.internalName
@@ -17,6 +20,7 @@ internal object LevelChunkSectionPatch : MethodTransformer(ReflectionRegistry.LE
         val instructions = methodNode.instructions
         val startLabel = instructions[0] as LabelNode
         instructions.insert(buildInsnList {
+            // if (state instanceof WrapperBlockState) return Blocks.AIR.defaultBlockState();
             addLabel()
             aLoad(4)
             instanceOf(WRAPPER_INTERNAL_NAME)

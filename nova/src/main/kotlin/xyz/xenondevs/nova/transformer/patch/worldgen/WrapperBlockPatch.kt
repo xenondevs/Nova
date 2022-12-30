@@ -10,6 +10,10 @@ import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.findNthOfType
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
 
+/**
+ * Prevents [WrapperBlock]s' from calling [Block]s' constructor which would lead to state definitions being
+ * registered.
+ */
 internal object WrapperBlockPatch : MethodTransformer(Block::class, "<init>", true) {
     
     override fun transform() {
@@ -19,8 +23,8 @@ internal object WrapperBlockPatch : MethodTransformer(Block::class, "<init>", tr
             instanceOf(WrapperBlock::class.internalName)
             ifeq(continueLabel)
             addLabel()
-            _return()
-        }) { it.opcode == Opcodes.INVOKESPECIAL }
+            _return() // if (this instanceof WrapperBlock) return;
+        }) { it.opcode == Opcodes.INVOKESPECIAL } // directly after the super call
     }
     
 }

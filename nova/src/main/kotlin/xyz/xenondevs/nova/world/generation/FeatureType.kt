@@ -12,8 +12,8 @@ import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.util.item.nmsBlock
 
 /**
- * A wrapper for Minecraft's [Feature] class that allows to use Bukkit's [Material] and [BlockNovaMaterial]s via protected
- * `setBlock` functions.
+ * An extension class of Minecraft's [Feature] that allows to use Bukkit's [Material] and [BlockNovaMaterial]s via
+ * protected `setBlock` functions.
  */
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Feature<FC>(codec) {

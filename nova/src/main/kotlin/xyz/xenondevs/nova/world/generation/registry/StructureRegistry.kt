@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.generation.registry
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
+import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureSet
 import net.minecraft.world.level.levelgen.structure.StructureType
@@ -22,9 +22,9 @@ import xyz.xenondevs.nova.data.NamespacedId
 object StructureRegistry : WorldGenRegistry() {
     
     override val neededRegistries = setOf(
-        Registry.STRUCTURE_REGISTRY, Registry.STRUCTURE_POOL_ELEMENT_REGISTRY, Registry.STRUCTURE_PIECE_REGISTRY,
-        Registry.STRUCTURE_PLACEMENT_TYPE_REGISTRY, Registry.STRUCTURE_PROCESSOR_REGISTRY, Registry.STRUCTURE_SET_REGISTRY,
-        Registry.STRUCTURE_TYPE_REGISTRY
+        Registries.STRUCTURE, Registries.STRUCTURE_POOL_ELEMENT, Registries.STRUCTURE_PIECE,
+        Registries.STRUCTURE_PLACEMENT, Registries.STRUCTURE_PROCESSOR, Registries.STRUCTURE_SET,
+        Registries.STRUCTURE_TYPE
     )
     
     private val structures = Object2ObjectOpenHashMap<NamespacedId, Structure>()
@@ -79,13 +79,13 @@ object StructureRegistry : WorldGenRegistry() {
     
     override fun register(registryAccess: RegistryAccess) {
         loadFiles("structure", Structure.CODEC, structures)
-        registerAll(registryAccess, Registry.STRUCTURE_REGISTRY, structures)
-        registerAll(registryAccess, Registry.STRUCTURE_POOL_ELEMENT_REGISTRY, structurePoolElementTypes)
-        registerAll(registryAccess, Registry.STRUCTURE_PIECE_REGISTRY, structurePieceTypes)
-        registerAll(registryAccess, Registry.STRUCTURE_PLACEMENT_TYPE_REGISTRY, structurePlacementTypes)
-        registerAll(registryAccess, Registry.STRUCTURE_PROCESSOR_REGISTRY, structureProcessorTypes)
+        registerAll(registryAccess, Registries.STRUCTURE, structures)
+        registerAll(registryAccess, Registries.STRUCTURE_POOL_ELEMENT, structurePoolElementTypes)
+        registerAll(registryAccess, Registries.STRUCTURE_PIECE, structurePieceTypes)
+        registerAll(registryAccess, Registries.STRUCTURE_PLACEMENT, structurePlacementTypes)
+        registerAll(registryAccess, Registries.STRUCTURE_PROCESSOR, structureProcessorTypes)
         loadFiles("structure_set", StructureSet.CODEC, structureSets)
-        registerAll(registryAccess, Registry.STRUCTURE_SET_REGISTRY, structureSets)
-        registerAll(registryAccess, Registry.STRUCTURE_TYPE_REGISTRY, structureTypes)
+        registerAll(registryAccess, Registries.STRUCTURE_SET, structureSets)
+        registerAll(registryAccess, Registries.STRUCTURE_TYPE, structureTypes)
     }
 }

@@ -11,6 +11,9 @@ import net.minecraft.world.level.material.Material
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BLOCK_DEFAULT_BLOCK_STATE_FIELD
 
+/**
+ * Class name is forced because of a check in [Block]
+ */
 class WrapperBlock(val novaMaterial: BlockNovaMaterial): Block(Properties.of(Material.STONE)) {
     
     init {

@@ -19,6 +19,9 @@ import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
 import java.util.function.Predicate;
 
+/**
+ * Wrapper for {@link LevelChunkSection}s to allow placing {@link WrapperBlockState}s.
+ */
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     private final Level level;

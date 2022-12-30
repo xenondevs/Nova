@@ -18,6 +18,9 @@ import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CHUNK_ACCESS_CONSTRUCTOR
 import xyz.xenondevs.nova.util.reflection.defineClass
 
+/**
+ * Patch to replace all [LevelChunkSection]s with Nova's [LevelChunkSectionWrapper].
+ */
 internal object ChunkAccessSectionsPatch : MethodTransformer(ChunkAccess::class, "<init>", Type.getConstructorDescriptor(CHUNK_ACCESS_CONSTRUCTOR), true) {
     
     override fun transform() {
@@ -28,6 +31,7 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(ChunkAccess::class,
             sectionClass.classLoader.defineClass(wrapperClass.java.name, VirtualClassPath[wrapperClass].assemble(true), sectionClass.protectionDomain)
         }
         methodNode.insertAfterFirst(buildInsnList {
+            // Just a for loop to replace all sections.
             
             val returnLabel = methodNode.instructions.last.previous(3) as LabelNode
             val loopLabel = LabelNode()
@@ -77,7 +81,7 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(ChunkAccess::class,
             goto(loopLabel)
             
         }) {
-            it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).desc == Type.getDescriptor(Registry::class.java)
+            it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).desc == Type.getDescriptor(Registry::class.java) // https://i.imgur.com/sChNvVq.png
         }
     }
     

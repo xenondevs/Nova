@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
-import net.minecraft.data.BuiltinRegistries
 import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.NamespacedId
@@ -45,7 +44,7 @@ abstract class WorldGenRegistry internal constructor() {
     
     protected fun <T: Any> registerAll(registryAccess: RegistryAccess, registryKey: ResourceKey<Registry<T>>, map: Map<NamespacedId, T>) {
         val registry = registryAccess.registry(registryKey).get()
-        map.forEach { (id, value) -> BuiltinRegistries.registerExact(registry, id.toString(":"), value) }
+        map.forEach { (id, value) -> Registry.register(registry, id.toString(":"), value) }
     }
     
     internal abstract fun register(registryAccess: RegistryAccess)

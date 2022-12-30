@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.generation.registry
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
+import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.data.NamespacedId
 
 object FeatureRegistry : WorldGenRegistry() {
     
-    override val neededRegistries = setOf(Registry.FEATURE_REGISTRY, Registry.CONFIGURED_FEATURE_REGISTRY, Registry.PLACED_FEATURE_REGISTRY)
+    override val neededRegistries = setOf(Registries.FEATURE, Registries.CONFIGURED_FEATURE, Registries.PLACED_FEATURE)
     
     private val featureTypes = Object2ObjectOpenHashMap<NamespacedId, Feature<*>>()
     private val configuredFeatures = Object2ObjectOpenHashMap<NamespacedId, ConfiguredFeature<*, *>>()
@@ -37,11 +37,11 @@ object FeatureRegistry : WorldGenRegistry() {
     }
     
     override fun register(registryAccess: RegistryAccess) {
-        registerAll(registryAccess, Registry.FEATURE_REGISTRY, featureTypes)
+        registerAll(registryAccess, Registries.FEATURE, featureTypes)
         loadFiles("configured_feature", ConfiguredFeature.CODEC, configuredFeatures)
-        registerAll(registryAccess, Registry.CONFIGURED_FEATURE_REGISTRY, configuredFeatures)
+        registerAll(registryAccess, Registries.CONFIGURED_FEATURE, configuredFeatures)
         loadFiles("placed_feature", PlacedFeature.CODEC, placedFeatures)
-        registerAll(registryAccess, Registry.PLACED_FEATURE_REGISTRY, placedFeatures)
+        registerAll(registryAccess, Registries.PLACED_FEATURE, placedFeatures)
     }
     
 }

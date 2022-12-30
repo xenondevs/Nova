@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -22,8 +23,8 @@ public record BiomeInjection(
     List<HolderSet<PlacedFeature>> features
 ) {
     
-    private static final Registry<Biome> BIOME_REGISTRY = NMSUtils.INSTANCE.getRegistry(Registry.BIOME_REGISTRY);
-    private static final Codec<TagKeyOrElementLocation<Biome>> BIOME_CODEC = DataFixerUpperUtils.tagOrElementCodec(Registry.BIOME_REGISTRY);
+    private static final Registry<Biome> BIOME_REGISTRY = NMSUtils.INSTANCE.getRegistry(Registries.BIOME);
+    private static final Codec<TagKeyOrElementLocation<Biome>> BIOME_CODEC = DataFixerUpperUtils.tagOrElementCodec(Registries.BIOME);
     
     public static final Codec<BiomeInjection> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Codec.either(BIOME_CODEC.listOf(), BIOME_CODEC).fieldOf("biomes").forGetter(BiomeInjection::biomes),

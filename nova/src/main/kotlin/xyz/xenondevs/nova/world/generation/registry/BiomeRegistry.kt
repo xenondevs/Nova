@@ -1,15 +1,15 @@
 package xyz.xenondevs.nova.world.generation.registry
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
+import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.biome.Biome
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 
 object BiomeRegistry : WorldGenRegistry() {
     
-    override val neededRegistries = setOf(Registry.BIOME_REGISTRY)
+    override val neededRegistries = setOf(Registries.BIOME)
     
     private val biomes = Object2ObjectOpenHashMap<NamespacedId, Biome>()
     
@@ -21,6 +21,6 @@ object BiomeRegistry : WorldGenRegistry() {
     
     override fun register(registryAccess: RegistryAccess) {
         loadFiles("biome", Biome.CODEC, biomes)
-        registerAll(registryAccess, Registry.BIOME_REGISTRY, biomes)
+        registerAll(registryAccess, Registries.BIOME, biomes)
     }
 }

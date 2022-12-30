@@ -96,8 +96,8 @@ remapStrings {
     classes.addAll(
         "xyz.xenondevs.nova.util.reflection.ReflectionRegistry",
         "xyz.xenondevs.nova.util.NMSUtils",
-        "xyz.xenondevs.nova.world.generation.WorldGenerationManager",
         "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch",
+        "xyz.xenondevs.nova.world.generation.WorldGenerationManager",
         "xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch",
         "xyz.xenondevs.nova.transformer.patch.worldgen.RegistryCodecPatch",
         "xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch",
