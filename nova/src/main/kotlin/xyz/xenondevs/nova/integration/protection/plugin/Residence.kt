@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.api.tileentity.TileEntity
 import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.protection.FakeOnlinePlayer
 
-object Residence : ProtectionIntegration, InternalIntegration {
+internal object Residence : ProtectionIntegration, InternalIntegration {
     
     private val RESIDENCE = if (Bukkit.getPluginManager().getPlugin("Residence") != null) Residence.getInstance() else null
     override val isInstalled = RESIDENCE != null

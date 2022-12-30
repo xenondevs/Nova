@@ -1,16 +1,19 @@
 package xyz.xenondevs.nova.world.region
 
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.util.createColoredParticle
 import xyz.xenondevs.nova.util.getBoxOutline
-import xyz.xenondevs.particle.task.TaskManager
+import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.util.send
 import java.awt.Color
 import java.util.*
 
 object VisualRegion {
     
-    private val taskId = HashMap<UUID, Int>()
+    private val tasks = HashMap<UUID, BukkitTask>()
     private val viewers = HashMap<UUID, MutableList<UUID>>()
     
     fun showRegion(player: Player, regionUUID: UUID, region: Region) {
@@ -40,16 +43,14 @@ object VisualRegion {
     }
     
     fun removeRegion(regionUUID: UUID) {
-        if (regionUUID !in taskId)
-            return
-        TaskManager.getTaskManager().stopTask(taskId[regionUUID]!!)
-        taskId.remove(regionUUID)
+        tasks.remove(regionUUID)?.cancel()
         viewers.remove(regionUUID)
     }
     
     fun updateRegion(regionUUID: UUID, region: Region) {
-        if (regionUUID in taskId) {
-            TaskManager.getTaskManager().stopTask(taskId[regionUUID]!!)
+        val task = tasks[regionUUID]
+        if (task != null) {
+            task.cancel()
             startShowingRegion(regionUUID, region)
         }
     }
@@ -64,15 +65,16 @@ object VisualRegion {
     private fun startShowingRegion(regionUUID: UUID, region: Region) {
         val packets = getParticlePackets(regionUUID, region)
         viewers.computeIfAbsent(regionUUID) { ArrayList() }
-        val id = TaskManager.startSuppliedTask(packets, 3) {
-            viewers[regionUUID]!!
-                .mapNotNull(Bukkit::getPlayer)
-                .filter { it.location.world == region.world }
+        tasks[regionUUID] = runTaskTimer(0, 3) {
+            viewers[regionUUID]
+                ?.asSequence()
+                ?.mapNotNull(Bukkit::getPlayer)
+                ?.filter { it.location.world == region.world }
+                ?.forEach { it.send(packets) }
         }
-        taskId[regionUUID] = id
     }
     
-    private fun getParticlePackets(regionUUID: UUID, region: Region): List<Any> {
+    private fun getParticlePackets(regionUUID: UUID, region: Region): List<ClientboundLevelParticlesPacket> {
         val color = Color(regionUUID.hashCode())
         return region.min.getBoxOutline(region.max, false).map { it.createColoredParticle(color) }
     }

@@ -45,12 +45,20 @@ internal object ConfigExtractor {
             storedCfg.set(path, internalValue)
         }
         
+        // remove keys that were once extracted but are no longer in the internal config
+        cfg.getKeys(true)
+            .filter { !internalCfg.isSet(it) && storedCfg.isSet(it) }
+            .forEach { path ->
+                cfg.set(path, null)
+                storedCfg.set(path, null)
+            }
+        
         internalCfg.getKeys(true).forEach { path ->
             // reset comments
             cfg.setComments(path, internalCfg.getComments(path))
             cfg.setInlineComments(path, internalCfg.getInlineComments(path))
             
-            // update keys that were unchanged by the user    
+            // update keys that were unchanged by the user
             val internalValue = internalCfg.get(path)
             if (internalValue is ConfigurationSection)
                 return@forEach
@@ -58,10 +66,7 @@ internal object ConfigExtractor {
             val storedValue = storedCfg.get(path)
             val configuredValue = cfg.get(path)
             
-            // check that the configured value differs from the internal value but was not changed by the user
-            if (internalValue != configuredValue && (storedValue == configuredValue ||
-                    (storedValue is List<*> && configuredValue is List<*> && storedValue.contentEquals(configuredValue)))
-            ) {
+            if (checkNoUserChanges(internalValue, configuredValue, storedValue)) {
                 cfg.set(path, internalValue)
                 storedCfg.set(path, internalValue)
             }
@@ -69,5 +74,17 @@ internal object ConfigExtractor {
         
         return cfg
     }
+    
+    /**
+     * Checks if the [configuredValue] differs from the [internalValue] but was not changed by the user by cross-referencing it with [storedValue].
+     */
+    private fun checkNoUserChanges(internalValue: Any?, configuredValue: Any?, storedValue: Any?): Boolean =
+        internalValue != configuredValue && checkEquality(storedValue, configuredValue)
+    
+    /**
+     * Checks if [value1] and [value2] are equal or if they're lists and have the same content.
+     */
+    private fun checkEquality(value1: Any?, value2: Any?): Boolean =
+        value1 == value2 || (value1 is List<*> && value2 is List<*> && value1.contentEquals(value2))
     
 }

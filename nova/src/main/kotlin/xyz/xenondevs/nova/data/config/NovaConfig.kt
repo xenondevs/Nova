@@ -42,7 +42,7 @@ object NovaConfig : Initializable() {
     private val configs = HashMap<String, YamlConfiguration>()
     internal val reloadables = arrayListOf<Reloadable>()
     
-    fun loadDefaultConfig() {
+    internal fun loadDefaultConfig() {
         LOGGER.info("Loading default config")
         
         configs["config"] = ConfigExtractor.extract(
@@ -103,6 +103,12 @@ object NovaConfig : Initializable() {
     
     operator fun get(material: ItemNovaMaterial): YamlConfiguration =
         configs[material.id.toString()] ?: throw IllegalArgumentException("Config not found: ${material.id}")
+    
+    fun getOrNull(name: String): YamlConfiguration? =
+        configs[name]
+    
+    fun getOrNull(material: ItemNovaMaterial): YamlConfiguration? =
+        configs[material.id.toString()]
     
     fun save(name: String) {
         configs[name]!!.save(File(NOVA.dataFolder, "configs/$name.yml"))

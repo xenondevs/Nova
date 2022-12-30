@@ -10,15 +10,16 @@ import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
+import java.util.function.Predicate
 
 /**
  * @param id The [NamespacedId] of this [ToolCategory]
- * @param getIcon Retrieves the icon for this [ToolCategory] with a given [ToolLevel]. An example id would
+ * @param getIcon Retrieves the icon for this [ToolCategory] with a given [ToolTier]. An example id would
  * be `minecraft:item/diamond_pickaxe` for the `minecraft:pickaxe` category and `minecraft:diamond` level.
  */
 open class ToolCategory internal constructor(
     val id: NamespacedId,
-    val getIcon: (ToolLevel?) -> ResourcePath
+    val getIcon: (ToolTier?) -> ResourcePath
 ) {
     
     fun isCorrectToolCategoryForBlock(block: Block): Boolean {
@@ -32,7 +33,7 @@ open class ToolCategory internal constructor(
             "shovel",
             canDoSweepAttack = false, canBreakBlocksInCreative = true,
             itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 2,
-            multipliers = mapOf(
+            genericMultipliers = mapOf(
                 Material.WOODEN_SHOVEL to 2.0,
                 Material.STONE_SHOVEL to 4.0,
                 Material.IRON_SHOVEL to 6.0,
@@ -46,7 +47,7 @@ open class ToolCategory internal constructor(
             "pickaxe",
             canDoSweepAttack = false, canBreakBlocksInCreative = true,
             itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 2,
-            multipliers = mapOf(
+            genericMultipliers = mapOf(
                 Material.WOODEN_PICKAXE to 2.0,
                 Material.STONE_PICKAXE to 4.0,
                 Material.IRON_PICKAXE to 6.0,
@@ -60,7 +61,7 @@ open class ToolCategory internal constructor(
             "axe",
             canDoSweepAttack = false, canBreakBlocksInCreative = true,
             itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 2,
-            multipliers = mapOf(
+            genericMultipliers = mapOf(
                 Material.WOODEN_AXE to 2.0,
                 Material.STONE_AXE to 4.0,
                 Material.IRON_AXE to 6.0,
@@ -74,7 +75,7 @@ open class ToolCategory internal constructor(
             "hoe",
             canDoSweepAttack = false, canBreakBlocksInCreative = true,
             itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 2,
-            multipliers = mapOf(
+            genericMultipliers = mapOf(
                 Material.WOODEN_HOE to 2.0,
                 Material.STONE_HOE to 4.0,
                 Material.IRON_HOE to 6.0,
@@ -88,13 +89,21 @@ open class ToolCategory internal constructor(
             "sword",
             canDoSweepAttack = true, canBreakBlocksInCreative = false,
             itemDamageOnBreakBlock = 2, itemDamageOnAttackEntity = 1,
-            multipliers = mapOf(
+            genericMultipliers = mapOf(
                 Material.WOODEN_SWORD to 1.5,
                 Material.STONE_SWORD to 1.5,
                 Material.IRON_SWORD to 1.5,
                 Material.DIAMOND_SWORD to 1.5,
                 Material.NETHERITE_SWORD to 1.5,
                 Material.GOLDEN_SWORD to 1.5
+            ),
+            specialMultipliers = mapOf(
+                Material.WOODEN_SWORD to mapOf(Material.COBWEB to 15.0),
+                Material.STONE_SWORD to mapOf(Material.COBWEB to 15.0),
+                Material.IRON_SWORD to mapOf(Material.COBWEB to 15.0),
+                Material.DIAMOND_SWORD to mapOf(Material.COBWEB to 15.0),
+                Material.NETHERITE_SWORD to mapOf(Material.COBWEB to 15.0),
+                Material.GOLDEN_SWORD to mapOf(Material.COBWEB to 15.0)
             )
         )
         
@@ -102,8 +111,15 @@ open class ToolCategory internal constructor(
             "shears",
             canDoSweepAttack = false, canBreakBlocksInCreative = true,
             itemDamageOnBreakBlock = 1, itemDamageOnAttackEntity = 0,
-            multipliers = mapOf(
+            genericMultipliers = mapOf(
                 Material.SHEARS to 1.5
+            ),
+            specialMultipliers = mapOf(
+                Material.SHEARS to mapOf(
+                    Predicate<Material> { it == Material.VINE || it == Material.GLOW_LICHEN } to 1.0,
+                    Predicate<Material> { Tag.WOOL.isTagged(it) } to 5.0,
+                    Predicate<Material> { Tag.LEAVES.isTagged(it) || it == Material.COBWEB } to 15.0
+                )
             )
         ) { ResourcePath.of("minecraft:item/shears") }
         
@@ -158,6 +174,7 @@ class VanillaToolCategory internal constructor(
     val canBreakBlocksInCreative: Boolean,
     val itemDamageOnAttackEntity: Int,
     val itemDamageOnBreakBlock: Int,
-    val multipliers: Map<Material, Double>,
-    getIcon: (ToolLevel?) -> ResourcePath
+    val genericMultipliers: Map<Material, Double>,
+    val specialMultipliers: Map<Material, Map<Material, Double>>,
+    getIcon: (ToolTier?) -> ResourcePath
 ) : ToolCategory(id, getIcon)

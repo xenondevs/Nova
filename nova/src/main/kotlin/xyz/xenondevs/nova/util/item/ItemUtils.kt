@@ -3,31 +3,42 @@ package xyz.xenondevs.nova.util.item
 import com.mojang.brigadier.StringReader
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.minecraft.commands.arguments.item.ItemParser
-import net.minecraft.core.HolderLookup.RegistryLookup
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
-import net.minecraft.nbt.Tag
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.item.Items
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack
+import org.bukkit.Tag
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ComplexTest
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.NovaIdTest
 import xyz.xenondevs.nova.data.recipe.NovaNameTest
+import xyz.xenondevs.nova.data.recipe.TagTest
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import java.util.logging.Level
+import net.minecraft.nbt.Tag as NBTTag
+import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
 
 val ItemStack.novaMaterial: ItemNovaMaterial?
@@ -81,8 +92,8 @@ val ItemStack.novaMaxStackSize: Int
     get() = novaMaterial?.maxStackSize ?: type.maxStackSize
 
 @Suppress("UNCHECKED_CAST")
-val ItemMeta.unhandledTags: MutableMap<String, Tag>
-    get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, Tag>
+val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
+    get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>
 
 val ItemStack.canDestroy: List<Material>
     get() {
@@ -97,8 +108,12 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     return first.isSimilar(second)
 }
 
+@Deprecated("Replaced by ItemStack.takeUnlessEmpty", ReplaceWith("takeUnlessEmpty()"))
 fun ItemStack.takeUnlessAir(): ItemStack? =
     if (type.isAir) null else this
+
+fun ItemStack.takeUnlessEmpty(): ItemStack? =
+    if (type.isAir || amount <= 0) null else this
 
 inline fun <reified K> ItemStack.retrieveData(key: NamespacedKey, getAlternative: () -> K): K {
     val persistentDataContainer = itemMeta?.persistentDataContainer ?: return getAlternative()
@@ -174,6 +189,14 @@ object ItemUtils {
     fun getRecipeChoice(nameList: List<String>): RecipeChoice {
         val tests = nameList.map { id ->
             try {
+                if (id.startsWith("#")) {
+                    val tagName = NamespacedKey.fromString(id.substringAfter('#'))
+                        ?: throw IllegalArgumentException("Malformed tag: $id")
+                    val tag = Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java)
+                        ?: throw IllegalArgumentException("Invalid tag: $id")
+                    return@map TagTest(tag)
+                }
+                
                 if (id.contains("{"))
                     return@map ComplexTest(toItemStack(id))
                 
@@ -271,7 +294,7 @@ object ItemUtils {
     }
     
     fun toItemStack(s: String): ItemStack {
-        val holder = ItemParser.parseForItem(RegistryLookup(Registry.ITEM), StringReader(s))
+        val holder = ItemParser.parseForItem(BuiltInRegistries.ITEM.asLookup(), StringReader(s))
         val nmsStack = MojangStack(holder.item, 1).apply { tag = holder.nbt }
         return CraftItemStack.asBukkitCopy(nmsStack)
     }
@@ -280,10 +303,60 @@ object ItemUtils {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) return novaMaterial.id.toString()
         
-        val customNameKey = CustomItemServiceManager.getNameKey(itemStack)
+        val customNameKey = CustomItemServiceManager.getId(itemStack)
         if (customNameKey != null) return customNameKey
         
         return "minecraft:${itemStack.type.name.lowercase()}"
+    }
+    
+    /**
+     * Gets the custom attribute modifiers that are configured in the NBT-data of this [ItemStack] for the given [slot].
+     */
+    fun getCustomAttributeModifiers(itemStack: ItemStack, slot: EquipmentSlot?): List<AttributeModifier> {
+        return getCustomAttributeModifiers(itemStack.nmsCopy, slot?.nmsEquipmentSlot)
+    }
+    
+    /**
+     * Gets the custom attribute modifiers that are configured in the NBT-data of this [ItemStack] for the given [slot].
+     */
+    internal fun getCustomAttributeModifiers(itemStack: MojangStack, slot: MojangEquipmentSlot?): List<AttributeModifier> {
+        val tag = itemStack.tag ?: return emptyList()
+        if (tag.contains("AttributeModifiers", NBTTag.TAG_LIST.toInt())) {
+            val attributeModifiers = ArrayList<AttributeModifier>()
+            
+            tag.getList("AttributeModifiers", NBTTag.TAG_COMPOUND.toInt()).forEach { modifier ->
+                modifier as CompoundTag
+                
+                try {
+                    val modifierSlot = modifier.getString("Slot").takeUnless(String::isBlank)
+                    
+                    if (slot == null || modifierSlot == null || modifierSlot.equals(slot.name, true)) {
+                        val slots = modifierSlot
+                            ?.let { MojangEquipmentSlot.valueOf(it.uppercase()) }
+                            ?.let { arrayOf(it) }
+                            ?: MojangEquipmentSlot.values()
+                        
+                        val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation.tryParse(modifier.getString("AttributeName"))) 
+                            ?: return@forEach
+                        
+                        val name = modifier.getString("Name")
+                        val amount = modifier.getDouble("Amount")
+                        val operation = Operation.fromValue(modifier.getInt("Operation"))
+                        val uuid = modifier.getUUID("UUID")
+                            .takeUnless { it.mostSignificantBits == 0L && it.leastSignificantBits == 0L }
+                            ?: return@forEach
+                        
+                        attributeModifiers += AttributeModifier(uuid, name, attribute, operation, amount, true, *slots)
+                    }
+                } catch (e: Exception) {
+                    LOGGER.log(Level.WARNING, "Could not read attribute modifier: $modifier", e)
+                }
+            }
+            
+            return attributeModifiers
+        }
+        
+        return emptyList()
     }
     
 }

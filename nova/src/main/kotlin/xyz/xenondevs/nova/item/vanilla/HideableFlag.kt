@@ -38,6 +38,10 @@ enum class HideableFlag {
      */
     DYE;
     
+    val mask: Int = 1 shl ordinal
+    
+    fun isHidden(flags: Int): Boolean = flags and mask != 0
+    
     companion object {
         
         fun toInt(flags: Iterable<HideableFlag>): Int {

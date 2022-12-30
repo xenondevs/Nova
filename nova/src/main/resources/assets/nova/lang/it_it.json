@@ -69,7 +69,7 @@
   "command.nova.recipe.no-recipe": "Questo oggetto non ha una ricetta.",
   "command.nova.usage.no-usage": "Questo oggetto non ha utilizzi.",
   "item.nova.wrench.mode.nova.energy": "Modalità: Energia",
-  "item.nova.wrench.mode.nova.items": "Modalità: Oggetti",
+  "item.nova.wrench.mode.nova.item": "Modalità: Oggetti",
   "item.nova.wrench.mode.nova.fluid": "Modalità: Fluidi",
   "menu.nova.items": "Oggetti",
   "command.nova.addons.header": "Componenti aggiuntivi (%s): ",

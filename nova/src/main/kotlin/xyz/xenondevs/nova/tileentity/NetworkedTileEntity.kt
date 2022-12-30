@@ -32,6 +32,7 @@ import kotlin.reflect.KProperty
 
 abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity(blockState), NetworkEndPoint {
     
+    final override var isNetworkInitialized = false
     final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = HashMap()
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = HashMap()
     final override val holders: MutableMap<NetworkType, EndPointDataHolder> by lazy {
@@ -58,16 +59,12 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     override fun saveData() {
         super.saveData()
         holders.values.forEach(EndPointDataHolder::saveData)
-        storeData("networks", serializeNetworks())
-        storeData("connectedNodes", serializeConnectedNodes())
+        serializeNetworks()
+        serializeConnectedNodes()
     }
     
     override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? {
         return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
-    }
-    
-    override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     }
     
     final override fun handleRightClick(ctx: BlockInteractContext): Boolean {

@@ -4,11 +4,11 @@ import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.builder.ItemBuilder
 import de.studiocode.invui.item.impl.BaseItem
 import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 
 open class ChangeNumberItem(
@@ -25,7 +25,7 @@ open class ChangeNumberItem(
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         if (canModify()) {
-            player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+            player.playClickSound()
             setNumber((getNumber() + if (clickType.isShiftClick) shiftSizeModifier else sizeModifier).coerceIn(getRange()))
         }
     }

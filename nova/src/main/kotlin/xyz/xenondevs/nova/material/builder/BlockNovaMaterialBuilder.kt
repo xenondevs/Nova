@@ -9,18 +9,18 @@ import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.material.BlockOptions
 import xyz.xenondevs.nova.material.MultiBlockLoader
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.PlaceCheckFun
 import xyz.xenondevs.nova.material.TileEntityConstructor
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.nova.material.options.BlockOptions
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.TileEntityBlock
 
-private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0, null, null, false)
+private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0)
 
-abstract class AbstractBlockNovaMaterialBuilder<S : AbstractBlockNovaMaterialBuilder<S, T>, T : NovaBlockState> internal constructor(addon: Addon, name: String) : ItemNovaMaterialBuilder(addon, name) {
+abstract class AbstractBlockNovaMaterialBuilder<S : AbstractBlockNovaMaterialBuilder<S, T>, T : NovaBlockState> internal constructor(addon: Addon, name: String) : NovaMaterialBuilder<S>(addon, name) {
     
     override var localizedName = "block.${id.namespace}.$name"
     protected abstract var block: NovaBlock<T>
@@ -54,8 +54,6 @@ abstract class AbstractBlockNovaMaterialBuilder<S : AbstractBlockNovaMaterialBui
         return getThis()
     }
     
-    protected abstract fun getThis(): S
-    
     abstract override fun register(): BlockNovaMaterial
     
 }
@@ -75,6 +73,7 @@ class BlockNovaMaterialBuilder internal constructor(addon: Addon, name: String) 
                 localizedName,
                 NovaItem(itemBehaviors),
                 maxStackSize,
+                isHidden,
                 block,
                 options,
                 properties,
@@ -120,6 +119,7 @@ class TileEntityNovaMaterialBuilder internal constructor(
                 localizedName,
                 NovaItem(itemBehaviors),
                 maxStackSize,
+                isHidden,
                 block,
                 options,
                 tileEntity,

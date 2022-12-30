@@ -1,13 +1,14 @@
 package xyz.xenondevs.nova.world.fakeentity
 
 import io.netty.buffer.Unpooled
-import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.material.PacketItems
@@ -216,10 +217,10 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         val buf = FriendlyByteBuf(Unpooled.buffer())
         
         val packedYaw = expectedLocation.yaw.toPackedByte().toInt()
-        buf.writeVarInt(0x00)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_ADD_ENTITY_PACKET)
         buf.writeVarInt(entityId)
         buf.writeUUID(uuid)
-        buf.writeId(Registry.ENTITY_TYPE, entityType)
+        buf.writeId(BuiltInRegistries.ENTITY_TYPE, entityType)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)
         buf.writeDouble(location.z)
@@ -236,7 +237,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createDespawnDataBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x3B)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_REMOVE_ENTITIES_PACKET)
         buf.writeVarIntArray(intArrayOf(entityId))
         
         return buf
@@ -244,7 +245,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createEquipmentBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x53)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_EQUIPMENT_PACKET)
         buf.writeVarInt(entityId)
         equipment.forEachIndexed { index, item ->
             buf.writeByte(if (index != 5) index or -128 else index)
@@ -256,7 +257,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createPosBuf(x: Short, y: Short, z: Short): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x28)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_MOVE_ENTITY_PACKET_POS)
         buf.writeVarInt(entityId)
         buf.writeShort(x.toInt())
         buf.writeShort(y.toInt())
@@ -267,7 +268,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createPosRotBuf(x: Short, y: Short, z: Short, yaw: Float, pitch: Float): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x29)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_MOVE_ENTITY_PACKET_POS_ROT)
         buf.writeVarInt(entityId)
         buf.writeShort(x.toInt())
         buf.writeShort(y.toInt())
@@ -280,7 +281,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createRotBuf(location: Location): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x2A)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_MOVE_ENTITY_PACKET_ROT)
         buf.writeVarInt(entityId)
         buf.writeByte(location.yaw.toPackedByte().toInt())
         buf.writeByte(location.pitch.toPackedByte().toInt())
@@ -290,7 +291,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createTeleportBuf(location: Location): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(0x66)
+        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_TELEPORT_ENTITY_PACKET)
         buf.writeVarInt(entityId)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)

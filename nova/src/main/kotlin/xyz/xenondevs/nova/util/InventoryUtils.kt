@@ -12,7 +12,7 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 /**
  * Adds a [List] of [ItemStack]s to a [VirtualInventory].
@@ -132,7 +132,7 @@ fun Inventory.getFirstEmptySlot(): Int? = InventoryUtils.getFirstEmptySlot(this)
  * if the given slot is occupied.
  */
 fun PlayerInventory.addPrioritized(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
-    if (getItem(prioritizedSlot)?.takeUnlessAir() == null) setItem(prioritizedSlot, itemStack)
+    if (getItem(prioritizedSlot)?.takeUnlessEmpty() == null) setItem(prioritizedSlot, itemStack)
     else addItem(itemStack)
 }
 

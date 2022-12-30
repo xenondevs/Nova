@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.integration.customitems.plugin
 
 import io.lumine.mythic.lib.api.item.NBTItem
 import net.Indyuce.mmoitems.api.Type
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -31,16 +33,10 @@ internal object MMOItems : CustomItemService {
         }
     }
     
-    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
+    override fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
         if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) return false
         block.type = Material.AIR
         return true
-    }
-    
-    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
-        val customBlock = mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null) ?: return null
-        block.type = Material.AIR
-        return listOf(customBlock.item)
     }
     
     override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
@@ -73,17 +69,17 @@ internal object MMOItems : CustomItemService {
         return if (mmoItems.customBlocks.getFromBlock(block.blockData).isEmpty) null else CustomBlockType.NORMAL
     }
     
-    override fun getItemByName(name: String): ItemStack? {
-        if (name.startsWith("mmoitems:")) {
-            val itemName = name.removePrefix("mmoitems:").uppercase()
+    override fun getItemById(id: String): ItemStack? {
+        if (id.startsWith("mmoitems:")) {
+            val itemName = id.removePrefix("mmoitems:").uppercase()
             return itemTypes.firstNotNullOfOrNull { mmoItems.getItem(it, itemName) }
         }
         
         return null
     }
     
-    override fun getItemTest(name: String): SingleItemTest? {
-        return getItemByName(name)?.let { MMOItemTest(name, it) }
+    override fun getItemTest(id: String): SingleItemTest? {
+        return getItemById(id)?.let { MMOItemTest(id, it) }
     }
     
     override fun getId(item: ItemStack): String? {
@@ -95,19 +91,25 @@ internal object MMOItems : CustomItemService {
         return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.let(::getId)
     }
     
-    override fun getName(item: ItemStack, locale: String): String? {
+    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
         if (getId(item) == null)
             return null
         
-        return item.displayName
+        return TextComponent.fromLegacyText(item.displayName)
     }
     
-    override fun getName(block: Block, locale: String): String? {
-        return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.displayName
+    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
+        return TextComponent.fromLegacyText(
+            mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.displayName
+        )
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {
         return key.namespace == "mmoitems"
+    }
+    
+    override fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
+        return null
     }
     
     override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {

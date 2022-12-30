@@ -14,7 +14,7 @@ abstract class Initializable internal constructor() {
     internal abstract fun init()
     internal open fun disable() = Unit
     
-    fun initialize() {
+    internal fun initialize() {
         try {
             init()
             isInitialized = true

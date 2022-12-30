@@ -7,23 +7,34 @@ resource_pack:
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:
     enabled: false
-  # Protection settings for the resource pack
-  protection:
-    # Renames resource pack textures and models
-    obfuscate: false
-    # Protects the zip from being opened in normal zip programs.
-    corrupt_entries: false
-  # Resource packs that should be merged with Nova's resource pack.
-  # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
-  base_packs: []
-  # A list of file extensions that shouldn't be excluded from the resource pack, even though they're not vanilla resource pack files.
-  whitelisted_file_types: []
-  # Defines what content is included in the generated resource pack.
-  # Excluding content will decrease the size of your resource pack but might also break some features.
-  content_filters: []
-  # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
-  # Please read the following documentation page before change this value:  https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
-  use_solid_blocks: true
+  # Settings affecting how the resource pack is generated.
+  generation:
+    # The resource pack description.
+    description: "Nova (%s asset pack(s), %s base pack(s))"
+    # Resource packs that should be merged with Nova's resource pack.
+    # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
+    base_packs: []
+    # The zip compression level, ranging from 0 (no compression) to 9 (best compression) or -1 for default.
+    compression_level: -1
+    # If the generation process should take place entirely in memory. This increases memory usage but improves generation speed.
+    in_memory: true
+    # Protection settings for the resource pack.
+    protection:
+      # Renames resource pack textures and models.
+      obfuscate: false
+      # Protects the zip from being opened in normal zip programs.
+      corrupt_entries: false
+    # A list of file extensions that shouldn't be excluded from the resource pack, even though they're not vanilla resource pack files.
+    whitelisted_file_types: []
+    # Excludes files from the resource pack. Excluding files will decrease the size of your resource pack but might also break some features.
+    # More information about resource filters can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/configuration/#resource-filters
+    resource_filters: []
+    # Whether Minecraft assets should be downloaded from GitHub or Mojang's API.
+    # GitHub is faster since it's a single zip file. If you're unable to access GitHub, change this to "mojang".
+    minecraft_assets_source: github
+    # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
+    # Please read the following documentation page before change this value: https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
+    use_solid_blocks: true
   # If players currently loading the resource pack should be frozen.
   freeze_loading_players: false
 
@@ -54,7 +65,7 @@ overlay:
     send_bars_after_resource_pack_loaded: false
     # A list of colors for which the boss bar should not be rendered.
     # Possible colors: pink, blue, red, green, yellow, purple, white
-    invisible_colors: []
+    invisible_colors: [ ]
 
 waila:
   # Enable / disable the WAILA overlay.
@@ -65,7 +76,32 @@ waila:
   # Updating the overlay under these circumstances is still required for displaying the tool matching, energy, etc. properly.
   data_update_interval: 5
   # A list of namespaced ids representing the blocks that should not be shown in WAILA.
-  blacklisted_blocks: []
+  blacklisted_blocks: [ ]
+
+world:
+  # Settings affecting block breaking.
+  block_breaking:
+    # If client-side predictions should be allowed for breaking vanilla blocks with vanilla tools.
+    clientside_predictions: true
+    # The block break cooldown, in ticks.
+    break_cooldown: 5
+  # If unknown blocks (e.g. blocks of addons that couldn't be loaded) should be deleted.
+  delete_unknown_blocks: false
+
+# Performance options
+performance:
+  # Nova's executor caps the amount of threads that are allowed to run simultaneously in order to prevent OutOfMemoryErrors.
+  nova_executor:
+    # If enabled, Nova's own executor will be used. Otherwise, Bukkit's scheduler system is used.
+    enabled: true
+    # The amount of threads to be started.
+    threads: 200
+  # If backup files should be created while saving Nova regions
+  region_backups: true
+  # If excess items should be dropped on the ground.
+  drop_excess_on_ground: true
+  # If block break particles should be displayed.
+  block_break_effects: true
 
 # Default transfer rates for networks when tile entities are directly connected.
 network:
@@ -76,29 +112,6 @@ network:
   fluid:
     default_transfer_rate: 9223372036854775807
 
-# Performance options
-performance:
-  # Nova's executor caps the amount of threads that are allowed to run simultaneously in order to prevent OutOfMemoryErrors.
-  nova_executor:
-    # If enabled, Nova's own executor will be used. Otherwise, Bukkit's scheduler system is used.
-    enabled: true
-    # The amount of threads to be started.
-    threads: 200
-  # If backup files should be created while saving nova regions
-  region_backups: true
-  # If excess items should be dropped on the ground.
-  drop_excess_on_ground: true
-  # If block break particles should be displayed.
-  block_break_effects: true
-
-debug:
-  # The chunk reload watcher will print stack traces if repeated chunk loads and unloads are detected.
-  watch_chunk_reloads: false
-  # If other plugins should be allowed to overwrite the results of Nova recipes.
-  allow_craft_result_overwrite: false
-  # The delay in ms to wait after the ApplicationStarted event has been fired (https://youtrack.jetbrains.com/issue/KTOR-4259)
-  self_host_delay: 1000
-
 # If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
 use_metric_prefixes: false
 
@@ -108,6 +121,10 @@ update_reminder:
   # The amount of ticks passed between update checks.
   interval: 12000
 
-world:
-  # If unknown blocks (e.g. blocks of addons that couldn't be loaded) should be deleted.
-  delete_unknown_blocks: false
+debug:
+  # The chunk reload watcher will print stack traces if repeated chunk loads and unloads are detected.
+  watch_chunk_reloads: false
+  # If other plugins should be allowed to overwrite the results of Nova recipes.
+  allow_craft_result_overwrite: false
+  # The delay in ms to wait after the ApplicationStarted event has been fired (https://youtrack.jetbrains.com/issue/KTOR-4259)
+  self_host_delay: 1000

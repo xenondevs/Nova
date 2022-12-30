@@ -1,9 +1,11 @@
 package xyz.xenondevs.nova.world.block
 
+import net.minecraft.core.Holder
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ClientboundCustomSoundPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
+import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -18,10 +20,10 @@ import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.getBreakParticlesPacket
 import xyz.xenondevs.nova.util.id
+import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.serverLevel
@@ -57,11 +59,8 @@ object BlockManager : Initializable(), IBlockManager {
         if (blockState is NovaBlockState)
             return blockState
         
-        if (useLinkedStates && blockState is LinkedBlockState) {
-            val linkedToBlockState = blockState.blockState
-            if (linkedToBlockState is NovaBlockState)
-                return linkedToBlockState
-        }
+        if (useLinkedStates && blockState is LinkedBlockState)
+            return blockState.blockState
         
         return null
     }
@@ -152,10 +151,12 @@ object BlockManager : Initializable(), IBlockManager {
         }
         
         fun broadcastBreakSound(soundGroup: SoundGroup) {
-            val soundPacket = ClientboundCustomSoundPacket(
-                ResourceLocation(soundGroup.breakSound),
+            val soundPacket = ClientboundSoundPacket(
+                Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(soundGroup.breakSound))),
                 SoundSource.BLOCKS,
-                nmsPos.center,
+                nmsPos.x + 0.5,
+                nmsPos.y + 0.5,
+                nmsPos.z + 0.5,
                 soundGroup.breakVolume,
                 soundGroup.breakPitch,
                 Random.nextLong()
@@ -177,7 +178,7 @@ object BlockManager : Initializable(), IBlockManager {
             // send sound and break particles manually for armor stand blocks
             if (soundGroup != null) broadcastBreakSound(soundGroup)
             val breakParticles = state.material.breakParticles?.getBreakParticlesPacket(pos.location)
-            if (breakParticles != null) broadcast(breakParticles, sendEffectsToBreaker)
+            if (breakParticles != null) broadcast(breakParticles, sendEffectsToBreaker || pos.block.type.hasNoBreakParticles())
         }
     }
     

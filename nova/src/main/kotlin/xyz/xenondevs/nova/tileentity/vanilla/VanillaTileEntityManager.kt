@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
@@ -88,6 +89,10 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
     }
     
     private fun tryCreateVTE(pos: BlockPos): VanillaTileEntityState? {
+        // Prevent creation of vanilla tile entities for custom item service blocks
+        if (CustomItemServiceManager.getBlockType(pos.block) != null)
+            return null
+        
         val block = pos.block
         val type = VanillaTileEntity.Type.of(block) ?: return null
         

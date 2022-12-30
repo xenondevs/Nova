@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.material
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
-import net.minecraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
@@ -13,7 +12,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.util.bukkitCopy
+import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.util.nmsCopy
 import kotlin.math.min
@@ -24,10 +23,11 @@ open class ItemNovaMaterial internal constructor(
     final override val id: NamespacedId,
     val localizedName: String,
     val novaItem: NovaItem,
-    maxStackSize: Int = 64
+    maxStackSize: Int = 64,
+    val isHidden: Boolean = false
 ) : INovaMaterial {
     
-    val maxStackSize: Int by lazyProvider { novaItem.vanillaMaterialProvider.map { min(maxStackSize, it.maxStackSize) } }
+    override val maxStackSize: Int by lazyProvider { novaItem.vanillaMaterialProvider.map { min(maxStackSize, it.maxStackSize) } }
     
     val item: ItemModelData by lazy {
         val itemModelData = Resources.getModelData(id).item!!
@@ -40,7 +40,7 @@ open class ItemNovaMaterial internal constructor(
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            val itemDisplayData = novaItem.getPacketItemData(itemStack, CompoundTag())
+            val itemDisplayData = novaItem.getPacketItemData(null, itemStack.nmsCopy)
             ItemWrapper(
                 item.createClientsideItemBuilder(
                     itemDisplayData.name,
@@ -54,7 +54,9 @@ open class ItemNovaMaterial internal constructor(
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            ItemWrapper(PacketItems.getFakeItem(null, itemStack.nmsCopy).bukkitCopy)
+            val clientsideItemStack = PacketItems.getFakeItem(null, itemStack.nmsCopy)
+            clientsideItemStack.tag?.remove("nova")
+            ItemWrapper(clientsideItemStack.bukkitMirror)
         }
     }
     
@@ -76,13 +78,13 @@ open class ItemNovaMaterial internal constructor(
      * It does not have a display name, lore, or any special nbt data.
      */
     fun createClientsideItemBuilder(): ItemBuilder =
-        item.createClientsideItemBuilder()
+        item.createClientsideItemBuilder().addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
     
-    /**
-     * Creates an [ItemStack] for this [ItemNovaMaterial].
-     */
-    fun createItemStack(amount: Int = 1): ItemStack =
+    override fun createItemStack(amount: Int): ItemStack =
         createItemBuilder().setAmount(amount).get()
+    
+    override fun createClientsideItemStack(amount: Int): ItemStack =
+        createClientsideItemBuilder().setAmount(amount).get()
     
     override fun getLocalizedName(locale: String): String =
         LocaleManager.getTranslatedName(locale, this)

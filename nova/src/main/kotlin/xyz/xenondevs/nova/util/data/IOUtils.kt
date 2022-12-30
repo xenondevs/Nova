@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.util.data
 
 import xyz.xenondevs.nova.NOVA
+import java.awt.image.BufferedImage
+import java.awt.image.RenderedImage
 import java.io.Closeable
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -8,8 +10,12 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.RandomAccessFile
+import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import javax.imageio.ImageIO
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 import kotlin.math.max
 import kotlin.streams.asSequence
 
@@ -218,6 +224,14 @@ inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
             }
         }
     }
+}
+
+internal fun Path.readImage(): BufferedImage {
+    return inputStream().use(ImageIO::read)
+}
+
+internal fun Path.writeImage(image: RenderedImage, formatName: String) {
+    outputStream().use { ImageIO.write(image, formatName, it) }
 }
 
 //<editor-fold desc="Legacy functions" defaultstate="collapsed">

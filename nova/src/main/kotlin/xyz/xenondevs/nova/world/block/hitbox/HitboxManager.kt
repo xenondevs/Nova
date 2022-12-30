@@ -37,7 +37,7 @@ object HitboxManager : Listener {
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
-    fun handleInteract(e: WrappedPlayerInteractEvent) {
+    private fun handleInteract(e: WrappedPlayerInteractEvent) {
         val event = e.event
         if (event.hand != EquipmentSlot.HAND || event.isCompletelyDenied()) return
         

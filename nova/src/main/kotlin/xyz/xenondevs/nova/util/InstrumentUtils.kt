@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util
 
+import net.minecraft.core.Holder
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import xyz.xenondevs.nova.world.BlockPos
 import org.bukkit.Instrument as BukkitInstrument
@@ -21,12 +23,27 @@ enum class Instrument(val bukkitInstrument: BukkitInstrument, val nmsInstrument:
     DIDGERIDOO(BukkitInstrument.DIDGERIDOO, NoteBlockInstrument.DIDGERIDOO),
     BIT(BukkitInstrument.BIT, NoteBlockInstrument.BIT),
     BANJO(BukkitInstrument.BANJO, NoteBlockInstrument.BANJO),
-    PLING(BukkitInstrument.PLING, NoteBlockInstrument.PLING);
+    PLING(BukkitInstrument.PLING, NoteBlockInstrument.PLING),
+    ZOMBIE(BukkitInstrument.ZOMBIE, NoteBlockInstrument.ZOMBIE),
+    SKELETON(BukkitInstrument.SKELETON, NoteBlockInstrument.SKELETON),
+    CREEPER(BukkitInstrument.CREEPER, NoteBlockInstrument.CREEPER),
+    DRAGON(BukkitInstrument.DRAGON, NoteBlockInstrument.DRAGON),
+    WITHER_SKELETON(BukkitInstrument.WITHER_SKELETON, NoteBlockInstrument.WITHER_SKELETON),
+    PIGLIN(BukkitInstrument.PIGLIN, NoteBlockInstrument.PIGLIN),
+    CUSTOM_HEAD(BukkitInstrument.CUSTOM_HEAD, NoteBlockInstrument.CUSTOM_HEAD);
+    
+    val soundEvent: Holder<SoundEvent> = nmsInstrument.soundEvent
+    val isTunable: Boolean = nmsInstrument.isTunable
+    val requiresAirAbove: Boolean = nmsInstrument.requiresAirAbove()
     
     companion object {
         
-        fun byBlockType(pos: BlockPos): Instrument {
-            return NoteBlockInstrument.byState(pos.world.serverLevel.getBlockState(pos.nmsPos)).instrument
+        fun byBlockAbove(pos: BlockPos): Instrument? {
+            return NoteBlockInstrument.byStateAbove(pos.world.serverLevel.getBlockState(pos.nmsPos)).orElse(null)?.instrument
+        }
+        
+        fun byBlockBelow(pos: BlockPos): Instrument {
+            return NoteBlockInstrument.byStateBelow(pos.world.serverLevel.getBlockState(pos.nmsPos)).instrument
         }
         
     }
@@ -51,6 +68,13 @@ internal val BukkitInstrument.instrument: Instrument
         BukkitInstrument.BIT -> Instrument.BIT
         BukkitInstrument.BANJO -> Instrument.BANJO
         BukkitInstrument.PLING -> Instrument.PLING
+        BukkitInstrument.ZOMBIE -> Instrument.ZOMBIE
+        BukkitInstrument.SKELETON -> Instrument.SKELETON
+        BukkitInstrument.CREEPER -> Instrument.CREEPER
+        BukkitInstrument.DRAGON -> Instrument.DRAGON
+        BukkitInstrument.WITHER_SKELETON -> Instrument.WITHER_SKELETON
+        BukkitInstrument.PIGLIN -> Instrument.PIGLIN
+        BukkitInstrument.CUSTOM_HEAD -> Instrument.CUSTOM_HEAD
     }
 
 internal val NoteBlockInstrument.instrument: Instrument
@@ -71,4 +95,11 @@ internal val NoteBlockInstrument.instrument: Instrument
         NoteBlockInstrument.BIT -> Instrument.BIT
         NoteBlockInstrument.BANJO -> Instrument.BANJO
         NoteBlockInstrument.PLING -> Instrument.PLING
+        NoteBlockInstrument.ZOMBIE -> Instrument.ZOMBIE
+        NoteBlockInstrument.SKELETON -> Instrument.SKELETON
+        NoteBlockInstrument.CREEPER -> Instrument.CREEPER
+        NoteBlockInstrument.DRAGON -> Instrument.DRAGON
+        NoteBlockInstrument.WITHER_SKELETON -> Instrument.WITHER_SKELETON
+        NoteBlockInstrument.PIGLIN -> Instrument.PIGLIN
+        NoteBlockInstrument.CUSTOM_HEAD -> Instrument.CUSTOM_HEAD
     }

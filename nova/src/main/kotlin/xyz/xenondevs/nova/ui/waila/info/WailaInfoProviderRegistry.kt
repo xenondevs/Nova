@@ -7,7 +7,6 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.ui.waila.info.impl.BellWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CakeWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CampfireWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CandleWailaInfoProvider
@@ -24,7 +23,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.RedstoneLampWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RepeaterWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RespawnAnchorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.SeaPickleWailaInfoProvider
-import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 
@@ -48,7 +47,6 @@ object WailaInfoProviderRegistry {
         registerProvider(RespawnAnchorWailaInfoProvider)
         registerProvider(LanternWailaInfoProvider)
         registerProvider(DaylightDetectorWailaInfoProvider)
-        registerProvider(BellWailaInfoProvider)
         registerProvider(CocoaWailaInfoProvider)
         registerProvider(RedstoneLampWailaInfoProvider)
     }
@@ -83,9 +81,9 @@ object WailaInfoProviderRegistry {
         val blockName = CustomItemServiceManager.getName(block, player.locale) ?: return null
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(ComponentBuilder().append(blockName).color(ChatColor.WHITE).create(), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(ComponentBuilder().append(blockName).create(), WailaLine.Alignment.CENTERED)
         lines += WailaLine(ComponentBuilder(blockId.toString()).color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(arrayOf(localized(ChatColor.GRAY, "waila.nova.required_tool.unknown")), WailaLine.Alignment.CENTERED)
+        lines += ToolLine.getCustomItemServiceToolLine(player, block)
         
         return WailaInfo(blockId, lines)
     }

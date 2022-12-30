@@ -3,14 +3,23 @@ package xyz.xenondevs.nova.data.serialization.json
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.Tag
+import org.bukkit.inventory.BlastingRecipe
+import org.bukkit.inventory.CampfireRecipe
+import org.bukkit.inventory.CookingRecipe
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.SmithingRecipe
+import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
+import org.bukkit.inventory.recipe.CookingBookCategory
+import org.bukkit.inventory.recipe.CraftingBookCategory
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer.Companion.getRecipeKey
 import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer.Companion.parseRecipeChoice
@@ -48,8 +57,13 @@ interface RecipeDeserializer<T> {
                 // Id fallbacks
                 ids.replace(" ", "")
                     .split(';')
-                    .firstOrNull { ItemUtils.isIdRegistered(it.substringBefore('{')) }
-                    ?: throw IllegalArgumentException("Invalid item id(s): $ids")
+                    .firstOrNull {
+                        if (it.startsWith('#')) {
+                            val tagName = NamespacedKey.fromString(it.substringAfter('#'))
+                                ?: throw IllegalArgumentException("Malformed tag: $it")
+                            return@firstOrNull Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java) != null
+                        } else ItemUtils.isIdRegistered(it.substringBefore('{'))
+                    } ?: throw IllegalArgumentException("Invalid item id(s): $ids")
             }
             
             return ItemUtils.getRecipeChoice(names)
@@ -91,6 +105,11 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
         recipe.shape(*shape.toTypedArray())
         ingredientMap.forEach { (key, material) -> recipe.setIngredient(key, material) }
         
+        val category = json.getString("category")
+            ?.let { CraftingBookCategory.valueOf(it.uppercase()) }
+            ?: CraftingBookCategory.MISC
+        recipe.category = category
+        
         return recipe
     }
     
@@ -129,6 +148,11 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
                 recipe.addIngredient(material)
             }
         }
+        
+        val category = json.getString("category")
+            ?.let { CraftingBookCategory.valueOf(it.uppercase()) }
+            ?: CraftingBookCategory.MISC
+        recipe.category = category
         
         return recipe
     }
@@ -175,11 +199,27 @@ abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
     
 }
 
-internal object FurnaceRecipeDeserializer : ConversionRecipeDeserializer<FurnaceRecipe>() {
+@Suppress("FINITE_BOUNDS_VIOLATION_IN_JAVA")
+internal abstract class CookingRecipeDeserializer<T : CookingRecipe<T>>(
+    val recipeConstructor: (key: NamespacedKey, result: ItemStack, input: RecipeChoice, experience: Float, time: Int) -> T
+) : ConversionRecipeDeserializer<T>() {
     
-    override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): FurnaceRecipe {
+    override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): T {
         val experience = json.getFloat("experience")!!
-        return FurnaceRecipe(key, result, input, experience, time)
+        
+        val recipe = recipeConstructor(key, result, input, experience, time)
+        
+        val category = json.getString("category")
+            ?.let { CookingBookCategory.valueOf(it.uppercase()) }
+            ?: CookingBookCategory.MISC
+        recipe.category = category
+        
+        return recipe
     }
     
 }
+
+internal object FurnaceRecipeDeserializer : CookingRecipeDeserializer<FurnaceRecipe>(::FurnaceRecipe)
+internal object BlastingRecipeDeserializer : CookingRecipeDeserializer<BlastingRecipe>(::BlastingRecipe)
+internal object SmokingRecipeDeserializer : CookingRecipeDeserializer<SmokingRecipe>(::SmokingRecipe)
+internal object CampfireRecipeDeserializer : CookingRecipeDeserializer<CampfireRecipe>(::CampfireRecipe)

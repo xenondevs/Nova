@@ -124,24 +124,26 @@ internal object Patcher : Initializable() {
             INSTRUMENTATION.redefineClasses(*definitions)
         } catch (ex: LinkageError) {
             LOGGER.severe("Failed to apply patches (LinkageError: $ex)! Trying to get more information...")
-        
+            
             var thrown = false
             val classLoader = ClassWrapperLoader(javaClass.classLoader)
             definitions.forEach {
                 try {
-                    classLoader.loadClass(VirtualClassPath[it.javaClass]).methods
+                    classLoader.loadClass(VirtualClassPath[it.definitionClass]).methods
                 } catch (e: LinkageError) {
                     if (e.message?.contains(ClassWrapperLoader::class.jvmName) != true) {
-                        LOGGER.severe("${e::class.simpleName} for class ${it.javaClass.internalName}:\n${e.message}")
+                        LOGGER.severe("${e::class.simpleName} for class ${it.definitionClass.internalName}:\n${e.message}")
                         thrown = true
                     }
+                } catch (t: Throwable) {
+                    LOGGER.log(Level.SEVERE, "Failed to load class ${it.definitionClass.internalName}", t)
                 }
             }
-        
+            
             if (!thrown) {
                 LOGGER.log(Level.SEVERE, "Could not get more information, original stacktrace: ", ex)
             }
-        
+            
             LOGGER.severe("Exiting server process...")
             exitProcess(-1)
         }

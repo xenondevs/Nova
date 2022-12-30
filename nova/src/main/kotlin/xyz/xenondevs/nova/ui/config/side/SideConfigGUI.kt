@@ -6,7 +6,6 @@ import de.studiocode.invui.gui.builder.guitype.GUIType
 import de.studiocode.invui.item.impl.SimpleItem
 import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -19,6 +18,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
+import xyz.xenondevs.nova.util.playClickSound
 
 class SideConfigGUI(
     endPoint: NetworkEndPoint,
@@ -105,7 +105,7 @@ class SideConfigGUI(
 class OpenSideConfigItem(private val sideConfigGUI: SideConfigGUI) : SimpleItem(CoreGUIMaterial.SIDE_CONFIG_BTN.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 1f)
+        player.playClickSound()
         sideConfigGUI.openWindow(player)
     }
     

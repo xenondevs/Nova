@@ -5,7 +5,7 @@ import io.lumine.mythic.utils.config.properties.Property.Material
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import kotlin.random.Random
@@ -37,6 +37,8 @@ fun Material.isTraversable() = isAir || this == Material.WATER || this == Materi
 fun Material.isFluid() = this == Material.WATER || this == Material.BUBBLE_COLUMN || this == Material.LAVA
 
 fun Material.isCauldron() = this == Material.CAULDRON || this == Material.WATER_CAULDRON || this == Material.LAVA_CAULDRON || this == Material.POWDER_SNOW_CAULDRON
+
+fun Material.hasNoBreakParticles() = this == Material.BARRIER || this == Material.STRUCTURE_VOID || this == Material.LIGHT
 
 fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmount(amount).get()
 

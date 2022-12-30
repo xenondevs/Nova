@@ -6,6 +6,8 @@ import dev.lone.itemsadder.api.CustomStack
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent.Cause
 import dev.lone.itemsadder.api.ItemsAdder
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -51,31 +53,22 @@ internal object ItemsAdder : CustomItemService {
         loaded.get()
     }
     
-    override fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
-        val customBlock = CustomBlock.byAlreadyPlaced(block) ?: return false
-        if (playSound || showParticles) customBlock.playBreakEffect()
-        customBlock.remove()
-        return true
-    }
-    
-    override fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
+    override fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
         val customBlock = CustomBlock.byAlreadyPlaced(block)
         if (customBlock != null) {
-            val loot = customBlock.getLoot(tool, true)
-            if (playSound || showParticles) customBlock.playBreakEffect()
+            if (breakEffects) customBlock.playBreakEffect()
             customBlock.remove()
-            return loot
+            return true
         }
         
         val customCrop = CustomCrop.byAlreadyPlaced(block)
         if (customCrop != null) {
-            val loot = customCrop.getLoot(tool)
-            if (playSound || showParticles) block.playBreakEffects()
+            if (breakEffects) block.playBreakEffects()
             block.type = Material.AIR
-            return loot
+            return true
         }
         
-        return null
+        return false
     }
     
     override fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
@@ -120,13 +113,13 @@ internal object ItemsAdder : CustomItemService {
         }
     }
     
-    override fun getItemByName(name: String): ItemStack? {
-        val customItem = CustomStack.getInstance(name)
+    override fun getItemById(id: String): ItemStack? {
+        val customItem = CustomStack.getInstance(id)
         return customItem?.itemStack
     }
     
-    override fun getItemTest(name: String): SingleItemTest? {
-        return getItemByName(name)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
+    override fun getItemTest(id: String): SingleItemTest? {
+        return getItemById(id)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {
@@ -142,13 +135,19 @@ internal object ItemsAdder : CustomItemService {
             ?: CustomCrop.byAlreadyPlaced(block)?.seed?.namespacedID
     }
     
-    override fun getName(item: ItemStack, locale: String): String? {
-        return CustomStack.byItemStack(item)?.namespace
+    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
+        return TextComponent.fromLegacyText(CustomStack.byItemStack(item)?.displayName)
     }
     
-    override fun getName(block: Block, locale: String): String? {
-        return CustomBlock.byAlreadyPlaced(block)?.displayName
-            ?: CustomCrop.byAlreadyPlaced(block)?.seed?.displayName
+    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
+        return (CustomBlock.byAlreadyPlaced(block)?.displayName
+            ?: CustomCrop.byAlreadyPlaced(block)?.seed?.displayName)
+            ?.let(TextComponent::fromLegacyText)
+    }
+    
+    override fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
+        // Missing API method
+        return null
     }
     
     override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
@@ -163,7 +162,7 @@ internal object ItemsAdder : CustomItemService {
     
 }
 
-class ItemsAdderLoadListener(private val run: () -> Unit) : Listener {
+private class ItemsAdderLoadListener(private val run: () -> Unit) : Listener {
     
     @EventHandler
     fun handleItemsAdderLoadData(event: ItemsAdderLoadDataEvent) {

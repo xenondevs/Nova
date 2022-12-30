@@ -1,18 +1,17 @@
 package xyz.xenondevs.nova.material
 
 import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
-import net.minecraft.network.syncher.EntityDataAccessor
-import net.minecraft.network.syncher.SynchedEntityData.DataItem
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -35,11 +34,11 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.bukkitStack
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.duplicate
 import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.ItemUtils
@@ -121,13 +120,11 @@ internal object PacketItems : Initializable(), Listener {
     private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val player = event.player
         val packet = event.packet
-        val data = packet.unpackedData ?: return
-        data.forEachIndexed { i, d ->
-            val value = d.value
+        val data = packet.packedItems ?: return
+        data.forEachIndexed { idx, dataValue ->
+            val value = dataValue.value
             if (value is MojangStack && isNovaItem(value)) {
-                @Suppress("UNCHECKED_CAST") // Has to be <MojangStack> since the value is a MojangStack
-                val newDataItem = DataItem(d.accessor as EntityDataAccessor<MojangStack>, getFakeItem(player, value, false))
-                data[i] = newDataItem
+                data[idx] = DataValue(dataValue.id, EntityDataSerializers.ITEM_STACK, getFakeItem(player, value, false))
             }
         }
     }
@@ -223,8 +220,8 @@ internal object PacketItems : Initializable(), Listener {
             || item == Items.LEATHER_HELMET
         ) {
             val color = itemStack.tag?.getOrNull<CompoundTag>("display")?.getOrNull<IntTag>("color")?.asInt
-            // custom textures use colors with mask 0xFF << 24
-            if (color != null && (color ushr 24 == 0xFF)) {
+            // custom armor only uses odd color codes
+            if (color != null && color % 2 != 0) {
                 // allow armor from custom item services to have any color
                 return CustomItemServiceManager.getId(itemStack.bukkitMirror) == null
             }
@@ -234,25 +231,9 @@ internal object PacketItems : Initializable(), Listener {
     }
     
     private fun getNovaItem(item: MojangStack): MojangStack {
-        return item.apply {
-            this.item = SERVER_SIDE_ITEM
-            
-            val tag = tag!!
-            tag.remove("CustomModelData")
-            tag.remove("Damage")
-            tag.remove("HideFlags")
-            
-            val display = tag.getOrNull<CompoundTag>("display")
-            
-            if (display != null) {
-                display.remove("Lore")
-                
-                // If the name component doesn't contain '"text":"', the item was not renamed in an anvil and the name can be removed
-                val name = display.getOrNull<StringTag>("Name")
-                if (name != null && name.asString?.contains("\"text\":\"") != true)
-                    display.remove("Name")
-            }
-        }
+        val serversideStack = MojangStack(SERVER_SIDE_ITEM, item.count)
+        serversideStack.tag = item.tag!!.getCompound("nova").getCompound("serversideTag")
+        return serversideStack
     }
     
     private fun getClientsideItemOrNull(player: Player?, item: MojangStack, fromCreative: Boolean, useName: Boolean = true) =
@@ -279,14 +260,13 @@ internal object PacketItems : Initializable(), Listener {
         
         val newItem = item.copy()
         val newItemTag = newItem.tag!!
+        newItemTag.getCompound("nova").put("serversideTag", itemTag)
         newItem.item = CraftMagicNumbers.getItem(data.material)
         newItemTag.putInt("CustomModelData", data.dataArray[subId])
         
-        val displayTag: CompoundTag = if (newItemTag.contains("display")) {
-            newItemTag.getCompound("display")
-        } else CompoundTag().also { newItemTag.put("display", it) }
+        val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
         
-        val itemDisplayData = novaItem.getPacketItemData(item.bukkitStack, newItemTag)
+        val itemDisplayData = novaItem.getPacketItemData(player, newItem)
         
         // name
         var itemDisplayName = itemDisplayData.name
@@ -300,7 +280,7 @@ internal object PacketItems : Initializable(), Listener {
         }
         
         // lore
-        val loreTag = ListTag()
+        val loreTag = displayTag.getOrPut("Lore", ::ListTag)
         val itemDisplayLore = itemDisplayData.lore
         itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
         if (player != null && player in AdvancedTooltips.players) {
@@ -309,7 +289,6 @@ internal object PacketItems : Initializable(), Listener {
             }
             loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
         }
-        displayTag.put("Lore", loreTag)
         
         // durability
         val itemDisplayDurabilityBar = itemDisplayData.durabilityBar
@@ -321,7 +300,7 @@ internal object PacketItems : Initializable(), Listener {
         // hide flags
         val hiddenFlags = itemDisplayData.hiddenFlags
         if (hiddenFlags.isNotEmpty()) {
-            newItemTag.putInt("HideFlags", HideableFlag.toInt(hiddenFlags))
+            newItemTag.putInt("HideFlags", newItemTag.getInt("HideFlags") or HideableFlag.toInt(hiddenFlags))
         }
         
         return newItem
@@ -376,12 +355,10 @@ internal object PacketItems : Initializable(), Listener {
         val stream = NBTUtils.convertListToStream(list)
         stream.forEach { contentItem ->
             val compound = CompoundTag()
-            
             if (isContainerItem(contentItem)) {
                 filterContainerItems(contentItem, fromCreative).save(compound)
-            } else if (fromCreative) {
-                if (isFakeItem(contentItem)) // Don't collapse if statement to prevent isNovaItem call
-                    getNovaItem(contentItem).save(compound)
+            } else if (fromCreative && isFakeItem(contentItem)) {
+                getNovaItem(contentItem).save(compound)
             } else if (isNovaItem(contentItem)) {
                 getFakeItem(null, contentItem).save(compound)
             } else {
@@ -397,12 +374,19 @@ internal object PacketItems : Initializable(), Listener {
         val newItem = item.copy()
         newItem.item = Items.BARRIER
         val tag = newItem.tag!!
+        
+        // remove custom model data
         tag.putInt("CustomModelData", 0)
         
-        val displayTag = tag.getCompound("display").also { tag.put("display", it) }
-        displayTag.put("Lore", NBTUtils.createStringList(
-            listOf(ComponentSerializer.toString(coloredText(ChatColor.RED, "Missing model for $id").withoutPreFormatting()))
-        ))
+        // store serversideTag
+        tag.getCompound("nova").put("serversideTag", item.tag!!)
+        
+        // overwrite display tag with "missing model" name
+        val displayTag = CompoundTag().also { tag.put("display", it) }
+        displayTag.putString(
+            "Name",
+            coloredText(ChatColor.RED, "Missing model for $id").withoutPreFormatting().serialize()
+        )
         
         return newItem
     }

@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.transformer
 
 import kotlin.reflect.KClass
 
-sealed interface Transformer {
+internal sealed interface Transformer {
     
     val classes: Set<KClass<*>>
     

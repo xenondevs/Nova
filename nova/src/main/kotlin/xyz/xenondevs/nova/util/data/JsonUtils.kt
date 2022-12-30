@@ -36,9 +36,13 @@ import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.world.loot.LootItem
 import xyz.xenondevs.nova.world.loot.LootTable
 import java.io.File
+import java.io.InputStream
 import java.io.Reader
 import java.lang.reflect.Type
+import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.reader
+import kotlin.io.path.writeText
 
 private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter<UUID>(UUIDTypeAdapter)
@@ -65,10 +69,21 @@ val PRETTY_GSON: Gson = GSON_BUILDER.setPrettyPrinting().create()
 fun File.parseJson(): JsonElement {
     try {
         return reader().use(JsonParser::parseReader)
-    } catch(e: Exception) {
-        throw JsonParseException("Could not parse json file: $this", e)
+    } catch (t: Throwable) {
+        throw JsonParseException("Could not parse json file: $this", t)
     }
 }
+
+fun Path.parseJson(): JsonElement {
+    try {
+        return reader().use(JsonParser::parseReader)
+    } catch (t: Throwable) {
+        throw JsonParseException("Could not parse json file: $this", t)
+    }
+}
+
+fun InputStream.parseJson(): JsonElement =
+    use { JsonParser.parseReader(it.reader()) }
 
 fun JsonObject.hasString(property: String) =
     has(property) && this[property].isString()
@@ -130,6 +145,9 @@ inline fun <reified T> JsonObject.getDeserialized(property: String, default: () 
 operator fun JsonObject.set(property: String, value: JsonElement) = add(property, value)
 
 fun JsonElement.writeToFile(file: File) =
+    file.writeText(toString())
+
+fun JsonElement.writeToFile(file: Path) =
     file.writeText(toString())
 
 fun JsonElement.isString() =

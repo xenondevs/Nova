@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.transformer.patch.item
 
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock
+import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.TypeInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethodByName
 import net.minecraft.world.entity.player.Player as MojangPlayer
@@ -44,7 +44,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
     
     @JvmStatic
     fun isPreferredTool(block: CraftBlock, blockState: BlockState, tool: MojangStack): Boolean {
-        return !blockState.requiresCorrectToolForDrops() || ToolUtils.isCorrectToolForDrops(block, tool.bukkitMirror.takeUnlessAir())
+        return !blockState.requiresCorrectToolForDrops() || ToolUtils.isCorrectToolForDrops(block, tool.bukkitMirror.takeUnlessEmpty())
     }
     
     /**

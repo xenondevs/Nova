@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.material.builder.BlockNovaMaterialBuilder
 import xyz.xenondevs.nova.material.builder.ItemNovaMaterialBuilder
 import xyz.xenondevs.nova.material.builder.TileEntityNovaMaterialBuilder
+import xyz.xenondevs.nova.material.options.BlockOptions
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -49,26 +50,41 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         name: String,
         vararg behaviors: ItemBehaviorHolder<*>,
         localizedName: String = "item.${addon.description.id}.$name",
-        maxStackSize: Int = 64
+        isHidden: Boolean = false
     ): ItemNovaMaterial {
         val namespace = addon.description.id
         return register(ItemNovaMaterial(
             NamespacedId(namespace, name),
             localizedName,
             NovaItem(*behaviors),
-            maxStackSize
+            isHidden = isHidden
         ))
     }
     
     fun registerUnnamedItem(
         addon: Addon,
-        name: String
-    ) : ItemNovaMaterial {
+        name: String,
+        isHidden: Boolean = false
+    ): ItemNovaMaterial {
         val namespace = addon.description.id
         return register(ItemNovaMaterial(
             NamespacedId(namespace, name),
             "",
-            NovaItem()
+            NovaItem(),
+            isHidden = isHidden
+        ))
+    }
+    
+    fun registerUnnamedHiddenItem(
+        addon: Addon,
+        name: String
+    ): ItemNovaMaterial {
+        val namespace = addon.description.id
+        return register(ItemNovaMaterial(
+            NamespacedId(namespace, name),
+            "",
+            NovaItem(),
+            isHidden = true
         ))
     }
     
@@ -107,7 +123,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     ): TileEntityNovaMaterial {
         val namespace = addon.description.id
         val material = TileEntityNovaMaterial(
-            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize,
+            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize, false,
             block, options, tileEntityConstructor, properties, placeCheck, multiBlockLoader
         )
         return register(material)
@@ -127,7 +143,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     ): BlockNovaMaterial {
         val namespace = addon.description.id
         val material = BlockNovaMaterial(
-            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize,
+            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize, false,
             block, options, properties, placeCheck, multiBlockLoader
         )
         return register(material)
@@ -160,19 +176,26 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     //</editor-fold>
     
     //<editor-fold desc="internal", defaultstate="collapsed">
-    internal fun registerDefaultCoreItem(name: String, vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial {
-        return register(ItemNovaMaterial(
-            NamespacedId("nova", name),
-            "item.nova.$name",
-            NovaItem(*itemBehaviors)
-        ))
-    }
-    
-    internal fun registerCoreItem(name: String, localizedName: String = "", vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial {
+    internal fun registerCoreItem(
+        name: String,
+        vararg itemBehaviors: ItemBehaviorHolder<*>,
+        localizedName:String = "item.nova.$name",
+        isHidden: Boolean = false
+    ): ItemNovaMaterial {
         return register(ItemNovaMaterial(
             NamespacedId("nova", name),
             localizedName,
-            NovaItem(*itemBehaviors)
+            NovaItem(*itemBehaviors),
+            isHidden = isHidden
+        ))
+    }
+    
+    internal fun registerUnnamedHiddenCoreItem(name: String, localizedName: String = "", vararg itemBehaviors: ItemBehaviorHolder<*>): ItemNovaMaterial {
+        return register(ItemNovaMaterial(
+            NamespacedId("nova", name),
+            localizedName,
+            NovaItem(*itemBehaviors),
+            isHidden = true
         ))
     }
     //</editor-fold>

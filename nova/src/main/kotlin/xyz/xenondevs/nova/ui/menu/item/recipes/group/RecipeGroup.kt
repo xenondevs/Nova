@@ -19,7 +19,7 @@ abstract class RecipeGroup : Comparable<RecipeGroup> {
         return guiCache.getOrPut(container) { createGUI(container) }
     }
     
-    fun invalidateCache() {
+    internal fun invalidateCache() {
         guiCache.clear()
     }
     

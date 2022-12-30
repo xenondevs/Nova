@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredAr
 import xyz.xenondevs.nova.util.data.getDouble
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getString
-import kotlin.math.roundToInt
 
 internal object ArmorIndexDeserializer {
     
@@ -44,10 +43,10 @@ internal object ArmorIndexDeserializer {
                 }
                 
                 element is JsonObject -> {
-                    layer1 = element.getString("layer1")
-                    layer2 = element.getString("layer2")
-                    layer1EmissivityMap = element.getString("layer1EmissivityMap")
-                    layer2EmissivityMap = element.getString("layer2EmissivityMap")
+                    layer1 = element.getString("layer_1")
+                    layer2 = element.getString("layer_2")
+                    layer1EmissivityMap = element.getString("layer_1_emissivity_map")
+                    layer2EmissivityMap = element.getString("layer_2_emissivity_map")
                     
                     interpolationMode = element.getOrNull("interpolation")
                         ?.asString?.uppercase()

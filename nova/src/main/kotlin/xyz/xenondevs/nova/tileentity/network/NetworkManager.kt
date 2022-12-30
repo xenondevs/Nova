@@ -46,7 +46,7 @@ typealias NetworkManagerTask = (NetworkManager) -> Unit
 
 private typealias PartialTask = () -> Unit
 
-class NoNetworkDataException(override val message: String? = null) : Exception()
+private class NoNetworkDataException(override val message: String? = null) : Exception()
 
 private var NETWORK_MANAGER = NetworkManagerImpl()
 
@@ -339,6 +339,9 @@ private class NetworkManagerImpl : NetworkManager {
             }
         }
         
+        // Mark as initialized
+        endPoint.isNetworkInitialized = true
+        
         return networks
     }
     
@@ -362,6 +365,9 @@ private class NetworkManagerImpl : NetworkManager {
             
             return@map network
         }
+        
+        // Mark as initialized
+        bridge.isNetworkInitialized = true
         
         return networks
     }
@@ -457,7 +463,7 @@ private class NetworkManagerImpl : NetworkManager {
                     }
                 }
             } else return@networks null
-        }
+        }.thenRun { endPoint.isNetworkInitialized = true }
     }
     
     private fun connectEndPoint(endPoint: NetworkEndPoint, neighborNode: NetworkNode, networkType: NetworkType, face: BlockFace, updateBridges: Boolean) {
@@ -531,6 +537,9 @@ private class NetworkManagerImpl : NetworkManager {
             
             // update itself
             bridge.handleNetworkUpdate()
+            
+            // mark as initialized
+            bridge.isNetworkInitialized = true
         }
     }
     

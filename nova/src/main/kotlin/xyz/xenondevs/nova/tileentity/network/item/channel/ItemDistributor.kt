@@ -95,12 +95,16 @@ internal class ItemDistributor(
                             val provider = providersInScope[providerRRCounter.get()]
                             
                             // prevent providers from providing to themselves
-                            if (!provider.isSameInventory(consumer)) {
+                            if (provider.canExchangeItemsWith(consumer)) {
                                 val providerContent = providerContentMap[provider]!!
                                 
                                 // find the first item that can be extracted into the current consumer and perform the extraction
                                 for ((slot, itemStack) in providerContent.withIndex()) {
-                                    if (itemStack == null || provider.deniesItem(itemStack) || consumerFailList.any { it.isSimilar(itemStack) }) continue
+                                    if (itemStack == null
+                                        || provider.deniesItem(itemStack)
+                                        || consumerFailList.any { it.isSimilar(itemStack) }
+                                        || !provider.canDecrementByOne(slot)
+                                    ) continue
                                     
                                     if (!consumer.deniesItem(itemStack)) {
                                         val singleStack = itemStack.clone().apply { amount = 1 }
@@ -140,7 +144,7 @@ internal class ItemDistributor(
     }
     
     private fun distributeDirectlyBetween(transferAmount: Int, consumer: FilteredNetworkedInventory, provider: FilteredNetworkedInventory): Int {
-        if (consumer.isSameInventory(provider)) return transferAmount
+        if (!consumer.canExchangeItemsWith(provider)) return transferAmount
         
         var transfersLeft = transferAmount
         
@@ -151,8 +155,10 @@ internal class ItemDistributor(
             val amountTransferred = transferableStack.amount - consumer.addItem(transferableStack)
             
             if (amountTransferred != 0) {
-                provider.setItem(slot, itemStack.also { it.amount -= amountTransferred }.takeUnless { it.amount <= 0 })
-                transfersLeft -= amountTransferred
+                val success = provider.setItem(slot, itemStack.also { it.amount -= amountTransferred }.takeUnless { it.amount <= 0 })
+                if (success) {
+                    transfersLeft -= amountTransferred
+                }
             }
             
             if (transfersLeft == 0) break
