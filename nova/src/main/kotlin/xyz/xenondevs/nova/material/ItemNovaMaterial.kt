@@ -54,7 +54,7 @@ open class ItemNovaMaterial internal constructor(
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            val clientsideItemStack = PacketItems.getFakeItem(null, itemStack.nmsCopy)
+            val clientsideItemStack = PacketItems.getClientSideStack(null, itemStack.nmsCopy)
             clientsideItemStack.tag?.remove("nova")
             ItemWrapper(clientsideItemStack.bukkitMirror)
         }

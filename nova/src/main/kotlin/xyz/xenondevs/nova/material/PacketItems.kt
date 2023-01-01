@@ -1,23 +1,21 @@
 package xyz.xenondevs.nova.material
 
 import net.md_5.bungee.api.ChatColor
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.ItemMergeEvent
-import org.bukkit.event.inventory.InventoryDragEvent
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
@@ -42,8 +40,6 @@ import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.ItemUtils
-import xyz.xenondevs.nova.util.item.novaMaterial
-import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
@@ -56,9 +52,7 @@ internal object PacketItems : Initializable(), Listener {
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
-    
-    private val PLAYER_HOTBAR_BLOCKED_SLOTS = BooleanArray(36) { it < 9 }
-    private val PLAYER_NON_HOTBAR_BLOCKED_SLOTS = BooleanArray(36) { it > 8 }
+    val SERVER_SIDE_ITEM_ID = BuiltInRegistries.ITEM.getKey(SERVER_SIDE_ITEM).toString()
     
     override val initializationStage = InitializationStage.POST_WORLD
     override val dependsOn = setOf(ResourceGeneration.PreWorld)
@@ -68,52 +62,22 @@ internal object PacketItems : Initializable(), Listener {
         registerPacketListener()
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun handleMerge(event: ItemMergeEvent) {
-        val first = event.entity.itemStack
-        val second = event.target.itemStack
-        
-        val novaMaterial = first.novaMaterial ?: return
-        if (first.amount + second.amount > novaMaterial.maxStackSize)
-            event.isCancelled = true
-    }
-    
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private fun handleDrag(event: InventoryDragEvent) {
-        if (event.newItems.values.any { it.amount > it.novaMaxStackSize })
-            event.isCancelled = true
-    }
-    
+    //<editor-fold desc="packet events", defaultstate="collapsed">
     @PacketHandler
     private fun handleSetContentPacket(event: ClientboundContainerSetContentPacketEvent) {
         val player = event.player
-        val packet = event.packet
-        val items = packet.items
-        val carriedItem = packet.carriedItem
+        val items = event.items
         
         items.forEachIndexed { i, item ->
-            val newItem = getClientsideItemOrNull(player, item, fromCreative = false)
-            if (newItem != null) {
-                items[i] = newItem
-            } else if (isIllegallyColoredArmor(item)) {
-                items[i] = getColorCorrectedArmor(item)
-            }
+            items[i] = getClientSideStack(player, item)
         }
         
-        if (isNovaItem(carriedItem))
-            event.carriedItem = getFakeItem(player, carriedItem)
+        event.carriedItem = getClientSideStack(player, event.carriedItem)
     }
     
     @PacketHandler
     private fun handleSetSlotPacket(event: ClientboundContainerSetSlotPacketEvent) {
-        val packet = event.packet
-        val item = packet.item
-        val newItem = getClientsideItemOrNull(event.player, item, fromCreative = false)
-        if (newItem != null) {
-            event.item = newItem
-        } else if (isIllegallyColoredArmor(item)) {
-            event.item = getColorCorrectedArmor(item)
-        }
+        event.item = getClientSideStack(event.player, event.item)
     }
     
     @PacketHandler
@@ -123,8 +87,8 @@ internal object PacketItems : Initializable(), Listener {
         val data = packet.packedItems ?: return
         data.forEachIndexed { idx, dataValue ->
             val value = dataValue.value
-            if (value is MojangStack && isNovaItem(value)) {
-                data[idx] = DataValue(dataValue.id, EntityDataSerializers.ITEM_STACK, getFakeItem(player, value, false))
+            if (value is MojangStack) {
+                data[idx] = DataValue(dataValue.id, EntityDataSerializers.ITEM_STACK, getClientSideStack(player, value, false))
             }
         }
     }
@@ -132,31 +96,19 @@ internal object PacketItems : Initializable(), Listener {
     @PacketHandler
     private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
         val player = event.player
-        val packet = event.packet
-        val slots = packet.slots
+        val slots = event.slots
         
         slots.forEachIndexed { i, pair ->
-            val slot = pair.first
-            val itemStack = pair.second
-            if (isNovaItem(itemStack)) {
-                slots[i] = MojangPair(slot, getFakeItem(player, itemStack))
-            } else if (isIllegallyColoredArmor(itemStack)) {
-                slots[i] = MojangPair(slot, getColorCorrectedArmor(itemStack))
-            }
+            slots[i] = MojangPair(
+                pair.first,
+                getClientSideStack(player, pair.second)
+            )
         }
     }
     
     @PacketHandler
     private fun handleCreativeSetItem(event: ServerboundSetCreativeModeSlotPacketEvent) {
-        val packet = event.packet
-        val item = packet.item
-        if (isContainerItem(item)) {
-            event.item = filterContainerItems(item, fromCreative = true)
-        } else if (isFakeItem(item)) {
-            event.item = getNovaItem(item)
-        } else if (isIllegallyColoredArmor(item)) {
-            event.item = getColorCorrectedArmor(item)
-        }
+        event.item = getServerSideStack(event.item)
     }
     
     @PacketHandler
@@ -172,44 +124,211 @@ internal object PacketItems : Initializable(), Listener {
     @PacketHandler
     private fun handleMerchantOffers(event: ClientboundMerchantOffersPacketEvent) {
         val newOffers = MerchantOffers()
-        var changed = false
         
         event.offers.forEach { offer ->
-            val newSlotA = getClientsideItemOrNull(event.player, offer.baseCostA, fromCreative = false)
-            val newSlotB = getClientsideItemOrNull(event.player, offer.costB, fromCreative = false)
-            val newResult = getClientsideItemOrNull(event.player, offer.result, fromCreative = false)
-            if (newSlotA != null || newSlotB != null || newResult != null) {
-                newOffers.add(MerchantOffer(
-                    newSlotA ?: offer.baseCostA,
-                    newSlotB ?: offer.costB,
-                    newResult ?: offer.result,
-                    offer.uses,
-                    offer.maxUses,
-                    offer.xp,
-                    offer.priceMultiplier,
-                    offer.demand
-                ))
-                changed = true
-            } else newOffers.add(offer)
+            newOffers += MerchantOffer(
+                getClientSideStack(event.player, offer.baseCostA),
+                getClientSideStack(event.player, offer.costB),
+                getClientSideStack(event.player, offer.result),
+                offer.uses,
+                offer.maxUses,
+                offer.xp,
+                offer.priceMultiplier,
+                offer.demand
+            
+            )
         }
-        if (changed) event.offers = newOffers
+        
+        event.offers = newOffers
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="server-side stack -> client-side stack", defaultstate="collapsed">
+    fun getClientSideStack(player: Player?, itemStack: MojangStack, useName: Boolean = true, storeServerSideTag: Boolean = true): MojangStack {
+        val itemTag = itemStack.tag
+            ?: return itemStack
+        
+        return if (itemTag.contains("nova", NBTUtils.TAG_COMPOUND)) {
+            getClientsideNovaStack(player, itemStack, useName, storeServerSideTag)
+        } else getClientsideVanillaStack(player, itemStack, storeServerSideTag)
     }
     
-    internal fun isNovaItem(item: MojangStack): Boolean {
-        return item.item == SERVER_SIDE_ITEM
-            && item.tag != null
-            && item.tag!!.contains("nova", NBTUtils.TAG_COMPOUND)
+    fun getClientSideStack(player: Player?, itemStackCompound: CompoundTag, useName: Boolean = true, storeServerSideTag: Boolean = true): CompoundTag {
+        val itemTag = itemStackCompound.getOrNull<CompoundTag>("tag")
+            ?: return itemStackCompound
+        
+        val itemStack = MojangStack.of(itemStackCompound)
+        val newItemStack = if (itemTag.contains("nova", NBTUtils.TAG_COMPOUND)) {
+            getClientsideNovaStack(player, itemStack, useName, storeServerSideTag)
+        } else getClientsideVanillaStack(player, itemStack, storeServerSideTag)
+        
+        return if (newItemStack == itemStack)
+            itemStackCompound
+        else newItemStack.save(CompoundTag())
     }
     
-    private fun isFakeItem(item: MojangStack): Boolean {
-        return item.tag != null
-            && item.tag!!.contains("nova", NBTUtils.TAG_COMPOUND)
-            && item.tag!!.contains("CustomModelData", NBTUtils.TAG_INT)
+    //<editor-fold desc="Nova", defaultstate="collapsed">
+    private fun getClientsideNovaStack(player: Player?, itemStack: MojangStack, useName: Boolean, storeServerSideTag: Boolean): MojangStack {
+        val itemTag = itemStack.tag!!
+        val novaTag = itemTag.getOrNull<CompoundTag>("nova")
+            ?: throw IllegalArgumentException("The provided ItemStack is not a Nova item.")
+        
+        val id = novaTag.getString("id") ?: return getUnknownItem(itemStack, null)
+        val material = NovaMaterialRegistry.getOrNull(id) ?: return getUnknownItem(itemStack, id)
+        val subId = novaTag.getInt("subId")
+        val novaItem = material.novaItem
+        
+        val itemModelDataMap = Resources.getModelDataOrNull(id)?.item
+        val data = itemModelDataMap?.get(novaItem.vanillaMaterial)
+            ?: itemModelDataMap?.values?.first()
+            ?: return getUnknownItem(itemStack, id)
+        
+        val newItemStack = itemStack.copy()
+        val newItemTag = newItemStack.tag!!
+        
+        // save server-side nbt data
+        if (storeServerSideTag) {
+            newItemTag.put("NovaServerSideTag", itemTag)
+        }
+        
+        // set item type and model data
+        newItemStack.item = CraftMagicNumbers.getItem(data.material)
+        newItemTag.putInt("CustomModelData", data.dataArray[subId])
+        
+        val packetItemData = novaItem.getPacketItemData(player, newItemStack)
+        
+        //<editor-fold desc="Display", defaultstate="collapsed">
+        val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
+        
+        // name
+        var itemDisplayName = packetItemData.name
+        if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
+            if (itemTag.contains("Enchantments", NBTUtils.TAG_LIST) && itemDisplayName.size == 1) {
+                itemDisplayName = itemDisplayName.duplicate()
+                itemDisplayName[0].color = ChatColor.AQUA
+            }
+            
+            displayTag.putString("Name", itemDisplayName.serialize())
+        }
+        
+        // lore
+        val loreTag = displayTag.getOrPut("Lore", ::ListTag)
+        val itemDisplayLore = packetItemData.lore
+        itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
+        if (player != null && player in AdvancedTooltips.players) {
+            packetItemData.advancedTooltipsLore?.forEach {
+                loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize())
+            }
+            loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
+        }
+        //</editor-fold>
+        
+        //<editor-fold desc="Damage", defaultstate="collapsed">
+        val itemDisplayDurabilityBar = packetItemData.durabilityBar
+        if (itemDisplayDurabilityBar != 1.0) {
+            val maxDurability = newItemStack.item.maxDamage
+            newItemTag.putInt("Damage", maxDurability - (maxDurability * itemDisplayDurabilityBar).toInt())
+        }
+        //</editor-fold>
+        
+        //<editor-fold desc="HideFlags">
+        val hiddenFlags = packetItemData.hiddenFlags
+        if (hiddenFlags.isNotEmpty()) {
+            newItemTag.putInt("HideFlags", newItemTag.getInt("HideFlags") or HideableFlag.toInt(hiddenFlags))
+        }
+        //</editor-fold>
+        
+        return newItemStack
+    }
+    
+    private fun getUnknownItem(itemStack: MojangStack, id: String?): MojangStack {
+        val newItemStack = itemStack.copy()
+        newItemStack.item = Items.BARRIER
+        val tag = newItemStack.tag!!
+        
+        // remove custom model data
+        tag.putInt("CustomModelData", 0)
+        
+        // store serversideTag
+        tag.getCompound("nova").put("serversideTag", itemStack.tag!!)
+        
+        // overwrite display tag with "missing model" name
+        val displayTag = CompoundTag().also { tag.put("display", it) }
+        displayTag.putString(
+            "Name",
+            coloredText(ChatColor.RED, "Unknown item: $id").withoutPreFormatting().serialize()
+        )
+        
+        return newItemStack
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="Vanilla", defaultstate="collapsed">
+    private fun getClientsideVanillaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
+        // TODO: advanced tooltips
+        
+        var newItemStack = itemStack
+        
+        if (storeServerSideTag && isContainerItem(itemStack)) {
+            newItemStack = getClientSideContainerItem(player, itemStack)
+        } else if (isIllegallyColoredArmor(itemStack)) {
+            newItemStack = getColorCorrectedArmor(itemStack)
+        }
+        
+        // save server-side nbt data if the item has been modified
+        if (storeServerSideTag && newItemStack != itemStack) {
+            newItemStack.tag!!.put("NovaServerSideTag", itemStack.tag!!)
+        }
+        
+        return newItemStack
     }
     
     private fun isContainerItem(item: MojangStack): Boolean {
-        return item.item == Items.BUNDLE
-            || item.item in ItemUtils.SHULKER_BOX_ITEMS
+        return item.item == Items.BUNDLE || item.item in ItemUtils.SHULKER_BOX_ITEMS
+    }
+    
+    private fun getClientSideContainerItem(player: Player?, itemStack: MojangStack): MojangStack {
+        when (itemStack.item) {
+            Items.BUNDLE -> {
+                val items = itemStack.tag
+                    ?.getOrNull<ListTag>("Items")
+                    ?: return itemStack
+                
+                val newItems = convertItemList(player, items)
+                return if (newItems != items) {
+                    itemStack.copy().apply { tag!!.put("Items", newItems) }
+                } else itemStack
+            }
+            
+            in ItemUtils.SHULKER_BOX_ITEMS -> {
+                val items = itemStack.tag
+                    ?.getOrNull<CompoundTag>("BlockEntityTag")
+                    ?.getOrNull<ListTag>("Items")
+                    ?: return itemStack
+                
+                val newItems = convertItemList(player, items)
+                return if (newItems != items) {
+                    itemStack.copy().apply { tag!!.getCompound("BlockEntityTag").put("Items", newItems) }
+                } else itemStack
+            }
+        }
+        
+        return itemStack
+    }
+    
+    private fun convertItemList(player: Player?, list: ListTag): ListTag {
+        val newList = list.copy()
+        var changed = false
+        newList.forEachIndexed { idx, itemStack ->
+            itemStack as CompoundTag
+            val newItemStack = getClientSideStack(player, itemStack, useName = true, storeServerSideTag = false)
+            if (newItemStack != itemStack) {
+                newList[idx] = newItemStack
+                changed = true
+            }
+        }
+        
+        return if (changed) newList else list
     }
     
     private fun isIllegallyColoredArmor(itemStack: MojangStack): Boolean {
@@ -230,165 +349,52 @@ internal object PacketItems : Initializable(), Listener {
         return false
     }
     
-    private fun getNovaItem(item: MojangStack): MojangStack {
-        val serversideStack = MojangStack(SERVER_SIDE_ITEM, item.count)
-        serversideStack.tag = item.tag!!.getCompound("nova").getCompound("serversideTag")
-        return serversideStack
-    }
-    
-    private fun getClientsideItemOrNull(player: Player?, item: MojangStack, fromCreative: Boolean, useName: Boolean = true) =
-        when {
-            isContainerItem(item) -> filterContainerItems(item, fromCreative)
-            isNovaItem(item) -> getFakeItem(player, item, useName)
-            else -> null
-        }
-    
-    internal fun getFakeItem(player: Player?, item: MojangStack, useName: Boolean = true): MojangStack {
-        val itemTag = item.tag!!
-        val novaTag = itemTag.getCompound("nova")
-            ?: throw IllegalStateException("Item is not a Nova item!")
-        
-        val id = novaTag.getString("id") ?: return getMissingItem(item, null)
-        val material = NovaMaterialRegistry.getOrNull(id) ?: return getMissingItem(item, id)
-        val subId = novaTag.getInt("subId")
-        val novaItem = material.novaItem
-        
-        val itemModelDataMap = Resources.getModelDataOrNull(id)?.item
-        val data = itemModelDataMap?.get(novaItem.vanillaMaterial)
-            ?: itemModelDataMap?.values?.first()
-            ?: return getMissingItem(item, id)
-        
-        val newItem = item.copy()
-        val newItemTag = newItem.tag!!
-        newItemTag.getCompound("nova").put("serversideTag", itemTag)
-        newItem.item = CraftMagicNumbers.getItem(data.material)
-        newItemTag.putInt("CustomModelData", data.dataArray[subId])
-        
-        val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
-        
-        val itemDisplayData = novaItem.getPacketItemData(player, newItem)
-        
-        // name
-        var itemDisplayName = itemDisplayData.name
-        if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
-            if (item.isEnchanted && itemDisplayName.size == 1) {
-                itemDisplayName = itemDisplayName.duplicate()
-                itemDisplayName[0].color = ChatColor.AQUA
-            }
-            
-            displayTag.putString("Name", itemDisplayName.serialize())
-        }
-        
-        // lore
-        val loreTag = displayTag.getOrPut("Lore", ::ListTag)
-        val itemDisplayLore = itemDisplayData.lore
-        itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
-        if (player != null && player in AdvancedTooltips.players) {
-            itemDisplayData.advancedTooltipsLore?.forEach {
-                loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize())
-            }
-            loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
-        }
-        
-        // durability
-        val itemDisplayDurabilityBar = itemDisplayData.durabilityBar
-        if (itemDisplayDurabilityBar != 1.0) {
-            val maxDurability = newItem.item.maxDamage
-            newItem.damageValue = maxDurability - (maxDurability * itemDisplayDurabilityBar).toInt()
-        }
-        
-        // hide flags
-        val hiddenFlags = itemDisplayData.hiddenFlags
-        if (hiddenFlags.isNotEmpty()) {
-            newItemTag.putInt("HideFlags", newItemTag.getInt("HideFlags") or HideableFlag.toInt(hiddenFlags))
-        }
-        
-        return newItem
-    }
-    
-    private fun getColorCorrectedArmor(item: MojangStack): MojangStack {
-        val newItem = item.copy()
+    private fun getColorCorrectedArmor(itemStack: MojangStack): MojangStack {
+        val newItem = itemStack.copy()
         val display = newItem.tag!!.getCompound("display")
         display.putInt("color", display.getInt("color") and 0xFFFFFF)
         return newItem
     }
+    //</editor-fold>
+    //</editor-fold>
     
-    private fun filterContainerItems(item: MojangStack, fromCreative: Boolean): MojangStack {
-        if (item.tag == null) return item
-        when (item.item) {
-            
-            Items.BUNDLE -> {
-                val tag = item.tag!!
-                if (!tag.contains("Items", NBTUtils.TAG_LIST))
-                    return item
-                
-                val copy = item.copy()
-                val copyTag = copy.tag!!
-                
-                val newItems = filterItemList(copyTag.getList("Items", NBTUtils.TAG_COMPOUND), fromCreative)
-                copyTag.put("Items", newItems)
-                return copy
-            }
-            
-            in ItemUtils.SHULKER_BOX_ITEMS -> {
-                val tag = item.tag!!
-                if (!tag.contains("BlockEntityTag", NBTUtils.TAG_COMPOUND))
-                    return item
-                
-                val copy = item.copy()
-                val copyTag = copy.tag!!
-                val blockEntityTag = copyTag.getCompound("BlockEntityTag")
-                if (!blockEntityTag.contains("Items", NBTUtils.TAG_LIST))
-                    return item
-                
-                val newItems = filterItemList(blockEntityTag.getList("Items", NBTUtils.TAG_COMPOUND), fromCreative)
-                blockEntityTag.put("Items", newItems)
-                return item
-            }
-            
-        }
-        return item
+    //<editor-fold desc="client-side stack -> server-side stack", defaultstate="collapsed">
+    fun getServerSideStack(itemStack: CompoundTag): CompoundTag {
+        val tag = itemStack.getOrNull<CompoundTag>("tag")
+        val serversideTag = tag
+            ?.getOrNull<CompoundTag>("NovaServerSideTag")
+            ?: return itemStack
+        
+        val serverSideStack = CompoundTag()
+        
+        // use server-side item for all Nova items, otherwise keep current item id
+        if (tag.contains("nova", NBTUtils.TAG_COMPOUND)) {
+            serverSideStack.putString("id", SERVER_SIDE_ITEM_ID)
+        } else serverSideStack.putString("id", itemStack.getString("id"))
+        // copy count
+        serverSideStack.putInt("Count", serverSideStack.getInt("Count"))
+        // apply server-side tag
+        serverSideStack.put("tag", serversideTag)
+        
+        return serverSideStack
     }
     
-    private fun filterItemList(list: ListTag, fromCreative: Boolean): ListTag {
-        val items = ListTag()
-        val stream = NBTUtils.convertListToStream(list)
-        stream.forEach { contentItem ->
-            val compound = CompoundTag()
-            if (isContainerItem(contentItem)) {
-                filterContainerItems(contentItem, fromCreative).save(compound)
-            } else if (fromCreative && isFakeItem(contentItem)) {
-                getNovaItem(contentItem).save(compound)
-            } else if (isNovaItem(contentItem)) {
-                getFakeItem(null, contentItem).save(compound)
-            } else {
-                contentItem.save(compound)
-            }
-            
-            items.add(compound)
-        }
-        return items
+    fun getServerSideStack(itemStack: MojangStack): MojangStack {
+        val tag = itemStack.tag
+        val serversideTag = tag
+            ?.getOrNull<CompoundTag>("NovaServerSideTag")
+            ?: return itemStack
+        
+        // use server-side item for all Nova items, otherwise keep current item
+        val item = if (tag.contains("nova", NBTUtils.TAG_COMPOUND)) SERVER_SIDE_ITEM else itemStack.item
+        val serversideStack = ItemStack(item)
+        // copy count
+        serversideStack.count = itemStack.count
+        // apply server-side tag
+        serversideStack.tag = serversideTag
+        
+        return serversideStack
     }
-    
-    private fun getMissingItem(item: MojangStack, id: String?): MojangStack {
-        val newItem = item.copy()
-        newItem.item = Items.BARRIER
-        val tag = newItem.tag!!
-        
-        // remove custom model data
-        tag.putInt("CustomModelData", 0)
-        
-        // store serversideTag
-        tag.getCompound("nova").put("serversideTag", item.tag!!)
-        
-        // overwrite display tag with "missing model" name
-        val displayTag = CompoundTag().also { tag.put("display", it) }
-        displayTag.putString(
-            "Name",
-            coloredText(ChatColor.RED, "Missing model for $id").withoutPreFormatting().serialize()
-        )
-        
-        return newItem
-    }
+    //</editor-fold>
     
 }

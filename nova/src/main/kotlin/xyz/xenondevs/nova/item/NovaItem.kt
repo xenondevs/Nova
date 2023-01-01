@@ -33,7 +33,6 @@ import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
@@ -107,10 +106,9 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     
     internal fun getPacketItemData(player: Player?, itemStack: MojangStack): PacketItemData {
         val itemData = PacketItemData(itemStack.tag!!)
-        val bukkitStack = itemStack.bukkitCopy
         
-        behaviors.forEach { it.updatePacketItemData(bukkitStack, itemData) }
-        itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer ?: EntityUtils.DUMMY_PLAYER, itemStack))
+        behaviors.forEach { it.updatePacketItemData(itemStack.bukkitCopy, itemData) }
+        itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
         if (itemData.name == null) itemData.name = this.name
         
         return itemData
@@ -167,16 +165,17 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     }
     
     private fun generateAttributeModifiersTooltip(player: ServerPlayer?, itemStack: MojangStack): List<Array<BaseComponent>> {
-        if (HideableFlag.MODIFIERS.isHidden(itemStack.tag?.getInt("HideFlags") ?: 0))
+        val tag = itemStack.tag!!
+        if (HideableFlag.MODIFIERS.isHidden(tag.getInt("HideFlags")))
             return emptyList()
         
         // if the item has custom modifiers set, all default modifiers are ignored
-        val customModifiers = itemStack.tag?.contains("AttributeModifiers", Tag.TAG_LIST.toInt()) == true
+        val customModifiers = tag.contains("AttributeModifiers", Tag.TAG_LIST.toInt())
         
         val lore = ArrayList<Array<BaseComponent>>()
         EquipmentSlot.values().forEach { slot ->
             val modifiers = if (customModifiers)
-                ItemUtils.getCustomAttributeModifiers(itemStack, slot)
+                ItemUtils.getCustomAttributeModifiers(tag, slot)
             else attributeModifiers[slot] ?: emptyList()
             
             if (modifiers.isEmpty() || modifiers.none { it.showInLore && it.value != 0.0 })
@@ -191,20 +190,18 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
                     var value = modifier.value
                     var isBaseModifier = false
                     
-                    if (player != null) {
                         when (modifier.uuid) {
                             Tool.BASE_ATTACK_DAMAGE_UUID -> {
-                                value += player.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)
+                                value += player?.getAttributeBaseValue(Attributes.ATTACK_DAMAGE) ?: 1.0
                                 value += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED)
                                 isBaseModifier = true
                             }
                             
                             Tool.BASE_ATTACK_SPEED_UUID -> {
-                                value += player.getAttributeBaseValue(Attributes.ATTACK_SPEED)
+                                value += player?.getAttributeBaseValue(Attributes.ATTACK_SPEED) ?: 4.0
                                 isBaseModifier = true
                             }
                         }
-                    }
                     
                     var displayedValue = if (modifier.operation == Operation.ADDITION) {
                         if (modifier.attribute == Attributes.KNOCKBACK_RESISTANCE) {

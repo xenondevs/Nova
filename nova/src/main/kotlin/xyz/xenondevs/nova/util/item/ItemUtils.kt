@@ -321,6 +321,14 @@ object ItemUtils {
      */
     internal fun getCustomAttributeModifiers(itemStack: MojangStack, slot: MojangEquipmentSlot?): List<AttributeModifier> {
         val tag = itemStack.tag ?: return emptyList()
+        return getCustomAttributeModifiers(tag, slot)
+    }
+    
+    /**
+     * Gets the custom attribute modifiers that are configured in the given [tag] for the given [slot].
+     * The provided [tag] must be the item tag, not the item stack itself.
+     */
+    internal fun getCustomAttributeModifiers(tag: CompoundTag, slot: MojangEquipmentSlot?): List<AttributeModifier> {
         if (tag.contains("AttributeModifiers", NBTTag.TAG_LIST.toInt())) {
             val attributeModifiers = ArrayList<AttributeModifier>()
             
@@ -336,7 +344,7 @@ object ItemUtils {
                             ?.let { arrayOf(it) }
                             ?: MojangEquipmentSlot.values()
                         
-                        val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation.tryParse(modifier.getString("AttributeName"))) 
+                        val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation.tryParse(modifier.getString("AttributeName")))
                             ?: return@forEach
                         
                         val name = modifier.getString("Name")
