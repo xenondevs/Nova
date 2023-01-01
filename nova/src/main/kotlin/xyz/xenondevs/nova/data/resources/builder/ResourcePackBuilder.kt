@@ -111,7 +111,15 @@ internal class ResourcePackBuilder {
                         mode = mode,
                         logger = LOGGER
                     )
-                    downloader.downloadAssets()
+                    try {
+                        downloader.downloadAssets()
+                    } catch (ex: Exception) {
+                        throw IllegalStateException(buildString {
+                            append("Failed to download minecraft assets. Check your firewall settings.")
+                            if (mode == ExtractionMode.GITHUB)
+                                append(" If your server can't access github.com in general, you can change \"minecraft_assets_source\" in the config to \"mojang\".")
+                        }, ex)
+                    }
                     PermanentStorage.store("minecraftAssetsVersion", Version.SERVER_VERSION)
                 }
             }

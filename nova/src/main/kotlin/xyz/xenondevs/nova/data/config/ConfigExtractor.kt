@@ -12,10 +12,6 @@ internal object ConfigExtractor {
     
     private val storedConfigs: HashMap<String, YamlConfiguration> = PermanentStorage.retrieve("storedConfigs", ::HashMap)
     
-    init {
-        NOVA.disableHandlers += { PermanentStorage.store("storedConfigs", storedConfigs) }
-    }
-    
     fun extract(configPath: String, data: ByteArray): YamlConfiguration {
         val file = File(NOVA.dataFolder, configPath)
         val internalCfg = YamlConfiguration.loadConfiguration(ByteArrayInputStream(data).reader())
@@ -68,6 +64,10 @@ internal object ConfigExtractor {
         }
         
         return cfg
+    }
+    
+    internal fun saveStoredConfigs() {
+        PermanentStorage.store("storedConfigs", storedConfigs)
     }
     
 }

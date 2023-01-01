@@ -77,6 +77,8 @@ object NovaConfig : Initializable() {
                     )
                 }
         }
+        
+        ConfigExtractor.saveStoredConfigs()
     }
     
     internal fun reload() {
