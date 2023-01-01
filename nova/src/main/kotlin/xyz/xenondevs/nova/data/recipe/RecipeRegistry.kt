@@ -84,12 +84,14 @@ object RecipeRegistry : Initializable() {
         }
         
         // add all nova machine recipes
-        getCreationNovaRecipeSequence().forEach {
-            val group = RecipeTypeRegistry.getType(it).group ?: return@forEach
-            val itemKey = getId(it.result)
-            map.getOrPut(itemKey) { hashMapOf() }
-                .getOrPut(group) { mutableListOf() }
-                .add(RecipeContainer(it))
+        getCreationNovaRecipeSequence().forEach { recipe ->
+            val group = RecipeTypeRegistry.getType(recipe).group ?: return@forEach
+            recipe.getAllResults().forEach { resultStack ->
+                val itemKey = getId(resultStack)
+                map.getOrPut(itemKey) { hashMapOf() }
+                    .getOrPut(group) { mutableListOf() }
+                    .add(RecipeContainer(recipe))
+            }
         }
         
         return map
@@ -147,8 +149,8 @@ object RecipeRegistry : Initializable() {
         return RecipeManager.novaRecipes.values.asSequence().flatMap { it.values } + fakeRecipes.asSequence()
     }
     
-    private fun getCreationNovaRecipeSequence(): Sequence<ResultingRecipe> {
-        return getAllNovaRecipes().filterIsInstance<ResultingRecipe>()
+    private fun getCreationNovaRecipeSequence(): Sequence<ResultRecipe> {
+        return getAllNovaRecipes().filterIsInstance<ResultRecipe>()
     }
     
     private fun getUsageNovaRecipeSequence(): Sequence<InputChoiceRecipe> {
