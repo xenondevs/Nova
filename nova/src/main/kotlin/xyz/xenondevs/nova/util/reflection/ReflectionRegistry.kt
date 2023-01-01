@@ -2,25 +2,27 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import com.mojang.serialization.Codec
+import com.mojang.serialization.DynamicOps
 import net.minecraft.core.BlockPos
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.RegistryFileCodec
 import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.players.PlayerList
 import net.minecraft.util.RandomSource
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.ItemCombinerMenu
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
-import net.minecraft.world.level.Level
 import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelHeightAccessor
 import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.biome.FeatureSorter
@@ -59,8 +61,8 @@ import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
-import java.util.function.Function as JavaFunction
 import net.minecraft.world.level.block.Block as MojangBlock
+import java.util.function.Function as JavaFunction
 
 @Suppress("MemberVisibilityCanBePrivate")
 internal object ReflectionRegistry {
@@ -108,6 +110,9 @@ internal object ReflectionRegistry {
     val BLOCK_PLAYER_WILL_DESTROY_METHOD = getMethod(MojangBlock::class, false, "SRM(net.minecraft.world.level.block.Block playerWillDestroy)", Level::class, BlockPos::class, BlockState::class, MojangPlayer::class)
     val INVENTORY_HURT_ARMOR_METHOD = getMethod(Inventory::class, false, "SRM(net.minecraft.world.entity.player.Inventory hurtArmor)", DamageSource::class, Float::class, IntArray::class)
     val ITEM_GET_DEFAULT_ATTRIBUTE_MODIFIERS_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item getDefaultAttributeModifiers)", MojangEquipmentSlot::class)
+    val REGISTRY_FILE_CODEC_DECODE_METHOD = getMethod(RegistryFileCodec::class, false, "SRM(net.minecraft.resources.RegistryFileCodec decode)", DynamicOps::class, Any::class)
+    val REGISTRY_BY_NAME_CODEC_METHOD = getMethod(Registry::class, true, "SRM(net.minecraft.core.Registry lambda\$byNameCodec\$1)", ResourceLocation::class)
+    val MAPPED_REGISTRY_LIFECYCLE_METHOD = getMethod(MappedRegistry::class, false, "SRM(net.minecraft.core.MappedRegistry lifecycle)", Any::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

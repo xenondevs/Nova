@@ -4,6 +4,7 @@ import com.mojang.serialization.DataResult
 import com.mojang.serialization.Lifecycle
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.RegistryFileCodec
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
@@ -15,10 +16,15 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.insertAfterFirst
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.nova.transformer.MultiTransformer
+import xyz.xenondevs.nova.util.addSuffix
 import xyz.xenondevs.nova.util.findNthOfType
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MAPPED_REGISTRY_LIFECYCLE_METHOD
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_BY_NAME_CODEC_METHOD
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_FILE_CODEC_DECODE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.generation.inject.codec.BlockNovaMaterialDecoder
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
+import java.io.File
 import com.mojang.datafixers.util.Pair as MojangPair
 
 /**
@@ -40,7 +46,7 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
      * block is registered in Nova and returns a [WrapperBlock] instead.
      */
     private fun patchRegistryFileCodec() {
-        val methodNode = VirtualClassPath[RegistryFileCodec::class].getMethod("SRM(net.minecraft.resources.RegistryFileCodec decode)")!!
+        val methodNode = VirtualClassPath[REGISTRY_FILE_CODEC_DECODE_METHOD]
         // For future reference: https://i.imgur.com/Agm0yYI.png
         methodNode.insertAfterFirst(buildInsnList {
             val continueLabel = methodNode.instructions.findNthOfType<LabelNode>(11) // L12 in the image
@@ -48,7 +54,7 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
             addLabel()
             aLoad(0) // this
             getField(RegistryFileCodec::class.internalName, "SRF(net.minecraft.resources.RegistryFileCodec registryKey)", "L$RESOURCE_KEY_NAME;")
-            getStatic(Registry::class.internalName, "SRF(net.minecraft.core.registries.Registries BLOCK)", "L$RESOURCE_KEY_NAME;")
+            getStatic(Registries::class.internalName, "SRF(net.minecraft.core.registries.Registries BLOCK)", "L$RESOURCE_KEY_NAME;")
             invokeVirtual("java/lang/Object", "equals", "(Ljava/lang/Object;)Z")
             ifeq(continueLabel) // if registryKey != Registry.BLOCK goto continueLabel
             
@@ -85,14 +91,14 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
      */
     private fun patchRegistryByNameCodec() {
         // Mapping name will 100% change in the future, check for these params and method structure: https://i.imgur.com/5mD0ET7.png
-        val instructions = VirtualClassPath[Registry::class].getMethod("SRM(net.minecraft.core.Registry lambda\$byNameCodec\$1)")!!.instructions
+        val instructions = VirtualClassPath[REGISTRY_BY_NAME_CODEC_METHOD].instructions
         instructions.insert(buildInsnList {
             val continueLabel = instructions.first as LabelNode
             
             addLabel()
             aLoad(0)
-            invokeVirtual(Registry::class.internalName, "SRM(net.minecraft.core.Registry key)", "()L$RESOURCE_KEY_NAME;")
-            getStatic(Registry::class.internalName, "SRF(net.minecraft.core.registries.Registries BLOCK)", "L$RESOURCE_KEY_NAME;")
+            invokeInterface(Registry::class.internalName, "SRM(net.minecraft.core.Registry key)", "()L$RESOURCE_KEY_NAME;")
+            getStatic(Registries::class.internalName, "SRF(net.minecraft.core.registries.Registries BLOCK)", "L$RESOURCE_KEY_NAME;")
             invokeVirtual("java/lang/Object", "equals", "(Ljava/lang/Object;)Z")
             ifeq(continueLabel) // if registryKey != Registry.BLOCK goto continueLabel
             
@@ -123,8 +129,8 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
      */
     private fun patchRegistryLifecycleGetter() {
         val lifecycleName = Lifecycle::class.internalName
-        // In case of mapping change, method body should be "return this.lifecycles.get(var0)"
-        val instructions = VirtualClassPath[MappedRegistry::class].getMethod("SRM(net.minecraft.core.MappedRegistry lifecycle)", "(Ljava/lang/Object;)L$lifecycleName;")!!.instructions
+        // In case of mapping change, method body should be "return this.lifecycles.get(param0)"
+        val instructions = VirtualClassPath[MAPPED_REGISTRY_LIFECYCLE_METHOD].instructions
         instructions.insert(buildInsnList {
             val continueLabel = instructions.first as LabelNode
             aLoad(1)

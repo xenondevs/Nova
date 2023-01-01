@@ -67,7 +67,7 @@ internal object DataFileParser : Initializable() {
         filter: (File) -> Boolean = { it.isFile && it.extension == "json" },
         fileProcessor: (NamespacedId, File) -> Unit
     ) {
-        DATA_DIR.listFiles(FileFilter(File::isDirectory))!!.forEach { namespaceDir ->
+        DATA_DIR.listFiles(FileFilter(File::isDirectory))?.forEach { namespaceDir ->
             val namespace = namespaceDir.name
             val dir = File(DATA_DIR, "$namespace/$dirName")
             if (!dir.exists() || dir.isFile) return@forEach

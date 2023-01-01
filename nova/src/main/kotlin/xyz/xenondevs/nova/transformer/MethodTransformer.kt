@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.transformer
 
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.MethodNode
+import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
 
@@ -23,6 +24,10 @@ internal abstract class MethodTransformer : ClassTransformer {
     
     constructor(method: Method, computeFrames: Boolean = false) : super(method.declaringClass.kotlin, computeFrames) {
         methodNode = classWrapper.getMethod(method.name, Type.getMethodDescriptor(method))!!
+    }
+    
+    constructor(method: Constructor<*>, computeFrames: Boolean = false) : super(method.declaringClass.kotlin, computeFrames) {
+        methodNode = classWrapper.getMethod("<init>", Type.getConstructorDescriptor(method))!!
     }
     
 }

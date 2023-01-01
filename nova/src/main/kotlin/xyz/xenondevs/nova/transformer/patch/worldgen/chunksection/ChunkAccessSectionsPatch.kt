@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.util.reflection.defineClass
 /**
  * Patch to replace all [LevelChunkSection]s with Nova's [LevelChunkSectionWrapper].
  */
-internal object ChunkAccessSectionsPatch : MethodTransformer(ChunkAccess::class, "<init>", Type.getConstructorDescriptor(CHUNK_ACCESS_CONSTRUCTOR), true) {
+internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTRUCTOR, true) {
     
     override fun transform() {
         val wrapperClass = LevelChunkSectionWrapper::class
