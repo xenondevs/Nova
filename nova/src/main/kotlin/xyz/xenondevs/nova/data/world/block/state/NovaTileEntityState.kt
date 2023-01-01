@@ -2,15 +2,16 @@ package xyz.xenondevs.nova.data.world.block.state
 
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.buffer.ByteBuffer
+import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.getLegacy
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.TileEntity.Companion.LEGACY_TILE_ENTITY_KEY
-import xyz.xenondevs.nova.tileentity.TileEntity.Companion.TILE_ENTITY_KEY
+import xyz.xenondevs.nova.tileentity.TileEntity.Companion.LEGACY_TILE_ENTITY_KEY_1
+import xyz.xenondevs.nova.tileentity.TileEntity.Companion.LEGACY_TILE_ENTITY_KEY_2
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
@@ -54,13 +55,24 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
         val itemMeta = item.itemMeta!!
         val dataContainer = itemMeta.persistentDataContainer
         
-        val legacyGlobalData = dataContainer.getLegacy<LegacyCompound>(LEGACY_TILE_ENTITY_KEY)
-        if (legacyGlobalData != null) {
+        //<editor-fold desc="legacy support", defaultstate="collapsed">
+        val legacyGlobalData1 = dataContainer.getLegacy<LegacyCompound>(LEGACY_TILE_ENTITY_KEY_1)
+        if (legacyGlobalData1 != null) {
             legacyData = LegacyCompound()
-            legacyData!!["global"] = legacyGlobalData
-        } else {
-            val globalData = ctx.item.itemMeta?.persistentDataContainer?.get<Compound>(TILE_ENTITY_KEY)
-            if (globalData != null) data["global"] = globalData
+            legacyData!!["global"] = legacyGlobalData1
+            return
+        }
+        
+        val legacyGlobalData = dataContainer.get<Compound>(LEGACY_TILE_ENTITY_KEY_2)
+        if (legacyGlobalData != null) {
+            data["global"] = legacyGlobalData
+            return
+        }
+        //</editor-fold>
+        
+        val globalData = item.novaCompoundOrNull?.get<Compound>(TileEntity.TILE_ENTITY_KEY)
+        if (globalData != null) {
+            data["global"] = globalData
         }
     }
     

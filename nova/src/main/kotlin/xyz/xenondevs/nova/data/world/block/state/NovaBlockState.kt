@@ -5,7 +5,7 @@ import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.buffer.ByteBuffer
+import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.property.BlockProperty
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType

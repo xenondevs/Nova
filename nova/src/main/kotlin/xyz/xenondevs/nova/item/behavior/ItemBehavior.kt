@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.provider.provider
@@ -42,7 +43,7 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     open fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
     
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
-    open fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) = Unit
+    open fun updatePacketItemData(data: Compound, itemData: PacketItemData) = Unit
     
     final override fun get(material: ItemNovaMaterial): ItemBehavior {
         setMaterial(material)

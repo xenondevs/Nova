@@ -23,7 +23,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.serialization.DataHolder
-import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
@@ -44,6 +43,7 @@ import xyz.xenondevs.nova.util.center
 import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.getYaw
 import xyz.xenondevs.nova.util.hasInventoryOpen
+import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
@@ -58,14 +58,22 @@ import xyz.xenondevs.nova.world.region.StaticRegion
 import xyz.xenondevs.nova.world.region.UpgradableRegion
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
 abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), Reloadable, ITileEntity {
     
     companion object {
         val SELF_UPDATE_REASON = object : UpdateReason {}
-        internal val LEGACY_TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
-        val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntityData")
+        
+        @Deprecated("Legacy value")
+        internal val LEGACY_TILE_ENTITY_KEY_1 = NamespacedKey(NOVA, "tileEntity")
+        @Deprecated("Legacy value")
+        val LEGACY_TILE_ENTITY_KEY_2 = NamespacedKey(NOVA, "tileEntityData")
+        
+        internal const val TILE_ENTITY_KEY = "tileEntity"
     }
     
     override var legacyData: LegacyCompound? = blockState.legacyData
@@ -152,9 +160,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             
             val item = material.createItemStack()
             if (globalData.isNotEmpty()) {
-                val itemMeta = item.itemMeta!!
-                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, globalData)
-                item.itemMeta = itemMeta
+                item.novaCompound[TILE_ENTITY_KEY] = globalData
             }
             
             drops += item

@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ComplexTest
@@ -27,12 +28,15 @@ import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.NovaIdTest
 import xyz.xenondevs.nova.data.recipe.NovaNameTest
 import xyz.xenondevs.nova.data.recipe.TagTest
+import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTag
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -50,6 +54,32 @@ val MojangStack.novaMaterial: ItemNovaMaterial?
     get() = tag?.getCompound("nova")
         ?.getString("id")
         ?.let(NovaMaterialRegistry::getOrNull)
+
+var ItemStack.novaCompound: Compound
+    get() {
+        val unhandledTags = itemMeta!!.unhandledTags
+        val tag = unhandledTags.getOrPut("nova_cbf", ::CBFCompoundTag) as? CBFCompoundTag
+        return tag!!.compound
+    }
+    set(value) {
+        val unhandledTags = itemMeta!!.unhandledTags
+        unhandledTags["nova_cbf"] = CBFCompoundTag(value)
+    }
+
+val ItemStack.novaCompoundOrNull: Compound?
+    get() = (itemMeta?.unhandledTags?.get("nova_cbf") as? CBFCompoundTag)?.compound
+
+var MojangStack.novaCompound: Compound
+    get() = orCreateTag.getOrPut("nova_cbf", ::CBFCompoundTag).compound
+    set(value) {
+        orCreateTag.put("nova_cbf", CBFCompoundTag(value))
+    }
+
+val MojangStack.novaCompoundOrNull: Compound?
+    get() = tag?.getOrNull<CBFCompoundTag>("nova_cbf")?.compound
+
+val ItemStack.novaMaxStackSize: Int
+    get() = novaMaterial?.maxStackSize ?: type.maxStackSize
 
 val ItemStack.customModelData: Int
     get() {
@@ -88,9 +118,6 @@ val ItemStack.namelessCopyOrSelf: ItemStack
         return itemStack
     }
 
-val ItemStack.novaMaxStackSize: Int
-    get() = novaMaterial?.maxStackSize ?: type.maxStackSize
-
 @Suppress("UNCHECKED_CAST")
 val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>
@@ -108,26 +135,31 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     return first.isSimilar(second)
 }
 
+fun ItemStack.takeUnlessEmpty(): ItemStack? =
+    if (type.isAir || amount <= 0) null else this
+
+//<editor-fold desc="deprecated", defaultstate="collapsed">
 @Deprecated("Replaced by ItemStack.takeUnlessEmpty", ReplaceWith("takeUnlessEmpty()"))
 fun ItemStack.takeUnlessAir(): ItemStack? =
     if (type.isAir) null else this
 
-fun ItemStack.takeUnlessEmpty(): ItemStack? =
-    if (type.isAir || amount <= 0) null else this
-
+@Deprecated("")
 inline fun <reified K> ItemStack.retrieveData(key: NamespacedKey, getAlternative: () -> K): K {
     val persistentDataContainer = itemMeta?.persistentDataContainer ?: return getAlternative()
     return if (persistentDataContainer.has(key, PersistentDataType.BYTE_ARRAY)) persistentDataContainer.get(key)!! else getAlternative();
 }
 
+@Deprecated("")
 inline fun <reified K> ItemStack.retrieveDataOrNull(key: NamespacedKey): K? {
     return itemMeta?.persistentDataContainer?.get(key)
 }
 
+@Deprecated("")
 fun <T> ItemStack.retrieveDataOrNull(key: NamespacedKey, persistentDataType: PersistentDataType<*, T>): T? {
     return itemMeta?.persistentDataContainer?.get(key, persistentDataType)
 }
 
+@Deprecated("")
 inline fun <reified T> ItemStack.storeData(key: NamespacedKey, data: T?) {
     val itemMeta = itemMeta
     val dataContainer = itemMeta?.persistentDataContainer
@@ -139,6 +171,7 @@ inline fun <reified T> ItemStack.storeData(key: NamespacedKey, data: T?) {
     }
 }
 
+@Deprecated("")
 fun <T> ItemStack.storeData(key: NamespacedKey, dataType: PersistentDataType<*, T>, data: T?) {
     val itemMeta = itemMeta
     val dataContainer = itemMeta?.persistentDataContainer
@@ -149,6 +182,7 @@ fun <T> ItemStack.storeData(key: NamespacedKey, dataType: PersistentDataType<*, 
         this.itemMeta = itemMeta
     }
 }
+//</editor-fold>
 
 object ItemUtils {
     

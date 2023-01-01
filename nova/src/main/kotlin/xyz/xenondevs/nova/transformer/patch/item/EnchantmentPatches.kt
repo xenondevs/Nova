@@ -14,7 +14,7 @@ import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethodByName
@@ -105,7 +105,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
         val itemStack = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player) {
             val novaMaterial = it.novaMaterial
             if (novaMaterial != null) {
-                val damage = novaMaterial.novaItem.getBehavior(Damageable::class)?.getDamage(it.bukkitMirror)
+                val damage = novaMaterial.novaItem.getBehavior(Damageable::class)?.getDamage(it.novaCompound)
                 return@getRandomItemWith damage != null && damage > 0
             }
             
@@ -117,10 +117,10 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
             
             val repair: Int
             if (damageable != null) {
-                val bukkitMirror = itemStack.bukkitMirror
-                val damageValue = damageable.getDamage(bukkitMirror)
+                val novaCompound = itemStack.novaCompound
+                val damageValue = damageable.getDamage(novaCompound)
                 repair = min(orb.value * 2, damageValue)
-                damageable.setDamage(bukkitMirror, damageValue - repair)
+                damageable.setDamage(novaCompound, damageValue - repair)
             } else {
                 repair = min(orb.value * 2, itemStack.damageValue)
                 itemStack.damageValue -= repair

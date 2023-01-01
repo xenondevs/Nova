@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.provider.combinedProvider
 import xyz.xenondevs.nova.data.provider.lazyProviderWrapper
 import xyz.xenondevs.nova.data.provider.map
@@ -149,7 +150,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         return event.isCancelled
     }
     
-    override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
+    override fun updatePacketItemData(data: Compound, itemData: PacketItemData) {
         val textureColor = textureColor
         if (textureColor != null) {
             itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", textureColor)

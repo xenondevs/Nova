@@ -33,7 +33,6 @@ import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getDoubleOrNull
@@ -42,6 +41,7 @@ import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.takeUnlessEmpty
 import java.text.DecimalFormat
@@ -107,7 +107,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     internal fun getPacketItemData(player: Player?, itemStack: MojangStack): PacketItemData {
         val itemData = PacketItemData(itemStack.tag!!)
         
-        behaviors.forEach { it.updatePacketItemData(itemStack.bukkitCopy, itemData) }
+        behaviors.forEach { it.updatePacketItemData(itemStack.novaCompound, itemData) }
         itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
         if (itemData.name == null) itemData.name = this.name
         

@@ -11,7 +11,7 @@ dependencyResolutionManagement {
             version("kotlin", "1.7.22")
             version("ktor", "2.1.3")
             version("spigot", "1.19.3-R0.1-SNAPSHOT")
-            version("cbf", "0.2")
+            version("cbf", "0.3")
             
             // lib - kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib-jdk8").versionRef("kotlin")

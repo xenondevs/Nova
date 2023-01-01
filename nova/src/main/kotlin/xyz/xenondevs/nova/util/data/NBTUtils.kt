@@ -1,11 +1,20 @@
 package xyz.xenondevs.nova.util.data
 
+import net.minecraft.nbt.ByteArrayTag
+import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.DoubleTag
+import net.minecraft.nbt.EndTag
 import net.minecraft.nbt.FloatTag
+import net.minecraft.nbt.IntArrayTag
+import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.LongArrayTag
+import net.minecraft.nbt.LongTag
+import net.minecraft.nbt.ShortTag
 import net.minecraft.nbt.StringTag
 import net.minecraft.nbt.Tag
+import net.minecraft.nbt.TagType
 import net.minecraft.world.item.ItemStack
 import java.util.stream.Stream
 
@@ -25,6 +34,11 @@ object NBTUtils {
     const val TAG_INT_ARRAY = 11
     const val TAG_LONG_ARRAY = 12
     const val TAG_ANY_NUMERIC = 99
+    
+    val TAG_TYPES: Array<TagType<*>> = arrayOf(
+        EndTag.TYPE, ByteTag.TYPE, ShortTag.TYPE, IntTag.TYPE, LongTag.TYPE, FloatTag.TYPE, DoubleTag.TYPE,
+        ByteArrayTag.TYPE, StringTag.TYPE, ListTag.TYPE, CompoundTag.TYPE, IntArrayTag.TYPE, LongArrayTag.TYPE
+    )
     
     fun createDoubleList(vararg doubles: Double): ListTag {
         val listTag = ListTag()

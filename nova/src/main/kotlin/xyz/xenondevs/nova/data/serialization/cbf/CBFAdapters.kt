@@ -8,7 +8,6 @@ import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.CBF.registerBinaryAdapter
 import xyz.xenondevs.cbf.CBF.registerBinaryHierarchyAdapter
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
-import xyz.xenondevs.cbf.adapter.NettyBufferProvider
 import xyz.xenondevs.cbf.instancecreator.InstanceCreator
 import xyz.xenondevs.cbf.security.CBFSecurityManager
 import xyz.xenondevs.nova.data.NamespacedId
@@ -28,8 +27,6 @@ import kotlin.reflect.KClass
 internal object CBFAdapters {
     
     fun register() {
-        CBF.defaultBufferProvider = NettyBufferProvider
-        
         // binary adapters
         registerBinaryAdapter(Color::class, ColorBinaryAdapter)
         registerBinaryAdapter(Location::class, LocationBinaryAdapter)

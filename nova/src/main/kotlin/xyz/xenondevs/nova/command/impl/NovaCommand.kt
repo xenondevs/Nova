@@ -46,6 +46,9 @@ import xyz.xenondevs.nova.util.data.ComponentUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.util.item.localizedName
+import xyz.xenondevs.nova.util.item.novaCompound
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
@@ -83,6 +86,9 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("getTileEntityData")
                     .requiresPlayer()
                     .executesCatching(::showTileEntityData))
+                .then(literal("getItemData")
+                    .requiresPlayer()
+                    .executesCatching(::showItemData))
                 .then(literal("reloadNetworks")
                     .executesCatching(::reloadNetworks))
                 .then(literal("updateChunkSearchId")
@@ -293,6 +299,27 @@ internal object NovaCommand : Command("nova") {
             }
         } else sendFailure()
         
+    }
+    
+    private fun showItemData(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty()
+        
+        if (item != null) {
+            val novaCompound = item.novaCompound
+            ctx.source.sendSuccess(localized(
+                ChatColor.GRAY,
+                "command.nova.show_item_data.success",
+                localized(ChatColor.AQUA, item.localizedName ?: item.type.name.lowercase()),
+                coloredText(ChatColor.WHITE, novaCompound.toString())
+            ))
+        } else {
+            ctx.source.sendFailure(localized(
+                ChatColor.RED,
+                "command.nova.show_item_data.failure"
+            ))
+        }
     }
     
     private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType) {
