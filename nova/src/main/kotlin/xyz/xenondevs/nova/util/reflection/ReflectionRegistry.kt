@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.reflection
 import com.mojang.brigadier.tree.CommandNode
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DynamicOps
+import com.mojang.serialization.Lifecycle
 import net.minecraft.core.BlockPos
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
@@ -113,6 +114,7 @@ internal object ReflectionRegistry {
     val REGISTRY_FILE_CODEC_DECODE_METHOD = getMethod(RegistryFileCodec::class, false, "SRM(net.minecraft.resources.RegistryFileCodec decode)", DynamicOps::class, Any::class)
     val REGISTRY_BY_NAME_CODEC_METHOD = getMethod(Registry::class, true, "SRM(net.minecraft.core.Registry lambda\$byNameCodec\$1)", ResourceLocation::class)
     val MAPPED_REGISTRY_LIFECYCLE_METHOD = getMethod(MappedRegistry::class, false, "SRM(net.minecraft.core.MappedRegistry lifecycle)", Any::class)
+    val MAPPED_REGISTRY_REGISTER_MAPPING_METHOD = getMethod(MappedRegistry::class, false, "SRM(net.minecraft.core.MappedRegistry registerMapping)", Int::class, ResourceKey::class, Any::class, Lifecycle::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

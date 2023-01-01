@@ -7,6 +7,7 @@ import net.minecraft.core.RegistryAccess
 import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.transformer.patch.worldgen.registry.ValueWrapper
 import xyz.xenondevs.nova.util.data.decodeJsonFile
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.data.getFirstValueOrThrow
@@ -43,8 +44,8 @@ abstract class WorldGenRegistry internal constructor() {
     }
     
     protected fun <T: Any> registerAll(registryAccess: RegistryAccess, registryKey: ResourceKey<Registry<T>>, map: Map<NamespacedId, T>) {
-        val registry = registryAccess.registry(registryKey).get()
-        map.forEach { (id, value) -> Registry.register(registry, id.toString(":"), value) }
+        val registry = registryAccess.registry(registryKey).get() as Registry<Any>
+        map.forEach { (id, value) -> Registry.register(registry, id.toString(":"), ValueWrapper(value)) }
     }
     
     internal abstract fun register(registryAccess: RegistryAccess)

@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.generation
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
@@ -29,14 +28,14 @@ internal object WorldGenManager : Initializable() {
     )
     private val NMS_REGISTRIES = WORLD_GEN_REGISTRIES.asSequence()
         .flatMap { it.neededRegistries }
-        .associateWithTo(Object2ObjectOpenHashMap()) { REGISTRY_ACCESS.registry(it).get() }
+        .map { REGISTRY_ACCESS.registry(it).get() }
     private val CODEC_OVERRIDES by lazy { listOf(BlockStateCodecOverride) }
     
     override fun init() {
-        NMS_REGISTRIES.values.forEach(NMSUtils::unfreezeRegistry)
+        NMS_REGISTRIES.forEach(NMSUtils::unfreezeRegistry)
         CODEC_OVERRIDES.forEach(CodecOverride::replace)
         WORLD_GEN_REGISTRIES.forEach { it.register(REGISTRY_ACCESS) }
-        NMS_REGISTRIES.values.forEach(NMSUtils::freezeRegistry)
+        NMS_REGISTRIES.forEach(NMSUtils::freezeRegistry)
     }
     
 }

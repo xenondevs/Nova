@@ -1,11 +1,16 @@
 package xyz.xenondevs.nova.data
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
 fun NamespacedKey.toNamespacedId(): NamespacedId {
     return NamespacedId(namespace, key)
+}
+
+internal fun NamespacedId.toResourceLocation(): ResourceLocation {
+    return ResourceLocation(namespace, name)
 }
 
 @Suppress("DEPRECATION")

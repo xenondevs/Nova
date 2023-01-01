@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.transformer.patch.worldgen
+package xyz.xenondevs.nova.transformer.patch.worldgen.registry
 
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.Lifecycle
@@ -16,7 +16,6 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.insertAfterFirst
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.addSuffix
 import xyz.xenondevs.nova.util.findNthOfType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MAPPED_REGISTRY_LIFECYCLE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_BY_NAME_CODEC_METHOD
@@ -24,7 +23,6 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_FILE_CODEC
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.generation.inject.codec.BlockNovaMaterialDecoder
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
-import java.io.File
 import com.mojang.datafixers.util.Pair as MojangPair
 
 /**

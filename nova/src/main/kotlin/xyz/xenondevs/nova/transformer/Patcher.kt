@@ -22,12 +22,13 @@ import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
+import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
-import xyz.xenondevs.nova.transformer.patch.worldgen.RegistryCodecPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.WrapperBlockPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
-import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.instrument.ClassDefinition
@@ -48,7 +49,7 @@ internal object Patcher : Initializable() {
         sequenceOf(
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
             StackSizePatch, BlockSoundPatches, BroadcastPacketPatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch,
-            RegistryCodecPatch, WrapperBlockPatch
+            RegistryCodecPatch, WrapperBlockPatch, MappedRegistryPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     
