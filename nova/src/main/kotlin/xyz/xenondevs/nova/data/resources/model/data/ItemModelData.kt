@@ -4,6 +4,7 @@ import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.PacketItems
@@ -23,6 +24,7 @@ open class ItemModelData(val id: NamespacedId, val material: Material, val dataA
         ItemBuilder(material)
             .setDisplayName(*name ?: emptyArray())
             .setCustomModelData(dataArray[subId])
+            .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
             .apply { lore?.forEach { addLoreLines(it.withoutPreFormatting()) } }
     
     private fun modifyNBT(itemStack: ItemStack, subId: Int): ItemStack {

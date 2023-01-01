@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
@@ -20,6 +21,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.configReloadable
@@ -104,11 +106,11 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         return builder
     }
     
-    internal fun getPacketItemData(player: Player?, itemStack: MojangStack): PacketItemData {
-        val itemData = PacketItemData(itemStack.tag!!)
+    internal fun getPacketItemData(player: Player?, itemStack: MojangStack?): PacketItemData {
+        val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag())
         
-        behaviors.forEach { it.updatePacketItemData(itemStack.novaCompound, itemData) }
-        itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
+        behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompound ?: Compound(), itemData) }
+        if (itemStack != null) itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
         if (itemData.name == null) itemData.name = this.name
         
         return itemData

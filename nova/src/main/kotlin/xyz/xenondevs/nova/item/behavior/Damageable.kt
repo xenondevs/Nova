@@ -92,11 +92,9 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
         
         itemData.durabilityBar = durability / options.maxDurability.toDouble()
         
-        if (damage != 0) {
-            itemData.addAdvancedTooltipsLore(
-                arrayOf(localized(ChatColor.WHITE, "item.durability", durability, options.maxDurability))
-            )
-        }
+        itemData.addAdvancedTooltipsLore(
+            arrayOf(localized(ChatColor.WHITE, "item.durability", durability, options.maxDurability))
+        )
     }
     
     companion object : ItemBehaviorFactory<Damageable>() {

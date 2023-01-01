@@ -37,9 +37,12 @@ import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.duplicate
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
+import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.serialize
+import xyz.xenondevs.nova.util.data.serializeToNBT
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
@@ -145,11 +148,8 @@ internal object PacketItems : Initializable(), Listener {
     
     //<editor-fold desc="server-side stack -> client-side stack", defaultstate="collapsed">
     fun getClientSideStack(player: Player?, itemStack: MojangStack, useName: Boolean = true, storeServerSideTag: Boolean = true): MojangStack {
-        val itemTag = itemStack.tag
-            ?: return itemStack
-        
-        return if (itemTag.contains("nova", NBTUtils.TAG_COMPOUND)) {
-            getClientsideNovaStack(player, itemStack, useName, storeServerSideTag)
+        return if (itemStack.tag?.contains("nova", NBTUtils.TAG_COMPOUND) == true) {
+            getClientSideNovaStack(player, itemStack, useName, storeServerSideTag)
         } else getClientsideVanillaStack(player, itemStack, storeServerSideTag)
     }
     
@@ -159,7 +159,7 @@ internal object PacketItems : Initializable(), Listener {
         
         val itemStack = MojangStack.of(itemStackCompound)
         val newItemStack = if (itemTag.contains("nova", NBTUtils.TAG_COMPOUND)) {
-            getClientsideNovaStack(player, itemStack, useName, storeServerSideTag)
+            getClientSideNovaStack(player, itemStack, useName, storeServerSideTag)
         } else getClientsideVanillaStack(player, itemStack, storeServerSideTag)
         
         return if (newItemStack == itemStack)
@@ -168,7 +168,7 @@ internal object PacketItems : Initializable(), Listener {
     }
     
     //<editor-fold desc="Nova", defaultstate="collapsed">
-    private fun getClientsideNovaStack(player: Player?, itemStack: MojangStack, useName: Boolean, storeServerSideTag: Boolean): MojangStack {
+    private fun getClientSideNovaStack(player: Player?, itemStack: MojangStack, useName: Boolean, storeServerSideTag: Boolean): MojangStack {
         val itemTag = itemStack.tag!!
         val novaTag = itemTag.getOrNull<CompoundTag>("nova")
             ?: throw IllegalArgumentException("The provided ItemStack is not a Nova item.")
@@ -215,11 +215,17 @@ internal object PacketItems : Initializable(), Listener {
         val loreTag = displayTag.getOrPut("Lore", ::ListTag)
         val itemDisplayLore = packetItemData.lore
         itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
-        if (player != null && player in AdvancedTooltips.players) {
-            packetItemData.advancedTooltipsLore?.forEach {
-                loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize())
-            }
-            loreTag += StringTag.valueOf(coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serialize())
+        if (player != null && AdvancedTooltips.hasNovaTooltips(player)) {
+            packetItemData.advancedTooltipsLore?.forEach { loreTag += it.withoutPreFormatting().serializeToNBT() }
+            loreTag += coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serializeToNBT()
+            
+            val cbfTagCount = itemStack.novaCompoundOrNull?.keys?.size ?: 0
+            val nbtTagCount = itemTag.allKeys.size - 1 // don't count 'nova' tag
+            
+            if (cbfTagCount > 0)
+                loreTag += localized(ChatColor.DARK_GRAY, "item.cbf_tags", cbfTagCount).withoutPreFormatting().serializeToNBT()
+            if (nbtTagCount > 0)
+                loreTag += localized(ChatColor.DARK_GRAY, "item.nbt_tags", nbtTagCount).withoutPreFormatting().serializeToNBT()
         }
         //</editor-fold>
         
@@ -265,8 +271,6 @@ internal object PacketItems : Initializable(), Listener {
     
     //<editor-fold desc="Vanilla", defaultstate="collapsed">
     private fun getClientsideVanillaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
-        // TODO: advanced tooltips
-        
         var newItemStack = itemStack
         
         if (storeServerSideTag && isContainerItem(itemStack)) {
@@ -275,9 +279,41 @@ internal object PacketItems : Initializable(), Listener {
             newItemStack = getColorCorrectedArmor(itemStack)
         }
         
+        //<editor-fold desc="advanced tool tips">
+        if (player != null && (itemStack.tag?.getInt("CustomModelData") ?: 0) == 0 && AdvancedTooltips.hasVanillaTooltips(player)) {
+            if (newItemStack === itemStack)
+                newItemStack = itemStack.copy()
+            
+            val tag = newItemStack.orCreateTag
+            val novaCompound = newItemStack.novaCompoundOrNull
+            
+            val nbtTagCount = tag.allKeys.size
+            val cbfTagCount = novaCompound?.keys?.size ?: 0
+            
+            val displayTag = tag.getOrPut("display", ::CompoundTag)
+            val loreTag = displayTag.getOrPut("Lore", ::ListTag)
+            
+            val maxDamage = newItemStack.item.maxDamage
+            if (maxDamage > 0) {
+                loreTag += localized(
+                    ChatColor.WHITE,
+                    "item.durability",
+                    (maxDamage - newItemStack.damageValue).toString(),
+                    maxDamage.toString()
+                ).withoutPreFormatting().serializeToNBT()
+            }
+            
+            loreTag += coloredText(ChatColor.DARK_GRAY, BuiltInRegistries.ITEM.getKey(newItemStack.item).toString()).withoutPreFormatting().serializeToNBT()
+            if (cbfTagCount > 0)
+                loreTag += localized(ChatColor.DARK_GRAY, "item.cbf_tags", cbfTagCount).withoutPreFormatting().serializeToNBT()
+            if (nbtTagCount > 0)
+                loreTag += localized(ChatColor.DARK_GRAY, "item.nbt_tags", nbtTagCount).withoutPreFormatting().serializeToNBT()
+        }
+        //</editor-fold>
+        
         // save server-side nbt data if the item has been modified
         if (storeServerSideTag && newItemStack != itemStack) {
-            newItemStack.tag!!.put("NovaServerSideTag", itemStack.tag!!)
+            newItemStack.orCreateTag.put("NovaServerSideTag", itemStack.orCreateTag)
         }
         
         return newItemStack

@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.material
 import de.studiocode.invui.item.ItemProvider
 import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.provider.lazyProvider
@@ -39,14 +38,12 @@ open class ItemNovaMaterial internal constructor(
     
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
-            val itemStack = item.createItemBuilder(subId).get()
-            val itemDisplayData = novaItem.getPacketItemData(null, itemStack.nmsCopy)
             ItemWrapper(
                 item.createClientsideItemBuilder(
-                    itemDisplayData.name,
+                    novaItem.getPacketItemData(null, null).name,
                     null,
                     subId
-                ).addItemFlags(ItemFlag.HIDE_ATTRIBUTES).get()
+                ).get()
             )
         }
     }
@@ -54,7 +51,12 @@ open class ItemNovaMaterial internal constructor(
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            val clientsideItemStack = PacketItems.getClientSideStack(null, itemStack.nmsCopy)
+            val clientsideItemStack = PacketItems.getClientSideStack(
+                player = null,
+                itemStack = itemStack.nmsCopy,
+                useName = true,
+                storeServerSideTag = false
+            )
             clientsideItemStack.tag?.remove("nova")
             ItemWrapper(clientsideItemStack.bukkitMirror)
         }
@@ -78,7 +80,7 @@ open class ItemNovaMaterial internal constructor(
      * It does not have a display name, lore, or any special nbt data.
      */
     fun createClientsideItemBuilder(): ItemBuilder =
-        item.createClientsideItemBuilder().addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
+        item.createClientsideItemBuilder()
     
     override fun createItemStack(amount: Int): ItemStack =
         createItemBuilder().setAmount(amount).get()
