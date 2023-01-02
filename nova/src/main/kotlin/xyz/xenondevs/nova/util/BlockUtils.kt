@@ -34,6 +34,7 @@ import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.Levelled
 import org.bukkit.block.data.type.Bed
 import org.bukkit.block.data.type.PistonHead
+import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent
@@ -276,6 +277,30 @@ fun Block.isUnobstructed(material: Material, player: Player? = null): Boolean {
 fun Block.remove(ctx: BlockBreakContext, playSound: Boolean, showParticles: Boolean) = remove(ctx, showParticles || playSound)
 
 /**
+ * Breaks this block naturally using the given [ctx].
+ * 
+ * This method works for vanilla blocks, blocks from Nova and blocks from custom item integrations.
+ * Items will be dropped in the world, those drops depend on the source and tool defined in the [ctx].
+ * If the source is a player, it will be as if the player broke the block.
+ * The tool item stack will not be damaged.
+ * 
+ * @param ctx The [BlockBreakContext] to be used
+ */
+fun Block.breakNaturally(ctx: BlockBreakContext) {
+    val state = state
+    
+    val itemEntities = removeInternal(
+        ctx,
+        ToolUtils.isCorrectToolForDrops(this, ctx.item),
+        breakEffects = true,
+        sendEffectsToBreaker = true
+    )
+    
+    val player = ctx.source as? Player ?: return
+    CraftEventFactory.handleBlockDropItemEvent(this, state, player.serverPlayer, itemEntities)
+}
+
+/**
  * Removes this block using the given [ctx].
  *
  * This method works for vanilla blocks, blocks from Nova and blocks from custom item services.
@@ -283,8 +308,13 @@ fun Block.remove(ctx: BlockBreakContext, playSound: Boolean, showParticles: Bool
  * @param ctx The [BlockBreakContext] to be used
  * @param breakEffects If break effects should be displayed (i.e. sounds and particle effects).
  */
-fun Block.remove(ctx: BlockBreakContext, breakEffects: Boolean = true) {
-    removeInternal(ctx, ToolUtils.isCorrectToolForDrops(this, ctx.item), breakEffects, true)
+fun Block.remove(ctx: BlockBreakContext, breakEffects: Boolean = true): List<ItemStack> {
+    return removeInternal(
+        ctx,
+        ToolUtils.isCorrectToolForDrops(this, ctx.item), 
+        breakEffects,
+        true
+    ).map { it.item.bukkitMirror }
 }
 
 internal fun Block.removeInternal(ctx: BlockBreakContext, drops: Boolean, breakEffects: Boolean, sendEffectsToBreaker: Boolean): List<ItemEntity> {
