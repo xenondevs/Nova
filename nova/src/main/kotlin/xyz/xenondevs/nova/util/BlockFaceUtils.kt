@@ -1,11 +1,12 @@
 package xyz.xenondevs.nova.util
 
+import net.minecraft.world.level.ClipContext
+import net.minecraft.world.phys.HitResult
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
-import xyz.xenondevs.nova.util.item.isTraversable
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -93,29 +94,24 @@ fun Axis.toBlockFace(positive: Boolean): BlockFace =
 object BlockFaceUtils {
     
     fun determineBlockFace(block: Block, location: Location): BlockFace {
-        val blockMiddle = block.location.add(0.5, 0.5, 0.5)
-        val diff = location.clone().subtract(blockMiddle)
-        
         val result = listOf(
-            Axis.X to diff.x,
-            Axis.Z to diff.z,
-            Axis.Y to diff.y
+            Axis.X to location.x - (block.x + 0.5),
+            Axis.Y to location.y - (block.y + 0.5),
+            Axis.Z to location.z - (block.z + 0.5)
         ).sortedByDescending { it.second.absoluteValue }[0]
         
         return result.first.toBlockFace(result.second >= 0)
     }
     
-    fun determineBlockFaceLookingAt(location: Location, maxDistance: Double, stepSize: Double): BlockFace? {
-        var previous = location
+    fun determineBlockFaceLookingAt(location: Location, maxDistance: Double = 6.0): BlockFace? {
+        val start = location.vec3
+        val direction = location.direction
+        val end = start.add(direction.x * maxDistance, direction.y * maxDistance, direction.z * maxDistance)
         
-        location.castRay(stepSize, maxDistance) { rayLocation ->
-            val block = rayLocation.block
-            if (block.type.isTraversable() && !block.boundingBox.contains(rayLocation.x, rayLocation.y, rayLocation.z)) {
-                previous = rayLocation.clone()
-                return@castRay true
-            } else {
-                return determineBlockFace(rayLocation.block, previous)
-            }
+        val ctx = ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, null)
+        val result = location.world!!.serverLevel.clip(ctx)
+        if (result.type == HitResult.Type.BLOCK) {
+            return result.direction.blockFace
         }
         
         return null
