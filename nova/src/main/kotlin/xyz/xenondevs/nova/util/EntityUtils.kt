@@ -27,7 +27,7 @@ import net.minecraft.world.entity.EntityType as NMSEntityType
  * Between 0 and 1 or null if the player is not breaking a block at the moment.
  */
 val Player.destroyProgress: Double?
-    get() = BlockBreaking.getBreaker(this)?.progress
+    get() = BlockBreaking.getBreaker(this)?.progress?.coerceAtMost(1.0)
 
 /**
  * Swings the [hand] of the player.
