@@ -79,7 +79,7 @@ internal object YamlSerialization {
         }
         
         // value and type are the same
-        if (value::class == clazz) {
+        if (value::class == clazz || value::class.isSubclassOf(clazz)) {
             return value as T
         }
         
