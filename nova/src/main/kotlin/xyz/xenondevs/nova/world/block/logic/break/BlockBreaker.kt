@@ -189,7 +189,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             handleBreakTick()
             
             // set the break stage
-            breakMethod.breakStage = (progress * 10).toInt() - 1
+            breakMethod.breakStage = (progress.coerceAtMost(1.0) * 10).toInt()
             
             if (!breakMethod.hasClientsidePrediction) {
                 // re-send mining fatigue every tick to ensure that the player actually has it
