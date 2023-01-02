@@ -23,11 +23,11 @@ object RecipeRegistry : Initializable() {
     
     private var BUKKIT_RECIPES: List<Recipe> = ArrayList()
     
-    var CREATION_RECIPES: Map<String, Map<RecipeGroup, List<RecipeContainer>>> = HashMap()
+    var CREATION_RECIPES: Map<String, Map<RecipeGroup<*>, List<RecipeContainer>>> = HashMap()
         private set
-    var USAGE_RECIPES: Map<String, Map<RecipeGroup, Set<RecipeContainer>>> = HashMap()
+    var USAGE_RECIPES: Map<String, Map<RecipeGroup<*>, Set<RecipeContainer>>> = HashMap()
         private set
-    var RECIPES_BY_TYPE: Map<RecipeGroup, List<RecipeContainer>> = HashMap()
+    var RECIPES_BY_TYPE: Map<RecipeGroup<*>, List<RecipeContainer>> = HashMap()
     
     override val initializationStage = InitializationStage.POST_WORLD_ASYNC
     override val dependsOn = setOf(RecipeManager)
@@ -71,8 +71,8 @@ object RecipeRegistry : Initializable() {
         return list
     }
     
-    private fun loadCreationRecipes(): Map<String, Map<RecipeGroup, List<RecipeContainer>>> {
-        val map = HashMap<String, HashMap<RecipeGroup, MutableList<RecipeContainer>>>()
+    private fun loadCreationRecipes(): Map<String, Map<RecipeGroup<*>, List<RecipeContainer>>> {
+        val map = HashMap<String, HashMap<RecipeGroup<*>, MutableList<RecipeContainer>>>()
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach {
@@ -97,8 +97,8 @@ object RecipeRegistry : Initializable() {
         return map
     }
     
-    private fun loadUsageRecipes(): Map<String, Map<RecipeGroup, Set<RecipeContainer>>> {
-        val map = HashMap<String, HashMap<RecipeGroup, HashSet<RecipeContainer>>>()
+    private fun loadUsageRecipes(): Map<String, Map<RecipeGroup<*>, Set<RecipeContainer>>> {
+        val map = HashMap<String, HashMap<RecipeGroup<*>, HashSet<RecipeContainer>>>()
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach { recipe ->
@@ -125,8 +125,8 @@ object RecipeRegistry : Initializable() {
         return map
     }
     
-    private fun loadRecipesByGroup(): Map<RecipeGroup, List<RecipeContainer>> {
-        val map = HashMap<RecipeGroup, MutableList<RecipeContainer>>()
+    private fun loadRecipesByGroup(): Map<RecipeGroup<*>, List<RecipeContainer>> {
+        val map = HashMap<RecipeGroup<*>, MutableList<RecipeContainer>>()
         (getBukkitRecipeSequence() + getAllNovaRecipes()).forEach {
             val group = RecipeTypeRegistry.getType(it).group ?: return@forEach
             map.getOrPut(group) { ArrayList() } += RecipeContainer(it)
