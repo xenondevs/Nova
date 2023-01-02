@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
+import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
 internal object ItemListener : Initializable(), Listener {
     
@@ -109,6 +110,14 @@ internal object ItemListener : Initializable(), Listener {
             val hotbarItem = player.inventory.getItem(event.hotbarButton)
             findBehaviors(hotbarItem)?.forEach { it.handleInventoryHotbarSwap(player, hotbarItem!!, event) }
         }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private fun handleBreakAction(event: BlockBreakActionEvent) {
+        val player = event.player
+        val item = event.player.inventory.itemInMainHand
+        
+        findBehaviors(item)?.forEach { it.handleBlockBreakAction(player, item, event) }
     }
     
     // This method stores the last used item for the RELEASE_USE_ITEM action below

@@ -148,7 +148,7 @@ internal object BlockBreaking : Listener {
     private fun handleDestroyAbort(player: Player, packet: ServerboundPlayerActionPacket) {
         val breaker = playerBreakers.remove(player)
         if (breaker != null) {
-            breaker.stop(packet.sequence)
+            breaker.stop(false, packet.sequence)
         } else {
             player.packetHandler?.injectIncoming(packet)
         }
@@ -158,7 +158,7 @@ internal object BlockBreaking : Listener {
         val breaker = playerBreakers.remove(player)
         if (breaker != null) {
             breaker.breakBlock(true, packet.sequence)
-            breaker.stop()
+            breaker.stop(true)
         } else {
             player.packetHandler?.injectIncoming(packet)
         }
@@ -194,7 +194,7 @@ internal object BlockBreaking : Listener {
         val player = event.player
         
         breakCooldowns -= player
-        playerBreakers.remove(player)?.stop()
+        playerBreakers.remove(player)?.stop(false)
     }
     
 }

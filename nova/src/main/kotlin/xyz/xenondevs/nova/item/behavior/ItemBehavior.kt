@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
 abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     
@@ -39,6 +40,7 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     open fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     open fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     open fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    open fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     open fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
     
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
@@ -59,7 +61,7 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
 }
 
 abstract class ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder<T>() {
-    internal abstract fun create(material: ItemNovaMaterial): T
+    abstract fun create(material: ItemNovaMaterial): T
     final override fun get(material: ItemNovaMaterial) = create(material).apply { setMaterial(material) }
 }
 

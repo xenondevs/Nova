@@ -48,6 +48,7 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 
@@ -76,7 +77,7 @@ internal class NovaBlockBreaker(
     
     private fun spawnHitParticles() {
         val texture = material.breakParticles ?: return
-        val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 6.0, 0.2) ?: BlockFace.UP
+        val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.UP
         
         val particlePacket = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5).advance(side, 0.6)) {
             Axis.values().forEach { if (it != side.axis) offset(it, 0.2) }
@@ -137,6 +138,10 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     var isStopped: Boolean = false
         private set
     
+    init {
+        callEvent(BlockBreakActionEvent(player, block, BlockBreakActionEvent.Action.START))
+    }
+    
     fun handleTick() {
         if (isDone)
             return
@@ -145,7 +150,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val clientsideDamage = calculateClientsideDamage()
         
         if (clientsideDamage >= 1 && damage < 1) {
-            stop(startSequence)
+            stop(false, startSequence)
             return
         }
         
@@ -177,7 +182,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             // Check if the breaker is still done. (This will not be the case when the BlockBreakEvent was cancelled)
             if (isDone) {
                 // Stop break animation and mining fatigue effect
-                stop()
+                stop(true)
             }
         } else {
             // break tick logic of subclasses (i.e. spawning particles for barrier nova blocks)
@@ -217,7 +222,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val ctx = BlockBreakContext(
             block.pos,
             player, player.location,
-            BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 8.0, 0.2),
+            BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation),
             tool
         )
         
@@ -263,12 +268,15 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             if (player.gameMode != GameMode.CREATIVE && toolCategory != null && hardness > 0)
                 player.damageToolBreakBlock()
             
+            // capture state
+            val state = block.state
+            
             // remove block
             val itemEntities = block.removeInternal(ctx, event.isDropItems && drops, true, !brokenClientside)
             
             // drop items
             if (event.isDropItems) {
-                CraftEventFactory.handleBlockDropItemEvent(block, block.state, player.serverPlayer, itemEntities)
+                CraftEventFactory.handleBlockDropItemEvent(block, state, player.serverPlayer, itemEntities)
             }
         } else {
             // If the block wasn't broken clientside, the client will keep breaking the block and not send
@@ -283,7 +291,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         BlockBreaking.setBreakCooldown(player)
     }
     
-    fun stop(sequence: Int? = null) {
+    fun stop(blockBroken: Boolean, sequence: Int? = null) {
         isStopped = true
         breakMethod.stop()
         
@@ -308,6 +316,8 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         if (sequence != null) {
             player.send(ClientboundBlockChangedAckPacket(sequence))
         }
+        
+        callEvent(BlockBreakActionEvent(player, block, if (blockBroken) BlockBreakActionEvent.Action.FINISH else BlockBreakActionEvent.Action.CANCEL))
     }
     
     private fun calculateClientsideDamage(): Double {
