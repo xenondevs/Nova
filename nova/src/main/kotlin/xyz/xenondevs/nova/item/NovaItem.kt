@@ -33,7 +33,6 @@ import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
@@ -110,7 +109,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         val bukkitStack = itemStack.bukkitCopy
         
         behaviors.forEach { it.updatePacketItemData(bukkitStack, itemData) }
-        itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer ?: EntityUtils.DUMMY_PLAYER, itemStack))
+        itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
         if (itemData.name == null) itemData.name = this.name
         
         return itemData
@@ -191,18 +190,16 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
                     var value = modifier.value
                     var isBaseModifier = false
                     
-                    if (player != null) {
-                        when (modifier.uuid) {
-                            Tool.BASE_ATTACK_DAMAGE_UUID -> {
-                                value += player.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)
-                                value += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED)
-                                isBaseModifier = true
-                            }
-                            
-                            Tool.BASE_ATTACK_SPEED_UUID -> {
-                                value += player.getAttributeBaseValue(Attributes.ATTACK_SPEED)
-                                isBaseModifier = true
-                            }
+                    when (modifier.uuid) {
+                        Tool.BASE_ATTACK_DAMAGE_UUID -> {
+                            value += player?.getAttributeBaseValue(Attributes.ATTACK_DAMAGE) ?: 1.0
+                            value += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED)
+                            isBaseModifier = true
+                        }
+                        
+                        Tool.BASE_ATTACK_SPEED_UUID -> {
+                            value += player?.getAttributeBaseValue(Attributes.ATTACK_SPEED) ?: 4.0
+                            isBaseModifier = true
                         }
                     }
                     
