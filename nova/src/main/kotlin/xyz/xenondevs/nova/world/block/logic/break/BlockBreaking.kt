@@ -84,6 +84,10 @@ internal object BlockBreaking : Listener {
         breakCooldowns[player] = serverTick + BREAK_COOLDOWN
     }
     
+    fun getBreaker(player: Player): BlockBreaker? {
+        return playerBreakers[player]
+    }
+    
     private fun handleTick() {
         playerBreakers.removeIf { (_, breaker) ->
             try {

@@ -14,12 +14,20 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EntityType as NMSEntityType
+
+/**
+ * The current block destroy progress of the player.
+ * Between 0 and 1 or null if the player is not breaking a block at the moment.
+ */
+val Player.destroyProgress: Double?
+    get() = BlockBreaking.getBreaker(this)?.progress
 
 /**
  * Swings the [hand] of the player.
