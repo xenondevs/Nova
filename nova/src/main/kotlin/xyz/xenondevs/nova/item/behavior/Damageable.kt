@@ -19,15 +19,15 @@ private val DAMAGE_KEY = NamespacedKey(NOVA, "damage")
 class Damageable(val options: DamageableOptions) : ItemBehavior() {
     
     @Deprecated("Replaced by DamageableOptions", ReplaceWith("options.maxDurability"))
-    val maxDurability: Int by options.maxDurabilityProvider
+    val maxDurability: Int by options.durabilityProvider
     override val vanillaMaterialProperties = provider(listOf(VanillaMaterialProperty.DAMAGEABLE))
     
     fun getDamage(itemStack: ItemStack): Int {
-        return min(options.maxDurability, itemStack.retrieveDataOrNull(DAMAGE_KEY) ?: 0)
+        return min(options.durability, itemStack.retrieveDataOrNull(DAMAGE_KEY) ?: 0)
     }
     
     fun setDamage(itemStack: ItemStack, damage: Int) {
-        val coercedDamage = damage.coerceIn(0..options.maxDurability)
+        val coercedDamage = damage.coerceIn(0..options.durability)
         itemStack.storeData(DAMAGE_KEY, coercedDamage)
     }
     
@@ -36,22 +36,22 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
     }
     
     fun getDurability(itemStack: ItemStack): Int {
-        return options.maxDurability - getDamage(itemStack)
+        return options.durability - getDamage(itemStack)
     }
     
     fun setDurability(itemStack: ItemStack, durability: Int) {
-        setDamage(itemStack, options.maxDurability - durability)
+        setDamage(itemStack, options.durability - durability)
     }
     
     override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
         val damage = getDamage(itemStack)
-        val durability = options.maxDurability - damage
+        val durability = options.durability - damage
         
-        itemData.durabilityBar = durability / options.maxDurability.toDouble()
+        itemData.durabilityBar = durability / options.durability.toDouble()
         
         if (damage != 0) {
             itemData.addAdvancedTooltipsLore(
-                arrayOf(localized(ChatColor.WHITE, "item.durability", durability, options.maxDurability))
+                arrayOf(localized(ChatColor.WHITE, "item.durability", durability, options.durability))
             )
         }
     }

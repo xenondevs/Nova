@@ -50,7 +50,7 @@ internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(i
         val novaMaterial = items[0].novaMaterial
         if (novaMaterial != null) {
             val damageable = novaMaterial.novaItem.getBehavior(Damageable::class)!!
-            val maxDurability = damageable.options.maxDurability
+            val maxDurability = damageable.options.durability
             
             val itemStackA = items[0]
             val itemStackB = items[1]
