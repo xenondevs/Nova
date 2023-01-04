@@ -123,7 +123,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     ): TileEntityNovaMaterial {
         val namespace = addon.description.id
         val material = TileEntityNovaMaterial(
-            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize, false,
+            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize, null, false,
             block, options, tileEntityConstructor, properties, placeCheck, multiBlockLoader
         )
         return register(material)
@@ -143,7 +143,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     ): BlockNovaMaterial {
         val namespace = addon.description.id
         val material = BlockNovaMaterial(
-            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize, false,
+            NamespacedId(namespace, name), "block.$namespace.$name", item, maxStackSize, null, false,
             block, options, properties, placeCheck, multiBlockLoader
         )
         return register(material)
@@ -179,7 +179,7 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
     internal fun registerCoreItem(
         name: String,
         vararg itemBehaviors: ItemBehaviorHolder<*>,
-        localizedName:String = "item.nova.$name",
+        localizedName: String = "item.nova.$name",
         isHidden: Boolean = false
     ): ItemNovaMaterial {
         return register(ItemNovaMaterial(

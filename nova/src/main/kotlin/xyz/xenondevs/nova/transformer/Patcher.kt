@@ -19,6 +19,9 @@ import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
 import xyz.xenondevs.nova.transformer.patch.item.AttributePatch
 import xyz.xenondevs.nova.transformer.patch.item.DamageablePatches
 import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
+import xyz.xenondevs.nova.transformer.patch.item.FireResistancePatches
+import xyz.xenondevs.nova.transformer.patch.item.FuelPatches
+import xyz.xenondevs.nova.transformer.patch.item.RemainingItemPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
@@ -42,7 +45,7 @@ internal object Patcher : Initializable() {
     private val transformers by lazy {
         sequenceOf(
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
-            StackSizePatch, BlockSoundPatches, BroadcastPacketPatch
+            StackSizePatch, FuelPatches, RemainingItemPatches, FireResistancePatches, BlockSoundPatches, BroadcastPacketPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

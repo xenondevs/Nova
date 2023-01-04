@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.transformer
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.loader.NovaClassLoader
 
+// The PatchedClassLoader is the parent of the ApplicationClassLoader and sits between the ApplicationClassLoader and the ExtensionClassLoader.
 internal class PatchedClassLoader : ClassLoader(NOVA.loader.javaClass.classLoader.parent.parent) {
     
     private val novaClassLoader = NOVA.javaClass.classLoader as NovaClassLoader
@@ -11,14 +12,18 @@ internal class PatchedClassLoader : ClassLoader(NOVA.loader.javaClass.classLoade
         // check if class is already loaded
         var c: Class<*>? = synchronized(getClassLoadingLock(name)) { findLoadedClass(name) }
         
+        // load class from parent (Extension ClassLoader)
+        if (c == null) {
+            c = runCatching { parent.loadClass(name) }.getOrNull()
+        }
+    
         // Load class from Nova & libraries
-        if (c == null && name.startsWith("xyz.xenondevs.nova") && checkNonPluginStackTrace()) {
+        if (c == null && checkNonPluginStackTrace()) {
             c = runCatching { novaClassLoader.loadClassNoParent(name) }.getOrNull()
         }
         
-        // load class from parent (nova classloader)
         if (c == null) {
-            c = parent.loadClass(name) ?: throw ClassNotFoundException(name)
+            throw ClassNotFoundException(name)
         }
         
         // resolve class

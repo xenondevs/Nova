@@ -2,20 +2,31 @@ package xyz.xenondevs.nova.util.reflection
 
 import com.mojang.brigadier.tree.CommandNode
 import net.minecraft.core.BlockPos
+import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.players.PlayerList
 import net.minecraft.util.RandomSource
+import net.minecraft.world.Container
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AnvilMenu
+import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.inventory.ItemCombinerMenu
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.crafting.BannerDuplicateRecipe
+import net.minecraft.world.item.crafting.BookCloningRecipe
+import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
+import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LinearPalette
@@ -59,6 +70,7 @@ internal object ReflectionRegistry {
     val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class, false, Class::class)
     val MEMORY_SECTION_CONSTRUCTOR = getConstructor(MemorySection::class, true, ConfigurationSection::class, String::class)
     val SECTION_PATH_DATA_CONSTRUCTOR = getConstructor(SECTION_PATH_DATA_CLASS, true, Any::class)
+    val ITEM_STACK_CONSTRUCTOR = getConstructor(MojangStack::class, false, ItemLike::class)
     
     // Methods
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class)
@@ -84,6 +96,19 @@ internal object ReflectionRegistry {
     val BLOCK_PLAYER_WILL_DESTROY_METHOD = getMethod(MojangBlock::class, false, "SRM(net.minecraft.world.level.block.Block playerWillDestroy)", Level::class, BlockPos::class, BlockState::class, MojangPlayer::class)
     val INVENTORY_HURT_ARMOR_METHOD = getMethod(Inventory::class, false, "SRM(net.minecraft.world.entity.player.Inventory hurtArmor)", DamageSource::class, Float::class, IntArray::class)
     val ITEM_GET_DEFAULT_ATTRIBUTE_MODIFIERS_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item getDefaultAttributeModifiers)", MojangEquipmentSlot::class)
+    val ABSTRACT_FURNACE_BLOCK_ENTITY_IS_FUEL_METHOD = getMethod(AbstractFurnaceBlockEntity::class, false, "SRM(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity isFuel)", MojangStack::class)
+    val ABSTRACT_FURNACE_BLOCK_ENTITY_GET_BURN_DURATION_METHOD = getMethod(AbstractFurnaceBlockEntity::class, true, "SRM(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity getBurnDuration)", MojangStack::class)
+    val ITEM_GET_CRAFTING_REMAINING_ITEM_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item getCraftingRemainingItem)")
+    val ITEM_STACK_GET_ITEM_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getItem)")
+    val RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(Recipe::class, false, "SRM(net.minecraft.world.item.crafting.Recipe getRemainingItems)", Container::class)
+    val BANNER_DUPLICATE_RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(BannerDuplicateRecipe::class, false, "SRM(net.minecraft.world.item.crafting.BannerDuplicateRecipe getRemainingItems)", CraftingContainer::class)
+    val BOOK_CLONING_RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(BookCloningRecipe::class, false, "SRM(net.minecraft.world.item.crafting.BookCloningRecipe getRemainingItems)", CraftingContainer::class)
+    val ABSTRACT_FURNACE_BLOCK_ENTITY_SERVER_TICK_METHOD = getMethod(AbstractFurnaceBlockEntity::class, false, "SRM(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity serverTick)", Level::class, BlockPos::class, BlockState::class, AbstractFurnaceBlockEntity::class)
+    val NON_NULL_LIST_SET_METHOD = getMethod(NonNullList::class, false , "SRM(net.minecraft.core.NonNullList set)", Int::class, Any::class)
+    val ITEM_HAS_CRAFTING_REMAINING_ITEM_METHOD = getMethod(Item::class, false, "SRM(net.minecraft.world.item.Item hasCraftingRemainingItem)")
+    val BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD = getMethod(BrewingStandBlockEntity::class, true, "SRM(net.minecraft.world.level.block.entity.BrewingStandBlockEntity doBrew)", Level::class, BlockPos::class, NonNullList::class, BrewingStandBlockEntity::class)
+    val ITEM_ENTITY_FIRE_IMMUNE_METHOD = getMethod(ItemEntity::class, false, "SRM(net.minecraft.world.entity.item.ItemEntity fireImmune)")
+    val ITEM_IS_FIRE_RESISTANT_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item isFireResistant)")
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -104,5 +129,6 @@ internal object ReflectionRegistry {
     val HASH_MAP_PALETTE_VALUES_FIELD = getField(HashMapPalette::class, true, "SRF(net.minecraft.world.level.chunk.HashMapPalette values)")
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
     val ITEM_COMBINER_MENU_PLAYER_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu player)")
+    val ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD = getField(AbstractFurnaceBlockEntity::class, true, "SRF(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity items)")
     
 }
