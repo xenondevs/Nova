@@ -1,23 +1,14 @@
 package xyz.xenondevs.nova.data.recipe
 
 import org.bukkit.Bukkit
-import org.bukkit.Keyed
-import org.bukkit.inventory.BlastingRecipe
-import org.bukkit.inventory.CampfireRecipe
-import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.Recipe
-import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.inventory.ShapelessRecipe
-import org.bukkit.inventory.SmithingRecipe
-import org.bukkit.inventory.SmokingRecipe
-import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.item.ItemUtils.getId
+import kotlin.reflect.full.isSuperclassOf
 
 object RecipeRegistry : Initializable() {
     
@@ -135,14 +126,9 @@ object RecipeRegistry : Initializable() {
     }
     
     private fun getBukkitRecipeSequence(): Sequence<Recipe> {
-        return BUKKIT_RECIPES.asSequence()
-            .filter {
-                val key = (it as Keyed).key
-                val namespace = key.namespace
-                
-                (namespace == "minecraft" || namespace == "nova" || CustomItemServiceManager.hasRecipe(key)) // do not allow recipes from unsupported plugins to show up
-                    && (it is ShapedRecipe || it is ShapelessRecipe || it is FurnaceRecipe || it is StonecuttingRecipe || it is SmithingRecipe || it is BlastingRecipe || it is CampfireRecipe || it is SmokingRecipe)
-            }
+        return BUKKIT_RECIPES.asSequence().filter { recipe ->
+            RecipeTypeRegistry.types.any { type -> type.recipeClass.isSuperclassOf(recipe::class) }
+        }
     }
     
     private fun getAllNovaRecipes(): Sequence<NovaRecipe> {
