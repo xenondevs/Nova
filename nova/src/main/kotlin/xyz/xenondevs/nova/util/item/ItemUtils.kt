@@ -101,6 +101,15 @@ val ItemStack.canDestroy: List<Material>
         return tag.mapNotNull { runCatching { NamespacedId.of(it.asString) }.getOrNull()?.let { Material.valueOf(it.name) } }
     }
 
+val ItemStack.craftingRemainingItem: ItemStack?
+    get() {
+        val novaMaterial = novaMaterial
+        if (novaMaterial != null)
+            return novaMaterial.craftingRemainingItem?.get()
+        
+        return type.craftingRemainingItem?.let(::ItemStack)
+    }
+
 fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     val first = this.namelessCopyOrSelf
     val second = other?.namelessCopyOrSelf
