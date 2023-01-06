@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.builder.content
+package xyz.xenondevs.nova.data.resources.builder.content.font
 
 import net.lingala.zip4j.model.FileHeader
 import xyz.xenondevs.nova.data.resources.ResourcePath
@@ -18,8 +18,12 @@ import kotlin.io.path.walk
 private const val HEIGHT = 16
 private const val ASCENT = 12
 
-internal class TextureIconContent : FontContent<FontChar, TextureIconContent.TextureFontData>(
-    Resources::updateTextureIconLookup, true
+internal class TextureIconContent(
+    movedFontContent: MovedFontContent
+) : FontContent(
+    "nova:texture_icons_%s",
+    Resources::updateTextureIconLookup,
+    movedFontContent
 ) {
     
     override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
@@ -61,18 +65,11 @@ internal class TextureIconContent : FontContent<FontChar, TextureIconContent.Tex
             
             addFontEntry(
                 "${namespace}:${relPath.substringBeforeLast('.')}",
-                ResourcePath(namespace, relPath)
+                ResourcePath(namespace, relPath),
+                HEIGHT,
+                ASCENT
             )
         }
-    }
-    
-    override fun createFontData(id: Int, char: Char, path: ResourcePath): TextureFontData =
-        TextureFontData("${FONT_NAME_START}_$id", char, path, getWidth(HEIGHT, path))
-    
-    class TextureFontData(font: String, char: Char, path: ResourcePath, width: Int) : FontData<FontChar>(font, char, path, width) {
-        override val height = HEIGHT
-        override val ascent = ASCENT
-        override fun toFontInfo() = FontChar("$font/0", char, width)
     }
     
 }

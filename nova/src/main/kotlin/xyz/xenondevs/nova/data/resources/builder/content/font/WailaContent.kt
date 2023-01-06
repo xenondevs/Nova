@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.builder.content
+package xyz.xenondevs.nova.data.resources.builder.content.font
 
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
@@ -22,7 +22,7 @@ import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.walk
 
 //<editor-fold desc="Hardcoded Textures", defaultstate="collapsed">
-private val MATERIAL_TEXTURES = enumMapOf(
+private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     // doors
     Material.IRON_DOOR to "item/iron_door",
     Material.OAK_DOOR to "item/oak_door",
@@ -60,73 +60,73 @@ private val MATERIAL_TEXTURES = enumMapOf(
     Material.BAMBOO_HANGING_SIGN to "item/bamboo_hanging_sign",
     
     // foliage
-    Material.OAK_SAPLING to null,
-    Material.SPRUCE_SAPLING to null,
-    Material.BIRCH_SAPLING to null,
-    Material.JUNGLE_SAPLING to null,
-    Material.ACACIA_SAPLING to null,
-    Material.DARK_OAK_SAPLING to null,
-    Material.MANGROVE_PROPAGULE to null,
+    Material.OAK_SAPLING to "block/oak_sapling",
+    Material.SPRUCE_SAPLING to "block/spruce_sapling",
+    Material.BIRCH_SAPLING to "block/birch_sapling",
+    Material.JUNGLE_SAPLING to "block/jungle_sapling",
+    Material.ACACIA_SAPLING to "block/acacia_sapling",
+    Material.DARK_OAK_SAPLING to "block/dark_oak_sapling",
+    Material.MANGROVE_PROPAGULE to "block/mangrove_propagule",
     Material.BAMBOO_SAPLING to "block/bamboo_stage0",
-    Material.DEAD_BUSH to null,
-    Material.SEAGRASS to null,
-    Material.SEA_PICKLE to null,
-    Material.CRIMSON_ROOTS to null,
-    Material.WARPED_ROOTS to null,
-    Material.NETHER_SPROUTS to null,
-    Material.WEEPING_VINES to null,
-    Material.TWISTING_VINES to null,
-    Material.HANGING_ROOTS to null,
-    Material.GLOW_LICHEN to null,
-    Material.SCULK_VEIN to null,
-    Material.SUGAR_CANE to null,
+    Material.DEAD_BUSH to "block/dead_bush",
+    Material.SEAGRASS to "block/seagrass",
+    Material.SEA_PICKLE to "block/sea_pickle",
+    Material.CRIMSON_ROOTS to "block/crimson_roots",
+    Material.WARPED_ROOTS to "block/warped_roots",
+    Material.NETHER_SPROUTS to "block/nether_sprouts",
+    Material.WEEPING_VINES to "block/weeping_vines",
+    Material.TWISTING_VINES to "block/twisting_vines",
+    Material.HANGING_ROOTS to "block/hanging_roots",
+    Material.GLOW_LICHEN to "block/glow_lichen",
+    Material.SCULK_VEIN to "block/sculk_vein",
+    Material.SUGAR_CANE to "block/sugar_cane",
     
     // flowers
-    Material.DANDELION to null,
-    Material.POPPY to null,
-    Material.BLUE_ORCHID to null,
-    Material.ALLIUM to null,
-    Material.AZURE_BLUET to null,
-    Material.RED_TULIP to null,
-    Material.ORANGE_TULIP to null,
-    Material.WHITE_TULIP to null,
-    Material.PINK_TULIP to null,
-    Material.OXEYE_DAISY to null,
-    Material.LILY_OF_THE_VALLEY to null,
-    Material.WITHER_ROSE to null,
-    Material.CORNFLOWER to null,
+    Material.DANDELION to "block/dandelion",
+    Material.POPPY to "block/poppy",
+    Material.BLUE_ORCHID to "block/blue_orchid",
+    Material.ALLIUM to "block/allium",
+    Material.AZURE_BLUET to "block/azure_bluet",
+    Material.RED_TULIP to "block/red_tulip",
+    Material.ORANGE_TULIP to "block/orange_tulip",
+    Material.WHITE_TULIP to "block/white_tulip",
+    Material.PINK_TULIP to "block/pink_tulip",
+    Material.OXEYE_DAISY to "block/oxeye_daisy",
+    Material.LILY_OF_THE_VALLEY to "block/lily_of_the_valley",
+    Material.WITHER_ROSE to "block/wither_rose",
+    Material.CORNFLOWER to "block/cornflower",
     Material.SUNFLOWER to "block/sunflower_front",
     Material.LILAC to "block/lilac_top",
     Material.ROSE_BUSH to "block/rose_bush_top",
     Material.PEONY to "block/peony_top",
     
     // mushrooms
-    Material.BROWN_MUSHROOM to null,
-    Material.RED_MUSHROOM to null,
-    Material.CRIMSON_FUNGUS to null,
-    Material.WARPED_FUNGUS to null,
+    Material.BROWN_MUSHROOM to "block/brown_mushroom",
+    Material.RED_MUSHROOM to "block/red_mushroom",
+    Material.CRIMSON_FUNGUS to "block/crimson_fungus",
+    Material.WARPED_FUNGUS to "block/warped_fungus",
     
     // coral
-    Material.TUBE_CORAL to null,
-    Material.BRAIN_CORAL to null,
-    Material.BUBBLE_CORAL to null,
-    Material.FIRE_CORAL to null,
-    Material.HORN_CORAL to null,
-    Material.TUBE_CORAL_FAN to null,
-    Material.BRAIN_CORAL_FAN to null,
-    Material.BUBBLE_CORAL_FAN to null,
-    Material.FIRE_CORAL_FAN to null,
-    Material.HORN_CORAL_FAN to null,
-    Material.DEAD_BUBBLE_CORAL to null,
-    Material.DEAD_BRAIN_CORAL to null,
-    Material.DEAD_FIRE_CORAL to null,
-    Material.DEAD_HORN_CORAL to null,
-    Material.DEAD_TUBE_CORAL to null,
-    Material.DEAD_TUBE_CORAL_FAN to null,
-    Material.DEAD_BRAIN_CORAL_FAN to null,
-    Material.DEAD_BUBBLE_CORAL_FAN to null,
-    Material.DEAD_FIRE_CORAL_FAN to null,
-    Material.DEAD_HORN_CORAL_FAN to null,
+    Material.TUBE_CORAL to "block/tube_coral",
+    Material.BRAIN_CORAL to "block/brain_coral",
+    Material.BUBBLE_CORAL to "block/bubble_coral",
+    Material.FIRE_CORAL to "block/fire_coral",
+    Material.HORN_CORAL to "block/horn_coral",
+    Material.TUBE_CORAL_FAN to "block/tube_coral_fan",
+    Material.BRAIN_CORAL_FAN to "block/brain_coral_fan",
+    Material.BUBBLE_CORAL_FAN to "block/bubble_coral_fan",
+    Material.FIRE_CORAL_FAN to "block/fire_coral_fan",
+    Material.HORN_CORAL_FAN to "block/horn_coral_fan",
+    Material.DEAD_BUBBLE_CORAL to "block/dead_bubble_coral",
+    Material.DEAD_BRAIN_CORAL to "block/dead_brain_coral",
+    Material.DEAD_FIRE_CORAL to "block/dead_fire_coral",
+    Material.DEAD_HORN_CORAL to "block/dead_horn_coral",
+    Material.DEAD_TUBE_CORAL to "block/dead_tube_coral",
+    Material.DEAD_TUBE_CORAL_FAN to "block/dead_tube_coral_fan",
+    Material.DEAD_BRAIN_CORAL_FAN to "block/dead_brain_coral_fan",
+    Material.DEAD_BUBBLE_CORAL_FAN to "block/dead_bubble_coral_fan",
+    Material.DEAD_FIRE_CORAL_FAN to "block/dead_fire_coral_fan",
+    Material.DEAD_HORN_CORAL_FAN to "block/dead_horn_coral_fan",
     
     // glass pane
     Material.GLASS_PANE to "block/glass",
@@ -148,27 +148,27 @@ private val MATERIAL_TEXTURES = enumMapOf(
     Material.BLACK_STAINED_GLASS_PANE to "block/black_stained_glass",
     
     // amethyst
-    Material.SMALL_AMETHYST_BUD to null,
-    Material.MEDIUM_AMETHYST_BUD to null,
-    Material.LARGE_AMETHYST_BUD to null,
-    Material.AMETHYST_CLUSTER to null,
+    Material.SMALL_AMETHYST_BUD to "block/small_amethyst_bud",
+    Material.MEDIUM_AMETHYST_BUD to "block/medium_amethyst_bud",
+    Material.LARGE_AMETHYST_BUD to "block/large_amethyst_bud",
+    Material.AMETHYST_CLUSTER to "block/amethyst_cluster",
     
     // misc
-    Material.TORCH to null,
-    Material.REDSTONE_TORCH to null,
-    Material.SOUL_TORCH to null,
-    Material.LADDER to null,
+    Material.TORCH to "block/torch",
+    Material.REDSTONE_TORCH to "block/redstone_torch",
+    Material.SOUL_TORCH to "block/soul_torch",
+    Material.LADDER to "block/ladder",
     Material.CHAIN to "item/chain",
-    Material.IRON_BARS to null,
-    Material.LEVER to null,
-    Material.TRIPWIRE_HOOK to null,
-    Material.FROGSPAWN to null,
+    Material.IRON_BARS to "block/iron_bars",
+    Material.LEVER to "block/lever",
+    Material.TRIPWIRE_HOOK to "block/tripwire_hook",
+    Material.FROGSPAWN to "block/frogspawn",
     Material.STRING to "item/string",
-    Material.COBWEB to null,
+    Material.COBWEB to "block/cobweb",
     Material.BARRIER to "item/barrier",
     Material.STRUCTURE_VOID to "item/structure_void",
     Material.POINTED_DRIPSTONE to "item/pointed_dripstone",
-    Material.RAIL to null,
+    Material.RAIL to "block/rail",
     Material.REDSTONE_WIRE to "item/redstone",
     Material.BELL to "item/bell"
 )
@@ -189,7 +189,13 @@ private const val ASCENT = -4
 
 private val WAILA_ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
 
-internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(Resources::updateWailaDataLookup) {
+internal class WailaContent(
+    movedFontContent: MovedFontContent
+) : FontContent(
+    "nova:waila_textures_%s",
+    Resources::updateWailaDataLookup,
+    movedFontContent
+) {
     
     override val stage = ResourcePackBuilder.BuildingStage.POST_WORLD
     
@@ -215,7 +221,7 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
                     val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace}/${id.name}.png")
                     file.parent.createDirectories()
                     renderer.renderModelToFile(path.toString(), file)
-                    addFontEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"))
+                    addFontEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"), SIZE, ASCENT)
                     count++
                 } catch (e: Exception) {
                     LOGGER.log(Level.WARNING, "Failed to render $id ($path) ", e)
@@ -241,12 +247,12 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
         
         MATERIAL_TEXTURES.forEach { (material, texture) ->
             val name = material.name.lowercase()
-            val path = ResourcePath.of((texture ?: "block/$name") + ".png")
-            addFontEntry("minecraft:$name", copyMCTexture(path))
+            val path = ResourcePath.of("$texture.png")
+            addFontEntry("minecraft:$name", copyMCTexture(path), SIZE, ASCENT)
         }
         
         TEXTURES.forEach {
-            addFontEntry("minecraft:$it", copyMCTexture(ResourcePath("minecraft", "block/$it.png")))
+            addFontEntry("minecraft:$it", copyMCTexture(ResourcePath("minecraft", "block/$it.png")), SIZE, ASCENT)
         }
     }
     
@@ -266,7 +272,7 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
             val id = "$idNamespace:${file.nameWithoutExtension}"
             val path = ResourcePath(pack.namespace, "waila/${file.name}")
             
-            addFontEntry(id, path)
+            addFontEntry(id, path, SIZE, ASCENT)
         }
     }
     
@@ -278,15 +284,6 @@ internal class WailaContent : FontContent<FontChar, WailaContent.WailaIconData>(
                 return true
         }
         return false
-    }
-    
-    override fun createFontData(id: Int, char: Char, path: ResourcePath): WailaIconData =
-        WailaIconData("nova:waila_textures_$id", char, path, getWidth(SIZE, path))
-    
-    class WailaIconData(font: String, char: Char, path: ResourcePath, width: Int) : FontData<FontChar>(font, char, path, width) {
-        override val height = SIZE
-        override val ascent = ASCENT
-        override fun toFontInfo(): FontChar = FontChar(font, char, width)
     }
     
 }

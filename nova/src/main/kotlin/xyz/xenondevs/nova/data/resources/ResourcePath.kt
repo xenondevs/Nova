@@ -1,14 +1,33 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
+
 package xyz.xenondevs.nova.data.resources
 
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import java.io.File
+import java.io.FileNotFoundException
+import java.nio.file.Path
+import kotlin.io.path.exists
 
 data class ResourcePath(val namespace: String, val path: String) {
     
     private val id = "$namespace:$path"
     
-    fun getFile(assetsDir: File, extraPath: String, extension: String? = null): File {
-        return File(assetsDir, "$namespace/$extraPath/$path" + if (extension != null) ".$extension" else "")
+    fun getFile(assetsDir: File, extraPath: String? = null, extension: String? = null): File {
+        return File(assetsDir, "$namespace/${extraPath ?: ""}/$path" + (extension?.let { ".$it" } ?: ""))
+    }
+    
+    fun getPath(assetsDir: Path, extraPath: String? = null, extension: String? = null): Path {
+        return assetsDir.resolve("$namespace/${extraPath ?: ""}/$path" + (extension?.let { ".$it" } ?: ""))
+    }
+    
+    internal fun findInAssetsOrNull(extraPath: String? = null, extension: String? = null): Path? {
+        return getPath(ResourcePackBuilder.MCASSETS_ASSETS_DIR, extraPath, extension).takeIf(Path::exists)
+            ?: getPath(ResourcePackBuilder.ASSETS_DIR, extraPath, extension).takeIf(Path::exists)
+    }
+    
+    internal fun findInAssets(extraPath: String? = null, extension: String? = null): Path {
+        return findInAssetsOrNull(extraPath, extension)
+            ?: throw FileNotFoundException("Could not find resource $id (extraPath: $extraPath, extension: $extension)")
     }
     
     override fun equals(other: Any?): Boolean {
