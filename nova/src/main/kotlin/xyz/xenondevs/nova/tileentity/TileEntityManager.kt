@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.runAsyncTaskTimerSynchronized
+import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
@@ -44,7 +44,7 @@ object TileEntityManager : Initializable(), ITileEntityManager {
         }
         
         runTaskTimer(0, 1) { handleTick(TileEntity::handleTick) }
-        runAsyncTaskTimerSynchronized(this, 0, 1) { handleTick(TileEntity::handleAsyncTick) }
+        runAsyncTaskTimer(0, 1) { handleTick(TileEntity::handleAsyncTick) }
     }
     
     @Synchronized
