@@ -63,8 +63,12 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
     }
     
     fun init() {
-        if (file.length() != 0L) {
-            readFile(DataInputStream(file.inputStream()))
+        try {
+            if (file.length() != 0L) {
+                readFile(DataInputStream(file.inputStream()))
+            }
+        } catch (e: Exception) {
+            throw IllegalStateException("Could not initialize region file $file", e)
         }
     }
     
