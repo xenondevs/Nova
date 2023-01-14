@@ -79,12 +79,12 @@ sealed interface FoodOptions {
         ALWAYS_EATABLE(VanillaMaterialProperty.CONSUMABLE_ALWAYS)
     }
     
-    companion object : MaterialOptionsType<FoodOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): FoodOptions =
+        fun configurable(material: ItemNovaMaterial): FoodOptions =
             ConfigurableFoodOptions(material)
         
-        override fun configurable(path: String): FoodOptions =
+        fun configurable(path: String): FoodOptions =
             ConfigurableFoodOptions(path)
         
     }
@@ -92,12 +92,12 @@ sealed interface FoodOptions {
 }
 
 private class HardcodedFoodOptions(
-     type: FoodType,
-     consumeTime: Int,
-     nutrition: Int,
-     saturationModifier: Float,
-     instantHealth: Double,
-     effects: List<PotionEffect>?
+    type: FoodType,
+    consumeTime: Int,
+    nutrition: Int,
+    saturationModifier: Float,
+    instantHealth: Double,
+    effects: List<PotionEffect>?
 ) : FoodOptions {
     override val typeProvider = provider(type)
     override val consumeTimeProvider = provider(consumeTime)

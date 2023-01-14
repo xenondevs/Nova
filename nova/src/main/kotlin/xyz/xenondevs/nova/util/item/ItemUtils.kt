@@ -14,6 +14,7 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Tag
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -30,6 +31,7 @@ import xyz.xenondevs.nova.data.recipe.TagTest
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
@@ -108,6 +110,15 @@ val ItemStack.craftingRemainingItem: ItemStack?
             return novaMaterial.craftingRemainingItem?.get()
         
         return type.craftingRemainingItem?.let(::ItemStack)
+    }
+
+val ItemStack.equipSound: String?
+    get() {
+        val novaMaterial = novaMaterial
+        if (novaMaterial != null)
+            return novaMaterial.novaItem.getBehavior(Wearable::class)?.options?.equipSound
+        
+        return CraftMagicNumbers.getItem(type).equipSound?.location?.toString()
     }
 
 fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {

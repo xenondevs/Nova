@@ -117,7 +117,7 @@ internal class ResourcePackBuilder {
         
     }
     
-    private val soundOverrides = BlockSoundOverrides()
+    private val soundOverrides = SoundOverrides()
     private lateinit var basePacks: BasePacks
     private lateinit var assetPacks: List<AssetPack>
     private lateinit var contents: List<PackContent>

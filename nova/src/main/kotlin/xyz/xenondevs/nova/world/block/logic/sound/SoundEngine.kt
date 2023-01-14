@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.take
 
-internal object BlockSoundEngine : Listener {
+internal object SoundEngine : Listener {
     
     private val SOUND_OVERRIDES: HashSet<String> = PermanentStorage.retrieve("soundOverrides", ::HashSet)
     

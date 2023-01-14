@@ -1,20 +1,27 @@
 package xyz.xenondevs.nova.data
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
-fun NamespacedKey.toNamespacedId(): NamespacedId {
-    return NamespacedId(namespace, key)
-}
+val NamespacedKey.namespacedId: NamespacedId
+    get() = NamespacedId(namespace, key)
+
+@Deprecated("Use namespacedId property", ReplaceWith("namespacedId"))
+fun NamespacedKey.toNamespacedId() = namespacedId
 
 @Suppress("DEPRECATION")
 class NamespacedId(override val namespace: String, override val name: String) : INamespacedId {
     
     private val id = "$namespace:$name"
     
-    constructor(addon: Addon, name: String) : this(addon.description.id, name)
+    val namespacedKey: NamespacedKey
+        get() = NamespacedKey(namespace, name)
+    val resourceLocation: ResourceLocation
+        get() = ResourceLocation(namespace, name)
     
+    constructor(addon: Addon, name: String) : this(addon.description.id, name)
     constructor(name: String) : this("nova", name)
     
     init {
@@ -22,9 +29,8 @@ class NamespacedId(override val namespace: String, override val name: String) : 
         require(name.matches(PART_PATTERN)) { "Name \"$name\" does not match pattern $PART_PATTERN" }
     }
     
-    override fun toNamespacedKey(): NamespacedKey {
-        return NamespacedKey(namespace, name)
-    }
+    @Deprecated("Use namespacedKey property", ReplaceWith("namespacedKey"))
+    override fun toNamespacedKey() = namespacedKey
     
     fun toString(separator: String): String {
         return namespace + separator + name

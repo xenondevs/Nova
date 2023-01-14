@@ -109,6 +109,8 @@ internal object ReflectionRegistry {
     val BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD = getMethod(BrewingStandBlockEntity::class, true, "SRM(net.minecraft.world.level.block.entity.BrewingStandBlockEntity doBrew)", Level::class, BlockPos::class, NonNullList::class, BrewingStandBlockEntity::class)
     val ITEM_ENTITY_FIRE_IMMUNE_METHOD = getMethod(ItemEntity::class, false, "SRM(net.minecraft.world.entity.item.ItemEntity fireImmune)")
     val ITEM_IS_FIRE_RESISTANT_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item isFireResistant)")
+    val ITEM_STACK_GET_EQUIP_SOUND_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getEquipSound)")
+    val LIVING_ENTITY_PLAY_EQUIP_SOUND_METHOD = getMethod(LivingEntity::class, true, "SRM(net.minecraft.world.entity.LivingEntity playEquipSound)", MojangStack::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

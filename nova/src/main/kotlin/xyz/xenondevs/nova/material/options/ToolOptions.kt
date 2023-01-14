@@ -51,12 +51,12 @@ sealed interface ToolOptions {
     val canBreakBlocksInCreative: Boolean
         get() = canBreakBlocksInCreativeProvider.value
     
-    companion object : MaterialOptionsType<ToolOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): ToolOptions =
+        fun configurable(material: ItemNovaMaterial): ToolOptions =
             ConfigurableToolOptions(material)
         
-        override fun configurable(path: String): ToolOptions =
+        fun configurable(path: String): ToolOptions =
             ConfigurableToolOptions(path)
         
     }

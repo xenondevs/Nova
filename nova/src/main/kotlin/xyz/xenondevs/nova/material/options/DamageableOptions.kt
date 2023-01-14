@@ -33,12 +33,12 @@ sealed interface DamageableOptions {
     val repairIngredient: RecipeChoice?
         get() = repairIngredientProvider.value
     
-    companion object : MaterialOptionsType<DamageableOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): DamageableOptions =
+        fun configurable(material: ItemNovaMaterial): DamageableOptions =
             ConfigurableDamageableOptions(material)
         
-        override fun configurable(path: String): DamageableOptions =
+        fun configurable(path: String): DamageableOptions =
             ConfigurableDamageableOptions(path)
         
     }
@@ -46,10 +46,10 @@ sealed interface DamageableOptions {
 }
 
 private class HardcodedDamageableOptions(
-     maxDurability: Int,
-     itemDamageOnAttackEntity: Int,
-     itemDamageOnBreakBlock: Int,
-     repairIngredient: RecipeChoice?
+    maxDurability: Int,
+    itemDamageOnAttackEntity: Int,
+    itemDamageOnBreakBlock: Int,
+    repairIngredient: RecipeChoice?
 ) : DamageableOptions {
     override val durabilityProvider = provider(maxDurability)
     override val itemDamageOnAttackEntityProvider = provider(itemDamageOnAttackEntity)

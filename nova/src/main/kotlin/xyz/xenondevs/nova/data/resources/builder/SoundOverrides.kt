@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
 import org.bukkit.Material
 import org.bukkit.SoundGroup
 import xyz.xenondevs.nova.LOGGER
@@ -18,12 +20,25 @@ import kotlin.io.path.exists
 
 /**
  * Removes the break, hit, step and fall sounds for blocks used by Nova to display custom blocks (note block, mushroom blocks,
- * specified armor stand hitbox blocks) and copies them to the Nova namespace, so that they can be completely controlled by the server.
+ * specified armor stand hitbox blocks) and all armor equip sounds and copies them to the Nova namespace, so that they can be completely controlled by the server.
  */
-internal class BlockSoundOverrides {
+internal class SoundOverrides {
     
     private val soundGroups = HashSet<SoundGroup>()
     private val soundEvents = ArrayList<String>()
+    
+    init {
+        // Armor equip sounds
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_CHAIN)
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_DIAMOND)
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_ELYTRA)
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_GENERIC)
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_GOLD)
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_IRON)
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_LEATHER)
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_NETHERITE)
+        addSoundEvent(SoundEvents.ARMOR_EQUIP_TURTLE)
+    }
     
     fun useMaterial(material: Material) {
         val soundGroup = material.soundGroup
@@ -38,6 +53,10 @@ internal class BlockSoundOverrides {
         soundEvents += group.hitSound.key.key
         soundEvents += group.stepSound.key.key
         soundEvents += group.fallSound.key.key
+    }
+    
+    private fun addSoundEvent(event: SoundEvent) {
+        soundEvents += event.location.path
     }
     
     fun write() {

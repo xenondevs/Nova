@@ -15,12 +15,12 @@ sealed interface FuelOptions {
      */
     val burnTime: Int
     
-    companion object : MaterialOptionsType<FuelOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): FuelOptions =
+        fun configurable(material: ItemNovaMaterial): FuelOptions =
             ConfigurableFuelOptions(material)
         
-        override fun configurable(path: String): FuelOptions =
+        fun configurable(path: String): FuelOptions =
             ConfigurableFuelOptions(path)
         
     }
