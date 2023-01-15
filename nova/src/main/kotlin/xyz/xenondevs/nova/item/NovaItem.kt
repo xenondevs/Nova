@@ -35,7 +35,6 @@ import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getDoubleOrNull

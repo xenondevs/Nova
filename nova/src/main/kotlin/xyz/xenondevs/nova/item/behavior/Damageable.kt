@@ -15,8 +15,8 @@ import net.minecraft.world.item.ItemStack as MojangStack
 
 class Damageable(val options: DamageableOptions) : ItemBehavior() {
     
-    @Deprecated("Replaced by DamageableOptions", ReplaceWith("options.maxDurability"))
-    val maxDurability: Int by options.maxDurabilityProvider
+    @Deprecated("Replaced by DamageableOptions", ReplaceWith("options.durability"))
+    val durability: Int by options.durabilityProvider
     override val vanillaMaterialProperties = provider(listOf(VanillaMaterialProperty.DAMAGEABLE))
     
     //<editor-fold desc="Bukkit ItemStack methods", defaultstate="collapsed">
@@ -65,11 +65,11 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
     
     //<editor-fold desc="Compound methods", defaultstate="collapsed">
     fun getDamage(data: Compound): Int {
-        return min(options.maxDurability, data["damage"] ?: 0)
+        return min(options.durability, data["damage"] ?: 0)
     }
     
     fun setDamage(data: Compound, damage: Int) {
-        val coercedDamage = damage.coerceIn(0..options.maxDurability)
+        val coercedDamage = damage.coerceIn(0..options.durability)
         data["damage"] = coercedDamage
     }
     
@@ -78,22 +78,22 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
     }
     
     fun getDurability(data: Compound): Int {
-        return options.maxDurability - getDamage(data)
+        return options.durability - getDamage(data)
     }
     
     fun setDurability(data: Compound, durability: Int) {
-        setDamage(data, options.maxDurability - durability)
+        setDamage(data, options.durability - durability)
     }
     //</editor-fold>
     
     override fun updatePacketItemData(data: Compound, itemData: PacketItemData) {
         val damage = getDamage(data)
-        val durability = options.maxDurability - damage
+        val durability = options.durability - damage
         
-        itemData.durabilityBar = durability / options.maxDurability.toDouble()
+        itemData.durabilityBar = durability / options.durability.toDouble()
         
         itemData.addAdvancedTooltipsLore(
-            arrayOf(localized(ChatColor.WHITE, "item.durability", durability, options.maxDurability))
+            arrayOf(localized(ChatColor.WHITE, "item.durability", durability, options.durability))
         )
     }
     
