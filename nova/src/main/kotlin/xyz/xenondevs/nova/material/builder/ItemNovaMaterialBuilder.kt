@@ -11,7 +11,7 @@ open class ItemNovaMaterialBuilder internal constructor(addon: Addon, name: Stri
     
     override fun register(): ItemNovaMaterial {
         return NovaMaterialRegistry.register(
-            ItemNovaMaterial(id, localizedName, NovaItem(itemBehaviors), maxStackSize)
+            ItemNovaMaterial(id, localizedName, NovaItem(itemBehaviors), maxStackSize, craftingRemainingItem, isHidden)
         )
     }
     

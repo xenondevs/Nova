@@ -1,9 +1,14 @@
+@file:Suppress("FunctionName")
+
 package xyz.xenondevs.nova.item.behavior
 
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.inventory.ClickType
@@ -29,13 +34,20 @@ import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
+import xyz.xenondevs.nova.util.serverPlayer
 
-@Suppress("FunctionName")
-fun Wearable(type: ArmorType): ItemBehaviorFactory<Wearable> =
+fun Wearable(type: ArmorType, equipSound: Sound): ItemBehaviorFactory<Wearable> =
+    Wearable(type, equipSound.key.toString())
+
+fun Wearable(type: ArmorType, equipSound: SoundEvent): ItemBehaviorFactory<Wearable> =
+    Wearable(type, equipSound.location.toString())
+
+fun Wearable(type: ArmorType, equipSound: String? = null): ItemBehaviorFactory<Wearable> =
     object : ItemBehaviorFactory<Wearable>() {
         override fun create(material: ItemNovaMaterial): Wearable =
-            Wearable(WearableOptions.semiConfigurable(type, material))
+            Wearable(WearableOptions.configurable(type, equipSound, material))
     }
 
 class Wearable(val options: WearableOptions) : ItemBehavior() {
@@ -99,7 +111,8 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         ) {
             event.isCancelled = true
             player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
-            player.inventory.setItem(event.hand!!, null)
+            if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(event.hand!!, null)
+            callLivingEntityOnEquip(player, null, itemStack)
         }
     }
     
@@ -113,9 +126,9 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
             && !callArmorEquipEvent(player, EquipMethod.SWAP, currentItem, itemStack)
         ) {
             event.isCancelled = true
-            
             player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
             event.cursor = currentItem
+            callLivingEntityOnEquip(player, currentItem, itemStack)
         }
     }
     
@@ -129,6 +142,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
             event.isCancelled = true
             player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
             event.view.setItem(event.rawSlot, null)
+            callLivingEntityOnEquip(player, null, itemStack)
         }
     }
     
@@ -141,6 +155,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
             event.isCancelled = true
             player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
             player.inventory.setItem(event.hotbarButton, currentItem)
+            callLivingEntityOnEquip(player, currentItem, itemStack)
         }
     }
     
@@ -150,6 +165,10 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         return event.isCancelled
     }
     
+    private fun callLivingEntityOnEquip(player: Player, previous: ItemStack?, now: ItemStack?) {
+        player.serverPlayer.onEquipItem(options.armorType.equipmentSlot.nmsEquipmentSlot, previous.nmsCopy, now.nmsCopy)
+    }
+    
     override fun updatePacketItemData(data: Compound, itemData: PacketItemData) {
         val textureColor = textureColor
         if (textureColor != null) {
@@ -157,11 +176,6 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
             itemData.hide(HideableFlag.DYE)
         }
         textureColor?.let { itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", it) }
-    }
-    
-    companion object : ItemBehaviorFactory<Wearable>() {
-        override fun create(material: ItemNovaMaterial): Wearable =
-            Wearable(WearableOptions.configurable(material))
     }
     
 }

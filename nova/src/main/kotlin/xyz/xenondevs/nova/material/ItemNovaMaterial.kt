@@ -23,6 +23,7 @@ open class ItemNovaMaterial internal constructor(
     val localizedName: String,
     val novaItem: NovaItem,
     maxStackSize: Int = 64,
+    val craftingRemainingItem: ItemBuilder? = null,
     val isHidden: Boolean = false
 ) : INovaMaterial {
     

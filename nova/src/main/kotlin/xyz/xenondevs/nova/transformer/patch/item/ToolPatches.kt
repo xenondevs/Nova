@@ -1,5 +1,8 @@
 package xyz.xenondevs.nova.transformer.patch.item
 
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
 import org.objectweb.asm.Opcodes
@@ -26,6 +29,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
     override fun transform() {
         transformCraftBlockIsPreferredTool()
         transformPlayerAttack()
+        transformEnchantmentHelperGetKnockbackBonus()
     }
     
     /**
@@ -60,12 +64,29 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
     @JvmStatic
     fun canDoSweepAttack(itemStack: MojangStack): Boolean {
         val novaMaterial = itemStack.novaMaterial
-    
+        
         return if (novaMaterial != null) {
             novaMaterial.novaItem.getBehavior(Tool::class)?.options?.canSweepAttack ?: false
         } else {
             (ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory)?.canSweepAttack ?: false
         }
+    }
+    
+    /**
+     * Patches the EnchantmentHelper#getKnockbackBonus method to add the knockback bonus from Nova's tools.
+     */
+    private fun transformEnchantmentHelperGetKnockbackBonus() {
+        VirtualClassPath[ReflectionRegistry.ENCHANTMENT_HELPER_GET_KNOCKBACK_BONUS_METHOD].instructions = buildInsnList {
+            aLoad(0)
+            invokeStatic(getMethodByName(ToolPatches::class.java, false, "getKnockbackBonus"))
+            ireturn()
+        }
+    }
+    
+    @JvmStatic
+    fun getKnockbackBonus(entity: LivingEntity): Int {
+        return EnchantmentHelper.getEnchantmentLevel(Enchantments.KNOCKBACK, entity) +
+            (entity.mainHandItem.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.knockbackBonus ?: 0)
     }
     
 }

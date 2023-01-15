@@ -12,12 +12,12 @@ sealed interface ChargeableOptions {
     
     val maxEnergy: Long
     
-    companion object : MaterialOptionsType<ChargeableOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): ChargeableOptions =
+        fun configurable(material: ItemNovaMaterial): ChargeableOptions =
             ConfigurableChargeableOptions(material)
         
-        override fun configurable(path: String): ChargeableOptions =
+        fun configurable(path: String): ChargeableOptions =
             ConfigurableChargeableOptions(path)
         
     }

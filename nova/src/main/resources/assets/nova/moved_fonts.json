@@ -1,0 +1,8 @@
+{
+  "minecraft:default": {
+    "range": [-19, -1]
+  },
+  "nova:bossbar": {
+    "range": [-19, -1]
+  }
+}

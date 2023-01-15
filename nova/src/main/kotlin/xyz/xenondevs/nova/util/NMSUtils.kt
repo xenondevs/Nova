@@ -40,6 +40,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.util.Vector
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
@@ -79,8 +80,11 @@ val MojangStack.bukkitMirror: ItemStack
 val Location.blockPos: MojangBlockPos
     get() = MojangBlockPos(blockX, blockY, blockZ)
 
-val BlockPos.nmsPos: MojangBlockPos
-    get() = MojangBlockPos(x, y, z)
+val Location.vec3: Vec3
+    get() = Vec3(x, y, z)
+
+val Vector.vec3: Vec3
+    get() = Vec3(x, y, z)
 
 val MojangBlockPos.vec3: Vec3
     get() = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
@@ -133,6 +137,16 @@ val BlockFace.nmsDirection: Direction
         BlockFace.UP -> Direction.UP
         BlockFace.DOWN -> Direction.DOWN
         else -> throw UnsupportedOperationException()
+    }
+
+val Direction.blockFace: BlockFace
+    get() = when (this) {
+        Direction.NORTH -> BlockFace.NORTH
+        Direction.EAST -> BlockFace.EAST
+        Direction.SOUTH -> BlockFace.SOUTH
+        Direction.WEST -> BlockFace.WEST
+        Direction.UP -> BlockFace.UP
+        Direction.DOWN -> BlockFace.DOWN
     }
 
 val Attribute.nmsAttribute: MojangAttribute

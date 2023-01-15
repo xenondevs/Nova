@@ -6,7 +6,7 @@ val mojangMapped = project.hasProperty("mojang-mapped") || System.getProperty("m
 plugins {
     java
     kotlin("jvm") version libs.versions.kotlin
-    id("org.jetbrains.dokka") version "1.7.20"
+    id("org.jetbrains.dokka") version libs.versions.dokka
     id("xyz.xenondevs.jar-loader-gradle-plugin")
     id("xyz.xenondevs.specialsource-gradle-plugin") version "1.0.0"
     id("xyz.xenondevs.string-remapper-gradle-plugin") version "1.0.0"
@@ -29,7 +29,7 @@ dependencies {
     novaLoader(libs.bundles.minecraft.assets)
     novaLoader(libs.zip4j)
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
-    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.2")
+    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.4")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
     novaLoader("software.amazon.awssdk:s3:2.18.35")
     novaLoader("com.google.jimfs:jimfs:1.2")

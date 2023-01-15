@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ModelData
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
-import xyz.xenondevs.nova.data.resources.builder.BlockSoundOverrides
+import xyz.xenondevs.nova.data.resources.builder.SoundOverrides
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
@@ -41,7 +41,7 @@ private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("re
 
 internal class MaterialContent(
     private val basePacks: BasePacks,
-    private val soundOverrides: BlockSoundOverrides
+    private val soundOverrides: SoundOverrides
 ) : PackContent {
     
     override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD

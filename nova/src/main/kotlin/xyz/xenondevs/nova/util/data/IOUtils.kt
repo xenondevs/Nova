@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
 import xyz.xenondevs.nova.NOVA
+import java.awt.Dimension
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
 import java.io.Closeable
@@ -14,6 +15,7 @@ import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
+import kotlin.io.path.extension
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlin.math.max
@@ -222,6 +224,19 @@ inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
                 it.close()
             } catch (ignored: Exception) {
             }
+        }
+    }
+}
+
+internal fun Path.readImageDimensions(): Dimension {
+    inputStream().use { 
+        val imageIn = ImageIO.createImageInputStream(it)
+        val reader = ImageIO.getImageReadersBySuffix(extension).next()
+        try {
+            reader.input = imageIn
+            return Dimension(reader.getWidth(0), reader.getHeight(0))
+        } finally {
+            reader.dispose()
         }
     }
 }

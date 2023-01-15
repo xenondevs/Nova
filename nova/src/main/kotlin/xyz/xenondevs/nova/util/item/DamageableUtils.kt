@@ -79,7 +79,7 @@ object DamageableUtils {
         if (novaDamageable != null) {
             val newDamage = novaDamageable.getDamage(itemStack) + damage
             novaDamageable.setDamage(itemStack, newDamage)
-            if (newDamage >= novaDamageable.options.maxDurability)
+            if (newDamage >= novaDamageable.options.durability)
                 return null
         } else if (meta is Damageable && itemStack.type.maxDurability > 0) {
             meta.damage += damage
@@ -137,7 +137,7 @@ object DamageableUtils {
             
             val newDamage = novaDamageable.getDamage(novaCompound) + damage
             novaDamageable.setDamage(novaCompound, newDamage)
-            if (newDamage >= novaDamageable.options.maxDurability)
+            if (newDamage >= novaDamageable.options.durability)
                 broken = true
         } else if (itemStack.isDamageableItem) {
             if (entity is ServerPlayer)
@@ -176,7 +176,7 @@ object DamageableUtils {
     fun getMaxDurability(itemStack: ItemStack): Int {
         val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
-            return damageable.options.maxDurability
+            return damageable.options.durability
         }
         
         return itemStack.type.maxDurability.toInt()
@@ -222,7 +222,7 @@ object DamageableUtils {
     internal fun getMaxDurability(itemStack: MojangStack): Int {
         val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
-            return damageable.options.maxDurability
+            return damageable.options.durability
         }
         
         return itemStack.maxDamage

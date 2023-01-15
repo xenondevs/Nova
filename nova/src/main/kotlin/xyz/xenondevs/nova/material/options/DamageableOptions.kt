@@ -19,13 +19,13 @@ fun DamageableOptions(
 
 sealed interface DamageableOptions {
     
-    val maxDurabilityProvider: Provider<Int>
+    val durabilityProvider: Provider<Int>
     val itemDamageOnAttackEntityProvider: Provider<Int>
     val itemDamageOnBreakBlockProvider: Provider<Int>
     val repairIngredientProvider: Provider<RecipeChoice?>
     
-    val maxDurability: Int
-        get() = maxDurabilityProvider.value
+    val durability: Int
+        get() = durabilityProvider.value
     val itemDamageOnAttackEntity: Int
         get() = itemDamageOnAttackEntityProvider.value
     val itemDamageOnBreakBlock: Int
@@ -33,12 +33,12 @@ sealed interface DamageableOptions {
     val repairIngredient: RecipeChoice?
         get() = repairIngredientProvider.value
     
-    companion object : MaterialOptionsType<DamageableOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): DamageableOptions =
+        fun configurable(material: ItemNovaMaterial): DamageableOptions =
             ConfigurableDamageableOptions(material)
         
-        override fun configurable(path: String): DamageableOptions =
+        fun configurable(path: String): DamageableOptions =
             ConfigurableDamageableOptions(path)
         
     }
@@ -46,12 +46,12 @@ sealed interface DamageableOptions {
 }
 
 private class HardcodedDamageableOptions(
-     maxDurability: Int,
-     itemDamageOnAttackEntity: Int,
-     itemDamageOnBreakBlock: Int,
-     repairIngredient: RecipeChoice?
+    maxDurability: Int,
+    itemDamageOnAttackEntity: Int,
+    itemDamageOnBreakBlock: Int,
+    repairIngredient: RecipeChoice?
 ) : DamageableOptions {
-    override val maxDurabilityProvider = provider(maxDurability)
+    override val durabilityProvider = provider(maxDurability)
     override val itemDamageOnAttackEntityProvider = provider(itemDamageOnAttackEntity)
     override val itemDamageOnBreakBlockProvider = provider(itemDamageOnBreakBlock)
     override val repairIngredientProvider = provider(repairIngredient)
@@ -60,7 +60,7 @@ private class HardcodedDamageableOptions(
 @Suppress("UNCHECKED_CAST")
 private class ConfigurableDamageableOptions : ConfigAccess, DamageableOptions {
     
-    override val maxDurabilityProvider = getEntry<Int>("max_durability")
+    override val durabilityProvider = getEntry<Int>("durability", "max_durability")
     override val itemDamageOnAttackEntityProvider = getOptionalEntry<Int>("item_damage_on_attack_entity").orElse(0)
     override val itemDamageOnBreakBlockProvider = getOptionalEntry<Int>("item_damage_on_break_block").orElse(0)
     override val repairIngredientProvider = getOptionalEntry<Any>("repair_ingredient").map {

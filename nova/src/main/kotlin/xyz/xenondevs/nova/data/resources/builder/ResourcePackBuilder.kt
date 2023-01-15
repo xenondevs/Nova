@@ -22,12 +22,13 @@ import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Stage
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.AtlasContent
-import xyz.xenondevs.nova.data.resources.builder.content.GUIContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
-import xyz.xenondevs.nova.data.resources.builder.content.TextureIconContent
-import xyz.xenondevs.nova.data.resources.builder.content.WailaContent
 import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorContent
+import xyz.xenondevs.nova.data.resources.builder.content.font.GUIContent
+import xyz.xenondevs.nova.data.resources.builder.content.font.MovedFontContent
+import xyz.xenondevs.nova.data.resources.builder.content.font.TextureIconContent
+import xyz.xenondevs.nova.data.resources.builder.content.font.WailaContent
 import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.Version
@@ -116,7 +117,7 @@ internal class ResourcePackBuilder {
         
     }
     
-    private val soundOverrides = BlockSoundOverrides()
+    private val soundOverrides = SoundOverrides()
     private lateinit var basePacks: BasePacks
     private lateinit var assetPacks: List<AssetPack>
     private lateinit var contents: List<PackContent>
@@ -154,7 +155,15 @@ internal class ResourcePackBuilder {
                         mode = EXTRACTION_MODE,
                         logger = LOGGER
                     )
-                    downloader.downloadAssets()
+                    try {
+                        downloader.downloadAssets()
+                    } catch (ex: Exception) {
+                        throw IllegalStateException(buildString {
+                            append("Failed to download minecraft assets. Check your firewall settings.")
+                            if (EXTRACTION_MODE == ExtractionMode.GITHUB)
+                                append(" If your server can't access github.com in general, you can change \"minecraft_assets_source\" in the config to \"mojang\".")
+                        }, ex)
+                    }
                     PermanentStorage.store("minecraftAssetsVersion", Version.SERVER_VERSION)
                 }
             }
@@ -164,16 +173,23 @@ internal class ResourcePackBuilder {
             assetPacks = loadAssetPacks()
             LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
             
-            // init pre-world content
+            // init content
+            val movedFontContent = MovedFontContent()
             contents = listOf(
+                // pre-world
                 MaterialContent(basePacks, soundOverrides),
                 ArmorContent(basePacks),
                 GUIContent(),
                 LanguageContent(),
-                TextureIconContent(),
+                TextureIconContent(movedFontContent),
                 AtlasContent(),
-                WailaContent()
+                
+                // post-world
+                WailaContent(movedFontContent),
+                movedFontContent
             )
+            
+            // init pre-world content
             val preWorldContents = contents.filter { it.stage == BuildingStage.PRE_WORLD }
             preWorldContents.forEach(PackContent::init)
             

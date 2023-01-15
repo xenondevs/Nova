@@ -51,6 +51,12 @@ fun Location.advance(blockFace: BlockFace, stepSize: Double = 1.0) =
         blockFace.modZ.toDouble() * stepSize
     )
 
+fun Location.advance(axis: Axis, stepSize: Double = 1.0) = when (axis) {
+    Axis.X -> add(stepSize, 0.0, 0.0)
+    Axis.Y -> add(0.0, stepSize, 0.0)
+    Axis.Z -> add(0.0, 0.0, stepSize)
+}
+
 fun Location.setCoordinate(axis: Axis, coordinate: Double) {
     when (axis) {
         Axis.X -> x = coordinate

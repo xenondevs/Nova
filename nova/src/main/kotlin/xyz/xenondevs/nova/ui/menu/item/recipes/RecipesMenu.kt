@@ -74,7 +74,7 @@ fun Player.showUsages(id: String): Boolean {
 private class RecipesWindow(
     player: Player,
     private val id: Int,
-    recipes: Map<RecipeGroup, Iterable<RecipeContainer>>,
+    recipes: Map<RecipeGroup<*>, Iterable<RecipeContainer>>,
     info: String? = null
 ) : ItemMenu {
     
@@ -88,14 +88,17 @@ private class RecipesWindow(
     
     private val viewerUUID = player.uniqueId
     
-    private lateinit var currentType: RecipeGroup
+    private lateinit var currentType: RecipeGroup<*>
     
     private val mainGUI: SimpleTabGUI
     private lateinit var window: Window
     
     init {
-        val craftingTabs: List<Pair<RecipeGroup, GUI>> = recipes
-            .mapValues { (type, holderList) -> PagedRecipesGUI(holderList.map { holder -> type.getGUI(holder) }).gui }
+        @Suppress("UNCHECKED_CAST")
+        recipes as Map<RecipeGroup<Any>, Iterable<RecipeContainer>>
+        
+        val craftingTabs: List<Pair<RecipeGroup<*>, GUI>> = recipes
+            .mapValues { (type, containers) -> createPagedRecipesGUI(containers.map { container -> type.getGUI(container.recipe) }) }
             .map { it.key to it.value }
             .sortedBy { it.first }
         
@@ -161,7 +164,7 @@ private class RecipesWindow(
         return id
     }
     
-    private inner class CraftingTabItem(private val recipeGroup: RecipeGroup, tab: Int) : TabItem(tab) {
+    private inner class CraftingTabItem(private val recipeGroup: RecipeGroup<*>, tab: Int) : TabItem(tab) {
         
         override fun getItemProvider(gui: TabGUI) = recipeGroup.icon
         
@@ -223,14 +226,11 @@ private class RecipesWindow(
         
     }
     
-    private inner class PagedRecipesGUI(recipes: List<GUI>) {
-        
-        val gui: GUI = GUIBuilder(GUIType.PAGED_GUIs)
+    private fun createPagedRecipesGUI(recipes: List<GUI>): GUI =
+        GUIBuilder(GUIType.PAGED_GUIs)
             .setStructure(recipesGuiStructure)
             .setGUIs(recipes)
             .build()
-        
-    }
     
 }
 

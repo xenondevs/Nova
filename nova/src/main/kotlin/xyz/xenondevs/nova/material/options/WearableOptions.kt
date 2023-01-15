@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.material.options
 
 import xyz.xenondevs.nova.data.config.ConfigAccess
 import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.provider.orElse
 import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -13,8 +12,9 @@ fun WearableOptions(
     armorType: ArmorType,
     armor: Double = 0.0,
     armorToughness: Double = 0.0,
-    knockbackResistance: Double = 0.0
-): WearableOptions = HardcodedWearableOptions(armorType, armor, armorToughness, knockbackResistance)
+    knockbackResistance: Double = 0.0,
+    equipSound: String? = null
+): WearableOptions = HardcodedWearableOptions(armorType, armor, armorToughness, knockbackResistance, equipSound)
 
 sealed interface WearableOptions {
     
@@ -22,6 +22,7 @@ sealed interface WearableOptions {
     val armorProvider: Provider<Double>
     val armorToughnessProvider: Provider<Double>
     val knockbackResistanceProvider: Provider<Double>
+    val equipSoundProvider: Provider<String?>
     
     val armorType: ArmorType
         get() = armorTypeProvider.value
@@ -31,62 +32,51 @@ sealed interface WearableOptions {
         get() = armorToughnessProvider.value
     val knockbackResistance: Double
         get() = knockbackResistanceProvider.value
+    val equipSound: String?
+        get() = equipSoundProvider.value
     
-    companion object : MaterialOptionsType<WearableOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): WearableOptions =
-             ConfigurableWearableOptions(material)
+        fun configurable(armorType: ArmorType, equipSound: String?, material: ItemNovaMaterial): WearableOptions =
+            ConfigurableWearableOptions(armorType, equipSound, material)
         
-        override fun configurable(path: String): WearableOptions =
-            ConfigurableWearableOptions(path)
-        
-        fun semiConfigurable(armorType: ArmorType, material: ItemNovaMaterial): WearableOptions =
-            SemiConfigurableWearableOptions(armorType, material)
-        
-        fun semiConfigurable(armorType: ArmorType, path: String): WearableOptions =
-            SemiConfigurableWearableOptions(armorType, path)
+        fun configurable(armorType: ArmorType, equipSound: String?, path: String): WearableOptions =
+            ConfigurableWearableOptions(armorType, equipSound, path)
         
     }
     
 }
 
 private class HardcodedWearableOptions(
-     armorType: ArmorType,
-     armor: Double,
-     armorToughness: Double,
-     knockbackResistance: Double
+    armorType: ArmorType,
+    armor: Double,
+    armorToughness: Double,
+    knockbackResistance: Double,
+    equipSound: String?
 ) : WearableOptions {
     override val armorTypeProvider = provider(armorType)
     override val armorProvider = provider(armor)
     override val armorToughnessProvider = provider(armorToughness)
     override val knockbackResistanceProvider = provider(knockbackResistance)
+    override val equipSoundProvider = provider(equipSound)
 }
 
 private class ConfigurableWearableOptions : ConfigAccess, WearableOptions {
     
-    override val armorTypeProvider = getEntry<String>("armor_type").map { ArmorType.valueOf(it.uppercase()) }
-    override val armorProvider = getOptionalEntry<Double>("armor").orElse(0.0)
-    override val armorToughnessProvider = getOptionalEntry<Double>("armor_toughness").orElse(0.0)
-    override val knockbackResistanceProvider = getOptionalEntry<Double>("knockback_resistance").orElse(0.0)
-    
-    constructor(path: String) : super(path)
-    constructor(material: ItemNovaMaterial) : super(material)
-    
-}
-
-private class SemiConfigurableWearableOptions : ConfigAccess, WearableOptions {
-    
+    override val equipSoundProvider: Provider<String?>
     override val armorTypeProvider: Provider<ArmorType>
     override val armorProvider = getOptionalEntry<Double>("armor").orElse(0.0)
     override val armorToughnessProvider = getOptionalEntry<Double>("armor_toughness").orElse(0.0)
     override val knockbackResistanceProvider = getOptionalEntry<Double>("knockback_resistance").orElse(0.0)
     
-    constructor(armorType: ArmorType, path: String) : super(path) {
+    constructor(armorType: ArmorType, soundEvent: String?, path: String) : super(path) {
         this.armorTypeProvider = provider(armorType)
+        this.equipSoundProvider = provider(soundEvent)
     }
     
-    constructor(armorType: ArmorType, material: ItemNovaMaterial) : super(material) {
+    constructor(armorType: ArmorType, soundEvent: String?, material: ItemNovaMaterial) : super(material) {
         this.armorTypeProvider = provider(armorType)
+        this.equipSoundProvider = provider(soundEvent)
     }
     
 }

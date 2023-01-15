@@ -12,10 +12,6 @@ internal object ConfigExtractor {
     
     private val storedConfigs: HashMap<String, YamlConfiguration> = PermanentStorage.retrieve("storedConfigs", ::HashMap)
     
-    init {
-        NOVA.disableHandlers += { PermanentStorage.store("storedConfigs", storedConfigs) }
-    }
-    
     fun extract(configPath: String, data: ByteArray): YamlConfiguration {
         val file = File(NOVA.dataFolder, configPath)
         val internalCfg = YamlConfiguration.loadConfiguration(ByteArrayInputStream(data).reader())
@@ -86,5 +82,9 @@ internal object ConfigExtractor {
      */
     private fun checkEquality(value1: Any?, value2: Any?): Boolean =
         value1 == value2 || (value1 is List<*> && value2 is List<*> && value1.contentEquals(value2))
+    
+    internal fun saveStoredConfigs() {
+        PermanentStorage.store("storedConfigs", storedConfigs)
+    }
     
 }

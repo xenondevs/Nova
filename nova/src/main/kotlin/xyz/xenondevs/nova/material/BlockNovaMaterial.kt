@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.material
 
+import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -26,13 +27,14 @@ open class BlockNovaMaterial internal constructor(
     localizedName: String,
     novaItem: NovaItem,
     maxStackSize: Int,
+    craftingRemainingItem: ItemBuilder?,
     isHidden: Boolean,
     val novaBlock: NovaBlock<NovaBlockState>,
     options: BlockOptions,
     val properties: List<BlockPropertyType<*>>,
     val placeCheck: PlaceCheckFun?,
     val multiBlockLoader: MultiBlockLoader?
-) : ItemNovaMaterial(id, localizedName, novaItem, maxStackSize, isHidden) {
+) : ItemNovaMaterial(id, localizedName, novaItem, maxStackSize, craftingRemainingItem, isHidden) {
     
     val block: BlockModelData by lazy { Resources.getModelData(id).block!! }
     
