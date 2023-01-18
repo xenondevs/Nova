@@ -20,7 +20,6 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
@@ -31,12 +30,14 @@ import xyz.xenondevs.nova.data.recipe.NovaIdTest
 import xyz.xenondevs.nova.data.recipe.NovaNameTest
 import xyz.xenondevs.nova.data.recipe.TagTest
 import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTag
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.getCBFCompoundTag
 import xyz.xenondevs.nova.util.data.getOrPutCBFCompoundTag
 import xyz.xenondevs.nova.util.nmsCopy
@@ -137,8 +138,8 @@ fun ItemStack.takeUnlessEmpty(): ItemStack? =
 
 //<editor-fold desc="nova item data storage", defaultstate="collapsed">
 
-@PublishedApi
-internal var ItemStack.novaCompound: Compound
+//<editor-fold desc="BukkitStack - Nova Compound", defaultstate="collapsed">
+var ItemStack.novaCompound: NamespacedCompound
     get() {
         val unhandledTags = itemMeta!!.unhandledTags
         val tag = unhandledTags.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag) as? CBFCompoundTag
@@ -148,23 +149,24 @@ internal var ItemStack.novaCompound: Compound
         itemMeta!!.unhandledTags["nova_cbf"] = CBFCompoundTag(value)
     }
 
-@PublishedApi
-internal val ItemStack.novaCompoundOrNull: Compound?
+val ItemStack.novaCompoundOrNull: NamespacedCompound?
     get() = itemMeta?.unhandledTags?.getCBFCompoundTag("nova_cbf")?.compound
+//</editor-fold>
 
-@PublishedApi
-internal var MojangStack.novaCompound: Compound
+//<editor-fold desc="MojangStack - Nova Compound", defaultstate="collapsed">
+var MojangStack.novaCompound: NamespacedCompound
     get() = orCreateTag.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag).compound
     set(value) {
         orCreateTag.put("nova_cbf", CBFCompoundTag(value))
     }
 
-@PublishedApi
-internal val MojangStack.novaCompoundOrNull: Compound?
+val MojangStack.novaCompoundOrNull: NamespacedCompound?
     get() = tag?.getCBFCompoundTag("nova_cbf")?.compound
+//</editor-fold>
 
-@PublishedApi
-internal inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? {
+//<editor-fold desc="BukkitStack - retrieve", defaultstate="collapsed">
+inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? {
+    // TODO: Remove legacy support at some point
     //<editor-fold desc="legacy support", defaultstate="collapsed">
     val itemMeta = itemMeta
     val dataContainer = itemMeta?.persistentDataContainer
@@ -173,6 +175,7 @@ internal inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, 
         val value = dataContainer.get<T>(namespacedKey)
         if (value != null) {
             dataContainer.remove(namespacedKey)
+            storeData(namespace, key, value)
             return value
         }
         
@@ -180,7 +183,7 @@ internal inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, 
     }
     //</editor-fold>
     
-    return novaCompoundOrNull?.get<Compound>(namespace)?.get<T>(key)
+    return novaCompoundOrNull?.get(namespace, key)
 }
 
 inline fun <reified T : Any> ItemStack.retrieveData(key: NamespacedKey): T? {
@@ -194,9 +197,11 @@ inline fun <reified T : Any> ItemStack.retrieveData(id: NamespacedId): T? {
 inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? {
     return retrieveData(addon.description.id, key)
 }
+//</editor-fold>
 
-@PublishedApi
-internal inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
+//<editor-fold desc="BukkitStack - store", defaultstate="collapsed">
+inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
+    // TODO: Remove legacy support at some point
     //<editor-fold desc="legacy support", defaultstate="collapsed">
     val itemMeta = itemMeta
     val dataContainer = itemMeta?.persistentDataContainer
@@ -206,8 +211,62 @@ internal inline fun <reified T : Any> ItemStack.storeData(namespace: String, key
     }
     //</editor-fold>
     
-    novaCompound.getOrPut(namespace, ::Compound)[key] = data
+    novaCompound[namespace, key] = data
 }
+
+inline fun <reified T : Any> ItemStack.storeData(key: NamespacedKey, data: T?) {
+    storeData(key.namespace, key.key, data)
+}
+
+inline fun <reified T : Any> ItemStack.storeData(id: NamespacedId, data: T?) {
+    storeData(id.namespace, id.name, data)
+}
+
+inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) {
+    storeData(addon.description.id, key, data)
+}
+//</editor-fold>
+
+//<editor-fold desc="MojangStack - retrieve", defaultstate="collapsed">
+inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? {
+    // TODO: Remove legacy support at some point
+    // For legacy support, we convert the MojangStack to a Bukkit ItemStack to access the persistent data container
+    return bukkitMirror.retrieveData(namespace, key)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(key: NamespacedKey): T? {
+    return retrieveData(key.namespace, key.key)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(id: NamespacedId): T? {
+    return retrieveData(id.namespace, id.name)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? {
+    return retrieveData(addon.description.id, key)
+}
+//</editor-fold>
+
+//<editor-fold desc="MojangStack - store", defaultstate="collapsed">
+@PublishedApi
+internal inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
+    // TODO: Remove legacy support at some point
+    // For legacy support, we convert the MojangStack to a Bukkit ItemStack to access the persistent data container
+    bukkitMirror.storeData(namespace, key, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(key: NamespacedKey, data: T?) {
+    storeData(key.namespace, key.key, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(id: NamespacedId, data: T?) {
+    storeData(id.namespace, id.name, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) {
+    storeData(addon.description.id, key, data)
+}
+//</editor-fold>
 
 //</editor-fold>
 

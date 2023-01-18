@@ -69,11 +69,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         val SELF_UPDATE_REASON = object : UpdateReason {}
         
         @Deprecated("Legacy value")
-        internal val LEGACY_TILE_ENTITY_KEY_1 = NamespacedKey(NOVA, "tileEntity")
-        @Deprecated("Legacy value")
-        val LEGACY_TILE_ENTITY_KEY_2 = NamespacedKey(NOVA, "tileEntityData")
+        val LEGACY_TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntityData")
         
-        internal const val TILE_ENTITY_KEY = "tileEntity"
+        internal val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
     }
     
     override var legacyData: LegacyCompound? = blockState.legacyData

@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.item.behavior
 
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.provider.provider
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -64,29 +64,29 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
     //</editor-fold>
     
     //<editor-fold desc="Compound methods", defaultstate="collapsed">
-    fun getDamage(data: Compound): Int {
-        return min(options.durability, data["damage"] ?: 0)
+    fun getDamage(data: NamespacedCompound): Int {
+        return min(options.durability, data["nova", "damage"] ?: 0)
     }
     
-    fun setDamage(data: Compound, damage: Int) {
+    fun setDamage(data: NamespacedCompound, damage: Int) {
         val coercedDamage = damage.coerceIn(0..options.durability)
-        data["damage"] = coercedDamage
+        data["nova", "damage"] = coercedDamage
     }
     
-    fun addDamage(data: Compound, damage: Int) {
+    fun addDamage(data: NamespacedCompound, damage: Int) {
         setDamage(data, getDamage(data) + damage)
     }
     
-    fun getDurability(data: Compound): Int {
+    fun getDurability(data: NamespacedCompound): Int {
         return options.durability - getDamage(data)
     }
     
-    fun setDurability(data: Compound, durability: Int) {
+    fun setDurability(data: NamespacedCompound, durability: Int) {
         setDamage(data, options.durability - durability)
     }
     //</editor-fold>
     
-    override fun updatePacketItemData(data: Compound, itemData: PacketItemData) {
+    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
         val damage = getDamage(data)
         val durability = options.durability - damage
         

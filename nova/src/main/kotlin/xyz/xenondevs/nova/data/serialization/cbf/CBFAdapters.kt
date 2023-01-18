@@ -11,6 +11,7 @@ import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.instancecreator.InstanceCreator
 import xyz.xenondevs.cbf.security.CBFSecurityManager
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound.NamespacedCompoundBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ColorBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemFilterBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemStackBinaryAdapter
@@ -28,6 +29,7 @@ internal object CBFAdapters {
     
     fun register() {
         // binary adapters
+        registerBinaryAdapter(NamespacedCompound::class, NamespacedCompoundBinaryAdapter)
         registerBinaryAdapter(Color::class, ColorBinaryAdapter)
         registerBinaryAdapter(Location::class, LocationBinaryAdapter)
         registerBinaryAdapter(NamespacedKey::class, NamespacedKeyBinaryAdapter)

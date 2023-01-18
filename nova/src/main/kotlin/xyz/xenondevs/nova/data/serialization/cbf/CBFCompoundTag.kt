@@ -7,7 +7,6 @@ import net.minecraft.nbt.Tag
 import net.minecraft.nbt.TagType
 import net.minecraft.nbt.TagVisitor
 import xyz.xenondevs.cbf.CBF
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteReader
 import java.io.DataInput
 import java.io.DataOutput
@@ -42,9 +41,9 @@ internal object CBFCompoundTagType : TagType.VariableSize<CBFCompoundTag> {
     
 }
 
-internal class CBFCompoundTag(val compound: Compound) : Tag {
+internal class CBFCompoundTag(val compound: NamespacedCompound) : Tag {
     
-    constructor() : this(Compound())
+    constructor() : this(NamespacedCompound())
     
     override fun getId(): Byte = 7 // byte array
     override fun getType(): TagType<CBFCompoundTag> = CBFCompoundTagType

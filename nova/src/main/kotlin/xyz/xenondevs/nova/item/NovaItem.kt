@@ -21,7 +21,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.configReloadable
@@ -29,6 +28,7 @@ import xyz.xenondevs.nova.data.provider.combinedLazyProvider
 import xyz.xenondevs.nova.data.provider.flatten
 import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.Tool
@@ -109,7 +109,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     internal fun getPacketItemData(player: Player?, itemStack: MojangStack?): PacketItemData {
         val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag())
         
-        behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompound ?: Compound(), itemData) }
+        behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompound ?: NamespacedCompound(), itemData) }
         if (itemStack != null) itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
         if (itemData.name == null) itemData.name = this.name
         

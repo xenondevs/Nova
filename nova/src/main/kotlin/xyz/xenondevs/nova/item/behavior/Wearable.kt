@@ -16,11 +16,11 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.provider.combinedProvider
 import xyz.xenondevs.nova.data.provider.lazyProviderWrapper
 import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
@@ -169,7 +169,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         player.serverPlayer.onEquipItem(options.armorType.equipmentSlot.nmsEquipmentSlot, previous.nmsCopy, now.nmsCopy)
     }
     
-    override fun updatePacketItemData(data: Compound, itemData: PacketItemData) {
+    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
         val textureColor = textureColor
         if (textureColor != null) {
             itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", textureColor)

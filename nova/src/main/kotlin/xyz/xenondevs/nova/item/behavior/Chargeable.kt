@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.item.behavior
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.provider.provider
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -62,8 +62,8 @@ class Chargeable(
     //</editor-fold>
     
     //<editor-fold desc="Compound methods", defaultstate="collapsed">
-    fun getEnergy(data: Compound): Long {
-        val currentEnergy = data["energy"] ?: 0L
+    fun getEnergy(data: NamespacedCompound): Long {
+        val currentEnergy = data["nova", "energy"] ?: 0L
         if (currentEnergy > options.maxEnergy) {
             setEnergy(data, options.maxEnergy)
             return options.maxEnergy
@@ -71,11 +71,11 @@ class Chargeable(
         return currentEnergy
     }
     
-    fun setEnergy(data: Compound, energy: Long) {
-        data["energy"] = energy.coerceIn(0, options.maxEnergy)
+    fun setEnergy(data: NamespacedCompound, energy: Long) {
+        data["nova", "energy"] = energy.coerceIn(0, options.maxEnergy)
     }
     
-    fun addEnergy(data: Compound, energy: Long) {
+    fun addEnergy(data: NamespacedCompound, energy: Long) {
         setEnergy(data, getEnergy(data) + energy)
     }
     //</editor-fold>
@@ -85,7 +85,7 @@ class Chargeable(
         return itemBuilder
     }
     
-    override fun updatePacketItemData(data: Compound, itemData: PacketItemData) {
+    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
         val energy = getEnergy(data)
         
         itemData.addLore(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, options.maxEnergy)))

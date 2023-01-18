@@ -17,8 +17,8 @@ import net.minecraft.nbt.Tag
 import net.minecraft.nbt.TagType
 import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.cbf.CBF
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTag
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import java.util.stream.Stream
 
 object NBTUtils {
@@ -77,7 +77,7 @@ object NBTUtils {
     internal fun reserializeCBFCompoundTag(cbfTag: Any): CBFCompoundTag {
         val toByteArrayMethod = cbfTag::class.java.getMethod("compoundToByteArray")
         val serializedCBFCompound = toByteArrayMethod.invoke(cbfTag) as ByteArray
-        return CBFCompoundTag(CBF.read<Compound>(serializedCBFCompound)!!)
+        return CBFCompoundTag(CBF.read<NamespacedCompound>(serializedCBFCompound)!!)
     }
     
 }
