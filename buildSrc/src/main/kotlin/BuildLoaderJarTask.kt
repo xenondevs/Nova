@@ -61,7 +61,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         // update plugin.yml
         val pluginYml = zip.getInputStream(zip.getFileHeader("plugin.yml"))
             .use { YamlConfiguration.loadConfiguration(InputStreamReader(it)) }
-        setLibraries(pluginYml, "spigotLoader")
+        setLibraries(pluginYml, "spigotLoader", false)
         zip.addStream(
             pluginYml.saveToString().byteInputStream(),
             ZipParameters().apply { fileNameInZip = "plugin.yml" }
@@ -75,7 +75,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         val customOutDir = (project.findProperty("outDir") as? String)?.let(::File)
             ?: System.getProperty("outDir")?.let(::File)
             ?: return
-        customOutDir.mkdirs() 
+        customOutDir.mkdirs()
         val copyTo = File(customOutDir, outFile.name)
         outFile.inputStream().use { ins -> copyTo.outputStream().use { out -> ins.copyTo(out) } }
     }
@@ -90,14 +90,14 @@ abstract class BuildLoaderJarTask : DefaultTask() {
             .apply { this -= MAVEN_CENTRAL }
             .toList() // Required for proper serialization
         
-        setLibraries(librariesYml, "novaLoader")
-        setExclusions(librariesYml, "spigotRuntime")
+        setLibraries(librariesYml, "novaLoader", true)
+        excludeConfiguration(librariesYml, "spigotRuntime")
         
         return librariesYml
     }
     
     @Suppress("SENSELESS_COMPARISON") // it isn't
-    private fun setLibraries(cfg: YamlConfiguration, configuration: String) {
+    private fun setLibraries(cfg: YamlConfiguration, configuration: String, writeExclusions: Boolean) {
         cfg["libraries"] = project.configurations.getByName(configuration)
             .incoming.dependencies.asSequence()
             .filterIsInstance<DefaultExternalModuleDependency>()
@@ -117,14 +117,24 @@ abstract class BuildLoaderJarTask : DefaultTask() {
                 
                 return@mapTo coords
             }
+        
+        if (writeExclusions) {
+            val exclusions = cfg.getStringList("exclusions")
+            exclusions += project.configurations.getByName(configuration).excludeRules.map { "${it.group}:${it.module}" }
+            cfg["exclusions"] = exclusions
+        }
     }
     
-    private fun setExclusions(cfg: YamlConfiguration, configuration: String) {
-        cfg["exclusions"] = project.configurations.getByName(configuration)
+    private fun excludeConfiguration(cfg: YamlConfiguration, configuration: String) {
+        val exclusions = cfg.getStringList("exclusions")
+        
+        exclusions += project.configurations.getByName(configuration)
             .incoming.artifacts.artifacts.asSequence()
             .map { it.variant.owner }
             .filterIsInstance<DefaultModuleComponentIdentifier>()
-            .mapTo(ArrayList()) { "${it.group}:${it.module}" }
+            .map { "${it.group}:${it.module}" }
+        
+        cfg["exclusions"] = exclusions
     }
     
     private fun getArtifactCoords(dependency: DefaultExternalModuleDependency): String {

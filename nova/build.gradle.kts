@@ -27,7 +27,6 @@ dependencies {
     compileOnly(project(":nova-loader"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
-    novaLoader(libs.zip4j)
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.4")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")

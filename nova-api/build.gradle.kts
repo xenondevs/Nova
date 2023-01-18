@@ -8,6 +8,7 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.bundles.kotlin)
     compileOnly(project(":nova-loader"))
     compileOnly(libs.spigot.api)
 }

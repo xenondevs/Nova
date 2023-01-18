@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.data.resources.builder.basepack
 
-import net.lingala.zip4j.ZipFile
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
@@ -11,11 +10,12 @@ import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorData
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
-import xyz.xenondevs.nova.util.data.extractAll
+import xyz.xenondevs.nova.util.data.openZip
 import java.io.File
 import java.nio.file.Path
 import java.util.logging.Level
 import kotlin.io.path.copyTo
+import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.extension
@@ -50,7 +50,7 @@ internal class BasePacks {
             if (it.isFile && it.extension.equals("zip", true)) {
                 val dir = ResourcePackBuilder.TEMP_BASE_PACKS_DIR.resolve("${it.nameWithoutExtension}-${StringUtils.randomString(5)}")
                 dir.createDirectories()
-                ZipFile(it).extractAll(dir)
+                it.openZip().copyToRecursively(dir, followLinks = false, overwrite = true)
                 
                 return@map dir
             }

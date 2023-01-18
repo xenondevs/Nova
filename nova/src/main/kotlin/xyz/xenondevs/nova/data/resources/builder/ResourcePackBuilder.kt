@@ -3,8 +3,6 @@ package xyz.xenondevs.nova.data.resources.builder
 import com.google.common.jimfs.Jimfs
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
-import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.model.FileHeader
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
@@ -32,20 +30,23 @@ import xyz.xenondevs.nova.data.resources.builder.content.font.WailaContent
 import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
 import xyz.xenondevs.nova.util.data.GSON
 import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.nova.util.data.extractDirectory
-import xyz.xenondevs.nova.util.data.extractFile
-import xyz.xenondevs.nova.util.data.fileExtension
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
+import xyz.xenondevs.nova.util.data.openZip
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.resourcepackobfuscator.ResourcePackObfuscator
 import java.io.File
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
+import kotlin.io.path.CopyActionResult
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.inputStream
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.outputStream
 import kotlin.io.path.relativeTo
 import kotlin.io.path.writeText
 
@@ -255,42 +256,47 @@ internal class ResourcePackBuilder {
     }
     
     private fun extractMinecraftAssets() {
-        val zip = ZipFile(NOVA.pluginFile)
-        zip.extractDirectory(
-            "assets/minecraft/",
-            MINECRAFT_ASSETS_DIR,
-            { _, relPath -> RESOURCE_FILTERS[Stage.ASSET_PACK]?.all { filter -> filter.allows("minecraft/$relPath") } ?: true },
-            { fh, ins, out -> if (fh.fileExtension == "png") PNGMetadataRemover.remove(ins, out) else ins.transferTo(out) }
-        )
+        val zip = NOVA.pluginFile.openZip()
+        zip.resolve("assets/minecraft/")
+            .copyToRecursively(
+                MINECRAFT_ASSETS_DIR,
+                followLinks = false,
+            ) { source, target ->
+                val relPath = target.relativeTo(MINECRAFT_ASSETS_DIR)
+                
+                if (RESOURCE_FILTERS[Stage.ASSET_PACK]?.all { filter -> filter.allows("minecraft/$relPath") } == false)
+                    return@copyToRecursively CopyActionResult.SKIP_SUBTREE
+                
+                source.inputStream().use { ins ->
+                    target.outputStream().use { out ->
+                        if (source.extension.equals("png", true))
+                            PNGMetadataRemover.remove(ins, out)
+                        else ins.transferTo(out)
+                    }
+                }
+                
+                CopyActionResult.CONTINUE
+            }
     }
     
     private fun loadAssetPacks(): List<AssetPack> {
         return buildList<Triple<String, File, String>> {
             this += AddonManager.loaders.map { (id, loader) -> Triple(id, loader.file, "assets/") }
             this += Triple("nova", NOVA.pluginFile, "assets/nova/")
-        }.map { (namespace, file, assetsPath) -> AssetPack(namespace, ZipFile(file), assetsPath) }
+        }.map { (namespace, file, assetsPath) ->
+            val zip = FileSystems.newFileSystem(file.toPath())
+            AssetPack(namespace, zip.getPath(assetsPath))
+        }
     }
     
     private fun extractResources(pack: AssetPack) {
         val namespace = pack.namespace
-        val namespaceDir = ASSETS_DIR.resolve(namespace)
-        
-        fun extractZipDir(fileHeader: FileHeader, directory: String) {
-            pack.zip.extractDirectory(
-                fileHeader, namespaceDir.resolve(directory),
-                { _, relPath ->
-                    contents.none { it.excludesPath(ResourcePath(namespace, "$directory/$relPath")) }
-                        && RESOURCE_FILTERS[Stage.ASSET_PACK]?.all { filter -> filter.allows("$namespace/$directory/$relPath") } ?: true
-                },
-                { fh, ins, out -> if (fh.fileExtension == "png") PNGMetadataRemover.remove(ins, out) else ins.transferTo(out) }
-            )
+        pack.extract(
+            ASSETS_DIR.resolve(namespace)
+        ) { relPath ->
+            contents.none { it.excludesPath(ResourcePath(namespace, relPath)) }
+                && RESOURCE_FILTERS[Stage.ASSET_PACK]?.all { filter -> filter.allows("$namespace/$relPath") } ?: true
         }
-        
-        pack.texturesDir?.let { extractZipDir(it, "textures") }
-        pack.modelsDir?.let { extractZipDir(it, "models") }
-        pack.fontsDir?.let { extractZipDir(it, "font") }
-        pack.soundsDir?.let { extractZipDir(it, "sounds") }
-        pack.soundsFile?.let { pack.zip.extractFile(it, namespaceDir.resolve("sounds.json")) }
     }
     
     private fun writeMetadata(assetPacks: Int, basePacks: Int) {
