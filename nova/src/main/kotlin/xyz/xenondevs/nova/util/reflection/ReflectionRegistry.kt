@@ -46,6 +46,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getConstructor
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import java.io.DataInput
+import java.security.ProtectionDomain
 import java.util.*
 import java.util.function.Consumer
 import kotlin.jvm.internal.CallableReference
@@ -115,6 +116,7 @@ internal object ReflectionRegistry {
     val ITEM_IS_FIRE_RESISTANT_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item isFireResistant)")
     val ITEM_STACK_GET_EQUIP_SOUND_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getEquipSound)")
     val LIVING_ENTITY_PLAY_EQUIP_SOUND_METHOD = getMethod(LivingEntity::class, true, "SRM(net.minecraft.world.entity.LivingEntity playEquipSound)", MojangStack::class)
+    val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

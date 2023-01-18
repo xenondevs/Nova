@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION", "MemberVisibilityCanBePrivate")
+
 package xyz.xenondevs.nova.material
 
 import net.md_5.bungee.api.ChatColor
@@ -41,16 +43,33 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.serialize
 import xyz.xenondevs.nova.util.data.serializeToNBT
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
-import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
-import java.util.*
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
-@Suppress("DEPRECATION")
+private val SHULKER_BOX_ITEMS = setOf(
+    Items.SHULKER_BOX,
+    Items.BLUE_SHULKER_BOX,
+    Items.BLACK_SHULKER_BOX,
+    Items.CYAN_SHULKER_BOX,
+    Items.BROWN_SHULKER_BOX,
+    Items.GREEN_SHULKER_BOX,
+    Items.GRAY_SHULKER_BOX,
+    Items.LIGHT_BLUE_SHULKER_BOX,
+    Items.LIGHT_GRAY_SHULKER_BOX,
+    Items.LIME_SHULKER_BOX,
+    Items.MAGENTA_SHULKER_BOX,
+    Items.ORANGE_SHULKER_BOX,
+    Items.PINK_SHULKER_BOX,
+    Items.PURPLE_SHULKER_BOX,
+    Items.RED_SHULKER_BOX,
+    Items.WHITE_SHULKER_BOX,
+    Items.YELLOW_SHULKER_BOX
+)
+
 internal object PacketItems : Initializable(), Listener {
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
@@ -320,7 +339,7 @@ internal object PacketItems : Initializable(), Listener {
     }
     
     private fun isContainerItem(item: MojangStack): Boolean {
-        return item.item == Items.BUNDLE || item.item in ItemUtils.SHULKER_BOX_ITEMS
+        return item.item == Items.BUNDLE || item.item in SHULKER_BOX_ITEMS
     }
     
     private fun getClientSideContainerItem(player: Player?, itemStack: MojangStack): MojangStack {
@@ -336,7 +355,7 @@ internal object PacketItems : Initializable(), Listener {
                 } else itemStack
             }
             
-            in ItemUtils.SHULKER_BOX_ITEMS -> {
+            in SHULKER_BOX_ITEMS -> {
                 val items = itemStack.tag
                     ?.getOrNull<CompoundTag>("BlockEntityTag")
                     ?.getOrNull<ListTag>("Items")

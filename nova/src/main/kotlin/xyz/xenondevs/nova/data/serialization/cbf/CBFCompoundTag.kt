@@ -59,6 +59,11 @@ internal class CBFCompoundTag(val compound: Compound) : Tag {
         out.write(bytes)
     }
     
+    @Suppress("unused") // Accessed via reflection
+    fun compoundToByteArray(): ByteArray {
+        return CBF.write(compound)
+    }
+    
     override fun accept(visitor: StreamTagVisitor): StreamTagVisitor.ValueResult {
         return visitor.visit(compound.toString())
     }

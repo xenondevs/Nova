@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.transformer.patch.item.FuelPatches
 import xyz.xenondevs.nova.transformer.patch.item.RemainingItemPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
-import xyz.xenondevs.nova.transformer.patch.nbt.NBTPatches
+import xyz.xenondevs.nova.transformer.patch.nbt.CBFCompoundTagPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
@@ -47,7 +47,7 @@ internal object Patcher : Initializable() {
         sequenceOf(
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
             StackSizePatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches, BroadcastPacketPatch,
-            NBTPatches,
+            CBFCompoundTagPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

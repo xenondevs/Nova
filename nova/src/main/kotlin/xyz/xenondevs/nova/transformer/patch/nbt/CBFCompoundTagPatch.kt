@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package xyz.xenondevs.nova.transformer.patch.nbt
 
 import net.minecraft.CrashReport
@@ -10,13 +12,13 @@ import net.minecraft.nbt.TagType
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTagType
-import xyz.xenondevs.nova.transformer.MultiTransformer
+import xyz.xenondevs.nova.transformer.ClassTransformer
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.io.DataInput
 import java.io.IOException
 
-internal object NBTPatches : MultiTransformer(setOf(CompoundTag::class), computeFrames = true) {
+internal object CBFCompoundTagPatch : ClassTransformer(CompoundTag::class, computeFrames = true) {
     
     override fun transform() {
         transformReadNamedTagData()
@@ -27,23 +29,23 @@ internal object NBTPatches : MultiTransformer(setOf(CompoundTag::class), compute
         method.localVariables.clear()
         method.tryCatchBlocks.clear()
         
-        method.instructions = buildInsnList { 
+        method.instructions = buildInsnList {
             aLoad(0)
             aLoad(1)
             aLoad(2)
             iLoad(3)
             aLoad(4)
-            invokeStatic(ReflectionUtils.getMethodByName(NBTPatches::class, false, "readNamedTagData"))
+            invokeStatic(ReflectionUtils.getMethodByName(CBFCompoundTagPatch::class, false, "readNamedTagData"))
             areturn()
         }
     }
     
     @JvmStatic
     fun readNamedTagData(type: TagType<*>, name: String, input: DataInput, depth: Int, accounter: NbtAccounter): Tag {
-         try {
-             if (type == ByteArrayTag.TYPE && name.endsWith("_cbf"))
-                 return CBFCompoundTagType.load(input, depth, accounter)
-             
+        try {
+            if (type == ByteArrayTag.TYPE && name.endsWith("_cbf"))
+                return CBFCompoundTagType.load(input, depth, accounter)
+            
             return type.load(input, depth, accounter)
         } catch (e: IOException) {
             val report = CrashReport.forThrowable(e, "Loading NBT data (Modified by Nova)")

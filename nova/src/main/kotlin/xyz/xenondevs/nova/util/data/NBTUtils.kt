@@ -16,6 +16,9 @@ import net.minecraft.nbt.StringTag
 import net.minecraft.nbt.Tag
 import net.minecraft.nbt.TagType
 import net.minecraft.world.item.ItemStack
+import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTag
 import java.util.stream.Stream
 
 object NBTUtils {
@@ -71,14 +74,20 @@ object NBTUtils {
         return tag.stream().map { ItemStack.of(it as CompoundTag) }
     }
     
+    internal fun reserializeCBFCompoundTag(cbfTag: Any): CBFCompoundTag {
+        val toByteArrayMethod = cbfTag::class.java.getMethod("compoundToByteArray")
+        val serializedCBFCompound = toByteArrayMethod.invoke(cbfTag) as ByteArray
+        return CBFCompoundTag(CBF.read<Compound>(serializedCBFCompound)!!)
+    }
+    
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T : Tag> CompoundTag.getOrPut(key: String, create: () -> T): T {
+fun <T : Tag> CompoundTag.getOrPut(key: String, defaultValue: () -> T): T {
     if (contains(key))
         return get(key) as T
     
-    val value = create()
+    val value = defaultValue()
     put(key, value)
     
     return value
@@ -89,4 +98,48 @@ fun <T : Tag> CompoundTag.getOrNull(key: String): T? {
     return if (contains(key)) {
         get(key) as? T
     } else null
+}
+
+internal fun CompoundTag.getOrPutCBFCompoundTag(key: String, defaultValue: () -> CBFCompoundTag): CBFCompoundTag {
+    var value = getCBFCompoundTag(key)
+    if (value != null)
+        return value
+    
+    value = defaultValue()
+    put(key, value)
+    
+    return value
+}
+
+internal fun CompoundTag.getCBFCompoundTag(key: String): CBFCompoundTag? {
+    val tag = get(key) ?: return null
+    if (tag !is CBFCompoundTag) {
+        val newTag = NBTUtils.reserializeCBFCompoundTag(tag)
+        put(key, newTag)
+        return newTag
+    }
+    
+    return tag
+}
+
+internal fun MutableMap<String, Tag>.getCBFCompoundTag(key: String): CBFCompoundTag? {
+    val tag = get(key) ?: return null
+    if (tag !is CBFCompoundTag) {
+        val newTag = NBTUtils.reserializeCBFCompoundTag(tag)
+        put(key, newTag)
+        return newTag
+    }
+    
+    return tag
+}
+
+internal fun MutableMap<String, Tag>.getOrPutCBFCompoundTag(key: String, defaultValue: () -> CBFCompoundTag): CBFCompoundTag {
+    var value = getCBFCompoundTag(key)
+    if (value != null)
+        return value
+    
+    value = defaultValue()
+    put(key, value)
+    
+    return value
 }
