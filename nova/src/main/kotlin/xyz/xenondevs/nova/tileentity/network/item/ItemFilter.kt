@@ -3,13 +3,14 @@ package xyz.xenondevs.nova.tileentity.network.item
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.persistentdata.getLegacy
-import xyz.xenondevs.nova.data.serialization.persistentdata.set
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter.Companion.ITEM_FILTER_KEY
 import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.retrieveData
+import xyz.xenondevs.nova.util.item.storeData
 
 private val LEGACY_ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
-private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter1")
 
 fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
     val itemMeta = itemMeta!!
@@ -23,15 +24,13 @@ fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
         return legacyFilter
     }
     
-    return container.get(ITEM_FILTER_KEY)
+    return retrieveData(ITEM_FILTER_KEY)
 }
 
 fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter = getFilterConfigOrNull() ?: ItemFilter(size)
 
 fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
-    val itemMeta = itemMeta!!
-    itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, itemFilter)
-    setItemMeta(itemMeta)
+    storeData(ITEM_FILTER_KEY, itemFilter)
 }
 
 class ItemFilter(
@@ -61,6 +60,7 @@ class ItemFilter(
     }
     
     companion object {
+        val ITEM_FILTER_KEY = NamespacedId(NOVA, "itemfilter1")
         lateinit var creatorFun: (ItemFilter) -> ItemStack
     }
     

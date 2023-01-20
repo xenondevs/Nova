@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.util.NumberFormatUtils
 internal class TileEntityItemBehavior : ItemBehavior() {
     
     override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
-        val tileEntityData: Compound? = data[TileEntity.TILE_ENTITY_KEY]
+        val tileEntityData: Compound? = data[TileEntity.TILE_ENTITY_DATA_KEY]
         
         if (tileEntityData != null) {
             val lore = ArrayList<Array<BaseComponent>>()

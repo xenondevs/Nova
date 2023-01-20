@@ -20,6 +20,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.serialization.DataHolder
@@ -71,7 +72,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         @Deprecated("Legacy value")
         val LEGACY_TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntityData")
         
-        internal val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
+        val TILE_ENTITY_DATA_KEY = NamespacedId(NOVA, "tileentity")
     }
     
     override var legacyData: LegacyCompound? = blockState.legacyData
@@ -158,7 +159,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             
             val item = material.createItemStack()
             if (globalData.isNotEmpty()) {
-                item.novaCompound[TILE_ENTITY_KEY] = globalData
+                item.novaCompound[TILE_ENTITY_DATA_KEY] = globalData
             }
             
             drops += item

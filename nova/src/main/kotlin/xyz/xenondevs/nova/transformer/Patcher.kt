@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
+import xyz.xenondevs.nova.transformer.patch.event.FakePlayerEventPreventionPatch
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
 import xyz.xenondevs.nova.transformer.patch.item.AttributePatch
 import xyz.xenondevs.nova.transformer.patch.item.DamageablePatches
@@ -47,7 +48,7 @@ internal object Patcher : Initializable() {
         sequenceOf(
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
             StackSizePatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches, BroadcastPacketPatch,
-            CBFCompoundTagPatch
+            CBFCompoundTagPatch, FakePlayerEventPreventionPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

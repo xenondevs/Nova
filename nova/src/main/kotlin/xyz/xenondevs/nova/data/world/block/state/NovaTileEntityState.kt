@@ -61,7 +61,7 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
         }
         //</editor-fold>
         
-        val globalData = item.novaCompoundOrNull?.get<Compound>(TileEntity.TILE_ENTITY_KEY)
+        val globalData = item.novaCompoundOrNull?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
         if (globalData != null) {
             data["global"] = globalData
         }

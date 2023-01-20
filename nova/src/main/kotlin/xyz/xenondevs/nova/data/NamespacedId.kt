@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
+import org.bukkit.plugin.Plugin
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
@@ -21,6 +22,7 @@ class NamespacedId(override val namespace: String, override val name: String) : 
     val resourceLocation: ResourceLocation
         get() = ResourceLocation(namespace, name)
     
+    constructor(plugin: Plugin, name: String) : this(plugin.name.lowercase(), name)
     constructor(addon: Addon, name: String) : this(addon.description.id, name)
     constructor(name: String) : this("nova", name)
     
