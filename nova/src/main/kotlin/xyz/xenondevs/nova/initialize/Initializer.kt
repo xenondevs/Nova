@@ -177,12 +177,8 @@ internal object Initializer : Listener {
     }
     
     private fun performAppropriateShutdown() {
-        if (Patcher.ENABLED) {
-            LOGGER.warning("Shutting down the server...")
-            Bukkit.shutdown()
-        } else {
-            Bukkit.getPluginManager().disablePlugin(NOVA.loader)
-        }
+        LOGGER.warning("Shutting down the server...")
+        Bukkit.shutdown()
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)

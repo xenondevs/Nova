@@ -9,8 +9,6 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
@@ -30,15 +28,14 @@ import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
 import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import java.lang.System.getProperty
 import java.lang.instrument.ClassDefinition
+import java.lang.management.ManagementFactory
 import java.lang.reflect.Field
 import java.util.logging.Level
 import kotlin.reflect.jvm.jvmName
-import kotlin.system.exitProcess
 
 internal object Patcher : Initializable() {
-    
-    val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("use_agent") }
     
     override val initializationStage = InitializationStage.PRE_WORLD
     override val dependsOn = emptySet<Initializable>()
@@ -55,25 +52,17 @@ internal object Patcher : Initializable() {
     private lateinit var classLoaderParentField: Field
     
     override fun init() {
-        if (!ENABLED) {
-            LOGGER.warning("Java agent is disabled. Some features will not work properly or at all.")
-            return
+        try {
+            LOGGER.info("Applying patches...")
+            VirtualClassPath.classLoaders += NOVA.loader.javaClass.classLoader.parent
+            redefineModule()
+            runTransformers()
+            classLoaderParentField = ReflectionUtils.getField(ClassLoader::class.java, true, "parent")
+            insertPatchedLoader()
+            undoReversiblePatches()
+        } catch (t: Throwable) {
+            throw PatcherException(t)
         }
-        
-        if (runCatching { INSTRUMENTATION }.isFailure) {
-            LOGGER.warning("Java agents aren't supported on this server! Disabling...")
-            DEFAULT_CONFIG["use_agent"] = false
-            NovaConfig.save("config")
-            return
-        }
-        
-        LOGGER.info("Applying patches...")
-        VirtualClassPath.classLoaders += NOVA.loader.javaClass.classLoader.parent
-        redefineModule()
-        runTransformers()
-        classLoaderParentField = ReflectionUtils.getField(ClassLoader::class.java, true, "parent")
-        insertPatchedLoader()
-        undoReversiblePatches()
     }
     
     override fun disable() {
@@ -123,29 +112,25 @@ internal object Patcher : Initializable() {
         try {
             INSTRUMENTATION.redefineClasses(*definitions)
         } catch (ex: LinkageError) {
-            LOGGER.severe("Failed to apply patches (LinkageError: $ex)! Trying to get more information...")
+            val errorMessages = ArrayList<String>()
             
-            var thrown = false
+            // tries to get more information by loading the classes using the ClassWrapperLoader instead of the instrumentation
             val classLoader = ClassWrapperLoader(javaClass.classLoader)
             definitions.forEach {
                 try {
                     classLoader.loadClass(VirtualClassPath[it.definitionClass]).methods
                 } catch (e: LinkageError) {
                     if (e.message?.contains(ClassWrapperLoader::class.jvmName) != true) {
-                        LOGGER.severe("${e::class.simpleName} for class ${it.definitionClass.internalName}:\n${e.message}")
-                        thrown = true
+                        errorMessages += "${e::class.simpleName} for class ${it.definitionClass.internalName}:\n${e.message}"
                     }
                 } catch (t: Throwable) {
-                    LOGGER.log(Level.SEVERE, "Failed to load class ${it.definitionClass.internalName}", t)
+                    LOGGER.log(Level.SEVERE, "Failed to load class while trying to obtain more information: ${it.definitionClass.internalName}", t)
                 }
             }
             
-            if (!thrown) {
-                LOGGER.log(Level.SEVERE, "Could not get more information, original stacktrace: ", ex)
-            }
-            
-            LOGGER.severe("Exiting server process...")
-            exitProcess(-1)
+            if (errorMessages.size > 0) {
+                throw PatchingException(errorMessages)
+            } else throw PatchingException(ex)
         }
     }
     
@@ -158,5 +143,19 @@ internal object Patcher : Initializable() {
         val spigotLoader = NOVA.loader.javaClass.classLoader.parent
         ReflectionUtils.setFinalField(classLoaderParentField, spigotLoader, spigotLoader.parent.parent)
     }
+    
+}
+
+private class PatcherException(t: Throwable) : Exception("""
+    JDK: ${getProperty("java.version")} by ${getProperty("java.vendor")}
+    JVM: ${getProperty("java.vm.name")}, ${getProperty("java.vm.version")} by ${getProperty("java.vm.vendor")}
+    Operating system: ${getProperty("os.name")}, ${getProperty("os.arch")}
+    Startup parameters: ${ManagementFactory.getRuntimeMXBean().inputArguments}
+""", t)
+
+private class PatchingException : Exception {
+    
+    constructor(messages: List<String>) : super("Failed to apply patches:\n${messages.joinToString("\n\n")}")
+    constructor(t: Throwable) : super("Failed to apply patches. Could not get more information.", t)
     
 }

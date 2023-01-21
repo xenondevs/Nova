@@ -46,11 +46,6 @@ resource_pack:
   # If players currently loading the resource pack should be frozen.
   freeze_loading_players: false
 
-# If Nova should use a java agent to self-attach and redefine methods.
-# This option will be automatically set to false if your jdk does not support java agents.
-# Disabling this will cause many of Nova's features (such as custom tools, custom stack sizes, proper block sounds, etc.) to stop working.
-use_agent: true
-
 # The render distance for fake (packet-based) entities from Nova, in chunks.
 # Note that the render distance is also limited by the entity render distance of the client.
 entity_render_distance:
