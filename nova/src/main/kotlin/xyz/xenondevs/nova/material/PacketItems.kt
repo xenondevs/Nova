@@ -238,8 +238,14 @@ internal object PacketItems : Initializable(), Listener {
             packetItemData.advancedTooltipsLore?.forEach { loreTag += it.withoutPreFormatting().serializeToNBT() }
             loreTag += coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serializeToNBT()
             
-            val cbfTagCount = itemStack.novaCompoundOrNull?.keys?.size ?: 0
-            val nbtTagCount = itemTag.allKeys.size - 1 // don't count 'nova' tag
+            var cbfTagCount = 0
+            var nbtTagCount = itemTag.allKeys.size - 1 // don't count 'nova' tag
+            
+            val novaCompound = itemStack.novaCompoundOrNull
+            if (novaCompound != null) {
+                cbfTagCount = novaCompound.keys.size
+                nbtTagCount -= 1 // don't count 'nova_cbf' tag
+            }
             
             if (cbfTagCount > 0)
                 loreTag += localized(ChatColor.DARK_GRAY, "item.cbf_tags", cbfTagCount).withoutPreFormatting().serializeToNBT()
