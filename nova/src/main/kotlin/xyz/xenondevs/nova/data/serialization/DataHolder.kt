@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.data.serialization
 
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.nova.data.provider.MutableProvider
+import xyz.xenondevs.commons.provider.mutable.MutableProvider
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.TileEntity
 import java.lang.reflect.Type
@@ -140,7 +140,7 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
         }
         
         override fun setValue(value: T) {
-            this.value = value
+            this._value = value
         }
         
         fun save() {

@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network.energy.holder
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.provider.Provider
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
@@ -16,6 +16,7 @@ sealed class NovaEnergyHolder(
     final override val endPoint: NetworkedTileEntity,
     defaultMaxEnergy: Provider<Long>,
     protected val upgradeHolder: UpgradeHolder?,
+    private val energyUpgradeType: UpgradeType<Double>?,
     lazyDefaultConfig: () -> EnumMap<BlockFace, NetworkConnectionType>
 ) : EnergyHolder {
     
@@ -64,8 +65,13 @@ sealed class NovaEnergyHolder(
         } else callUpdateHandlers()
     }
     
-    private fun calculateMaxEnergy(): Long =
-        (defaultMaxEnergy * (upgradeHolder?.getValue(UpgradeType.ENERGY) ?: 1.0)).toLong()
+    private fun calculateMaxEnergy(): Long {
+        if (upgradeHolder != null && energyUpgradeType != null) {
+            return (defaultMaxEnergy * (upgradeHolder.getValue(energyUpgradeType))).toLong()
+        }
+        
+        return defaultMaxEnergy
+    }
     
     private fun callUpdateHandlers() =
         updateHandlers.forEach { it() }

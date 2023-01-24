@@ -5,6 +5,7 @@ import de.studiocode.invui.virtualinventory.event.InventoryUpdatedEvent
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.SELF_UPDATE_REASON
@@ -21,15 +22,16 @@ private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
 
 class UpgradeHolder internal constructor(
     tileEntity: TileEntity,
-    val lazyGUI: Lazy<TileEntityGUI>,
+    internal val lazyGUI: Lazy<TileEntityGUI>,
     private val updateHandler: (() -> Unit)?,
-    vararg allowed: UpgradeType<*>
+    internal val allowed: Set<UpgradeType<*>>
 ) {
     
-    val material = tileEntity.material
-    val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handlePreInvUpdate); setInventoryUpdatedHandler(::handlePostInvUpdate) }
-    val allowed: Set<UpgradeType<*>> = allowed.toSet()
-    val upgrades: HashMap<UpgradeType<*>, Int> =
+    private val material = tileEntity.material
+    private val valueProviders: Map<UpgradeType<*>, ModifierProvider<*>> = allowed.associateWithTo(HashMap()) { ModifierProvider(it) }
+    
+    internal val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handlePreInvUpdate); setInventoryUpdatedHandler(::handlePostInvUpdate) }
+    internal val upgrades: HashMap<UpgradeType<*>, Int> =
         tileEntity.retrieveData<Map<NamespacedId, Int>>("upgrades", ::HashMap)
             .mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of<UpgradeType<*>>(it.key) }
     
@@ -75,6 +77,11 @@ class UpgradeHolder internal constructor(
         return type.getValue(material, amount)
     }
     
+    @Suppress("UNCHECKED_CAST")
+    fun <T> getValueProvider(type: UpgradeType<T>): Provider<T> {
+        return valueProviders[type] as Provider<T>
+    }
+    
     fun getLevel(type: UpgradeType<*>): Int {
         return upgrades[type] ?: 0
     }
@@ -83,7 +90,27 @@ class UpgradeHolder internal constructor(
         return type in upgrades
     }
     
-    fun getLimit(type: UpgradeType<*>): Int = min(type.getUpgradeValues(material).size - 1, 999)
+    fun getLimit(type: UpgradeType<*>): Int {
+        return min(type.getValueList(material).size - 1, 999)
+    }
+    
+    fun getUpgradeItems(): List<ItemStack> {
+        return upgrades.map { (type, amount) -> type.item.createItemStack(amount) }
+    }
+    
+    internal fun save(compound: Compound) {
+        compound["upgrades"] = upgrades.mapKeys { it.key.id }
+    }
+    
+    internal fun handleRemoved() {
+        valueProviders.values.forEach(ModifierProvider<*>::handleRemoved)
+    }
+    
+    private fun handleUpgradeUpdates() {
+        gui.updateUpgrades()
+        updateHandler?.invoke()
+        valueProviders.values.forEach(ModifierProvider<*>::update)
+    }
     
     private fun handlePreInvUpdate(event: ItemUpdateEvent) {
         if (event.updateReason == SELF_UPDATE_REASON || event.isRemove || event.newItemStack == null)
@@ -124,15 +151,22 @@ class UpgradeHolder internal constructor(
         }
     }
     
-    private fun handleUpgradeUpdates() {
-        gui.updateUpgrades()
-        updateHandler?.invoke()
-    }
-    
-    fun dropUpgrades() = upgrades.map { (type, amount) -> type.item.createItemStack(amount) }
-    
-    fun save(compound: Compound) {
-        compound["upgrades"] = upgrades.mapKeys { it.key.id }
+    private inner class ModifierProvider<T>(private val type: UpgradeType<T>) : Provider<T>() {
+        
+        private val parent = type.getValueListProvider(material)
+        
+        init {
+            parent.addChild(this)
+        }
+        
+        fun handleRemoved() {
+            parent.removeChild(this)
+        }
+        
+        override fun loadValue(): T {
+            return getValue(type)
+        }
+        
     }
     
 }

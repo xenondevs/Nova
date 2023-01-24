@@ -3,9 +3,9 @@
 package xyz.xenondevs.nova.data.config
 
 import org.bukkit.configuration.file.YamlConfiguration
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.orElse
-import xyz.xenondevs.nova.data.provider.requireNonNull
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.requireNonNull
 import xyz.xenondevs.nova.data.serialization.yaml.getLazilyEvaluated
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.util.reflection.type

@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.item.behavior
 
 import net.md_5.bungee.api.ChatColor
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.provider.provider
+import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty

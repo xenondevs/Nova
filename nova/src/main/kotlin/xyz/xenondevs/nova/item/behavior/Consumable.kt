@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
-import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType

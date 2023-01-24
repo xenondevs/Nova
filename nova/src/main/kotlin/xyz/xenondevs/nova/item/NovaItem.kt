@@ -21,12 +21,12 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.immutable.combinedLazyProvider
+import xyz.xenondevs.commons.provider.immutable.flatten
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.provider.combinedLazyProvider
-import xyz.xenondevs.nova.data.provider.flatten
-import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior

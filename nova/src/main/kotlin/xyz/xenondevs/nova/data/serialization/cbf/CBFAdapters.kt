@@ -19,9 +19,11 @@ import xyz.xenondevs.nova.data.serialization.cbf.adapter.LocationBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedIdBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedKeyBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NetworkTypeBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.UpgradeTypeBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.VirtualInventoryBinaryAdapter
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
+import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import java.awt.Color
 import kotlin.reflect.KClass
 
@@ -35,6 +37,7 @@ internal object CBFAdapters {
         registerBinaryAdapter(NamespacedKey::class, NamespacedKeyBinaryAdapter)
         registerBinaryAdapter(NamespacedId::class, NamespacedIdBinaryAdapter)
         registerBinaryAdapter(NetworkType::class, NetworkTypeBinaryAdapter)
+        registerBinaryAdapter(UpgradeType::class, UpgradeTypeBinaryAdapter)
         registerBinaryAdapter(VirtualInventory::class, VirtualInventoryBinaryAdapter)
         registerBinaryAdapter(ItemFilter::class, ItemFilterBinaryAdapter)
         

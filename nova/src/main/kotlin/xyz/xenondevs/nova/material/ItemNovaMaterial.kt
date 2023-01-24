@@ -5,8 +5,8 @@ import de.studiocode.invui.item.ItemWrapper
 import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.provider.lazyProvider
-import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.commons.provider.immutable.lazyProvider
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager

@@ -5,6 +5,10 @@ import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.model.FileHeader
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.combinedProvider
+import xyz.xenondevs.commons.provider.immutable.flatten
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
@@ -13,10 +17,6 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.combinedProvider
-import xyz.xenondevs.nova.data.provider.flatten
-import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Stage
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
@@ -111,7 +111,7 @@ internal class ResourcePackBuilder {
         val PACK_MCMETA_FILE: Path by PACK_MCMETA_FILE_PROVIDER
         //</editor-fold>
         
-        private val RESOURCE_FILTERS: Map<Stage, List<ResourceFilter>> by combinedProvider(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS)
+        private val RESOURCE_FILTERS: Map<Stage, List<ResourceFilter>> by combinedProvider(listOf(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS))
             .flatten()
             .map { filters -> filters.groupBy { filter -> filter.stage } }
         

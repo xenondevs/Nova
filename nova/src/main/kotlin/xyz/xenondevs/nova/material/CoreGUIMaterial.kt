@@ -65,6 +65,7 @@ object CoreGUIMaterial {
     val MINUS_BTN_ON = registerUnnamedHiddenCoreItem("gui_minus_btn_on")
     val PLUS_BTN_OFF = registerUnnamedHiddenCoreItem("gui_plus_btn_off")
     val PLUS_BTN_ON = registerUnnamedHiddenCoreItem("gui_plus_btn_on")
+    val UPGRADES_BTN = registerUnnamedHiddenCoreItem("gui_upgrades_btn", "menu.nova.upgrades")
     val SIDE_CONFIG_BTN = registerUnnamedHiddenCoreItem("gui_side_config_btn", "menu.nova.side_config")
     val ENERGY_BTN_OFF = registerUnnamedHiddenCoreItem("gui_energy_btn_off", "menu.nova.side_config.energy")
     val ENERGY_BTN_ON = registerUnnamedHiddenCoreItem("gui_energy_btn_on", "menu.nova.side_config.energy")
@@ -108,13 +109,5 @@ object CoreGUIMaterial {
     val TP_PIXEL_ARROW_LEFT_ON = registerUnnamedHiddenCoreItem("gui_tp_pixel_arrow_left_on")
     val TP_PIXEL_ARROW_RIGHT_OFF = registerUnnamedHiddenCoreItem("gui_tp_pixel_arrow_right_off")
     val TP_PIXEL_ARROW_RIGHT_ON = registerUnnamedHiddenCoreItem("gui_tp_pixel_arrow_right_on")
-    
-    // Might be moved to a separate addon in the future
-    val UPGRADES_BTN = registerUnnamedHiddenCoreItem("gui_upgrades_btn", "menu.nova.upgrades")
-    val SPEED_UPGRADE = registerUnnamedHiddenCoreItem("gui_speed_upgrade")
-    val EFFICIENCY_UPGRADE = registerUnnamedHiddenCoreItem("gui_efficiency_upgrade")
-    val ENERGY_UPGRADE = registerUnnamedHiddenCoreItem("gui_energy_upgrade")
-    val RANGE_UPGRADE = registerUnnamedHiddenCoreItem("gui_range_upgrade")
-    val FLUID_UPGRADE = registerUnnamedHiddenCoreItem("gui_fluid_upgrade")
     
 }

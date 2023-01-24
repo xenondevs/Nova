@@ -16,9 +16,8 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.provider.combinedProvider
-import xyz.xenondevs.nova.data.provider.lazyProviderWrapper
-import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.commons.provider.immutable.combinedProvider
+import xyz.xenondevs.commons.provider.immutable.lazyProviderWrapper
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
@@ -73,15 +72,15 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
     
     override val attributeModifiers = combinedProvider(
         options.armorTypeProvider, options.armorProvider, options.armorToughnessProvider, options.knockbackResistanceProvider
-    ).map {
-        val equipmentSlot = (it[0] as ArmorType).equipmentSlot.nmsEquipmentSlot
+    ) { armorType, armor, armorToughness, knockbackResistance ->
+        val equipmentSlot = armorType.equipmentSlot.nmsEquipmentSlot
         
-        return@map listOf(
+        listOf(
             AttributeModifier(
                 "Nova Armor (${novaMaterial.id}})",
                 Attributes.ARMOR,
                 Operation.ADDITION,
-                it[1] as Double,
+                armor,
                 true,
                 equipmentSlot
             ),
@@ -89,7 +88,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 "Nova Armor Toughness (${novaMaterial.id}})",
                 Attributes.ARMOR_TOUGHNESS,
                 Operation.ADDITION,
-                it[2] as Double,
+                armorToughness,
                 true,
                 equipmentSlot
             ),
@@ -97,7 +96,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 "Nova Knockback Resistance (${novaMaterial.id}})",
                 Attributes.KNOCKBACK_RESISTANCE,
                 Operation.ADDITION,
-                it[3] as Double,
+                knockbackResistance,
                 true,
                 equipmentSlot
             )

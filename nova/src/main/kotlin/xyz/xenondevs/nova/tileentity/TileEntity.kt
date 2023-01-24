@@ -19,10 +19,10 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
@@ -165,7 +165,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             drops += item
         }
         
-        if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
+        if (this is Upgradable) drops += this.upgradeHolder.getUpgradeItems()
         _inventories.forEach { (inv, global) -> if (!global) drops += inv.items.filterNotNull() }
         return drops
     }
@@ -208,6 +208,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         multiModels.forEach { it.close() }
         packetTasks.forEach { it.stop() }
         regions.values.forEach { VisualRegion.removeRegion(it.uuid) }
+        if (this is Upgradable) upgradeHolder.handleRemoved()
     }
     
     /**
@@ -227,7 +228,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder =
-        UpgradeHolder(this, gui!!, ::reload, *allowed)
+        UpgradeHolder(this, gui!!, ::reload, allowed.toHashSet())
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
@@ -276,13 +277,15 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     /**
      * Gets a [FluidContainer] for this [TileEntity].
      */
-    fun getFluidContainer(
+    @JvmName("getFluidContainerInternal")
+    private fun getFluidContainer(
         name: String,
         types: Set<FluidType>,
         capacity: Provider<Long>,
         defaultAmount: Long = 0,
         updateHandler: (() -> Unit)? = null,
         upgradeHolder: UpgradeHolder? = null,
+        upgradeType: UpgradeType<Double>? = null,
         global: Boolean = true
     ): FluidContainer {
         val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
@@ -300,13 +303,49 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             storedType = fluidData?.get<FluidType>("type")
         }
         
-        val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, storedAmount
-            ?: defaultAmount, capacity, upgradeHolder)
+        val container = NovaFluidContainer(
+            uuid,
+            types,
+            storedType ?: FluidType.NONE,
+            storedAmount ?: defaultAmount,
+            capacity,
+            upgradeHolder,
+            upgradeType
+        )
         
-        updateHandler?.apply(container.updateHandlers::add)
+        if (updateHandler != null)
+            container.updateHandlers += updateHandler
+        
         _fluidContainers[container] = global
         return container
     }
+    
+    /**
+     * Gets a [FluidContainer] for this [TileEntity].
+     */
+    fun getFluidContainer(
+        name: String,
+        types: Set<FluidType>,
+        capacity: Provider<Long>,
+        defaultAmount: Long = 0,
+        updateHandler: (() -> Unit)? = null,
+        upgradeHolder: UpgradeHolder,
+        upgradeType: UpgradeType<Double>,
+        global: Boolean = true
+    ) = getFluidContainer(name, types, capacity, defaultAmount, updateHandler, upgradeHolder as UpgradeHolder?, upgradeType as UpgradeType<Double>?, global)
+    
+    
+    /**
+     * Gets a [FluidContainer] for this [TileEntity].
+     */
+    fun getFluidContainer(
+        name: String,
+        types: Set<FluidType>,
+        capacity: Provider<Long>,
+        defaultAmount: Long = 0,
+        updateHandler: (() -> Unit)? = null,
+        global: Boolean = true
+    ) = getFluidContainer(name, types, capacity, defaultAmount, updateHandler, null, null, global)
     
     /**
      * Creates a new [StaticRegion] with a reloadable [size] under the name "default".

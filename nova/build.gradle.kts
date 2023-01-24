@@ -22,6 +22,8 @@ dependencies {
     novaLoaderApi("de.studiocode.invui:ResourcePack:0.10") { exclude("de.studiocode.invui", "InvUI") }
     novaLoaderApi("de.studiocode.invui:IA-R12:0.10:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.6:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs.commons:commons-provider:1.0-SNAPSHOT")
+    novaLoaderApi("xyz.xenondevs.commons:commons-reflection:1.0-SNAPSHOT")
     
     // internal dependencies
     compileOnly(project(":nova-loader"))

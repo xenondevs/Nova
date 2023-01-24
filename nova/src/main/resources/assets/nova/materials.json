@@ -86,11 +86,6 @@
     "gui_yellow_btn": "item/gui/btn/yellow",
     "gui_minus": "item/gui/minus",
     "gui_upgrades_btn": "item/gui/btn/upgrades",
-    "gui_speed_upgrade": "item/gui/upgrade/speed",
-    "gui_efficiency_upgrade": "item/gui/upgrade/efficiency",
-    "gui_energy_upgrade": "item/gui/upgrade/energy",
-    "gui_range_upgrade": "item/gui/upgrade/range",
-    "gui_fluid_upgrade": "item/gui/upgrade/fluid",
     "gui_tp_stopwatch": "item/gui/stopwatch",
     "gui_tp_color_picker": "item/gui/color_picker",
     "gui_tp_pixel_arrow_left_off": "item/gui/pixel_arrow_left_off",
@@ -153,10 +148,5 @@
             }
         }
     },
-    "wrench": "item/wrench",
-    "speed_upgrade": "item/upgrade/speed",
-    "efficiency_upgrade": "item/upgrade/efficiency",
-    "energy_upgrade": "item/upgrade/energy",
-    "range_upgrade": "item/upgrade/range",
-    "fluid_upgrade": "item/upgrade/fluid"
+    "wrench": "item/wrench"
 }
