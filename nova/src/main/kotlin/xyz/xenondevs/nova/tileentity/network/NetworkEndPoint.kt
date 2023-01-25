@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.data.serialization.DataHolder
-import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
 
 interface NetworkEndPoint : NetworkNode {
@@ -27,7 +27,7 @@ interface NetworkEndPoint : NetworkNode {
         networks.values.flatMap { networkMap -> networkMap.map { faceMap -> faceMap.key to faceMap.value } }
     
     fun getFaceMap(networkType: NetworkType): MutableMap<BlockFace, Network> {
-        return networks.getOrPut(networkType) { emptyEnumMap() }
+        return networks.getOrPut(networkType, ::enumMap)
     }
     
     fun setNetwork(networkType: NetworkType, face: BlockFace, network: Network) {
@@ -51,7 +51,7 @@ interface NetworkEndPoint : NetworkNode {
             return
         
         val serializedNetworks = networks.entries.associateTo (HashMap()) { entry ->
-            entry.key to entry.value.mapValuesTo(emptyEnumMap()) { it.value.uuid }
+            entry.key to entry.value.mapValuesTo(enumMap()) { it.value.uuid }
         }
         
         storeData("networks", serializedNetworks)

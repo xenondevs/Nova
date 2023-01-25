@@ -8,6 +8,10 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkUnloadEvent
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.collections.filterIsInstanceValues
+import xyz.xenondevs.commons.collections.flatMap
+import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
@@ -26,10 +30,6 @@ import xyz.xenondevs.nova.util.concurrent.ObservableLock
 import xyz.xenondevs.nova.util.concurrent.lockAndRun
 import xyz.xenondevs.nova.util.concurrent.mapToAllFuture
 import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
-import xyz.xenondevs.nova.util.emptyEnumMap
-import xyz.xenondevs.nova.util.filterIsInstanceValues
-import xyz.xenondevs.nova.util.flatMap
-import xyz.xenondevs.nova.util.pollFirst
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.serverTick
@@ -206,7 +206,7 @@ private class NetworkManagerImpl : NetworkManager {
                         
                         // only load chunks if the other queues are empty
                         while (chunkLoadQueue.isNotEmpty() && asyncQueue.isEmpty() && partialTaskQueue.isEmpty()) {
-                            val pos = chunkLoadQueue.pollFirst() ?: break
+                            val pos = chunkLoadQueue.poll() ?: break
                             lock.lockAndRun { loadChunk(pos) }
                         }
                     }
@@ -324,7 +324,7 @@ private class NetworkManagerImpl : NetworkManager {
         loadNetworkNode(endPoint)
         val serializedNetworks = endPoint.retrieveSerializedNetworks() ?: throw NoNetworkDataException()
         
-        val networks = emptyEnumMap<BlockFace, MutableList<Network>>()
+        val networks = enumMap<BlockFace, MutableList<Network>>()
         
         serializedNetworks.forEach { (networkType, faceMap) ->
             faceMap.forEach faces@{ (face, networkUUID) ->

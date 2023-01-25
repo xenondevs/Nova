@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.item.tool
 
 import org.bukkit.Material
+import xyz.xenondevs.commons.collections.associateWithNotNullTo
+import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.util.associateWithNotNullTo
-import xyz.xenondevs.nova.util.enumMapOf
 import java.util.function.Predicate
 
 object ToolCategoryRegistry {

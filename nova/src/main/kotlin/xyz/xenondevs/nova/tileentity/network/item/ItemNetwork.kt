@@ -1,13 +1,13 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.tileentity.network.*
 import xyz.xenondevs.nova.tileentity.network.item.channel.ItemNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
-import xyz.xenondevs.nova.util.getOrSet
 import java.util.*
 
 class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network {

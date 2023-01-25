@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.resources.builder.content.armor
 
+import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
@@ -12,7 +13,6 @@ import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredAr
 import xyz.xenondevs.nova.util.data.readImage
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.intValue
-import xyz.xenondevs.nova.util.isNotNullOrEmpty
 import java.awt.Color
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage

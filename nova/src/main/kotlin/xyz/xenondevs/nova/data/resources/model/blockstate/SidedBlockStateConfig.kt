@@ -4,8 +4,8 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.mapToBooleanArray
 import xyz.xenondevs.nova.util.MathUtils
-import xyz.xenondevs.nova.util.mapToBooleanArray
 
 private val POSSIBLE_FACES = arrayOf(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN)
 

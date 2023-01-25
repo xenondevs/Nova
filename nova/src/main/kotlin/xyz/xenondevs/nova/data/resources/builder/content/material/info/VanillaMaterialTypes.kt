@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.data.resources.builder.content.material.info
 
 import org.bukkit.Material
+import xyz.xenondevs.commons.collections.contentEquals
+import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.util.contentEquals
-import xyz.xenondevs.nova.util.enumMapOf
 
 internal object VanillaMaterialTypes {
     

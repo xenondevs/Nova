@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.addon.loader
 
+import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.nova.addon.AddonLogger
 import xyz.xenondevs.nova.loader.library.LibraryLoader
-import xyz.xenondevs.nova.util.pollFirst
 import java.net.URLClassLoader
 
 internal object LibraryLoaderPools {
@@ -14,7 +14,7 @@ internal object LibraryLoaderPools {
         
         val remaining = loaders.toMutableList()
         while (remaining.isNotEmpty()) {
-            pools += arrayListOf(remaining.pollFirst()!!)
+            pools += arrayListOf(remaining.poll()!!)
             
             remaining.removeIf { currentLoader ->
                 pools.forEach { pool ->

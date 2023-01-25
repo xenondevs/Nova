@@ -15,6 +15,7 @@ import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
@@ -23,7 +24,6 @@ import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.item.genericMaxHealth
 import xyz.xenondevs.nova.util.playSoundNearby
-import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send

@@ -14,10 +14,10 @@ import net.minecraft.network.chat.Component
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
 import org.bukkit.entity.Entity
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.util.localizedName
-import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.removeMinecraftFormatting
 
 private val DEFAULT_FONT_TEMPLATE = ComponentBuilder("").font("default").create()[0]

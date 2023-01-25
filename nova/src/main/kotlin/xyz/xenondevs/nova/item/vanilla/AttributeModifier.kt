@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.item.vanilla
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
-import xyz.xenondevs.nova.util.mapToArray
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.util.nmsAttribute
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.nmsOperation

@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -16,7 +17,6 @@ import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 

@@ -19,6 +19,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.NamespacedId
@@ -41,7 +42,6 @@ import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.LocationUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.center
-import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.getYaw
 import xyz.xenondevs.nova.util.hasInventoryOpen
 import xyz.xenondevs.nova.util.item.novaCompound
@@ -524,7 +524,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): EnumMap<BlockFace, NetworkConnectionType> {
         
         val sideFaces = sides.map(::getFace)
-        return CUBE_FACES.associateWithTo(emptyEnumMap()) {
+        return CUBE_FACES.associateWithTo(enumMap()) {
             if (it in sideFaces) type else NetworkConnectionType.NONE
         }
     }

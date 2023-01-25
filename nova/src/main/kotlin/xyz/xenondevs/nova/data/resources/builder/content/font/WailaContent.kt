@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.resources.builder.content.font
 
 import org.bukkit.Material
+import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
@@ -9,7 +10,6 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import java.util.logging.Level
 import kotlin.io.path.copyTo

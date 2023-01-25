@@ -7,7 +7,7 @@ import org.bukkit.entity.Animals
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Tameable
-import xyz.xenondevs.nova.util.enumMapOf
+import xyz.xenondevs.commons.collections.enumMapOf
 
 val LivingEntity.genericMaxHealth: Double
     get() = getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value

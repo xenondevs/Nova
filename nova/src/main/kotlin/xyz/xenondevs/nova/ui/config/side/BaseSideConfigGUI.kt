@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -21,7 +22,6 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
 import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.yaw
 
@@ -29,7 +29,7 @@ internal abstract class BaseSideConfigGUI<H : EndPointDataHolder>(
     val holder: H
 ) : SimpleGUI(9, 3) {
     
-    private val configItems = enumMapOf<BlockFace, MutableList<Item>>()
+    private val configItems = enumMap<BlockFace, MutableList<Item>>()
     
     fun registerConfigItem(blockFace: BlockFace, item: Item) {
         configItems.getOrPut(blockFace, ::ArrayList) += item

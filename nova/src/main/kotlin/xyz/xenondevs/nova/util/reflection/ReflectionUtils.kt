@@ -6,7 +6,7 @@ import jdk.internal.misc.Unsafe
 import org.bukkit.Bukkit
 import xyz.xenondevs.bytebase.jvm.ClassWrapper
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
-import xyz.xenondevs.nova.util.mapToArray
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_DEFINE_CLASS_METHOD
 import java.lang.reflect.Constructor

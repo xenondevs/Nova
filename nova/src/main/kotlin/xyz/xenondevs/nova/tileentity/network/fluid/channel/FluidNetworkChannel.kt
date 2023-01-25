@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.tileentity.network.fluid.channel
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.pollFirstWhere
+import xyz.xenondevs.commons.collections.selectValues
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
-import xyz.xenondevs.nova.util.getValues
-import xyz.xenondevs.nova.util.pollFirstWhere
 import java.util.*
 
 internal sealed interface FluidConfiguration {
@@ -28,7 +28,7 @@ private class DefaultFluidConfiguration(
         NetworkConnectionType.INSERT -> fluidHolder.insertPriorities
         NetworkConnectionType.EXTRACT -> fluidHolder.extractPriorities
         else -> throw IllegalArgumentException()
-    }.getValues(faces).maxOrNull()!!
+    }.selectValues(faces).maxOrNull()!!
     
     fun component1() = container
     fun component2() = priority
@@ -68,8 +68,8 @@ private class FluidBufferConfiguration(
     val bufferPriority: Int
     
     init {
-        val insertPriority = fluidHolder.insertPriorities.getValues(faces).maxOrNull()!!
-        val extractPriority = fluidHolder.extractPriorities.getValues(faces).maxOrNull()!!
+        val insertPriority = fluidHolder.insertPriorities.selectValues(faces).maxOrNull()!!
+        val extractPriority = fluidHolder.extractPriorities.selectValues(faces).maxOrNull()!!
         
         if (insertPriority != extractPriority) {
             if (insertPriority > extractPriority) {

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
@@ -28,7 +29,6 @@ import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.serialization.json.GSON
-import xyz.xenondevs.nova.util.mapToIntArray
 import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2

@@ -5,6 +5,7 @@ import de.studiocode.invui.virtualinventory.event.InventoryUpdatedEvent
 import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.commons.collections.mapKeysNotNullTo
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -12,7 +13,6 @@ import xyz.xenondevs.nova.tileentity.TileEntity.Companion.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.TileEntity.TileEntityGUI
 import xyz.xenondevs.nova.ui.UpgradesGUI
 import xyz.xenondevs.nova.util.item.novaMaterial
-import xyz.xenondevs.nova.util.mapKeysNotNullTo
 import kotlin.math.min
 
 private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
