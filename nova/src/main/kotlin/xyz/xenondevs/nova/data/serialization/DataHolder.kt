@@ -5,21 +5,25 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.TileEntity
-import java.lang.reflect.Type
+import kotlin.reflect.KType
+import kotlin.reflect.jvm.javaType
 
 abstract class DataHolder internal constructor(includeGlobal: Boolean) {
     
-    val dataAccessors = ArrayList<DataAccessor<*>>()
-    
-    abstract val data: Compound
-    val globalData: Compound by lazy {
+    @PublishedApi
+    internal val dataAccessors = ArrayList<DataAccessor<*>>()
+    @PublishedApi
+    internal abstract val data: Compound
+    @PublishedApi
+    internal val globalData: Compound by lazy {
         val global = data.get<Compound>("global")
         global ?: Compound().also { if (includeGlobal) data["global"] = it }
     }
     
-    open var legacyData: LegacyCompound? = null
-        internal set
-    val legacyGlobalData: LegacyCompound by lazy {
+    @PublishedApi
+    internal open var legacyData: LegacyCompound? = null
+    @PublishedApi
+    internal val legacyGlobalData: LegacyCompound by lazy {
         val global = legacyData?.get<LegacyCompound>("global")
         global ?: LegacyCompound().also { if (includeGlobal) legacyData?.set("global", it) }
     }
@@ -57,7 +61,7 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
      * If it can't find anything under the given key, the result of the
      * [getAlternative] lambda is returned.
      */
-    fun <T> retrieveData(type: Type, key: String, getAlternative: () -> T): T {
+    fun <T> retrieveData(type: KType, key: String, getAlternative: () -> T): T {
         return retrieveDataOrNull(type, key) ?: getAlternative()
     }
     
@@ -65,9 +69,9 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
      * Retrieves data of the specified [type] using CBF deserialization from the data [Compound].
      * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
      */
-    fun <T> retrieveDataOrNull(type: Type, key: String): T? {
+    fun <T> retrieveDataOrNull(type: KType, key: String): T? {
         if (legacyData != null)
-            return legacyData!!.get(type, key) ?: legacyGlobalData.get(type, key)
+            return legacyData!!.get(type.javaType, key) ?: legacyGlobalData.get(type.javaType, key)
         return data.get(type, key) ?: globalData.get(type, key)
     }
     

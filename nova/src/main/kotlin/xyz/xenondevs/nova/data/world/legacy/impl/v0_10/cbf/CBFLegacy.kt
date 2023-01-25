@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf
 
 import de.studiocode.invui.virtualinventory.VirtualInventory
@@ -6,6 +8,7 @@ import io.netty.buffer.Unpooled
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.reflection.rawType
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound.CompoundBinaryAdapterLegacy
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.*
@@ -13,8 +16,6 @@ import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.instancecreator.EnumM
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.util.data.toByteArray
-import xyz.xenondevs.nova.util.reflection.representedKClass
-import xyz.xenondevs.nova.util.reflection.type
 import java.awt.Color
 import java.lang.reflect.Type
 import java.util.*
@@ -111,7 +112,7 @@ object CBFLegacy {
     
     fun <T> read(type: Type, buf: ByteBuf): T? {
         if (buf.readBoolean()) {
-            val clazz = type.representedKClass
+            val clazz = type.rawType.kotlin
             val typeAdapter = getBinaryAdapter<T>(clazz)
             return typeAdapter.read(type, buf)
         }
@@ -141,7 +142,7 @@ object CBFLegacy {
     }
     
     fun <T> createInstance(type: Type): T? {
-        val clazz = type.representedKClass
+        val clazz = type.rawType.kotlin
         
         val creator = instanceCreators[clazz]
         if (creator != null)

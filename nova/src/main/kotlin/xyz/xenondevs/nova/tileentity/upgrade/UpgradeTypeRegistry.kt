@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.tileentity.upgrade
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.data.type
-import java.lang.reflect.Type
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @Suppress("UNCHECKED_CAST")
 object UpgradeTypeRegistry {
@@ -16,7 +16,7 @@ object UpgradeTypeRegistry {
     fun <T> register(
         addon: Addon, name: String,
         item: ItemNovaMaterial, icon: ItemNovaMaterial,
-        valueType: Type
+        valueType: KType
     ): UpgradeType<T> {
         val id = NamespacedId(addon.description.id, name)
         val type = UpgradeType<T>(id, item, icon, valueType)
@@ -27,7 +27,7 @@ object UpgradeTypeRegistry {
     inline fun <reified T> register(
         addon: Addon, name: String,
         item: ItemNovaMaterial, icon: ItemNovaMaterial
-    ) = register<T>(addon, name, item, icon, type<T>())
+    ) = register<T>(addon, name, item, icon, typeOf<T>())
     
     fun <T> of(id: NamespacedId): UpgradeType<T>? =
         _types[id] as? UpgradeType<T>

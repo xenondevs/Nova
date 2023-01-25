@@ -7,7 +7,7 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.item.novaCompound
-import java.lang.reflect.Type
+import kotlin.reflect.KType
 import net.minecraft.world.item.ItemStack as MojangStack
 
 internal sealed interface ItemStackLegacyConverter {
@@ -33,7 +33,7 @@ internal class ItemStackNamespaceConverter(
 }
 
 internal class ItemStackPersistentDataConverter(
-    private val type: Type,
+    private val type: KType,
     private val oldKey: NamespacedKey,
     private val newKey: NamespacedKey = oldKey
 ) : AllItemStackLegacyConverter {

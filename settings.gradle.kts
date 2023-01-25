@@ -12,7 +12,8 @@ dependencyResolutionManagement {
             version("dokka", "1.7.20")
             version("ktor", "2.2.2")
             version("spigot", "1.19.3-R0.1-SNAPSHOT")
-            version("cbf", "0.3")
+            version("cbf", "0.4")
+            version("xenondevs-commons", "1.0-SNAPSHOT")
             
             // lib - kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").versionRef("kotlin")
@@ -38,6 +39,10 @@ dependencyResolutionManagement {
             library("cosmic-binary-format", "xyz.xenondevs.cbf", "cosmic-binary-format").versionRef("cbf")
             library("cosmic-binary-format-netty-adapter", "xyz.xenondevs.cbf", "cosmic-binary-format-netty-adapter").versionRef("cbf")
             
+            // lib - xenondevs-commons
+            library("commons-provider", "xyz.xenondevs.commons", "commons-provider").versionRef("xenondevs-commons")
+            library("commons-reflection", "xyz.xenondevs.commons", "commons-reflection").versionRef("xenondevs-commons")
+            
             // lib - maven resolver
             library("maven-resolver-provider", "org.apache.maven:maven-resolver-provider:3.8.5")
             library("maven-resolver-connector-basic", "org.apache.maven.resolver:maven-resolver-connector-basic:1.8.2")
@@ -56,6 +61,7 @@ dependencyResolutionManagement {
             bundle("test", listOf("kotlin-test-junit", "junit-jupiter"))
             bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-netty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
             bundle("cbf", listOf("cosmic-binary-format", "cosmic-binary-format-netty-adapter"))
+            bundle("xenondevs-commons", listOf("commons-provider", "commons-reflection"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
             bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer", "resource-pack-obfuscator"))
             

@@ -6,7 +6,7 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.data.getOrNull
-import xyz.xenondevs.nova.util.data.type
+import kotlin.reflect.typeOf
 
 internal object ItemStackLegacyConversion {
     
@@ -26,19 +26,19 @@ internal object ItemStackLegacyConversion {
         ))
         
         registerConverter(ItemStackPersistentDataConverter(
-            type<Compound>(),
+            typeOf<Compound>(),
             NamespacedKey(NOVA, "tileEntityData"),
             NamespacedKey(NOVA, "tileentity")
         ))
         
         registerConverter(ItemStackPersistentDataConverter(
-            type<Long>(),
+            typeOf<Long>(),
             NamespacedKey(NOVA, "item_energy"),
             NamespacedKey(NOVA, "energy")
         ))
         
         registerConverter(ItemStackPersistentDataConverter(
-            type<Compound>(),
+            typeOf<Compound>(),
             NamespacedKey(NOVA, "damage"),
         ))
     }

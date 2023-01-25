@@ -6,10 +6,10 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import xyz.xenondevs.cbf.util.type
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
-import java.lang.reflect.Type
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class NamespacedCompound internal constructor(
     private val map: HashMap<String, Compound>
@@ -37,37 +37,37 @@ class NamespacedCompound internal constructor(
     }
     
     
-    fun <T> get(type: Type, namespace: String, key: String): T? {
+    fun <T> get(type: KType, namespace: String, key: String): T? {
         return map[namespace]?.get(type, key)
     }
     
-    fun <T> get(type: Type, id: NamespacedId): T? {
+    fun <T> get(type: KType, id: NamespacedId): T? {
         return get(type, id.namespace, id.name)
     }
     
-    fun <T> get(type: Type, key: NamespacedKey): T? {
+    fun <T> get(type: KType, key: NamespacedKey): T? {
         return get(type, key.namespace, key.key)
     }
     
-    fun <T> get(type: Type, addon: Addon, key: String): T? {
+    fun <T> get(type: KType, addon: Addon, key: String): T? {
         return get(type, addon.description.id, key)
     }
     
     
     inline operator fun <reified T> get(namespace: String, key: String): T? {
-        return get(type<T>(), namespace, key)
+        return get(typeOf<T>(), namespace, key)
     }
     
     inline operator fun <reified T> get(id: NamespacedId): T? {
-        return get(type<T>(), id)
+        return get(typeOf<T>(), id)
     }
     
     inline operator fun <reified T> get(key: NamespacedKey): T? {
-        return get(type<T>(), key)
+        return get(typeOf<T>(), key)
     }
     
     inline operator fun <reified T> get(addon: Addon, key: String): T? {
-        return get(type<T>(), addon, key)
+        return get(typeOf<T>(), addon, key)
     }
     
     
@@ -154,7 +154,7 @@ class NamespacedCompound internal constructor(
     
     internal object NamespacedCompoundBinaryAdapter : BinaryAdapter<NamespacedCompound> {
         
-        override fun write(obj: NamespacedCompound, writer: ByteWriter) {
+        override fun write(obj: NamespacedCompound, type: KType, writer: ByteWriter) {
             writer.writeVarInt(obj.map.size)
             
             obj.map.forEach { (key, data) ->
@@ -163,7 +163,7 @@ class NamespacedCompound internal constructor(
             }
         }
         
-        override fun read(type: Type, reader: ByteReader): NamespacedCompound {
+        override fun read(type: KType, reader: ByteReader): NamespacedCompound {
             val mapSize = reader.readVarInt()
             val map = HashMap<String, Compound>(mapSize)
             

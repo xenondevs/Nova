@@ -1,22 +1,22 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.reflection.ParameterizedTypeImpl
+import xyz.xenondevs.commons.reflection.createType
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.serialization.yaml.getLazilyEvaluated
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import java.lang.reflect.Type
+import kotlin.reflect.KType
 
 class UpgradeType<T> internal constructor(
     val id: NamespacedId,
     val item: ItemNovaMaterial,
     val icon: ItemNovaMaterial,
-    valueType: Type
+    valueType: KType
 ) : Reloadable {
     
-    private val listValueType = ParameterizedTypeImpl(null, List::class.java, valueType)
+    private val listValueType = createType(List::class, valueType)
     private val valueListProviders = HashMap<ItemNovaMaterial, ValueListProvider>()
     private val valueProviders = HashMap<ItemNovaMaterial, HashMap<Int, ValueProvider>>()
     
