@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.util.data.readStringLegacy
 import xyz.xenondevs.nova.util.data.writeStringLegacy
 import java.lang.reflect.Type
 
+@PublishedApi
 @Suppress("UNCHECKED_CAST")
 internal class LegacyCompound internal constructor(
     private val binMap: HashMap<String, ByteArray>,

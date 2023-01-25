@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.parseJson
+import xyz.xenondevs.commons.gson.set
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.parseJson
-import xyz.xenondevs.nova.util.data.set
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.exists

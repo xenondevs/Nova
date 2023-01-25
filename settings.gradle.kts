@@ -40,6 +40,7 @@ dependencyResolutionManagement {
             library("cosmic-binary-format-netty-adapter", "xyz.xenondevs.cbf", "cosmic-binary-format-netty-adapter").versionRef("cbf")
             
             // lib - xenondevs-commons
+            library("commons-gson", "xyz.xenondevs.commons", "commons-gson").versionRef("xenondevs-commons")
             library("commons-provider", "xyz.xenondevs.commons", "commons-provider").versionRef("xenondevs-commons")
             library("commons-reflection", "xyz.xenondevs.commons", "commons-reflection").versionRef("xenondevs-commons")
             
@@ -61,7 +62,7 @@ dependencyResolutionManagement {
             bundle("test", listOf("kotlin-test-junit", "junit-jupiter"))
             bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-netty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
             bundle("cbf", listOf("cosmic-binary-format", "cosmic-binary-format-netty-adapter"))
-            bundle("xenondevs-commons", listOf("commons-provider", "commons-reflection"))
+            bundle("xenondevs-commons", listOf("commons-gson", "commons-provider", "commons-reflection"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
             bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer", "resource-pack-obfuscator"))
             

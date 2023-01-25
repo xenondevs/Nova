@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.data.resources.builder.content.font
 
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
@@ -10,8 +12,7 @@ import xyz.xenondevs.nova.data.resources.builder.BitmapFontGenerator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder.BuildingStage
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.writeToFile
+import xyz.xenondevs.nova.util.data.getIntOrNull
 import kotlin.io.path.createDirectories
 
 private val DEFAULT_FONT = ResourcePath("minecraft", "default")
@@ -55,7 +56,7 @@ internal class MovedFontContent : PackContent {
                 val providers = fontCopy.getAsJsonArray("providers")
                 providers.forEach { provider ->
                     require(provider is JsonObject)
-                    val currentAscent = provider.getInt("ascent") ?: 0
+                    val currentAscent = provider.getIntOrNull("ascent") ?: 0
                     provider.addProperty("ascent", currentAscent + ascent)
                 }
                 

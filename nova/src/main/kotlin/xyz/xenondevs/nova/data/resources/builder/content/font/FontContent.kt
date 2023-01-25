@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
-import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.util.data.readImageDimensions
 import java.nio.file.Path
 import kotlin.io.path.createDirectories

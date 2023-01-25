@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.serialization.json
+package xyz.xenondevs.nova.data.serialization.json.serializer
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -7,7 +7,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import xyz.xenondevs.nova.util.data.isNumber
+import xyz.xenondevs.commons.gson.isNumber
 import java.lang.reflect.Type
 
 internal object IntRangeSerialization : JsonSerializer<IntRange>, JsonDeserializer<IntRange> {

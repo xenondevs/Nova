@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.serialization.json
+package xyz.xenondevs.nova.data.serialization.json.serializer
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonDeserializationContext
@@ -9,17 +9,17 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.gson.getAllInts
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.getAllInts
-import xyz.xenondevs.nova.util.data.getDeserialized
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getString
+import xyz.xenondevs.nova.data.serialization.json.GSON
+import xyz.xenondevs.nova.data.serialization.json.getDeserializedOrNull
 import java.lang.reflect.Type
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.jvm.jvmName
@@ -59,23 +59,23 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
         json as JsonObject
         
         if (json.has("data")) {
-            val id = json.getString("id")!!
+            val id = json.getStringOrNull("id")!!
             val data = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
             
             json.getAsJsonArray("data").forEach { obj ->
                 obj as JsonObject
                 
-                val face: BlockFace = obj.getDeserialized("face")!!
-                val type = Class.forName(obj.getString("type")).kotlin.companionObjectInstance as BlockStateConfigType<BlockStateConfig>
-                val blockStateId = obj.getInt("id")!!
+                val face: BlockFace = obj.getDeserializedOrNull("face")!!
+                val type = Class.forName(obj.getStringOrNull("type")).kotlin.companionObjectInstance as BlockStateConfigType<BlockStateConfig>
+                val blockStateId = obj.getIntOrNull("id")!!
                 
                 data.getOrPut(face, ::ArrayList) += type.of(blockStateId)
             }
             
             return BlockStateBlockModelData(NamespacedId.of(id), data)
         } else {
-            val id = json.getString("id")!!
-            val hitboxType = Material.valueOf(json.getString("hitboxType")!!)
+            val id = json.getStringOrNull("id")!!
+            val hitboxType = Material.valueOf(json.getStringOrNull("hitboxType")!!)
             val dataArray = json.getAsJsonArray("dataArray").getAllInts().toIntArray()
             
             return ArmorStandBlockModelData(NamespacedId.of(id), hitboxType, dataArray)

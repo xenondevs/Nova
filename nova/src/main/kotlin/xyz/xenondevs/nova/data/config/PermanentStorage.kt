@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.data.config
 
 import com.google.gson.JsonObject
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.fromJson
-import xyz.xenondevs.nova.util.data.parseJson
+import xyz.xenondevs.commons.gson.fromJson
+import xyz.xenondevs.commons.gson.parseJson
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.io.File
 
 internal object PermanentStorage {

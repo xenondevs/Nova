@@ -18,12 +18,11 @@ dependencies {
     api(project(":nova-api"))
     spigotLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
+    novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi("de.studiocode.invui:InvUI:0.10") { for (i in 1..12) exclude("de.studiocode.invui", "IA-R$i") }
     novaLoaderApi("de.studiocode.invui:ResourcePack:0.10") { exclude("de.studiocode.invui", "InvUI") }
     novaLoaderApi("de.studiocode.invui:IA-R12:0.10:remapped-mojang")
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.6:remapped-mojang")
-    novaLoaderApi("xyz.xenondevs.commons:commons-provider:1.0-SNAPSHOT")
-    novaLoaderApi("xyz.xenondevs.commons:commons-reflection:1.0-SNAPSHOT")
     
     // internal dependencies
     compileOnly(project(":nova-loader"))

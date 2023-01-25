@@ -36,6 +36,7 @@ interface InstanceCreatorLegacy<T> {
     
 }
 
+@PublishedApi
 @Suppress("UNCHECKED_CAST")
 internal object CBFLegacy {
     

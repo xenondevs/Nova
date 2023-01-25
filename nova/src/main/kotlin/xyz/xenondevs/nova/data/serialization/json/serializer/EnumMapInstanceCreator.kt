@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.serialization.json
+package xyz.xenondevs.nova.data.serialization.json.serializer
 
 import com.google.gson.InstanceCreator
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ENUM_MAP_CONSTRUCTOR

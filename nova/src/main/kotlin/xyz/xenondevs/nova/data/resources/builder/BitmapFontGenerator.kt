@@ -4,11 +4,11 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import xyz.xenondevs.commons.gson.addAll
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.util.data.addAll
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.data.readImage
 import xyz.xenondevs.nova.util.data.writeImage
 import java.awt.image.BufferedImage
@@ -43,7 +43,7 @@ internal class BitmapFontGenerator(
         val inProviders = fontObj.getAsJsonArray("providers")
         inProviders.forEach { provider ->
             provider as JsonObject
-            val type = provider.getString("type")
+            val type = provider.getStringOrNull("type")
             if (type == "legacy_unicode") {
                 outProviders.addAll(convertLegacyUnicodeProvider(provider))
             } else if (!removeBitmapProviders || type != "bitmap") {
@@ -59,8 +59,8 @@ internal class BitmapFontGenerator(
      * Also creates the required font textures.
      */
     private fun convertLegacyUnicodeProvider(provider: JsonObject): List<JsonObject> {
-        val sizesPath = ResourcePath.of(provider.getString("sizes")!!, "minecraft")
-        val textureTemplate = provider.getString("template")!!
+        val sizesPath = ResourcePath.of(provider.getStringOrNull("sizes")!!, "minecraft")
+        val textureTemplate = provider.getStringOrNull("template")!!
         
         val glyphSizes: ByteBuf = Unpooled.wrappedBuffer(sizesPath.findInAssets().readBytes())
         val unicodePages: Array<BufferedImage?> = Array(256) {

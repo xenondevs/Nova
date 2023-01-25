@@ -30,7 +30,7 @@ import xyz.xenondevs.nova.data.resources.builder.content.font.MovedFontContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.WailaContent
 import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
-import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.extractDirectory
 import xyz.xenondevs.nova.util.data.extractFile

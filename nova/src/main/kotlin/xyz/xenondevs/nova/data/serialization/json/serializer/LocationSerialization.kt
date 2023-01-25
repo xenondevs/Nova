@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.serialization.json
+package xyz.xenondevs.nova.data.serialization.json.serializer
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

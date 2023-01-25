@@ -2,6 +2,10 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonObject
 import io.netty.buffer.Unpooled
+import xyz.xenondevs.commons.gson.getAllStrings
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.CharSizeTable
@@ -9,10 +13,6 @@ import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.encodeWithBase64
-import xyz.xenondevs.nova.util.data.getAllStrings
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.data.readImage
 import java.awt.image.BufferedImage
 import java.io.FileNotFoundException
@@ -84,7 +84,7 @@ internal class CharSizeCalculator {
             val providers = obj.getAsJsonArray("providers")
             providers.forEach { provider ->
                 provider as JsonObject
-                when (val type = provider.getString("type")) {
+                when (val type = provider.getStringOrNull("type")) {
                     "space" -> readSpaceProvider(provider, table)
                     "bitmap" -> readBitmapProvider(provider, table)
                     "legacy_unicode" -> readUnicodeProvider(provider, table)
@@ -106,9 +106,9 @@ internal class CharSizeCalculator {
     }
     
     private fun readBitmapProvider(obj: JsonObject, table: CharSizeTable) {
-        val bitmap = getBitmap(ResourcePath.of(obj.getString("file")!!, "minecraft"))
-        val height = obj.getInt("height", 8)
-        val ascent = obj.getInt("ascent", 0)
+        val bitmap = getBitmap(ResourcePath.of(obj.getStringOrNull("file")!!, "minecraft"))
+        val height = obj.getIntOrNull("height") ?: 8
+        val ascent = obj.getIntOrNull("ascent") ?: 0
         val chars = obj.getAsJsonArray("chars").getAllStrings().map(::readChars)
         
         val charsPerLine = chars[0].size
@@ -156,7 +156,7 @@ internal class CharSizeCalculator {
     }
     
     private fun readUnicodeProvider(obj: JsonObject, table: CharSizeTable) {
-        val sizes = getGlyphSizes(ResourcePath.of(obj.getString("sizes")!!))
+        val sizes = getGlyphSizes(ResourcePath.of(obj.getStringOrNull("sizes")!!))
         val buffer = Unpooled.wrappedBuffer(sizes)
         
         // legacy_unicode can only have codepoints from U+0000 to U+FFFF

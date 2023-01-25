@@ -4,12 +4,12 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.parseJson
+import xyz.xenondevs.commons.gson.set
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.parseJson
-import xyz.xenondevs.nova.util.data.set
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.copyTo
@@ -89,8 +89,8 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(bas
         fun getModelConfig(element: JsonElement): Pair<Int, String>? {
             val obj = element as? JsonObject ?: return null
             val predicate = obj.get("predicate") as? JsonObject ?: return null
-            val customModelData = predicate.getInt("custom_model_data") ?: return null
-            val model = obj.getString("model") ?: return null
+            val customModelData = predicate.getIntOrNull("custom_model_data") ?: return null
+            val model = obj.getStringOrNull("model") ?: return null
             
             return customModelData to model
         }

@@ -1,11 +1,11 @@
-package xyz.xenondevs.nova.data.serialization.json
+package xyz.xenondevs.nova.data.serialization.json.serializer
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import org.bukkit.NamespacedKey
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.fromJson
+import xyz.xenondevs.commons.gson.fromJson
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.world.loot.LootItem
 import xyz.xenondevs.nova.world.loot.LootTable

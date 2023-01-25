@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.serialization.json
+package xyz.xenondevs.nova.data.serialization.json.serializer
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -20,15 +20,15 @@ import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import org.bukkit.inventory.recipe.CookingBookCategory
 import org.bukkit.inventory.recipe.CraftingBookCategory
+import xyz.xenondevs.commons.gson.getAllStrings
+import xyz.xenondevs.commons.gson.getFloatOrNull
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.getString
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.isString
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer.Companion.getRecipeKey
-import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer.Companion.parseRecipeChoice
-import xyz.xenondevs.nova.util.data.getAllStrings
-import xyz.xenondevs.nova.util.data.getFloat
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.isString
-import xyz.xenondevs.nova.util.data.toStringList
+import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer.Companion.getRecipeKey
+import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer.Companion.parseRecipeChoice
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.ItemUtils.getItemBuilder
 import java.io.File
@@ -79,13 +79,13 @@ interface RecipeDeserializer<T> {
 internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): ShapedRecipe {
-        val resultKey = json.getString("result")!!
+        val resultKey = json.getString("result")
         
         val result = getItemBuilder(resultKey)
-            .setAmount(json.getInt("amount", default = 1))
+            .setAmount(json.getIntOrNull("amount") ?: 1)
             .get()
         
-        val shape = json.getAsJsonArray("shape").toStringList(::ArrayList)
+        val shape = json.getAsJsonArray("shape").getAllStrings()
         val ingredientMap = HashMap<Char, RecipeChoice>()
         
         val ingredients = json.get("ingredients")
@@ -95,8 +95,8 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
             // legacy support
             ingredients.forEach {
                 it as JsonObject
-                val char = it.getString("char")!![0]
-                val item = it.getString("item")!!
+                val char = it.getStringOrNull("char")!![0]
+                val item = it.getStringOrNull("item")!!
                 ingredientMap[char] = ItemUtils.getRecipeChoice(listOf(item))
             }
         }
@@ -105,7 +105,7 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
         recipe.shape(*shape.toTypedArray())
         ingredientMap.forEach { (key, material) -> recipe.setIngredient(key, material) }
         
-        val category = json.getString("category")
+        val category = json.getStringOrNull("category")
             ?.let { CraftingBookCategory.valueOf(it.uppercase()) }
             ?: CraftingBookCategory.MISC
         recipe.category = category
@@ -118,10 +118,10 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
 internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe> {
     
     override fun deserialize(json: JsonObject, file: File): ShapelessRecipe {
-        val resultKey = json.getString("result")!!
+        val resultKey = json.getStringOrNull("result")!!
         
         val result = getItemBuilder(resultKey)
-            .setAmount(json.getInt("amount", default = 1))
+            .setAmount(json.getIntOrNull("amount") ?: 1)
             .get()
         
         val ingredientsMap = HashMap<RecipeChoice, Int>()
@@ -137,7 +137,7 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
                 
                 val items = it.get("item") ?: it.get("items")
                 val choice = parseRecipeChoice(items)
-                ingredientsMap[choice] = it.getInt("amount")!!
+                ingredientsMap[choice] = it.getIntOrNull("amount")!!
             }
         }
         
@@ -149,7 +149,7 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
             }
         }
         
-        val category = json.getString("category")
+        val category = json.getStringOrNull("category")
             ?.let { CraftingBookCategory.valueOf(it.uppercase()) }
             ?: CraftingBookCategory.MISC
         recipe.category = category
@@ -164,7 +164,7 @@ internal object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingR
     override fun deserialize(json: JsonObject, file: File): StonecuttingRecipe {
         val input = parseRecipeChoice(json.get("input"))
         val result = getItemBuilder(json.get("result").asString)
-        result.amount = json.getInt("amount", 1)
+        result.amount = json.getIntOrNull("amount") ?: 1
         return StonecuttingRecipe(getRecipeKey(file), result.get(), input)
     }
     
@@ -176,7 +176,7 @@ internal object SmithingRecipeDeserializer : RecipeDeserializer<SmithingRecipe> 
         val base = parseRecipeChoice(json.get("base"))
         val addition = parseRecipeChoice(json.get("addition"))
         val result = getItemBuilder(json.get("result").asString)
-        result.amount = json.getInt("amount", 1)
+        result.amount = json.getIntOrNull("amount") ?: 1
         return SmithingRecipe(getRecipeKey(file), result.get(), base, addition)
     }
     
@@ -187,10 +187,10 @@ abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
     override fun deserialize(json: JsonObject, file: File): T {
         val inputChoice = parseRecipeChoice(json.get("input"))
         
-        val result = getItemBuilder(json.getString("result")!!)
-        result.amount = json.getInt("amount", default = 1)
+        val result = getItemBuilder(json.getStringOrNull("result")!!)
+        result.amount = json.getIntOrNull("amount") ?: 1
         
-        val time = json.getInt("time") ?: json.getInt("cookingTime")!! // legacy support
+        val time = json.getIntOrNull("time") ?: json.getIntOrNull("cookingTime")!! // legacy support
         
         return createRecipe(json, getRecipeKey(file), inputChoice, result.get(), time)
     }
@@ -205,11 +205,11 @@ internal abstract class CookingRecipeDeserializer<T : CookingRecipe<T>>(
 ) : ConversionRecipeDeserializer<T>() {
     
     override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): T {
-        val experience = json.getFloat("experience")!!
+        val experience = json.getFloatOrNull("experience")!!
         
         val recipe = recipeConstructor(key, result, input, experience, time)
         
-        val category = json.getString("category")
+        val category = json.getStringOrNull("category")
             ?.let { CookingBookCategory.valueOf(it.uppercase()) }
             ?: CookingBookCategory.MISC
         recipe.category = category
