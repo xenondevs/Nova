@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.data.writeStringLegacy
 import java.lang.reflect.Type
 
 @Suppress("UNCHECKED_CAST")
-class LegacyCompound internal constructor(
+internal class LegacyCompound internal constructor(
     private val binMap: HashMap<String, ByteArray>,
     private val map: HashMap<String, Any?>
 ) {

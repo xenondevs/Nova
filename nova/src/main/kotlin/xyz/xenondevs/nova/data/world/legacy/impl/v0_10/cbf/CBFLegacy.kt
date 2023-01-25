@@ -37,7 +37,7 @@ interface InstanceCreatorLegacy<T> {
 }
 
 @Suppress("UNCHECKED_CAST")
-object CBFLegacy {
+internal object CBFLegacy {
     
     private val binaryAdapters = HashMap<KClass<*>, BinaryAdapterLegacy<*>>()
     private val binaryHierarchyAdapters = HashMap<KClass<*>, BinaryAdapterLegacy<*>>()
