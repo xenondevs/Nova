@@ -15,8 +15,8 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.insertAfterFirst
 import xyz.xenondevs.bytebase.util.internalName
+import xyz.xenondevs.commons.collections.findNthOfType
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.findNthOfType
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MAPPED_REGISTRY_LIFECYCLE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_BY_NAME_CODEC_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_FILE_CODEC_DECODE_METHOD
