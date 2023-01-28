@@ -2,12 +2,9 @@ package xyz.xenondevs.nova.world.fakeentity.impl
 
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.decoration.GlowItemFrame
-import net.minecraft.world.entity.decoration.ItemFrame
-import net.minecraft.world.entity.item.ItemEntity
 import org.bukkit.Location
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemFrameMetadata
-import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemMetadata
 
 class FakeGlowItemFrame(
 	location: Location,

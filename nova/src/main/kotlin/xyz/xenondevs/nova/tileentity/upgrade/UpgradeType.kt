@@ -1,53 +1,74 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.reflection.createType
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.material.CoreGUIMaterial
-import xyz.xenondevs.nova.material.CoreItems
+import xyz.xenondevs.nova.data.serialization.yaml.getLazilyEvaluated
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry.register
-import xyz.xenondevs.nova.util.data.getListOrNull
+import kotlin.reflect.KType
 
 class UpgradeType<T> internal constructor(
     val id: NamespacedId,
     val item: ItemNovaMaterial,
     val icon: ItemNovaMaterial,
-    private val configLoader: (Any) -> T
+    valueType: KType
 ) : Reloadable {
     
-    private val modifierCache = HashMap<ItemNovaMaterial, List<T>>()
-    private val defaultConfig by configReloadable { NovaConfig["${id.namespace}:upgrade_values"] }
+    private val listValueType = createType(List::class, valueType)
+    private val valueListProviders = HashMap<ItemNovaMaterial, ValueListProvider>()
+    private val valueProviders = HashMap<ItemNovaMaterial, HashMap<Int, ValueProvider>>()
     
     fun getValue(material: ItemNovaMaterial, level: Int): T {
-        val values = getUpgradeValues(material)
+        val values = getValueList(material)
         return values[level.coerceIn(0..values.lastIndex)]
     }
     
-    fun getUpgradeValues(material: ItemNovaMaterial): List<T> {
-        return modifierCache.getOrPut(material) {
-            val specificConfig = NovaConfig[material]
-            
-            val configValues: List<Any>? = specificConfig.getListOrNull("upgrade_values.${id.name}")
-                ?: defaultConfig.getListOrNull(id.name)
-            checkNotNull(configValues) { "No upgrade values present for $id" }
-            
-            return@getOrPut configValues.map(configLoader)
-        }
+    fun getValueProvider(material: ItemNovaMaterial, level: Int): Provider<T> {
+        return valueProviders
+            .getOrPut(material, ::HashMap)
+            .getOrPut(level) { ValueProvider(getValueListProvider(material), level) }
+    }
+    
+    fun getValueList(material: ItemNovaMaterial): List<T> {
+        return getValueListProvider(material).value
+    }
+    
+    fun getValueListProvider(material: ItemNovaMaterial): Provider<List<T>> {
+        return valueListProviders.getOrPut(material) { ValueListProvider(material) }
     }
     
     override fun reload() {
-        modifierCache.clear()
+        valueListProviders.values.forEach(Provider<*>::update)
     }
     
-    companion object {
-        val SPEED = register<Double>("speed", CoreItems.SPEED_UPGRADE, CoreGUIMaterial.SPEED_UPGRADE)
-        val EFFICIENCY = register<Double>("efficiency", CoreItems.EFFICIENCY_UPGRADE, CoreGUIMaterial.EFFICIENCY_UPGRADE)
-        val ENERGY = register<Double>("energy", CoreItems.ENERGY_UPGRADE, CoreGUIMaterial.ENERGY_UPGRADE)
-        val FLUID = register<Double>("fluid", CoreItems.FLUID_UPGRADE, CoreGUIMaterial.FLUID_UPGRADE)
-        val RANGE = register<Int>("range", CoreItems.RANGE_UPGRADE, CoreGUIMaterial.RANGE_UPGRADE)
+    private inner class ValueListProvider(
+        private val material: ItemNovaMaterial
+    ) : Provider<List<T>>() {
+        
+        override fun loadValue(): List<T> {
+            return NovaConfig[material].getLazilyEvaluated("upgrade_values.${id.name}", listValueType)
+                ?: NovaConfig["${id.namespace}:upgrade_values"].getLazilyEvaluated(id.name, listValueType)
+                ?: throw IllegalStateException("No upgrade values present for $id")
+        }
+        
     }
     
+    private inner class ValueProvider(
+        private val listProvider: Provider<List<T>>,
+        private val level: Int
+    ) : Provider<T>() {
+        
+        init {
+            listProvider.addChild(this)
+        }
+        
+        override fun loadValue(): T {
+            val valueList = listProvider.value
+            return valueList[level.coerceIn(0..valueList.lastIndex)]
+        }
+        
+    }
     
 }

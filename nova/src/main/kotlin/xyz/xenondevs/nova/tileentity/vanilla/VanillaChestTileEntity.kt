@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Chest
 import org.bukkit.block.DoubleChest
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -13,7 +14,6 @@ import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedChestInventory
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.runTaskLaterSynchronized
 import java.util.*
 
@@ -52,7 +52,7 @@ internal class VanillaChestTileEntity internal constructor(blockState: VanillaTi
         val chest = block.state
         if (chest is Chest) {
             val inventory = NetworkedChestInventory(chest.inventory)
-            inventories = CUBE_FACES.associateWithTo(emptyEnumMap()) { inventory }
+            inventories = CUBE_FACES.associateWithTo(enumMap()) { inventory }
             allowedConnectionTypes = inventories.entries.associateTo(HashMap()) { (_, inv) -> inv to NetworkConnectionType.BUFFER }
         }
     }

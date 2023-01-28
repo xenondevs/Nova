@@ -4,15 +4,15 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import xyz.xenondevs.commons.gson.getDoubleOrNull
+import xyz.xenondevs.commons.gson.getOrNull
+import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorEmissivityMapPath
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexturePath
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor.InterpolationMode
-import xyz.xenondevs.nova.util.data.getDouble
-import xyz.xenondevs.nova.util.data.getOrNull
-import xyz.xenondevs.nova.util.data.getString
 
 internal object ArmorIndexDeserializer {
     
@@ -43,17 +43,17 @@ internal object ArmorIndexDeserializer {
                 }
                 
                 element is JsonObject -> {
-                    layer1 = element.getString("layer_1")
-                    layer2 = element.getString("layer_2")
-                    layer1EmissivityMap = element.getString("layer_1_emissivity_map")
-                    layer2EmissivityMap = element.getString("layer_2_emissivity_map")
+                    layer1 = element.getStringOrNull("layer_1")
+                    layer2 = element.getStringOrNull("layer_2")
+                    layer1EmissivityMap = element.getStringOrNull("layer_1_emissivity_map")
+                    layer2EmissivityMap = element.getStringOrNull("layer_2_emissivity_map")
                     
                     interpolationMode = element.getOrNull("interpolation")
                         ?.asString?.uppercase()
                         ?.let(InterpolationMode::valueOf)
                         ?: InterpolationMode.NONE
                     
-                    fps = element.getDouble("fps") ?: 0.0
+                    fps = element.getDoubleOrNull("fps") ?: 0.0
                 }
                 
                 else -> throw UnsupportedOperationException()

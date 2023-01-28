@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import xyz.xenondevs.commons.collections.treeMapOf
 import xyz.xenondevs.nova.data.config.GlobalValues
 import java.math.BigDecimal
 import java.math.RoundingMode

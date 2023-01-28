@@ -1,16 +1,16 @@
 package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.vanilla.ItemStorageVanillaTileEntity
 import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
 
-private val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(emptyEnumMap()) { 50 } }
-private val DEFAULT_CHANNELS = { CUBE_FACES.associateWithTo(emptyEnumMap()) { 0 } }
+private val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(enumMap()) { 50 } }
+private val DEFAULT_CHANNELS = { CUBE_FACES.associateWithTo(enumMap()) { 0 } }
 
 internal abstract class VanillaItemHolder(
     final override val endPoint: ItemStorageVanillaTileEntity
@@ -19,17 +19,17 @@ internal abstract class VanillaItemHolder(
     override val mergedInventory: NetworkedInventory? = null
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        endPoint.retrieveData("itemConfig") { CUBE_FACES.associateWithTo(emptyEnumMap()) { NetworkConnectionType.INSERT } }
+        endPoint.retrieveData("itemConfig") { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.INSERT } }
     
     override val allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType> by lazy {
         containerConfig.entries.associate { (_, inv) -> inv to NetworkConnectionType.BUFFER }
     }
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveData<EnumMap<BlockFace, ItemFilter>>("insertFilters", ::emptyEnumMap)
+        endPoint.retrieveData<EnumMap<BlockFace, ItemFilter>>("insertFilters", ::enumMap)
     
     override val extractFilters: MutableMap<BlockFace, ItemFilter> =
-        endPoint.retrieveData<EnumMap<BlockFace, ItemFilter>>("extractFilters", ::emptyEnumMap)
+        endPoint.retrieveData<EnumMap<BlockFace, ItemFilter>>("extractFilters", ::enumMap)
     
     override val insertPriorities: MutableMap<BlockFace, Int> =
         endPoint.retrieveData("insertPriorities", DEFAULT_PRIORITIES)

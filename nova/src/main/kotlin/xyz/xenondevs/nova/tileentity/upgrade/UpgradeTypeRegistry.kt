@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.tileentity.upgrade
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.ItemNovaMaterial
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @Suppress("UNCHECKED_CAST")
 object UpgradeTypeRegistry {
@@ -11,36 +13,26 @@ object UpgradeTypeRegistry {
     val types: Collection<UpgradeType<*>>
         get() = _types.values
     
-    init {
-        UpgradeType // Loads the default upgrade types
-    }
-    
     fun <T> register(
         addon: Addon, name: String,
         item: ItemNovaMaterial, icon: ItemNovaMaterial,
-        configLoader: (Any) -> T = { it as T }
+        valueType: KType
     ): UpgradeType<T> {
         val id = NamespacedId(addon.description.id, name)
-        val type = UpgradeType(id, item, icon, configLoader)
+        val type = UpgradeType<T>(id, item, icon, valueType)
         _types[id] = type
         return type
     }
     
-    internal fun <T> register(
-        name: String,
-        item: ItemNovaMaterial, icon: ItemNovaMaterial,
-        configLoader: (Any) -> T = { it as T }
-    ): UpgradeType<T> {
-        val id = NamespacedId("nova", name)
-        val type = UpgradeType(id, item, icon, configLoader)
-        _types[id] = type
-        return type
-    }
+    inline fun <reified T> register(
+        addon: Addon, name: String,
+        item: ItemNovaMaterial, icon: ItemNovaMaterial
+    ) = register<T>(addon, name, item, icon, typeOf<T>())
     
-    fun <T : UpgradeType<*>> of(id: NamespacedId): UpgradeType<*>? =
-        _types[id] as? T
+    fun <T> of(id: NamespacedId): UpgradeType<T>? =
+        _types[id] as? UpgradeType<T>
     
-    fun <T: UpgradeType<*>> of(item: ItemNovaMaterial): UpgradeType<*>? =
-        types.firstOrNull { it.item == item } as? T
+    fun <T> of(item: ItemNovaMaterial): UpgradeType<T>? =
+        types.firstOrNull { it.item == item } as? UpgradeType<T>
     
 }

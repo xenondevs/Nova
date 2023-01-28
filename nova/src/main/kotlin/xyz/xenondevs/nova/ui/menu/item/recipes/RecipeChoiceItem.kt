@@ -1,16 +1,16 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes
 
-import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.ItemWrapper
-import de.studiocode.invui.item.impl.AutoCycleItem
-import de.studiocode.invui.item.impl.SimpleItem
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.impl.AutoCycleItem
+import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaMaterial

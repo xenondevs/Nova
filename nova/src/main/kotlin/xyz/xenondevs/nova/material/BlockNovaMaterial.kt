@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData

@@ -2,6 +2,9 @@ package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.addAll
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
@@ -9,10 +12,7 @@ import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStat
 import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.NoteBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.RedMushroomBlockStateConfig
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.addAll
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.parseJson
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.nio.file.Path
 import java.util.logging.Level
 import kotlin.io.path.copyTo
@@ -83,7 +83,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
             val occupied = basePacks.occupiedSolidIds.getOrPut(configType, ::HashSet)
             obj.entrySet().removeIf { (variant, obj) ->
                 obj as JsonObject
-                val model = obj.getString("model")
+                val model = obj.getStringOrNull("model")
                 if (model in IGNORABLE_MODELS)
                     return@removeIf true
                 

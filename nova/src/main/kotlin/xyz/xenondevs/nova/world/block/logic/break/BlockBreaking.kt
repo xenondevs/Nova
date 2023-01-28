@@ -17,13 +17,13 @@ import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.packetHandler
+import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
-import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send

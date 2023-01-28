@@ -3,7 +3,6 @@
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
-import de.studiocode.invui.item.builder.ItemBuilder
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
@@ -20,6 +19,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId

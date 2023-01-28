@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.item.behavior
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
-import xyz.xenondevs.nova.data.provider.combinedProvider
-import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.commons.provider.immutable.combinedProvider
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
@@ -24,10 +24,7 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
         }
     }
     
-    override val attributeModifiers = combinedProvider(options.attackSpeedProvider, options.attackDamageProvider).map {
-        val attackSpeed = it[0]
-        val attackDamage = it[1]
-        
+    override val attributeModifiers = combinedProvider(options.attackSpeedProvider, options.attackDamageProvider) { attackSpeed, attackDamage ->
         buildList {
             if (attackDamage != null) {
                 this += AttributeModifier(
@@ -55,9 +52,9 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
     }
     
     companion object : ItemBehaviorFactory<Tool>() {
-    
-        val BASE_ATTACK_DAMAGE_UUID = UUID.fromString("e63e979b-a109-4519-8b20-2ce3962e490c")
-        val BASE_ATTACK_SPEED_UUID = UUID.fromString("54277290-d821-4616-936b-eee88e98bc0b")
+        
+        val BASE_ATTACK_DAMAGE_UUID: UUID = UUID.fromString("e63e979b-a109-4519-8b20-2ce3962e490c")
+        val BASE_ATTACK_SPEED_UUID: UUID = UUID.fromString("54277290-d821-4616-936b-eee88e98bc0b")
         
         override fun create(material: ItemNovaMaterial) =
             Tool(ToolOptions.configurable(material))

@@ -5,8 +5,8 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.item.behavior.Fuel
-import xyz.xenondevs.nova.util.enumMapOf
 import net.minecraft.world.item.ItemStack as MojangStack
 
 val Material.burnTime: Int?
@@ -22,7 +22,7 @@ object FuelUtils {
     
     private val NMS_VANILLA_FUELS: Map<Item, Int> = AbstractFurnaceBlockEntity.getFuel()
     private val VANILLA_FUELS: Map<Material, Int> = NMS_VANILLA_FUELS
-        .mapKeysTo(enumMapOf()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
+        .mapKeysTo(enumMap()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
     
     fun isFuel(material: Material): Boolean = material in VANILLA_FUELS
     fun getBurnTime(material: Material): Int? = VANILLA_FUELS[material]

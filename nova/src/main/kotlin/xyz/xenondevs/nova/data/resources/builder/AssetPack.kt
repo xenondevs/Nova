@@ -4,15 +4,15 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.model.FileHeader
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.RegisteredMaterial
 import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
-import xyz.xenondevs.nova.data.resources.builder.index.GUIsIndexDeserializer
+import xyz.xenondevs.nova.data.resources.builder.index.GuisIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MaterialsIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MovedFontsIndexDeserializer
 import xyz.xenondevs.nova.util.data.get
-import xyz.xenondevs.nova.util.data.parseJson
 import java.io.InputStream
 
 internal class AssetPack(val namespace: String, val zip: ZipFile, val assetsPath: String) {
@@ -30,7 +30,7 @@ internal class AssetPack(val namespace: String, val zip: ZipFile, val assetsPath
         ?.let { MaterialsIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
     
     val guisIndex: Map<String, ResourcePath>? = zip[assetsPath, "guis.json"]
-        ?.let { GUIsIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
+        ?.let { GuisIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
     
     val armorIndex: List<RegisteredArmor>? = zip[assetsPath, "armor.json"]
         ?.let { ArmorIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }

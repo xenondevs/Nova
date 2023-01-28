@@ -1,21 +1,5 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.gui.impl.PagedGUI
-import de.studiocode.invui.gui.impl.SimplePagedNestedGUI
-import de.studiocode.invui.gui.impl.SimpleTabGUI
-import de.studiocode.invui.gui.impl.TabGUI
-import de.studiocode.invui.gui.structure.Structure
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.ItemWrapper
-import de.studiocode.invui.item.builder.ItemBuilder
-import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.item.impl.controlitem.ControlItem
-import de.studiocode.invui.item.impl.controlitem.TabItem
-import de.studiocode.invui.window.Window
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -25,9 +9,23 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.gui.TabGui
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.gui.structure.Structure
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.controlitem.ControlItem
+import xyz.xenondevs.invui.item.impl.controlitem.TabItem
+import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.builder.WindowType
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
@@ -90,19 +88,19 @@ private class RecipesWindow(
     
     private lateinit var currentType: RecipeGroup<*>
     
-    private val mainGUI: SimpleTabGUI
+    private val mainGui: TabGui
     private lateinit var window: Window
     
     init {
         @Suppress("UNCHECKED_CAST")
         recipes as Map<RecipeGroup<Any>, Iterable<RecipeContainer>>
         
-        val craftingTabs: List<Pair<RecipeGroup<*>, GUI>> = recipes
-            .mapValues { (type, containers) -> createPagedRecipesGUI(containers.map { container -> type.getGUI(container.recipe) }) }
+        val craftingTabs: List<Pair<RecipeGroup<*>, Gui>> = recipes
+            .mapValues { (type, containers) -> createPagedRecipesGui(containers.map { container -> type.getGui(container.recipe) }) }
             .map { it.key to it.value }
             .sortedBy { it.first }
         
-        mainGUI = GUIBuilder(GUIType.TAB)
+        mainGui = GuiBuilder(GuiType.TAB)
             .setStructure(
                 "b . . . . . . . .",
                 "x x x x x x x x x",
@@ -111,7 +109,7 @@ private class RecipesWindow(
                 "x x x x x x x x x",
                 ". . . . . . . . ."
             )
-            .setGUIs(craftingTabs.map { it.second })
+            .setContent(craftingTabs.map { it.second })
             .addIngredient('b', LastRecipeItem(viewerUUID))
             .build()
         
@@ -121,21 +119,24 @@ private class RecipesWindow(
             .map { it.first }
             .forEach { craftingType ->
                 if (!::currentType.isInitialized) currentType = craftingType
-                mainGUI.setItem(2 + ++lastTab, CraftingTabItem(craftingType, lastTab))
+                mainGui.setItem(2 + ++lastTab, CraftingTabItem(craftingType, lastTab))
             }
         
-        if (info != null) mainGUI.setItem(2 + ++lastTab, InfoItem(info))
+        if (info != null) mainGui.setItem(2 + ++lastTab, InfoItem(info))
     }
     
     override fun show() {
         ItemMenu.addToHistory(viewerUUID, this)
-        window = SimpleWindow(viewerUUID, getCurrentTitle(), mainGUI)
-        window.show()
+        window = WindowType.NORMAL.createWindow { 
+            it.setViewer(viewerUUID)
+            it.setTitle(getCurrentTitle())
+            it.setGui(mainGui)
+        }.apply { show() }
     }
     
     private fun getCurrentTitle(): Array<BaseComponent> {
-        val currentTab = mainGUI.tabs[mainGUI.currentTab] as SimplePagedNestedGUI
-        val pageNumberString = "${currentTab.currentPageIndex + 1} / ${currentTab.pageAmount}"
+        val currentTab = mainGui.tabs[mainGui.currentTab] as PagedGui<*>
+        val pageNumberString = "${currentTab.currentPage + 1} / ${currentTab.pageAmount}"
         
         return ComponentBuilder()
             .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
@@ -166,7 +167,7 @@ private class RecipesWindow(
     
     private inner class CraftingTabItem(private val recipeGroup: RecipeGroup<*>, tab: Int) : TabItem(tab) {
         
-        override fun getItemProvider(gui: TabGUI) = recipeGroup.icon
+        override fun getItemProvider(gui: TabGui) = recipeGroup.icon
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             super.handleClick(clickType, player, event)
@@ -194,14 +195,14 @@ private class RecipesWindow(
         
     }
     
-    private inner class PageBackItem : ControlItem<PagedGUI>() {
+    private inner class PageBackItem : ControlItem<PagedGui<*>>() {
         
-        override fun getItemProvider(gui: PagedGUI) =
-            (if (gui.hasPageBefore()) CoreGUIMaterial.TP_ARROW_LEFT_BTN_ON else CoreGUIMaterial.TP_ARROW_LEFT_BTN_OFF)
+        override fun getItemProvider(gui: PagedGui<*>) =
+            (if (gui.hasPreviousPage()) CoreGuiMaterial.TP_ARROW_LEFT_BTN_ON else CoreGuiMaterial.TP_ARROW_LEFT_BTN_OFF)
                 .clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            if (clickType == ClickType.LEFT && gui.hasPageBefore()) {
+            if (clickType == ClickType.LEFT && gui.hasPreviousPage()) {
                 player.playClickSound()
                 gui.goBack()
                 updateTitle()
@@ -210,10 +211,10 @@ private class RecipesWindow(
         
     }
     
-    private inner class PageForwardItem : ControlItem<PagedGUI>() {
+    private inner class PageForwardItem : ControlItem<PagedGui<*>>() {
         
-        override fun getItemProvider(gui: PagedGUI) =
-            (if (gui.hasNextPage()) CoreGUIMaterial.TP_ARROW_RIGHT_BTN_ON else CoreGUIMaterial.TP_ARROW_RIGHT_BTN_OFF)
+        override fun getItemProvider(gui: PagedGui<*>) =
+            (if (gui.hasNextPage()) CoreGuiMaterial.TP_ARROW_RIGHT_BTN_ON else CoreGuiMaterial.TP_ARROW_RIGHT_BTN_OFF)
                 .clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -226,10 +227,10 @@ private class RecipesWindow(
         
     }
     
-    private fun createPagedRecipesGUI(recipes: List<GUI>): GUI =
-        GUIBuilder(GUIType.PAGED_GUIs)
+    private fun createPagedRecipesGui(recipes: List<Gui>): Gui =
+        GuiBuilder(GuiType.PAGED_GUIS)
             .setStructure(recipesGuiStructure)
-            .setGUIs(recipes)
+            .setContent(recipes)
             .build()
     
 }
@@ -238,7 +239,7 @@ private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
     
     override fun getItemProvider(): ItemProvider {
         return if (ItemMenu.hasHistory(viewerUUID)) {
-            CoreGUIMaterial.LIGHT_ARROW_1_LEFT.clientsideProvider
+            CoreGuiMaterial.LIGHT_ARROW_1_LEFT.clientsideProvider
         } else ItemWrapper(ItemStack(Material.AIR))
     }
     

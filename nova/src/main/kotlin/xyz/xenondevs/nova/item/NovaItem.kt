@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.item
 
-import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -21,12 +20,15 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
+import xyz.xenondevs.commons.provider.immutable.combinedLazyProvider
+import xyz.xenondevs.commons.provider.immutable.flatten
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.provider.combinedLazyProvider
-import xyz.xenondevs.nova.data.provider.flatten
-import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
@@ -41,11 +43,9 @@ import xyz.xenondevs.nova.util.data.getDoubleOrNull
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
-import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.util.takeUnlessEmpty
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -73,7 +73,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     internal val attributeModifiersProvider = combinedLazyProvider { behaviors.map(ItemBehavior::attributeModifiers) + configuredAttributeModifiersProvider }
         .flatten()
         .map { modifiers ->
-            val map = enumMapOf<EquipmentSlot, ArrayList<AttributeModifier>>()
+            val map = enumMap<EquipmentSlot, ArrayList<AttributeModifier>>()
             modifiers.forEach { modifier -> modifier.slots.forEach { slot -> map.getOrPut(slot, ::ArrayList) += modifier } }
             return@map map
         }

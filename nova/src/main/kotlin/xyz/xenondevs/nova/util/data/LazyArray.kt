@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.util.data
 
-import xyz.xenondevs.nova.util.getOrSet
+import xyz.xenondevs.commons.collections.getOrSet
 
 @Suppress("UNCHECKED_CAST")
 class LazyArray<T : Any>(size: Int, private val init: (Int) -> T) {

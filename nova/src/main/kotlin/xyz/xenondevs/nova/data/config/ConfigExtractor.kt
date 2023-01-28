@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.data.config
 
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
+import xyz.xenondevs.commons.collections.contentEquals
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.contentEquals
 import xyz.xenondevs.nova.util.data.copy
 import java.io.ByteArrayInputStream
 import java.io.File

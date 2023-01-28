@@ -2,9 +2,6 @@
 
 package xyz.xenondevs.nova.initialize
 
-import de.studiocode.invui.InvUI
-import de.studiocode.invui.util.InventoryUtils
-import de.studiocode.invui.virtualinventory.StackSizeProvider
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
 import org.bukkit.Bukkit
@@ -13,6 +10,10 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
+import xyz.xenondevs.commons.collections.CollectionUtils
+import xyz.xenondevs.invui.InvUI
+import xyz.xenondevs.invui.util.InventoryUtils
+import xyz.xenondevs.invui.virtualinventory.StackSizeProvider
 import xyz.xenondevs.nmsutils.NMSUtilities
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
@@ -52,7 +53,6 @@ import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.ui.waila.WailaManager
-import xyz.xenondevs.nova.util.CollectionUtils
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents

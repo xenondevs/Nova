@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.data.addLoreLines
@@ -13,7 +13,7 @@ class EnergyBar(
     private val energyHolder: NovaEnergyHolder
 ) : VerticalBar(height) {
     
-    override val barMaterial = CoreGUIMaterial.BAR_RED
+    override val barMaterial = CoreGuiMaterial.BAR_RED
     
     private var energy: Long = 0
     private var maxEnergy: Long = 0

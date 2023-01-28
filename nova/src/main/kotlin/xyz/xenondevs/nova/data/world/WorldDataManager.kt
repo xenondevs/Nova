@@ -13,6 +13,8 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.event.world.WorldUnloadEvent
+import xyz.xenondevs.commons.collections.pollFirstWhere
+import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -26,9 +28,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.concurrent.Latch
-import xyz.xenondevs.nova.util.pollFirstWhere
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos

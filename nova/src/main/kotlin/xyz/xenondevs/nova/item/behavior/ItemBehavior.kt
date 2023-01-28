@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.item.behavior
 
-import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -12,9 +11,10 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier

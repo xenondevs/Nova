@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.WorldLoadEvent
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -17,7 +18,6 @@ import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.removeIf
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption

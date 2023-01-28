@@ -4,6 +4,12 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
+import xyz.xenondevs.commons.gson.getAllInts
+import xyz.xenondevs.commons.gson.getAllStrings
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.getOrNull
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.isString
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockDirection
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelInformation
@@ -11,12 +17,6 @@ import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockMode
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.ItemModelInformation
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.RegisteredMaterial
 import xyz.xenondevs.nova.util.addNamespace
-import xyz.xenondevs.nova.util.data.getAllInts
-import xyz.xenondevs.nova.util.data.getAllStrings
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getOrNull
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.isString
 
 private fun String.toMaterial(): Material? = Material.getMaterial(uppercase())
 
@@ -56,15 +56,15 @@ internal object MaterialsIndexDeserializer {
                     (block.getOrNull("models")?.let(MaterialsIndexDeserializer::deserializeModelList) ?: itemModelList)
                         ?.map { it.addNamespace(namespace) }
                         ?.let {
-                            val blockType = block.getString("type")?.uppercase()?.let(BlockModelType::valueOf)
-                            val hitboxType = block.getString("hitbox")?.toMaterial()
-                            val directions = block.getString("directions")?.let(BlockDirection::of)
-                            val priority = block.getInt("priority", 0)
+                            val blockType = block.getStringOrNull("type")?.uppercase()?.let(BlockModelType::valueOf)
+                            val hitboxType = block.getStringOrNull("hitbox")?.toMaterial()
+                            val directions = block.getStringOrNull("directions")?.let(BlockDirection::of)
+                            val priority = block.getIntOrNull("priority") ?: 0
                             BlockModelInformation(id, blockType, hitboxType, it, directions, priority)
                         }
                 } else null
                 
-                armorInfo = element.getString("armor")?.let { NamespacedId.of(it, namespace) }
+                armorInfo = element.getStringOrNull("armor")?.let { NamespacedId.of(it, namespace) }
                 
             } else if (element.isString()) {
                 itemInfo = ItemModelInformation(id, listOf(element.asString.addNamespace(namespace)))

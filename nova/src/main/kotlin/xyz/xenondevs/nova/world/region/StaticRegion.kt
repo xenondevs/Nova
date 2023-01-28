@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.region
 
-import xyz.xenondevs.nova.data.provider.Provider
+import xyz.xenondevs.commons.provider.Provider
 import java.util.*
 
 class StaticRegion internal constructor(

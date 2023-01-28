@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.addon
 
+import xyz.xenondevs.commons.collections.CollectionUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.loader.AddonLoader
@@ -11,7 +12,6 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.Patcher
-import xyz.xenondevs.nova.util.CollectionUtils
 import java.io.File
 import java.util.logging.Level
 

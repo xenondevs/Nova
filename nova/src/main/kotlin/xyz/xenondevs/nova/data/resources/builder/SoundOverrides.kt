@@ -6,13 +6,13 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import org.bukkit.Material
 import org.bukkit.SoundGroup
+import xyz.xenondevs.commons.gson.getBooleanOrNull
+import xyz.xenondevs.commons.gson.getOrPut
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.parseJson
+import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.util.data.getBoolean
-import xyz.xenondevs.nova.util.data.getOrPut
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.parseJson
-import xyz.xenondevs.nova.util.data.writeToFile
 import xyz.xenondevs.nova.util.item.soundGroup
 import java.nio.file.Path
 import java.util.logging.Level
@@ -63,8 +63,7 @@ internal class SoundOverrides {
         try {
             // an index of all vanilla sounds
             val vanillaIndex = createSoundsIndex(
-                ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/sounds.json")
-                    .parseJson() as JsonObject
+                ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/sounds.json").parseJson() as JsonObject
             )
             
             // merge the sound.json files
@@ -136,8 +135,8 @@ internal class SoundOverrides {
                 
                 val mergedSoundEventObj = merged.getOrPut(soundEvent, ::JsonObject)
                 
-                val subtitle = soundEventObj.getString("subtitle")
-                val replace = soundEventObj.getBoolean("replace")
+                val subtitle = soundEventObj.getStringOrNull("subtitle")
+                val replace = soundEventObj.getBooleanOrNull("replace") ?: false
                 
                 // write non-sound entries
                 if (subtitle != null)

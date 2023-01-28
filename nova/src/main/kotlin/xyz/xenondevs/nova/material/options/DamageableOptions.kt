@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.material.options
 
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.map
-import xyz.xenondevs.nova.data.provider.orElse
-import xyz.xenondevs.nova.data.provider.provider
-import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 
 @HardcodedMaterialOptions

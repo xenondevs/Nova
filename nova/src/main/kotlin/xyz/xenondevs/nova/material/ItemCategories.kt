@@ -1,8 +1,5 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.ItemWrapper
-import de.studiocode.invui.item.impl.BaseItem
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -10,6 +7,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.impl.BaseItem
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager

@@ -19,8 +19,10 @@ import xyz.xenondevs.nova.transformer.patch.item.DamageablePatches
 import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
 import xyz.xenondevs.nova.transformer.patch.item.FireResistancePatches
 import xyz.xenondevs.nova.transformer.patch.item.FuelPatches
+import xyz.xenondevs.nova.transformer.patch.item.LegacyConversionPatch
 import xyz.xenondevs.nova.transformer.patch.item.RemainingItemPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
+import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.nbt.CBFCompoundTagPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
@@ -48,10 +50,10 @@ internal object Patcher : Initializable() {
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
         sequenceOf(
-            FieldFilterPatch, NoteBlockPatch, DamageablePatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
+            FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
             StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
-            BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch
+            BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch, LegacyConversionPatch,
         ).filter(Transformer::shouldTransform).toSet()
     }
     

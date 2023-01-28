@@ -6,11 +6,11 @@ import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
-import java.lang.reflect.Type
+import kotlin.reflect.KType
 
 internal object ItemFilterBinaryAdapter : BinaryAdapter<ItemFilter> {
     
-    override fun read(type: Type, reader: ByteReader): ItemFilter {
+    override fun read(type: KType, reader: ByteReader): ItemFilter {
         val whitelist = reader.readBoolean()
         val nbt = reader.readBoolean()
         val size = reader.readVarInt()
@@ -19,7 +19,7 @@ internal object ItemFilterBinaryAdapter : BinaryAdapter<ItemFilter> {
         return ItemFilter(whitelist, nbt, size, items)
     }
     
-    override fun write(obj: ItemFilter, writer: ByteWriter) {
+    override fun write(obj: ItemFilter, type: KType, writer: ByteWriter) {
         writer.writeBoolean(obj.whitelist)
         writer.writeBoolean(obj.nbt)
         writer.writeVarInt(obj.size)

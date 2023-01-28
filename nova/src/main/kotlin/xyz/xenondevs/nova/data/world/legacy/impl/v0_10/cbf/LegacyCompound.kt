@@ -1,13 +1,15 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf
 
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.util.data.readStringLegacy
 import xyz.xenondevs.nova.util.data.writeStringLegacy
-import xyz.xenondevs.nova.util.reflection.type
 import java.lang.reflect.Type
 
+@PublishedApi
 @Suppress("UNCHECKED_CAST")
-class LegacyCompound internal constructor(
+internal class LegacyCompound internal constructor(
     private val binMap: HashMap<String, ByteArray>,
     private val map: HashMap<String, Any?>
 ) {

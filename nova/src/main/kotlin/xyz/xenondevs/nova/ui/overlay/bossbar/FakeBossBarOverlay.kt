@@ -6,13 +6,13 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.world.BossEvent.BossBarColor
 import org.bukkit.entity.Player
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nmsutils.bossbar.BossBar
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
-import xyz.xenondevs.nova.util.enumMapOf
 import java.awt.Color
 import kotlin.math.roundToInt
 import net.minecraft.world.BossEvent.BossBarOverlay as BossBarStyle
@@ -30,7 +30,7 @@ private val COLOR_LOOKUP: Map<BossBarColor, ChatColor> = mapOf(
     BossBarColor.YELLOW to Color(252, 255, 0),
     BossBarColor.PURPLE to Color(133, 0, 255),
     BossBarColor.WHITE to Color(255, 255, 255)
-).mapValuesTo(enumMapOf()) { (_, color) -> ChatColor.of(color) }
+).mapValuesTo(enumMap()) { (_, color) -> ChatColor.of(color) }
 
 private const val BOSS_BAR_LENGTH = 182
 private const val HALF_BOSS_BAR_LENGTH = BOSS_BAR_LENGTH / 2

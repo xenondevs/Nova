@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.data.serialization.DataHolder
-import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.getNeighboringTileEntitiesOfType
 import java.util.*
 
@@ -33,7 +33,7 @@ sealed interface NetworkNode {
      * Sets given the [node] as a connected [NetworkNode] at the given [face] for the specified [networkType].
      */
     fun setConnectedNode(networkType: NetworkType, face: BlockFace, node: NetworkNode) {
-        connectedNodes.getOrPut(networkType) { emptyEnumMap() }[face] = node
+        connectedNodes.getOrPut(networkType, ::enumMap)[face] = node
     }
     
     /**
@@ -139,7 +139,7 @@ sealed interface NetworkNode {
             return
         
         val serializedConnectedNodes = connectedNodes.mapValuesTo(HashMap()) { faceMap ->
-            faceMap.value.mapValuesTo(emptyEnumMap()) { it.value.uuid }
+            faceMap.value.mapValuesTo(enumMap()) { it.value.uuid }
         }
         
         storeData("connectedNodes", serializedConnectedNodes)
