@@ -11,4 +11,8 @@ internal abstract class ClassTransformer(val clazz: KClass<*>, override val comp
     
     protected var classWrapper = VirtualClassPath[clazz]
     
+    fun dump(name: String = clazz.simpleName!!) {
+        File(name.addSuffix(".class")).writeBytes(classWrapper.assemble())
+    }
+    
 }

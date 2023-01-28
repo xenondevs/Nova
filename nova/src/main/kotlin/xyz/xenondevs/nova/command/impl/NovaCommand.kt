@@ -53,6 +53,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.fakeEntityRenderDistance
@@ -86,6 +87,9 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("getTileEntityData")
                     .requiresPlayer()
                     .executesCatching(::showTileEntityData))
+                .then(literal("listBlocks")
+                    .requiresPlayer()
+                    .executesCatching(::listBlocks))
                 .then(literal("getItemData")
                     .requiresPlayer()
                     .executesCatching(::showItemData))
@@ -297,6 +301,15 @@ internal object NovaCommand : Command("nova") {
         
     }
     
+    private fun listBlocks(ctx: CommandContext<CommandSourceStack>) {
+        val chunk = ctx.player.location.chunkPos
+        val states = WorldDataManager.getBlockStates(chunk)
+        ctx.source.sendSuccess(TextComponent("Total: ${states.size}"))
+        states.forEach {
+            ctx.source.sendSuccess(TextComponent(it.key.toString()))
+        }
+    }
+    
     private fun showItemData(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         
@@ -310,7 +323,7 @@ internal object NovaCommand : Command("nova") {
                     "command.nova.show_item_data.success",
                     localized(ChatColor.AQUA, item.localizedName ?: item.type.name.lowercase()),
                     coloredText(ChatColor.WHITE, novaCompound.toString())
-                ))   
+                ))
             } else {
                 ctx.source.sendFailure(localized(
                     ChatColor.RED,
