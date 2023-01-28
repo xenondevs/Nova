@@ -26,8 +26,8 @@ import xyz.xenondevs.nova.material.ItemCategory
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
-import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
+import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.runTask
@@ -62,7 +62,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         )
         .addIngredient('<', TabPageBackItem())
         .addIngredient('>', TabPageForwardItem())
-        .build().apply { registerPageChangeHandler(::handleTabPageChange) }
+        .build().apply { registerPageChangeHandler { _, now -> handleTabPageChange(now) } }
     
     private val mainGui = GuiBuilder(GuiType.TAB)
         .setStructure(
@@ -119,14 +119,19 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         updateFilteredItems()
     }
     
-    private fun handleTabPageChange(previous: Int, now: Int) {
-        mainGui.showTab(now * 5)
+    private fun handleTabPageChange(newTab: Int) {
+        mainGui.showTab(newTab * 5)
         currentWindow?.changeTitle(getMainWindowTitle())
     }
     
     private fun updateFilteredItems() {
-        filteredItems = (if (filter.isEmpty()) ItemCategories.OBTAINABLE_ITEMS.toList()
-        else ItemCategories.OBTAINABLE_ITEMS.searchFor(filter) { LocaleManager.getTranslation(player, it.localizedName) })
+        filteredItems = if (filter.isEmpty()) {
+            ItemCategories.OBTAINABLE_ITEMS.toList()
+        } else {
+            ItemCategories.OBTAINABLE_ITEMS.searchFor(filter) {
+                LocaleManager.getTranslation(player, it.localizedName)
+            }
+        }
         
         searchResultsGui.setContent(filteredItems)
         searchPreviewGui.setContent(filteredItems)
@@ -134,8 +139,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private fun getMainWindowTitle(): Array<BaseComponent> {
         return if (filter == "") {
-            ComponentBuilder()
-                .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
+            MovingComponentBuilder()
+                .move(-8)
                 .append(TAB_BUTTON_TEXTURES[mainGui.currentTab % 5].component)
                 .create()
         } else {
@@ -161,26 +166,25 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     private fun openSearchWindow() {
         filter = ""
         
-        val anvilGui = Gui.empty(3, 1)
-            .apply {
-                setItem(0, textItem)
-                setItem(2, clickableItem(
-                    CoreGuiMaterial.X.createClientsideItemBuilder()
-                        .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.clear")
-                ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
-            }
+        val anvilGui = Gui.empty(3, 1).apply {
+            setItem(0, textItem)
+            setItem(2, clickableItem(
+                CoreGuiMaterial.X.createClientsideItemBuilder()
+                    .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.clear")
+            ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
+        }
         
-        val builder = ComponentBuilder()
-            .append(MoveCharacters.getMovingComponent(-60)) // move to side to place overlay
+        val title = MovingComponentBuilder()
+            .move(-60)
             .append(CoreGuiTexture.SEARCH.component)
-            .append(MoveCharacters.getMovingComponent(-170)) // move back to start
-        
-        builder.append(TranslatableComponent("menu.nova.items.search"))
+            .moveToStart()
+            .append(TranslatableComponent("menu.nova.items.search"))
             .font("default").color(ChatColor.DARK_GRAY)
+            .create()
         
         currentWindow = WindowType.ANVIL_SPLIT.create {
             setViewer(player)
-            setTitle(builder.create())
+            setTitle(title)
             setUpperGui(anvilGui)
             setLowerGui(searchPreviewGui)
             setRenameHandler { filter = it }
