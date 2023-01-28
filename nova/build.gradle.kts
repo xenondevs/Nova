@@ -1,6 +1,6 @@
 group = "xyz.xenondevs.nova"
 
-val mojangMapped = System.getProperty("mojang-mapped") != null
+val mojangMapped = project.hasProperty("mojang-mapped") ||  System.getProperty("mojang-mapped") != null
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
