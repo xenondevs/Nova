@@ -66,6 +66,7 @@ object NBTUtils {
         tag.remove("HandItems")
         tag.remove("ArmorItems")
         tag.remove("SaddleItem")
+        tag.remove("Inventory")
         
         return tag
     }
