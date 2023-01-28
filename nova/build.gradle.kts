@@ -49,8 +49,7 @@ dependencies {
     compileOnly("com.griefdefender:api:2.0.0-SNAPSHOT") { isTransitive = false }
     compileOnly("com.github.LoneDev6:API-ItemsAdder:3.2.4") { isTransitive = false }
     compileOnly("com.github.TownyAdvanced:Towny:0.97.2.0") { isTransitive = false }
-    compileOnly("com.google.code.gson:gson:2.8.9") // The Oraxen artifact is a fat jar with an outdated gson version, this fixes compilation issues
-    compileOnly("com.github.Th0rgal:Oraxen:ebd90cfbb2") { isTransitive = false }
+    compileOnly("io.th0rgal:oraxen:1.151.0") { isTransitive = false }
     compileOnly("io.lumine:MythicLib-dist:1.3") { isTransitive = false }
     compileOnly("net.Indyuce:MMOItems:6.7") { isTransitive = false }
     compileOnly("dev.espi:protectionstones:2.10.2") { isTransitive = false }
