@@ -2,8 +2,8 @@
 
 package xyz.xenondevs.nova.util
 
-import com.mojang.serialization.JsonOps
 import com.mojang.datafixers.util.Either
+import com.mojang.serialization.JsonOps
 import net.minecraft.core.Direction
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
@@ -51,6 +51,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
@@ -353,6 +354,6 @@ object NMSUtils {
     }
     
     fun <T, R : Registry<T>> getRegistry(location: ResourceKey<R>) =
-        REGISTRY_ACCESS.registry(location).get() ?: throw IllegalArgumentException("Registry $location does not exist!")
+        REGISTRY_ACCESS.registry(location).getOrNull() ?: throw IllegalArgumentException("Registry $location does not exist!")
     
 }

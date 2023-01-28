@@ -61,13 +61,13 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     }
     
     @Override
-    public BlockState setBlockState(int i, int j, int k, BlockState iblockdata) {
-        return delegate.setBlockState(i, j, k, iblockdata);
+    public BlockState setBlockState(int relX, int relY, int relZ, BlockState state) {
+        return setBlockState(relX, relY, relZ, state, true);
     }
     
     @Override
-    public BlockState setBlockState(int relX, int relY, int relZ, BlockState iblockdata, boolean flag) {
-        if (iblockdata instanceof WrapperBlockState wrappedState) {
+    public BlockState setBlockState(int relX, int relY, int relZ, BlockState state, boolean sync) {
+        if (state instanceof WrapperBlockState wrappedState) {
             var chunkPos = this.chunkPos;
             WorldDataManager.INSTANCE.addOrphanBlock$nova(level,
                 relX + chunkPos.getMinBlockX(),
@@ -76,7 +76,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
                 wrappedState.getNovaMaterial());
             return Blocks.AIR.defaultBlockState();
         }
-        return delegate.setBlockState(relX, relY, relZ, iblockdata, flag);
+        return delegate.setBlockState(relX, relY, relZ, state, sync);
     }
     
     @Override
