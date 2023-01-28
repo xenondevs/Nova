@@ -173,11 +173,12 @@ internal object NovaCommand : Command("nova") {
         val player = ctx.player
         val changed = AdvancedTooltips.setType(player, type)
         
+        val typeName = type.name.lowercase()
         if (changed) {
-            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.advanced_tooltips.$type.success"))
+            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.advanced_tooltips.$typeName.success"))
             player.updateInventory()
         } else {
-            ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.advanced_tooltips.$type.failure"))
+            ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.advanced_tooltips.$typeName.failure"))
         }
     }
     
