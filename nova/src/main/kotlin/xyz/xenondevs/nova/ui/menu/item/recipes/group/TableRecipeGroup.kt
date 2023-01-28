@@ -1,26 +1,26 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes.group
 
-import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.builder.GuiBuilder
-import xyz.xenondevs.invui.gui.builder.guitype.GuiType
-import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.util.SlotUtils
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.util.SlotUtils
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
 import xyz.xenondevs.nova.util.intValue
 
 internal object TableRecipeGroup : RecipeGroup<Recipe>() {
     
     override val priority = 0
-    override val texture = CoreGUITexture.RECIPE_CRAFTING
+    override val texture = CoreGuiTexture.RECIPE_CRAFTING
     override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
-    override fun createGUI(recipe: Recipe): Gui {
+    override fun createGui(recipe: Recipe): Gui {
         val gui = GuiBuilder(GuiType.NORMAL)
             .setStructure(
                 ". . . . . . . . .",

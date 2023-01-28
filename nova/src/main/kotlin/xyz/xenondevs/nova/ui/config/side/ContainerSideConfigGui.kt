@@ -1,17 +1,17 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import xyz.xenondevs.invui.gui.builder.GuiBuilder
-import xyz.xenondevs.invui.gui.builder.guitype.GuiType
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.EndPointContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -23,10 +23,10 @@ import xyz.xenondevs.nova.util.data.addLoreLines
 import xyz.xenondevs.nova.util.data.setLocalizedName
 import xyz.xenondevs.nova.util.playClickSound
 
-internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : ContainerEndPointDataHolder<C>>(
+internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : ContainerEndPointDataHolder<C>>(
     holder: H,
     containers: List<Pair<C, String>>
-) : BaseSideConfigGUI<H>(holder) {
+) : BaseSideConfigGui<H>(holder) {
     
     protected abstract val hasSimpleVersion: Boolean
     protected abstract val hasAdvancedVersion: Boolean
@@ -45,7 +45,7 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
     
     private var simpleModeBtn: SimplicityModeItem? = null
     
-    private val simpleGUI = GuiBuilder(GuiType.NORMAL)
+    private val simpleGui = GuiBuilder(GuiType.NORMAL)
         .setStructure(
             "# # # # u # # # #",
             "# # # l f r # # #",
@@ -59,7 +59,7 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
         .addIngredient('b', ConnectionConfigItem(BlockSide.BACK))
         .build()
     
-    private val advancedGUI = GuiBuilder(GuiType.NORMAL)
+    private val advancedGui = GuiBuilder(GuiType.NORMAL)
         .setStructure(
             "# # u # # # 1 # #",
             "# l f r # 2 3 4 #",
@@ -79,20 +79,20 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
         .addIngredient('6', InventoryConfigItem(BlockSide.BACK))
         .build()
     
-    fun initGUI() {
+    fun initGui() {
         if (hasSimpleVersion && hasAdvancedVersion) {
             simpleModeBtn = SimplicityModeItem(true)
-            advancedGUI.setItem(8, 0, simpleModeBtn)
+            advancedGui.setItem(8, 0, simpleModeBtn)
             
             val advancedModeBtn = SimplicityModeItem(false)
-            simpleGUI.setItem(8, 0, advancedModeBtn)
+            simpleGui.setItem(8, 0, advancedModeBtn)
         }
         
         switchSimplicity(isSimpleConfiguration())
     }
     
     private fun switchSimplicity(simple: Boolean) {
-        fillRectangle(0, 0, if (simple) simpleGUI else advancedGUI, true)
+        fillRectangle(0, 0, if (simple) simpleGui else advancedGui, true)
     }
     
     private fun changeInventory(blockFace: BlockFace, forward: Boolean): Boolean {
@@ -148,11 +148,11 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
         override fun getItemProvider(): ItemProvider {
             return if (simple) {
                 if (isSimpleConfiguration()) {
-                    CoreGUIMaterial.SIMPLE_MODE_BTN_ON.clientsideProvider
-                } else CoreGUIMaterial.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
+                    CoreGuiMaterial.SIMPLE_MODE_BTN_ON.clientsideProvider
+                } else CoreGuiMaterial.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
                     .setLocalizedName("menu.nova.side_config.simple_mode")
                     .addLocalizedLoreLines(ChatColor.GRAY, "menu.nova.side_config.simple_mode.unavailable")
-            } else CoreGUIMaterial.ADVANCED_MODE_BTN_ON.clientsideProvider
+            } else CoreGuiMaterial.ADVANCED_MODE_BTN_ON.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

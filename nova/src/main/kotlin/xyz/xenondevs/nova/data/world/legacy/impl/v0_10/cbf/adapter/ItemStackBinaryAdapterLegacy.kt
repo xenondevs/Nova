@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter
 
-import xyz.xenondevs.inventoryaccess.InventoryAccess
 import io.netty.buffer.ByteBuf
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.inventoryaccess.InventoryAccess
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.BinaryAdapterLegacy
 import java.lang.reflect.Type
 

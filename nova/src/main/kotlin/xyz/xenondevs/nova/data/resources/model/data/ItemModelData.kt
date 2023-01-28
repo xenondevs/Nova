@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.data.resources.model.data
 
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.data.withoutPreFormatting

@@ -1,14 +1,14 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import xyz.xenondevs.invui.gui.structure.Structure
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.invui.gui.structure.Structure
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.BlockSide
 
-internal class EnergySideConfigGUI(
+internal class EnergySideConfigGui(
     holder: EnergyHolder
-) : BaseSideConfigGUI<EnergyHolder>(holder) {
+) : BaseSideConfigGui<EnergyHolder>(holder) {
     
     private val structure = Structure("" +
         "# # # # u # # # #" +

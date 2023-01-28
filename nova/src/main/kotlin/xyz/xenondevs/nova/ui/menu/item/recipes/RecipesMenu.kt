@@ -1,5 +1,14 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes
 
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.ComponentBuilder
+import net.md_5.bungee.api.chat.TranslatableComponent
+import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.TabGui
@@ -13,19 +22,10 @@ import xyz.xenondevs.invui.item.impl.BaseItem
 import xyz.xenondevs.invui.item.impl.controlitem.ControlItem
 import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.type.WindowType
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.Material
-import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.window.builder.WindowType
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
@@ -96,7 +96,7 @@ private class RecipesWindow(
         recipes as Map<RecipeGroup<Any>, Iterable<RecipeContainer>>
         
         val craftingTabs: List<Pair<RecipeGroup<*>, Gui>> = recipes
-            .mapValues { (type, containers) -> createPagedRecipesGUI(containers.map { container -> type.getGUI(container.recipe) }) }
+            .mapValues { (type, containers) -> createPagedRecipesGui(containers.map { container -> type.getGui(container.recipe) }) }
             .map { it.key to it.value }
             .sortedBy { it.first }
         
@@ -198,7 +198,7 @@ private class RecipesWindow(
     private inner class PageBackItem : ControlItem<PagedGui<*>>() {
         
         override fun getItemProvider(gui: PagedGui<*>) =
-            (if (gui.hasPreviousPage()) CoreGUIMaterial.TP_ARROW_LEFT_BTN_ON else CoreGUIMaterial.TP_ARROW_LEFT_BTN_OFF)
+            (if (gui.hasPreviousPage()) CoreGuiMaterial.TP_ARROW_LEFT_BTN_ON else CoreGuiMaterial.TP_ARROW_LEFT_BTN_OFF)
                 .clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -214,7 +214,7 @@ private class RecipesWindow(
     private inner class PageForwardItem : ControlItem<PagedGui<*>>() {
         
         override fun getItemProvider(gui: PagedGui<*>) =
-            (if (gui.hasNextPage()) CoreGUIMaterial.TP_ARROW_RIGHT_BTN_ON else CoreGUIMaterial.TP_ARROW_RIGHT_BTN_OFF)
+            (if (gui.hasNextPage()) CoreGuiMaterial.TP_ARROW_RIGHT_BTN_ON else CoreGuiMaterial.TP_ARROW_RIGHT_BTN_OFF)
                 .clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -227,7 +227,7 @@ private class RecipesWindow(
         
     }
     
-    private fun createPagedRecipesGUI(recipes: List<Gui>): Gui =
+    private fun createPagedRecipesGui(recipes: List<Gui>): Gui =
         GuiBuilder(GuiType.PAGED_GUIS)
             .setStructure(recipesGuiStructure)
             .setContent(recipes)
@@ -239,7 +239,7 @@ private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
     
     override fun getItemProvider(): ItemProvider {
         return if (ItemMenu.hasHistory(viewerUUID)) {
-            CoreGUIMaterial.LIGHT_ARROW_1_LEFT.clientsideProvider
+            CoreGuiMaterial.LIGHT_ARROW_1_LEFT.clientsideProvider
         } else ItemWrapper(ItemStack(Material.AIR))
     }
     

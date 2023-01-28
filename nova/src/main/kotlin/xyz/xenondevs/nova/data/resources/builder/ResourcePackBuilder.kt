@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.data.resources.builder.content.AtlasContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorContent
-import xyz.xenondevs.nova.data.resources.builder.content.font.GUIContent
+import xyz.xenondevs.nova.data.resources.builder.content.font.GuiContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.MovedFontContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.WailaContent
@@ -179,7 +179,7 @@ internal class ResourcePackBuilder {
                 // pre-world
                 MaterialContent(basePacks, soundOverrides),
                 ArmorContent(basePacks),
-                GUIContent(),
+                GuiContent(),
                 LanguageContent(),
                 TextureIconContent(movedFontContent),
                 AtlasContent(),

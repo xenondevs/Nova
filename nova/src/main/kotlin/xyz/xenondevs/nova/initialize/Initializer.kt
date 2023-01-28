@@ -2,9 +2,6 @@
 
 package xyz.xenondevs.nova.initialize
 
-import xyz.xenondevs.invui.InvUI
-import xyz.xenondevs.invui.util.InventoryUtils
-import xyz.xenondevs.invui.virtualinventory.StackSizeProvider
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
 import org.bukkit.Bukkit
@@ -14,6 +11,9 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
 import xyz.xenondevs.commons.collections.CollectionUtils
+import xyz.xenondevs.invui.InvUI
+import xyz.xenondevs.invui.util.InventoryUtils
+import xyz.xenondevs.invui.virtualinventory.StackSizeProvider
 import xyz.xenondevs.nmsutils.NMSUtilities
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER

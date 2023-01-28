@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 
 private const val ASCENT = 13
 
-internal class GUIContent : FontContent(
+internal class GuiContent : FontContent(
     "nova:gui_%s",
     Resources::updateGuiDataLookup
 ) {

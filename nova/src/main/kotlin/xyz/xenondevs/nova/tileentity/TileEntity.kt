@@ -1,11 +1,5 @@
 package xyz.xenondevs.nova.tileentity
 
-import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
-import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
-import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
-import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
-import xyz.xenondevs.invui.window.type.WindowType
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.network.protocol.Packet
 import org.bukkit.Bukkit
@@ -21,6 +15,12 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
+import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
+import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
+import xyz.xenondevs.invui.window.builder.WindowType
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.Reloadable
@@ -36,7 +36,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.ui.overlay.character.gui.GUITexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.GuiTexture
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.LocationUtils
@@ -102,7 +102,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     var isValid: Boolean = true
         private set
     
-    abstract val gui: Lazy<TileEntityGUI>?
+    abstract val gui: Lazy<TileEntityGui>?
     
     internal val multiModels = ArrayList<MultiModel>()
     internal val packetTasks = ArrayList<TileEntityPacketTask>()
@@ -590,7 +590,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         return "${javaClass.name}(Material: $material, Location: ${pos}, UUID: $uuid)"
     }
     
-    abstract inner class TileEntityGUI(private val texture: GUITexture? = null) {
+    abstract inner class TileEntityGui(private val texture: GuiTexture? = null) {
         
         /**
          * The main [Gui] of a [TileEntity] to be opened when it is right-clicked and closed when
@@ -599,10 +599,10 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         abstract val gui: Gui
         
         /**
-         * A list of [GUIs][Gui] that are not a part of [gui] but should still be closed
+         * A list of [Guis][Gui] that are not a part of [gui] but should still be closed
          * when the [TileEntity] is destroyed.
          */
-        val subGUIs = ArrayList<Gui>()
+        val subGuis = ArrayList<Gui>()
         
         /**
          * Opens a Window of the [gui] to the specified [player].
@@ -615,15 +615,15 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
                 it.setViewer(player)
                 it.setTitle(title)
                 it.setGui(gui)
-            }.apply { show() }
+            }.apply { com.bekvon.bukkit.residence.commands.show() }
         }
         
         /**
-         * Closes all Windows connected to this [TileEntityGUI].
+         * Closes all Windows connected to this [TileEntityGui].
          */
         fun closeWindows() {
             gui.closeForAllViewers()
-            subGUIs.forEach(Gui::closeForAllViewers)
+            subGuis.forEach(Gui::closeForAllViewers)
         }
         
     }

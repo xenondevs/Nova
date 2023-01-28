@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.data.serialization.cbf.adapter
 
-import xyz.xenondevs.inventoryaccess.InventoryAccess
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.inventoryaccess.InventoryAccess
 import kotlin.reflect.KType
 
 internal object ItemStackBinaryAdapter: BinaryAdapter<ItemStack> {

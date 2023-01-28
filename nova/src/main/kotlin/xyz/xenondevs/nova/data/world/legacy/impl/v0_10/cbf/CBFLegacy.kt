@@ -2,13 +2,13 @@
 
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf
 
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.reflection.rawType
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound.CompoundBinaryAdapterLegacy
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter.*

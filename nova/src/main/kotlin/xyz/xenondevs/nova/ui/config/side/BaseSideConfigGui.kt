@@ -1,9 +1,5 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import xyz.xenondevs.invui.gui.AbstractGui
-import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -13,8 +9,12 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.invui.gui.AbstractGui
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.impl.BaseItem
 import xyz.xenondevs.nova.data.world.block.property.Directional
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.yaw
 
-internal abstract class BaseSideConfigGUI<H : EndPointDataHolder>(
+internal abstract class BaseSideConfigGui<H : EndPointDataHolder>(
     val holder: H
 ) : AbstractGui(9, 3) {
     
@@ -85,13 +85,13 @@ internal abstract class BaseSideConfigGUI<H : EndPointDataHolder>(
             val connectionType = holder.connectionConfig[blockFace]!! // fixme: Unsafe network value access. Should only be accessed from NetworkManager thread.
             return when (connectionType) {
                 NetworkConnectionType.NONE ->
-                    CoreGUIMaterial.GRAY_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GRAY, "menu.nova.side_config.none")
+                    CoreGuiMaterial.GRAY_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GRAY, "menu.nova.side_config.none")
                 NetworkConnectionType.EXTRACT ->
-                    CoreGUIMaterial.ORANGE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GOLD, "menu.nova.side_config.output")
+                    CoreGuiMaterial.ORANGE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GOLD, "menu.nova.side_config.output")
                 NetworkConnectionType.INSERT ->
-                    CoreGUIMaterial.BLUE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.AQUA, "menu.nova.side_config.input")
+                    CoreGuiMaterial.BLUE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.AQUA, "menu.nova.side_config.input")
                 NetworkConnectionType.BUFFER ->
-                    CoreGUIMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GREEN, "menu.nova.side_config.input_output")
+                    CoreGuiMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GREEN, "menu.nova.side_config.input_output")
             }.setDisplayName(*getSideName(blockSide, blockFace))
         }
     

@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.util.data
 
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.util.ComponentUtils
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ClickEvent
@@ -15,6 +13,8 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
 import org.bukkit.entity.Entity
 import xyz.xenondevs.commons.collections.mapToArray
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.util.ComponentUtils
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.util.localizedName

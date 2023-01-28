@@ -1,5 +1,10 @@
 package xyz.xenondevs.nova.ui
 
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.TranslatableComponent
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.builder.GuiBuilder
 import xyz.xenondevs.invui.gui.builder.guitype.GuiType
@@ -8,13 +13,8 @@ import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.BaseItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
-import xyz.xenondevs.invui.window.type.WindowType
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.invui.window.builder.WindowType
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.config.side.BackItem
@@ -25,11 +25,11 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 
-class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Unit) {
+class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Unit) {
     
     private val upgradeItems = ArrayList<Item>()
     
-    private val upgradeScrollGUI = GuiBuilder(GuiType.SCROLL_ITEMS)
+    private val upgradeScrollGui = GuiBuilder(GuiType.SCROLL_ITEMS)
         .setStructure(
             "x x x x x",
             "x x x x x",
@@ -38,7 +38,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         .addIngredient('<', ScrollLeftItem())
         .addIngredient('>', ScrollRightItem())
         .addIngredient('x', Markers.CONTENT_LIST_SLOT_VERTICAL)
-        .setBackground(CoreGUIMaterial.INVENTORY_PART.clientsideProvider)
+        .setBackground(CoreGuiMaterial.INVENTORY_PART.clientsideProvider)
         .setContent(createUpgradeItemList())
         .build()
     
@@ -52,10 +52,10 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         .addIngredient('i', upgradeHolder.input)
         .addIngredient('b', BackItem(openPrevious))
         .build()
-        .apply { fillRectangle(3, 1, upgradeScrollGUI, true) }
+        .apply { fillRectangle(3, 1, upgradeScrollGui, true) }
     
     init {
-        upgradeHolder.lazyGUI.value.subGUIs += gui
+        upgradeHolder.lazyGui.value.subGuis += gui
     }
     
     private fun createUpgradeItemList(): List<Item> {
@@ -116,8 +116,8 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         
         override fun getItemProvider(): ItemProvider {
             return if (type in upgradeHolder.allowed)
-                CoreGUIMaterial.NUMBER.item.createClientsideItemBuilder(subId = upgradeHolder.upgrades[type] ?: 0)
-            else CoreGUIMaterial.MINUS.clientsideProvider
+                CoreGuiMaterial.NUMBER.item.createClientsideItemBuilder(subId = upgradeHolder.upgrades[type] ?: 0)
+            else CoreGuiMaterial.MINUS.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
@@ -126,7 +126,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     
 }
 
-class OpenUpgradesItem(private val upgradeHolder: UpgradeHolder) : SimpleItem(CoreGUIMaterial.UPGRADES_BTN.clientsideProvider) {
+class OpenUpgradesItem(private val upgradeHolder: UpgradeHolder) : SimpleItem(CoreGuiMaterial.UPGRADES_BTN.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playClickSound()

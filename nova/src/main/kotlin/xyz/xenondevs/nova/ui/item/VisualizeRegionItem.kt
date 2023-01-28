@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.ui.item
 
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.BaseItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
@@ -22,8 +22,8 @@ class VisualizeRegionItem(
             override fun get() = null
             override fun getFor(playerUUID: UUID): ItemStack {
                 val visible = VisualRegion.isVisible(playerUUID, regionUUID)
-                return (if (visible) CoreGUIMaterial.AREA_BTN_ON.clientsideProvider
-                else CoreGUIMaterial.AREA_BTN_OFF.clientsideProvider).get()
+                return (if (visible) CoreGuiMaterial.AREA_BTN_ON.clientsideProvider
+                else CoreGuiMaterial.AREA_BTN_OFF.clientsideProvider).get()
             }
         }
     

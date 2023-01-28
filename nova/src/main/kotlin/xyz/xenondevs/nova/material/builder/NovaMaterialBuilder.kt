@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.material.builder
 
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import org.bukkit.Material
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder

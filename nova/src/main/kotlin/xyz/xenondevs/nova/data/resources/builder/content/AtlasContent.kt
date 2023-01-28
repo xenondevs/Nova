@@ -7,7 +7,6 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.data.walk
 import java.nio.file.Path
 import kotlin.io.path.createDirectories

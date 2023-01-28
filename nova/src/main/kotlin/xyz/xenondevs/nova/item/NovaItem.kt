@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.item
 
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -26,6 +25,7 @@ import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.provider.immutable.combinedLazyProvider
 import xyz.xenondevs.commons.provider.immutable.flatten
 import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.configReloadable

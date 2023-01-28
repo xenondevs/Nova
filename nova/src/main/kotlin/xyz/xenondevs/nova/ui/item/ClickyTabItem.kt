@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.ui.item
 
-import xyz.xenondevs.invui.gui.TabGui
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.invui.gui.TabGui
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.nova.util.playClickSound
 
 class ClickyTabItem(private val tab: Int, private val itemProvider: (TabGui) -> ItemProvider) : TabItem(tab) {

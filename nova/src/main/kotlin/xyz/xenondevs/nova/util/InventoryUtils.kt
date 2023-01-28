@@ -1,8 +1,5 @@
 package xyz.xenondevs.nova.util
 
-import xyz.xenondevs.invui.util.InventoryUtils
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
-import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.CraftingInventory
@@ -12,6 +9,9 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.invui.util.InventoryUtils
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 /**

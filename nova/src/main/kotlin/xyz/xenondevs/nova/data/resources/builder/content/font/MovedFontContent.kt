@@ -12,7 +12,6 @@ import xyz.xenondevs.nova.data.resources.builder.BitmapFontGenerator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder.BuildingStage
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
-import xyz.xenondevs.nova.util.data.getIntOrNull
 import kotlin.io.path.createDirectories
 
 private val DEFAULT_FONT = ResourcePath("minecraft", "default")

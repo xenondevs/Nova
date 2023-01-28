@@ -2,9 +2,8 @@ package xyz.xenondevs.nova.material
 
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.registerUnnamedHiddenCoreItem
 
-
 @Suppress("unused")
-object CoreGUIMaterial {
+object CoreGuiMaterial {
     
     val ANVIL_OVERLAY_ARROW = registerUnnamedHiddenCoreItem("gui_anvil_overlay_arrow")
     val ANVIL_OVERLAY_ARROW_LEFT = registerUnnamedHiddenCoreItem("gui_anvil_overlay_arrow_left")

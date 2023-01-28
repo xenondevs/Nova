@@ -1,17 +1,17 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
-import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
-import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.mapKeysNotNullTo
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
+import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntity.TileEntityGUI
-import xyz.xenondevs.nova.ui.UpgradesGUI
+import xyz.xenondevs.nova.tileentity.TileEntity.TileEntityGui
+import xyz.xenondevs.nova.ui.UpgradesGui
 import xyz.xenondevs.nova.util.item.novaMaterial
 import kotlin.math.min
 
@@ -22,7 +22,7 @@ private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
 
 class UpgradeHolder internal constructor(
     tileEntity: TileEntity,
-    internal val lazyGUI: Lazy<TileEntityGUI>,
+    internal val lazyGui: Lazy<TileEntityGui>,
     private val updateHandler: (() -> Unit)?,
     internal val allowed: Set<UpgradeType<*>>
 ) {
@@ -35,7 +35,7 @@ class UpgradeHolder internal constructor(
         tileEntity.retrieveData<Map<NamespacedId, Int>>("upgrades", ::HashMap)
             .mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of<UpgradeType<*>>(it.key) }
     
-    val gui by lazy { UpgradesGUI(this) { lazyGUI.value.openWindow(it) } }
+    val gui by lazy { UpgradesGui(this) { lazyGui.value.openWindow(it) } }
     
     /**
      * Tries adding the given amount of upgrades and

@@ -22,7 +22,7 @@ import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 
-private const val EXTINGUISH_CAMPFIRE_LEVEL_EVENT = 1009
+private const val EXTINGuiSH_CAMPFIRE_LEVEL_EVENT = 1009
 
 object Extinguishing : ItemBehavior() {
     
@@ -45,7 +45,7 @@ object Extinguishing : ItemBehavior() {
                 
                 val newState = state.setValue(CampfireBlock.LIT, false)
                 level.setBlock(pos, newState, 11)
-                level.levelEvent(null, EXTINGUISH_CAMPFIRE_LEVEL_EVENT, pos, 0)
+                level.levelEvent(null, EXTINGuiSH_CAMPFIRE_LEVEL_EVENT, pos, 0)
                 level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(serverPlayer, newState))
                 
                 val hand = event.hand!!

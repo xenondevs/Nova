@@ -16,7 +16,7 @@ private val TITLE_TEMPLATE = ComponentBuilder("")
     .font("default")
     .create()[0]
 
-class GUITexture(private val info: FontChar) {
+class GuiTexture(private val info: FontChar) {
     
     val component: BaseComponent = ComponentBuilder(info.char.toString())
         .font(info.font)
@@ -42,7 +42,7 @@ class GUITexture(private val info: FontChar) {
     
     companion object {
         
-        internal fun of(id: String) = GUITexture(Resources.getGUIChar(id))
+        internal fun of(id: String) = GuiTexture(Resources.getGuiChar(id))
         
         fun of(addon: Addon, name: String) = of(name.addNamespace(addon.description.id))
         
