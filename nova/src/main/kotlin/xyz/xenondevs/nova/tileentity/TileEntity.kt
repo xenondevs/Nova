@@ -615,7 +615,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
                 it.setViewer(player)
                 it.setTitle(title)
                 it.setGui(gui)
-            }.apply { com.bekvon.bukkit.residence.commands.show() }
+            }.apply { show() }
         }
         
         /**
