@@ -3,7 +3,7 @@
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
-import de.studiocode.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag

@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes.group
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.item.ItemWrapper
-import de.studiocode.invui.util.SlotUtils
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.util.SlotUtils
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
@@ -20,8 +20,8 @@ internal object TableRecipeGroup : RecipeGroup<Recipe>() {
     override val texture = CoreGUITexture.RECIPE_CRAFTING
     override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
-    override fun createGUI(recipe: Recipe): GUI {
-        val gui = GUIBuilder(GUIType.NORMAL)
+    override fun createGUI(recipe: Recipe): Gui {
+        val gui = GuiBuilder(GuiType.NORMAL)
             .setStructure(
                 ". . . . . . . . .",
                 ". . . . . . . r .",

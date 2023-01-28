@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes.group
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemWrapper
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemWrapper
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.Material
 import org.bukkit.inventory.BlastingRecipe
@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.util.data.getInputStacks
 
 abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
     
-    override fun createGUI(recipe: T): GUI =
+    override fun createGUI(recipe: T): Gui =
         when (recipe) {
             is CookingRecipe<*> -> createConversionRecipeGUI(recipe.inputChoice, recipe.result, recipe.cookingTime)
             is StonecuttingRecipe -> createConversionRecipeGUI(recipe.inputChoice, recipe.result, 0)
@@ -31,14 +31,14 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
             else -> throw UnsupportedOperationException("Unsupported recipe type: ${recipe::class}")
         }
     
-    private fun createConversionRecipeGUI(input: RecipeChoice, result: ItemStack, time: Int): GUI =
+    private fun createConversionRecipeGUI(input: RecipeChoice, result: ItemStack, time: Int): Gui =
         createConversionRecipeGUI(createRecipeChoiceItem(input), result, time)
     
-    private fun createConversionRecipeGUI(input: List<ItemStack>, result: ItemStack, time: Int): GUI =
+    private fun createConversionRecipeGUI(input: List<ItemStack>, result: ItemStack, time: Int): Gui =
         createConversionRecipeGUI(createRecipeChoiceItem(input), result, time)
     
-    private fun createConversionRecipeGUI(inputUIItem: Item, outputItem: ItemStack, time: Int): GUI {
-        val builder = GUIBuilder(GUIType.NORMAL)
+    private fun createConversionRecipeGUI(inputUIItem: Item, outputItem: ItemStack, time: Int): Gui {
+        val builder = GuiBuilder(GuiType.NORMAL)
             .setStructure(
                 ". . t . . . . . .",
                 ". . i . . . r . .",

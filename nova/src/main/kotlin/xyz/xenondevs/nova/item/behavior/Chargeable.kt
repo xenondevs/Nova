@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.item.behavior
 
-import de.studiocode.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.immutable.provider

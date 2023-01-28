@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.ItemWrapper
-import de.studiocode.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.commons.provider.immutable.lazyProvider

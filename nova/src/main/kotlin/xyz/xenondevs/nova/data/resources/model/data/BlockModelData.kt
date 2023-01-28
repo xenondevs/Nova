@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.resources.model.data
 
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.NamespacedId

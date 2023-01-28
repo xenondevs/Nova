@@ -19,8 +19,9 @@ dependencies {
     spigotLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
-    novaLoaderApi("de.studiocode.invui:InvUI:0.10") { for (i in 1..12) exclude("de.studiocode.invui", "IA-R$i") }
-    novaLoaderApi("de.studiocode.invui:IA-R12:0.10:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs.invui:invui:1.0-SNAPSHOT") { for (i in 1..12) exclude("xyz.xenondevs.invui", "inventory-access-r$i") }
+    novaLoaderApi("xyz.xenondevs.invui:inventory-access-r12:1.0-SNAPSHOT:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs.invui:invui-kotlin:1.0-SNAPSHOT")
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.6:remapped-mojang")
     
     // internal dependencies
@@ -28,7 +29,7 @@ dependencies {
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
     novaLoader(libs.zip4j)
-    novaLoader("de.studiocode.invui:ResourcePack:0.10") { exclude("de.studiocode.invui", "InvUI") }
+    novaLoader("xyz.xenondevs.invui:invui-resourcepack:1.0-SNAPSHOT") { exclude("xyz.xenondevs.invui", "invui") }
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.4")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")

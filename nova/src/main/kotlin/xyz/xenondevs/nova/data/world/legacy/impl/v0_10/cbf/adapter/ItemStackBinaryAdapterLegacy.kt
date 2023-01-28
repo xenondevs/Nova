@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter
 
-import de.studiocode.inventoryaccess.version.InventoryAccess
+import xyz.xenondevs.inventoryaccess.InventoryAccess
 import io.netty.buffer.ByteBuf
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.BinaryAdapterLegacy

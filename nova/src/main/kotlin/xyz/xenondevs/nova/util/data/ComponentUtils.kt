@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
-import de.studiocode.invui.item.builder.ItemBuilder
-import de.studiocode.invui.util.ComponentUtils
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.util.ComponentUtils
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ClickEvent

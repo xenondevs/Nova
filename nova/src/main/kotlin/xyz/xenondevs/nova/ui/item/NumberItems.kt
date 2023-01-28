@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.ui.item
 
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.builder.ItemBuilder
-import de.studiocode.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.impl.BaseItem
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType

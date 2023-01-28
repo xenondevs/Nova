@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.resources
 
-import de.studiocode.inventoryaccess.util.DataUtils
+import xyz.xenondevs.inventoryaccess.util.DataUtils
 import kotlinx.coroutines.runBlocking
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA

@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.tileentity
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.event.InventoryUpdatedEvent
-import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import de.studiocode.invui.virtualinventory.event.UpdateReason
-import de.studiocode.invui.window.impl.single.SimpleWindow
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
+import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
+import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
+import xyz.xenondevs.invui.window.type.WindowType
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.network.protocol.Packet
 import org.bukkit.Bukkit
@@ -593,16 +593,16 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     abstract inner class TileEntityGUI(private val texture: GUITexture? = null) {
         
         /**
-         * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
+         * The main [Gui] of a [TileEntity] to be opened when it is right-clicked and closed when
          * the owning [TileEntity] is destroyed.
          */
-        abstract val gui: GUI
+        abstract val gui: Gui
         
         /**
-         * A list of [GUIs][GUI] that are not a part of [gui] but should still be closed
+         * A list of [GUIs][Gui] that are not a part of [gui] but should still be closed
          * when the [TileEntity] is destroyed.
          */
-        val subGUIs = ArrayList<GUI>()
+        val subGUIs = ArrayList<Gui>()
         
         /**
          * Opens a Window of the [gui] to the specified [player].
@@ -610,7 +610,12 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         fun openWindow(player: Player) {
             val title = texture?.getTitle(material.localizedName)
                 ?: arrayOf(TranslatableComponent(material.localizedName))
-            SimpleWindow(player, title, gui).show()
+            
+            WindowType.NORMAL.createWindow {
+                it.setViewer(player)
+                it.setTitle(title)
+                it.setGui(gui)
+            }.apply { show() }
         }
         
         /**
@@ -618,7 +623,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
          */
         fun closeWindows() {
             gui.closeForAllViewers()
-            subGUIs.forEach(GUI::closeForAllViewers)
+            subGUIs.forEach(Gui::closeForAllViewers)
         }
         
     }

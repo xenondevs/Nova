@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.item.behavior
 
-import de.studiocode.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action

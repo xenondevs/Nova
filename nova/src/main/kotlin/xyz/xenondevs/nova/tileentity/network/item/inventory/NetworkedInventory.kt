@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network.item.inventory
 
-import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.event.UpdateReason
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.flatMap

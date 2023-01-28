@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.util
 
-import de.studiocode.invui.util.InventoryUtils
-import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.event.UpdateReason
+import xyz.xenondevs.invui.util.InventoryUtils
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.CraftingInventory
@@ -21,16 +21,6 @@ fun VirtualInventory.addAll(reason: UpdateReason?, items: List<ItemStack>) =
     items.forEach { addItem(reason, it) }
 
 /**
- * Checks if a [VirtualInventory] is full.
- */
-fun VirtualInventory.isFull(): Boolean {
-    for ((index, item) in items.withIndex())
-        if (item == null || item.amount < getMaxStackSize(index, -1))
-            return false
-    return true
-}
-
-/**
  * Checks if an [Inventory] is full.
  */
 fun Inventory.isFull(): Boolean {
@@ -39,12 +29,6 @@ fun Inventory.isFull(): Boolean {
             return false
     return true
 }
-
-/**
- * Checks if a [VirtualInventory] has an empty slot.
- */
-fun VirtualInventory.hasEmptySlot(): Boolean =
-    items.any { it == null }
 
 /**
  * Adds an [ItemStack] to an [Inventory] while respecting both
@@ -157,41 +141,6 @@ val Player.hasInventoryOpen: Boolean
  */
 fun InventoryView.isPlayerView() = topInventory is CraftingInventory && topInventory.size == 5
 
-/**
- * Tries to remove the first ItemStack#amount items from the first slots that have a similar item.
- * @return How many items could not be removed
- */
-fun VirtualInventory.removeFirstMatching(toMatch: ItemStack, updateReason: UpdateReason? = null): Int {
-    var leftOver = toMatch.amount
-    
-    for (i in 0 until size) {
-        val item = getUnsafeItemStack(i)
-        if (toMatch.isSimilar(item)) {
-            leftOver += addItemAmount(updateReason, i, -leftOver)
-            
-            if (leftOver <= 0) break
-        }
-    }
-    
-    return leftOver
-}
-
-/**
- * Checks if that [VirtualInventory] has ItemStack#amount items.
- */
-fun VirtualInventory.contains(toCheck: ItemStack): Boolean {
-    var amount = toCheck.amount
-    for (i in 0 until size) {
-        val item = getUnsafeItemStack(i)
-        if (toCheck.isSimilar(item)) {
-            amount -= item.amount
-            if (amount <= 0) return true
-        }
-    }
-    
-    return false
-}
-
 class VoidingVirtualInventory(size: Int) : VirtualInventory(null, size) {
     override fun setItemStackSilently(slot: Int, itemStack: ItemStack?) = Unit
     override fun forceSetItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
@@ -200,7 +149,7 @@ class VoidingVirtualInventory(size: Int) : VirtualInventory(null, size) {
     override fun setItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
     override fun addItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
     override fun addItem(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
-    override fun collectToCursor(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
+    override fun collectSimilar(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
     override fun simulateAdd(itemStacks: MutableList<ItemStack>) = IntArray(itemStacks.size)
     override fun simulateAdd(itemStack: ItemStack, vararg itemStacks: ItemStack) = IntArray(1 + itemStacks.size)
     override fun canHold(itemStacks: MutableList<ItemStack>) = true

@@ -1,20 +1,20 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes.group
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.item.ItemProvider
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.ui.overlay.character.gui.GUITexture
 
-abstract class RecipeGroup<T: Any> : Comparable<RecipeGroup<*>> {
+abstract class RecipeGroup<T : Any> : Comparable<RecipeGroup<*>> {
     
-    private val guiCache = HashMap<T, GUI>()
+    private val guiCache = HashMap<T, Gui>()
     
     abstract val priority: Int
     abstract val texture: GUITexture
     abstract val icon: ItemProvider
     
-    protected abstract fun createGUI(recipe: T): GUI
+    protected abstract fun createGUI(recipe: T): Gui
     
-    fun getGUI(recipe: T): GUI {
+    fun getGUI(recipe: T): Gui {
         return guiCache.getOrPut(recipe) { createGUI(recipe) }
     }
     

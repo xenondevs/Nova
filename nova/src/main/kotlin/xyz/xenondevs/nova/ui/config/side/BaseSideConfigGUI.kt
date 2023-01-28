@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import de.studiocode.invui.gui.impl.SimpleGUI
-import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.gui.AbstractGui
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.util.yaw
 
 internal abstract class BaseSideConfigGUI<H : EndPointDataHolder>(
     val holder: H
-) : SimpleGUI(9, 3) {
+) : AbstractGui(9, 3) {
     
     private val configItems = enumMap<BlockFace, MutableList<Item>>()
     

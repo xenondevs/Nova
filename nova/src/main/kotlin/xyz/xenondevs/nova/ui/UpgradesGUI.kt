@@ -1,14 +1,14 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.gui.structure.Markers
-import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.item.impl.SimpleItem
-import de.studiocode.invui.window.impl.single.SimpleWindow
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.gui.structure.Markers
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.SimpleItem
+import xyz.xenondevs.invui.window.type.WindowType
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.entity.Player
@@ -29,7 +29,7 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     
     private val upgradeItems = ArrayList<Item>()
     
-    private val upgradeScrollGUI = GUIBuilder(GUIType.SCROLL_ITEMS)
+    private val upgradeScrollGUI = GuiBuilder(GuiType.SCROLL_ITEMS)
         .setStructure(
             "x x x x x",
             "x x x x x",
@@ -37,12 +37,12 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         )
         .addIngredient('<', ScrollLeftItem())
         .addIngredient('>', ScrollRightItem())
-        .addIngredient('x', Markers.ITEM_LIST_SLOT_VERTICAL)
+        .addIngredient('x', Markers.CONTENT_LIST_SLOT_VERTICAL)
         .setBackground(CoreGUIMaterial.INVENTORY_PART.clientsideProvider)
-        .setItems(createUpgradeItemList())
+        .setContent(createUpgradeItemList())
         .build()
     
-    val gui: GUI = GUIBuilder(GUIType.NORMAL)
+    val gui: Gui = GuiBuilder(GuiType.NORMAL)
         .setStructure(
             "b - - - - - - - 2",
             "| i # . . . . . |",
@@ -68,7 +68,11 @@ class UpgradesGUI(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     }
     
     fun openWindow(player: Player) {
-        SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.upgrades")), gui).show()
+        WindowType.NORMAL.createWindow { 
+            it.setViewer(player)
+            it.setTitle(arrayOf(TranslatableComponent("menu.nova.upgrades")))
+            it.setGui(gui)
+        }.show()
     }
     
     fun updateUpgrades() {

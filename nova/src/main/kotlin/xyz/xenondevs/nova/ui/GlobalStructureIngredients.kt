@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.gui.structure.Markers
-import de.studiocode.invui.gui.structure.Structure.addGlobalIngredient
+import xyz.xenondevs.invui.gui.structure.Markers
+import xyz.xenondevs.invui.gui.structure.Structure.addGlobalIngredient
 import xyz.xenondevs.nova.material.CoreGUIMaterial
 import xyz.xenondevs.nova.ui.item.PageBackItem
 import xyz.xenondevs.nova.ui.item.PageForwardItem
@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.ui.item.ScrollDownItem
 import xyz.xenondevs.nova.ui.item.ScrollUpItem
 
 internal fun setGlobalIngredients() {
-    addGlobalIngredient('x', Markers.ITEM_LIST_SLOT_HORIZONTAL)
+    addGlobalIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
     addGlobalIngredient('#', CoreGUIMaterial.INVENTORY_PART.clientsideProvider)
     addGlobalIngredient('-', CoreGUIMaterial.LIGHT_HORIZONTAL_LINE.clientsideProvider)
     addGlobalIngredient('|', CoreGUIMaterial.LIGHT_VERTICAL_LINE.clientsideProvider)

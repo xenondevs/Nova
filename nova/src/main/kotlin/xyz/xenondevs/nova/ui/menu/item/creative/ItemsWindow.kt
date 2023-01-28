@@ -1,19 +1,17 @@
 package xyz.xenondevs.nova.ui.menu.item.creative
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.gui.impl.PagedGUI
-import de.studiocode.invui.gui.impl.SimpleGUI
-import de.studiocode.invui.gui.impl.SimplePagedItemsGUI
-import de.studiocode.invui.gui.impl.TabGUI
-import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.impl.controlitem.PageItem
-import de.studiocode.invui.item.impl.controlitem.TabItem
-import de.studiocode.invui.window.Window
-import de.studiocode.invui.window.impl.merged.split.AnvilSplitWindow
-import de.studiocode.invui.window.impl.single.SimpleWindow
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.gui.TabGui
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.impl.controlitem.PageItem
+import xyz.xenondevs.invui.item.impl.controlitem.TabItem
+import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.WindowType
+import xyz.xenondevs.invui.window.type.create
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -57,16 +55,16 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
     ) { openMainWindow() }
     
-    private val tabPagesGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+    private val tabPagesGUI = GuiBuilder(GuiType.PAGED_ITEMS)
         .setStructure(
             "x . x . x . x . x",
             "< . . . . . . . >"
         )
         .addIngredient('<', TabPageBackItem())
         .addIngredient('>', TabPageForwardItem())
-        .build().apply { addPageChangeHandler(::handleTabPageChange) }
+        .build().apply { registerPageChangeHandler(::handleTabPageChange) }
     
-    private val mainGUI = GUIBuilder(GUIType.TAB)
+    private val mainGUI = GuiBuilder(GuiType.TAB)
         .setStructure(
             ". . . . . . . . .",
             ". . . . . . . . .",
@@ -76,10 +74,10 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             "x x x x x x x x x"
         )
         .addIngredient('s', openSearchItem)
-        .setGUIs(ItemCategories.CATEGORIES.map(::createCategoryGUI))
+        .setContent(ItemCategories.CATEGORIES.map(::createCategoryGUI))
         .build().apply { fillRectangle(0, 0, tabPagesGUI, true) }
     
-    private val searchResultsGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+    private val searchResultsGUI = GuiBuilder(GuiType.PAGED_ITEMS)
         .setStructure(
             "# # # < s > # # #",
             "x x x x x x x x x",
@@ -89,9 +87,9 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             "x x x x x x x x x"
         )
         .addIngredient('s', openSearchItem)
-        .build() as SimplePagedItemsGUI
+        .build()
     
-    private val searchPreviewGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+    private val searchPreviewGUI = GuiBuilder(GuiType.PAGED_ITEMS)
         .setStructure(
             "x x x x x x x x x",
             "x x x x x x x x x",
@@ -99,7 +97,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             "# # # < # > # # s"
         )
         .addIngredient('s', openMainWindowItem)
-        .build() as SimplePagedItemsGUI
+        .build()
     
     private val textItem = AnvilTextItem(CoreGUIMaterial.INVISIBLE_ITEM.createClientsideItemBuilder(), "")
     
@@ -116,7 +114,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         val tabButtons = ItemCategories.CATEGORIES
             .withIndex()
             .map { (index, category) -> CreativeTabItem(index, category).apply { setGui(mainGUI) } }
-        tabPagesGUI.setItems(tabButtons)
+        tabPagesGUI.setContent(tabButtons)
         
         updateFilteredItems()
     }
@@ -130,8 +128,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         filteredItems = (if (filter.isEmpty()) ItemCategories.OBTAINABLE_ITEMS.toList()
         else ItemCategories.OBTAINABLE_ITEMS.searchFor(filter) { LocaleManager.getTranslation(player, it.localizedName) })
         
-        searchResultsGUI.setItems(filteredItems)
-        searchPreviewGUI.setItems(filteredItems)
+        searchResultsGUI.setContent(filteredItems)
+        searchPreviewGUI.setContent(filteredItems)
     }
     
     private fun getMainWindowTitle(): Array<BaseComponent> {
@@ -153,14 +151,17 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private fun openMainWindow() {
-        currentWindow = SimpleWindow(player, getMainWindowTitle(), if (filter == "") mainGUI else searchResultsGUI)
-        currentWindow?.show()
+        currentWindow = WindowType.NORMAL.create {
+            setViewer(player)
+            setTitle(getMainWindowTitle())
+            setGui(if (filter == "") mainGUI else searchResultsGUI)
+        }.apply { show() }
     }
     
     private fun openSearchWindow() {
         filter = ""
         
-        val anvilGUI = SimpleGUI(3, 1)
+        val anvilGui = Gui.empty(3, 1)
             .apply {
                 setItem(0, textItem)
                 setItem(2, clickableItem(
@@ -177,13 +178,13 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         builder.append(TranslatableComponent("menu.nova.items.search"))
             .font("default").color(ChatColor.DARK_GRAY)
         
-        currentWindow = AnvilSplitWindow(
-            player,
-            builder.create(),
-            anvilGUI,
-            searchPreviewGUI
-        ) { filter = it }
-        currentWindow?.show()
+        currentWindow = WindowType.ANVIL_SPLIT.create {
+            setViewer(player)
+            setTitle(builder.create())
+            setUpperGui(anvilGui)
+            setLowerGui(searchPreviewGUI)
+            setRenameHandler { filter = it }
+        }.apply { show() }
     }
     
     override fun show() {
@@ -191,8 +192,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         openMainWindow()
     }
     
-    private fun createCategoryGUI(category: ItemCategory): GUI {
-        return GUIBuilder(GUIType.SCROLL_ITEMS)
+    private fun createCategoryGUI(category: ItemCategory): Gui {
+        return GuiBuilder(GuiType.SCROLL_ITEMS)
             .setStructure(
                 "x x x x x x x x s",
                 "x x x x x x x x u",
@@ -200,13 +201,13 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
                 "x x x x x x x x d"
             )
             .addIngredient('s', openSearchItem)
-            .setItems(category.items)
+            .setContent(category.items)
             .build()
     }
     
     private inner class CreativeTabItem(private val tab: Int, private val category: ItemCategory) : TabItem(tab) {
         
-        override fun getItemProvider(gui: TabGUI) = category.icon
+        override fun getItemProvider(gui: TabGui) = category.icon
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.isTabAvailable(tab) && gui.currentTab != tab) {
@@ -221,10 +222,10 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private class TabPageBackItem : PageItem(false) {
         
-        override fun getItemProvider(gui: PagedGUI): ItemProvider {
+        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
-            else if (gui.hasPageBefore())
+            else if (gui.hasPreviousPage())
                 CoreGUIMaterial.TP_PIXEL_ARROW_LEFT_ON.clientsideProvider
             else CoreGUIMaterial.TP_PIXEL_ARROW_LEFT_OFF.clientsideProvider
         }
@@ -238,7 +239,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private class TabPageForwardItem : PageItem(true) {
         
-        override fun getItemProvider(gui: PagedGUI): ItemProvider {
+        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasNextPage())

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.resources.model.data
 
-import de.studiocode.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material

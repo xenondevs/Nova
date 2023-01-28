@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.adapter
 
-import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.VirtualInventoryManager
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.VirtualInventoryManager
 import io.netty.buffer.ByteBuf
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.BinaryAdapterLegacy
 import java.lang.reflect.Type

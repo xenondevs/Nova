@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.builder.ItemBuilder
-import de.studiocode.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.impl.BaseItem
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.block.BlockFace
@@ -45,7 +45,7 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
     
     private var simpleModeBtn: SimplicityModeItem? = null
     
-    private val simpleGUI = GUIBuilder(GUIType.NORMAL)
+    private val simpleGUI = GuiBuilder(GuiType.NORMAL)
         .setStructure(
             "# # # # u # # # #",
             "# # # l f r # # #",
@@ -59,7 +59,7 @@ internal abstract class ContainerSideConfigGUI<C : EndPointContainer, H : Contai
         .addIngredient('b', ConnectionConfigItem(BlockSide.BACK))
         .build()
     
-    private val advancedGUI = GUIBuilder(GUIType.NORMAL)
+    private val advancedGUI = GuiBuilder(GuiType.NORMAL)
         .setStructure(
             "# # u # # # 1 # #",
             "# l f r # 2 3 4 #",

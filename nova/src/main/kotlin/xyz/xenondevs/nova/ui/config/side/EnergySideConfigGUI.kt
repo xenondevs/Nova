@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import de.studiocode.invui.gui.structure.Structure
+import xyz.xenondevs.invui.gui.structure.Structure
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder

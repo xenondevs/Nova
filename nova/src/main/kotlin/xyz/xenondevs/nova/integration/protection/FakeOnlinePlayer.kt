@@ -253,7 +253,15 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun playSound(entity: Entity, sound: String, volume: Float, pitch: Float) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun playSound(entity: Entity, sound: Sound, category: SoundCategory, volume: Float, pitch: Float) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun playSound(entity: Entity, sound: String, category: SoundCategory, volume: Float, pitch: Float) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -652,6 +660,14 @@ internal class FakeOnlinePlayer(
     }
     
     override fun setWindowProperty(prop: InventoryView.Property, value: Int): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getEnchantmentSeed(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setEnchantmentSeed(seed: Int) {
         throw UnsupportedOperationException("Player is not online")
     }
     

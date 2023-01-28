@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.ItemWrapper
-import de.studiocode.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.impl.BaseItem
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration

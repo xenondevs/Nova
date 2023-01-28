@@ -2,7 +2,7 @@
 
 package xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf
 
-import de.studiocode.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import org.bukkit.Location

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.material.builder
 
-import de.studiocode.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import org.bukkit.Material
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId

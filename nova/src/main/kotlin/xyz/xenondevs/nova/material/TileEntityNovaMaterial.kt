@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState

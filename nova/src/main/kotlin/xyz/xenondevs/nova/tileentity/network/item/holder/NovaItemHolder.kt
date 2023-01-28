@@ -2,7 +2,7 @@
 
 package xyz.xenondevs.nova.tileentity.network.item.holder
 
-import de.studiocode.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity

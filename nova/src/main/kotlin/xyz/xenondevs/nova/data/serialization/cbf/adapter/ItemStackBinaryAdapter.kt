@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.serialization.cbf.adapter
 
-import de.studiocode.inventoryaccess.version.InventoryAccess
+import xyz.xenondevs.inventoryaccess.InventoryAccess
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader

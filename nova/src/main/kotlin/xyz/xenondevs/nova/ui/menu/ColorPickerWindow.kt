@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.ui.menu
 
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.item.builder.ItemBuilder
-import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.item.impl.SimpleItem
-import de.studiocode.invui.window.impl.single.SimpleWindow
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.SimpleItem
+import xyz.xenondevs.invui.window.type.WindowType
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -43,7 +43,7 @@ class ColorPickerWindow(
             updateColorPreview()
         }
     
-    private val gui = GUIBuilder(GUIType.NORMAL)
+    private val gui = GuiBuilder(GuiType.NORMAL)
         .setStructure(
             "< . . . p . . . .",
             ". . . . . . . . .",
@@ -65,7 +65,11 @@ class ColorPickerWindow(
     }
     
     fun openWindow(player: Player) {
-        SimpleWindow(player, CoreGUITexture.COLOR_PICKER.getTitle("menu.nova.color_picker"), gui).show()
+        WindowType.NORMAL.createWindow { 
+            it.setViewer(player)
+            it.setTitle(CoreGUITexture.COLOR_PICKER.getTitle("menu.nova.color_picker"))
+            it.setGui(gui)
+        }.show()
     }
     
 }

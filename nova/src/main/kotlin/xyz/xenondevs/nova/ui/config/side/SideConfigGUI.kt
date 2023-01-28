@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.item.impl.SimpleItem
-import de.studiocode.invui.window.impl.single.SimpleWindow
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.builder.GuiBuilder
+import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.item.impl.SimpleItem
+import xyz.xenondevs.invui.window.type.WindowType
 import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -42,7 +42,7 @@ class SideConfigGUI(
     private val itemConfigGUI: ItemSideConfigGUI?
     private val fluidConfigGUI: FluidSideConfigGUI?
     
-    private val mainGUI: GUI
+    private val mainGui: Gui
     
     init {
         val energyHolder = endPoint.holders[NetworkType.ENERGY]
@@ -62,7 +62,7 @@ class SideConfigGUI(
         
         require(energyConfigGUI != null || itemConfigGUI != null || fluidConfigGUI != null)
         
-        mainGUI = GUIBuilder(GUIType.TAB)
+        mainGui = GuiBuilder(GuiType.TAB)
             .setStructure(
                 "< # # e i f # # #",
                 "- - - - - - - - -",
@@ -92,12 +92,16 @@ class SideConfigGUI(
                     else CoreGUIMaterial.FLUID_BTN_ON
                 } else CoreGUIMaterial.FLUID_BTN_OFF).clientsideProvider
             })
-            .setGUIs(listOf(energyConfigGUI, itemConfigGUI, fluidConfigGUI))
+            .setContent(listOf(energyConfigGUI, itemConfigGUI, fluidConfigGUI))
             .build()
     }
     
     fun openWindow(player: Player) {
-        SimpleWindow(player, arrayOf(TranslatableComponent("menu.nova.side_config")), mainGUI).show()
+        WindowType.NORMAL.createWindow { 
+            it.setViewer(player)
+            it.setTitle(arrayOf(TranslatableComponent("menu.nova.side_config")))
+            it.setGui(mainGui)
+        }.show()
     }
     
 }
