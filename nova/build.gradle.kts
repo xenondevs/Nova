@@ -1,6 +1,6 @@
 group = "xyz.xenondevs.nova"
 
-val mojangMapped = project.hasProperty("mojang-mapped") || System.getProperty("mojang-mapped") != null
+val mojangMapped = System.getProperty("mojang-mapped") != null
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -93,13 +93,19 @@ spigotRemap {
 remapStrings {
     remapGoal.set(if (mojangMapped) "mojang" else "spigot")
     spigotVersion.set(libs.versions.spigot.get())
-    classes.set(listOf(
+    classes.addAll(
         "xyz.xenondevs.nova.util.reflection.ReflectionRegistry",
         "xyz.xenondevs.nova.util.NMSUtils",
         "xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch",
+        "xyz.xenondevs.nova.world.generation.WorldGenerationManager",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatch",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch",
+        "xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch",
         "xyz.xenondevs.nova.transformer.patch.item.ToolPatches",
         "xyz.xenondevs.nova.transformer.patch.item.DamageablePatches"
-    ))
+    )
 }
 
 publishing {

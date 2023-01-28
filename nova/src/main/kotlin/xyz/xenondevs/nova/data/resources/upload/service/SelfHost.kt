@@ -22,7 +22,7 @@ import kotlin.concurrent.thread
 
 private val SELF_HOST_DELAY by configReloadable { DEFAULT_CONFIG.getLong("debug.self_host_delay") }
 
-@Suppress("HttpUrlsUsage")
+@Suppress("HttpUrlsUsage", "ExtractKtorModule")
 internal object SelfHost : UploadService {
     
     override val name = "SelfHost"

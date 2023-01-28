@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.command.CommandManager
+import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.recipe.RecipeManager
@@ -34,6 +35,7 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.integration.worldedit.WorldEditIntegration
 import xyz.xenondevs.nova.item.ItemListener
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.ItemCategories
@@ -60,6 +62,7 @@ import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
+import xyz.xenondevs.nova.world.generation.WorldGenManager
 import xyz.xenondevs.nova.world.loot.LootConfigHandler
 import xyz.xenondevs.nova.world.loot.LootGeneration
 import java.util.*
@@ -75,7 +78,8 @@ internal object Initializer : Listener {
         NetworkManager, ItemListener, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
-        BossBarOverlayManager, WailaManager, ResourceGeneration.PreWorld, ResourceGeneration.PostWorld
+        BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser, WorldEditIntegration, ResourceGeneration.PreWorld,
+        ResourceGeneration.PostWorld
     ), Initializable::dependsOn)
     
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())

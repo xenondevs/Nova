@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
@@ -34,12 +35,13 @@ data class BlockPlaceContext(
     val item: ItemStack,
     val source: Any?,
     val sourceLocation: Location?,
-    val ownerUUID: UUID,
+    val ownerUUID: UUID?,
     val placedOn: BlockPos,
     val placedOnFace: BlockFace
 ) {
     
     init {
+        require(ownerUUID != UUIDUtils.ZERO) { "Owner UUID must not be 0-0. Use null instead." }
         require(!item.type.isAir) { "empty item stacks are not allowed" }
     }
     

@@ -12,6 +12,10 @@ val NamespacedKey.namespacedId: NamespacedId
 @Deprecated("Use namespacedId property", ReplaceWith("namespacedId"))
 fun NamespacedKey.toNamespacedId() = namespacedId
 
+internal fun NamespacedId.toResourceLocation(): ResourceLocation {
+    return ResourceLocation(namespace, name)
+}
+
 @Suppress("DEPRECATION")
 class NamespacedId(override val namespace: String, override val name: String) : INamespacedId {
     

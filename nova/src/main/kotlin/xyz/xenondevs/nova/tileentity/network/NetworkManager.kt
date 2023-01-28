@@ -380,6 +380,7 @@ private class NetworkManagerImpl : NetworkManager {
             when (node) {
                 is NetworkBridge -> unloadNetworkBridge(node, resetInternalData)
                 is NetworkEndPoint -> unloadNetworkEndPoint(node, resetInternalData)
+                else -> throw IllegalStateException("Unknown NetworkNode type: ${node::class}")
             }.forEach { network -> networks.getOrPut(network) { ArrayList() } += node }
         }
         

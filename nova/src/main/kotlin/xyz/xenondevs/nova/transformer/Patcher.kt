@@ -21,11 +21,16 @@ import xyz.xenondevs.nova.transformer.patch.item.FireResistancePatches
 import xyz.xenondevs.nova.transformer.patch.item.FuelPatches
 import xyz.xenondevs.nova.transformer.patch.item.RemainingItemPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
-import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.nbt.CBFCompoundTagPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
+import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.WrapperBlockPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch
 import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.System.getProperty
@@ -43,9 +48,10 @@ internal object Patcher : Initializable() {
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
         sequenceOf(
-            FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
-            StackSizePatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches, BroadcastPacketPatch,
-            CBFCompoundTagPatch, FakePlayerEventPreventionPatch
+            FieldFilterPatch, NoteBlockPatch, DamageablePatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
+            StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
+            WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
+            BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     
