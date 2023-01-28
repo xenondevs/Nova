@@ -6,8 +6,8 @@ import com.mojang.serialization.DynamicOps
 import com.mojang.serialization.Lifecycle
 import net.minecraft.core.BlockPos
 import net.minecraft.core.MappedRegistry
-import net.minecraft.core.Registry
 import net.minecraft.core.NonNullList
+import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.TagType
@@ -66,7 +66,6 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getConstructor
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
-import java.security.ProtectionDomain
 import java.io.DataInput
 import java.security.ProtectionDomain
 import java.util.*
@@ -150,7 +149,6 @@ internal object ReflectionRegistry {
     val ITEM_IS_FIRE_RESISTANT_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item isFireResistant)")
     val ITEM_STACK_GET_EQUIP_SOUND_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getEquipSound)")
     val LIVING_ENTITY_PLAY_EQUIP_SOUND_METHOD = getMethod(LivingEntity::class, true, "SRM(net.minecraft.world.entity.LivingEntity playEquipSound)", MojangStack::class)
-    val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class)
     val SIMPLE_PLUGIN_MANAGER_FIRE_EVENT_METHOD = getMethod(SimplePluginManager::class, true, "fireEvent", Event::class)
     
     // Fields

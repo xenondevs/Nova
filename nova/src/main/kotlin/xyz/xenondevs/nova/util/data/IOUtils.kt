@@ -75,8 +75,10 @@ fun InputStream.transferTo(output: OutputStream, amount: Int) {
  * Appends the given [bytes] to the file at the given [pos].
  */
 internal fun RandomAccessFile.append(pos: Long, bytes: ByteArray) {
-    if (length() == 0L)
+    if (length() == 0L) {
         write(bytes)
+        return
+    }
     var toWrite = bytes.copyOf()
     val buffer = ByteArray(max(bytes.size, 1024))
     seek(pos)
