@@ -5,6 +5,7 @@ import xyz.xenondevs.bytebase.ClassWrapperLoader
 import xyz.xenondevs.bytebase.INSTRUMENTATION
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
@@ -33,7 +34,6 @@ import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSec
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch
-import xyz.xenondevs.nova.util.mapToArray
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.System.getProperty
 import java.lang.instrument.ClassDefinition
