@@ -7,27 +7,40 @@ import com.mojang.serialization.Lifecycle
 import net.minecraft.core.BlockPos
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
+import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtAccounter
+import net.minecraft.nbt.TagType
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.RegistryFileCodec
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.players.PlayerList
 import net.minecraft.util.RandomSource
+import net.minecraft.world.Container
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AnvilMenu
+import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.inventory.ItemCombinerMenu
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.crafting.BannerDuplicateRecipe
+import net.minecraft.world.item.crafting.BookCloningRecipe
+import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelHeightAccessor
 import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.biome.FeatureSorter
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
+import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateHolder
 import net.minecraft.world.level.chunk.ChunkAccess
@@ -42,15 +55,19 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
 import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
+import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
+import org.bukkit.plugin.SimplePluginManager
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCBClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getConstructor
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
+import java.security.ProtectionDomain
+import java.io.DataInput
 import java.security.ProtectionDomain
 import java.util.*
 import java.util.function.Consumer
@@ -81,6 +98,7 @@ internal object ReflectionRegistry {
     val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class, false, Class::class)
     val MEMORY_SECTION_CONSTRUCTOR = getConstructor(MemorySection::class, true, ConfigurationSection::class, String::class)
     val SECTION_PATH_DATA_CONSTRUCTOR = getConstructor(SECTION_PATH_DATA_CLASS, true, Any::class)
+    val ITEM_STACK_CONSTRUCTOR = getConstructor(MojangStack::class, false, ItemLike::class)
     val CHUNK_ACCESS_CONSTRUCTOR = getConstructor(ChunkAccess::class, false, ChunkPos::class, UpgradeData::class, LevelHeightAccessor::class, Registry::class, Long::class, Array<LevelChunkSection>::class, BlendingData::class)
     val TARGET_BLOCK_STATE_CONSTRUCTOR = getConstructor(TargetBlockState::class, true, RuleTest::class, BlockState::class)
     
@@ -100,6 +118,7 @@ internal object ReflectionRegistry {
     val ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD = getMethod(EnchantmentHelper::class, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getAvailableEnchantmentResults)", Int::class, MojangStack::class, Boolean::class)
     val ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD = getMethod(EnchantmentHelper::class, true, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getEnchantmentCost)", RandomSource::class, Int::class, Int::class, MojangStack::class)
     val ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD = getMethod(EnchantmentHelper::class, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper selectEnchantment)", RandomSource::class, MojangStack::class, Int::class, Boolean::class)
+    val ENCHANTMENT_HELPER_GET_KNOCKBACK_BONUS_METHOD = getMethod(EnchantmentHelper::class, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentHelper getKnockbackBonus)", MojangLivingEntity::class)
     val ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD = getMethod(EnchantmentCategory::class, false, "SRM(net.minecraft.world.item.enchantment.EnchantmentCategory canEnchant)", MojangItem::class)
     val ITEM_IS_ENCHANTABLE_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item isEnchantable)", MojangStack::class)
     val ITEM_GET_ENCHANTMENT_VALUE_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item getEnchantmentValue)")
@@ -115,6 +134,24 @@ internal object ReflectionRegistry {
     val REGISTRY_BY_NAME_CODEC_METHOD = getMethod(Registry::class, true, "SRM(net.minecraft.core.Registry lambda\$byNameCodec\$1)", ResourceLocation::class)
     val MAPPED_REGISTRY_LIFECYCLE_METHOD = getMethod(MappedRegistry::class, false, "SRM(net.minecraft.core.MappedRegistry lifecycle)", Any::class)
     val MAPPED_REGISTRY_REGISTER_MAPPING_METHOD = getMethod(MappedRegistry::class, false, "SRM(net.minecraft.core.MappedRegistry registerMapping)", Int::class, ResourceKey::class, Any::class, Lifecycle::class)
+    val COMPOUND_TAG_READ_NAMED_TAG_DATA_METHOD = getMethod(CompoundTag::class, true, "SRM(net.minecraft.nbt.CompoundTag readNamedTagData)", TagType::class, String::class, DataInput::class, Int::class, NbtAccounter::class)
+    val ABSTRACT_FURNACE_BLOCK_ENTITY_IS_FUEL_METHOD = getMethod(AbstractFurnaceBlockEntity::class, false, "SRM(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity isFuel)", MojangStack::class)
+    val ABSTRACT_FURNACE_BLOCK_ENTITY_GET_BURN_DURATION_METHOD = getMethod(AbstractFurnaceBlockEntity::class, true, "SRM(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity getBurnDuration)", MojangStack::class)
+    val ITEM_GET_CRAFTING_REMAINING_ITEM_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item getCraftingRemainingItem)")
+    val ITEM_STACK_GET_ITEM_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getItem)")
+    val RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(Recipe::class, false, "SRM(net.minecraft.world.item.crafting.Recipe getRemainingItems)", Container::class)
+    val BANNER_DUPLICATE_RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(BannerDuplicateRecipe::class, false, "SRM(net.minecraft.world.item.crafting.BannerDuplicateRecipe getRemainingItems)", CraftingContainer::class)
+    val BOOK_CLONING_RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(BookCloningRecipe::class, false, "SRM(net.minecraft.world.item.crafting.BookCloningRecipe getRemainingItems)", CraftingContainer::class)
+    val ABSTRACT_FURNACE_BLOCK_ENTITY_SERVER_TICK_METHOD = getMethod(AbstractFurnaceBlockEntity::class, false, "SRM(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity serverTick)", Level::class, BlockPos::class, BlockState::class, AbstractFurnaceBlockEntity::class)
+    val NON_NULL_LIST_SET_METHOD = getMethod(NonNullList::class, false , "SRM(net.minecraft.core.NonNullList set)", Int::class, Any::class)
+    val ITEM_HAS_CRAFTING_REMAINING_ITEM_METHOD = getMethod(Item::class, false, "SRM(net.minecraft.world.item.Item hasCraftingRemainingItem)")
+    val BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD = getMethod(BrewingStandBlockEntity::class, true, "SRM(net.minecraft.world.level.block.entity.BrewingStandBlockEntity doBrew)", Level::class, BlockPos::class, NonNullList::class, BrewingStandBlockEntity::class)
+    val ITEM_ENTITY_FIRE_IMMUNE_METHOD = getMethod(ItemEntity::class, false, "SRM(net.minecraft.world.entity.item.ItemEntity fireImmune)")
+    val ITEM_IS_FIRE_RESISTANT_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item isFireResistant)")
+    val ITEM_STACK_GET_EQUIP_SOUND_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getEquipSound)")
+    val LIVING_ENTITY_PLAY_EQUIP_SOUND_METHOD = getMethod(LivingEntity::class, true, "SRM(net.minecraft.world.entity.LivingEntity playEquipSound)", MojangStack::class)
+    val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class)
+    val SIMPLE_PLUGIN_MANAGER_FIRE_EVENT_METHOD = getMethod(SimplePluginManager::class, true, "fireEvent", Event::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -143,5 +180,6 @@ internal object ReflectionRegistry {
     val HOLDER_SET_DIRECT_CONTENTS_SET_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contentsSet)")
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
     val ITEM_COMBINER_MENU_PLAYER_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu player)")
+    val ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD = getField(AbstractFurnaceBlockEntity::class, true, "SRF(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity items)")
     
 }

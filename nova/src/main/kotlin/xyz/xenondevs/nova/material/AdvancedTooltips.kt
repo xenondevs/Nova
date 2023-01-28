@@ -12,42 +12,38 @@ import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.registerEvents
 
-private val ADVANCED_TOOLTIPS_KEY = NamespacedKey(NOVA, "advancedTooltips")
+private val ADVANCED_TOOLTIPS_KEY = NamespacedKey(NOVA, "advancedTooltipsType")
 
 internal object AdvancedTooltips : Listener {
     
-    private val _players = HashSet<Player>()
-    val players: Set<Player>
-        get() = _players
+    private val players = HashMap<Player, Type>()
     
     init {
         registerEvents()
         Bukkit.getOnlinePlayers().forEach(::loadPlayer)
     }
     
-    fun toggle(player: Player, state: Boolean): Boolean {
+    fun setType(player: Player, type: Type): Boolean {
         val dataContainer = player.persistentDataContainer
-        if (state) {
-            if (player in _players)
-                return false
-            
-            _players += player
-            dataContainer.set(ADVANCED_TOOLTIPS_KEY, true)
-            return true
-        } else {
-            if (player !in players)
-                return false
-            
-            _players -= player
-            dataContainer.set(ADVANCED_TOOLTIPS_KEY, false)
-        }
+        val current = players[player] ?: Type.OFF
+        
+        if (current == type)
+            return false
+        
+        players[player] = type
+        dataContainer.set(ADVANCED_TOOLTIPS_KEY, type)
         
         return true
     }
     
+    fun hasNovaTooltips(player: Player): Boolean =
+        players[player]?.includesNova == true
+    
+    fun hasVanillaTooltips(player: Player): Boolean =
+        players[player]?.includesVanilla == true
+    
     private fun loadPlayer(player: Player) {
-        if (player.persistentDataContainer.get<Boolean>(ADVANCED_TOOLTIPS_KEY) == true)
-            _players += player
+        players[player] = player.persistentDataContainer.get(ADVANCED_TOOLTIPS_KEY) ?: Type.OFF
     }
     
     @EventHandler
@@ -57,7 +53,13 @@ internal object AdvancedTooltips : Listener {
     
     @EventHandler
     private fun handleQuit(event: PlayerQuitEvent) {
-        _players -= event.player
+        players -= event.player
+    }
+
+    enum class Type(val includesNova: Boolean, val includesVanilla: Boolean) {
+        OFF(false, false),
+        NOVA(true, false),
+        ALL(true, true)
     }
     
 }

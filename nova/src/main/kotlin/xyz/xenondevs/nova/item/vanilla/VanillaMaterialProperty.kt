@@ -1,50 +1,55 @@
 package xyz.xenondevs.nova.item.vanilla
 
-enum class VanillaMaterialProperty {
+enum class VanillaMaterialProperty(internal val importance: Int) {
     
     /**
      * The item has a durability bar.
      */
-    DAMAGEABLE,
+    DAMAGEABLE(2),
     
     /**
      * The item can't break any blocks in creative.
      */
-    CREATIVE_NON_BLOCK_BREAKING,
+    CREATIVE_NON_BLOCK_BREAKING(1),
     
     /**
      * The item can be consumed normally.
      */
-    CONSUMABLE_NORMAL,
+    CONSUMABLE_NORMAL(3),
     
     /**
      * The item can be consumed fast.
      */
-    CONSUMABLE_FAST,
+    CONSUMABLE_FAST(3),
     
     /**
      * The item can always be consumed.
      */
-    CONSUMABLE_ALWAYS,
+    CONSUMABLE_ALWAYS(3),
     
     /**
      * The item can render a custom helmet texture.
      */
-    HELMET,
+    HELMET(3),
     
     /**
      * The item can render a custom chestplate texture.
      */
-    CHESTPLATE,
+    CHESTPLATE(3),
     
     /**
      * The item can render a custom leggings texture.
      */
-    LEGGINGS,
+    LEGGINGS(3),
     
     /**
      * The item can render a custom boots texture.
      */
-    BOOTS
+    BOOTS(3),
+    
+    /**
+     * The item will not catch on fire.
+     */
+    FIRE_RESISTANT(0)
     
 }

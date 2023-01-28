@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.material
 
+import de.studiocode.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -19,6 +20,7 @@ class TileEntityNovaMaterial internal constructor(
     localizedName: String,
     novaItem: NovaItem,
     maxStackSize: Int,
+    craftingRemainingItem: ItemBuilder?,
     isHidden: Boolean,
     novaBlock: NovaBlock<NovaTileEntityState>,
     options: BlockOptions,
@@ -31,6 +33,7 @@ class TileEntityNovaMaterial internal constructor(
     localizedName,
     novaItem,
     maxStackSize,
+    craftingRemainingItem,
     isHidden,
     novaBlock as NovaBlock<NovaBlockState>, // fixme: users could cast to BlockNovaMaterial and then call methods on the NovaBlock with a BlockState that is not a NovaTileEntityState
     options,

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.world.block.state
 
-import xyz.xenondevs.cbf.buffer.ByteBuffer
+import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.world.BlockPos
 
 internal class LinkedBlockState(override val pos: BlockPos, val blockState: NovaBlockState) : BlockState() {

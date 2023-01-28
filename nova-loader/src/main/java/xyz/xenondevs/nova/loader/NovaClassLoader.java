@@ -10,19 +10,18 @@ public class NovaClassLoader extends URLClassLoader {
     }
     
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class<?> c;
         
         // check if the class is already loaded
         synchronized (getClassLoadingLock(name)) {
+            // check in jvm
             c = findLoadedClass(name);
             
-            // check nova classes and libraries
+            // check Nova classes and libraries before parent to prevent it from using old patch classes
+            // (which stay in memory after reloading because patched code references them)
             if (c == null) {
-                try {
-                    c = findClass(name);
-                } catch (ClassNotFoundException ignored) {
-                }
+                c = findClassOrNull(name);
             }
         }
         
@@ -40,17 +39,11 @@ public class NovaClassLoader extends URLClassLoader {
         return c;
     }
     
-    public Class<?> loadClassNoParent(String name) throws ClassNotFoundException {
-        synchronized (getClassLoadingLock(name)) {
-            // check if the class is already loaded
-            Class<?> c = findLoadedClass(name);
-            
-            // check nova classes and libraries
-            if (c == null) {
-                c = findClass(name);
-            }
-            
-            return c;
+    private Class<?> findClassOrNull(String name) {
+        try {
+            return findClass(name);
+        } catch (ClassNotFoundException e) {
+            return null;
         }
     }
     

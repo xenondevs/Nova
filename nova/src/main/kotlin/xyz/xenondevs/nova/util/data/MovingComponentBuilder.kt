@@ -7,7 +7,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention
 import net.md_5.bungee.api.chat.HoverEvent
 import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.data.resources.builder.content.FontChar
+import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 
 class MovingComponentBuilder(private val locale: String) {

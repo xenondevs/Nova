@@ -17,7 +17,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.interactionHand
 import xyz.xenondevs.nova.util.item.DamageableUtils
-import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.serverLevel

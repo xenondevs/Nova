@@ -23,7 +23,7 @@ internal object PotionEffectSerializer : YamlSerializer<PotionEffect> {
             ?: throw NoSuchElementException("Missing value 'type'")
         
         val type = PotionEffectType.getByKey(
-            NamespacedId.of(map["type"] as String, "minecraft").toNamespacedKey()
+            NamespacedId.of(map["type"] as String, "minecraft").namespacedKey
         ) ?: throw IllegalArgumentException("Invalid potion effect type '$typeStr'")
         
         return PotionEffect(

@@ -6,8 +6,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import xyz.xenondevs.nova.data.resources.builder.content.FontChar
-import xyz.xenondevs.nova.util.data.getInt
+import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.util.data.getString
 import java.lang.reflect.Type
 
@@ -17,7 +16,6 @@ internal object FontCharSerialization : JsonSerializer<FontChar>, JsonDeserializ
         return JsonObject().apply {
             addProperty("font", src.font)
             addProperty("char", src.char)
-            addProperty("width", src.width)
         }
     }
     
@@ -25,8 +23,7 @@ internal object FontCharSerialization : JsonSerializer<FontChar>, JsonDeserializ
         json as JsonObject
         return FontChar(
             json.getString("font")!!,
-            json.getString("char")!!.first(),
-            json.getInt("width")!!
+            json.getString("char")!!.first()
         )
     }
     

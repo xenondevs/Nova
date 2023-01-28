@@ -2,19 +2,16 @@ package xyz.xenondevs.nova.item.behavior
 
 import de.studiocode.invui.item.builder.ItemBuilder
 import net.md_5.bungee.api.chat.TextComponent
-import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.provider.provider
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.ChargeableOptions
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.item.retrieveDataOrNull
-import xyz.xenondevs.nova.util.item.storeData
-
-private val ENERGY_KEY = NamespacedKey(NOVA, "item_energy")
+import xyz.xenondevs.nova.util.item.novaCompound
+import net.minecraft.world.item.ItemStack as MojangStack
 
 @Suppress("FunctionName")
 fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable> =
@@ -36,31 +33,60 @@ class Chargeable(
     val maxEnergy: Long
         get() = options.maxEnergy
     
+    //<editor-fold desc="Bukkit ItemStack methods", defaultstate="collapsed">
     fun getEnergy(itemStack: ItemStack): Long {
-        val currentEnergy = itemStack.retrieveDataOrNull<Long>(ENERGY_KEY) ?: 0L
+        return getEnergy(itemStack.novaCompound)
+    }
+    
+    fun setEnergy(itemStack: ItemStack, energy: Long) {
+        return setEnergy(itemStack.novaCompound, energy)
+    }
+    
+    fun addEnergy(itemStack: ItemStack, energy: Long) {
+        return addEnergy(itemStack.novaCompound, energy)
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="Mojang ItemStack methods", defaultstate="collapsed">
+    fun getEnergy(itemStack: MojangStack): Long {
+        return getEnergy(itemStack.novaCompound)
+    }
+    
+    fun setEnergy(itemStack: MojangStack, energy: Long) {
+        return setEnergy(itemStack.novaCompound, energy)
+    }
+    
+    fun addEnergy(itemStack: MojangStack, energy: Long) {
+        return addEnergy(itemStack.novaCompound, energy)
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="Compound methods", defaultstate="collapsed">
+    fun getEnergy(data: NamespacedCompound): Long {
+        val currentEnergy = data["nova", "energy"] ?: 0L
         if (currentEnergy > options.maxEnergy) {
-            setEnergy(itemStack, options.maxEnergy)
+            setEnergy(data, options.maxEnergy)
             return options.maxEnergy
         }
         return currentEnergy
     }
     
-    fun setEnergy(itemStack: ItemStack, energy: Long) {
-        val coercedEnergy = energy.coerceIn(0, options.maxEnergy)
-        itemStack.storeData(ENERGY_KEY, coercedEnergy)
+    fun setEnergy(data: NamespacedCompound, energy: Long) {
+        data["nova", "energy"] = energy.coerceIn(0, options.maxEnergy)
     }
     
-    fun addEnergy(itemStack: ItemStack, energy: Long) {
-        setEnergy(itemStack, getEnergy(itemStack) + energy)
+    fun addEnergy(data: NamespacedCompound, energy: Long) {
+        setEnergy(data, getEnergy(data) + energy)
     }
+    //</editor-fold>
     
     override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
-        itemBuilder.addModifier { setEnergy(it, 0); it }
+        itemBuilder.addModifier { setEnergy(it.novaCompound, 0); it }
         return itemBuilder
     }
     
-    override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
-        val energy = getEnergy(itemStack)
+    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
+        val energy = getEnergy(data)
         
         itemData.addLore(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, options.maxEnergy)))
         

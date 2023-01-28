@@ -45,6 +45,14 @@ fun <T> Provider<List<List<T>>>.flatten(): Provider<List<T>> {
     return FlatMapProvider(this) { it }.also(::addChild)
 }
 
+fun <K, V> Provider<List<Map<K, V>>>.merged(): Provider<Map<K, V>> {
+    return MergeMapsProvider(this, ::LinkedHashMap).also(::addChild)
+}
+
+fun <K, V> Provider<List<Map<K, V>>>.merged(createMap: () -> MutableMap<K, V>): Provider<Map<K, V>> {
+    return MergeMapsProvider(this, createMap).also(::addChild)
+}
+
 abstract class Provider<T> {
     
     private var children: ArrayList<Provider<*>>? = null
@@ -144,5 +152,16 @@ private class FlatMapProvider<T, R>(
 ) : Provider<List<R>>() {
     override fun loadValue(): List<R> {
         return provider.value.flatMap(transform)
+    }
+}
+
+private class MergeMapsProvider<K, V>(
+    private val provider: Provider<List<Map<K, V>>>,
+    private val createMap: () -> MutableMap<K, V>
+) : Provider<Map<K, V>>() {
+    override fun loadValue(): Map<K, V> {
+        val newMap = createMap()
+        provider.value.forEach { newMap.putAll(it) }
+        return newMap
     }
 }

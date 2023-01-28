@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.data.world.block.state
 
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.buffer.ByteBuffer
+import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity

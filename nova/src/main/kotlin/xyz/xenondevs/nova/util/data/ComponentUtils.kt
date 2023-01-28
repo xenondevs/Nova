@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.md_5.bungee.chat.ComponentSerializer
+import net.minecraft.nbt.StringTag
 import net.minecraft.network.chat.Component
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
@@ -137,8 +138,17 @@ fun Array<BaseComponent>.withoutPreFormatting(): Array<BaseComponent> =
 fun BaseComponent.withoutPreFormatting(): Array<BaseComponent> =
     ComponentUtils.withoutPreFormatting(this)
 
+fun BaseComponent.serialize(): String =
+    ComponentSerializer.toString(this)
+
 fun Array<BaseComponent>.serialize(): String =
     ComponentSerializer.toString(this)
+
+fun BaseComponent.serializeToNBT(): StringTag =
+    StringTag.valueOf(serialize())
+
+fun Array<BaseComponent>.serializeToNBT(): StringTag =
+    StringTag.valueOf(serialize())
 
 fun ComponentBuilder.appendLocalized(translate: String, vararg with: Any): ComponentBuilder {
     append(TranslatableComponent(translate, *with))

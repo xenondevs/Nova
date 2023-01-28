@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.waila.overlay
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
-import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
+import xyz.xenondevs.nova.ui.overlay.character.MovedFonts
 import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 
 private val EMPTY_TEXT = arrayOf(TextComponent(""))
@@ -16,10 +16,10 @@ internal class WailaLineOverlay(line: Int) : BossBarOverlay() {
     override val components: Array<out BaseComponent>
         get() {
             return if (centered)
-                DefaultFont.getVerticallyMovedText(this.text, y % 19)
+                MovedFonts.moveVertically(this.text, y % 19)
             else MovingComponentBuilder()
                 .move(x) 
-                .append(DefaultFont.getVerticallyMovedText(this.text, y % 19))
+                .append(MovedFonts.moveVertically(this.text, y % 19))
                 .create()
         }
     override val centerX: Int?

@@ -9,7 +9,6 @@ import net.minecraft.world.item.enchantment.Enchantment
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.level.Level
 import xyz.xenondevs.nova.item.behavior.Damageable
-import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.DamageableUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.nmsCopy
@@ -50,13 +49,13 @@ internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(i
         val novaMaterial = items[0].novaMaterial
         if (novaMaterial != null) {
             val damageable = novaMaterial.novaItem.getBehavior(Damageable::class)!!
-            val maxDurability = damageable.options.maxDurability
+            val maxDurability = damageable.options.durability
             
             val itemStackA = items[0]
             val itemStackB = items[1]
             
-            val durabilityA = maxDurability - damageable.getDamage(itemStackA.bukkitMirror)
-            val durabilityB = maxDurability - damageable.getDamage(itemStackB.bukkitMirror)
+            val durabilityA = maxDurability - damageable.getDamage(itemStackA)
+            val durabilityB = maxDurability - damageable.getDamage(itemStackB)
             
             val resultItem = novaMaterial.createItemStack().apply {
                 val resultingDamage = maxDurability - min(durabilityA + durabilityB, maxDurability)

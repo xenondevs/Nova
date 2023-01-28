@@ -269,6 +269,8 @@ object RecipeManager : Initializable(), Listener {
                     is StonecuttingRecipe -> {
                         Bukkit.addRecipe(recipe)
                         
+                        // TODO
+                        
                         _clientsideRecipes[key] = recipe.clientsideCopy()
                     }
                     

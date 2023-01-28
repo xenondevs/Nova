@@ -6,7 +6,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TranslatableComponent
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.data.resources.builder.content.FontChar
+import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.addNamespace
 import xyz.xenondevs.nova.util.data.formatWithTemplate
@@ -34,9 +34,7 @@ class GUITexture(private val info: FontChar) {
     fun getTitle(title: Array<BaseComponent>): Array<BaseComponent> {
         return ComponentBuilder()
             .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
-            .append(info.char.toString())
-            .font(info.font)
-            .color(ChatColor.WHITE)
+            .append(info.component)
             .append(MoveCharacters.getMovingComponent(-info.width + 7)) // move back to start
             .append(title.formatWithTemplate(TITLE_TEMPLATE))
             .create()

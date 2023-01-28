@@ -41,12 +41,12 @@ object RecipeTypeRegistry {
         RecipeType.init() // Loads the default recipe types
     }
     
-    fun <T : NovaRecipe> register(addon: Addon, dirName: String?, recipeClass: KClass<T>, group: RecipeGroup?, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
+    fun <T : NovaRecipe> register(addon: Addon, dirName: String?, recipeClass: KClass<T>, group: RecipeGroup<in T>?, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
         val name = "${addon.description.id}/$dirName"
         return register(name, recipeClass, group, deserializer)
     }
     
-    internal fun <T : Any> register(dirName: String?, recipeClass: KClass<T>, group: RecipeGroup?, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
+    internal fun <T : Any> register(dirName: String?, recipeClass: KClass<T>, group: RecipeGroup<in T>?, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
         val recipeType = RecipeType(dirName, recipeClass, group, deserializer)
         _types += recipeType
         return recipeType
@@ -63,7 +63,7 @@ object RecipeTypeRegistry {
 class RecipeType<T : Any> internal constructor(
     val dirName: String?,
     val recipeClass: KClass<T>,
-    val group: RecipeGroup?,
+    val group: RecipeGroup<in T>?,
     val deserializer: RecipeDeserializer<T>?
 ) {
     
@@ -74,8 +74,8 @@ class RecipeType<T : Any> internal constructor(
         val BLAST_FURNACE = register("minecraft/blast_furnace", BlastingRecipe::class, BlastingRecipeGroup, BlastingRecipeDeserializer)
         val SMOKER = register("minecraft/smoker", SmokingRecipe::class, SmokingRecipeGroup, SmokingRecipeDeserializer)
         val CAMPFIRE = register("minecraft/campfire", CampfireRecipe::class, CampfireRecipeGroup, CampfireRecipeDeserializer)
-        val SMITHING = register("minecraft/smithing", SmithingRecipe::class, SmithingRecipeGroup, SmithingRecipeDeserializer)
         val STONECUTTER = register("minecraft/stonecutter", StonecuttingRecipe::class, StonecutterRecipeGroup, StonecutterRecipeDeserializer)
+        val SMITHING = register("minecraft/smithing", SmithingRecipe::class, SmithingRecipeGroup, SmithingRecipeDeserializer)
         
         internal fun init() = Unit
     }

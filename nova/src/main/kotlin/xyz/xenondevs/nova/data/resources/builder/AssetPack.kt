@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.resources.builder.content.material.info.Registere
 import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.GUIsIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MaterialsIndexDeserializer
+import xyz.xenondevs.nova.data.resources.builder.index.MovedFontsIndexDeserializer
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.parseJson
 import java.io.InputStream
@@ -33,6 +34,9 @@ internal class AssetPack(val namespace: String, val zip: ZipFile, val assetsPath
     
     val armorIndex: List<RegisteredArmor>? = zip[assetsPath, "armor.json"]
         ?.let { ArmorIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
+    
+    val movedFontsIndex: Map<ResourcePath, Set<Int>>? = zip[assetsPath, "moved_fonts.json"]
+        ?.let { MovedFontsIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
     
     fun getFileHeader(path: String): FileHeader? =
         zip[assetsPath, path]

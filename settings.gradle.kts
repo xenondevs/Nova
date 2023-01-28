@@ -8,13 +8,14 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // versions
-            version("kotlin", "1.7.22")
-            version("ktor", "2.1.3")
+            version("kotlin", "1.8.0")
+            version("dokka", "1.7.20")
+            version("ktor", "2.2.2")
             version("spigot", "1.19.3-R0.1-SNAPSHOT")
-            version("cbf", "0.2")
+            version("cbf", "0.3")
             
             // lib - kotlin
-            library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib-jdk8").versionRef("kotlin")
+            library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").versionRef("kotlin")
             library("kotlin-reflect", "org.jetbrains.kotlin", "kotlin-reflect").versionRef("kotlin")
             
             // lib - test

@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.data.resources
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.resources.builder.content.FontChar
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
+import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 

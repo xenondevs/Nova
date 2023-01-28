@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.util
 import com.mojang.authlib.GameProfile
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
@@ -14,6 +16,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -21,6 +24,17 @@ import java.util.concurrent.CopyOnWriteArrayList
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EntityType as NMSEntityType
 
+/**
+ * The current block destroy progress of the player.
+ * Between 0 and 1 or null if the player is not breaking a block at the moment.
+ */
+val Player.destroyProgress: Double?
+    get() = BlockBreaking.getBreaker(this)?.progress?.coerceAtMost(1.0)
+
+/**
+ * Swings the [hand] of the player.
+ * @throws IllegalArgumentException If the [hand] is not a valid hand.
+ */
 fun Player.swingHand(hand: EquipmentSlot) {
     when (hand) {
         EquipmentSlot.HAND -> swingMainHand()
@@ -29,15 +43,24 @@ fun Player.swingHand(hand: EquipmentSlot) {
     }
 }
 
+/**
+ * Teleports the [Entity] after modifying its location using the [modifyLocation] lambda.
+ */
 fun Entity.teleport(modifyLocation: Location.() -> Unit) {
     val location = location
     location.modifyLocation()
     teleport(location)
 }
 
+/**
+ * The translation key for the name of this [Entity]. 
+ */
 val Entity.localizedName: String?
     get() = (this as CraftEntity).handle.type.descriptionId
 
+/**
+ * If the [Entity's][Entity] eye is underwater.
+ */
 val Entity.eyeInWater: Boolean
     get() = (this as CraftEntity).handle.isEyeInFluid(FluidTags.WATER)
 
@@ -137,15 +160,36 @@ object EntityUtils {
         }!!
     }
     
-    fun createFakePlayer(location: Location, uuid: UUID, name: String): ServerPlayer {
+    /**
+     * Creates a fake [ServerPlayer] object.
+     */
+    fun createFakePlayer(
+        location: Location,
+        uuid: UUID = UUID.randomUUID(),
+        name: String = "Nova FakePlayer",
+        hasEvents: Boolean = false
+    ): ServerPlayer {
         val server = (Bukkit.getServer() as CraftServer).server
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
-        val serverPlayer = object : ServerPlayer(server, world, gameProfile) {
-            override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: MojangEntity?) = Unit
-        }
-        serverPlayer.advancements.stopListening()
-        return serverPlayer
+        return FakePlayer(server, world, gameProfile, hasEvents)
+    }
+    
+}
+
+class FakePlayer(
+    server: MinecraftServer,
+    level: ServerLevel,
+    profile: GameProfile,
+    val hasEvents: Boolean
+) : ServerPlayer(server, level, profile) {
+    
+    init {
+        advancements.stopListening()
+    }
+    
+    override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: MojangEntity?) {
+        // empty
     }
     
 }

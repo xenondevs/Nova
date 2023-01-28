@@ -130,10 +130,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         equipmentBuf = null
         
         // update the equipment array
-        var nmsStack = bukkitStack.nmsCopy
-        if (PacketItems.isNovaItem(nmsStack))
-            nmsStack = PacketItems.getFakeItem(null, nmsStack)
-        equipment[slot.ordinal] = nmsStack
+        equipment[slot.ordinal] = PacketItems.getClientSideStack(null, bukkitStack.nmsCopy)
         
         // rebuild buf and send packet if requested
         if (sendPacket) {

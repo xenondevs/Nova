@@ -1,0 +1,15 @@
+package xyz.xenondevs.nova.item.behavior
+
+import xyz.xenondevs.nova.data.provider.provider
+import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.material.ItemNovaMaterial
+
+class FireResistant : ItemBehavior() {
+    
+    override val vanillaMaterialProperties = provider(listOf(VanillaMaterialProperty.FIRE_RESISTANT))
+    
+    companion object : ItemBehaviorFactory<FireResistant>() {
+        override fun create(material: ItemNovaMaterial) = FireResistant()
+    }
+    
+}

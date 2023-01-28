@@ -10,20 +10,17 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
-import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
 import xyz.xenondevs.nova.util.intValue
 
-internal object TableRecipeGroup : RecipeGroup() {
+internal object TableRecipeGroup : RecipeGroup<Recipe>() {
     
     override val priority = 0
     override val texture = CoreGUITexture.RECIPE_CRAFTING
     override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
-    override fun createGUI(container: RecipeContainer): GUI {
-        val recipe = container.recipe as Recipe
-        
+    override fun createGUI(recipe: Recipe): GUI {
         val gui = GUIBuilder(GUIType.NORMAL)
             .setStructure(
                 ". . . . . . . . .",

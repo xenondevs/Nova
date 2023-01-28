@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.util.above
 import xyz.xenondevs.nova.util.interactionHand
 import xyz.xenondevs.nova.util.item.DamageableUtils
 import xyz.xenondevs.nova.util.nmsDirection
-import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.serverLevel

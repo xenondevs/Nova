@@ -22,7 +22,6 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.util.getTargetLocation
 import xyz.xenondevs.nova.util.reflection.actualDelegate
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
@@ -101,8 +100,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     
     private fun fillBucket(holder: NovaFluidHolder, player: Player, hand: EquipmentSlot): Boolean {
         val inventory = player.inventory
-        val targetLocation = player.eyeLocation.getTargetLocation(0.25, 8.0)
-        val face = BlockFaceUtils.determineBlockFace(location.block, targetLocation)
+        val face = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation)
         
         val container = holder.containerConfig[face]
             ?.takeUnless { holder.connectionConfig[face] != NetworkConnectionType.NONE || it.amount < 1000 || !holder.allowedConnectionTypes[it]!!.extract }

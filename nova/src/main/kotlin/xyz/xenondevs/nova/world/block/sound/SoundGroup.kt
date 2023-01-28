@@ -27,9 +27,9 @@ data class SoundGroup(
     val stepPitch: Float
         get() = pitch
     val placeVolume: Float
-        get() = 1f
+        get() = (volume + 1f) / 2f
     val placePitch: Float
-        get() = 1f
+        get() = pitch * 0.8f
     val hitVolume: Float
         get() = (volume + 1f) / 8f
     val hitPitch: Float

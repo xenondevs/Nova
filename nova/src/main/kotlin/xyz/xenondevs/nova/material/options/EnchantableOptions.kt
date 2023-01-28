@@ -16,12 +16,12 @@ sealed interface EnchantableOptions {
     val enchantmentValue: Int
     val enchantmentCategories: List<EnchantmentCategory>
     
-    companion object : MaterialOptionsType<EnchantableOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): EnchantableOptions =
+        fun configurable(material: ItemNovaMaterial): EnchantableOptions =
             ConfigurableEnchantableOptions(material)
         
-        override fun configurable(path: String): EnchantableOptions =
+        fun configurable(path: String): EnchantableOptions =
             ConfigurableEnchantableOptions(path)
         
     }

@@ -46,6 +46,9 @@ import xyz.xenondevs.nova.util.data.ComponentUtils
 import xyz.xenondevs.nova.util.data.coloredText
 import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.util.item.localizedName
+import xyz.xenondevs.nova.util.item.novaCompoundOrNull
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
@@ -83,6 +86,9 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("getTileEntityData")
                     .requiresPlayer()
                     .executesCatching(::showTileEntityData))
+                .then(literal("getItemData")
+                    .requiresPlayer()
+                    .executesCatching(::showItemData))
                 .then(literal("reloadNetworks")
                     .executesCatching(::reloadNetworks))
                 .then(literal("updateChunkSearchId")
@@ -101,10 +107,12 @@ internal object NovaCommand : Command("nova") {
                 .executesCatching(::openItemInventory))
             .then(literal("advancedTooltips")
                 .requiresPlayerPermission("nova.command.advancedTooltips")
-                .then(literal("on")
-                    .executesCatching { toggleAdvancedTooltips(it, true) })
                 .then(literal("off")
-                    .executesCatching { toggleAdvancedTooltips(it, false) }))
+                    .executesCatching { toggleAdvancedTooltips(it, AdvancedTooltips.Type.OFF) })
+                .then(literal("nova")
+                    .executesCatching { toggleAdvancedTooltips(it, AdvancedTooltips.Type.NOVA) })
+                .then(literal("all")
+                    .executesCatching { toggleAdvancedTooltips(it, AdvancedTooltips.Type.ALL) }))
             .then(literal("waila")
                 .requiresPlayerPermission("nova.command.waila")
                 .then(literal("on")
@@ -157,21 +165,15 @@ internal object NovaCommand : Command("nova") {
         }
     }
     
-    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>, state: Boolean) {
+    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>, type: AdvancedTooltips.Type) {
         val player = ctx.player
-        val changed = AdvancedTooltips.toggle(player, state)
+        val changed = AdvancedTooltips.setType(player, type)
         
-        val onOff = if (state) "on" else "off"
         if (changed) {
-            ctx.source.sendSuccess(localized(
-                ChatColor.GRAY,
-                "command.nova.advanced_tooltips.$onOff"
-            ))
+            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.advanced_tooltips.$type.success"))
+            player.updateInventory()
         } else {
-            ctx.source.sendFailure(localized(
-                ChatColor.RED,
-                "command.nova.advanced_tooltips.already_$onOff"
-            ))
+            ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.advanced_tooltips.$type.failure"))
         }
     }
     
@@ -293,6 +295,34 @@ internal object NovaCommand : Command("nova") {
             }
         } else sendFailure()
         
+    }
+    
+    private fun showItemData(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty()
+        
+        if (item != null) {
+            val novaCompound = item.novaCompoundOrNull
+            if (novaCompound != null) {
+                ctx.source.sendSuccess(localized(
+                    ChatColor.GRAY,
+                    "command.nova.show_item_data.success",
+                    localized(ChatColor.AQUA, item.localizedName ?: item.type.name.lowercase()),
+                    coloredText(ChatColor.WHITE, novaCompound.toString())
+                ))   
+            } else {
+                ctx.source.sendFailure(localized(
+                    ChatColor.RED,
+                    "command.nova.show_item.no_data"
+                ))
+            }
+        } else {
+            ctx.source.sendFailure(localized(
+                ChatColor.RED,
+                "command.nova.show_item_data.no_item"
+            ))
+        }
     }
     
     private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType) {

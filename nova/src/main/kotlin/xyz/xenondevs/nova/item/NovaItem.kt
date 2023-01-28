@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
@@ -27,14 +28,13 @@ import xyz.xenondevs.nova.data.provider.combinedLazyProvider
 import xyz.xenondevs.nova.data.provider.flatten
 import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getDoubleOrNull
@@ -43,6 +43,7 @@ import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.takeUnlessEmpty
 import java.text.DecimalFormat
@@ -105,12 +106,11 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         return builder
     }
     
-    internal fun getPacketItemData(player: Player?, itemStack: MojangStack): PacketItemData {
-        val itemData = PacketItemData(itemStack.tag!!)
-        val bukkitStack = itemStack.bukkitCopy
+    internal fun getPacketItemData(player: Player?, itemStack: MojangStack?): PacketItemData {
+        val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag())
         
-        behaviors.forEach { it.updatePacketItemData(bukkitStack, itemData) }
-        itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer ?: EntityUtils.DUMMY_PLAYER, itemStack))
+        behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompound ?: NamespacedCompound(), itemData) }
+        if (itemStack != null) itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
         if (itemData.name == null) itemData.name = this.name
         
         return itemData
@@ -191,18 +191,16 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
                     var value = modifier.value
                     var isBaseModifier = false
                     
-                    if (player != null) {
-                        when (modifier.uuid) {
-                            Tool.BASE_ATTACK_DAMAGE_UUID -> {
-                                value += player.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)
-                                value += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED)
-                                isBaseModifier = true
-                            }
-                            
-                            Tool.BASE_ATTACK_SPEED_UUID -> {
-                                value += player.getAttributeBaseValue(Attributes.ATTACK_SPEED)
-                                isBaseModifier = true
-                            }
+                    when (modifier.uuid) {
+                        Tool.BASE_ATTACK_DAMAGE_UUID -> {
+                            value += player?.getAttributeBaseValue(Attributes.ATTACK_DAMAGE) ?: 1.0
+                            value += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED)
+                            isBaseModifier = true
+                        }
+                        
+                        Tool.BASE_ATTACK_SPEED_UUID -> {
+                            value += player?.getAttributeBaseValue(Attributes.ATTACK_SPEED) ?: 4.0
+                            isBaseModifier = true
                         }
                     }
                     
