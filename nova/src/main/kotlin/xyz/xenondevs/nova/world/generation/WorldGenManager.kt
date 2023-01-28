@@ -8,8 +8,6 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
-import xyz.xenondevs.nova.world.generation.inject.codec.CodecOverride
-import xyz.xenondevs.nova.world.generation.inject.codec.blockstate.BlockStateCodecOverride
 import xyz.xenondevs.nova.world.generation.registry.BiomeInjectionRegistry
 import xyz.xenondevs.nova.world.generation.registry.BiomeRegistry
 import xyz.xenondevs.nova.world.generation.registry.CarverRegistry
@@ -29,11 +27,9 @@ internal object WorldGenManager : Initializable() {
     private val NMS_REGISTRIES = WORLD_GEN_REGISTRIES.asSequence()
         .flatMap { it.neededRegistries }
         .map { REGISTRY_ACCESS.registry(it).get() }
-    private val CODEC_OVERRIDES by lazy { listOf(BlockStateCodecOverride) }
     
     override fun init() {
         NMS_REGISTRIES.forEach(NMSUtils::unfreezeRegistry)
-        CODEC_OVERRIDES.forEach(CodecOverride::replace)
         WORLD_GEN_REGISTRIES.forEach { it.register(REGISTRY_ACCESS) }
         NMS_REGISTRIES.forEach(NMSUtils::freezeRegistry)
     }

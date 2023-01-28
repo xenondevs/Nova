@@ -86,8 +86,7 @@ internal object BiomeInjector {
             }
             
             patchedBiomes += hash
-            
-            println("Patched new biome: $key")
+            // println("Patched new biome: $key") TODO: config option
         }
     }
     
