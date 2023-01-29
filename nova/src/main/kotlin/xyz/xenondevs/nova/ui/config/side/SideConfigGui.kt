@@ -5,8 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.builder.GuiBuilder
-import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.gui.builder.GuiType
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.builder.WindowType
 import xyz.xenondevs.nova.material.CoreGuiMaterial
@@ -62,7 +61,7 @@ class SideConfigGui(
         
         require(energyConfigGui != null || itemConfigGui != null || fluidConfigGui != null)
         
-        mainGui = GuiBuilder(GuiType.TAB)
+        mainGui = GuiType.TAB.builder()
             .setStructure(
                 "< # # e i f # # #",
                 "- - - - - - - - -",
@@ -92,7 +91,7 @@ class SideConfigGui(
                     else CoreGuiMaterial.FLUID_BTN_ON
                 } else CoreGuiMaterial.FLUID_BTN_OFF).clientsideProvider
             })
-            .setContent(listOf(energyConfigGui, itemConfigGui, fluidConfigGui))
+            .setTabs(listOf(energyConfigGui, itemConfigGui, fluidConfigGui))
             .build()
     }
     

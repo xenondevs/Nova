@@ -4,8 +4,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.invui.gui.builder.GuiBuilder
-import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.gui.builder.GuiType
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.impl.BaseItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
@@ -43,7 +42,7 @@ class ColorPickerWindow(
             updateColorPreview()
         }
     
-    private val gui = GuiBuilder(GuiType.NORMAL)
+    private val gui = GuiType.NORMAL.builder()
         .setStructure(
             "< . . . p . . . .",
             ". . . . . . . . .",

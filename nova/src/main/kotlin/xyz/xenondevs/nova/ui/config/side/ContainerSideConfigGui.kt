@@ -6,8 +6,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.invui.gui.builder.GuiBuilder
-import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.gui.builder.GuiType
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.impl.BaseItem
@@ -45,7 +44,7 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
     
     private var simpleModeBtn: SimplicityModeItem? = null
     
-    private val simpleGui = GuiBuilder(GuiType.NORMAL)
+    private val simpleGui = GuiType.NORMAL.builder()
         .setStructure(
             "# # # # u # # # #",
             "# # # l f r # # #",
@@ -59,7 +58,7 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
         .addIngredient('b', ConnectionConfigItem(BlockSide.BACK))
         .build()
     
-    private val advancedGui = GuiBuilder(GuiType.NORMAL)
+    private val advancedGui = GuiType.NORMAL.builder()
         .setStructure(
             "# # u # # # 1 # #",
             "# l f r # 2 3 4 #",

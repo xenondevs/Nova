@@ -6,8 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.builder.GuiBuilder
-import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.gui.builder.GuiType
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
@@ -29,7 +28,7 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     
     private val upgradeItems = ArrayList<Item>()
     
-    private val upgradeScrollGui = GuiBuilder(GuiType.SCROLL_ITEMS)
+    private val upgradeScrollGui = GuiType.SCROLL_ITEMS.builder()
         .setStructure(
             "x x x x x",
             "x x x x x",
@@ -42,7 +41,7 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         .setContent(createUpgradeItemList())
         .build()
     
-    val gui: Gui = GuiBuilder(GuiType.NORMAL)
+    val gui: Gui = GuiType.NORMAL.builder()
         .setStructure(
             "b - - - - - - - 2",
             "| i # . . . . . |",

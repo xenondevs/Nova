@@ -11,8 +11,7 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.builder.GuiBuilder
-import xyz.xenondevs.invui.gui.builder.guitype.GuiType
+import xyz.xenondevs.invui.gui.builder.GuiType
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
@@ -38,7 +37,7 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
         createConversionRecipeGui(createRecipeChoiceItem(input), result, time)
     
     private fun createConversionRecipeGui(inputUIItem: Item, outputItem: ItemStack, time: Int): Gui {
-        val builder = GuiBuilder(GuiType.NORMAL)
+        val builder = GuiType.NORMAL.builder()
             .setStructure(
                 ". . t . . . . . .",
                 ". . i . . . r . .",
