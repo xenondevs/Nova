@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.event.FakePlayerEventPreventionPatch
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
+import xyz.xenondevs.nova.transformer.patch.item.WearablePatch
 import xyz.xenondevs.nova.transformer.patch.item.AttributePatch
 import xyz.xenondevs.nova.transformer.patch.item.DamageablePatches
 import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
@@ -53,7 +54,7 @@ internal object Patcher : Initializable() {
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
             StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
-            BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch, LegacyConversionPatch,
+            BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch, LegacyConversionPatch, WearablePatch,
         ).filter(Transformer::shouldTransform).toSet()
     }
     

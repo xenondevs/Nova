@@ -151,6 +151,7 @@ internal object ReflectionRegistry {
     val LIVING_ENTITY_PLAY_EQUIP_SOUND_METHOD = getMethod(LivingEntity::class, true, "SRM(net.minecraft.world.entity.LivingEntity playEquipSound)", MojangStack::class)
     val SIMPLE_PLUGIN_MANAGER_FIRE_EVENT_METHOD = getMethod(SimplePluginManager::class, true, "fireEvent", Event::class)
     val ITEM_STACK_LOAD_METHOD = getMethod(MojangStack::class, true, "load", CompoundTag::class)
+    val LIVING_ENTITY_GET_EQUIPMENT_SLOT_FOR_ITEM_METHOD = getMethod(LivingEntity::class, false, "getEquipmentSlotForItem", MojangStack::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
