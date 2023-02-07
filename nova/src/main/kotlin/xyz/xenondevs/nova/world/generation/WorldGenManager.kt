@@ -36,6 +36,7 @@ internal object WorldGenManager : Initializable() {
     
     override fun init() {
         WORLD_GEN_REGISTRIES.forEach { it.register() }
+        NMSUtils.getRegistry(Registries.LEVEL_STEM).forEach { BiomeInjector.injectFeatures(it.generator.biomeSource.possibleBiomes().toList()) }
         NMS_REGISTRIES.forEach(NMSUtils::freezeRegistry)
     }
     
