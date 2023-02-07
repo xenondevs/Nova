@@ -5,6 +5,7 @@ package xyz.xenondevs.nova.util
 import com.mojang.datafixers.util.Either
 import com.mojang.serialization.JsonOps
 import net.minecraft.core.Direction
+import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
@@ -355,5 +356,10 @@ object NMSUtils {
     
     fun <T, R : Registry<T>> getRegistry(location: ResourceKey<R>) =
         REGISTRY_ACCESS.registry(location).getOrNull() ?: throw IllegalArgumentException("Registry $location does not exist!")
+    
+    fun <T, R : Registry<T>> getHolder(key: ResourceKey<T>): Holder.Reference<T> {
+        val registry = ResourceKey.createRegistryKey<T>(key.registry())
+        return REGISTRY_ACCESS.registryOrThrow(registry).getHolderOrThrow(key)
+    }
     
 }

@@ -1,16 +1,16 @@
 package xyz.xenondevs.nova.world.generation.registry
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.Registries
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjector
 
-object BiomeInjectionRegistry : WorldGenRegistry() {
+object BiomeInjectionRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
-    override val neededRegistries = setOf(Registries.BIOME)
+    override val neededRegistries get() = setOf(Registries.BIOME)
     
     private val biomeInjections = Object2ObjectOpenHashMap<NamespacedId, BiomeInjection>()
 
@@ -20,7 +20,7 @@ object BiomeInjectionRegistry : WorldGenRegistry() {
         biomeInjections[id] = injection
     }
     
-    override fun register(registryAccess: RegistryAccess) {
+    override fun register() {
         loadFiles("inject/biome", BiomeInjection.CODEC, biomeInjections)
         BiomeInjector.loadInjections(biomeInjections.values)
     }

@@ -1,17 +1,17 @@
 package xyz.xenondevs.nova.world.generation.registry
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.levelgen.carver.CarverConfiguration
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
 import net.minecraft.world.level.levelgen.carver.WorldCarver
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.util.NMSUtils
 
-object CarverRegistry : WorldGenRegistry() {
+object CarverRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
-    override val neededRegistries = setOf(Registries.CARVER, Registries.CONFIGURED_CARVER)
+    override val neededRegistries get() = setOf(Registries.CARVER, Registries.CONFIGURED_CARVER)
     
     private val carvers = Object2ObjectOpenHashMap<NamespacedId, WorldCarver<*>>()
     private val configuredCarvers = Object2ObjectOpenHashMap<NamespacedId, ConfiguredWorldCarver<*>>()
@@ -28,9 +28,9 @@ object CarverRegistry : WorldGenRegistry() {
         this.configuredCarvers[id] = configuredCarver
     }
     
-    override fun register(registryAccess: RegistryAccess) {
-        registerAll(registryAccess, Registries.CARVER, carvers)
+    override fun register() {
+        registerAll(Registries.CARVER, carvers)
         loadFiles("configured_carver", ConfiguredWorldCarver.CODEC, configuredCarvers)
-        registerAll(registryAccess, Registries.CONFIGURED_CARVER, configuredCarvers)
+        registerAll(Registries.CONFIGURED_CARVER, configuredCarvers)
     }
 }

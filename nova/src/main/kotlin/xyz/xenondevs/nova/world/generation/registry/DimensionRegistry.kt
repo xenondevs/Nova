@@ -1,18 +1,18 @@
 package xyz.xenondevs.nova.world.generation.registry
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.dimension.DimensionType
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.util.NMSUtils
 
 /**
  * TODO: inject into WorldPresets
  */
-object DimensionRegistry : WorldGenRegistry(){
+object DimensionRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
-    override val neededRegistries = setOf(Registries.DIMENSION_TYPE)
+    override val neededRegistries get() = setOf(Registries.DIMENSION_TYPE)
     
     private val dimensionTypes = Object2ObjectOpenHashMap<NamespacedId, DimensionType>()
     
@@ -22,8 +22,8 @@ object DimensionRegistry : WorldGenRegistry(){
         dimensionTypes[id] = dimensionType
     }
     
-    override fun register(registryAccess: RegistryAccess) {
+    override fun register() {
         loadFiles("dimension_type", DimensionType.CODEC, dimensionTypes)
-        registerAll(registryAccess, Registries.DIMENSION_TYPE, dimensionTypes)
+        registerAll(Registries.DIMENSION_TYPE, dimensionTypes)
     }
 }
