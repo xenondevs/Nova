@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.block.state.BlockState
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.Initializable
@@ -30,6 +31,7 @@ import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.concurrent.Latch
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
+import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
@@ -40,6 +42,7 @@ import java.util.logging.Level
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
 import kotlin.concurrent.write
+import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.level.Level as MojangWorld
 
 internal object WorldDataManager : Initializable(), Listener {
@@ -236,6 +239,13 @@ internal object WorldDataManager : Initializable(), Listener {
         setBlockState(pos, state)
         state.handleInitialized(true)
         material.novaBlock.handlePlace(state, ctx)
+    }
+    
+    @Synchronized
+    internal fun getWorldGenMaterial(pos: MojangBlockPos, world: MojangWorld): BlockNovaMaterial? {
+        val novaPos = pos.toNovaPos(world.world)
+        val chunk = novaPos.chunkPos
+        return if (chunk.isLoaded()) (getBlockState(novaPos) as? NovaBlockState)?.material else pendingOrphanBlocks[chunk]?.get(novaPos)
     }
     
     @Synchronized

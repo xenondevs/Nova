@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.transformer
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap
+import net.minecraft.server.MinecraftServer
 import xyz.xenondevs.bytebase.ClassWrapperLoader
 import xyz.xenondevs.bytebase.INSTRUMENTATION
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
@@ -9,13 +10,12 @@ import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.loader.NovaClassLoader
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.event.FakePlayerEventPreventionPatch
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
-import xyz.xenondevs.nova.transformer.patch.item.WearablePatch
 import xyz.xenondevs.nova.transformer.patch.item.AttributePatch
 import xyz.xenondevs.nova.transformer.patch.item.DamageablePatches
 import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
@@ -25,17 +25,22 @@ import xyz.xenondevs.nova.transformer.patch.item.LegacyConversionPatch
 import xyz.xenondevs.nova.transformer.patch.item.RemainingItemPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
+import xyz.xenondevs.nova.transformer.patch.item.WearablePatch
 import xyz.xenondevs.nova.transformer.patch.nbt.CBFCompoundTagPatch
 import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
 import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.NovaRuleTestPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.WrapperBlockPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch
+import xyz.xenondevs.nova.util.ServerUtils
+import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.util.reflection.defineClass
 import java.lang.System.getProperty
 import java.lang.instrument.ClassDefinition
 import java.lang.management.ManagementFactory
@@ -55,8 +60,14 @@ internal object Patcher : Initializable() {
             StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
             BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch, LegacyConversionPatch, WearablePatch,
+            NovaRuleTestPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
+    
+    // These class names can't be accessed via reflection to prevent class loading
+    private val injectedClasses = setOf(
+        "xyz/xenondevs/nova/transformer/patch/worldgen/chunksection/LevelChunkSectionWrapper"
+    )
     
     private lateinit var classLoaderParentField: Field
     
@@ -65,6 +76,7 @@ internal object Patcher : Initializable() {
             LOGGER.info("Applying patches...")
             VirtualClassPath.classLoaders += NOVA.loader.javaClass.classLoader.parent
             redefineModule()
+            defineInjectedClasses()
             runTransformers()
             classLoaderParentField = ReflectionUtils.getField(ClassLoader::class.java, true, "parent")
             insertPatchedLoader()
@@ -75,8 +87,7 @@ internal object Patcher : Initializable() {
     }
     
     override fun disable() {
-        if (DEFAULT_CONFIG.getBoolean("use_agent"))
-            removePatchedLoader()
+        removePatchedLoader()
     }
     
     private fun redefineModule() {
@@ -91,6 +102,17 @@ internal object Patcher : Initializable() {
             emptySet(),
             emptyMap()
         )
+    }
+    
+    private fun defineInjectedClasses() {
+        (javaClass.classLoader as NovaClassLoader).addInjectedClasses(injectedClasses.map { it.replace('/', '.') })
+        if (ServerUtils.isReload) return
+        injectedClasses.forEach {
+            val bytes = getResourceData("$it.class")
+            if (bytes.isEmpty()) throw IllegalStateException("Failed to load injected class $it (Wrong path?)")
+            val minecraftServerClass = MinecraftServer::class.java
+            minecraftServerClass.classLoader.defineClass(it.replace('/', '.'), bytes, minecraftServerClass.protectionDomain)
+        }
     }
     
     private fun runTransformers() {

@@ -16,7 +16,10 @@ import com.mojang.datafixers.util.Pair as MojangPair
 fun <T> Codec<T>.decodeJsonFile(file: File) =
     decode(NMSUtils.REGISTRY_OPS, file.reader().use(JsonParser::parseReader))!!
 
-fun <R> DataResult<R>.resultOrNull() = result().orElse(null)
+inline fun <reified T : S, S> Codec<S>.subType(): Codec<T> =
+    this.xmap({ it as T }, { it })
+
+fun <R> DataResult<R>.resultOrNull(): R? = result().orElse(null)
 
 fun <R> DataResult<Holder<R>>.resultValueOrNull() = result().orElse(null)?.value()
 

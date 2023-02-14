@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.DynamicOps
 import com.mojang.serialization.Lifecycle
 import net.minecraft.core.BlockPos
+import net.minecraft.core.BlockPos.MutableBlockPos
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
@@ -36,6 +37,8 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelHeightAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.WorldGenLevel
 import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.biome.FeatureSorter
 import net.minecraft.world.level.block.Block
@@ -50,8 +53,16 @@ import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.PalettedContainer
 import net.minecraft.world.level.chunk.UpgradeData
 import net.minecraft.world.level.levelgen.blending.BlendingData
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
+import net.minecraft.world.level.levelgen.feature.OreFeature
+import net.minecraft.world.level.levelgen.feature.ReplaceBlockFeature
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState
+import net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleProcessor
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
 import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
@@ -99,7 +110,6 @@ internal object ReflectionRegistry {
     val SECTION_PATH_DATA_CONSTRUCTOR = getConstructor(SECTION_PATH_DATA_CLASS, true, Any::class)
     val ITEM_STACK_CONSTRUCTOR = getConstructor(MojangStack::class, false, ItemLike::class)
     val CHUNK_ACCESS_CONSTRUCTOR = getConstructor(ChunkAccess::class, false, ChunkPos::class, UpgradeData::class, LevelHeightAccessor::class, Registry::class, Long::class, Array<LevelChunkSection>::class, BlendingData::class)
-    val TARGET_BLOCK_STATE_CONSTRUCTOR = getConstructor(TargetBlockState::class, true, RuleTest::class, BlockState::class)
     
     // Methods
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class)
@@ -142,7 +152,7 @@ internal object ReflectionRegistry {
     val BANNER_DUPLICATE_RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(BannerDuplicateRecipe::class, false, "SRM(net.minecraft.world.item.crafting.BannerDuplicateRecipe getRemainingItems)", CraftingContainer::class)
     val BOOK_CLONING_RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(BookCloningRecipe::class, false, "SRM(net.minecraft.world.item.crafting.BookCloningRecipe getRemainingItems)", CraftingContainer::class)
     val ABSTRACT_FURNACE_BLOCK_ENTITY_SERVER_TICK_METHOD = getMethod(AbstractFurnaceBlockEntity::class, false, "SRM(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity serverTick)", Level::class, BlockPos::class, BlockState::class, AbstractFurnaceBlockEntity::class)
-    val NON_NULL_LIST_SET_METHOD = getMethod(NonNullList::class, false , "SRM(net.minecraft.core.NonNullList set)", Int::class, Any::class)
+    val NON_NULL_LIST_SET_METHOD = getMethod(NonNullList::class, false, "SRM(net.minecraft.core.NonNullList set)", Int::class, Any::class)
     val ITEM_HAS_CRAFTING_REMAINING_ITEM_METHOD = getMethod(Item::class, false, "SRM(net.minecraft.world.item.Item hasCraftingRemainingItem)")
     val BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD = getMethod(BrewingStandBlockEntity::class, true, "SRM(net.minecraft.world.level.block.entity.BrewingStandBlockEntity doBrew)", Level::class, BlockPos::class, NonNullList::class, BrewingStandBlockEntity::class)
     val ITEM_ENTITY_FIRE_IMMUNE_METHOD = getMethod(ItemEntity::class, false, "SRM(net.minecraft.world.entity.item.ItemEntity fireImmune)")
@@ -152,6 +162,14 @@ internal object ReflectionRegistry {
     val SIMPLE_PLUGIN_MANAGER_FIRE_EVENT_METHOD = getMethod(SimplePluginManager::class, true, "fireEvent", Event::class)
     val ITEM_STACK_LOAD_METHOD = getMethod(MojangStack::class, true, "load", CompoundTag::class)
     val LIVING_ENTITY_GET_EQUIPMENT_SLOT_FOR_ITEM_METHOD = getMethod(LivingEntity::class, false, "getEquipmentSlotForItem", MojangStack::class)
+    val RULE_PROCESSOR_PROCESS_BLOCK_METHOD = getMethod(RuleProcessor::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.RuleProcessor processBlock)", LevelReader::class, BlockPos::class, BlockPos::class, StructureTemplate.StructureBlockInfo::class, StructureTemplate.StructureBlockInfo::class, StructurePlaceSettings::class)
+    val PROCESSOR_RULE_TEST_METHOD = getMethod(ProcessorRule::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule test)", BlockState::class, BlockState::class, BlockPos::class, BlockPos::class, BlockPos::class, RandomSource::class)
+    val ORE_FEATURE_CAN_PLACE_ORE_METHOD = getMethod(OreFeature::class, true, "SRM(net.minecraft.world.level.levelgen.feature.OreFeature canPlaceOre)", BlockState::class, JavaFunction::class, RandomSource::class, OreConfiguration::class, TargetBlockState::class, MutableBlockPos::class)
+    val ORE_FEATURE_DO_PLACE_METHOD = getMethod(OreFeature::class, true, "SRM(net.minecraft.world.level.levelgen.feature.OreFeature doPlace)", WorldGenLevel::class, RandomSource::class, OreConfiguration::class, Double::class, Double::class, Double::class, Double::class, Double::class, Double::class, Int::class, Int::class, Int::class, Int::class, Int::class)
+    val REPLACE_BLOCK_PLACE_METHOD = getMethod(ReplaceBlockFeature::class, false, "SRM(net.minecraft.world.level.levelgen.feature.ReplaceBlockFeature place)", FeaturePlaceContext::class)
+    val RULE_TEST_TEST_METHOD = getMethod(RuleTest::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest test)", BlockState::class, RandomSource::class)
+    val WORLD_GEN_LEVEL_GET_BLOCK_STATE_METHOD = getMethod(WorldGenLevel::class, false, "SRM(net.minecraft.world.level.WorldGenLevel getBlockState)", BlockPos::class)
+    val FEATURE_PLACE_CONTEXT_RANDOM_METHOD = getMethod(FeaturePlaceContext::class, false, "SRM(net.minecraft.world.level.levelgen.feature.FeaturePlaceContext random)")
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -181,5 +199,9 @@ internal object ReflectionRegistry {
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
     val ITEM_COMBINER_MENU_PLAYER_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu player)")
     val ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD = getField(AbstractFurnaceBlockEntity::class, true, "SRF(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity items)")
+    val PROCESSOR_RULE_INPUT_PREDICATE_FIELD = getField(ProcessorRule::class, true, "SRF(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule inputPredicate)")
+    val PROCESSOR_RULE_LOC_PREDICATE_FIELD = getField(ProcessorRule::class, true, "SRF(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule locPredicate)")
+    val PROCESSOR_RULE_POS_PREDICATE_FIELD = getField(ProcessorRule::class, true, "SRF(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule posPredicate)")
+    val TARGET_BLOCK_STATE_TARGET_FIELD = getField(TargetBlockState::class, false, "SRF(net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration\$TargetBlockState target)")
     
 }

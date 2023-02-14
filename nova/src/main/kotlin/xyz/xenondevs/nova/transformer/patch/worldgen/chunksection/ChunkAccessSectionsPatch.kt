@@ -9,14 +9,11 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.LabelNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
-import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.insertAfterFirst
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.bytebase.util.previous
 import xyz.xenondevs.nova.transformer.MethodTransformer
-import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CHUNK_ACCESS_CONSTRUCTOR
-import xyz.xenondevs.nova.util.reflection.defineClass
 
 /**
  * Patch to replace all [LevelChunkSection]s with Nova's [LevelChunkSectionWrapper].
@@ -25,11 +22,6 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
     
     override fun transform() {
         val wrapperClass = LevelChunkSectionWrapper::class
-        if (!ServerUtils.isReload) {
-            // Define wrapper class in the same class loader as the ChunkAccess class so there aren't any issues when reloading
-            val sectionClass = LevelChunkSection::class.java
-            sectionClass.classLoader.defineClass(wrapperClass.java.name, VirtualClassPath[wrapperClass].assemble(true), sectionClass.protectionDomain)
-        }
         methodNode.insertAfterFirst(buildInsnList {
             // Just a for loop to replace all sections.
             

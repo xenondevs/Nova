@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.material
 
+import com.mojang.datafixers.util.Either
+import com.mojang.serialization.Codec
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.immutable.lazyProvider
 import xyz.xenondevs.commons.provider.immutable.map
@@ -93,5 +95,14 @@ open class ItemNovaMaterial internal constructor(
         LocaleManager.getTranslatedName(locale, this)
     
     override fun toString() = id.toString()
+    
+    companion object {
+        
+        val CODEC: Codec<ItemNovaMaterial> = Codec.either(NamespacedId.CODEC, Codec.STRING).xmap(
+            { either -> either.map(NovaMaterialRegistry::get) { NovaMaterialRegistry.getNonNamespaced(it).first() } },
+            { material -> Either.left(material.id) }
+        )
+        
+    }
     
 }

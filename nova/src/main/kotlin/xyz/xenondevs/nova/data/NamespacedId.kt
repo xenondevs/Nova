@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data
 
+import com.mojang.serialization.Codec
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.Plugin
@@ -11,6 +12,14 @@ val NamespacedKey.namespacedId: NamespacedId
 
 @Deprecated("Use namespacedId property", ReplaceWith("namespacedId"))
 fun NamespacedKey.toNamespacedId() = namespacedId
+
+internal operator fun <T> MutableMap<NamespacedId, T>.set(namespace: String, key: String, value: T) {
+    this[NamespacedId(namespace, key)] = value
+}
+
+internal operator fun <T> MutableMap<NamespacedId, T>.get(namespace: String, key: String): T? {
+    return this[NamespacedId(namespace, key)]
+}
 
 internal fun NamespacedId.toResourceLocation(): ResourceLocation {
     return ResourceLocation(namespace, name)
@@ -55,6 +64,8 @@ class NamespacedId(override val namespace: String, override val name: String) : 
     }
     
     companion object {
+        
+        val CODEC: Codec<NamespacedId> = Codec.STRING.xmap(::of, NamespacedId::toString)
         
         val PART_PATTERN = Regex("""^[a-z][a-z\d_]*$""")
         val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_]*:[a-z][a-z\d_]*$""")

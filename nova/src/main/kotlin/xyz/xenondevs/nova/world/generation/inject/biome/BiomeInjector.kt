@@ -65,7 +65,7 @@ internal object BiomeInjector {
             
             // check if we need to add more HolderSets to the biome
             if (injections.size <= preInjectSize) {
-                // loop through all HolderSets and replaced the backing list & set with our own
+                // loop through all HolderSets and replace the backing List and Set with our own
                 for (i in injections.indices) {
                     val features = biomeFeatures[i]
                     val newFeatures = ObjectArrayList(features.unwrap().right().get()).apply { addAll(injections[i]) }

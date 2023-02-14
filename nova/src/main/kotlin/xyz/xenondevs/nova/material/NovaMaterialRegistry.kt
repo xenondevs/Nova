@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.TileEntityBlock
+import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
 
 object NovaMaterialRegistry : INovaMaterialRegistry {
@@ -31,8 +32,10 @@ object NovaMaterialRegistry : INovaMaterialRegistry {
         get() = materialsById.values
     
     override fun getOrNull(id: String): ItemNovaMaterial? = materialsById[id.lowercase()]
+    override fun getOrNull(id: INamespacedId): ItemNovaMaterial? = getOrNull(id.toString())
     override fun getOrNull(item: ItemStack): ItemNovaMaterial? = item.novaMaterial
     override fun get(id: String): ItemNovaMaterial = getOrNull(id)!!
+    override fun get(id: INamespacedId): ItemNovaMaterial = getOrNull(id)!!
     override fun get(item: ItemStack): ItemNovaMaterial = getOrNull(item)!!
     override fun getNonNamespaced(name: String): List<ItemNovaMaterial> = materialsByName[name.lowercase()] ?: emptyList()
     

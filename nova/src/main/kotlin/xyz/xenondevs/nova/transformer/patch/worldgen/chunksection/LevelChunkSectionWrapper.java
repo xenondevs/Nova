@@ -14,6 +14,7 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.material.FluidState;
 import xyz.xenondevs.nova.data.world.WorldDataManager;
+import xyz.xenondevs.nova.transformer.Patcher;
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry;
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
@@ -21,6 +22,8 @@ import java.util.function.Predicate;
 
 /**
  * Wrapper for {@link LevelChunkSection}s to allow placing {@link WrapperBlockState}s.
+ * <p>
+ * <h2>!UPDATE {@link Patcher Patcher.injectedClasses} WHEN MOVING THIS CLASS!</h2>
  */
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     

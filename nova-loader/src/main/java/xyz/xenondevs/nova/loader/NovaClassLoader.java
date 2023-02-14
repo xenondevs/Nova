@@ -2,8 +2,13 @@ package xyz.xenondevs.nova.loader;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class NovaClassLoader extends URLClassLoader {
+    
+    private final Set<String> injectedClasses = new HashSet<>();
     
     public NovaClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
@@ -20,7 +25,7 @@ public class NovaClassLoader extends URLClassLoader {
             
             // check Nova classes and libraries before parent to prevent it from using old patch classes
             // (which stay in memory after reloading because patched code references them)
-            if (c == null) {
+            if (c == null && !injectedClasses.contains(name) ) {
                 c = findClassOrNull(name);
             }
         }
@@ -45,6 +50,14 @@ public class NovaClassLoader extends URLClassLoader {
         } catch (ClassNotFoundException e) {
             return null;
         }
+    }
+    
+    public void addInjectedClass(String name) {
+        injectedClasses.add(name);
+    }
+    
+    public void addInjectedClasses(Collection<String> names) {
+        injectedClasses.addAll(names);
     }
     
 }

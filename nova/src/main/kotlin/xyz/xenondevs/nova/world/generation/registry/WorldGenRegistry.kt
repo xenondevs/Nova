@@ -73,4 +73,6 @@ abstract class WorldGenRegistry internal constructor(private val registryAccess:
     
     internal abstract fun register()
     
+    internal open fun registerDefaults() {}
+    
 }
