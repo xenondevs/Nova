@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.LazyArray
+import xyz.xenondevs.nova.util.data.asDataResult
 import xyz.xenondevs.nova.util.nmsCopy
 import kotlin.math.min
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
@@ -98,8 +99,13 @@ open class ItemNovaMaterial internal constructor(
     
     companion object {
         
-        val CODEC: Codec<ItemNovaMaterial> = Codec.either(NamespacedId.CODEC, Codec.STRING).xmap(
-            { either -> either.map(NovaMaterialRegistry::get) { NovaMaterialRegistry.getNonNamespaced(it).first() } },
+        val CODEC: Codec<ItemNovaMaterial> = Codec.either(NamespacedId.CODEC, Codec.STRING).comapFlatMap(
+            { either ->
+                either.map(
+                    { NovaMaterialRegistry.getOrNull(it).asDataResult("Could not find material with id $it") },
+                    { NovaMaterialRegistry.getNonNamespaced(it).firstOrNull().asDataResult("Could not find material with id $it") }
+                )
+            },
             { material -> Either.left(material.id) }
         )
         

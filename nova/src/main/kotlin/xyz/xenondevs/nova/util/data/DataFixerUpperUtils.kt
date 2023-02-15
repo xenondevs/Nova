@@ -16,8 +16,8 @@ import com.mojang.datafixers.util.Pair as MojangPair
 fun <T> Codec<T>.decodeJsonFile(file: File) =
     decode(NMSUtils.REGISTRY_OPS, file.reader().use(JsonParser::parseReader))!!
 
-inline fun <reified T : S, S> Codec<S>.subType(): Codec<T> =
-    this.xmap({ it as T }, { it })
+inline fun <reified T : S, S: Any> Codec<S>.subType(): Codec<T> =
+    this.comapFlatMap({ (it as? T).asDataResult("Expected subtype ${T::class.simpleName} but got ${it::class.simpleName}") }, { it })
 
 fun <R> DataResult<R>.resultOrNull(): R? = result().orElse(null)
 
@@ -66,6 +66,14 @@ fun <F : Any, S : Any> DataResult<MojangPair<Holder<F>, S>>.getFirstValueOrThrow
     return if (result().isPresent) result().get().first.value()
     else throw IllegalArgumentException(error().get().toString())
 }
+
+fun <R> Result<R>.asDataResult() : DataResult<R> {
+    return if (isSuccess) DataResult.success(getOrThrow())
+    else DataResult.error(toString())
+}
+
+fun <R: Any> R?.asDataResult(error: String): DataResult<R> =
+    if (this != null) DataResult.success(this) else DataResult.error(error)
 
 class TagKeyOrElementLocation<T>(internal val either: Either<ResourceLocation, TagKey<T>>) {
     

@@ -1,10 +1,12 @@
 package xyz.xenondevs.nova.data
 
 import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.Plugin
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.util.data.asDataResult
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
 val NamespacedKey.namespacedId: NamespacedId
@@ -65,7 +67,7 @@ class NamespacedId(override val namespace: String, override val name: String) : 
     
     companion object {
         
-        val CODEC: Codec<NamespacedId> = Codec.STRING.xmap(::of, NamespacedId::toString)
+        val CODEC: Codec<NamespacedId> = Codec.STRING.comapFlatMap(::ofSafe, NamespacedId::toString)
         
         val PART_PATTERN = Regex("""^[a-z][a-z\d_]*$""")
         val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_]*:[a-z][a-z\d_]*$""")
@@ -87,6 +89,8 @@ class NamespacedId(override val namespace: String, override val name: String) : 
             
             return NamespacedId(namespace, name)
         }
+        
+        private fun ofSafe(id: String): DataResult<NamespacedId> = runCatching { of(id) }.asDataResult()
         
     }
     
