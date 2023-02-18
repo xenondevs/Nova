@@ -67,6 +67,7 @@ import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
 import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
 import org.bukkit.event.Event
+import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData
 import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
@@ -117,8 +118,8 @@ internal object ReflectionRegistry {
     val STATE_HOLDER_CODEC_METHOD = getMethod(StateHolder::class, true, "SRM(net.minecraft.world.level.block.state.StateHolder codec)", Codec::class, JavaFunction::class)
     val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class, true, "SRM(net.minecraft.world.level.chunk.LevelChunkSection setBlockState)", Int::class, Int::class, Int::class, BlockState::class, Boolean::class)
     val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class, false, "getDelegate", Any::class)
+    val CRAFT_BLOCK_DATA_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlockData::class, true, "isPreferredTool", BlockState::class, MojangStack::class)
     val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class)
-    val CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlock::class, true, "isPreferredTool", BlockState::class, MojangStack::class)
     val ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getAttributeModifiers)", MojangEquipmentSlot::class)
     val ITEM_STACK_HURT_AND_BREAK_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack hurtAndBreak)", Int::class, MojangLivingEntity::class, Consumer::class)
     val ITEM_STACK_HURT_ENTITY_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack hurtEnemy)", MojangLivingEntity::class, MojangPlayer::class)
