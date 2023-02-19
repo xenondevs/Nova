@@ -33,6 +33,7 @@ import net.minecraft.world.item.crafting.BookCloningRecipe
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.Level
@@ -169,7 +170,7 @@ internal object ReflectionRegistry {
     val ORE_FEATURE_DO_PLACE_METHOD = getMethod(OreFeature::class, true, "SRM(net.minecraft.world.level.levelgen.feature.OreFeature doPlace)", WorldGenLevel::class, RandomSource::class, OreConfiguration::class, Double::class, Double::class, Double::class, Double::class, Double::class, Double::class, Int::class, Int::class, Int::class, Int::class, Int::class)
     val REPLACE_BLOCK_PLACE_METHOD = getMethod(ReplaceBlockFeature::class, false, "SRM(net.minecraft.world.level.levelgen.feature.ReplaceBlockFeature place)", FeaturePlaceContext::class)
     val RULE_TEST_TEST_METHOD = getMethod(RuleTest::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest test)", BlockState::class, RandomSource::class)
-    val WORLD_GEN_LEVEL_GET_BLOCK_STATE_METHOD = getMethod(WorldGenLevel::class, false, "SRM(net.minecraft.world.level.WorldGenLevel getBlockState)", BlockPos::class)
+    val BLOCK_GETTER_GET_BLOCK_STATE_METHOD = getMethod(BlockGetter::class, false, "SRM(net.minecraft.world.level.BlockGetter getBlockState)", BlockPos::class)
     val FEATURE_PLACE_CONTEXT_RANDOM_METHOD = getMethod(FeaturePlaceContext::class, false, "SRM(net.minecraft.world.level.levelgen.feature.FeaturePlaceContext random)")
     
     // Fields

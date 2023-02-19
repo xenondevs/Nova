@@ -107,7 +107,7 @@ open class ItemNovaMaterial internal constructor(
                 )
             },
             { material -> Either.left(material.id) }
-        )
+        ).stable()
         
     }
     

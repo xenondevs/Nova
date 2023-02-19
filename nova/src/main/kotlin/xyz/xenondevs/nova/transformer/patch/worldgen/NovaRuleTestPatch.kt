@@ -26,8 +26,8 @@ import xyz.xenondevs.bytebase.util.previousLabel
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.commons.collections.findNthOfType
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.addSuffix
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BLOCK_GETTER_GET_BLOCK_STATE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.FEATURE_PLACE_CONTEXT_RANDOM_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ORE_FEATURE_CAN_PLACE_ORE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ORE_FEATURE_DO_PLACE_METHOD
@@ -39,10 +39,8 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REPLACE_BLOCK_PLACE
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.RULE_PROCESSOR_PROCESS_BLOCK_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.RULE_TEST_TEST_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.TARGET_BLOCK_STATE_TARGET_FIELD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.WORLD_GEN_LEVEL_GET_BLOCK_STATE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.generation.ruletest.NovaRuleTest
-import java.io.File
 
 /**
  * This patch allows [NovaRuleTest]s to be used in [OreFeature]s, [ReplaceBlockFeature]s and structure [ProcessorRule]s
@@ -76,7 +74,7 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
         canPlaceMethod.instructions.insert(buildInsnList {
             addLabel()
             aLoad(4)
-            getField(ReflectionRegistry.TARGET_BLOCK_STATE_TARGET_FIELD)
+            getField(TARGET_BLOCK_STATE_TARGET_FIELD)
             instanceOf(NovaRuleTest::class)
             ifne(novaRuleLabel)
         })
@@ -100,7 +98,7 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
             addLabel()
             aLoad(2)
             aLoad(3)
-            invokeInterface(WORLD_GEN_LEVEL_GET_BLOCK_STATE_METHOD, isInterface = true)
+            invokeInterface(BLOCK_GETTER_GET_BLOCK_STATE_METHOD, isInterface = true)
             aLoad(1)
             invokeVirtual(FEATURE_PLACE_CONTEXT_RANDOM_METHOD)
             aLoad(3)
@@ -112,8 +110,6 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
             addLabel()
             goto(falseLabel)
         })
-        val clazz = VirtualClassPath[ReplaceBlockFeature::class]
-        File(clazz.className.addSuffix(".class")).writeBytes(clazz.assemble())
     }
     
     private fun transformProcessorRule() {

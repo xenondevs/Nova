@@ -62,7 +62,7 @@ open class BlockNovaMaterial internal constructor(
     
     companion object {
         
-        val CODEC: Codec<BlockNovaMaterial> = ItemNovaMaterial.CODEC.subType()
+        val CODEC: Codec<BlockNovaMaterial> = ItemNovaMaterial.CODEC.subType<BlockNovaMaterial, ItemNovaMaterial>().stable()
         
     }
     

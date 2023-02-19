@@ -27,6 +27,7 @@ object MaterialMatchTestType : RuleTestType<MaterialMatchTest> {
             .fieldOf("material")
             .xmap(::MaterialMatchTest, MaterialMatchTest::material)
             .codec()
+            .stable()
     
     override fun codec() = CODEC
     

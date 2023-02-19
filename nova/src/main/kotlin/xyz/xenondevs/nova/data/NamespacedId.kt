@@ -67,7 +67,7 @@ class NamespacedId(override val namespace: String, override val name: String) : 
     
     companion object {
         
-        val CODEC: Codec<NamespacedId> = Codec.STRING.comapFlatMap(::ofSafe, NamespacedId::toString)
+        val CODEC: Codec<NamespacedId> = Codec.STRING.comapFlatMap(::ofSafe, NamespacedId::toString).stable()
         
         val PART_PATTERN = Regex("""^[a-z][a-z\d_]*$""")
         val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_]*:[a-z][a-z\d_]*$""")
