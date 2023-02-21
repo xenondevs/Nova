@@ -26,7 +26,6 @@ import xyz.xenondevs.bytebase.util.previousLabel
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.commons.collections.findNthOfType
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BLOCK_GETTER_GET_BLOCK_STATE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.FEATURE_PLACE_CONTEXT_RANDOM_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ORE_FEATURE_CAN_PLACE_ORE_METHOD

@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.world.generation.registry.CarverRegistry
 import xyz.xenondevs.nova.world.generation.registry.DimensionRegistry
 import xyz.xenondevs.nova.world.generation.registry.FeatureRegistry
 import xyz.xenondevs.nova.world.generation.registry.NoiseRegistry
-import xyz.xenondevs.nova.world.generation.registry.RuleTestRegistry
 import xyz.xenondevs.nova.world.generation.registry.StructureRegistry
 
 internal object WorldGenManager : Initializable() {
@@ -27,7 +26,7 @@ internal object WorldGenManager : Initializable() {
     private val WORLD_GEN_REGISTRIES by lazy {
         listOf(
             FeatureRegistry, NoiseRegistry, CarverRegistry, StructureRegistry, BiomeRegistry, BiomeInjectionRegistry,
-            DimensionRegistry, RuleTestRegistry
+            DimensionRegistry
         )
     }
     private val NMS_REGISTRIES  by lazy {

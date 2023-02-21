@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.generation.registry
 
+import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
@@ -8,22 +9,33 @@ import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.placement.PlacementModifier
+import net.minecraft.world.level.levelgen.placement.PlacementModifierType
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.set
 import xyz.xenondevs.nova.util.NMSUtils
+import xyz.xenondevs.nova.world.generation.ruletest.MaterialMatchTestType
 
 object FeatureRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
-    override val neededRegistries get() = setOf(Registries.FEATURE, Registries.CONFIGURED_FEATURE, Registries.PLACED_FEATURE)
+    override val neededRegistries
+        get() = setOf(
+            Registries.FEATURE, Registries.CONFIGURED_FEATURE, Registries.PLACED_FEATURE, Registries.RULE_TEST, Registries.PLACEMENT_MODIFIER_TYPE
+        )
     
     private val featureTypes = Object2ObjectOpenHashMap<NamespacedId, Feature<*>>()
     private val configuredFeatures = Object2ObjectOpenHashMap<NamespacedId, ConfiguredFeature<*, *>>()
     private val placedFeatures = Object2ObjectOpenHashMap<NamespacedId, PlacedFeature>()
+    private val ruleTestTypes = Object2ObjectOpenHashMap<NamespacedId, RuleTestType<*>>()
+    private val placementModifierTypes = Object2ObjectOpenHashMap<NamespacedId, PlacementModifierType<*>>()
     
-    fun <FC : FeatureConfiguration> registerFeatureType(addon: Addon, name: String, feature: Feature<FC>) {
+    fun <FC : FeatureConfiguration> registerFeatureType(addon: Addon, name: String, feature: Feature<FC>): Feature<FC> {
         val id = NamespacedId(addon, name)
         require(id !in featureTypes) { "Duplicate feature type $id" }
         featureTypes[id] = feature
+        return feature
     }
     
     @Suppress("UNCHECKED_CAST")
@@ -48,6 +60,26 @@ object FeatureRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
         placedFeatures[id] = placedFeature
         return getHolder(id, Registries.PLACED_FEATURE)
     }
+    
+    fun <T : RuleTest> registerRuleTestType(addon: Addon, name: String, ruleTestType: RuleTestType<T>): RuleTestType<T> {
+        val id = NamespacedId(addon, name)
+        require(id !in ruleTestTypes) { "Duplicate rule test type $id" }
+        ruleTestTypes[id] = ruleTestType
+        return ruleTestType
+    }
+    
+    fun <T : RuleTest> registerRuleTestType(addon: Addon, name: String, codec: Codec<T>): RuleTestType<T> =
+        registerRuleTestType(addon, name) { codec }
+    
+    fun <T : PlacementModifier> registerPlacementModifierType(addon: Addon, name: String, placementModifierType: PlacementModifierType<T>): PlacementModifierType<T> {
+        val id = NamespacedId(addon, name)
+        require(id !in placementModifierTypes) { "Duplicate placement modifier type $id" }
+        placementModifierTypes[id] = placementModifierType
+        return placementModifierType
+    }
+    
+    fun <T : PlacementModifier> registerPlacementModifierType(addon: Addon, name: String, codec: Codec<T>): PlacementModifierType<T> =
+        registerPlacementModifierType(addon, name) { codec }
     
     @Suppress("UNCHECKED_CAST")
     fun <F : Feature<FC>, FC : FeatureConfiguration> registerPlacedFeature(
@@ -77,6 +109,13 @@ object FeatureRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
         registerAll(Registries.CONFIGURED_FEATURE, configuredFeatures)
         loadFiles("placed_feature", PlacedFeature.CODEC, placedFeatures)
         registerAll(Registries.PLACED_FEATURE, placedFeatures)
+        
+        registerAll(Registries.RULE_TEST, ruleTestTypes)
+        registerAll(Registries.PLACEMENT_MODIFIER_TYPE, placementModifierTypes)
+    }
+    
+    override fun registerDefaults() {
+        ruleTestTypes["nova", "material_match"] = MaterialMatchTestType
     }
     
 }
