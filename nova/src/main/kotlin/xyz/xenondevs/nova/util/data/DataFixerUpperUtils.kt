@@ -75,7 +75,7 @@ fun <R> Result<R>.asDataResult() : DataResult<R> {
 fun <R: Any> R?.asDataResult(error: String): DataResult<R> =
     if (this != null) DataResult.success(this) else DataResult.error(error)
 
-class TagKeyOrElementLocation<T>(internal val either: Either<ResourceLocation, TagKey<T>>) {
+class ElementLocationOrTagKey<T>(internal val either: Either<ResourceLocation, TagKey<T>>) {
     
     val element: ResourceLocation
         get() = either.left().get()
@@ -99,10 +99,10 @@ class TagKeyOrElementLocation<T>(internal val either: Either<ResourceLocation, T
 object DataFixerUpperUtils {
     
     @JvmStatic
-    fun <T, R : Registry<T>> tagOrElementCodec(registry: ResourceKey<R>): Codec<TagKeyOrElementLocation<T>> {
+    fun <T, R : Registry<T>> tagOrElementCodec(registry: ResourceKey<R>): Codec<ElementLocationOrTagKey<T>> {
         val tagKeyCodec = TagKey.hashedCodec(registry)
         return Codec.either(ResourceLocation.CODEC, tagKeyCodec).xmap(
-            { either -> TagKeyOrElementLocation(either) },
+            { either -> ElementLocationOrTagKey(either) },
             { tagKeyOrElementLocation -> tagKeyOrElementLocation.either }
         )
     }

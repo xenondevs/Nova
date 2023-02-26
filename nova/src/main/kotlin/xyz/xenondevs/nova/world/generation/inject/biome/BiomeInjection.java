@@ -12,19 +12,20 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import xyz.xenondevs.nova.util.NMSUtils;
 import xyz.xenondevs.nova.util.data.DataFixerUpperUtils;
-import xyz.xenondevs.nova.util.data.TagKeyOrElementLocation;
+import xyz.xenondevs.nova.util.data.ElementLocationOrTagKey;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public record BiomeInjection(
-    Either<List<TagKeyOrElementLocation<Biome>>, TagKeyOrElementLocation<Biome>> biomes,
+    Either<List<ElementLocationOrTagKey<Biome>>, ElementLocationOrTagKey<Biome>> biomes,
     List<HolderSet<PlacedFeature>> features
 ) {
     
     private static final Registry<Biome> BIOME_REGISTRY = NMSUtils.INSTANCE.getRegistry(Registries.BIOME);
-    private static final Codec<TagKeyOrElementLocation<Biome>> BIOME_CODEC = DataFixerUpperUtils.tagOrElementCodec(Registries.BIOME);
+    private static final Codec<ElementLocationOrTagKey<Biome>> BIOME_CODEC = DataFixerUpperUtils.tagOrElementCodec(Registries.BIOME);
     
     public static final Codec<BiomeInjection> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Codec.either(BIOME_CODEC.listOf(), BIOME_CODEC).fieldOf("biomes").forGetter(BiomeInjection::biomes),
@@ -49,6 +50,16 @@ public record BiomeInjection(
             } else throw new IllegalStateException("BiomeInjection has neither a tag nor a resource location!");
         }
         return out;
+    }
+    
+    public static BiomeInjectionBuilder builder() {
+        return new BiomeInjectionBuilder();
+    }
+    
+    public static BiomeInjection builder(Consumer<BiomeInjectionBuilder> builder) {
+        var biomeInjectionBuilder = new BiomeInjectionBuilder();
+        builder.accept(biomeInjectionBuilder);
+        return biomeInjectionBuilder.build();
     }
     
 }
