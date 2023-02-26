@@ -6,7 +6,6 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.builder.GuiType
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.util.SlotUtils
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
@@ -20,7 +19,7 @@ internal object TableRecipeGroup : RecipeGroup<Recipe>() {
     override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
     override fun createGui(recipe: Recipe): Gui {
-        val gui = GuiType.NORMAL.builder()
+        val gui = Gui.normal()
             .setStructure(
                 ". . . . . . . . .",
                 ". . . . . . . r .",

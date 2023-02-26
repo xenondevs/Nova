@@ -20,7 +20,7 @@ import xyz.xenondevs.invui.virtualinventory.VirtualInventory
 import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
 import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
 import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
-import xyz.xenondevs.invui.window.builder.WindowType
+import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.Reloadable
@@ -611,7 +611,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
             val title = texture?.getTitle(material.localizedName)
                 ?: arrayOf(TranslatableComponent(material.localizedName))
             
-            WindowType.NORMAL.createWindow {
+            Window.single {
                 it.setViewer(player)
                 it.setTitle(title)
                 it.setGui(gui)

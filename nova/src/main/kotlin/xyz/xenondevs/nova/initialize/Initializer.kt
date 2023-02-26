@@ -11,6 +11,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
 import xyz.xenondevs.commons.collections.CollectionUtils
+import xyz.xenondevs.inventoryaccess.component.i18n.Languages
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.util.InventoryUtils
 import xyz.xenondevs.invui.virtualinventory.StackSizeProvider
@@ -93,6 +94,7 @@ internal object Initializer : Listener {
         
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
+        Languages.getInstance().enableServerSideTranslations(false)
         
         CBFAdapters.register()
         InventoryUtils.stackSizeProvider = StackSizeProvider { it.novaMaxStackSize }

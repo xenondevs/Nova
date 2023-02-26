@@ -6,13 +6,13 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.builder.GuiType
+import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.BaseItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
-import xyz.xenondevs.invui.window.builder.WindowType
+import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
@@ -28,7 +28,7 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     
     private val upgradeItems = ArrayList<Item>()
     
-    private val upgradeScrollGui = GuiType.SCROLL_ITEMS.builder()
+    private val upgradeScrollGui = ScrollGui.items()
         .setStructure(
             "x x x x x",
             "x x x x x",
@@ -41,7 +41,7 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         .setContent(createUpgradeItemList())
         .build()
     
-    val gui: Gui = GuiType.NORMAL.builder()
+    val gui: Gui = Gui.normal()
         .setStructure(
             "b - - - - - - - 2",
             "| i # . . . . . |",
@@ -67,7 +67,7 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     }
     
     fun openWindow(player: Player) {
-        WindowType.NORMAL.createWindow { 
+        Window.single {
             it.setViewer(player)
             it.setTitle(arrayOf(TranslatableComponent("menu.nova.upgrades")))
             it.setGui(gui)

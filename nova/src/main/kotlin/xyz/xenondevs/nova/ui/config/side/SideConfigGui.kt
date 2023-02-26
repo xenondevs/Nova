@@ -5,9 +5,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.builder.GuiType
+import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.impl.SimpleItem
-import xyz.xenondevs.invui.window.builder.WindowType
+import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkType
@@ -61,7 +61,7 @@ class SideConfigGui(
         
         require(energyConfigGui != null || itemConfigGui != null || fluidConfigGui != null)
         
-        mainGui = GuiType.TAB.builder()
+        mainGui = TabGui.normal()
             .setStructure(
                 "< # # e i f # # #",
                 "- - - - - - - - -",
@@ -96,7 +96,7 @@ class SideConfigGui(
     }
     
     fun openWindow(player: Player) {
-        WindowType.NORMAL.createWindow { 
+        Window.single { 
             it.setViewer(player)
             it.setTitle(arrayOf(TranslatableComponent("menu.nova.side_config")))
             it.setGui(mainGui)

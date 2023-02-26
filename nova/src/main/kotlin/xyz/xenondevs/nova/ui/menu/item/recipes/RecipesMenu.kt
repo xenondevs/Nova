@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.TabGui
-import xyz.xenondevs.invui.gui.builder.GuiType
 import xyz.xenondevs.invui.gui.structure.Structure
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
@@ -21,7 +20,6 @@ import xyz.xenondevs.invui.item.impl.BaseItem
 import xyz.xenondevs.invui.item.impl.controlitem.ControlItem
 import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.builder.WindowType
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.material.CoreGuiMaterial
@@ -99,7 +97,7 @@ private class RecipesWindow(
             .map { it.key to it.value }
             .sortedBy { it.first }
         
-        mainGui = GuiType.TAB.builder()
+        mainGui = TabGui.normal()
             .setStructure(
                 "b . . . . . . . .",
                 "x x x x x x x x x",
@@ -126,7 +124,7 @@ private class RecipesWindow(
     
     override fun show() {
         ItemMenu.addToHistory(viewerUUID, this)
-        window = WindowType.NORMAL.createWindow {
+        window = Window.single {
             it.setViewer(viewerUUID)
             it.setTitle(getCurrentTitle())
             it.setGui(mainGui)
@@ -227,7 +225,7 @@ private class RecipesWindow(
     }
     
     private fun createPagedRecipesGui(recipes: List<Gui>): Gui =
-        GuiType.PAGED_GUIS.builder()
+        PagedGui.guis()
             .setStructure(recipesGuiStructure)
             .setContent(recipes)
             .build()

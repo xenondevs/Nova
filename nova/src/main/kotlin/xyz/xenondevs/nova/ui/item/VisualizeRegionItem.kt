@@ -17,15 +17,16 @@ class VisualizeRegionItem(
     private val getRegion: () -> Region,
 ) : BaseItem() {
     
-    override fun getItemProvider() =
-        object : ItemProvider {
-            override fun get() = null
-            override fun getFor(playerUUID: UUID): ItemStack {
-                val visible = VisualRegion.isVisible(playerUUID, regionUUID)
-                return (if (visible) CoreGuiMaterial.AREA_BTN_ON.clientsideProvider
-                else CoreGuiMaterial.AREA_BTN_OFF.clientsideProvider).get()
-            }
-        }
+    // FIXME
+    override fun getItemProvider() = CoreGuiMaterial.AREA_BTN_OFF.clientsideProvider
+//        object : ItemProvider {
+//            override fun get() = null
+//            override fun getFor(playerUUID: UUID): ItemStack {
+//                val visible = VisualRegion.isVisible(playerUUID, regionUUID)
+//                return (if (visible) CoreGuiMaterial.AREA_BTN_ON.clientsideProvider
+//                else CoreGuiMaterial.AREA_BTN_OFF.clientsideProvider).get()
+//            }
+//        }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playClickSound()

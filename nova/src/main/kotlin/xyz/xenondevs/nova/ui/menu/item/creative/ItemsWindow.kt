@@ -9,15 +9,14 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.TabGui
-import xyz.xenondevs.invui.gui.builder.GuiType
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.item.impl.controlitem.TabItem
+import xyz.xenondevs.invui.window.AnvilWindow
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.builder.WindowType
-import xyz.xenondevs.invui.window.builder.create
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.material.ItemCategories
@@ -54,7 +53,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
     ) { openMainWindow() }
     
-    private val tabPagesGui = GuiType.PAGED_ITEMS.builder()
+    private val tabPagesGui = PagedGui.items()
         .setStructure(
             "x . x . x . x . x",
             "< . . . . . . . >"
@@ -64,7 +63,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         .addPageChangeHandler { _, now -> handleTabPageChange(now) }
         .build()
     
-    private val mainGui = GuiType.TAB.builder()
+    private val mainGui = TabGui.normal()
         .setStructure(
             ". . . . . . . . .",
             ". . . . . . . . .",
@@ -78,7 +77,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         .addModifier { it.fillRectangle(0, 0, tabPagesGui, true) }
         .build()
     
-    private val searchResultsGui = GuiType.PAGED_ITEMS.builder()
+    private val searchResultsGui = PagedGui.items()
         .setStructure(
             "# # # < s > # # #",
             "x x x x x x x x x",
@@ -90,7 +89,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         .addIngredient('s', openSearchItem)
         .build()
     
-    private val searchPreviewGui = GuiType.PAGED_ITEMS.builder()
+    private val searchPreviewGui = PagedGui.items()
         .setStructure(
             "x x x x x x x x x",
             "x x x x x x x x x",
@@ -157,10 +156,10 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private fun openMainWindow() {
-        currentWindow = WindowType.NORMAL.create {
-            setViewer(player)
-            setTitle(getMainWindowTitle())
-            setGui(if (filter == "") mainGui else searchResultsGui)
+        currentWindow = Window.single {
+            it.setViewer(player)
+            it.setTitle(getMainWindowTitle())
+            it.setGui(if (filter == "") mainGui else searchResultsGui)
         }.apply { show() }
     }
     
@@ -183,12 +182,12 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             .font("default").color(ChatColor.DARK_GRAY)
             .create()
         
-        currentWindow = WindowType.ANVIL_SPLIT.create {
-            setViewer(player)
-            setTitle(title)
-            setUpperGui(anvilGui)
-            setLowerGui(searchPreviewGui)
-            addRenameHandler { filter = it }
+        currentWindow = AnvilWindow.split {
+            it.setViewer(player)
+            it.setTitle(title)
+            it.setUpperGui(anvilGui)
+            it.setLowerGui(searchPreviewGui)
+            it.addRenameHandler { text -> filter = text }
         }.apply { show() }
     }
     
@@ -198,7 +197,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private fun createCategoryGui(category: ItemCategory): Gui {
-        return GuiType.SCROLL_ITEMS.builder()
+        return ScrollGui.items()
             .setStructure(
                 "x x x x x x x x s",
                 "x x x x x x x x u",
