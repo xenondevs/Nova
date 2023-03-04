@@ -317,7 +317,11 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun sendEquipmentChange(p0: LivingEntity, p1: EquipmentSlot, p2: ItemStack) {
+    override fun sendEquipmentChange(entity: LivingEntity, slot: EquipmentSlot, item: ItemStack?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendEquipmentChange(entity: LivingEntity, items: MutableMap<EquipmentSlot, ItemStack>) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -336,6 +340,18 @@ internal class FakeOnlinePlayer(
     }
     
     override fun sendMap(map: MapView) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun addCustomChatCompletions(completions: MutableCollection<String>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun removeCustomChatCompletions(completions: MutableCollection<String>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setCustomChatCompletions(completions: MutableCollection<String>) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1398,6 +1414,14 @@ internal class FakeOnlinePlayer(
     }
     
     override fun isCustomNameVisible(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setVisibleByDefault(visible: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isVisibleByDefault(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
     
