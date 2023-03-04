@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.EndPointContainer
@@ -142,7 +142,7 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
         
     }
     
-    private inner class SimplicityModeItem(private val simple: Boolean) : BaseItem() {
+    private inner class SimplicityModeItem(private val simple: Boolean) : AbstractItem() {
         
         override fun getItemProvider(): ItemProvider {
             return if (simple) {

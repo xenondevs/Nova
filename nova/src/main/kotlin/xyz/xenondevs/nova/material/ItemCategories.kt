@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -132,7 +132,7 @@ internal data class ItemCategory(val name: String, val icon: ItemProvider, val i
     
 }
 
-internal class CategorizedItem(val id: String) : BaseItem() {
+internal class CategorizedItem(val id: String) : AbstractItem() {
     
     val localizedName: String
     val itemStack: ItemStack

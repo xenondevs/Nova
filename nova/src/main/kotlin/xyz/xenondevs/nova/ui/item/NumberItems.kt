@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
@@ -19,7 +19,7 @@ open class ChangeNumberItem(
     private val setNumber: (Int) -> Unit,
     private val onProvider: ItemProvider,
     private val offProvider: ItemProvider
-) : BaseItem() {
+) : AbstractItem() {
     
     override fun getItemProvider(): ItemProvider = if (canModify()) onProvider else offProvider
     
@@ -34,7 +34,7 @@ open class ChangeNumberItem(
     
 }
 
-class DisplayNumberItem(private val getNumber: () -> Int, private val localizedName: String? = null) : BaseItem() {
+class DisplayNumberItem(private val getNumber: () -> Int, private val localizedName: String? = null) : AbstractItem() {
     
     constructor(getNumber: () -> Int) : this(getNumber, null)
     
@@ -93,7 +93,7 @@ open class AioNumberItem(
     private val setNumber: (Int) -> Unit,
     private val localizedName: String,
     private val builder: ItemBuilder
-) : BaseItem() {
+) : AbstractItem() {
     
     override fun getItemProvider(): ItemProvider =
         builder.setDisplayName(TranslatableComponent(localizedName, getNumber()))

@@ -3,9 +3,7 @@ package xyz.xenondevs.nova.ui.item
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.region.Region
@@ -15,7 +13,7 @@ import java.util.*
 class VisualizeRegionItem(
     private val regionUUID: UUID,
     private val getRegion: () -> Region,
-) : BaseItem() {
+) : AbstractItem() {
     
     // FIXME
     override fun getItemProvider() = CoreGuiMaterial.AREA_BTN_OFF.clientsideProvider

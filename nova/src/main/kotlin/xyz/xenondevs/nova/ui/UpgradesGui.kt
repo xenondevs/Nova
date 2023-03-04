@@ -10,7 +10,7 @@ import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.material.CoreGuiMaterial
@@ -78,7 +78,7 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         upgradeItems.forEach(Item::notifyWindows)
     }
     
-    private inner class UpgradeDisplay(private val type: UpgradeType<*>) : BaseItem() {
+    private inner class UpgradeDisplay(private val type: UpgradeType<*>) : AbstractItem() {
         
         init {
             upgradeItems += this
@@ -107,7 +107,7 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         
     }
     
-    private inner class UpgradeCounter(private val type: UpgradeType<*>) : BaseItem() {
+    private inner class UpgradeCounter(private val type: UpgradeType<*>) : AbstractItem() {
         
         init {
             upgradeItems += this

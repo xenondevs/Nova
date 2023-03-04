@@ -5,9 +5,9 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 
-class AnvilTextItem(val builder: ItemBuilder, text: String) : BaseItem() {
+class AnvilTextItem(val builder: ItemBuilder, text: String) : AbstractItem() {
     
     var text: String = text
         set(value) {

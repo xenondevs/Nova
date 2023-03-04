@@ -16,7 +16,7 @@ import xyz.xenondevs.invui.gui.structure.Structure
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.ControlItem
 import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.invui.window.Window
@@ -67,7 +67,7 @@ fun Player.showUsages(id: String): Boolean {
  * A menu that displays the given list of recipes.
  */
 private class RecipesWindow(
-    player: Player,
+    private val player: Player,
     private val id: Int,
     recipes: Map<RecipeGroup<*>, Iterable<RecipeContainer>>,
     info: String? = null
@@ -125,7 +125,7 @@ private class RecipesWindow(
     override fun show() {
         ItemMenu.addToHistory(viewerUUID, this)
         window = Window.single {
-            it.setViewer(viewerUUID)
+            it.setViewer(player)
             it.setTitle(getCurrentTitle())
             it.setGui(mainGui)
         }.apply { show() }
@@ -179,7 +179,7 @@ private class RecipesWindow(
         
     }
     
-    private class InfoItem(private val info: String) : BaseItem() {
+    private class InfoItem(private val info: String) : AbstractItem() {
         
         override fun getItemProvider(): ItemBuilder =
             ItemBuilder(Material.KNOWLEDGE_BOOK)
@@ -232,7 +232,7 @@ private class RecipesWindow(
     
 }
 
-private class LastRecipeItem(private val viewerUUID: UUID) : BaseItem() {
+private class LastRecipeItem(private val viewerUUID: UUID) : AbstractItem() {
     
     override fun getItemProvider(): ItemProvider {
         return if (ItemMenu.hasHistory(viewerUUID)) {

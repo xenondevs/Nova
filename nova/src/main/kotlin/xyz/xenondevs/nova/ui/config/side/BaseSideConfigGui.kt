@@ -12,7 +12,7 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.gui.AbstractGui
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -104,7 +104,7 @@ internal abstract class BaseSideConfigGui<H : EndPointDataHolder>(
         
     }
     
-    abstract inner class ConfigItem(blockSide: BlockSide) : BaseItem() {
+    abstract inner class ConfigItem(blockSide: BlockSide) : AbstractItem() {
         
         protected val blockSide: BlockSide?
         protected val blockFace: BlockFace

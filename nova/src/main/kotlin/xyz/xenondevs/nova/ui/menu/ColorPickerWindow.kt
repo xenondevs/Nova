@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.impl.BaseItem
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.material.CoreGuiMaterial
@@ -85,7 +85,7 @@ private class ChangeColorItem(
     localizedName, builder
 )
 
-abstract class ColorPreviewItem(color: Color) : BaseItem() {
+abstract class ColorPreviewItem(color: Color) : AbstractItem() {
     
     var color: Color = color
         set(value) {
