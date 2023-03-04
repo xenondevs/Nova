@@ -11,6 +11,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.jvm.isAccessible
 
 abstract class MenuContainer internal constructor() {
     
@@ -43,6 +44,7 @@ abstract class MenuContainer internal constructor() {
         @Suppress("UNCHECKED_CAST")
         fun of(tileEntity: TileEntity, clazz: KClass<*>): MenuContainer {
             val constructor = clazz.constructors.first()
+            constructor.isAccessible = true
             
             return when {
                 clazz.isSubclassOf(GlobalTileEntityMenu::class) -> GlobalMenuContainer(tileEntity, constructor as KFunction<GlobalTileEntityMenu>)
