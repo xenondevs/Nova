@@ -17,7 +17,7 @@ class ClickyTabItem(private val tab: Int, private val itemProvider: (TabGui) -> 
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         if (clickType == ClickType.LEFT && gui.isTabAvailable(tab) && gui.currentTab != tab) {
             player.playClickSound()
-            gui.showTab(tab)
+            gui.setTab(tab)
         }
     }
     

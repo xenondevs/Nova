@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
+import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TranslatableComponent
 import net.minecraft.network.protocol.Packet
 import org.bukkit.Bukkit
@@ -15,6 +16,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.reflection.isSubclassOfAny
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.virtualinventory.VirtualInventory
 import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
@@ -29,6 +31,7 @@ import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
@@ -62,7 +65,9 @@ import java.util.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.reflect.full.hasAnnotation
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
+import xyz.xenondevs.nova.tileentity.menu.TileEntityMenuClass as TileEntityMenuAnnotation
 
 abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), Reloadable, ITileEntity {
     
@@ -102,8 +107,6 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     var isValid: Boolean = true
         private set
     
-    abstract val gui: Lazy<TileEntityGui>?
-    
     internal val multiModels = ArrayList<MultiModel>()
     internal val packetTasks = ArrayList<TileEntityPacketTask>()
     private val regions = HashMap<String, ReloadableRegion>()
@@ -115,6 +118,16 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         get() = _inventories.keys.toList()
     val fluidContainers: List<FluidContainer>
         get() = _fluidContainers.keys.toList()
+    
+    lateinit var menuContainer: MenuContainer
+    
+    init {
+        val guiClass = this::class.nestedClasses.firstOrNull { it.hasAnnotation<TileEntityMenuAnnotation>() }
+        if (guiClass != null) {
+            @Suppress("LeakingThis")
+            menuContainer = MenuContainer.of(this, guiClass)
+        }
+    }
     
     override fun reload() {
         regions.values.forEach(ReloadableRegion::reload)
@@ -203,8 +216,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRemoved(unload: Boolean) {
         isValid = false
-        if (gui?.isInitialized() == true) gui!!.value.closeWindows()
-        
+        menuContainer?.closeWindows()
         multiModels.forEach { it.close() }
         packetTasks.forEach { it.stop() }
         regions.values.forEach { VisualRegion.removeRegion(it.uuid) }
@@ -220,15 +232,17 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRightClick(ctx: BlockInteractContext): Boolean {
         val player = ctx.source as? Player ?: return false
-        if (gui != null && !player.hasInventoryOpen) {
-            gui!!.value.openWindow(player)
+        if (menuContainer != null && !player.hasInventoryOpen) {
+            menuContainer.openWindow(player)
             return true
         }
         return false
     }
     
-    fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder =
-        UpgradeHolder(this, gui!!, ::reload, allowed.toHashSet())
+    fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder {
+        check(menuContainer != null) { "A TileEntityMenu class must be present to create an UpgradeHolder"}
+        return UpgradeHolder(this, menuContainer, ::reload, allowed.toHashSet())
+    }
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
@@ -590,40 +604,50 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         return "${javaClass.name}(Material: $material, Location: ${pos}, UUID: $uuid)"
     }
     
-    abstract inner class TileEntityGui(private val texture: GuiTexture? = null) {
+    abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
         
-        /**
-         * The main [Gui] of a [TileEntity] to be opened when it is right-clicked and closed when
-         * the owning [TileEntity] is destroyed.
-         */
-        abstract val gui: Gui
-        
-        /**
-         * A list of [Guis][Gui] that are not a part of [gui] but should still be closed
-         * when the [TileEntity] is destroyed.
-         */
-        val subGuis = ArrayList<Gui>()
-        
-        /**
-         * Opens a Window of the [gui] to the specified [player].
-         */
-        fun openWindow(player: Player) {
-            val title = texture?.getTitle(material.localizedName)
+        open fun getTitle(): Array<BaseComponent> {
+            return texture?.getTitle(material.localizedName)
                 ?: arrayOf(TranslatableComponent(material.localizedName))
-            
-            Window.single {
-                it.setViewer(player)
-                it.setTitle(title)
-                it.setGui(gui)
-            }.apply { show() }
         }
         
-        /**
-         * Closes all Windows connected to this [TileEntityGui].
-         */
-        fun closeWindows() {
-            gui.closeForAllViewers()
-            subGuis.forEach(Gui::closeForAllViewers)
+    }
+    
+    abstract inner class GlobalTileEntityMenu(
+        texture: GuiTexture? = null
+    ) : TileEntityMenu(texture) {
+        
+        abstract val gui: Gui
+        open val windowBuilder: Window.Builder<*, *> by lazy {
+            Window.single()
+                .setGui(gui)
+                .setTitle(getTitle())
+        }
+        
+        open fun openWindow(player: Player) {
+            val window = windowBuilder.build(player)
+            menuContainer!!.registerWindow(window)
+            window.open()
+        }
+        
+    }
+    
+    abstract inner class IndividualTileEntityMenu(
+        protected val player: Player,
+        texture: GuiTexture? = null
+    ) : TileEntityMenu(texture) {
+        
+        abstract val gui: Gui
+        open val windowBuilder: Window.Builder<*, *> by lazy {
+            Window.single()
+                .setGui(gui)
+                .setTitle(getTitle())
+        }
+        
+        open fun openWindow() {
+            val window = windowBuilder.build(player)
+            menuContainer!!.registerWindow(window)
+            window.open()
         }
         
     }

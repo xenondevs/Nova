@@ -120,7 +120,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private fun handleTabPageChange(newTab: Int) {
-        mainGui.showTab(newTab * 5)
+        mainGui.setTab(newTab * 5)
         currentWindow?.changeTitle(getMainWindowTitle())
     }
     
@@ -151,7 +151,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
                 .append(")").color(ChatColor.DARK_GRAY)
                 .create()
             
-            CoreGuiTexture.EMPTY_Gui.getTitle(title)
+            CoreGuiTexture.EMPTY_GUI.getTitle(title)
         }
     }
     
@@ -160,7 +160,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             it.setViewer(player)
             it.setTitle(getMainWindowTitle())
             it.setGui(if (filter == "") mainGui else searchResultsGui)
-        }.apply { show() }
+        }.apply { open() }
     }
     
     private fun openSearchWindow() {
@@ -188,7 +188,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             it.setUpperGui(anvilGui)
             it.setLowerGui(searchPreviewGui)
             it.addRenameHandler { text -> filter = text }
-        }.apply { show() }
+        }.apply { open() }
     }
     
     override fun show() {
@@ -216,7 +216,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.isTabAvailable(tab) && gui.currentTab != tab) {
                 player.playClickSound()
-                gui.showTab(tab)
+                gui.setTab(tab)
                 
                 currentWindow?.changeTitle(getMainWindowTitle())
             }

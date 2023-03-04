@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.overlay.character.gui
 
 object CoreGuiTexture {
     
-    val EMPTY_Gui = GuiTexture.of("nova:empty")
+    val EMPTY_GUI = GuiTexture.of("nova:empty")
     val SEARCH = GuiTexture.of("nova:search")
     val ITEMS_0 = GuiTexture.of("nova:items_0")
     val ITEMS_1 = GuiTexture.of("nova:items_1")

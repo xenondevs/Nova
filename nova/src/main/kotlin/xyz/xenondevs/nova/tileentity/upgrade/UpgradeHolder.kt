@@ -10,7 +10,7 @@ import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.SELF_UPDATE_REASON
-import xyz.xenondevs.nova.tileentity.TileEntity.TileEntityGui
+import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.ui.UpgradesGui
 import xyz.xenondevs.nova.util.item.novaMaterial
 import kotlin.math.min
@@ -22,7 +22,7 @@ private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
 
 class UpgradeHolder internal constructor(
     tileEntity: TileEntity,
-    internal val lazyGui: Lazy<TileEntityGui>,
+    internal val menuContainer: MenuContainer,
     private val updateHandler: (() -> Unit)?,
     internal val allowed: Set<UpgradeType<*>>
 ) {
@@ -35,7 +35,7 @@ class UpgradeHolder internal constructor(
         tileEntity.retrieveData<Map<NamespacedId, Int>>("upgrades", ::HashMap)
             .mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of<UpgradeType<*>>(it.key) }
     
-    val gui by lazy { UpgradesGui(this) { lazyGui.value.openWindow(it) } }
+    val gui by lazy { UpgradesGui(this) { menuContainer.openWindow(it) } }
     
     /**
      * Tries adding the given amount of upgrades and

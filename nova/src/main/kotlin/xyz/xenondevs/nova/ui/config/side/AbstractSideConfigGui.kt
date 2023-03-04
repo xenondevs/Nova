@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.yaw
 
-internal abstract class BaseSideConfigGui<H : EndPointDataHolder>(
+internal abstract class AbstractSideConfigGui<H : EndPointDataHolder>(
     val holder: H
 ) : AbstractGui(9, 3) {
     

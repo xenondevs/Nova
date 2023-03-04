@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.BlockSide
 
 internal class EnergySideConfigGui(
     holder: EnergyHolder
-) : BaseSideConfigGui<EnergyHolder>(holder) {
+) : AbstractSideConfigGui<EnergyHolder>(holder) {
     
     private val structure = Structure("" +
         "# # # # u # # # #" +

@@ -128,7 +128,7 @@ private class RecipesWindow(
             it.setViewer(player)
             it.setTitle(getCurrentTitle())
             it.setGui(mainGui)
-        }.apply { show() }
+        }.apply { open() }
     }
     
     private fun getCurrentTitle(): Array<BaseComponent> {

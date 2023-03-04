@@ -16,10 +16,11 @@ import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.ui.item.BackItem
 import xyz.xenondevs.nova.ui.item.ClickyTabItem
 import xyz.xenondevs.nova.util.playClickSound
 
-class SideConfigGui(
+class SideConfigMenu(
     endPoint: NetworkEndPoint,
     inventoryNames: List<Pair<NetworkedInventory, String>>? = null,
     fluidContainerNames: List<Pair<FluidContainer, String>>? = null,
@@ -28,14 +29,32 @@ class SideConfigGui(
     
     constructor(
         endPoint: NetworkEndPoint,
+        inventoryNames: List<Pair<NetworkedInventory, String>>? = null,
+        fluidContainerNames: List<Pair<FluidContainer, String>>? = null,
+        openPrevious: () -> Unit
+    ) : this(endPoint, inventoryNames, fluidContainerNames, { _ -> openPrevious() })
+    
+    constructor(
+        endPoint: NetworkEndPoint,
         openPrevious: (Player) -> Unit
     ) : this(endPoint, null, null, openPrevious)
+    
+    constructor(
+        endPoint: NetworkEndPoint,
+        openPrevious: () -> Unit
+    ) : this(endPoint, null, null, { _ -> openPrevious() })
     
     constructor(
         endPoint: NetworkEndPoint,
         inventories: List<Pair<NetworkedInventory, String>>?,
         openPrevious: (Player) -> Unit
     ) : this(endPoint, inventories, null, openPrevious)
+    
+    constructor(
+        endPoint: NetworkEndPoint,
+        inventories: List<Pair<NetworkedInventory, String>>?,
+        openPrevious: () -> Unit
+    ) : this(endPoint, inventories, null, { _ -> openPrevious() })
     
     private val energyConfigGui: EnergySideConfigGui?
     private val itemConfigGui: ItemSideConfigGui?
@@ -96,28 +115,20 @@ class SideConfigGui(
     }
     
     fun openWindow(player: Player) {
-        Window.single { 
+        Window.single {
             it.setViewer(player)
             it.setTitle(arrayOf(TranslatableComponent("menu.nova.side_config")))
             it.setGui(mainGui)
-        }.show()
+        }.open()
     }
     
 }
 
-class OpenSideConfigItem(private val sideConfigGui: SideConfigGui) : SimpleItem(CoreGuiMaterial.SIDE_CONFIG_BTN.clientsideProvider) {
+class OpenSideConfigItem(private val sideConfigMenu: SideConfigMenu) : SimpleItem(CoreGuiMaterial.SIDE_CONFIG_BTN.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playClickSound()
-        sideConfigGui.openWindow(player)
-    }
-    
-}
-
-class BackItem(private val openPrevious: (Player) -> Unit) : SimpleItem(CoreGuiMaterial.ARROW_1_LEFT.clientsideProvider) {
-    
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        openPrevious(player)
+        sideConfigMenu.openWindow(player)
     }
     
 }

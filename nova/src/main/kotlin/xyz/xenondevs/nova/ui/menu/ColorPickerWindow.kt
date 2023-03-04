@@ -10,7 +10,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.material.CoreGuiMaterial
-import xyz.xenondevs.nova.ui.config.side.BackItem
+import xyz.xenondevs.nova.ui.item.BackItem
 import xyz.xenondevs.nova.ui.item.AioNumberItem
 import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
 import java.awt.Color
@@ -68,7 +68,7 @@ class ColorPickerWindow(
             it.setViewer(player)
             it.setTitle(CoreGuiTexture.COLOR_PICKER.getTitle("menu.nova.color_picker"))
             it.setGui(gui)
-        }.show()
+        }.open()
     }
     
 }

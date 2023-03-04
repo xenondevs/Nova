@@ -16,7 +16,7 @@ import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.ui.config.side.BackItem
+import xyz.xenondevs.nova.ui.item.BackItem
 import xyz.xenondevs.nova.ui.item.ScrollLeftItem
 import xyz.xenondevs.nova.ui.item.ScrollRightItem
 import xyz.xenondevs.nova.util.addItemCorrectly
@@ -53,10 +53,6 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         .build()
         .apply { fillRectangle(3, 1, upgradeScrollGui, true) }
     
-    init {
-        upgradeHolder.lazyGui.value.subGuis += gui
-    }
-    
     private fun createUpgradeItemList(): List<Item> {
         val list = ArrayList<Item>()
         upgradeHolder.allowed.forEach {
@@ -67,11 +63,14 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     }
     
     fun openWindow(player: Player) {
-        Window.single {
+        val window = Window.single {
             it.setViewer(player)
             it.setTitle(arrayOf(TranslatableComponent("menu.nova.upgrades")))
             it.setGui(gui)
-        }.show()
+        }
+        
+        upgradeHolder.menuContainer.registerWindow(window)
+        window.open()
     }
     
     fun updateUpgrades() {

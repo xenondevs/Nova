@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.util.playClickSound
 internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : ContainerEndPointDataHolder<C>>(
     holder: H,
     containers: List<Pair<C, String>>
-) : BaseSideConfigGui<H>(holder) {
+) : AbstractSideConfigGui<H>(holder) {
     
     protected abstract val hasSimpleVersion: Boolean
     protected abstract val hasAdvancedVersion: Boolean
