@@ -7,7 +7,9 @@ import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.util.NMSUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 
+@ExperimentalLevelGen
 object NoiseRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
     override val neededRegistries get() = setOf(Registries.NOISE, Registries.NOISE_SETTINGS)

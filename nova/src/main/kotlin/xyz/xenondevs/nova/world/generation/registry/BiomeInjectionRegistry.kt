@@ -5,10 +5,12 @@ import net.minecraft.core.registries.Registries
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.util.NMSUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjectionBuilder
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjector
 
+@ExperimentalLevelGen
 object BiomeInjectionRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
     override val neededRegistries get() = setOf(Registries.BIOME)

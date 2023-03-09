@@ -15,10 +15,12 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.util.NMSUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 
 /**
  * TODO: fix configured structure deserialization
  */
+@ExperimentalLevelGen
 object StructureRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
     override val neededRegistries get() = setOf(

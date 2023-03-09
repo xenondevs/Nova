@@ -9,7 +9,9 @@ import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.nova.util.data.ElementLocationOrTagKey
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 
+@ExperimentalLevelGen
 class BiomeInjectionBuilder {
     
     private val biomes = mutableListOf<ElementLocationOrTagKey<Biome>>()

@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.world.generation.registry.FeatureRegistry
 import xyz.xenondevs.nova.world.generation.registry.NoiseRegistry
 import xyz.xenondevs.nova.world.generation.registry.StructureRegistry
 
+@OptIn(ExperimentalLevelGen::class)
 internal object WorldGenManager : Initializable() {
     
     override val initializationStage = InitializationStage.PRE_WORLD

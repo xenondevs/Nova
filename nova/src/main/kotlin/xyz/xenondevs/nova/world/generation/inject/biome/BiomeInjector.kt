@@ -16,7 +16,9 @@ import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_GENERATION_SETTINGS_FEATURES_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 
+@OptIn(ExperimentalLevelGen::class)
 internal object BiomeInjector {
     
     private val BIOME_REGISTRY = NMSUtils.getRegistry(Registries.BIOME)

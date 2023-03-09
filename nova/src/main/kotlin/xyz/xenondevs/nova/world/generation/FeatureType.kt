@@ -22,6 +22,7 @@ import java.util.function.Predicate
  * protected `setBlock` functions.
  */
 @Suppress("MemberVisibilityCanBePrivate")
+@ExperimentalLevelGen
 abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Feature<FC>(codec) {
     
     /**

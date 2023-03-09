@@ -7,7 +7,9 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 
+@ExperimentalLevelGen
 class MaterialMatchTest(val material: BlockNovaMaterial) : NovaMaterialTest() {
     
     override fun test(material: BlockNovaMaterial, level: Level, pos: BlockPos, state: BlockState, random: RandomSource): Boolean {
@@ -20,6 +22,7 @@ class MaterialMatchTest(val material: BlockNovaMaterial) : NovaMaterialTest() {
     
 }
 
+@ExperimentalLevelGen
 object MaterialMatchTestType : RuleTestType<MaterialMatchTest> {
     
     private val CODEC: Codec<MaterialMatchTest> =

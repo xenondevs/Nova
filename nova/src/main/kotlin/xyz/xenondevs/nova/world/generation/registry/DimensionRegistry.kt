@@ -6,10 +6,12 @@ import net.minecraft.world.level.dimension.DimensionType
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.util.NMSUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 
 /**
  * TODO: inject into WorldPresets
  */
+@ExperimentalLevelGen
 object DimensionRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
     override val neededRegistries get() = setOf(Registries.DIMENSION_TYPE)

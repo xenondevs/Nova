@@ -8,7 +8,9 @@ import net.minecraft.world.level.levelgen.carver.WorldCarver
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.util.NMSUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 
+@ExperimentalLevelGen
 object CarverRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
     override val neededRegistries get() = setOf(Registries.CARVER, Registries.CONFIGURED_CARVER)

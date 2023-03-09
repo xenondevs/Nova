@@ -16,8 +16,10 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.set
 import xyz.xenondevs.nova.util.NMSUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
 import xyz.xenondevs.nova.world.generation.ruletest.MaterialMatchTestType
 
+@ExperimentalLevelGen
 object FeatureRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
     override val neededRegistries

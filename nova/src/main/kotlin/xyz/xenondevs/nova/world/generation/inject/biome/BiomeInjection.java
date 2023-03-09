@@ -13,12 +13,15 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import xyz.xenondevs.nova.util.NMSUtils;
 import xyz.xenondevs.nova.util.data.DataFixerUpperUtils;
 import xyz.xenondevs.nova.util.data.ElementLocationOrTagKey;
+import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+
+@ExperimentalLevelGen
 public record BiomeInjection(
     Either<List<ElementLocationOrTagKey<Biome>>, ElementLocationOrTagKey<Biome>> biomes,
     List<HolderSet<PlacedFeature>> features
