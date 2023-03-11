@@ -19,6 +19,7 @@ dependencies {
     spigotLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
+    novaLoaderApi(libs.bundles.kyori.adventure)
     novaLoaderApi("xyz.xenondevs.invui:invui:1.0-SNAPSHOT") { for (i in 1..12) exclude("xyz.xenondevs.invui", "inventory-access-r$i") }
     novaLoaderApi("xyz.xenondevs.invui:inventory-access-r12:1.0-SNAPSHOT:remapped-mojang")
     novaLoaderApi("xyz.xenondevs.invui:invui-kotlin:1.0-SNAPSHOT")
@@ -46,7 +47,6 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Core:6.10.5") { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Bukkit:6.10.5") { isTransitive = false }
-    compileOnly("com.griefdefender:api:2.0.0-SNAPSHOT") { isTransitive = false }
     compileOnly("com.github.LoneDev6:API-ItemsAdder:3.2.4") { isTransitive = false }
     compileOnly("com.github.TownyAdvanced:Towny:0.97.2.0") { isTransitive = false }
     compileOnly("io.th0rgal:oraxen:1.151.0") { isTransitive = false }

@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.DamageableOptions
-import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.component.bungee.localized
 import xyz.xenondevs.nova.util.item.novaCompound
 import kotlin.math.min
 import net.minecraft.world.item.ItemStack as MojangStack

@@ -22,11 +22,11 @@ internal abstract class MethodTransformer : ClassTransformer {
         methodNode = classWrapper.getMethod(methodName, desc)!!
     }
     
-    constructor(method: Method, computeFrames: Boolean = false) : super(method.declaringClass.kotlin, computeFrames) {
+    constructor(method: Method, computeFrames: Boolean = true) : super(method.declaringClass.kotlin, computeFrames) {
         methodNode = classWrapper.getMethod(method.name, Type.getMethodDescriptor(method))!!
     }
     
-    constructor(method: Constructor<*>, computeFrames: Boolean = false) : super(method.declaringClass.kotlin, computeFrames) {
+    constructor(method: Constructor<*>, computeFrames: Boolean = true) : super(method.declaringClass.kotlin, computeFrames) {
         methodNode = classWrapper.getMethod("<init>", Type.getConstructorDescriptor(method))!!
     }
     

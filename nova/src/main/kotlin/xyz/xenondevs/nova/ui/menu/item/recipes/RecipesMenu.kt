@@ -131,15 +131,15 @@ private class RecipesWindow(
         }.apply { open() }
     }
     
-    private fun getCurrentTitle(): Array<BaseComponent> {
+    private fun getCurrentTitle(): Array<out BaseComponent> {
         val currentTab = mainGui.tabs[mainGui.currentTab] as PagedGui<*>
         val pageNumberString = "${currentTab.currentPage + 1} / ${currentTab.pageAmount}"
         
         return ComponentBuilder()
-            .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
+            .append(MoveCharacters.getMovingBungeeComponent(-8)) // move to side to place overlay
             .append(currentType.texture.component)
-            .append(MoveCharacters.getMovingComponent(-84)) // move back to the middle
-            .append(MoveCharacters.getMovingComponent((
+            .append(MoveCharacters.getMovingBungeeComponent(-84)) // move back to the middle
+            .append(MoveCharacters.getMovingBungeeComponent((
                 DefaultFont.getStringLength(pageNumberString) // this would be the string length in the default font
                     + pageNumberString.replace(" ", "").length // non-space characters are generally one pixel bigger in this font
                 ) / -2 // divided by -2 to center it

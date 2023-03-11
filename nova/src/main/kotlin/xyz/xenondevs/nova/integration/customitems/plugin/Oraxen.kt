@@ -150,11 +150,11 @@ internal object Oraxen : CustomItemService {
         return "oraxen:$name"
     }
     
-    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
+    override fun getName(item: ItemStack, locale: String): Array<out BaseComponent>? {
         return if (OraxenItems.getIdByItem(item) != null) TextComponent.fromLegacyText(item.displayName) else null
     }
     
-    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
+    override fun getName(block: Block, locale: String): Array<out BaseComponent>? {
         return getId(block)?.let(::getItemById)?.displayName?.let(TextComponent::fromLegacyText)
     }
     

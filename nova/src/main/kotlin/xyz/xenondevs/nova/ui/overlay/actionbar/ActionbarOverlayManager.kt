@@ -13,8 +13,8 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPac
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
-import xyz.xenondevs.nova.util.data.forceDefaultFont
-import xyz.xenondevs.nova.util.data.toPlainText
+import xyz.xenondevs.nova.util.component.bungee.forceDefaultFont
+import xyz.xenondevs.nova.util.component.bungee.toPlainText
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
 import java.util.*
@@ -105,17 +105,17 @@ object ActionbarOverlayManager {
         }
     }
     
-    private fun saveInterceptedComponent(player: Player, text: Array<BaseComponent>) {
+    private fun saveInterceptedComponent(player: Player, text: Array<out BaseComponent>) {
         val components = ArrayList<BaseComponent>()
         
         // calculate the length (in pixels) of the intercepted message
         val textLength = DefaultFont.getStringLength(text.toPlainText(player.locale))
         // to center, move the cursor to the right by half of the length
-        components.add(MoveCharacters.getMovingComponent(textLength / -2))
+        components.add(MoveCharacters.getMovingBungeeComponent(textLength / -2))
         // append the text while explicitly setting it to the default font (required because of the moving component)
         components.addAll(text.forceDefaultFont())
         // move half of the text length back so the cursor is in the middle of the screen again (prevents clientside centering)
-        components.add(MoveCharacters.getMovingComponent(textLength / -2))
+        components.add(MoveCharacters.getMovingBungeeComponent(textLength / -2))
         
         interceptedActionbars[player.uniqueId] = components to System.currentTimeMillis()
     }
@@ -124,13 +124,15 @@ object ActionbarOverlayManager {
         val uuid = player.uniqueId
         val componentList = ArrayList<BaseComponent>()
         
-        overlays[uuid]!!.forEach {
-            val components = it.components
-            // add components
-            componentList.addAll(components)
-            // move back
-            componentList.add(MoveCharacters.getMovingComponent(-it.getWidth(player.locale)))
-        }
+        // TODO: reimplement
+        
+//        overlays[uuid]!!.forEach {
+//            val components = it.components
+//            // add components
+//            componentList.addAll(components)
+//            // move back
+//            componentList.add(MoveCharacters.getMovingBungeeComponent(-it.getWidth(player.locale)))
+//        }
         
         val interceptedActionbar = interceptedActionbars[uuid]
         if (interceptedActionbar != null) {

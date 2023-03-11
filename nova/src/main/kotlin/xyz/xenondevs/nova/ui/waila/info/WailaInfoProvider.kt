@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info
 
+import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Material
@@ -9,22 +10,28 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.util.data.MovingComponentBuilder
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
+import xyz.xenondevs.nova.util.component.bungee.MovingComponentBuilder
 
-class WailaLine(val components: Array<out BaseComponent>, val alignment: Alignment) {
+data class WailaLine(val text: Component, val alignment: Alignment) {
     
+    @Deprecated("Use adventure components instead")
+    constructor(components: Array<BaseComponent>, alignment: Alignment) : this(
+        components.toAdventureComponent(),
+        alignment
+    )
+    
+    @Deprecated("Use adventure components instead")
     constructor(builder: ComponentBuilder, alignment: Alignment) : this(
-        builder.create(),
+        builder.create().toAdventureComponent(),
         alignment
     )
     
+    @Deprecated("Use adventure components instead")
     constructor(builder: MovingComponentBuilder, alignment: Alignment) : this(
-        builder.create(),
+        builder.create().toAdventureComponent(),
         alignment
     )
-    
-    operator fun component1() = components
-    operator fun component2() = alignment
     
     enum class Alignment {
         LEFT,
@@ -35,7 +42,7 @@ class WailaLine(val components: Array<out BaseComponent>, val alignment: Alignme
     
 }
 
-class WailaInfo(var icon: NamespacedId, var lines: MutableList<WailaLine>)
+data class WailaInfo(var icon: NamespacedId, var lines: MutableList<WailaLine>)
 
 sealed interface WailaInfoProvider<T> {
     fun getInfo(player: Player, block: T): WailaInfo

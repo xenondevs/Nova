@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.loader.NovaClassLoader
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
+import xyz.xenondevs.nova.transformer.patch.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.transformer.patch.event.FakePlayerEventPreventionPatch
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
 import xyz.xenondevs.nova.transformer.patch.item.AttributePatch
@@ -60,7 +61,7 @@ internal object Patcher : Initializable() {
             StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
             BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch, LegacyConversionPatch, WearablePatch,
-            NovaRuleTestPatch
+            NovaRuleTestPatch, BossBarOriginPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

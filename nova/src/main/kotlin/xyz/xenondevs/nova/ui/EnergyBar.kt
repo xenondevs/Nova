@@ -5,8 +5,8 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.data.addLoreLines
-import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.component.bungee.addLoreLines
+import xyz.xenondevs.nova.util.component.bungee.localized
 
 class EnergyBar(
     height: Int,

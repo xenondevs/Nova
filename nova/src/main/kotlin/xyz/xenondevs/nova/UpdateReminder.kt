@@ -13,10 +13,10 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
-import xyz.xenondevs.nova.util.data.ComponentUtils
+import xyz.xenondevs.nova.util.component.bungee.BungeeComponentUtils
+import xyz.xenondevs.nova.util.component.bungee.coloredText
+import xyz.xenondevs.nova.util.component.bungee.localized
 import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.nova.util.data.coloredText
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.net.URL
@@ -114,7 +114,7 @@ internal object UpdateReminder : Initializable(), Listener {
     private fun getOutdatedMessage(addon: Addon?): BaseComponent {
         val addonName = coloredText(ChatColor.AQUA, addon?.description?.name ?: "Nova")
         val url = "https://spigotmc.org/resources/" + (addon?.description?.spigotResourceId ?: NOVA_RESOURCE_ID)
-        return localized(ChatColor.RED, "nova.outdated_version", addonName, ComponentUtils.createLinkComponent(url))
+        return localized(ChatColor.RED, "nova.outdated_version", addonName, BungeeComponentUtils.createLinkComponent(url))
     }
     
 }

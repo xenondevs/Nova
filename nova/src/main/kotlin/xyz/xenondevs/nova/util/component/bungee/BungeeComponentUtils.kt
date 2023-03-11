@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.util.data
+package xyz.xenondevs.nova.util.component.bungee
 
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
@@ -70,7 +70,7 @@ fun ItemBuilder.addLoreLines(vararg lines: BaseComponent): ItemBuilder {
     return addLoreLines(*lines.map { arrayOf(it) }.toTypedArray())
 }
 
-fun Component.toBaseComponentArray(): Array<BaseComponent> {
+fun Component.toBaseComponentArray(): Array<out BaseComponent> {
     try {
         return ComponentSerializer.parse(CraftChatMessage.toJSON(this))
     } catch (e: Exception) {
@@ -118,11 +118,11 @@ fun BaseComponent.toPlainText(locale: String): String {
     }
 }
 
-fun Array<BaseComponent>.forceDefaultFont(): Array<BaseComponent> {
+fun Array<out BaseComponent>.forceDefaultFont(): Array<out BaseComponent> {
     return formatWithTemplate(DEFAULT_FONT_TEMPLATE)
 }
 
-fun Array<BaseComponent>.formatWithTemplate(template: BaseComponent): Array<BaseComponent> {
+fun Array<out BaseComponent>.formatWithTemplate(template: BaseComponent): Array<out BaseComponent> {
     var previousComponent = template
     for (component in this) {
         component.copyFormatting(previousComponent, false)
@@ -132,22 +132,22 @@ fun Array<BaseComponent>.formatWithTemplate(template: BaseComponent): Array<Base
     return this
 }
 
-fun Array<BaseComponent>.withoutPreFormatting(): Array<BaseComponent> =
+fun Array<out BaseComponent>.withoutPreFormatting(): Array<out BaseComponent> =
     ComponentUtils.withoutPreFormatting(*this)
 
-fun BaseComponent.withoutPreFormatting(): Array<BaseComponent> =
+fun BaseComponent.withoutPreFormatting(): Array<out BaseComponent> =
     ComponentUtils.withoutPreFormatting(this)
 
 fun BaseComponent.serialize(): String =
     ComponentSerializer.toString(this)
 
-fun Array<BaseComponent>.serialize(): String =
+fun Array<out BaseComponent>.serialize(): String =
     ComponentSerializer.toString(this)
 
 fun BaseComponent.serializeToNBT(): StringTag =
     StringTag.valueOf(serialize())
 
-fun Array<BaseComponent>.serializeToNBT(): StringTag =
+fun Array<out BaseComponent>.serializeToNBT(): StringTag =
     StringTag.valueOf(serialize())
 
 fun ComponentBuilder.appendLocalized(translate: String, vararg with: Any): ComponentBuilder {
@@ -155,11 +155,11 @@ fun ComponentBuilder.appendLocalized(translate: String, vararg with: Any): Compo
     return this
 }
 
-fun Array<BaseComponent>.duplicate(): Array<BaseComponent> {
+fun Array<out BaseComponent>.duplicate(): Array<out BaseComponent> {
     return Array(size) { this[it].duplicate() }
 }
 
-object ComponentUtils {
+object BungeeComponentUtils {
     
     fun createLinkComponent(url: String): BaseComponent {
         return ComponentBuilder(url)

@@ -16,9 +16,9 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.component.bungee.localized
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.facing
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions

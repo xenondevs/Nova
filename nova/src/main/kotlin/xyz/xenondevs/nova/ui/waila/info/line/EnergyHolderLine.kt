@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.data.MovingComponentBuilder
+import xyz.xenondevs.nova.util.component.bungee.MovingComponentBuilder
 
 private const val ENERGY_BAR_LENGTH = 40
 
@@ -43,7 +43,7 @@ object EnergyHolderLine {
         )
     }
     
-    private fun createEnergyBarString(energy: Long, maxEnergy: Long): Array<BaseComponent> {
+    private fun createEnergyBarString(energy: Long, maxEnergy: Long): Array<out BaseComponent> {
         val percentage = energy.toDouble() / maxEnergy.toDouble()
         
         val green = (ENERGY_BAR_LENGTH * percentage).toInt()

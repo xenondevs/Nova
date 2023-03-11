@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
-import xyz.xenondevs.nova.util.data.MovingComponentBuilder
+import xyz.xenondevs.nova.util.component.bungee.MovingComponentBuilder
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty

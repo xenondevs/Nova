@@ -15,17 +15,17 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * The displayed name of this item.
      */
-    var name: Array<BaseComponent>? = null
+    var name: Array<out BaseComponent>? = null
     
     /**
      * The displayed lore of this item.
      */
-    var lore: MutableList<Array<BaseComponent>>? = null
+    var lore: MutableList<Array<out BaseComponent>>? = null
     
     /**
      * The advanced tooltips lore of this item which is displayed when Nova's advanced tooltips are enabled.
      */
-    var advancedTooltipsLore: MutableList<Array<BaseComponent>>? = null
+    var advancedTooltipsLore: MutableList<Array<out BaseComponent>>? = null
     
     /**
      * The durability percentage of this item from 0 to 1.
@@ -40,7 +40,7 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * Adds multiple lore lines to the current lore.
      */
-    fun addLore(lore: List<Array<BaseComponent>>) {
+    fun addLore(lore: List<Array<out BaseComponent>>) {
         if (this.lore == null)
             this.lore = ArrayList()
         
@@ -50,7 +50,7 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * Adds one lore line to the current lore.
      */
-    fun addLore(lore: Array<BaseComponent>) {
+    fun addLore(lore: Array<out BaseComponent>) {
         if (this.lore == null)
             this.lore = ArrayList()
         
@@ -60,7 +60,7 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * Adds multiple lore lines to the advanced tooltips lore.
      */
-    fun addAdvancedTooltipsLore(lore: List<Array<BaseComponent>>) {
+    fun addAdvancedTooltipsLore(lore: List<Array<out BaseComponent>>) {
         if (this.advancedTooltipsLore == null)
             this.advancedTooltipsLore = ArrayList()
         
@@ -70,7 +70,7 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * Adds one lore line to the advanced tooltips lore.
      */
-    fun addAdvancedTooltipsLore(lore: Array<BaseComponent>) {
+    fun addAdvancedTooltipsLore(lore: Array<out BaseComponent>) {
         if (this.advancedTooltipsLore == null)
             this.advancedTooltipsLore = ArrayList()
         

@@ -37,12 +37,12 @@ import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.data.appendLocalized
+import xyz.xenondevs.nova.util.component.bungee.appendLocalized
+import xyz.xenondevs.nova.util.component.bungee.localized
+import xyz.xenondevs.nova.util.component.bungee.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getDoubleOrNull
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.logExceptionMessages
-import xyz.xenondevs.nova.util.data.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.serverPlayer
@@ -64,7 +64,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     
     val behaviors: List<ItemBehavior> by lazy { holders.map { it.get(material) } }
     private lateinit var material: ItemNovaMaterial
-    private lateinit var name: Array<BaseComponent>
+    private lateinit var name: Array<out BaseComponent>
     
     internal val vanillaMaterialProvider = combinedLazyProvider { behaviors.map(ItemBehavior::vanillaMaterialProperties) }
         .flatten()
@@ -166,14 +166,14 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         return modifiers
     }
     
-    private fun generateAttributeModifiersTooltip(player: ServerPlayer?, itemStack: MojangStack): List<Array<BaseComponent>> {
+    private fun generateAttributeModifiersTooltip(player: ServerPlayer?, itemStack: MojangStack): List<Array<out BaseComponent>> {
         if (HideableFlag.MODIFIERS.isHidden(itemStack.tag?.getInt("HideFlags") ?: 0))
             return emptyList()
         
         // if the item has custom modifiers set, all default modifiers are ignored
         val customModifiers = itemStack.tag?.contains("AttributeModifiers", Tag.TAG_LIST.toInt()) == true
         
-        val lore = ArrayList<Array<BaseComponent>>()
+        val lore = ArrayList<Array<out BaseComponent>>()
         EquipmentSlot.values().forEach { slot ->
             val modifiers = if (customModifiers)
                 ItemUtils.getCustomAttributeModifiers(itemStack, slot)

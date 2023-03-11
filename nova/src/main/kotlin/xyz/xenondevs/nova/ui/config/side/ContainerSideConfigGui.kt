@@ -17,9 +17,9 @@ import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.ui.item.BUTTON_COLORS
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
-import xyz.xenondevs.nova.util.data.addLoreLines
-import xyz.xenondevs.nova.util.data.setLocalizedName
+import xyz.xenondevs.nova.util.component.bungee.addLocalizedLoreLines
+import xyz.xenondevs.nova.util.component.bungee.addLoreLines
+import xyz.xenondevs.nova.util.component.bungee.setLocalizedName
 import xyz.xenondevs.nova.util.playClickSound
 
 internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : ContainerEndPointDataHolder<C>>(

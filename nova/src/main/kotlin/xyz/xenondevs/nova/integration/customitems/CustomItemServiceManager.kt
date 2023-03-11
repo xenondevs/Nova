@@ -62,11 +62,11 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.firstNotNullOfOrNull { it.getId(block) }
     }
     
-    fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
+    fun getName(item: ItemStack, locale: String): Array<out BaseComponent>? {
         return PLUGINS.firstNotNullOfOrNull { it.getName(item, locale) }
     }
     
-    fun getName(block: Block, locale: String): Array<BaseComponent>? {
+    fun getName(block: Block, locale: String): Array<out BaseComponent>? {
         return PLUGINS.firstNotNullOfOrNull { it.getName(block, locale) }
     }
     

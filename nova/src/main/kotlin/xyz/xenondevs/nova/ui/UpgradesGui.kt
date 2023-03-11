@@ -20,7 +20,7 @@ import xyz.xenondevs.nova.ui.item.BackItem
 import xyz.xenondevs.nova.ui.item.ScrollLeftItem
 import xyz.xenondevs.nova.ui.item.ScrollRightItem
 import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.component.bungee.localized
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 

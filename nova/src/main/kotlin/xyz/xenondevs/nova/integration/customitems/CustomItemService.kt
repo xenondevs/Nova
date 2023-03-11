@@ -72,12 +72,12 @@ internal interface CustomItemService : InternalIntegration {
     /**
      * Gets a localized name for an [ItemStack]
      */
-    fun getName(item: ItemStack, locale: String): Array<BaseComponent>?
+    fun getName(item: ItemStack, locale: String): Array<out BaseComponent>?
     
     /**
      * Gets a localized name from a placed [Block]
      */
-    fun getName(block: Block, locale: String): Array<BaseComponent>?
+    fun getName(block: Block, locale: String): Array<out BaseComponent>?
     
     /**
      * Checks if this [CustomItemService] registered a recipe with that [key]

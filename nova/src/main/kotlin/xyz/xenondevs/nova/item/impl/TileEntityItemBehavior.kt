@@ -19,7 +19,7 @@ internal class TileEntityItemBehavior : ItemBehavior() {
         val tileEntityData: Compound? = data[TileEntity.TILE_ENTITY_DATA_KEY]
         
         if (tileEntityData != null) {
-            val lore = ArrayList<Array<BaseComponent>>()
+            val lore = ArrayList<Array<out BaseComponent>>()
             
             val energy = tileEntityData.get<Long>("energy")
             if (energy != null) {

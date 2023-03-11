@@ -135,11 +135,11 @@ internal object ItemsAdder : CustomItemService {
             ?: CustomCrop.byAlreadyPlaced(block)?.seed?.namespacedID
     }
     
-    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
+    override fun getName(item: ItemStack, locale: String): Array<out BaseComponent>? {
         return TextComponent.fromLegacyText(CustomStack.byItemStack(item)?.displayName)
     }
     
-    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
+    override fun getName(block: Block, locale: String): Array<out BaseComponent>? {
         return (CustomBlock.byAlreadyPlaced(block)?.displayName
             ?: CustomCrop.byAlreadyPlaced(block)?.seed?.displayName)
             ?.let(TextComponent::fromLegacyText)

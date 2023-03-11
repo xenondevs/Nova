@@ -118,6 +118,7 @@ internal class ResourcePackBuilder {
     }
     
     private val soundOverrides = SoundOverrides()
+    private val movedFonts = MovedFontContent()
     private lateinit var basePacks: BasePacks
     private lateinit var assetPacks: List<AssetPack>
     private lateinit var contents: List<PackContent>
@@ -174,19 +175,18 @@ internal class ResourcePackBuilder {
             LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
             
             // init content
-            val movedFontContent = MovedFontContent()
             contents = listOf(
                 // pre-world
                 MaterialContent(basePacks, soundOverrides),
                 ArmorContent(basePacks),
                 GuiContent(),
                 LanguageContent(),
-                TextureIconContent(movedFontContent),
+                TextureIconContent(movedFonts),
                 AtlasContent(),
                 
                 // post-world
-                WailaContent(movedFontContent),
-                movedFontContent
+                WailaContent(movedFonts),
+                movedFonts
             )
             
             // init pre-world content

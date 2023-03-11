@@ -16,7 +16,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.reflection.isSubclassOfAny
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.virtualinventory.VirtualInventory
 import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
@@ -606,7 +605,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
         
-        open fun getTitle(): Array<BaseComponent> {
+        open fun getTitle(): Array<out BaseComponent> {
             return texture?.getTitle(material.localizedName)
                 ?: arrayOf(TranslatableComponent(material.localizedName))
         }

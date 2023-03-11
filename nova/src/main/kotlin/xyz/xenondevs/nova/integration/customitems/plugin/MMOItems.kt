@@ -91,14 +91,14 @@ internal object MMOItems : CustomItemService {
         return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.let(::getId)
     }
     
-    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
+    override fun getName(item: ItemStack, locale: String): Array<out BaseComponent>? {
         if (getId(item) == null)
             return null
         
         return TextComponent.fromLegacyText(item.displayName)
     }
     
-    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
+    override fun getName(block: Block, locale: String): Array<out BaseComponent>? {
         return TextComponent.fromLegacyText(
             mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.displayName
         )

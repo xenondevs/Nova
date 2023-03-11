@@ -5,9 +5,9 @@ import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.nova.material.CoreGuiMaterial
-import xyz.xenondevs.nova.util.data.addLoreLines
-import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.util.data.setLocalizedName
+import xyz.xenondevs.nova.util.component.bungee.addLoreLines
+import xyz.xenondevs.nova.util.component.bungee.localized
+import xyz.xenondevs.nova.util.component.bungee.setLocalizedName
 
 class PageBackItem : PageItem(false) {
     

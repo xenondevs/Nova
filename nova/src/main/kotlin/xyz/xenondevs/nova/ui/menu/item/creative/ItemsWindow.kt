@@ -25,8 +25,8 @@ import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
-import xyz.xenondevs.nova.util.data.MovingComponentBuilder
-import xyz.xenondevs.nova.util.data.setLocalizedName
+import xyz.xenondevs.nova.util.component.bungee.MovingComponentBuilder
+import xyz.xenondevs.nova.util.component.bungee.setLocalizedName
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.searchFor
@@ -137,7 +137,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         searchPreviewGui.setContent(filteredItems)
     }
     
-    private fun getMainWindowTitle(): Array<BaseComponent> {
+    private fun getMainWindowTitle(): Array<out BaseComponent> {
         return if (filter == "") {
             MovingComponentBuilder()
                 .move(-8)

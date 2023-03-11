@@ -5,12 +5,11 @@ package xyz.xenondevs.nova.data.resources
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import net.md_5.bungee.api.chat.BaseComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextDecoration
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.data.ArrayKey
-import xyz.xenondevs.nova.util.data.toPlainText
-import xyz.xenondevs.nova.util.removeMinecraftFormatting
+import xyz.xenondevs.nova.util.component.adventure.chars
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
@@ -19,8 +18,14 @@ import java.util.concurrent.TimeUnit
 
 data class ComponentSize(
     val width: Int,
-    val xRange: IntRange,
+    // TODO: xRange
     val yRange: IntRange,
+)
+
+data class CharOptions(
+    val char: Char,
+    val font: String,
+    val isBold: Boolean
 )
 
 object CharSizes {
@@ -29,7 +34,7 @@ object CharSizes {
     
     private val loadedTables = HashMap<String, CharSizeTable>()
     
-    private val componentSizeCache: Cache<Pair<ArrayKey<BaseComponent>, String>, ComponentSize> = CacheBuilder.newBuilder()
+    private val componentCache: Cache<Pair<Component, String>, ComponentSize> = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.MINUTES)
         .build()
     
@@ -73,6 +78,12 @@ object CharSizes {
     fun getCharAscent(font: String, char: Char): Int =
         getCharAscent(font, char.code)
     
+    fun getCharYRange(font: String, char: Int): IntRange =
+        getTable(font)?.getYRange(char) ?: IntRange.EMPTY
+    
+    fun getCharYRange(font: String, char: Char): IntRange =
+        getCharYRange(font, char.code)
+    
     /**
      * Calculates the width of [string] when rendered with [font].
      */
@@ -81,56 +92,61 @@ object CharSizes {
     }
     
     /**
-     * Calculates the width of a component array in pixels.
+     * Calculates the width of a component.
      */
-    fun calculateComponentWidth(components: Array<out BaseComponent>, locale: String): Int {
-        return calculateComponentSize(components, locale).width
+    fun calculateComponentWidth(component: Component, lang: String): Int {
+        return calculateComponentSize(component, lang).width
     }
     
     /**
-     * Calculates the [ComponentSize] of the given [components] array under [locale].
+     * Calculates the [ComponentSize] of the given [component] under [lang].
      */
-    fun calculateComponentSize(components: Array<out BaseComponent>, locale: String): ComponentSize {
-        return componentSizeCache.get(ArrayKey(components) to locale) {
-            var width = 0
-            
-            var xRangeMin = 0
-            var xRangeMax = 0
-            var yRangeMin = 0
-            var yRangeMax = 0
-            
-            for (component in components) {
-                val text = component.toPlainText(locale).removeMinecraftFormatting()
-                val font = component.font ?: "default"
-                for (char in text.toCharArray()) {
-                    // x
-                    var charWidth = getCharWidth(font, char)
-                    if (charWidth < 0) charWidth += 1
-                    if (component.isBold) charWidth += 1
-                    
-                    width += charWidth
-                    
-                    if (xRangeMin > width) xRangeMin = width
-                    if (xRangeMax < width) xRangeMax = width
-                    
-                    // ignore move font for yRange
-                    if (font == "nova:move")
-                        continue
-                    
-                    // y
-                    val charHeight = getCharHeight(font, char)
-                    val charAscent = getCharAscent(font, char)
-                    
-                    val charYMin = -charAscent
-                    val charYMax = -charAscent + charHeight
-                    
-                    if (yRangeMin > charYMin) yRangeMin = charYMin
-                    if (yRangeMax < charYMax) yRangeMax = charYMax
+    fun calculateComponentSize(component: Component, lang: String): ComponentSize {
+        //return componentCache.get(component to lang) {
+        return calculateComponentSize(
+            component.chars(lang)
+                .map {
+                    CharOptions(
+                        it.char,
+                        it.style.font()?.asString() ?: "minecraft:default",
+                        it.style.hasDecoration(TextDecoration.BOLD)
+                    )
                 }
-            }
+        )
+        //}
+    }
+    
+    /**
+     * Calculates the [ComponentSize] from a sequence of [CharOptions].
+     */
+    fun calculateComponentSize(chars: Sequence<CharOptions>): ComponentSize {
+        var width = 0
+        
+        var yRangeMin = Integer.MAX_VALUE
+        var yRangeMax = Integer.MIN_VALUE
+        
+        chars.forEach { (char, font, isBold) ->
+            // x
+            var charWidth = getCharWidth(font, char)
+            if (charWidth < 0) charWidth += 1
+            if (isBold) charWidth += 1
             
-            return@get ComponentSize(width, xRangeMin..xRangeMax, yRangeMin..yRangeMax)
+            width += charWidth
+            
+            // ignore move font for yRange
+            if (font == "nova:move")
+                return@forEach
+            
+            // y
+            val yRange = getCharYRange(font, char)
+            val charMinY = yRange.first
+            val charMaxY = yRange.last
+            
+            if (charMinY < yRangeMin) yRangeMin = charMinY
+            if (charMaxY > yRangeMax) yRangeMax = charMaxY
         }
+        
+        return ComponentSize(width, yRangeMin..yRangeMax)
     }
     
     private fun loadTable(font: String): CharSizeTable? {
@@ -184,16 +200,26 @@ internal class CharSizeTable(
         return sizes[char]?.get(2) ?: 0
     }
     
+    fun getYRange(char: Int): IntRange {
+        return sizes[char]?.let { it[3]..it[4] } ?: IntRange.EMPTY
+    }
+    
     fun setWidth(char: Int, width: Int) {
-        sizes.getOrPut(char) { IntArray(3) }[0] = width
+        sizes.getOrPut(char) { IntArray(5) }[0] = width
     }
     
     fun setHeight(char: Int, height: Int) {
-        sizes.getOrPut(char) { IntArray(3) }[1] = height
+        sizes.getOrPut(char) { IntArray(5) }[1] = height
     }
     
     fun setAscent(char: Int, ascent: Int) {
-        sizes.getOrPut(char) { IntArray(3) }[2] = ascent
+        sizes.getOrPut(char) { IntArray(5) }[2] = ascent
+    }
+    
+    fun setYRange(char: Int, start: Int, end: Int) {
+        val sizes = sizes.getOrPut(char) { IntArray(5) }
+        sizes[3] = start
+        sizes[4] = end
     }
     
     fun setSizes(char: Int, sizes: IntArray) {
@@ -213,6 +239,8 @@ internal class CharSizeTable(
                 dout.writeInt(charSizes[0]) // width
                 dout.writeInt(charSizes[1]) // height
                 dout.writeInt(charSizes[2]) // ascent
+                dout.writeInt(charSizes[3]) // yMin
+                dout.writeInt(charSizes[4]) // yMax
             }
         }
     }
@@ -226,8 +254,8 @@ internal class CharSizeTable(
                 val sizes = Int2ObjectOpenHashMap<IntArray>()
                 
                 while (din.available() >= 16) {
-                    // char code, width, height, ascent
-                    sizes[din.readInt()] = intArrayOf(din.readInt(), din.readInt(), din.readInt())
+                    // char code, width, height, ascent, yMin, yMax
+                    sizes[din.readInt()] = intArrayOf(din.readInt(), din.readInt(), din.readInt(), din.readInt(), din.readInt())
                 }
                 
                 return CharSizeTable(sizes)

@@ -58,6 +58,12 @@ dependencyResolutionManagement {
             // lib - zip4j
             library("zip4j", "net.lingala.zip4j:zip4j:2.11.2")
             
+            // lib - kyori adventure
+            library("adventure-api", "net.kyori:adventure-api:4.12.0")
+            library("adventure-text-serializer-gson", "net.kyori:adventure-text-serializer-gson:4.12.0")
+            library("adventure-text-serializer-plain", "net.kyori:adventure-text-serializer-plain:4.12.0")
+            library("adventure-platform-bukkit", "net.kyori:adventure-platform-bukkit:4.2.0")
+            
             // bundles
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("kotlin-test-junit", "junit-jupiter"))
@@ -66,6 +72,7 @@ dependencyResolutionManagement {
             bundle("xenondevs-commons", listOf("commons-collections", "commons-gson", "commons-provider", "commons-reflection"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
             bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer", "resource-pack-obfuscator"))
+            bundle("kyori-adventure", listOf("adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-plain", "adventure-platform-bukkit"))
             
             // plugins
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")

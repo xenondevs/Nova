@@ -20,8 +20,8 @@ import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.data.addLocalizedLoreLines
-import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.component.bungee.addLocalizedLoreLines
+import xyz.xenondevs.nova.util.component.bungee.localized
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.yaw
 
@@ -42,7 +42,7 @@ internal abstract class AbstractSideConfigGui<H : EndPointDataHolder>(
         else null to blockSide.blockFace
     }
     
-    fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Array<BaseComponent> {
+    fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Array<out BaseComponent> {
         return if (blockSide != null) {
             ComponentBuilder()
                 .color(ChatColor.GRAY)

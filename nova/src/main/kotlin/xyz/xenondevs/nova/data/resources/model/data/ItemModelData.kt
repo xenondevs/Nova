@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.PacketItems
-import xyz.xenondevs.nova.util.data.withoutPreFormatting
+import xyz.xenondevs.nova.util.component.bungee.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.unhandledTags
 
 open class ItemModelData(val id: NamespacedId, val material: Material, val dataArray: IntArray) {
@@ -20,7 +20,7 @@ open class ItemModelData(val id: NamespacedId, val material: Material, val dataA
         ItemBuilder(PacketItems.SERVER_SIDE_MATERIAL)
             .addModifier { modifyNBT(it, subId) }
     
-    fun createClientsideItemBuilder(name: Array<BaseComponent>? = null, lore: List<Array<BaseComponent>>? = null, subId: Int = 0): ItemBuilder =
+    fun createClientsideItemBuilder(name: Array<out BaseComponent>? = null, lore: List<Array<out BaseComponent>>? = null, subId: Int = 0): ItemBuilder =
         ItemBuilder(material)
             .setDisplayName(*name ?: emptyArray())
             .setCustomModelData(dataArray[subId])

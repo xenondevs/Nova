@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.command.requiresPlayerPermission
 import xyz.xenondevs.nova.command.sendFailure
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.showUsages
-import xyz.xenondevs.nova.util.data.localized
+import xyz.xenondevs.nova.util.component.bungee.localized
 
 internal object NovaUsageCommand : Command("nvusage") {
     

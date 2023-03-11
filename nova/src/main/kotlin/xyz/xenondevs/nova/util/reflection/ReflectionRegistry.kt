@@ -13,11 +13,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.TagType
 import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.resources.RegistryFileCodec
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.players.PlayerList
 import net.minecraft.util.RandomSource
+import net.minecraft.world.BossEvent
 import net.minecraft.world.Container
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.ExperienceOrb
@@ -171,6 +173,7 @@ internal object ReflectionRegistry {
     val RULE_TEST_TEST_METHOD = getMethod(RuleTest::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest test)", BlockState::class, RandomSource::class)
     val BLOCK_GETTER_GET_BLOCK_STATE_METHOD = getMethod(BlockGetter::class, false, "SRM(net.minecraft.world.level.BlockGetter getBlockState)", BlockPos::class)
     val FEATURE_PLACE_CONTEXT_RANDOM_METHOD = getMethod(FeaturePlaceContext::class, false, "SRM(net.minecraft.world.level.levelgen.feature.FeaturePlaceContext random)")
+    val CLIENTBOUND_BOSS_EVENT_PACKET_CREATE_ADD_PACKET_METHOD = getMethod(ClientboundBossEventPacket::class, false, "SRM(net.minecraft.network.protocol.game.ClientboundBossEventPacket createAddPacket)", BossEvent::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

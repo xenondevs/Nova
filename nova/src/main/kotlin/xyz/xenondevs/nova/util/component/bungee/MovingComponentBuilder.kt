@@ -1,5 +1,6 @@
-package xyz.xenondevs.nova.util.data
+package xyz.xenondevs.nova.util.component.bungee
 
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.ClickEvent
@@ -10,11 +11,12 @@ import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 
+@Deprecated("Use adventure components instead")
 class MovingComponentBuilder(private val locale: String) {
     
     private val builder = ComponentBuilder()
     val width: Int
-        get() = CharSizes.calculateComponentWidth(create(), locale)
+        get() = CharSizes.calculateComponentWidth(BungeeComponentSerializer.get().deserialize(create()), locale)
     
     constructor() : this("en_us")
     
@@ -34,11 +36,11 @@ class MovingComponentBuilder(private val locale: String) {
     }
     
     fun append(fontChar: FontChar): MovingComponentBuilder {
-        return append(fontChar.component)
+        return append(fontChar.bungeeComponent)
     }
     
     fun move(distance: Int): MovingComponentBuilder {
-        builder.append(MoveCharacters.getMovingComponent(distance), FormatRetention.NONE)
+        builder.append(MoveCharacters.getMovingBungeeComponent(distance), FormatRetention.NONE)
         return this
     }
     
@@ -105,7 +107,7 @@ class MovingComponentBuilder(private val locale: String) {
     }
     
     fun reset(): MovingComponentBuilder {
-        builder.retain(FormatRetention.NONE)
+        builder.reset()
         return this
     }
     
@@ -114,7 +116,7 @@ class MovingComponentBuilder(private val locale: String) {
         return this
     }
     
-    fun create(): Array<BaseComponent> {
+    fun create(): Array<out BaseComponent> {
         return builder.create()
     }
     

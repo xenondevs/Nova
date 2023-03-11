@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.addNamespace
-import xyz.xenondevs.nova.util.data.formatWithTemplate
+import xyz.xenondevs.nova.util.component.bungee.formatWithTemplate
 
 private val TITLE_TEMPLATE = ComponentBuilder("")
     .color(ChatColor.DARK_GRAY)
@@ -23,19 +23,19 @@ class GuiTexture(private val info: FontChar) {
         .color(ChatColor.WHITE)
         .create()[0]
     
-    fun getTitle(translate: String): Array<BaseComponent> {
+    fun getTitle(translate: String): Array<out BaseComponent> {
         return getTitle(TranslatableComponent(translate))
     }
     
-    fun getTitle(title: BaseComponent): Array<BaseComponent> {
+    fun getTitle(title: BaseComponent): Array<out BaseComponent> {
         return getTitle(arrayOf(title))
     }
     
-    fun getTitle(title: Array<BaseComponent>): Array<BaseComponent> {
+    fun getTitle(title: Array<out BaseComponent>): Array<out BaseComponent> {
         return ComponentBuilder()
-            .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
-            .append(info.component)
-            .append(MoveCharacters.getMovingComponent(-info.width + 7)) // move back to start
+            .append(MoveCharacters.getMovingBungeeComponent(-8)) // move to side to place overlay
+            .append(info.bungeeComponent)
+            .append(MoveCharacters.getMovingBungeeComponent(-info.width + 7)) // move back to start
             .append(title.formatWithTemplate(TITLE_TEMPLATE))
             .create()
     }
