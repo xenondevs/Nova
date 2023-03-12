@@ -39,11 +39,13 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.RULE_PROCESSOR_PROC
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.RULE_TEST_TEST_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.TARGET_BLOCK_STATE_TARGET_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.ruletest.NovaRuleTest
 
 /**
  * This patch allows [NovaRuleTest]s to be used in [OreFeature]s, [ReplaceBlockFeature]s and structure [ProcessorRule]s
  */
+@OptIn(ExperimentalWorldGen::class)
 internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, ReplaceBlockFeature::class, RuleProcessor::class), computeFrames = true) {
     
     override fun transform() {
