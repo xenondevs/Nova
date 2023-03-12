@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MAPPED_REGISTRY_LIF
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_BY_NAME_CODEC_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_FILE_CODEC_DECODE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.codec.BlockNovaMaterialDecoder
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
 import com.mojang.datafixers.util.Pair as MojangPair
@@ -28,6 +29,7 @@ import com.mojang.datafixers.util.Pair as MojangPair
 /**
  * Allows accessing Nova's registry from Minecraft's Block registry.
  */
+@OptIn(ExperimentalWorldGen::class)
 internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::class, Registry::class, MappedRegistry::class), true) {
     
     private val RESOURCE_KEY_NAME = ResourceKey::class.internalName
