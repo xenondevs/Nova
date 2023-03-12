@@ -41,7 +41,7 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     
     override fun getItemProvider(): ItemProvider {
         val number = getNumber().coerceIn(0..999)
-        val builder = CoreGuiMaterial.NUMBER.item.createItemBuilder(number)
+        val builder = CoreGuiMaterial.NUMBER.item.createClientsideItemBuilder(subId = number)
         if (localizedName != null)
             builder.setDisplayName(Component.translatable(localizedName, Component.text(number)))
         
