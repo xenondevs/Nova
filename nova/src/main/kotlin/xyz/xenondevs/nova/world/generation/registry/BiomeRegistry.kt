@@ -6,9 +6,9 @@ import net.minecraft.world.level.biome.Biome
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.util.NMSUtils
-import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
+import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
-@ExperimentalLevelGen
+@ExperimentalWorldGen
 object BiomeRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
     
     override val neededRegistries get() = setOf(Registries.BIOME)

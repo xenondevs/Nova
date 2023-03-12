@@ -5,10 +5,10 @@ import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
+import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import net.minecraft.world.level.block.state.BlockState as MojangState
 
-@ExperimentalLevelGen
+@ExperimentalWorldGen
 abstract class NovaMaterialTest : NovaRuleTest() {
     
     final override fun test(level: Level, pos: BlockPos, state: MojangState, random: RandomSource): Boolean {
