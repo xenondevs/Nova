@@ -15,23 +15,25 @@ import java.nio.file.Path
 import kotlin.io.path.CopyActionResult
 import kotlin.io.path.copyTo
 import kotlin.io.path.copyToRecursively
+import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.inputStream
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isDirectory
 import kotlin.io.path.outputStream
 import kotlin.io.path.relativeTo
 
 internal class AssetPack(val namespace: String, val assetsDir: Path) {
     
-    val modelsDir: Path? = assetsDir.resolve("models/")
-    val texturesDir: Path? = assetsDir.resolve("textures/")
-    val fontsDir: Path? = assetsDir.resolve("fonts/")
-    val langDir: Path? = assetsDir.resolve("lang/")
-    val soundsDir: Path? = assetsDir.resolve("sounds/")
-    val soundsFile: Path? = assetsDir.resolve("sounds.json")
-    val wailaTexturesDir: Path? = assetsDir.resolve("textures/waila/")
-    val atlasesDir: Path? = assetsDir.resolve("atlases/")
+    val modelsDir: Path? = assetsDir.resolve("models/").takeIf(Path::exists)
+    val texturesDir: Path? = assetsDir.resolve("textures/").takeIf(Path::exists)
+    val fontsDir: Path? = assetsDir.resolve("fonts/").takeIf(Path::exists)
+    val langDir: Path? = assetsDir.resolve("lang/").takeIf(Path::exists)
+    val soundsDir: Path? = assetsDir.resolve("sounds/").takeIf(Path::exists)
+    val soundsFile: Path? = assetsDir.resolve("sounds.json").takeIf(Path::exists)
+    val wailaTexturesDir: Path? = assetsDir.resolve("textures/waila/").takeIf(Path::exists)
+    val atlasesDir: Path? = assetsDir.resolve("atlases/").takeIf(Path::exists)
     
     val materialsIndex: List<RegisteredMaterial>? = assetsDir.resolve("materials.json")
         .takeIf(Path::exists)
@@ -52,19 +54,21 @@ internal class AssetPack(val namespace: String, val assetsDir: Path) {
     fun getInputStream(path: String): InputStream? =
         assetsDir.resolve(path).takeIf(Path::exists)?.inputStream()
     
-    fun extract(destDir: Path, fileFilter: (String) -> Boolean) {
-        val namespaceDir = destDir.resolve(namespace)
-        
+    fun extract(namespaceDir: Path, fileFilter: (String) -> Boolean) {
         fun extractDir(sourceDir: Path, dirName: String) {
             sourceDir.copyToRecursively(
                 target = namespaceDir.resolve("$dirName/"),
                 followLinks = false,
             ) { source, target ->
+                if (source.isDirectory())
+                    return@copyToRecursively CopyActionResult.CONTINUE
+                
                 val relPath = source.relativeTo(sourceDir).invariantSeparatorsPathString
                 if (!fileFilter(relPath))
                     return@copyToRecursively CopyActionResult.SKIP_SUBTREE
                 
                 source.inputStream().use { ins ->
+                    target.parent.createDirectories()
                     target.outputStream().use { out ->
                         if (source.extension.equals("png", true))
                             PNGMetadataRemover.remove(ins, out)

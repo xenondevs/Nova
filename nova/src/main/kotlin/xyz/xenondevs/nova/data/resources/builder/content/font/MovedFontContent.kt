@@ -13,13 +13,6 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder.BuildingStage
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import kotlin.io.path.createDirectories
-import kotlin.io.path.extension
-import kotlin.io.path.forEachDirectoryEntry
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
-import kotlin.io.path.nameWithoutExtension
 
 private val DEFAULT_FONT = ResourcePath("minecraft", "default")
 
@@ -50,20 +43,6 @@ internal class MovedFontContent : PackContent {
     }
     
     override fun write() {
-        // add all fonts from other namespaces (for boss bar overlay, because we don't know which fonts are used in boss bars)
-        ResourcePackBuilder.ASSETS_DIR.listDirectoryEntries()
-            .filter { it.isDirectory() && it.name != "nova" && it.name != "minecraft" }
-            .forEach {
-                val namespace = it.name
-                val fontDir = it.resolve("font")
-                fontDir.forEachDirectoryEntry { fontFile ->
-                    if (fontFile.isRegularFile() && fontFile.extension == "json") {
-                        requestMovedFonts(ResourcePath(namespace, fontFile.nameWithoutExtension), 1..19)
-                    }
-                }
-            }
-        
-        // create moved fonts
         LOGGER.info("Creating moved fonts")
         movingRequests.forEach { (font, variants) ->
             if (font in MOVED_FONT_BLACKLIST)

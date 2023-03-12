@@ -46,6 +46,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.inputStream
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isDirectory
 import kotlin.io.path.outputStream
 import kotlin.io.path.relativeTo
 import kotlin.io.path.writeText
@@ -129,7 +130,7 @@ internal class ResourcePackBuilder {
         File(NOVA.dataFolder, "ResourcePack").deleteRecursively()
         File(RESOURCE_PACK_DIR.toFile(), "asset_packs").deleteRecursively()
         File(RESOURCE_PACK_DIR.toFile(), "pack").deleteRecursively()
-        if (!IN_MEMORY) RESOURCE_PACK_DIR.toFile().deleteRecursively()
+        if (!IN_MEMORY) RESOURCE_PACK_BUILD_DIR.toFile().deleteRecursively()
         
         if (NOVA.lastVersion != null && NOVA.lastVersion!! < Version("0.10")) {
             BASE_PACKS_DIR.toFile().delete()
@@ -262,12 +263,16 @@ internal class ResourcePackBuilder {
                 MINECRAFT_ASSETS_DIR,
                 followLinks = false,
             ) { source, target ->
+                if (source.isDirectory())
+                    return@copyToRecursively CopyActionResult.CONTINUE
+                
                 val relPath = target.relativeTo(MINECRAFT_ASSETS_DIR)
                 
                 if (RESOURCE_FILTERS[Stage.ASSET_PACK]?.all { filter -> filter.allows("minecraft/$relPath") } == false)
                     return@copyToRecursively CopyActionResult.SKIP_SUBTREE
                 
                 source.inputStream().use { ins ->
+                    target.parent.createDirectories()
                     target.outputStream().use { out ->
                         if (source.extension.equals("png", true))
                             PNGMetadataRemover.remove(ins, out)

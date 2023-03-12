@@ -35,7 +35,7 @@ private val WHITELISTED_FILE_TYPES: Set<String> by configReloadable {
 
 private val BASE_PACKS by configReloadable { DEFAULT_CONFIG.getStringList("resource_pack.generation.base_packs").map(::File) }
 
-internal class BasePacks {
+internal class BasePacks(private val builder: ResourcePackBuilder) {
     
     private val mergers = FileMerger.createMergers(this)
     private val packs = BASE_PACKS + (ResourcePackBuilder.BASE_PACKS_DIR.toFile().listFiles() ?: emptyArray())
