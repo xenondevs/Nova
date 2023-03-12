@@ -1,12 +1,16 @@
 package xyz.xenondevs.nova.tileentity.network.fluid
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.tileentity.network.*
+import xyz.xenondevs.nova.tileentity.network.Network
+import xyz.xenondevs.nova.tileentity.network.NetworkBridge
+import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.NetworkNode
+import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.fluid.channel.FluidNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
-import xyz.xenondevs.nova.util.getOrSet
 import java.util.*
 
 class FluidNetwork(override val uuid: UUID) : Network {

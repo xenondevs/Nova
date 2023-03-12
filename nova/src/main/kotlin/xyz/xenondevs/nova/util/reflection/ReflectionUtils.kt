@@ -2,81 +2,30 @@
 
 package xyz.xenondevs.nova.util.reflection
 
-import com.google.gson.reflect.TypeToken
 import jdk.internal.misc.Unsafe
 import org.bukkit.Bukkit
-import org.checkerframework.checker.units.qual.C
-import xyz.xenondevs.nova.util.mapToArray
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CALLABLE_REFERENCE_RECEIVER_FIELD
+import xyz.xenondevs.bytebase.jvm.ClassWrapper
+import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.K_PROPERTY_1_GET_DELEGATE_METHOD
-import java.lang.reflect.Array
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_DEFINE_CLASS_METHOD
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
-import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-import java.lang.reflect.WildcardType
-import kotlin.jvm.internal.CallableReference
+import java.security.ProtectionDomain
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty0
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
 
-val KProperty0<*>.isLazyInitialized: Boolean
-    get() {
-        val delegate = actualDelegate
-        return if (delegate is Lazy<*>) delegate.isInitialized() else throw IllegalStateException("Property doesn't delegate to Lazy")
-    }
+internal fun ClassLoader.defineClass(name: String, bytecode: ByteArray, protectionDomain: ProtectionDomain?) =
+    CLASS_LOADER_DEFINE_CLASS_METHOD.invoke(this, name, bytecode, 0, bytecode.size, protectionDomain) as Class<*>
 
-val KProperty0<*>.actualDelegate: Any?
-    get() {
-        val receiver = CALLABLE_REFERENCE_RECEIVER_FIELD.get(this)
-        if (receiver == CallableReference.NO_RECEIVER) {
-            isAccessible = true
-            return this.getDelegate()
-        }
-        
-        val property = receiver::class.memberProperties.first { it.name == name }
-        property.isAccessible = true
-        return K_PROPERTY_1_GET_DELEGATE_METHOD.invoke(property, receiver)
-    }
+internal fun ClassLoader.defineClass(clazz: Class<*>) =
+    defineClass(clazz.name, VirtualClassPath[clazz].assemble(true), clazz.protectionDomain)
 
-inline val <reified K, V> Map<K, V>.keyType: Type
-    get() = type<K>()
+internal fun ClassLoader.defineClass(clazz: KClass<*>) =
+    defineClass(clazz.java)
 
-inline val <K, reified V> Map<K, V>.valueType: Type
-    get() = type<V>()
-
-@Suppress("UNCHECKED_CAST")
-inline val <reified K, V> Map<K, V>.keyClass: Class<K>
-    get() = Class.forName(keyType.typeName) as Class<K>
-
-@Suppress("UNCHECKED_CAST")
-inline val <K, reified V> Map<K, V>.valueClass: Class<V>
-    get() = Class.forName(valueType.typeName) as Class<V>
-
-inline fun <reified T> type(): Type = object : TypeToken<T>() {}.type
-
-val Type.representedClass: Class<*>
-    get() = when (this) {
-        is ParameterizedType -> rawType as Class<*>
-        is WildcardType -> upperBounds[0] as Class<*>
-        is GenericArrayType -> Array.newInstance(genericComponentType.representedClass, 0)::class.java
-        is Class<*> -> this
-        else -> throw IllegalStateException("Type $this is not a class")
-    }
-
-val Type.representedKClass: KClass<*>
-    get() = representedClass.kotlin
-
-fun <T : Enum<*>> enumValueOf(enumClass: Class<T>, name: String): T =
-    enumClass.enumConstants.first { it.name == name }
-
-fun Type.tryTakeUpperBound(): Type {
-    return if (this is WildcardType) this.upperBounds[0] else this
-}
+internal fun ClassLoader.defineClass(classWrapper: ClassWrapper) =
+    defineClass(classWrapper.name.replace('/', '.'), classWrapper.assemble(true), null)
 
 @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
 object ReflectionUtils {

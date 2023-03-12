@@ -6,13 +6,13 @@ import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.configuration.serialization.ConfigurationSerialization
 import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.commons.reflection.classifierClass
+import xyz.xenondevs.nova.data.serialization.yaml.serializer.BarMatcherSerializer
 import xyz.xenondevs.nova.data.serialization.yaml.serializer.PotionEffectSerializer
-import xyz.xenondevs.nova.util.reflection.representedKClass
-import xyz.xenondevs.nova.util.reflection.type
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
 import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.typeOf
 
 private val NUMBER_CONVERTER_MAP: Map<KClass<*>, (Number) -> Number> = mapOf(
     Byte::class to { it.toByte() },
@@ -28,10 +28,10 @@ internal fun ConfigurationSection.setLazilyEvaluated(path: String, value: Any) {
 }
 
 internal inline fun <reified T : Any> ConfigurationSection.getLazilyEvaluated(path: String): T? {
-    return getLazilyEvaluated(path, type<T>())
+    return getLazilyEvaluated(path, typeOf<T>())
 }
 
-internal fun <T : Any> ConfigurationSection.getLazilyEvaluated(path: String, type: Type): T? {
+internal fun <T : Any> ConfigurationSection.getLazilyEvaluated(path: String, type: KType): T? {
     val value = get(path) ?: return null
     return YamlSerialization.deserialize(value, type)
 }
@@ -42,6 +42,7 @@ internal object YamlSerialization {
     
     init {
         registerSerializer(PotionEffectSerializer)
+        registerSerializer(BarMatcherSerializer)
     }
     
     inline fun <reified T> registerSerializer(serializer: YamlSerializer<T>) {
@@ -62,20 +63,20 @@ internal object YamlSerialization {
     }
     
     inline fun <reified T : Any> deserialize(value: Any): T {
-        return deserialize(value, type<T>())
+        return deserialize(value, typeOf<T>())
     }
     
-    fun <T : Any> deserialize(value: Any, type: Type): T {
-        val clazz = type.representedKClass as KClass<T>
+    fun <T : Any> deserialize(value: Any, type: KType): T {
+        val clazz = type.classifierClass!!
         
         // if value is a collection, also deserialize the elements
         if (value is Collection<*> && clazz.isSubclassOf(List::class)) {
-            return deserializeCollectionEntries(value, type as ParameterizedType)
+            return deserializeCollectionEntries(value, type)
         }
         
         // if value is a map, also deserialize the entries
         if (value is Map<*, *> && clazz.isSubclassOf(Map::class)) {
-            return deserializeMapEntries(value, type as ParameterizedType)
+            return deserializeMapEntries(value, type)
         }
         
         // value and type are the same
@@ -105,17 +106,17 @@ internal object YamlSerialization {
         throw IllegalArgumentException("Value $value cannot be deserialized to type $type")
     }
     
-    private fun <T> deserializeCollectionEntries(value: Collection<*>, type: ParameterizedType): T {
-        val listType = type.actualTypeArguments[0]
+    private fun <T> deserializeCollectionEntries(value: Collection<*>, type: KType): T {
+        val listType = type.arguments[0].type!!
         val dest = CBF.createInstance<MutableCollection<Any?>>(type) ?: ArrayList()
         value.forEach { if (it != null) dest += deserialize<Any>(it, listType) else dest += null }
         return dest as T
     }
     
-    private fun <T> deserializeMapEntries(value: Map<*, *>, type: ParameterizedType): T {
-        val typeArgs = type.actualTypeArguments
-        val keyType = typeArgs[0]
-        val valueType = typeArgs[1]
+    private fun <T> deserializeMapEntries(value: Map<*, *>, type: KType): T {
+        val typeArgs = type.arguments
+        val keyType = typeArgs[0].type!!
+        val valueType = typeArgs[1].type!!
         
         val dest = CBF.createInstance<MutableMap<Any?, Any?>>(type) ?: HashMap()
         value.forEach { (key, value) ->

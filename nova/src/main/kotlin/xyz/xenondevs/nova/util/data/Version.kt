@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.util.data
 
 import com.google.common.collect.HashBiMap
 import org.bukkit.Bukkit
-import xyz.xenondevs.nova.util.mapToIntArray
+import xyz.xenondevs.commons.collections.mapToIntArray
 import kotlin.math.max
 
 private val RELEASE_STAGES = HashBiMap.create<String, Int>().apply {

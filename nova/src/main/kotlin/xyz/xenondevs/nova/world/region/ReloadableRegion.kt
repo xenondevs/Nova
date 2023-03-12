@@ -25,8 +25,6 @@ abstract class ReloadableRegion(
             return _region
         }
     
-    val visualizeRegionItem by lazy { VisualizeRegionItem(uuid) { region } }
-    
     //<editor-fold desc="delegated to region", defaultstate="collapsed">
     val blocks
         get() = region.blocks
@@ -41,6 +39,10 @@ abstract class ReloadableRegion(
     
     open fun reload() {
         updateRegion()
+    }
+    
+    fun createVisualizeRegionItem(player: Player): VisualizeRegionItem {
+        return VisualizeRegionItem(player, uuid, ::region)
     }
     
     fun showRegionOutline(player: Player) {

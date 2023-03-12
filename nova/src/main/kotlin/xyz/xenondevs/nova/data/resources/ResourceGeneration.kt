@@ -1,15 +1,15 @@
 package xyz.xenondevs.nova.data.resources
 
-import de.studiocode.inventoryaccess.util.DataUtils
 import kotlinx.coroutines.runBlocking
+import xyz.xenondevs.inventoryaccess.util.DataUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
+import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
@@ -23,7 +23,7 @@ private const val MODEL_DATA_LOOKUP = "modelDataLookup"
 private const val ARMOR_DATA_LOOKUP = "armorDataLookup"
 private const val LANGUAGE_LOOKUP = "languageLookup"
 private const val TEXTURE_ICON_LOOKUP = "textureIconLookup"
-private const val GUI_DATA_LOOKUP = "guiDataLookup"
+private const val Gui_DATA_LOOKUP = "guiDataLookup"
 private const val WAILA_DATA_LOOKUP = "wailaDataLookup"
 
 private val ASSET_INDEX_FILES = listOf("assets/materials.json", "assets/guis.json", "assets/armor.json")
@@ -51,7 +51,7 @@ internal object ResourceGeneration {
                 && PermanentStorage.has(LANGUAGE_LOOKUP)
                 && PermanentStorage.has(TEXTURE_ICON_LOOKUP)
                 && PermanentStorage.has(WAILA_DATA_LOOKUP)
-                && PermanentStorage.has(GUI_DATA_LOOKUP)
+                && PermanentStorage.has(Gui_DATA_LOOKUP)
             ) {
                 // Load from PermanentStorage
                 Resources.modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, ModelData>>(MODEL_DATA_LOOKUP)!!
@@ -59,7 +59,7 @@ internal object ResourceGeneration {
                 Resources.languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>(LANGUAGE_LOOKUP)!!
                 Resources.textureIconLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(TEXTURE_ICON_LOOKUP)!!
                 Resources.wailaDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(WAILA_DATA_LOOKUP)!!
-                Resources.guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(GUI_DATA_LOOKUP)!!
+                Resources.guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(Gui_DATA_LOOKUP)!!
             } else {
                 // Build resource pack
                 LOGGER.info("Building resource pack")

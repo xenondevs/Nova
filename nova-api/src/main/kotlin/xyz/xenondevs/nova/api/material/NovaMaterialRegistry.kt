@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.api.material
 
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.api.data.NamespacedId
 
 interface NovaMaterialRegistry {
     
@@ -9,6 +10,11 @@ interface NovaMaterialRegistry {
      * The id has to be in the format namespace:name.
      */
     fun get(id: String): NovaMaterial
+    
+    /**
+     * Gets the [NovaMaterial] of this [id] or throws an exception if there isn't one.
+     */
+    fun get(id: NamespacedId): NovaMaterial
     
     /**
      * Gets the [NovaMaterial] of this [item] or throws an exception if this [ItemStack] is not from Nova.
@@ -20,6 +26,11 @@ interface NovaMaterialRegistry {
      * The id has to be in the format namespace:name.
      */
     fun getOrNull(id: String): NovaMaterial?
+    
+    /**
+     * Gets the [NovaMaterial] of this [id] or null if there isn't one.
+     */
+    fun getOrNull(id: NamespacedId): NovaMaterial?
     
     /**
      * Gets the [NovaMaterial] of this [item] or null if this [ItemStack] is not from Nova.

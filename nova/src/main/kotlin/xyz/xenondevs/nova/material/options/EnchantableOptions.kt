@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.material.options
 
 import net.minecraft.world.item.enchantment.EnchantmentCategory
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 
 @HardcodedMaterialOptions
@@ -16,12 +16,12 @@ sealed interface EnchantableOptions {
     val enchantmentValue: Int
     val enchantmentCategories: List<EnchantmentCategory>
     
-    companion object : MaterialOptionsType<EnchantableOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): EnchantableOptions =
+        fun configurable(material: ItemNovaMaterial): EnchantableOptions =
             ConfigurableEnchantableOptions(material)
         
-        override fun configurable(path: String): EnchantableOptions =
+        fun configurable(path: String): EnchantableOptions =
             ConfigurableEnchantableOptions(path)
         
     }

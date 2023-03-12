@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.integration.customitems
 
-import net.md_5.bungee.api.chat.BaseComponent
+import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
@@ -72,12 +72,12 @@ internal interface CustomItemService : InternalIntegration {
     /**
      * Gets a localized name for an [ItemStack]
      */
-    fun getName(item: ItemStack, locale: String): Array<BaseComponent>?
+    fun getName(item: ItemStack, locale: String): Component?
     
     /**
      * Gets a localized name from a placed [Block]
      */
-    fun getName(block: Block, locale: String): Array<BaseComponent>?
+    fun getName(block: Block, locale: String): Component?
     
     /**
      * Checks if this [CustomItemService] registered a recipe with that [key]
@@ -86,14 +86,14 @@ internal interface CustomItemService : InternalIntegration {
     
     /**
      * Checks if the specified [tool] is good enough for the [block] to drop items.
-     * 
+     *
      * @return If the tool is good enough for block drops or null if the block isn't from this [CustomItemService].
      */
     fun canBreakBlock(block: Block, tool: ItemStack?): Boolean?
     
     /**
      * Gets the paths of all item models that are blocks.
-     * 
+     *
      * example: [minecraft:dirt -> minecraft:item/dirt]
      */
     fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath>

@@ -6,8 +6,8 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.tool.ToolTierRegistry.register
 import xyz.xenondevs.nova.util.item.novaMaterial

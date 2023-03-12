@@ -3,10 +3,16 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
+import com.mojang.serialization.JsonOps
 import net.minecraft.core.Direction
+import net.minecraft.core.Holder
+import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
+import net.minecraft.core.Registry
 import net.minecraft.core.Rotations
 import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.RegistryOps
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
@@ -42,9 +48,11 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
@@ -332,5 +340,26 @@ object NMSUtils {
         true,
         "SRF(net.minecraft.world.entity.Entity ENTITY_COUNTER)"
     ).get(null) as AtomicInteger
+    
+    val REGISTRY_ACCESS = minecraftServer.registryAccess()!!
+    val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, REGISTRY_ACCESS)!!
+    
+    fun freezeRegistry(registry: Registry<*>) {
+        if (registry !is MappedRegistry) return
+        ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = true
+    }
+    
+    fun unfreezeRegistry(registry: Registry<*>) {
+        if (registry !is MappedRegistry) return
+        ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = false
+    }
+    
+    fun <T, R : Registry<T>> getRegistry(location: ResourceKey<R>) =
+        REGISTRY_ACCESS.registry(location).getOrNull() ?: throw IllegalArgumentException("Registry $location does not exist!")
+    
+    fun <T, R : Registry<T>> getHolder(key: ResourceKey<T>): Holder.Reference<T> {
+        val registry = ResourceKey.createRegistryKey<T>(key.registry())
+        return REGISTRY_ACCESS.registryOrThrow(registry).getHolderOrThrow(key)
+    }
     
 }

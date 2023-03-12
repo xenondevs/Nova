@@ -8,9 +8,9 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.nmsutils.network.ClientboundRotateHeadPacket
 import xyz.xenondevs.nmsutils.network.ClientboundSetPassengersPacket
-import xyz.xenondevs.nova.util.mapToIntArray
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverTick

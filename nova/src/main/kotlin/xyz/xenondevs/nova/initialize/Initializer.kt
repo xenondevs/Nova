@@ -2,9 +2,6 @@
 
 package xyz.xenondevs.nova.initialize
 
-import de.studiocode.invui.InvUI
-import de.studiocode.invui.util.InventoryUtils
-import de.studiocode.invui.virtualinventory.StackSizeProvider
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
 import org.bukkit.Bukkit
@@ -13,6 +10,11 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
+import xyz.xenondevs.commons.collections.CollectionUtils
+import xyz.xenondevs.inventoryaccess.component.i18n.Languages
+import xyz.xenondevs.invui.InvUI
+import xyz.xenondevs.invui.util.InventoryUtils
+import xyz.xenondevs.invui.virtualinventory.StackSizeProvider
 import xyz.xenondevs.nmsutils.NMSUtilities
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
@@ -23,10 +25,12 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.command.CommandManager
+import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
@@ -34,6 +38,7 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.integration.worldedit.WorldEditIntegration
 import xyz.xenondevs.nova.item.ItemListener
 import xyz.xenondevs.nova.material.CoreItems
 import xyz.xenondevs.nova.material.ItemCategories
@@ -50,7 +55,6 @@ import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.ui.waila.WailaManager
-import xyz.xenondevs.nova.util.CollectionUtils
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents
@@ -60,6 +64,7 @@ import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
+import xyz.xenondevs.nova.world.generation.WorldGenManager
 import xyz.xenondevs.nova.world.loot.LootConfigHandler
 import xyz.xenondevs.nova.world.loot.LootGeneration
 import java.util.*
@@ -75,7 +80,8 @@ internal object Initializer : Listener {
         NetworkManager, ItemListener, AttachmentManager, CommandManager, ArmorEquipListener,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
-        BossBarOverlayManager, WailaManager, ResourceGeneration.PreWorld, ResourceGeneration.PostWorld
+        BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser, WorldEditIntegration, ResourceGeneration.PreWorld,
+        ResourceGeneration.PostWorld, CharSizes
     ), Initializable::dependsOn)
     
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())
@@ -89,6 +95,7 @@ internal object Initializer : Listener {
         
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
+        Languages.getInstance().enableServerSideTranslations(false)
         
         CBFAdapters.register()
         InventoryUtils.stackSizeProvider = StackSizeProvider { it.novaMaxStackSize }
@@ -177,12 +184,8 @@ internal object Initializer : Listener {
     }
     
     private fun performAppropriateShutdown() {
-        if (Patcher.ENABLED) {
-            LOGGER.warning("Shutting down the server...")
-            Bukkit.shutdown()
-        } else {
-            Bukkit.getPluginManager().disablePlugin(NOVA.loader)
-        }
+        LOGGER.warning("Shutting down the server...")
+        Bukkit.shutdown()
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)

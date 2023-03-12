@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.ui
 
-import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.builder.ItemBuilder
-import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import java.util.function.Supplier
 import kotlin.math.max
@@ -37,7 +37,7 @@ abstract class VerticalBar(height: Int) : Supplier<Item> {
     protected open inner class VerticalBarItem(
         private val section: Int,
         private val totalSections: Int,
-    ) : BaseItem() {
+    ) : AbstractItem() {
         
         override fun getItemProvider(): ItemProvider {
             val displayPercentageStart = (1.0 / totalSections) * section

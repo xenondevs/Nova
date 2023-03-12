@@ -1,11 +1,30 @@
 package xyz.xenondevs.nova.data
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
+import org.bukkit.plugin.Plugin
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.util.data.asDataResult
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
-fun NamespacedKey.toNamespacedId(): NamespacedId {
-    return NamespacedId(namespace, key)
+val NamespacedKey.namespacedId: NamespacedId
+    get() = NamespacedId(namespace, key)
+
+@Deprecated("Use namespacedId property", ReplaceWith("namespacedId"))
+fun NamespacedKey.toNamespacedId() = namespacedId
+
+internal operator fun <T> MutableMap<NamespacedId, T>.set(namespace: String, key: String, value: T) {
+    this[NamespacedId(namespace, key)] = value
+}
+
+internal operator fun <T> MutableMap<NamespacedId, T>.get(namespace: String, key: String): T? {
+    return this[NamespacedId(namespace, key)]
+}
+
+internal fun NamespacedId.toResourceLocation(): ResourceLocation {
+    return ResourceLocation(namespace, name)
 }
 
 @Suppress("DEPRECATION")
@@ -13,8 +32,13 @@ class NamespacedId(override val namespace: String, override val name: String) : 
     
     private val id = "$namespace:$name"
     
-    constructor(addon: Addon, name: String) : this(addon.description.id, name)
+    val namespacedKey: NamespacedKey
+        get() = NamespacedKey(namespace, name)
+    val resourceLocation: ResourceLocation
+        get() = ResourceLocation(namespace, name)
     
+    constructor(plugin: Plugin, name: String) : this(plugin.name.lowercase(), name)
+    constructor(addon: Addon, name: String) : this(addon.description.id, name)
     constructor(name: String) : this("nova", name)
     
     init {
@@ -22,9 +46,8 @@ class NamespacedId(override val namespace: String, override val name: String) : 
         require(name.matches(PART_PATTERN)) { "Name \"$name\" does not match pattern $PART_PATTERN" }
     }
     
-    override fun toNamespacedKey(): NamespacedKey {
-        return NamespacedKey(namespace, name)
-    }
+    @Deprecated("Use namespacedKey property", ReplaceWith("namespacedKey"))
+    override fun toNamespacedKey() = namespacedKey
     
     fun toString(separator: String): String {
         return namespace + separator + name
@@ -43,6 +66,8 @@ class NamespacedId(override val namespace: String, override val name: String) : 
     }
     
     companion object {
+        
+        val CODEC: Codec<NamespacedId> = Codec.STRING.comapFlatMap(::ofSafe, NamespacedId::toString).stable()
         
         val PART_PATTERN = Regex("""^[a-z][a-z\d_]*$""")
         val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_]*:[a-z][a-z\d_]*$""")
@@ -64,6 +89,8 @@ class NamespacedId(override val namespace: String, override val name: String) : 
             
             return NamespacedId(namespace, name)
         }
+        
+        private fun ofSafe(id: String): DataResult<NamespacedId> = runCatching { of(id) }.asDataResult()
         
     }
     

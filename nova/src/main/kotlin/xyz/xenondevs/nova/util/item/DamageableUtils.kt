@@ -130,13 +130,13 @@ object DamageableUtils {
         // damage item
         var broken = false
         if (novaDamageable != null) {
-            val bukkitStack = itemStack.bukkitMirror
+            val novaCompound = itemStack.novaCompound
             
             if (entity is ServerPlayer)
-                CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger(entity, itemStack, novaDamageable.getDamage(bukkitStack) + damage)
+                CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger(entity, itemStack, novaDamageable.getDamage(novaCompound) + damage)
             
-            val newDamage = novaDamageable.getDamage(bukkitStack) + damage
-            novaDamageable.setDamage(bukkitStack, newDamage)
+            val newDamage = novaDamageable.getDamage(novaCompound) + damage
+            novaDamageable.setDamage(novaCompound, newDamage)
             if (newDamage >= novaDamageable.options.durability)
                 broken = true
         } else if (itemStack.isDamageableItem) {
@@ -231,7 +231,7 @@ object DamageableUtils {
     internal fun getDamage(itemStack: MojangStack): Int {
         val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
-            return damageable.getDamage(itemStack.bukkitMirror)
+            return damageable.getDamage(itemStack)
         }
         
         return itemStack.damageValue
@@ -240,7 +240,7 @@ object DamageableUtils {
     internal fun setDamage(itemStack: MojangStack, damage: Int) {
         val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
-            damageable.setDamage(itemStack.bukkitMirror, damage)
+            damageable.setDamage(itemStack, damage)
         } else {
             itemStack.damageValue = damage
         }

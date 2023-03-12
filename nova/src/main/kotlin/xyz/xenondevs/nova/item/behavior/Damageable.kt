@@ -1,59 +1,99 @@
 package xyz.xenondevs.nova.item.behavior
 
-import net.md_5.bungee.api.ChatColor
-import org.bukkit.NamespacedKey
+import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.provider.provider
+import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.DamageableOptions
-import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.util.item.retrieveDataOrNull
-import xyz.xenondevs.nova.util.item.storeData
+import xyz.xenondevs.nova.util.item.novaCompound
 import kotlin.math.min
-
-private val DAMAGE_KEY = NamespacedKey(NOVA, "damage")
+import net.minecraft.world.item.ItemStack as MojangStack
 
 class Damageable(val options: DamageableOptions) : ItemBehavior() {
     
-    @Deprecated("Replaced by DamageableOptions", ReplaceWith("options.maxDurability"))
-    val maxDurability: Int by options.durabilityProvider
+    @Deprecated("Replaced by DamageableOptions", ReplaceWith("options.durability"))
+    val durability: Int by options.durabilityProvider
     override val vanillaMaterialProperties = provider(listOf(VanillaMaterialProperty.DAMAGEABLE))
     
+    //<editor-fold desc="Bukkit ItemStack methods", defaultstate="collapsed">
     fun getDamage(itemStack: ItemStack): Int {
-        return min(options.durability, itemStack.retrieveDataOrNull(DAMAGE_KEY) ?: 0)
+        return getDamage(itemStack.novaCompound)
     }
     
     fun setDamage(itemStack: ItemStack, damage: Int) {
-        val coercedDamage = damage.coerceIn(0..options.durability)
-        itemStack.storeData(DAMAGE_KEY, coercedDamage)
+        setDamage(itemStack.novaCompound, damage)
     }
     
     fun addDamage(itemStack: ItemStack, damage: Int) {
-        setDamage(itemStack, getDamage(itemStack) + damage)
+        addDamage(itemStack.novaCompound, damage)
     }
     
     fun getDurability(itemStack: ItemStack): Int {
-        return options.durability - getDamage(itemStack)
+        return getDurability(itemStack.novaCompound)
     }
     
     fun setDurability(itemStack: ItemStack, durability: Int) {
-        setDamage(itemStack, options.durability - durability)
+        return setDurability(itemStack.novaCompound, durability)
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="Mojang ItemStack methods", defaultstate="collapsed">
+    fun getDamage(itemStack: MojangStack): Int {
+        return getDamage(itemStack.novaCompound)
     }
     
-    override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
-        val damage = getDamage(itemStack)
+    fun setDamage(itemStack: MojangStack, damage: Int) {
+        setDamage(itemStack.novaCompound, damage)
+    }
+    
+    fun addDamage(itemStack: MojangStack, damage: Int) {
+        addDamage(itemStack.novaCompound, damage)
+    }
+    
+    fun getDurability(itemStack: MojangStack): Int {
+        return getDurability(itemStack.novaCompound)
+    }
+    
+    fun setDurability(itemStack: MojangStack, durability: Int) {
+        return setDurability(itemStack.novaCompound, durability)
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="Compound methods", defaultstate="collapsed">
+    fun getDamage(data: NamespacedCompound): Int {
+        return min(options.durability, data["nova", "damage"] ?: 0)
+    }
+    
+    fun setDamage(data: NamespacedCompound, damage: Int) {
+        val coercedDamage = damage.coerceIn(0..options.durability)
+        data["nova", "damage"] = coercedDamage
+    }
+    
+    fun addDamage(data: NamespacedCompound, damage: Int) {
+        setDamage(data, getDamage(data) + damage)
+    }
+    
+    fun getDurability(data: NamespacedCompound): Int {
+        return options.durability - getDamage(data)
+    }
+    
+    fun setDurability(data: NamespacedCompound, durability: Int) {
+        setDamage(data, options.durability - durability)
+    }
+    //</editor-fold>
+    
+    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
+        val damage = getDamage(data)
         val durability = options.durability - damage
         
         itemData.durabilityBar = durability / options.durability.toDouble()
         
-        if (damage != 0) {
-            itemData.addAdvancedTooltipsLore(
-                arrayOf(localized(ChatColor.WHITE, "item.durability", durability, options.durability))
-            )
-        }
+        itemData.addAdvancedTooltipsLore(
+            Component.translatable("item.durability", Component.text(durability), Component.text(options.durability))
+        )
     }
     
     companion object : ItemBehaviorFactory<Damageable>() {

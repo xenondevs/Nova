@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.material.options
 
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.map
-import xyz.xenondevs.nova.data.provider.orElse
-import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolCategoryRegistry
 import xyz.xenondevs.nova.item.tool.ToolTier
@@ -51,12 +51,12 @@ sealed interface ToolOptions {
     val canBreakBlocksInCreative: Boolean
         get() = canBreakBlocksInCreativeProvider.value
     
-    companion object : MaterialOptionsType<ToolOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): ToolOptions =
+        fun configurable(material: ItemNovaMaterial): ToolOptions =
             ConfigurableToolOptions(material)
         
-        override fun configurable(path: String): ToolOptions =
+        fun configurable(path: String): ToolOptions =
             ConfigurableToolOptions(path)
         
     }

@@ -14,7 +14,7 @@ import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.Palette
 import net.minecraft.world.level.chunk.SingleValuePalette
-import xyz.xenondevs.nova.util.getOrSet
+import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HASH_MAP_PALETTE_VALUES_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.LINEAR_PALETTE_VALUES_FIELD

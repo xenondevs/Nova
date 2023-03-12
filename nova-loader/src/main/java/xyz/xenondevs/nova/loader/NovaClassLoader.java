@@ -2,27 +2,31 @@ package xyz.xenondevs.nova.loader;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class NovaClassLoader extends URLClassLoader {
+    
+    private final Set<String> injectedClasses = new HashSet<>();
     
     public NovaClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
     }
     
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class<?> c;
         
         // check if the class is already loaded
         synchronized (getClassLoadingLock(name)) {
+            // check in jvm
             c = findLoadedClass(name);
             
-            // check nova classes and libraries
-            if (c == null) {
-                try {
-                    c = findClass(name);
-                } catch (ClassNotFoundException ignored) {
-                }
+            // check Nova classes and libraries before parent to prevent it from using old patch classes
+            // (which stay in memory after reloading because patched code references them)
+            if (c == null && !injectedClasses.contains(name) ) {
+                c = findClassOrNull(name);
             }
         }
         
@@ -40,18 +44,20 @@ public class NovaClassLoader extends URLClassLoader {
         return c;
     }
     
-    public Class<?> loadClassNoParent(String name) throws ClassNotFoundException {
-        synchronized (getClassLoadingLock(name)) {
-            // check if the class is already loaded
-            Class<?> c = findLoadedClass(name);
-            
-            // check nova classes and libraries
-            if (c == null) {
-                c = findClass(name);
-            }
-            
-            return c;
+    private Class<?> findClassOrNull(String name) {
+        try {
+            return findClass(name);
+        } catch (ClassNotFoundException e) {
+            return null;
         }
+    }
+    
+    public void addInjectedClass(String name) {
+        injectedClasses.add(name);
+    }
+    
+    public void addInjectedClasses(Collection<String> names) {
+        injectedClasses.addAll(names);
     }
     
 }

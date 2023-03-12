@@ -1,15 +1,16 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.ItemWrapper
-import de.studiocode.invui.item.impl.BaseItem
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -117,7 +118,7 @@ internal data class ItemCategory(val name: String, val icon: ItemProvider, val i
             try {
                 val name = element.getString("name")!!
                 val icon = ItemUtils.getItemBuilder(element.getString("icon")!!, true)
-                    .setDisplayName(TranslatableComponent(name))
+                    .setDisplayName(Component.translatable(name))
                     .get()
                 val items = element.getStringList("items").map(::CategorizedItem)
                 
@@ -132,7 +133,7 @@ internal data class ItemCategory(val name: String, val icon: ItemProvider, val i
     
 }
 
-internal class CategorizedItem(val id: String) : BaseItem() {
+internal class CategorizedItem(val id: String) : AbstractItem() {
     
     val localizedName: String
     val itemStack: ItemStack

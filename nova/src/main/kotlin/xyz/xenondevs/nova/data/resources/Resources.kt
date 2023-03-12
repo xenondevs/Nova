@@ -101,27 +101,27 @@ object Resources {
         return armorDataLookup[id]
     }
     
-    fun getGUIChar(id: NamespacedId): FontChar {
+    fun getGuiChar(id: NamespacedId): FontChar {
         return guiDataLookup[id.toString()]!!
     }
     
-    fun getGUIChar(path: ResourcePath): FontChar {
+    fun getGuiChar(path: ResourcePath): FontChar {
         return guiDataLookup[path.toString()]!!
     }
     
-    fun getGUIChar(id: String): FontChar {
+    fun getGuiChar(id: String): FontChar {
         return guiDataLookup[id]!!
     }
     
-    fun getGUICharOrNull(id: NamespacedId): FontChar? {
+    fun getGuiCharOrNull(id: NamespacedId): FontChar? {
         return guiDataLookup[id.toString()]
     }
     
-    fun getGUICharOrNull(path: ResourcePath): FontChar? {
+    fun getGuiCharOrNull(path: ResourcePath): FontChar? {
         return guiDataLookup[path.toString()]
     }
     
-    fun getGUICharOrNull(id: String): FontChar? {
+    fun getGuiCharOrNull(id: String): FontChar? {
         return guiDataLookup[id]
     }
     

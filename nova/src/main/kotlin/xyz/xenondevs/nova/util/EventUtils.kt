@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.RegisteredListener
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry

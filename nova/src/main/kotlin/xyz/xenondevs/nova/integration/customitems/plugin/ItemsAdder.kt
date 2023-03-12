@@ -6,8 +6,8 @@ import dev.lone.itemsadder.api.CustomStack
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent.Cause
 import dev.lone.itemsadder.api.ItemsAdder
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.TextComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -131,18 +131,31 @@ internal object ItemsAdder : CustomItemService {
     }
     
     override fun getId(block: Block): String? {
-        return CustomBlock.byAlreadyPlaced(block)?.namespacedID 
+        return CustomBlock.byAlreadyPlaced(block)?.namespacedID
             ?: CustomCrop.byAlreadyPlaced(block)?.seed?.namespacedID
     }
     
-    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
-        return TextComponent.fromLegacyText(CustomStack.byItemStack(item)?.displayName)
+    override fun getName(item: ItemStack, locale: String): Component? {
+        val customStack = CustomStack.byItemStack(item) ?: return null
+        return customStack.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
     }
     
-    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
-        return (CustomBlock.byAlreadyPlaced(block)?.displayName
-            ?: CustomCrop.byAlreadyPlaced(block)?.seed?.displayName)
-            ?.let(TextComponent::fromLegacyText)
+    override fun getName(block: Block, locale: String): Component? {
+        val customBlock = CustomBlock.byAlreadyPlaced(block)
+        if (customBlock != null) {
+            return customBlock.displayName
+                ?.let(LegacyComponentSerializer.legacySection()::deserialize)
+                ?: Component.empty()
+        }
+        
+        val customCrop = CustomCrop.byAlreadyPlaced(block)?.seed
+        if (customCrop != null) {
+            return customCrop.displayName
+                ?.let(LegacyComponentSerializer.legacySection()::deserialize)
+                ?: Component.empty()
+        }
+        
+        return null
     }
     
     override fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {

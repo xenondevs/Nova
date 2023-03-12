@@ -36,6 +36,9 @@ data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
     val chunkPos: ChunkPos
         get() = ChunkPos(world.uid, x shr 4, z shr 4)
     
+    val below: BlockPos
+        get() = add(0, -1, 0)
+    
     fun add(x: Int, y: Int, z: Int): BlockPos =
         BlockPos(world, this.x + x, this.y + y, this.z + z)
     

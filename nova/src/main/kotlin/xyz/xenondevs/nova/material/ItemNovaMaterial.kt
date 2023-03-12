@@ -1,19 +1,21 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.ItemWrapper
-import de.studiocode.invui.item.builder.ItemBuilder
-import org.bukkit.inventory.ItemFlag
+import com.mojang.datafixers.util.Either
+import com.mojang.serialization.Codec
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.immutable.lazyProvider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.provider.lazyProvider
-import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.LazyArray
+import xyz.xenondevs.nova.util.data.asDataResult
 import xyz.xenondevs.nova.util.nmsCopy
 import kotlin.math.min
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
@@ -40,14 +42,12 @@ open class ItemNovaMaterial internal constructor(
     
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
-            val itemStack = item.createItemBuilder(subId).get()
-            val itemDisplayData = novaItem.getPacketItemData(null, itemStack.nmsCopy)
             ItemWrapper(
                 item.createClientsideItemBuilder(
-                    itemDisplayData.name,
+                    novaItem.getPacketItemData(null, null).name,
                     null,
                     subId
-                ).addItemFlags(ItemFlag.HIDE_ATTRIBUTES).get()
+                ).get()
             )
         }
     }
@@ -55,7 +55,12 @@ open class ItemNovaMaterial internal constructor(
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(item.dataArray.size) { subId ->
             val itemStack = item.createItemBuilder(subId).get()
-            val clientsideItemStack = PacketItems.getFakeItem(null, itemStack.nmsCopy)
+            val clientsideItemStack = PacketItems.getClientSideStack(
+                player = null,
+                itemStack = itemStack.nmsCopy,
+                useName = true,
+                storeServerSideTag = false
+            )
             clientsideItemStack.tag?.remove("nova")
             ItemWrapper(clientsideItemStack.bukkitMirror)
         }
@@ -79,7 +84,7 @@ open class ItemNovaMaterial internal constructor(
      * It does not have a display name, lore, or any special nbt data.
      */
     fun createClientsideItemBuilder(): ItemBuilder =
-        item.createClientsideItemBuilder().addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
+        item.createClientsideItemBuilder()
     
     override fun createItemStack(amount: Int): ItemStack =
         createItemBuilder().setAmount(amount).get()
@@ -91,5 +96,19 @@ open class ItemNovaMaterial internal constructor(
         LocaleManager.getTranslatedName(locale, this)
     
     override fun toString() = id.toString()
+    
+    companion object {
+        
+        val CODEC: Codec<ItemNovaMaterial> = Codec.either(NamespacedId.CODEC, Codec.STRING).comapFlatMap(
+            { either ->
+                either.map(
+                    { NovaMaterialRegistry.getOrNull(it).asDataResult("Could not find material with id $it") },
+                    { NovaMaterialRegistry.getNonNamespaced(it).firstOrNull().asDataResult("Could not find material with id $it") }
+                )
+            },
+            { material -> Either.left(material.id) }
+        ).stable()
+        
+    }
     
 }

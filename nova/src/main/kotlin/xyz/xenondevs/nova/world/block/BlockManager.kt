@@ -35,7 +35,7 @@ import xyz.xenondevs.nova.world.block.limits.TileEntityTracker
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.block.logic.interact.BlockInteracting
 import xyz.xenondevs.nova.world.block.logic.place.BlockPlacing
-import xyz.xenondevs.nova.world.block.logic.sound.BlockSoundEngine
+import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
@@ -50,7 +50,7 @@ object BlockManager : Initializable(), IBlockManager {
         BlockPlacing.init()
         BlockBreaking.init()
         BlockInteracting.init()
-        BlockSoundEngine.init()
+        SoundEngine.init()
     }
     
     fun getBlock(pos: BlockPos, useLinkedStates: Boolean = true): NovaBlockState? {
@@ -171,7 +171,7 @@ object BlockManager : Initializable(), IBlockManager {
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
             broadcast(levelEventPacket, sendEffectsToBreaker)
             
-            if (soundGroup != null && BlockSoundEngine.overridesSound(pos.block.type.soundGroup.breakSound.key.key)) {
+            if (soundGroup != null && SoundEngine.overridesSound(pos.block.type.soundGroup.breakSound.key.key)) {
                 broadcastBreakSound(soundGroup)
             }
         } else {

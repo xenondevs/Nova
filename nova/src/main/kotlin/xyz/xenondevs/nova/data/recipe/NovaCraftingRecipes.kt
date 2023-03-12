@@ -2,27 +2,27 @@ package xyz.xenondevs.nova.data.recipe
 
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.CraftingContainer
+import net.minecraft.world.item.crafting.BlastingRecipe
+import net.minecraft.world.item.crafting.CampfireCookingRecipe
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
-import net.minecraft.world.item.crafting.BlastingRecipe
 import net.minecraft.world.item.crafting.SmokingRecipe
-import net.minecraft.world.item.crafting.CampfireCookingRecipe
 import net.minecraft.world.level.Level
 import org.bukkit.inventory.Recipe
+import xyz.xenondevs.commons.collections.removeFirstWhere
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.nmsCategory
 import xyz.xenondevs.nova.util.data.nmsIngredient
 import xyz.xenondevs.nova.util.nmsCopy
-import xyz.xenondevs.nova.util.removeFirstWhere
 import xyz.xenondevs.nova.util.resourceLocation
-import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
-import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
+import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
+import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
 
 internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : ShapedRecipe(
     optimizedRecipe.recipe.key.resourceLocation,

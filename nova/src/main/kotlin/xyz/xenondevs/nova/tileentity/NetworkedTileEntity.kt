@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.reflection.getRuntimeDelegate
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.Network
@@ -22,7 +23,6 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.util.reflection.actualDelegate
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import java.util.*
@@ -36,9 +36,9 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = HashMap()
     final override val holders: MutableMap<NetworkType, EndPointDataHolder> by lazy {
         val map = HashMap<NetworkType, EndPointDataHolder>()
-        if (::energyHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.ENERGY] = energyHolder
-        if (::itemHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.ITEMS] = itemHolder
-        if (::fluidHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.FLUID] = fluidHolder
+        if (::energyHolder.getRuntimeDelegate() !is PlaceholderProperty) map[NetworkType.ENERGY] = energyHolder
+        if (::itemHolder.getRuntimeDelegate() !is PlaceholderProperty) map[NetworkType.ITEMS] = itemHolder
+        if (::fluidHolder.getRuntimeDelegate() !is PlaceholderProperty) map[NetworkType.FLUID] = fluidHolder
         return@lazy map
     }
     

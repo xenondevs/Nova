@@ -1,19 +1,19 @@
 package xyz.xenondevs.nova.ui.menu
 
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.item.builder.ItemBuilder
-import de.studiocode.invui.item.impl.BaseItem
-import de.studiocode.invui.item.impl.SimpleItem
-import de.studiocode.invui.window.impl.single.SimpleWindow
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.CoreGUIMaterial
-import xyz.xenondevs.nova.ui.config.side.BackItem
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.impl.SimpleItem
+import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.context.setTitle
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.ui.item.AioNumberItem
-import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
+import xyz.xenondevs.nova.ui.item.BackItem
+import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
 import java.awt.Color
 
 class ColorPickerWindow(
@@ -43,7 +43,7 @@ class ColorPickerWindow(
             updateColorPreview()
         }
     
-    private val gui = GUIBuilder(GUIType.NORMAL)
+    private val gui = Gui.normal()
         .setStructure(
             "< . . . p . . . .",
             ". . . . . . . . .",
@@ -65,7 +65,11 @@ class ColorPickerWindow(
     }
     
     fun openWindow(player: Player) {
-        SimpleWindow(player, CoreGUITexture.COLOR_PICKER.getTitle("menu.nova.color_picker"), gui).show()
+        Window.single { 
+            it.setViewer(player)
+            it.setTitle(CoreGuiTexture.COLOR_PICKER.getTitle("menu.nova.color_picker"))
+            it.setGui(gui)
+        }.open()
     }
     
 }
@@ -82,7 +86,7 @@ private class ChangeColorItem(
     localizedName, builder
 )
 
-abstract class ColorPreviewItem(color: Color) : BaseItem() {
+abstract class ColorPreviewItem(color: Color) : AbstractItem() {
     
     var color: Color = color
         set(value) {
@@ -94,7 +98,7 @@ abstract class ColorPreviewItem(color: Color) : BaseItem() {
     
 }
 
-class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(CoreGUIMaterial.TP_COLOR_PICKER.clientsideProvider) {
+class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(CoreGuiMaterial.TP_COLOR_PICKER.clientsideProvider) {
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         window.openWindow(player)
     }

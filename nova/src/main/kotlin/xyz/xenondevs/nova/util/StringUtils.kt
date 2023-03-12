@@ -25,6 +25,12 @@ fun String.capitalizeAll(): String {
 
 fun String.insert(offset: Int, charSequence: CharSequence) = StringBuilder(this).insert(offset, charSequence).toString()
 
+fun String.insertAfter(char: Char, charSequence: CharSequence, ignoreCase: Boolean = false) =
+    insert(indexOf(char, ignoreCase = ignoreCase) + 1, charSequence)
+
+fun String.insertAfterLast(char: Char, charSequence: CharSequence, ignoreCase: Boolean = false) =
+    insert(lastIndexOf(char, ignoreCase = ignoreCase) + 1, charSequence)
+
 fun String.Companion.formatSafely(format: String, vararg args: Any?): String {
     return try {
         String.format(format, *args)

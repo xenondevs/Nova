@@ -2,13 +2,11 @@
 
 package xyz.xenondevs.nova.item
 
-import de.studiocode.invui.item.builder.ItemBuilder
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TextComponent
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
@@ -20,30 +18,29 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
+import xyz.xenondevs.commons.provider.immutable.combinedLazyProvider
+import xyz.xenondevs.commons.provider.immutable.flatten
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.provider.combinedLazyProvider
-import xyz.xenondevs.nova.data.provider.flatten
-import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.bukkitCopy
-import xyz.xenondevs.nova.util.data.appendLocalized
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getDoubleOrNull
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.data.logExceptionMessages
-import xyz.xenondevs.nova.util.data.withoutPreFormatting
-import xyz.xenondevs.nova.util.enumMapOf
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.util.takeUnlessEmpty
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -62,7 +59,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     
     val behaviors: List<ItemBehavior> by lazy { holders.map { it.get(material) } }
     private lateinit var material: ItemNovaMaterial
-    private lateinit var name: Array<BaseComponent>
+    private lateinit var name: Component
     
     internal val vanillaMaterialProvider = combinedLazyProvider { behaviors.map(ItemBehavior::vanillaMaterialProperties) }
         .flatten()
@@ -71,7 +68,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
     internal val attributeModifiersProvider = combinedLazyProvider { behaviors.map(ItemBehavior::attributeModifiers) + configuredAttributeModifiersProvider }
         .flatten()
         .map { modifiers ->
-            val map = enumMapOf<EquipmentSlot, ArrayList<AttributeModifier>>()
+            val map = enumMap<EquipmentSlot, ArrayList<AttributeModifier>>()
             modifiers.forEach { modifier -> modifier.slots.forEach { slot -> map.getOrPut(slot, ::ArrayList) += modifier } }
             return@map map
         }
@@ -95,7 +92,7 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
             throw IllegalStateException("NovaItems cannot be used for multiple materials")
         
         this.material = material
-        this.name = TranslatableComponent(material.localizedName).withoutPreFormatting()
+        this.name = Component.translatable(material.localizedName)
     }
     
     internal fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
@@ -104,12 +101,11 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         return builder
     }
     
-    internal fun getPacketItemData(player: Player?, itemStack: MojangStack): PacketItemData {
-        val itemData = PacketItemData(itemStack.tag!!)
-        val bukkitStack = itemStack.bukkitCopy
+    internal fun getPacketItemData(player: Player?, itemStack: MojangStack?): PacketItemData {
+        val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag())
         
-        behaviors.forEach { it.updatePacketItemData(bukkitStack, itemData) }
-        itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
+        behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompound ?: NamespacedCompound(), itemData) }
+        if (itemStack != null) itemData.addLore(generateAttributeModifiersTooltip(player?.serverPlayer, itemStack))
         if (itemData.name == null) itemData.name = this.name
         
         return itemData
@@ -165,14 +161,14 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
         return modifiers
     }
     
-    private fun generateAttributeModifiersTooltip(player: ServerPlayer?, itemStack: MojangStack): List<Array<BaseComponent>> {
+    private fun generateAttributeModifiersTooltip(player: ServerPlayer?, itemStack: MojangStack): List<Component> {
         if (HideableFlag.MODIFIERS.isHidden(itemStack.tag?.getInt("HideFlags") ?: 0))
             return emptyList()
         
         // if the item has custom modifiers set, all default modifiers are ignored
         val customModifiers = itemStack.tag?.contains("AttributeModifiers", Tag.TAG_LIST.toInt()) == true
         
-        val lore = ArrayList<Array<BaseComponent>>()
+        val lore = ArrayList<Component>()
         EquipmentSlot.values().forEach { slot ->
             val modifiers = if (customModifiers)
                 ItemUtils.getCustomAttributeModifiers(itemStack, slot)
@@ -181,8 +177,8 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
             if (modifiers.isEmpty() || modifiers.none { it.showInLore && it.value != 0.0 })
                 return@forEach
             
-            lore += arrayOf(TextComponent(" "))
-            lore += arrayOf(localized(ChatColor.GRAY, "item.modifiers.${slot.name.lowercase()}"))
+            lore += Component.empty()
+            lore += Component.translatable("item.modifiers.${slot.name.lowercase()}", NamedTextColor.GRAY)
             
             modifiers.asSequence()
                 .filter { it.showInLore && it.value != 0.0 }
@@ -209,24 +205,25 @@ class NovaItem internal constructor(holders: List<ItemBehaviorHolder<*>>) {
                         } else value
                     } else value * 100.0
                     
-                    fun appendModifier(type: String, color: ChatColor) {
-                        lore += ComponentBuilder(if (isBaseModifier) " " else "")
-                            .appendLocalized(
+                    fun appendModifier(type: String, color: TextColor) {
+                        lore += Component.text()
+                            .append(Component.text(if (isBaseModifier) " " else ""))
+                            .append(Component.translatable(
                                 "attribute.modifier.$type.${modifier.operation.ordinal}",
-                                ATTRIBUTE_DECIMAL_FORMAT.format(displayedValue),
-                                TranslatableComponent(modifier.attribute.descriptionId)
-                            )
-                            .color(color)
-                            .create()
+                                color,
+                                Component.text(ATTRIBUTE_DECIMAL_FORMAT.format(displayedValue)),
+                                Component.translatable(modifier.attribute.descriptionId)
+                            ))
+                            .build()
                     }
                     
                     if (isBaseModifier) {
-                        appendModifier("equals", ChatColor.DARK_GREEN)
+                        appendModifier("equals", NamedTextColor.DARK_GREEN)
                     } else if (value > 0.0) {
-                        appendModifier("plus", ChatColor.BLUE)
+                        appendModifier("plus", NamedTextColor.BLUE)
                     } else if (value < 0.0) {
                         displayedValue *= -1
-                        appendModifier("take", ChatColor.RED)
+                        appendModifier("take", NamedTextColor.RED)
                     }
                 }
         }

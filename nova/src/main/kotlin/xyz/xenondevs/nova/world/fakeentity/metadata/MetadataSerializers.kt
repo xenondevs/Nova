@@ -37,7 +37,7 @@ internal object MetadataSerializers {
     val COMPONENT: MetadataSerializer<Component> = metadataSerializer(EntityDataSerializers.COMPONENT, FriendlyByteBuf::writeComponent)
     val OPT_COMPONENT: MetadataSerializer<Component?> = optionalMetadataSerializer(EntityDataSerializers.OPTIONAL_COMPONENT, FriendlyByteBuf::writeComponent)
     val ITEM_STACK: MetadataSerializer<ItemStack> = metadataSerializer(EntityDataSerializers.ITEM_STACK) { value, buf ->
-        buf.writeItem(if (PacketItems.isNovaItem(value)) PacketItems.getFakeItem(null, value) else value)
+        buf.writeItem(PacketItems.getClientSideStack(null, value))
     }
     val BOOLEAN: MetadataSerializer<Boolean> = metadataSerializer(EntityDataSerializers.BOOLEAN, FriendlyByteBuf::writeBoolean)
     val ROTATIONS: MetadataSerializer<Rotations> = metadataSerializer(EntityDataSerializers.ROTATIONS) { value, buf ->

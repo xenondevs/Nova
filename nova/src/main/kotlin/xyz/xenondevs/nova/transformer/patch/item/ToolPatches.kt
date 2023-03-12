@@ -36,7 +36,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
      * Patches the CraftBlock#isPreferredTool method to properly handle Nova's tools.
      */
     private fun transformCraftBlockIsPreferredTool() {
-        VirtualClassPath[ReflectionRegistry.CRAFT_BLOCK_IS_PREFERRED_TOOL_METHOD]
+        VirtualClassPath[ReflectionRegistry.CRAFT_BLOCK_DATA_IS_PREFERRED_TOOL_METHOD]
             .instructions = buildInsnList {
             aLoad(0)
             aLoad(1)

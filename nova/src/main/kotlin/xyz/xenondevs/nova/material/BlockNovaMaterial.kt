@@ -1,10 +1,11 @@
 package xyz.xenondevs.nova.material
 
-import de.studiocode.invui.item.builder.ItemBuilder
+import com.mojang.serialization.Codec
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
@@ -14,6 +15,7 @@ import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.material.options.BlockOptions
+import xyz.xenondevs.nova.util.data.subType
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
@@ -57,5 +59,11 @@ open class BlockNovaMaterial internal constructor(
     
     internal open fun createNewBlockState(ctx: BlockPlaceContext): NovaBlockState =
         NovaBlockState(this, ctx)
+    
+    companion object {
+        
+        val CODEC: Codec<BlockNovaMaterial> = ItemNovaMaterial.CODEC.subType<BlockNovaMaterial, ItemNovaMaterial>().stable()
+        
+    }
     
 }

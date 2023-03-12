@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.material.options
 
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.map
-import xyz.xenondevs.nova.data.provider.orElse
-import xyz.xenondevs.nova.data.provider.provider
-import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 
 @HardcodedMaterialOptions
@@ -33,12 +33,12 @@ sealed interface DamageableOptions {
     val repairIngredient: RecipeChoice?
         get() = repairIngredientProvider.value
     
-    companion object : MaterialOptionsType<DamageableOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): DamageableOptions =
+        fun configurable(material: ItemNovaMaterial): DamageableOptions =
             ConfigurableDamageableOptions(material)
         
-        override fun configurable(path: String): DamageableOptions =
+        fun configurable(path: String): DamageableOptions =
             ConfigurableDamageableOptions(path)
         
     }
@@ -46,10 +46,10 @@ sealed interface DamageableOptions {
 }
 
 private class HardcodedDamageableOptions(
-     maxDurability: Int,
-     itemDamageOnAttackEntity: Int,
-     itemDamageOnBreakBlock: Int,
-     repairIngredient: RecipeChoice?
+    maxDurability: Int,
+    itemDamageOnAttackEntity: Int,
+    itemDamageOnBreakBlock: Int,
+    repairIngredient: RecipeChoice?
 ) : DamageableOptions {
     override val durabilityProvider = provider(maxDurability)
     override val itemDamageOnAttackEntityProvider = provider(itemDamageOnAttackEntity)

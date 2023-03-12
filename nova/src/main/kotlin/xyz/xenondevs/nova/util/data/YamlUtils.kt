@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.util.data
 
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
-import xyz.xenondevs.nova.util.contentEquals
+import xyz.xenondevs.commons.collections.contentEquals
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.io.StringReader
 

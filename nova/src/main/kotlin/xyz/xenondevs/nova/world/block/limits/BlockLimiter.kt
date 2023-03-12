@@ -86,15 +86,16 @@ internal class AmountLimiter(cfg: ConfigurationSection, private val type: Type) 
     
     override fun canPlace(material: BlockNovaMaterial, ctx: BlockPlaceContext): PlaceResult {
         val id = material.id
+        val owner = ctx.ownerUUID ?: return ALLOWED
         
         val specificLimit = limits[id]
         val totalLimit = limits[null]
         
         if (specificLimit != null) {
             val amount = when (type) {
-                Type.GLOBAL -> TileEntityTracker.getBlocksPlacedAmount(ctx.ownerUUID, id)
-                Type.PER_WORLD -> TileEntityTracker.getBlocksPlacedAmount(ctx.ownerUUID, ctx.pos.world.uid, id)
-                Type.PER_CHUNK -> TileEntityTracker.getBlocksPlacedAmount(ctx.ownerUUID, ctx.pos.chunkPos, id)
+                Type.GLOBAL -> TileEntityTracker.getBlocksPlacedAmount(owner, id)
+                Type.PER_WORLD -> TileEntityTracker.getBlocksPlacedAmount(owner, ctx.pos.world.uid, id)
+                Type.PER_CHUNK -> TileEntityTracker.getBlocksPlacedAmount(owner, ctx.pos.chunkPos, id)
             }
             
             if (amount >= specificLimit)
@@ -103,9 +104,9 @@ internal class AmountLimiter(cfg: ConfigurationSection, private val type: Type) 
         
         if (totalLimit != null) {
             val amount = when (type) {
-                Type.GLOBAL -> TileEntityTracker.getBlocksPlacedAmount(ctx.ownerUUID)
-                Type.PER_WORLD -> TileEntityTracker.getBlocksPlacedAmount(ctx.ownerUUID, ctx.pos.world.uid)
-                Type.PER_CHUNK -> TileEntityTracker.getBlocksPlacedAmount(ctx.ownerUUID, ctx.pos.chunkPos)
+                Type.GLOBAL -> TileEntityTracker.getBlocksPlacedAmount(owner)
+                Type.PER_WORLD -> TileEntityTracker.getBlocksPlacedAmount(owner, ctx.pos.world.uid)
+                Type.PER_CHUNK -> TileEntityTracker.getBlocksPlacedAmount(owner, ctx.pos.chunkPos)
             }
             
             if (amount >= totalLimit)

@@ -1,20 +1,22 @@
+@file:Suppress("FunctionName")
+
 package xyz.xenondevs.nova.item.behavior
 
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.provider.combinedProvider
-import xyz.xenondevs.nova.data.provider.lazyProviderWrapper
-import xyz.xenondevs.nova.data.provider.map
+import xyz.xenondevs.commons.provider.immutable.combinedProvider
+import xyz.xenondevs.commons.provider.immutable.lazyProviderWrapper
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
@@ -25,16 +27,22 @@ import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.ArmorType
 import xyz.xenondevs.nova.player.equipment.EquipMethod
 import xyz.xenondevs.nova.util.data.getOrPut
-import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
+import xyz.xenondevs.nova.util.serverPlayer
 
-@Suppress("FunctionName")
-fun Wearable(type: ArmorType): ItemBehaviorFactory<Wearable> =
+fun Wearable(type: ArmorType, equipSound: Sound): ItemBehaviorFactory<Wearable> =
+    Wearable(type, equipSound.key.toString())
+
+fun Wearable(type: ArmorType, equipSound: SoundEvent): ItemBehaviorFactory<Wearable> =
+    Wearable(type, equipSound.location.toString())
+
+fun Wearable(type: ArmorType, equipSound: String? = null): ItemBehaviorFactory<Wearable> =
     object : ItemBehaviorFactory<Wearable>() {
         override fun create(material: ItemNovaMaterial): Wearable =
-            Wearable(WearableOptions.semiConfigurable(type, material))
+            Wearable(WearableOptions.configurable(type, equipSound, material))
     }
 
 class Wearable(val options: WearableOptions) : ItemBehavior() {
@@ -60,15 +68,15 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
     
     override val attributeModifiers = combinedProvider(
         options.armorTypeProvider, options.armorProvider, options.armorToughnessProvider, options.knockbackResistanceProvider
-    ).map {
-        val equipmentSlot = (it[0] as ArmorType).equipmentSlot.nmsEquipmentSlot
+    ) { armorType, armor, armorToughness, knockbackResistance ->
+        val equipmentSlot = armorType.equipmentSlot.nmsEquipmentSlot
         
-        return@map listOf(
+        listOf(
             AttributeModifier(
                 "Nova Armor (${novaMaterial.id}})",
                 Attributes.ARMOR,
                 Operation.ADDITION,
-                it[1] as Double,
+                armor,
                 true,
                 equipmentSlot
             ),
@@ -76,7 +84,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 "Nova Armor Toughness (${novaMaterial.id}})",
                 Attributes.ARMOR_TOUGHNESS,
                 Operation.ADDITION,
-                it[2] as Double,
+                armorToughness,
                 true,
                 equipmentSlot
             ),
@@ -84,7 +92,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 "Nova Knockback Resistance (${novaMaterial.id}})",
                 Attributes.KNOCKBACK_RESISTANCE,
                 Operation.ADDITION,
-                it[3] as Double,
+                knockbackResistance,
                 true,
                 equipmentSlot
             )
@@ -98,48 +106,8 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         ) {
             event.isCancelled = true
             player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
-            player.inventory.setItem(event.hand!!, null)
-        }
-    }
-    
-    @Suppress("DEPRECATION")
-    override fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
-        val slotType = event.slotType
-        val currentItem = event.currentItem
-        if (slotType == InventoryType.SlotType.ARMOR
-            && event.rawSlot == options.armorType.rawSlot
-            && (event.click == ClickType.LEFT || event.click == ClickType.RIGHT)
-            && !callArmorEquipEvent(player, EquipMethod.SWAP, currentItem, itemStack)
-        ) {
-            event.isCancelled = true
-            
-            player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
-            event.cursor = currentItem
-        }
-    }
-    
-    override fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
-        if ((event.click == ClickType.SHIFT_LEFT || event.click == ClickType.SHIFT_RIGHT)
-            && event.view.isPlayerView()
-            && event.clickedInventory != event.view.topInventory
-            && player.inventory.getItem(options.armorType.equipmentSlot)?.takeUnlessEmpty() == null
-            && !callArmorEquipEvent(player, EquipMethod.SHIFT_CLICK, null, itemStack)
-        ) {
-            event.isCancelled = true
-            player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
-            event.view.setItem(event.rawSlot, null)
-        }
-    }
-    
-    override fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
-        val currentItem = event.currentItem
-        if (event.slotType == InventoryType.SlotType.ARMOR
-            && event.rawSlot == options.armorType.rawSlot
-            && !callArmorEquipEvent(player, EquipMethod.HOTBAR_SWAP, currentItem, itemStack)
-        ) {
-            event.isCancelled = true
-            player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
-            player.inventory.setItem(event.hotbarButton, currentItem)
+            if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(event.hand!!, null)
+            callLivingEntityOnEquip(player, null, itemStack)
         }
     }
     
@@ -149,18 +117,17 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         return event.isCancelled
     }
     
-    override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
+    private fun callLivingEntityOnEquip(player: Player, previous: ItemStack?, now: ItemStack?) {
+        player.serverPlayer.onEquipItem(options.armorType.equipmentSlot.nmsEquipmentSlot, previous.nmsCopy, now.nmsCopy)
+    }
+    
+    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
         val textureColor = textureColor
         if (textureColor != null) {
             itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", textureColor)
             itemData.hide(HideableFlag.DYE)
         }
         textureColor?.let { itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", it) }
-    }
-    
-    companion object : ItemBehaviorFactory<Wearable>() {
-        override fun create(material: ItemNovaMaterial): Wearable =
-            Wearable(WearableOptions.configurable(material))
     }
     
 }

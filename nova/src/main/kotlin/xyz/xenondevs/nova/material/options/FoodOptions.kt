@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.material.options
 
 import org.bukkit.potion.PotionEffect
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.map
-import xyz.xenondevs.nova.data.provider.orElse
-import xyz.xenondevs.nova.data.provider.provider
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
@@ -79,12 +79,12 @@ sealed interface FoodOptions {
         ALWAYS_EATABLE(VanillaMaterialProperty.CONSUMABLE_ALWAYS)
     }
     
-    companion object : MaterialOptionsType<FoodOptions> {
+    companion object {
         
-        override fun configurable(material: ItemNovaMaterial): FoodOptions =
+        fun configurable(material: ItemNovaMaterial): FoodOptions =
             ConfigurableFoodOptions(material)
         
-        override fun configurable(path: String): FoodOptions =
+        fun configurable(path: String): FoodOptions =
             ConfigurableFoodOptions(path)
         
     }
@@ -92,12 +92,12 @@ sealed interface FoodOptions {
 }
 
 private class HardcodedFoodOptions(
-     type: FoodType,
-     consumeTime: Int,
-     nutrition: Int,
-     saturationModifier: Float,
-     instantHealth: Double,
-     effects: List<PotionEffect>?
+    type: FoodType,
+    consumeTime: Int,
+    nutrition: Int,
+    saturationModifier: Float,
+    instantHealth: Double,
+    effects: List<PotionEffect>?
 ) : FoodOptions {
     override val typeProvider = provider(type)
     override val consumeTimeProvider = provider(consumeTime)

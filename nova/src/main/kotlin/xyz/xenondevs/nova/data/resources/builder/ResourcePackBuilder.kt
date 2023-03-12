@@ -3,6 +3,12 @@ package xyz.xenondevs.nova.data.resources.builder
 import com.google.common.jimfs.Jimfs
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
+import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.model.FileHeader
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.combinedProvider
+import xyz.xenondevs.commons.provider.immutable.flatten
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
@@ -11,10 +17,6 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.combinedProvider
-import xyz.xenondevs.nova.data.provider.flatten
-import xyz.xenondevs.nova.data.provider.map
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Stage
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
@@ -23,12 +25,12 @@ import xyz.xenondevs.nova.data.resources.builder.content.AtlasContent
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorContent
-import xyz.xenondevs.nova.data.resources.builder.content.font.GUIContent
+import xyz.xenondevs.nova.data.resources.builder.content.font.GuiContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.MovedFontContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.WailaContent
 import xyz.xenondevs.nova.data.resources.builder.content.material.MaterialContent
-import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.openZip
@@ -112,13 +114,14 @@ internal class ResourcePackBuilder {
         val PACK_MCMETA_FILE: Path by PACK_MCMETA_FILE_PROVIDER
         //</editor-fold>
         
-        private val RESOURCE_FILTERS: Map<Stage, List<ResourceFilter>> by combinedProvider(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS)
+        private val RESOURCE_FILTERS: Map<Stage, List<ResourceFilter>> by combinedProvider(listOf(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS))
             .flatten()
             .map { filters -> filters.groupBy { filter -> filter.stage } }
         
     }
     
-    private val soundOverrides = BlockSoundOverrides()
+    private val soundOverrides = SoundOverrides()
+    private val movedFonts = MovedFontContent()
     private lateinit var basePacks: BasePacks
     private lateinit var assetPacks: List<AssetPack>
     private lateinit var contents: List<PackContent>
@@ -175,19 +178,18 @@ internal class ResourcePackBuilder {
             LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
             
             // init content
-            val movedFontContent = MovedFontContent()
             contents = listOf(
                 // pre-world
                 MaterialContent(basePacks, soundOverrides),
                 ArmorContent(basePacks),
-                GUIContent(),
+                GuiContent(),
                 LanguageContent(),
-                TextureIconContent(movedFontContent),
+                TextureIconContent(movedFonts),
                 AtlasContent(),
                 
                 // post-world
-                WailaContent(movedFontContent),
-                movedFontContent
+                WailaContent(movedFonts),
+                movedFonts
             )
             
             // init pre-world content

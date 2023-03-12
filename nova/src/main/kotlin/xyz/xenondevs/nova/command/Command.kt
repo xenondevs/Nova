@@ -1,3 +1,5 @@
+@file:Suppress("DeprecatedCallableAddReplaceWith")
+
 package xyz.xenondevs.nova.command
 
 import com.mojang.brigadier.arguments.ArgumentType
@@ -5,7 +7,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import net.md_5.bungee.api.chat.BaseComponent
+import net.kyori.adventure.text.Component
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.dedicated.DedicatedServer
@@ -13,7 +15,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.rcon.RconConsoleSource
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.util.data.toComponent
+import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import java.util.logging.Level
 
 val CommandContext<CommandSourceStack>.player: Player
@@ -22,22 +24,12 @@ val CommandContext<CommandSourceStack>.player: Player
 val CommandSourceStack.bukkitPlayer: Player
     get() = playerOrException.bukkitEntity
 
-fun CommandSourceStack.sendSuccess(message: Array<BaseComponent>) {
-    sendSuccess(message.toComponent(), false)
+fun CommandSourceStack.sendSuccess(message: Component, broadcast: Boolean = false) {
+    sendSuccess(message.toNMSComponent(), broadcast)
 }
 
-@JvmName("sendSuccess1")
-fun CommandSourceStack.sendSuccess(vararg message: BaseComponent) {
-    this.sendSuccess(message.toComponent(), false)
-}
-
-fun CommandSourceStack.sendFailure(message: Array<BaseComponent>) {
-    sendFailure(message.toComponent())
-}
-
-@JvmName("sendFailure1")
-fun CommandSourceStack.sendFailure(vararg message: BaseComponent) {
-    sendFailure(message.toComponent())
+fun CommandSourceStack.sendFailure(message: Component) {
+    sendFailure(message.toNMSComponent())
 }
 
 fun CommandSource.isConsole() = this is DedicatedServer || this is RconConsoleSource

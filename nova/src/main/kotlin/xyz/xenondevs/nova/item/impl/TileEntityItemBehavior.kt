@@ -1,13 +1,9 @@
 package xyz.xenondevs.nova.item.impl
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TextComponent
-import net.md_5.bungee.api.chat.TranslatableComponent
-import org.bukkit.inventory.ItemStack
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.nova.data.serialization.persistentdata.get
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -16,20 +12,20 @@ import xyz.xenondevs.nova.util.NumberFormatUtils
 
 internal class TileEntityItemBehavior : ItemBehavior() {
     
-    override fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) {
-        val data: Compound? = itemStack.itemMeta?.persistentDataContainer?.get(TileEntity.TILE_ENTITY_KEY)
+    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
+        val tileEntityData: Compound? = data[TileEntity.TILE_ENTITY_DATA_KEY]
         
-        if (data != null) {
-            val lore = ArrayList<Array<BaseComponent>>()
+        if (tileEntityData != null) {
+            val lore = ArrayList<Component>()
             
-            val energy = data.get<Long>("energy")
+            val energy = tileEntityData.get<Long>("energy")
             if (energy != null) {
-                lore += TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy))
+                lore += Component.text(NumberFormatUtils.getEnergyString(energy), NamedTextColor.GRAY)
             }
             
-            data.keys.forEach { key ->
+            tileEntityData.keys.forEach { key ->
                 if (key.startsWith("fluidContainer.")) {
-                    val fluidData = data.get<Compound>(key)!!
+                    val fluidData = tileEntityData.get<Compound>(key)!!
                     val amount = fluidData.get<Long>("amount")!!
                     val type = fluidData.get<FluidType?>("type")
                     
@@ -38,11 +34,11 @@ internal class TileEntityItemBehavior : ItemBehavior() {
                             NumberFormatUtils.getFluidString(amount) + " mB"
                         else "∞ mB"
                         
-                        lore += ComponentBuilder()
-                            .color(ChatColor.GRAY)
-                            .append(TranslatableComponent(type.localizedName))
-                            .append(": $amountStr")
-                            .create()
+                        lore += Component.text()
+                            .color(NamedTextColor.GRAY)
+                            .append(Component.translatable(type.localizedName))
+                            .append(Component.text(": $amountStr"))
+                            .build()
                     }
                 }
             }

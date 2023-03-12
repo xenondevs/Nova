@@ -1,8 +1,7 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
@@ -23,22 +22,19 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
     override fun getInfo(player: Player, block: NovaBlockState): WailaInfo {
         val material = block.material
         
-        val translate = TranslatableComponent(material.localizedName)
-        translate.color = ChatColor.WHITE
-        
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(ComponentBuilder(material.id.toString()).color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.translatable(material.localizedName), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.text(material.id.toString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block.pos.block)
         
         if (block is NovaTileEntityState) {
             val tileEntity = block.tileEntity
             if (tileEntity is NetworkedTileEntity) {
-                val energyHolder = tileEntity.holders[NetworkType.ENERGY] as? NovaEnergyHolder      
-                if (energyHolder != null && (energyHolder !is BufferEnergyHolder || !energyHolder.creative)) {
-                    lines += EnergyHolderLine.getEnergyBarLine(player, energyHolder)
-                    lines += EnergyHolderLine.getEnergyAmountLine(player, energyHolder)
-                    lines += EnergyHolderLine.getEnergyDeltaLine(player, energyHolder)
+                val energyHolder = tileEntity.holders[NetworkType.ENERGY] as? NovaEnergyHolder
+                if (energyHolder != null && (energyHolder !is BufferEnergyHolder || !energyHolder.infiniteEnergy)) {
+                    lines += EnergyHolderLine.getEnergyBarLine(energyHolder)
+                    lines += EnergyHolderLine.getEnergyAmountLine(energyHolder)
+                    lines += EnergyHolderLine.getEnergyDeltaLine(energyHolder)
                 }
             }
         }

@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.data.resources.builder.content.font
 
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
@@ -10,9 +12,14 @@ import xyz.xenondevs.nova.data.resources.builder.BitmapFontGenerator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder.BuildingStage
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.writeToFile
 import kotlin.io.path.createDirectories
+import kotlin.io.path.extension
+import kotlin.io.path.forEachDirectoryEntry
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
 
 private val DEFAULT_FONT = ResourcePath("minecraft", "default")
 
@@ -43,6 +50,20 @@ internal class MovedFontContent : PackContent {
     }
     
     override fun write() {
+        // add all fonts from other namespaces (for boss bar overlay, because we don't know which fonts are used in boss bars)
+        ResourcePackBuilder.ASSETS_DIR.listDirectoryEntries()
+            .filter { it.isDirectory() && it.name != "nova" && it.name != "minecraft" }
+            .forEach {
+                val namespace = it.name
+                val fontDir = it.resolve("font")
+                fontDir.forEachDirectoryEntry { fontFile ->
+                    if (fontFile.isRegularFile() && fontFile.extension == "json") {
+                        requestMovedFonts(ResourcePath(namespace, fontFile.nameWithoutExtension), 1..19)
+                    }
+                }
+            }
+        
+        // create moved fonts
         LOGGER.info("Creating moved fonts")
         movingRequests.forEach { (font, variants) ->
             if (font in MOVED_FONT_BLACKLIST)
@@ -50,16 +71,16 @@ internal class MovedFontContent : PackContent {
             
             val bitmapFont = BitmapFontGenerator(font, font == DEFAULT_FONT && FORCE_UNICODE_FONT).generateBitmapFont()
             
-            variants.forEach { ascent ->
+            variants.forEach { y ->
                 val fontCopy = bitmapFont.deepCopy()
                 val providers = fontCopy.getAsJsonArray("providers")
                 providers.forEach { provider ->
                     require(provider is JsonObject)
-                    val currentAscent = provider.getInt("ascent") ?: 0
-                    provider.addProperty("ascent", currentAscent + ascent)
+                    val currentAscent = provider.getIntOrNull("ascent") ?: 0
+                    provider.addProperty("ascent", currentAscent - y)
                 }
                 
-                val file = ResourcePackBuilder.ASSETS_DIR.resolve("${font.namespace}/font/${font.path}/$ascent.json")
+                val file = ResourcePackBuilder.ASSETS_DIR.resolve("${font.namespace}/font/${font.path}/$y.json")
                 file.parent.createDirectories()
                 fontCopy.writeToFile(file)
             }

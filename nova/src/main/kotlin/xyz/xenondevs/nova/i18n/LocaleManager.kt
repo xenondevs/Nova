@@ -5,6 +5,7 @@ import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
@@ -12,7 +13,6 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.data.parseJson
 import xyz.xenondevs.nova.util.formatSafely
 import xyz.xenondevs.nova.util.runAsyncTask
 
@@ -52,8 +52,37 @@ object LocaleManager : Initializable() {
     }
     
     @Synchronized
-    fun getAllTranslations(key: String, vararg args: Any): Set<String> {
-        return loadedLangs.mapTo(HashSet()) { getTranslation(it, key, *args) }
+    fun hasTranslation(lang: String, key: String): Boolean {
+        if (!::translationProviders.isInitialized) return false
+        if (lang !in loadedLangs) loadLang(lang)
+        return translationProviders[lang]?.containsKey(key) ?: false
+    }
+    
+    @Synchronized
+    fun getFormatStringOrNull(lang: String, key: String): String? {
+        if (!::translationProviders.isInitialized) return null
+        if (lang !in loadedLangs) loadLang(lang)
+        return translationProviders[lang]?.get(key)
+    }
+    
+    @Synchronized
+    fun getFormatString(lang: String, key: String): String {
+        var formatString = getFormatStringOrNull(lang, key)
+        if (formatString == null && lang != "en_us")
+            formatString = getFormatStringOrNull("en_us", key)
+        return formatString ?: key
+    }
+    
+    @Synchronized
+    fun getAllFormatStrings(key: String): Set<String> {
+        return loadedLangs.mapTo(HashSet()) { getFormatString(it, key) }
+    }
+    
+    @Synchronized
+    fun getTranslationOrNull(lang: String, key: String, vararg args: Any): String? {
+        if (!::translationProviders.isInitialized) return null
+        if (lang !in loadedLangs) loadLang(lang)
+        return translationProviders[lang]?.get(key)?.let { String.formatSafely(it, *args) }
     }
     
     @Synchronized
@@ -65,17 +94,8 @@ object LocaleManager : Initializable() {
     }
     
     @Synchronized
-    fun getTranslationOrNull(lang: String, key: String, vararg args: Any): String? {
-        if (!::translationProviders.isInitialized) return null
-        if (lang !in loadedLangs) loadLang(lang)
-        return translationProviders[lang]?.get(key)?.let { String.formatSafely(it, *args) }
-    }
-    
-    @Synchronized
-    fun hasTranslation(lang: String, key: String): Boolean {
-        if (!::translationProviders.isInitialized) return false
-        if (lang !in loadedLangs) loadLang(lang)
-        return translationProviders[lang]?.containsKey(key) ?: false
+    fun getAllTranslations(key: String, vararg args: Any): Set<String> {
+        return loadedLangs.mapTo(HashSet()) { getTranslation(it, key, *args) }
     }
     
     @Synchronized

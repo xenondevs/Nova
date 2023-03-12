@@ -4,14 +4,16 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.mapToIntArray
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ModelData
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
-import xyz.xenondevs.nova.data.resources.builder.BlockSoundOverrides
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.SoundOverrides
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
@@ -26,9 +28,7 @@ import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.parseJson
-import xyz.xenondevs.nova.util.mapToIntArray
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -41,7 +41,7 @@ private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("re
 
 internal class MaterialContent(
     private val basePacks: BasePacks,
-    private val soundOverrides: BlockSoundOverrides
+    private val soundOverrides: SoundOverrides
 ) : PackContent {
     
     override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD

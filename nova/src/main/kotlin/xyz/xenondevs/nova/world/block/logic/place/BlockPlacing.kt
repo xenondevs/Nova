@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.block.logic.place
 
-import net.md_5.bungee.api.ChatColor
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -16,9 +17,9 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.advance
+import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.facing
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
@@ -130,7 +131,7 @@ internal object BlockPlacing : Listener {
                 if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
                 runTask { player.swingHand(event.hand!!) }
             } else {
-                player.spigot().sendMessage(localized(ChatColor.RED, result.message))
+                player.sendMessage(Component.text(result.message, NamedTextColor.RED))
             }
         }
     }

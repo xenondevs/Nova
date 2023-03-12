@@ -1,25 +1,27 @@
+@file:Suppress("MemberVisibilityCanBePrivate", "DEPRECATION", "UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
-import de.studiocode.invui.item.builder.ItemBuilder
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
-import net.minecraft.world.item.Items
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Tag
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
-import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ComplexTest
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
@@ -27,16 +29,22 @@ import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.NovaIdTest
 import xyz.xenondevs.nova.data.recipe.NovaNameTest
 import xyz.xenondevs.nova.data.recipe.TagTest
+import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTag
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
-import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.data.getCBFCompoundTag
+import xyz.xenondevs.nova.util.data.getOrPutCBFCompoundTag
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.util.logging.Level
+import kotlin.collections.set
 import net.minecraft.nbt.Tag as NBTTag
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -50,6 +58,9 @@ val MojangStack.novaMaterial: ItemNovaMaterial?
     get() = tag?.getCompound("nova")
         ?.getString("id")
         ?.let(NovaMaterialRegistry::getOrNull)
+
+val ItemStack.novaMaxStackSize: Int
+    get() = novaMaterial?.maxStackSize ?: type.maxStackSize
 
 val ItemStack.customModelData: Int
     get() {
@@ -88,10 +99,6 @@ val ItemStack.namelessCopyOrSelf: ItemStack
         return itemStack
     }
 
-val ItemStack.novaMaxStackSize: Int
-    get() = novaMaterial?.maxStackSize ?: type.maxStackSize
-
-@Suppress("UNCHECKED_CAST")
 val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>
 
@@ -110,6 +117,15 @@ val ItemStack.craftingRemainingItem: ItemStack?
         return type.craftingRemainingItem?.let(::ItemStack)
     }
 
+val ItemStack.equipSound: String?
+    get() {
+        val novaMaterial = novaMaterial
+        if (novaMaterial != null)
+            return novaMaterial.novaItem.getBehavior(Wearable::class)?.options?.equipSound
+        
+        return CraftMagicNumbers.getItem(type).equipSound?.location?.toString()
+    }
+
 fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     val first = this.namelessCopyOrSelf
     val second = other?.namelessCopyOrSelf
@@ -117,69 +133,150 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     return first.isSimilar(second)
 }
 
-@Deprecated("Replaced by ItemStack.takeUnlessEmpty", ReplaceWith("takeUnlessEmpty()"))
-fun ItemStack.takeUnlessAir(): ItemStack? =
-    if (type.isAir) null else this
-
 fun ItemStack.takeUnlessEmpty(): ItemStack? =
     if (type.isAir || amount <= 0) null else this
 
-inline fun <reified K> ItemStack.retrieveData(key: NamespacedKey, getAlternative: () -> K): K {
-    val persistentDataContainer = itemMeta?.persistentDataContainer ?: return getAlternative()
-    return if (persistentDataContainer.has(key, PersistentDataType.BYTE_ARRAY)) persistentDataContainer.get(key)!! else getAlternative();
-}
+//<editor-fold desc="nova item data storage", defaultstate="collapsed">
 
-inline fun <reified K> ItemStack.retrieveDataOrNull(key: NamespacedKey): K? {
-    return itemMeta?.persistentDataContainer?.get(key)
-}
+//<editor-fold desc="BukkitStack - Nova Compound", defaultstate="collapsed">
+var ItemStack.novaCompound: NamespacedCompound
+    get() {
+        val unhandledTags = itemMeta!!.unhandledTags
+        val tag = unhandledTags.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag) as? CBFCompoundTag
+        return tag!!.compound
+    }
+    set(value) {
+        itemMeta!!.unhandledTags["nova_cbf"] = CBFCompoundTag(value)
+    }
 
-fun <T> ItemStack.retrieveDataOrNull(key: NamespacedKey, persistentDataType: PersistentDataType<*, T>): T? {
-    return itemMeta?.persistentDataContainer?.get(key, persistentDataType)
-}
+val ItemStack.novaCompoundOrNull: NamespacedCompound?
+    get() = itemMeta?.unhandledTags?.getCBFCompoundTag("nova_cbf")?.compound
+//</editor-fold>
 
-inline fun <reified T> ItemStack.storeData(key: NamespacedKey, data: T?) {
+//<editor-fold desc="MojangStack - Nova Compound", defaultstate="collapsed">
+var MojangStack.novaCompound: NamespacedCompound
+    get() = orCreateTag.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag).compound
+    set(value) {
+        orCreateTag.put("nova_cbf", CBFCompoundTag(value))
+    }
+
+val MojangStack.novaCompoundOrNull: NamespacedCompound?
+    get() = tag?.getCBFCompoundTag("nova_cbf")?.compound
+//</editor-fold>
+
+//<editor-fold desc="BukkitStack - retrieve", defaultstate="collapsed">
+inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? {
+    // TODO: Remove legacy support at some point
+    //<editor-fold desc="legacy support", defaultstate="collapsed">
     val itemMeta = itemMeta
     val dataContainer = itemMeta?.persistentDataContainer
     if (dataContainer != null) {
-        if (data != null) dataContainer.set(key, data)
-        else dataContainer.remove(key)
+        val namespacedKey = NamespacedKey(namespace, key)
+        val value = dataContainer.get<T>(namespacedKey)
+        if (value != null) {
+            dataContainer.remove(namespacedKey)
+            storeData(namespace, key, value)
+            return value
+        }
         
         this.itemMeta = itemMeta
     }
+    //</editor-fold>
+    
+    return novaCompoundOrNull?.get(namespace, key)
 }
 
-fun <T> ItemStack.storeData(key: NamespacedKey, dataType: PersistentDataType<*, T>, data: T?) {
+inline fun <reified T : Any> ItemStack.retrieveData(key: NamespacedKey): T? {
+    return retrieveData(key.namespace, key.key)
+}
+
+inline fun <reified T : Any> ItemStack.retrieveData(id: NamespacedId): T? {
+    return retrieveData(id.namespace, id.name)
+}
+
+inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? {
+    return retrieveData(addon.description.id, key)
+}
+//</editor-fold>
+
+//<editor-fold desc="BukkitStack - store", defaultstate="collapsed">
+inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
+    // TODO: Remove legacy support at some point
+    //<editor-fold desc="legacy support", defaultstate="collapsed">
     val itemMeta = itemMeta
     val dataContainer = itemMeta?.persistentDataContainer
     if (dataContainer != null) {
-        if (data != null) dataContainer.set(key, dataType, data)
-        else dataContainer.remove(key)
-        
+        dataContainer.remove(NamespacedKey(namespace, key))
         this.itemMeta = itemMeta
     }
+    //</editor-fold>
+    
+    novaCompound[namespace, key] = data
 }
+
+inline fun <reified T : Any> ItemStack.storeData(key: NamespacedKey, data: T?) {
+    storeData(key.namespace, key.key, data)
+}
+
+inline fun <reified T : Any> ItemStack.storeData(id: NamespacedId, data: T?) {
+    storeData(id.namespace, id.name, data)
+}
+
+inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) {
+    storeData(addon.description.id, key, data)
+}
+//</editor-fold>
+
+//<editor-fold desc="MojangStack - retrieve", defaultstate="collapsed">
+inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? {
+    // TODO: Remove legacy support at some point
+    // For legacy support, we convert the MojangStack to a Bukkit ItemStack to access the persistent data container
+    return bukkitMirror.retrieveData(namespace, key)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(key: NamespacedKey): T? {
+    return retrieveData(key.namespace, key.key)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(id: NamespacedId): T? {
+    return retrieveData(id.namespace, id.name)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? {
+    return retrieveData(addon.description.id, key)
+}
+//</editor-fold>
+
+//<editor-fold desc="MojangStack - store", defaultstate="collapsed">
+@PublishedApi
+internal inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
+    // TODO: Remove legacy support at some point
+    // For legacy support, we convert the MojangStack to a Bukkit ItemStack to access the persistent data container
+    bukkitMirror.storeData(namespace, key, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(key: NamespacedKey, data: T?) {
+    storeData(key.namespace, key.key, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(id: NamespacedId, data: T?) {
+    storeData(id.namespace, id.name, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) {
+    storeData(addon.description.id, key, data)
+}
+//</editor-fold>
+
+//</editor-fold>
+
+//<editor-fold desc="deprecated", defaultstate="collapsed">
+@Deprecated("Replaced by ItemStack.takeUnlessEmpty", ReplaceWith("takeUnlessEmpty()"))
+fun ItemStack.takeUnlessAir(): ItemStack? =
+    if (type.isAir) null else this
+//</editor-fold>
 
 object ItemUtils {
-    
-    val SHULKER_BOX_ITEMS = setOf(
-        Items.SHULKER_BOX,
-        Items.BLUE_SHULKER_BOX,
-        Items.BLACK_SHULKER_BOX,
-        Items.CYAN_SHULKER_BOX,
-        Items.BROWN_SHULKER_BOX,
-        Items.GREEN_SHULKER_BOX,
-        Items.GRAY_SHULKER_BOX,
-        Items.LIGHT_BLUE_SHULKER_BOX,
-        Items.LIGHT_GRAY_SHULKER_BOX,
-        Items.LIME_SHULKER_BOX,
-        Items.MAGENTA_SHULKER_BOX,
-        Items.ORANGE_SHULKER_BOX,
-        Items.PINK_SHULKER_BOX,
-        Items.PURPLE_SHULKER_BOX,
-        Items.RED_SHULKER_BOX,
-        Items.WHITE_SHULKER_BOX,
-        Items.YELLOW_SHULKER_BOX
-    )
     
     fun isIdRegistered(id: String): Boolean {
         try {
@@ -330,6 +427,14 @@ object ItemUtils {
      */
     internal fun getCustomAttributeModifiers(itemStack: MojangStack, slot: MojangEquipmentSlot?): List<AttributeModifier> {
         val tag = itemStack.tag ?: return emptyList()
+        return getCustomAttributeModifiers(tag, slot)
+    }
+    
+    /**
+     * Gets the custom attribute modifiers that are configured in the given [tag] for the given [slot].
+     * The provided [tag] must be the item tag, not the item stack itself.
+     */
+    internal fun getCustomAttributeModifiers(tag: CompoundTag, slot: MojangEquipmentSlot?): List<AttributeModifier> {
         if (tag.contains("AttributeModifiers", NBTTag.TAG_LIST.toInt())) {
             val attributeModifiers = ArrayList<AttributeModifier>()
             
@@ -345,7 +450,7 @@ object ItemUtils {
                             ?.let { arrayOf(it) }
                             ?: MojangEquipmentSlot.values()
                         
-                        val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation.tryParse(modifier.getString("AttributeName"))) 
+                        val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation.tryParse(modifier.getString("AttributeName")))
                             ?: return@forEach
                         
                         val name = modifier.getString("Name")

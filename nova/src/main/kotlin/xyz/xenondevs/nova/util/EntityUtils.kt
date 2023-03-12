@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.util
 import com.mojang.authlib.GameProfile
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
@@ -161,15 +163,33 @@ object EntityUtils {
     /**
      * Creates a fake [ServerPlayer] object.
      */
-    fun createFakePlayer(location: Location, uuid: UUID, name: String): ServerPlayer {
+    fun createFakePlayer(
+        location: Location,
+        uuid: UUID = UUID.randomUUID(),
+        name: String = "Nova FakePlayer",
+        hasEvents: Boolean = false
+    ): ServerPlayer {
         val server = (Bukkit.getServer() as CraftServer).server
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
-        val serverPlayer = object : ServerPlayer(server, world, gameProfile) {
-            override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: MojangEntity?) = Unit
-        }
-        serverPlayer.advancements.stopListening()
-        return serverPlayer
+        return FakePlayer(server, world, gameProfile, hasEvents)
+    }
+    
+}
+
+class FakePlayer(
+    server: MinecraftServer,
+    level: ServerLevel,
+    profile: GameProfile,
+    val hasEvents: Boolean
+) : ServerPlayer(server, level, profile) {
+    
+    init {
+        advancements.stopListening()
+    }
+    
+    override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: MojangEntity?) {
+        // empty
     }
     
 }

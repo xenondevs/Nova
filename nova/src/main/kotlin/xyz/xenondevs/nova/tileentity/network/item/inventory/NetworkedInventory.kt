@@ -1,16 +1,16 @@
 package xyz.xenondevs.nova.tileentity.network.item.inventory
 
-import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.flatMap
+import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.EndPointContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkException
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedVirtualInventory.Companion.UPDATE_REASON
 import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.flatMap
 import xyz.xenondevs.nova.util.isFull
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 

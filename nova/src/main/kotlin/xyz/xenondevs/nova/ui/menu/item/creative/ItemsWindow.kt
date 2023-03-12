@@ -1,46 +1,43 @@
 package xyz.xenondevs.nova.ui.menu.item.creative
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.gui.builder.GUIBuilder
-import de.studiocode.invui.gui.builder.guitype.GUIType
-import de.studiocode.invui.gui.impl.PagedGUI
-import de.studiocode.invui.gui.impl.SimpleGUI
-import de.studiocode.invui.gui.impl.SimplePagedItemsGUI
-import de.studiocode.invui.gui.impl.TabGUI
-import de.studiocode.invui.item.Item
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.impl.controlitem.PageItem
-import de.studiocode.invui.item.impl.controlitem.TabItem
-import de.studiocode.invui.window.Window
-import de.studiocode.invui.window.impl.merged.split.AnvilSplitWindow
-import de.studiocode.invui.window.impl.single.SimpleWindow
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.gui.ScrollGui
+import xyz.xenondevs.invui.gui.TabGui
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.impl.controlitem.PageItem
+import xyz.xenondevs.invui.item.impl.controlitem.TabItem
+import xyz.xenondevs.invui.window.AnvilWindow
+import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.changeTitle
+import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.material.CoreGUIMaterial
+import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.ItemCategory
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
-import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
-import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGUITexture
-import xyz.xenondevs.nova.util.data.setLocalizedName
+import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
+import xyz.xenondevs.nova.util.component.adventure.move
+import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.searchFor
 
 private val TAB_BUTTON_TEXTURES = arrayOf(
-    CoreGUITexture.ITEMS_0,
-    CoreGUITexture.ITEMS_1,
-    CoreGUITexture.ITEMS_2,
-    CoreGUITexture.ITEMS_3,
-    CoreGUITexture.ITEMS_4
+    CoreGuiTexture.ITEMS_0,
+    CoreGuiTexture.ITEMS_1,
+    CoreGuiTexture.ITEMS_2,
+    CoreGuiTexture.ITEMS_3,
+    CoreGuiTexture.ITEMS_4
 )
 
 internal class ItemsWindow(val player: Player) : ItemMenu {
@@ -48,25 +45,26 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     private var currentWindow: Window? = null
     
     private val openSearchItem = clickableItem(
-        CoreGUIMaterial.TP_SEARCH.createClientsideItemBuilder()
-            .setLocalizedName("menu.nova.items.search-item")
+        CoreGuiMaterial.TP_SEARCH.createClientsideItemBuilder()
+            .setDisplayName(Component.translatable("menu.nova.items.search-item"))
     ) { openSearchWindow() }
     
     private val openMainWindowItem = clickableItem(
-        CoreGUIMaterial.ARROW_1_UP.createClientsideItemBuilder()
-            .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
+        CoreGuiMaterial.ARROW_1_UP.createClientsideItemBuilder()
+            .setDisplayName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
     ) { openMainWindow() }
     
-    private val tabPagesGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+    private val tabPagesGui = PagedGui.items()
         .setStructure(
             "x . x . x . x . x",
             "< . . . . . . . >"
         )
         .addIngredient('<', TabPageBackItem())
         .addIngredient('>', TabPageForwardItem())
-        .build().apply { addPageChangeHandler(::handleTabPageChange) }
+        .addPageChangeHandler { _, now -> handleTabPageChange(now) }
+        .build()
     
-    private val mainGUI = GUIBuilder(GUIType.TAB)
+    private val mainGui = TabGui.normal()
         .setStructure(
             ". . . . . . . . .",
             ". . . . . . . . .",
@@ -76,10 +74,11 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             "x x x x x x x x x"
         )
         .addIngredient('s', openSearchItem)
-        .setGUIs(ItemCategories.CATEGORIES.map(::createCategoryGUI))
-        .build().apply { fillRectangle(0, 0, tabPagesGUI, true) }
+        .setTabs(ItemCategories.CATEGORIES.map(::createCategoryGui))
+        .addModifier { it.fillRectangle(0, 0, tabPagesGui, true) }
+        .build()
     
-    private val searchResultsGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+    private val searchResultsGui = PagedGui.items()
         .setStructure(
             "# # # < s > # # #",
             "x x x x x x x x x",
@@ -89,9 +88,9 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             "x x x x x x x x x"
         )
         .addIngredient('s', openSearchItem)
-        .build() as SimplePagedItemsGUI
+        .build()
     
-    private val searchPreviewGUI = GUIBuilder(GUIType.PAGED_ITEMS)
+    private val searchPreviewGui = PagedGui.items()
         .setStructure(
             "x x x x x x x x x",
             "x x x x x x x x x",
@@ -99,9 +98,9 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             "# # # < # > # # s"
         )
         .addIngredient('s', openMainWindowItem)
-        .build() as SimplePagedItemsGUI
+        .build()
     
-    private val textItem = AnvilTextItem(CoreGUIMaterial.INVISIBLE_ITEM.createClientsideItemBuilder(), "")
+    private val textItem = AnvilTextItem(CoreGuiMaterial.INVISIBLE_ITEM.createClientsideItemBuilder(), "")
     
     private var filteredItems: List<Item>? = null
     private var filter = ""
@@ -115,75 +114,81 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     init {
         val tabButtons = ItemCategories.CATEGORIES
             .withIndex()
-            .map { (index, category) -> CreativeTabItem(index, category).apply { setGui(mainGUI) } }
-        tabPagesGUI.setItems(tabButtons)
+            .map { (index, category) -> CreativeTabItem(index, category).apply { setGui(mainGui) } }
+        tabPagesGui.setContent(tabButtons)
         
         updateFilteredItems()
     }
     
-    private fun handleTabPageChange(previous: Int, now: Int) {
-        mainGUI.showTab(now * 5)
+    private fun handleTabPageChange(newTab: Int) {
+        mainGui.setTab(newTab * 5)
         currentWindow?.changeTitle(getMainWindowTitle())
     }
     
     private fun updateFilteredItems() {
-        filteredItems = (if (filter.isEmpty()) ItemCategories.OBTAINABLE_ITEMS.toList()
-        else ItemCategories.OBTAINABLE_ITEMS.searchFor(filter) { LocaleManager.getTranslation(player, it.localizedName) })
+        filteredItems = if (filter.isEmpty()) {
+            ItemCategories.OBTAINABLE_ITEMS.toList()
+        } else {
+            ItemCategories.OBTAINABLE_ITEMS.searchFor(filter) {
+                LocaleManager.getTranslation(player, it.localizedName)
+            }
+        }
         
-        searchResultsGUI.setItems(filteredItems)
-        searchPreviewGUI.setItems(filteredItems)
+        searchResultsGui.setContent(filteredItems)
+        searchPreviewGui.setContent(filteredItems)
     }
     
-    private fun getMainWindowTitle(): Array<BaseComponent> {
+    private fun getMainWindowTitle(): Component {
         return if (filter == "") {
-            ComponentBuilder()
-                .append(MoveCharacters.getMovingComponent(-8)) // move to side to place overlay
-                .append(TAB_BUTTON_TEXTURES[mainGUI.currentTab % 5].component)
-                .create()
+            Component.text()
+                .move(-8)
+                .append(TAB_BUTTON_TEXTURES[mainGui.currentTab % 5].component)
+                .build()
         } else {
-            val title = ComponentBuilder()
-                .append(TranslatableComponent("menu.nova.items"))
-                .append(" (").color(ChatColor.DARK_GRAY)
-                .append(filter).color(ChatColor.GRAY)
-                .append(")").color(ChatColor.DARK_GRAY)
-                .create()
+            val title = Component.text()
+                .append(Component.translatable("menu.nova.items"))
+                .append(Component.text(" (", NamedTextColor.DARK_GRAY))
+                .append(Component.text(filter, NamedTextColor.GRAY))
+                .append(Component.text(")", NamedTextColor.DARK_GRAY))
+                .build()
             
-            CoreGUITexture.EMPTY_GUI.getTitle(title)
+            CoreGuiTexture.EMPTY_GUI.getTitle(title)
         }
     }
     
     private fun openMainWindow() {
-        currentWindow = SimpleWindow(player, getMainWindowTitle(), if (filter == "") mainGUI else searchResultsGUI)
-        currentWindow?.show()
+        currentWindow = Window.single {
+            it.setViewer(player)
+            it.setTitle(getMainWindowTitle())
+            it.setGui(if (filter == "") mainGui else searchResultsGui)
+        }.apply { open() }
     }
     
     private fun openSearchWindow() {
         filter = ""
         
-        val anvilGUI = SimpleGUI(3, 1)
-            .apply {
-                setItem(0, textItem)
-                setItem(2, clickableItem(
-                    CoreGUIMaterial.X.createClientsideItemBuilder()
-                        .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.clear")
-                ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
-            }
+        val anvilGui = Gui.empty(3, 1).apply {
+            setItem(0, textItem)
+            setItem(2, clickableItem(
+                CoreGuiMaterial.X.createClientsideItemBuilder()
+                    .setDisplayName(Component.translatable("menu.nova.items.search.clear", NamedTextColor.GRAY))
+            ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
+        }
         
-        val builder = ComponentBuilder()
-            .append(MoveCharacters.getMovingComponent(-60)) // move to side to place overlay
-            .append(CoreGUITexture.SEARCH.component)
-            .append(MoveCharacters.getMovingComponent(-170)) // move back to start
+        val title = Component.text()
+            .move(-60)
+            .append(CoreGuiTexture.SEARCH.component)
+            .moveToStart()
+            .append(Component.translatable("menu.nova.items.search", NamedTextColor.DARK_GRAY))
+            .build()
         
-        builder.append(TranslatableComponent("menu.nova.items.search"))
-            .font("default").color(ChatColor.DARK_GRAY)
-        
-        currentWindow = AnvilSplitWindow(
-            player,
-            builder.create(),
-            anvilGUI,
-            searchPreviewGUI
-        ) { filter = it }
-        currentWindow?.show()
+        currentWindow = AnvilWindow.split {
+            it.setViewer(player)
+            it.setTitle(title)
+            it.setUpperGui(anvilGui)
+            it.setLowerGui(searchPreviewGui)
+            it.addRenameHandler { text -> filter = text }
+        }.apply { open() }
     }
     
     override fun show() {
@@ -191,8 +196,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         openMainWindow()
     }
     
-    private fun createCategoryGUI(category: ItemCategory): GUI {
-        return GUIBuilder(GUIType.SCROLL_ITEMS)
+    private fun createCategoryGui(category: ItemCategory): Gui {
+        return ScrollGui.items()
             .setStructure(
                 "x x x x x x x x s",
                 "x x x x x x x x u",
@@ -200,18 +205,18 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
                 "x x x x x x x x d"
             )
             .addIngredient('s', openSearchItem)
-            .setItems(category.items)
+            .setContent(category.items)
             .build()
     }
     
     private inner class CreativeTabItem(private val tab: Int, private val category: ItemCategory) : TabItem(tab) {
         
-        override fun getItemProvider(gui: TabGUI) = category.icon
+        override fun getItemProvider(gui: TabGui) = category.icon
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.isTabAvailable(tab) && gui.currentTab != tab) {
                 player.playClickSound()
-                gui.showTab(tab)
+                gui.setTab(tab)
                 
                 currentWindow?.changeTitle(getMainWindowTitle())
             }
@@ -221,12 +226,12 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private class TabPageBackItem : PageItem(false) {
         
-        override fun getItemProvider(gui: PagedGUI): ItemProvider {
+        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
-            else if (gui.hasPageBefore())
-                CoreGUIMaterial.TP_PIXEL_ARROW_LEFT_ON.clientsideProvider
-            else CoreGUIMaterial.TP_PIXEL_ARROW_LEFT_OFF.clientsideProvider
+            else if (gui.hasPreviousPage())
+                CoreGuiMaterial.TP_PIXEL_ARROW_LEFT_ON.clientsideProvider
+            else CoreGuiMaterial.TP_PIXEL_ARROW_LEFT_OFF.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -238,12 +243,12 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private class TabPageForwardItem : PageItem(true) {
         
-        override fun getItemProvider(gui: PagedGUI): ItemProvider {
+        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasNextPage())
-                CoreGUIMaterial.TP_PIXEL_ARROW_RIGHT_ON.clientsideProvider
-            else CoreGUIMaterial.TP_PIXEL_ARROW_RIGHT_OFF.clientsideProvider
+                CoreGuiMaterial.TP_PIXEL_ARROW_RIGHT_ON.clientsideProvider
+            else CoreGuiMaterial.TP_PIXEL_ARROW_RIGHT_OFF.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

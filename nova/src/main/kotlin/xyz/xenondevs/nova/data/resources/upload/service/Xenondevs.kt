@@ -6,9 +6,9 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.ContentType.Application.Zip
 import org.bukkit.configuration.ConfigurationSection
+import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.nova.HTTP_CLIENT
 import xyz.xenondevs.nova.data.resources.upload.UploadService
-import xyz.xenondevs.nova.util.data.getString
 import xyz.xenondevs.nova.util.data.http.BinaryBufferedBody
 import java.io.File
 
@@ -31,12 +31,12 @@ internal object Xenondevs : UploadService {
         }.execute { response ->
             val json = response.body<JsonObject>()
             check(response.status.isSuccess()) {
-                "Failed to upload pack to xenondevs: ${response.status} ${json.getString("error")}." +
+                "Failed to upload pack to xenondevs: ${response.status} ${json.getStringOrNull("error")}." +
                     "Please remember that this feature is only available for Patrons!"
             }
             return@execute json
         }
-        val url = json.getString("url")
+        val url = json.getStringOrNull("url")
         checkNotNull(url) { "Server did not return a url" }
         return url
     }
