@@ -19,7 +19,10 @@ import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.extension
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
@@ -56,7 +59,10 @@ internal class BasePacks(private val builder: ResourcePackBuilder) {
             }
             
             return@map it.toPath()
-        }.forEach(::mergeBasePack)
+        }.forEach {
+            mergeBasePack(it)
+            requestMovedFonts(it)
+        }
     }
     
     private fun mergeBasePack(packDir: Path) {
@@ -92,6 +98,26 @@ internal class BasePacks(private val builder: ResourcePackBuilder) {
                 } else {
                     LOGGER.warning("Skipping file $file: File type cannot be merged")
                 }
+            }
+    }
+    
+    private fun requestMovedFonts(packDir: Path) {
+        val assetsDir = packDir.resolve("assets").takeIf(Path::exists) ?: return
+        assetsDir.listDirectoryEntries()
+            .mapNotNull { it.resolve("font").takeIf(Path::isDirectory) }
+            .forEach { fontDir ->
+                fontDir.walk()
+                    .filter { it.isRegularFile() && it.extension.equals("json", true) }
+                    .forEach { fontFile ->
+                        val fontNameParts = fontFile.relativeTo(assetsDir).invariantSeparatorsPathString
+                            .substringBeforeLast('.')
+                            .split('/')
+                        
+                        builder.movedFonts.requestMovedFonts(
+                            ResourcePath(fontNameParts[0], fontNameParts.drop(2).joinToString("/")),
+                            1..19
+                        )
+                    }
             }
     }
     

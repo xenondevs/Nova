@@ -119,9 +119,10 @@ internal class ResourcePackBuilder {
         
     }
     
-    private val soundOverrides = SoundOverrides()
-    private val movedFonts = MovedFontContent()
-    private lateinit var basePacks: BasePacks
+    val soundOverrides = SoundOverrides()
+    val movedFonts = MovedFontContent()
+    val basePacks = BasePacks(this)
+    
     private lateinit var assetPacks: List<AssetPack>
     private lateinit var contents: List<PackContent>
     
@@ -172,22 +173,22 @@ internal class ResourcePackBuilder {
             }
             
             // load base- and asset packs
-            basePacks = BasePacks().also(BasePacks::include)
+            basePacks.include()
             assetPacks = loadAssetPacks()
             LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
             
             // init content
             contents = listOf(
                 // pre-world
-                MaterialContent(basePacks, soundOverrides),
-                ArmorContent(basePacks),
+                MaterialContent(this),
+                ArmorContent(this),
                 GuiContent(),
                 LanguageContent(),
-                TextureIconContent(movedFonts),
+                TextureIconContent(this),
                 AtlasContent(),
                 
                 // post-world
-                WailaContent(movedFonts),
+                WailaContent(this),
                 movedFonts
             )
             

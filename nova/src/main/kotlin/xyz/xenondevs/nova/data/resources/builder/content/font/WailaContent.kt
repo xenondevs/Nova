@@ -190,11 +190,11 @@ private const val ASCENT = -4
 private val WAILA_ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
 
 internal class WailaContent(
-    movedFontContent: MovedFontContent
+    builder: ResourcePackBuilder
 ) : FontContent(
     "nova:waila_textures_%s",
     Resources::updateWailaDataLookup,
-    movedFontContent
+    builder.movedFonts
 ) {
     
     override val stage = ResourcePackBuilder.BuildingStage.POST_WORLD

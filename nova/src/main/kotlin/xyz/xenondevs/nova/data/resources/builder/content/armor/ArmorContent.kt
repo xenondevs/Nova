@@ -6,7 +6,6 @@ import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor.InterpolationMode
@@ -35,7 +34,7 @@ internal class ArmorData(
 )
 
 internal class ArmorContent(
-    private val basePacks: BasePacks
+    private val builder: ResourcePackBuilder
 ) : PackContent {
     
     override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
@@ -44,7 +43,7 @@ internal class ArmorContent(
     private var color = -1
     
     override fun init() {
-        armor += basePacks.customArmor.values
+        armor += builder.basePacks.customArmor.values
     }
     
     override fun excludesPath(path: ResourcePath): Boolean =
@@ -75,7 +74,7 @@ internal class ArmorContent(
             color += 2
             
             // skip colors that are already in use by base packs
-        } while (color in basePacks.customArmor.keys)
+        } while (color in builder.basePacks.customArmor.keys)
         
         check(color <= 0xFFFFFF)
         return color

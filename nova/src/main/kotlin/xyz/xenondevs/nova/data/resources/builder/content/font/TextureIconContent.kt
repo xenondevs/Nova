@@ -15,11 +15,11 @@ private const val HEIGHT = 16
 private const val ASCENT = 12
 
 internal class TextureIconContent(
-    movedFontContent: MovedFontContent
+    builder: ResourcePackBuilder
 ) : FontContent(
     "nova:texture_icons_%s",
     Resources::updateTextureIconLookup,
-    movedFontContent
+    builder.movedFonts
 ) {
     
     override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
