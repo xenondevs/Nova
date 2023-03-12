@@ -3,11 +3,8 @@
 package xyz.xenondevs.nmsutils.internal.util
 
 import io.netty.channel.ChannelFuture
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.Registries
-import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
@@ -27,7 +24,6 @@ import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_19_R2.potion.CraftPotionUtil
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -96,22 +92,4 @@ internal val Player.connection: ServerGamePacketListenerImpl
 internal fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
     packets.forEach { connection.send(it) }
-}
-
-internal fun Component.toBaseComponentArray(): Array<BaseComponent> {
-    try {
-        return ComponentSerializer.parse(CraftChatMessage.toJSON(this))
-    } catch (e: Exception) {
-        throw IllegalArgumentException("Could not convert to BaseComponent array: $this", e)
-    }
-}
-
-internal fun Array<out BaseComponent>.toComponent(): Component {
-    if (isEmpty()) return Component.empty()
-    
-    try {
-        return CraftChatMessage.fromJSON(ComponentSerializer.toString(this))
-    } catch (e: Exception) {
-        throw IllegalArgumentException("Could not convert to Component: ${this.contentToString()}", e)
-    }
 }

@@ -1,7 +1,7 @@
 package xyz.xenondevs.nmsutils.bossbar
 
+import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.chat.BaseComponent
-import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.world.BossEvent
 import xyz.xenondevs.nmsutils.bossbar.operation.AddBossBarOperation
@@ -10,17 +10,19 @@ import xyz.xenondevs.nmsutils.bossbar.operation.UpdateNameBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.UpdateProgressBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.UpdatePropertiesBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.UpdateStyleBossBarOperation
+import xyz.xenondevs.nmsutils.internal.util.toAdventureComponent
 import xyz.xenondevs.nmsutils.internal.util.toBaseComponentArray
-import xyz.xenondevs.nmsutils.internal.util.toComponent
+import xyz.xenondevs.nmsutils.internal.util.toNmsComponent
 import xyz.xenondevs.nmsutils.network.ClientboundBossEventPacket
 import java.util.*
+import net.minecraft.network.chat.Component as MojangComponent
 
 /**
  * A boss bar class with cached operations and packets
  */
 class BossBar(
     val id: UUID,
-    nmsName: Component = Component.literal(""),
+    name: MojangComponent = MojangComponent.literal(""),
     progress: Float = 0.0f,
     color: BossEvent.BossBarColor = BossEvent.BossBarColor.WHITE,
     overlay: BossEvent.BossBarOverlay = BossEvent.BossBarOverlay.PROGRESS,
@@ -29,7 +31,7 @@ class BossBar(
     createWorldFog: Boolean = false
 ) {
     
-    var nmsName: Component = nmsName
+    var name: MojangComponent = name
         set(value) {
             field = value
             
@@ -100,17 +102,23 @@ class BossBar(
             _updatePropertiesPacket = null
         }
     
-    var name: Array<BaseComponent>
-        get() = nmsName.toBaseComponentArray()
+    var bungeeName: Array<out BaseComponent>
+        get() = name.toBaseComponentArray()
         set(value) {
-            nmsName = value.toComponent()
+            name = value.toNmsComponent()
+        }
+    
+    var adventureName: Component
+        get() = name.toAdventureComponent()
+        set(value) {
+            name = value.toNmsComponent()
         }
     
     private var _addOperation: AddBossBarOperation? = null
     val addOperation: AddBossBarOperation
         get() {
             if (_addOperation == null) {
-                _addOperation = AddBossBarOperation(nmsName, progress, color, overlay, darkenScreen, playMusic, createWorldFog)
+                _addOperation = AddBossBarOperation(this.name, progress, color, overlay, darkenScreen, playMusic, createWorldFog)
             }
             return _addOperation!!
         }
@@ -119,7 +127,7 @@ class BossBar(
     val updateNameOperation: UpdateNameBossBarOperation
         get() {
             if (_updateNameOperation == null) {
-                _updateNameOperation = UpdateNameBossBarOperation(nmsName)
+                _updateNameOperation = UpdateNameBossBarOperation(this.name)
             }
             return _updateNameOperation!!
         }
@@ -202,14 +210,14 @@ class BossBar(
     
     constructor(
         id: UUID,
-        name: Array<BaseComponent>,
+        name: Array<out BaseComponent>,
         progress: Float = 0.0f,
         color: BossEvent.BossBarColor = BossEvent.BossBarColor.WHITE,
         overlay: BossEvent.BossBarOverlay = BossEvent.BossBarOverlay.PROGRESS,
         darkenScreen: Boolean = false,
         playMusic: Boolean = false,
         createWorldFog: Boolean = false
-    ) : this(id, name.toComponent(), progress, color, overlay, darkenScreen, playMusic, createWorldFog)
+    ) : this(id, name.toNmsComponent(), progress, color, overlay, darkenScreen, playMusic, createWorldFog)
     
     companion object {
         

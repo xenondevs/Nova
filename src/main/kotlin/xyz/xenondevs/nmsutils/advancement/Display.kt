@@ -1,5 +1,6 @@
 package xyz.xenondevs.nmsutils.advancement
 
+import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.advancements.DisplayInfo
@@ -7,7 +8,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.adapter.Adapter
 import xyz.xenondevs.nmsutils.internal.util.nmsStack
 import xyz.xenondevs.nmsutils.internal.util.resourceLocation
-import xyz.xenondevs.nmsutils.internal.util.toComponent
+import xyz.xenondevs.nmsutils.internal.util.toJson
+import xyz.xenondevs.nmsutils.internal.util.toNmsComponent
 
 enum class FrameType {
     TASK,
@@ -15,23 +17,63 @@ enum class FrameType {
     GOAL
 }
 
-class Display(
+class Display private constructor(
     val frame: FrameType,
     val background: String?,
     val icon: ItemStack,
-    val title: Array<BaseComponent>,
-    val description: Array<BaseComponent>,
+    val titleJson: String,
+    val descriptionJson: String,
     val showToast: Boolean,
     val announceToChat: Boolean,
     val hidden: Boolean
 ) {
+    
+    constructor(
+        frame: FrameType,
+        background: String?,
+        icon: ItemStack,
+        title: Array<out BaseComponent>,
+        description: Array<out BaseComponent>,
+        showToast: Boolean,
+        announceToChat: Boolean,
+        hidden: Boolean
+    ) : this(
+        frame,
+        background,
+        icon,
+        title.toJson(),
+        description.toJson(),
+        showToast,
+        announceToChat,
+        hidden
+    )
+    
+    constructor(
+        frame: FrameType,
+        background: String?,
+        icon: ItemStack,
+        title: Component,
+        description: Component,
+        showToast: Boolean,
+        announceToChat: Boolean,
+        hidden: Boolean
+    ) : this (
+        frame,
+        background,
+        icon,
+        title.toJson(),
+        description.toJson(),
+        showToast,
+        announceToChat,
+        hidden
+    )
     
     companion object : Adapter<Display, DisplayInfo> {
         
         override fun toNMS(value: Display): DisplayInfo =
             DisplayInfo(
                 value.icon.nmsStack,
-                value.title.toComponent(), value.description.toComponent(),
+                value.titleJson.toNmsComponent(), value.descriptionJson.toNmsComponent(),
                 value.background?.resourceLocation,
                 net.minecraft.advancements.FrameType.values()[value.frame.ordinal],
                 value.showToast,
@@ -49,8 +91,8 @@ class Display(
         
         private var icon: ItemStack? = null
         
-        private var title: Array<BaseComponent>? = null
-        private var description: Array<BaseComponent>? = null
+        private var titleJson: String? = null
+        private var descriptionJson: String? = null
         
         private var showToast = true
         private var announceToChat = true
@@ -68,28 +110,36 @@ class Display(
             this.icon = icon
         }
         
-        fun title(title: Array<BaseComponent>) {
-            this.title = title
+        fun title(title: Array<out BaseComponent>) {
+            this.titleJson = title.toJson()
         }
         
         fun title(title: BaseComponent) {
-            this.title = arrayOf(title)
+            this.titleJson = arrayOf(title).toJson()
+        }
+        
+        fun title(title: Component) {
+            this.titleJson = title.toJson()
         }
         
         fun title(title: String) {
-            this.title = TextComponent.fromLegacyText(title)
+            this.titleJson = TextComponent.fromLegacyText(title).toJson()
         }
         
-        fun description(description: Array<BaseComponent>) {
-            this.description = description
+        fun description(description: Array<out BaseComponent>) {
+            this.descriptionJson = description.toJson()
         }
         
         fun description(description: BaseComponent) {
-            this.description = arrayOf(description)
+            this.descriptionJson = arrayOf(description).toJson()
+        }
+        
+        fun description(description: Component) {
+            this.descriptionJson = description.toJson()
         }
         
         fun description(description: String) {
-            this.description = TextComponent.fromLegacyText(description)
+            this.descriptionJson = TextComponent.fromLegacyText(description).toJson()
         }
         
         fun showToast(showToast: Boolean) {
@@ -105,11 +155,15 @@ class Display(
         }
         
         internal fun build(): Display {
-            checkNotNull(icon) { "Display icon is not set" }
-            checkNotNull(title) { "Display title is not set" }
-            checkNotNull(description) { "Display description is not set" }
+            val icon = icon
+            val titleJson = titleJson
+            val descriptionJson = descriptionJson
             
-            return Display(frame, background, icon!!, title!!, description!!, showToast, announceToChat, hidden)
+            checkNotNull(icon) { "Display icon is not set" }
+            checkNotNull(titleJson) { "Display title is not set" }
+            checkNotNull(descriptionJson) { "Display description is not set" }
+            
+            return Display(frame, background, icon, titleJson, descriptionJson, showToast, announceToChat, hidden)
             
         }
         
