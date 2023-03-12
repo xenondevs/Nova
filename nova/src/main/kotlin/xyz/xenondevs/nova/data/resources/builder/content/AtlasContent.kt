@@ -2,11 +2,11 @@ package xyz.xenondevs.nova.data.resources.builder.content
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.getOrPut
+import xyz.xenondevs.commons.gson.parseJson
+import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.util.data.getOrPut
-import xyz.xenondevs.nova.util.data.parseJson
-import xyz.xenondevs.nova.util.data.writeToFile
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists

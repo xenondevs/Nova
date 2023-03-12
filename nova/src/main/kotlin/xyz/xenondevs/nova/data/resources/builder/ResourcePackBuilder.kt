@@ -3,8 +3,6 @@ package xyz.xenondevs.nova.data.resources.builder
 import com.google.common.jimfs.Jimfs
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
-import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.model.FileHeader
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.flatten

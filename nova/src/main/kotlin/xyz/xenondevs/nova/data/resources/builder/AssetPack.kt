@@ -2,14 +2,14 @@
 
 package xyz.xenondevs.nova.data.resources.builder
 
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.RegisteredMaterial
 import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
-import xyz.xenondevs.nova.data.resources.builder.index.GUIsIndexDeserializer
+import xyz.xenondevs.nova.data.resources.builder.index.GuisIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MaterialsIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MovedFontsIndexDeserializer
-import xyz.xenondevs.nova.util.data.parseJson
 import java.io.InputStream
 import java.nio.file.Path
 import kotlin.io.path.CopyActionResult
@@ -39,7 +39,7 @@ internal class AssetPack(val namespace: String, val assetsDir: Path) {
     
     val guisIndex: Map<String, ResourcePath>? = assetsDir.resolve("guis.json")
         .takeIf(Path::exists)
-        ?.let { GUIsIndexDeserializer.deserialize(namespace, it.parseJson()) }
+        ?.let { GuisIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
     val armorIndex: List<RegisteredArmor>? = assetsDir.resolve("armor.json")
         .takeIf(Path::exists)
