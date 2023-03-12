@@ -9,11 +9,16 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.util.component.adventure.chars
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 data class ComponentSize(
@@ -28,12 +33,15 @@ data class CharOptions(
     val isBold: Boolean
 )
 
-object CharSizes {
+private val LOAD_CHAR_SIZES_ON_STARTUP by configReloadable { DEFAULT_CONFIG.getBoolean("performance.load_char_sizes_on_startup") }
+
+object CharSizes : Initializable() {
+    
+    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
+    override val dependsOn = setOf(ResourceGeneration.PostWorld)
     
     private val CHAR_SIZES_DIR = File(NOVA.dataFolder, ".internal_data/char_sizes/")
-    
     private val loadedTables = HashMap<String, CharSizeTable>()
-    
     private val componentCache: Cache<Pair<Component, String>, ComponentSize> = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.MINUTES)
         .build()
@@ -149,6 +157,32 @@ object CharSizes {
         return ComponentSize(width, yRangeMin..yRangeMax)
     }
     
+    override fun init() {
+        if (LOAD_CHAR_SIZES_ON_STARTUP) {
+            val service = Executors.newCachedThreadPool()
+            
+            CHAR_SIZES_DIR.walkTopDown().filter(File::isFile).forEach {
+                val fontName = getFontName(it)
+                if (fontName !in loadedTables) {
+                    service.submit {
+                        val table = CharSizeTable.load(it)
+                        loadedTables[getFontName(it)] = table
+                    }
+                }
+            }
+            
+            service.shutdown()
+            service.awaitTermination(5, TimeUnit.MINUTES)
+        }
+    }
+    
+    private fun getFontName(file: File): String {
+        val fontNameParts = file.relativeTo(CHAR_SIZES_DIR).invariantSeparatorsPath
+            .substringBeforeLast('.')
+            .split('/')
+        return "${fontNameParts[0]}:" + fontNameParts.drop(1).joinToString("/")
+    }
+    
     private fun loadTable(font: String): CharSizeTable? {
         val file = getFile(font)
         if (file.exists()) {
@@ -248,7 +282,7 @@ internal class CharSizeTable(
     companion object {
         
         fun load(file: File): CharSizeTable {
-            LOGGER.info("Loading char size table: $file")
+            LOGGER.info("Loading char size table: $file...")
             file.inputStream().use {
                 val din = DataInputStream(it)
                 val sizes = Int2ObjectOpenHashMap<IntArray>()
