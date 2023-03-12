@@ -23,7 +23,7 @@ dependencies {
     novaLoaderApi("xyz.xenondevs.invui:invui:1.0-SNAPSHOT") { for (i in 1..12) exclude("xyz.xenondevs.invui", "inventory-access-r$i") }
     novaLoaderApi("xyz.xenondevs.invui:inventory-access-r12:1.0-SNAPSHOT:remapped-mojang")
     novaLoaderApi("xyz.xenondevs.invui:invui-kotlin:1.0-SNAPSHOT")
-    novaLoaderApi("xyz.xenondevs:nms-utilities:0.6:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs:nms-utilities:0.7:remapped-mojang")
     
     // internal dependencies
     compileOnly(project(":nova-loader"))

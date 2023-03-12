@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.ui
 
-import net.md_5.bungee.api.ChatColor
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.addLoreLines
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.component.bungee.addLoreLines
-import xyz.xenondevs.nova.util.component.bungee.localized
 
 class EnergyBar(
     height: Int,
@@ -38,17 +38,17 @@ class EnergyBar(
         else itemBuilder.setDisplayName(NumberFormatUtils.getEnergyString(energy, maxEnergy))
         
         if (energyPlusPerTick > 0) {
-            itemBuilder.addLoreLines(localized(
-                ChatColor.GRAY,
+            itemBuilder.addLoreLines(Component.translatable(
                 "menu.nova.energy_per_tick",
-                "+" + NumberFormatUtils.getEnergyString(energyPlusPerTick)
+                NamedTextColor.GRAY,
+                Component.text("+" + NumberFormatUtils.getEnergyString(energyPlusPerTick))
             ))
         }
         if (energyMinusPerTick > 0) {
-            itemBuilder.addLoreLines(localized(
-                ChatColor.GRAY,
+            itemBuilder.addLoreLines(Component.translatable(
                 "menu.nova.energy_per_tick",
-                "-" + NumberFormatUtils.getEnergyString(energyMinusPerTick)
+                NamedTextColor.GRAY,
+                Component.text("-" + NumberFormatUtils.getEnergyString(energyMinusPerTick))
             ))
         }
         return itemBuilder

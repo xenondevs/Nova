@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -9,6 +9,8 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.addLoreLines
+import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.ContainerEndPointDataHolder
@@ -17,9 +19,6 @@ import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.ui.item.BUTTON_COLORS
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.component.bungee.addLocalizedLoreLines
-import xyz.xenondevs.nova.util.component.bungee.addLoreLines
-import xyz.xenondevs.nova.util.component.bungee.setLocalizedName
 import xyz.xenondevs.nova.util.playClickSound
 
 internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : ContainerEndPointDataHolder<C>>(
@@ -39,7 +38,7 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
         containers.withIndex().associate { (index, triple) ->
             triple.first to BUTTON_COLORS[index]
                 .createClientsideItemBuilder()
-                .addLoreLines(TranslatableComponent(triple.second).apply { color = ChatColor.AQUA })
+                .addLoreLines(Component.translatable(triple.second, NamedTextColor.AQUA))
         }
     
     private var simpleModeBtn: SimplicityModeItem? = null
@@ -130,7 +129,7 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
         
         override fun getItemProvider(): ItemProvider {
             val buttonBuilder = buttonBuilders[holder.containerConfig[blockFace]!!]!! // fixme: Unsafe network value access. Should only be accessed from NetworkManager thread.
-            return buttonBuilder.setDisplayName(*getSideName(blockSide, blockFace))
+            return buttonBuilder.setDisplayName(getSideName(blockSide, blockFace))
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -149,8 +148,8 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
                 if (isSimpleConfiguration()) {
                     CoreGuiMaterial.SIMPLE_MODE_BTN_ON.clientsideProvider
                 } else CoreGuiMaterial.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
-                    .setLocalizedName("menu.nova.side_config.simple_mode")
-                    .addLocalizedLoreLines(ChatColor.GRAY, "menu.nova.side_config.simple_mode.unavailable")
+                    .setDisplayName(Component.translatable("menu.nova.side_config.simple_mode"))
+                    .addLoreLines(Component.translatable("menu.nova.side_config.simple_mode.unavailable", NamedTextColor.GRAY))
             } else CoreGuiMaterial.ADVANCED_MODE_BTN_ON.clientsideProvider
         }
         

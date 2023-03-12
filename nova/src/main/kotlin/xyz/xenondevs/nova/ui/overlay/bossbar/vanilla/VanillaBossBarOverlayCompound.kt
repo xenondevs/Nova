@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayCompound
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
-import xyz.xenondevs.nova.util.component.adventure.adventureName
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 
 private val MARGIN_TOP = configReloadable { DEFAULT_CONFIG.getInt("overlay.bossbar.vanilla_bars.positioning.margin_top") }

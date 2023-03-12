@@ -3,9 +3,6 @@ package xyz.xenondevs.nova.data.resources.builder.content.font
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.kyori.adventure.text.Component
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.TextComponent
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -101,9 +98,6 @@ class FontChar internal constructor(val font: String, val char: Char) {
     val width by lazy { CharSizes.getCharWidth(font, char) }
     val height by lazy { CharSizes.getCharHeight(font, char) }
     val ascent by lazy { CharSizes.getCharAscent(font, char) }
-    
-    val bungeeComponent: BaseComponent
-        get() = TextComponent(char.toString()).also { it.font = font; it.color = ChatColor.WHITE }
     
     val component: Component
         get() = Component.text()

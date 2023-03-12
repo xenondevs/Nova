@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.integration.customitems
 
-import net.md_5.bungee.api.chat.BaseComponent
+import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
@@ -62,11 +62,11 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.firstNotNullOfOrNull { it.getId(block) }
     }
     
-    fun getName(item: ItemStack, locale: String): Array<out BaseComponent>? {
+    fun getName(item: ItemStack, locale: String): Component? {
         return PLUGINS.firstNotNullOfOrNull { it.getName(item, locale) }
     }
     
-    fun getName(block: Block, locale: String): Array<out BaseComponent>? {
+    fun getName(block: Block, locale: String): Component? {
         return PLUGINS.firstNotNullOfOrNull { it.getName(block, locale) }
     }
     

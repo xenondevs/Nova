@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.overlay.bossbar.positioning
 
 import xyz.xenondevs.nmsutils.bossbar.BossBar
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.util.component.adventure.adventureName
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import java.util.*
 import org.bukkit.plugin.Plugin as BukkitPlugin

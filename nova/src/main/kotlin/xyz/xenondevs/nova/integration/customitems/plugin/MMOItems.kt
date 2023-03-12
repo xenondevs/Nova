@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.integration.customitems.plugin
 
 import io.lumine.mythic.lib.api.item.NBTItem
 import net.Indyuce.mmoitems.api.Type
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.TextComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -91,17 +91,16 @@ internal object MMOItems : CustomItemService {
         return mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.let(::getId)
     }
     
-    override fun getName(item: ItemStack, locale: String): Array<out BaseComponent>? {
+    override fun getName(item: ItemStack, locale: String): Component? {
         if (getId(item) == null)
             return null
         
-        return TextComponent.fromLegacyText(item.displayName)
+        return item.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
     }
     
-    override fun getName(block: Block, locale: String): Array<out BaseComponent>? {
-        return TextComponent.fromLegacyText(
-            mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item?.displayName
-        )
+    override fun getName(block: Block, locale: String): Component? {
+        val item = mmoItems.customBlocks.getFromBlock(block.blockData).orElse(null)?.item ?: return null
+        return item.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {

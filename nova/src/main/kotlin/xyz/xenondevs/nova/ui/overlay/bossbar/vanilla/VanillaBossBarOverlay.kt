@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
-import xyz.xenondevs.nova.util.component.adventure.adventureName
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.toPlainText

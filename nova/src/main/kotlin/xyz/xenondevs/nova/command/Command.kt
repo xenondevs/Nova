@@ -8,7 +8,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import net.kyori.adventure.text.Component
-import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.server.dedicated.DedicatedServer
@@ -17,7 +16,6 @@ import net.minecraft.server.rcon.RconConsoleSource
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
-import xyz.xenondevs.nova.util.component.bungee.toComponent
 import java.util.logging.Level
 
 val CommandContext<CommandSourceStack>.player: Player
@@ -64,30 +62,6 @@ fun LiteralArgumentBuilder<CommandSourceStack>.requiresConsole(): LiteralArgumen
 
 fun LiteralArgumentBuilder<CommandSourceStack>.requiresPlayer(): LiteralArgumentBuilder<CommandSourceStack> =
     this.requires { it.source.isPlayer() }
-
-//<editor-fold desc="deprecated">
-@Deprecated("Use adventure components instead")
-fun CommandSourceStack.sendSuccess(message: Array<out BaseComponent>) {
-    sendSuccess(message.toComponent(), false)
-}
-
-@Deprecated("Use adventure components instead")
-@JvmName("sendSuccess1")
-fun CommandSourceStack.sendSuccess(vararg message: BaseComponent) {
-    this.sendSuccess(message.toComponent(), false)
-}
-
-@Deprecated("Use adventure components instead")
-fun CommandSourceStack.sendFailure(message: Array<out BaseComponent>) {
-    sendFailure(message.toComponent())
-}
-
-@Deprecated("Use adventure components instead")
-@JvmName("sendFailure1")
-fun CommandSourceStack.sendFailure(vararg message: BaseComponent) {
-    sendFailure(message.toComponent())
-}
-//</editor-fold>
 
 abstract class Command(val name: String) {
     

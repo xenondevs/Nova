@@ -1,9 +1,7 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -12,6 +10,8 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.gui.AbstractGui
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.addLoreLines
+import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.material.CoreGuiMaterial
@@ -20,8 +20,6 @@ import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.component.bungee.addLocalizedLoreLines
-import xyz.xenondevs.nova.util.component.bungee.localized
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.yaw
 
@@ -42,17 +40,17 @@ internal abstract class AbstractSideConfigGui<H : EndPointDataHolder>(
         else null to blockSide.blockFace
     }
     
-    fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Array<out BaseComponent> {
+    fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Component {
         return if (blockSide != null) {
-            ComponentBuilder()
-                .color(ChatColor.GRAY)
-                .append(TranslatableComponent("menu.nova.side_config.${blockSide.name.lowercase()}"))
-                .append(" (")
-                .append(TranslatableComponent("menu.nova.side_config.${blockFace.name.lowercase()}"))
-                .append(")")
-                .create()
+            Component.text()
+                .color(NamedTextColor.GRAY)
+                .append(Component.translatable("menu.nova.side_config.${blockSide.name.lowercase()}"))
+                .append(Component.text(" ("))
+                .append(Component.translatable("menu.nova.side_config.${blockFace.name.lowercase()}"))
+                .append(Component.text(")"))
+                .build()
         } else {
-            arrayOf(localized(ChatColor.GRAY, "menu.nova.side_config.${blockFace.name.lowercase()}"))
+            Component.translatable("menu.nova.side_config.${blockFace.name.lowercase()}", NamedTextColor.GRAY)
         }
     }
     
@@ -85,14 +83,18 @@ internal abstract class AbstractSideConfigGui<H : EndPointDataHolder>(
             val connectionType = holder.connectionConfig[blockFace]!! // fixme: Unsafe network value access. Should only be accessed from NetworkManager thread.
             return when (connectionType) {
                 NetworkConnectionType.NONE ->
-                    CoreGuiMaterial.GRAY_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GRAY, "menu.nova.side_config.none")
+                    CoreGuiMaterial.GRAY_BTN.createClientsideItemBuilder()
+                        .addLoreLines(Component.translatable("menu.nova.side_config.none", NamedTextColor.GRAY))
                 NetworkConnectionType.EXTRACT ->
-                    CoreGuiMaterial.ORANGE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GOLD, "menu.nova.side_config.output")
+                    CoreGuiMaterial.ORANGE_BTN.createClientsideItemBuilder()
+                        .addLoreLines(Component.translatable( "menu.nova.side_config.output", NamedTextColor.GOLD))
                 NetworkConnectionType.INSERT ->
-                    CoreGuiMaterial.BLUE_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.AQUA, "menu.nova.side_config.input")
+                    CoreGuiMaterial.BLUE_BTN.createClientsideItemBuilder()
+                        .addLoreLines(Component.translatable("menu.nova.side_config.input", NamedTextColor.AQUA))
                 NetworkConnectionType.BUFFER ->
-                    CoreGuiMaterial.GREEN_BTN.createClientsideItemBuilder().addLocalizedLoreLines(ChatColor.GREEN, "menu.nova.side_config.input_output")
-            }.setDisplayName(*getSideName(blockSide, blockFace))
+                    CoreGuiMaterial.GREEN_BTN.createClientsideItemBuilder()
+                        .addLoreLines(Component.translatable("menu.nova.side_config.input_output", NamedTextColor.GREEN))
+            }.setDisplayName(getSideName(blockSide, blockFace))
         }
     
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

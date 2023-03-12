@@ -1,9 +1,7 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -16,17 +14,22 @@ import xyz.xenondevs.invui.gui.structure.Structure
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.ControlItem
 import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.changeTitle
+import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
-import xyz.xenondevs.nova.ui.overlay.character.DefaultFont
-import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
+import xyz.xenondevs.nova.util.component.adventure.font
+import xyz.xenondevs.nova.util.component.adventure.move
+import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.playClickSound
 import java.util.*
@@ -41,7 +44,7 @@ fun Player.showRecipes(id: String): Boolean {
         return true
     } else if (info != null) {
         closeInventory()
-        spigot().sendMessage(TranslatableComponent(info))
+        sendMessage(Component.translatable(info))
         return true
     }
     return false
@@ -57,7 +60,7 @@ fun Player.showUsages(id: String): Boolean {
         return true
     } else if (info != null) {
         closeInventory()
-        spigot().sendMessage(TranslatableComponent(info))
+        sendMessage(Component.translatable(info))
         return true
     }
     return false
@@ -131,23 +134,17 @@ private class RecipesWindow(
         }.apply { open() }
     }
     
-    private fun getCurrentTitle(): Array<out BaseComponent> {
+    private fun getCurrentTitle(): Component {
         val currentTab = mainGui.tabs[mainGui.currentTab] as PagedGui<*>
         val pageNumberString = "${currentTab.currentPage + 1} / ${currentTab.pageAmount}"
-        
-        return ComponentBuilder()
-            .append(MoveCharacters.getMovingBungeeComponent(-8)) // move to side to place overlay
+        val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
+        return Component.text()
+            .move(-8) // move to side to place overlay
             .append(currentType.texture.component)
-            .append(MoveCharacters.getMovingBungeeComponent(-84)) // move back to the middle
-            .append(MoveCharacters.getMovingBungeeComponent((
-                DefaultFont.getStringLength(pageNumberString) // this would be the string length in the default font
-                    + pageNumberString.replace(" ", "").length // non-space characters are generally one pixel bigger in this font
-                ) / -2 // divided by -2 to center it
-            ))
-            .append(pageNumberString)
-            .font("nova:recipes_numbers")
-            .color(ChatColor.WHITE)
-            .create()
+            .move(-84) // move back to the middle
+            .move(CharSizes.calculateComponentWidth(pageNumberComponent) / -2)
+            .append(pageNumberComponent)
+            .build()
     }
     
     private fun updateTitle() {
@@ -183,11 +180,11 @@ private class RecipesWindow(
         
         override fun getItemProvider(): ItemBuilder =
             ItemBuilder(Material.KNOWLEDGE_BOOK)
-                .setDisplayName(TranslatableComponent("menu.nova.recipe.item_info"))
+                .setDisplayName(Component.translatable("menu.nova.recipe.item_info"))
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             player.closeInventory()
-            player.spigot().sendMessage(TranslatableComponent(info))
+            player.sendMessage(Component.translatable(info))
         }
         
     }

@@ -2,12 +2,12 @@
 
 package xyz.xenondevs.nova.material
 
-import net.md_5.bungee.api.ChatColor
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.ListTag
-import net.minecraft.nbt.StringTag
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.world.item.ItemStack
@@ -34,12 +34,9 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.component.bungee.coloredText
-import xyz.xenondevs.nova.util.component.bungee.duplicate
-import xyz.xenondevs.nova.util.component.bungee.localized
-import xyz.xenondevs.nova.util.component.bungee.serialize
-import xyz.xenondevs.nova.util.component.bungee.serializeToNBT
-import xyz.xenondevs.nova.util.component.bungee.withoutPreFormatting
+import xyz.xenondevs.nova.util.component.adventure.toJson
+import xyz.xenondevs.nova.util.component.adventure.toNBT
+import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
@@ -222,21 +219,20 @@ internal object PacketItems : Initializable(), Listener {
         // name
         var itemDisplayName = packetItemData.name
         if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
-            if (itemTag.contains("Enchantments", NBTUtils.TAG_LIST) && itemDisplayName.size == 1) {
-                itemDisplayName = itemDisplayName.duplicate()
-                itemDisplayName[0].color = ChatColor.AQUA
+            if (itemTag.contains("Enchantments", NBTUtils.TAG_LIST) && itemDisplayName.children().isEmpty()) {
+                itemDisplayName = itemDisplayName.color(NamedTextColor.AQUA)
             }
             
-            displayTag.putString("Name", itemDisplayName.serialize())
+            displayTag.putString("Name", itemDisplayName.withoutPreFormatting().toJson())
         }
         
         // lore
         val loreTag = displayTag.getOrPut("Lore", ::ListTag)
         val itemDisplayLore = packetItemData.lore
-        itemDisplayLore?.forEach { loreTag += StringTag.valueOf(it.withoutPreFormatting().serialize()) }
+        itemDisplayLore?.forEach { loreTag += it.withoutPreFormatting().toNBT() }
         if (player != null && AdvancedTooltips.hasNovaTooltips(player)) {
-            packetItemData.advancedTooltipsLore?.forEach { loreTag += it.withoutPreFormatting().serializeToNBT() }
-            loreTag += coloredText(ChatColor.DARK_GRAY, id).withoutPreFormatting().serializeToNBT()
+            packetItemData.advancedTooltipsLore?.forEach { loreTag += it.withoutPreFormatting().toNBT() }
+            loreTag += Component.text(id, NamedTextColor.DARK_GRAY).withoutPreFormatting().toNBT()
             
             var cbfTagCount = 0
             var nbtTagCount = itemTag.allKeys.size - 1 // don't count 'nova' tag
@@ -248,9 +244,18 @@ internal object PacketItems : Initializable(), Listener {
             }
             
             if (cbfTagCount > 0)
-                loreTag += localized(ChatColor.DARK_GRAY, "item.cbf_tags", cbfTagCount).withoutPreFormatting().serializeToNBT()
+                loreTag += Component.translatable(
+                    "item.cbf_tags",
+                    NamedTextColor.DARK_GRAY,
+                    Component.text(cbfTagCount)
+                ).withoutPreFormatting().toNBT()
+            
             if (nbtTagCount > 0)
-                loreTag += localized(ChatColor.DARK_GRAY, "item.nbt_tags", nbtTagCount).withoutPreFormatting().serializeToNBT()
+                loreTag += Component.translatable(
+                    "item.nbt_tags",
+                    NamedTextColor.DARK_GRAY,
+                    Component.text(nbtTagCount)
+                ).withoutPreFormatting().toNBT()
         }
         //</editor-fold>
         
@@ -287,7 +292,7 @@ internal object PacketItems : Initializable(), Listener {
         val displayTag = CompoundTag().also { tag.put("display", it) }
         displayTag.putString(
             "Name",
-            coloredText(ChatColor.RED, "Unknown item: $id").withoutPreFormatting().serialize()
+            Component.text("Unknown item: $id", NamedTextColor.RED).withoutPreFormatting().toJson()
         )
         
         return newItemStack
@@ -320,19 +325,32 @@ internal object PacketItems : Initializable(), Listener {
             
             val maxDamage = newItemStack.item.maxDamage
             if (maxDamage > 0) {
-                loreTag += localized(
-                    ChatColor.WHITE,
+                loreTag += Component.translatable(
                     "item.durability",
-                    (maxDamage - newItemStack.damageValue).toString(),
-                    maxDamage.toString()
-                ).withoutPreFormatting().serializeToNBT()
+                    NamedTextColor.WHITE,
+                    Component.text(maxDamage - newItemStack.damageValue),
+                    Component.text(maxDamage)
+                ).withoutPreFormatting().toNBT()
             }
             
-            loreTag += coloredText(ChatColor.DARK_GRAY, BuiltInRegistries.ITEM.getKey(newItemStack.item).toString()).withoutPreFormatting().serializeToNBT()
+            loreTag += Component.translatable(
+                BuiltInRegistries.ITEM.getKey(newItemStack.item).toString(),
+                NamedTextColor.DARK_GRAY
+            ).withoutPreFormatting().toNBT()
+            
             if (cbfTagCount > 0)
-                loreTag += localized(ChatColor.DARK_GRAY, "item.cbf_tags", cbfTagCount).withoutPreFormatting().serializeToNBT()
+                loreTag += Component.translatable(
+                    "item.cbf_tags",
+                    NamedTextColor.DARK_GRAY,
+                    Component.text(cbfTagCount)
+                ).withoutPreFormatting().toNBT()
+            
             if (nbtTagCount > 0)
-                loreTag += localized(ChatColor.DARK_GRAY, "item.nbt_tags", nbtTagCount).withoutPreFormatting().serializeToNBT()
+                loreTag += Component.translatable(
+                    "item.nbt_tags",
+                    NamedTextColor.DARK_GRAY,
+                    Component.text(nbtTagCount)
+                ).withoutPreFormatting().toNBT()
         }
         //</editor-fold>
         

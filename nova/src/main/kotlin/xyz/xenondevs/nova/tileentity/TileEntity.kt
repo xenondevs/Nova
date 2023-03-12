@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity
 
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
 import net.minecraft.network.protocol.Packet
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -22,6 +21,7 @@ import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
 import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
 import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.Reloadable
@@ -239,7 +239,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder {
-        check(menuContainer != null) { "A TileEntityMenu class must be present to create an UpgradeHolder"}
+        check(menuContainer != null) { "A TileEntityMenu class must be present to create an UpgradeHolder" }
         return UpgradeHolder(this, menuContainer, ::reload, allowed.toHashSet())
     }
     
@@ -605,9 +605,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
         
-        open fun getTitle(): Array<out BaseComponent> {
+        open fun getTitle(): Component {
             return texture?.getTitle(material.localizedName)
-                ?: arrayOf(TranslatableComponent(material.localizedName))
+                ?: Component.translatable(material.localizedName)
         }
         
     }

@@ -94,7 +94,7 @@ object CharSizes {
     /**
      * Calculates the width of a component.
      */
-    fun calculateComponentWidth(component: Component, lang: String): Int {
+    fun calculateComponentWidth(component: Component, lang: String = "en_us"): Int {
         return calculateComponentSize(component, lang).width
     }
     

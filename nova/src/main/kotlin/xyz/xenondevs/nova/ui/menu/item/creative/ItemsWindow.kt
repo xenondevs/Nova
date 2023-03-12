@@ -1,9 +1,7 @@
 package xyz.xenondevs.nova.ui.menu.item.creative
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -13,10 +11,13 @@ import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.invui.window.AnvilWindow
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.changeTitle
+import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.material.ItemCategories
@@ -25,8 +26,8 @@ import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
-import xyz.xenondevs.nova.util.component.bungee.MovingComponentBuilder
-import xyz.xenondevs.nova.util.component.bungee.setLocalizedName
+import xyz.xenondevs.nova.util.component.adventure.move
+import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.searchFor
@@ -45,12 +46,12 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private val openSearchItem = clickableItem(
         CoreGuiMaterial.TP_SEARCH.createClientsideItemBuilder()
-            .setLocalizedName("menu.nova.items.search-item")
+            .setDisplayName(Component.translatable("menu.nova.items.search-item"))
     ) { openSearchWindow() }
     
     private val openMainWindowItem = clickableItem(
         CoreGuiMaterial.ARROW_1_UP.createClientsideItemBuilder()
-            .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.back")
+            .setDisplayName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
     ) { openMainWindow() }
     
     private val tabPagesGui = PagedGui.items()
@@ -137,19 +138,19 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         searchPreviewGui.setContent(filteredItems)
     }
     
-    private fun getMainWindowTitle(): Array<out BaseComponent> {
+    private fun getMainWindowTitle(): Component {
         return if (filter == "") {
-            MovingComponentBuilder()
+            Component.text()
                 .move(-8)
                 .append(TAB_BUTTON_TEXTURES[mainGui.currentTab % 5].component)
-                .create()
+                .build()
         } else {
-            val title = ComponentBuilder()
-                .append(TranslatableComponent("menu.nova.items"))
-                .append(" (").color(ChatColor.DARK_GRAY)
-                .append(filter).color(ChatColor.GRAY)
-                .append(")").color(ChatColor.DARK_GRAY)
-                .create()
+            val title = Component.text()
+                .append(Component.translatable("menu.nova.items"))
+                .append(Component.text(" (", NamedTextColor.DARK_GRAY))
+                .append(Component.text(filter, NamedTextColor.GRAY))
+                .append(Component.text(")", NamedTextColor.DARK_GRAY))
+                .build()
             
             CoreGuiTexture.EMPTY_GUI.getTitle(title)
         }
@@ -170,17 +171,16 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             setItem(0, textItem)
             setItem(2, clickableItem(
                 CoreGuiMaterial.X.createClientsideItemBuilder()
-                    .setLocalizedName(ChatColor.GRAY, "menu.nova.items.search.clear")
+                    .setDisplayName(Component.translatable("menu.nova.items.search.clear", NamedTextColor.GRAY))
             ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
         }
         
-        val title = MovingComponentBuilder()
+        val title = Component.text()
             .move(-60)
             .append(CoreGuiTexture.SEARCH.component)
             .moveToStart()
-            .append(TranslatableComponent("menu.nova.items.search"))
-            .font("default").color(ChatColor.DARK_GRAY)
-            .create()
+            .append(Component.translatable("menu.nova.items.search", NamedTextColor.DARK_GRAY))
+            .build()
         
         currentWindow = AnvilWindow.split {
             it.setViewer(player)

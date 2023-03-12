@@ -33,9 +33,7 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlayCompound
 import xyz.xenondevs.nova.ui.overlay.character.MovedFonts
-import xyz.xenondevs.nova.util.component.adventure.adventureName
 import xyz.xenondevs.nova.util.component.adventure.move
-import xyz.xenondevs.nova.util.component.adventure.toJson
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -125,7 +123,7 @@ object BossBarOverlayManager : Initializable(), Listener {
         val locale = player.locale
         
         // clear bars
-        bars.forEach { it.nmsName = MojangComponent.literal("") }
+        bars.forEach { it.name = MojangComponent.literal("") }
         
         // group sorted fixed bars by bar level
         val groupedFixedOverlays = groupOverlaysByBarLevel(
@@ -311,7 +309,7 @@ object BossBarOverlayManager : Initializable(), Listener {
                     // update the values in the boss bar
                     val bar = trackedBars[player]?.get(id) ?: return
                     when (operation) {
-                        is UpdateNameBossBarOperation -> bar.nmsName = operation.name
+                        is UpdateNameBossBarOperation -> bar.name = operation.name
                         is UpdateProgressBossBarOperation -> bar.progress = operation.progress
                         
                         is UpdateStyleBossBarOperation -> {

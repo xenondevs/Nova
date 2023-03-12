@@ -9,14 +9,25 @@ import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.BaseComponent
+import net.minecraft.nbt.StringTag
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
-import xyz.xenondevs.nmsutils.bossbar.BossBar
+import org.bukkit.entity.Player
+import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import java.awt.Color
 import net.minecraft.network.chat.Component as MojangComponent
+
+fun Player.sendMessage(component: Component) {
+    spigot().sendMessage(*component.toBungeeComponent())
+}
+
+fun Player.sendMessage(type: ChatMessageType, component: Component) {
+    spigot().sendMessage(type, *component.toBungeeComponent())
+}
 
 fun MojangComponent.toAdventureComponent(): Component {
     return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(this))
@@ -46,6 +57,10 @@ fun Component.toJson(): String {
     return GsonComponentSerializer.gson().serialize(this)
 }
 
+fun Component.toNBT(): StringTag {
+    return StringTag.valueOf(toJson())
+}
+
 fun Component.toPlainText(locale: String = "en_us"): String {
     return PlainTextComponentConverter.toPlainText(this, locale)
 }
@@ -58,40 +73,34 @@ fun Component.fontName(): String? {
     return font()?.toString()
 }
 
-fun <C: BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.font(font: String): B {
+fun Component.withoutPreFormatting(): Component {
+    return AdventureComponentUtils.withoutPreFormatting(this)
+}
+
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.font(font: String): B {
     return font(Key.key(font))
 }
 
-fun <C: BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.color(color: Color): B {
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.color(color: Color): B {
     return color(TextColor.color(color.rgb))
 }
 
-fun <C: BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.append(fontChar: FontChar): B {
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.append(fontChar: FontChar): B {
     return append(fontChar.component)
 }
 
-fun <C: BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.move(distance: Int): B {
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.move(distance: Int): B {
     return append(MoveCharacters.getMovingComponent(distance))
 }
 
-fun <C: BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToStart(lang: String): B {
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToStart(lang: String = "en_us"): B {
     return move(-CharSizes.calculateComponentWidth(build(), lang))
 }
 
-fun <C: BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToCenter(lang: String): B {
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToCenter(lang: String = "en_us"): B {
     return move(-CharSizes.calculateComponentWidth(build(), lang))
 }
 
-fun <C: BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(lang: String, afterStart: Int): B {
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(afterStart: Int, lang: String = "en_us"): B {
     return move(-CharSizes.calculateComponentWidth(build(), lang) + afterStart)
 }
-
-fun <C: BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(afterStart: Int): B {
-    return moveTo("en_us", afterStart)
-}
-
-var BossBar.adventureName: Component
-    get() = nmsName.toAdventureComponent()
-    set(value) {
-        nmsName = value.toNMSComponent()
-    }

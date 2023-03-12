@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info
 
 import net.kyori.adventure.text.Component
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -10,28 +8,8 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
-import xyz.xenondevs.nova.util.component.bungee.MovingComponentBuilder
 
 data class WailaLine(val text: Component, val alignment: Alignment) {
-    
-    @Deprecated("Use adventure components instead")
-    constructor(components: Array<BaseComponent>, alignment: Alignment) : this(
-        components.toAdventureComponent(),
-        alignment
-    )
-    
-    @Deprecated("Use adventure components instead")
-    constructor(builder: ComponentBuilder, alignment: Alignment) : this(
-        builder.create().toAdventureComponent(),
-        alignment
-    )
-    
-    @Deprecated("Use adventure components instead")
-    constructor(builder: MovingComponentBuilder, alignment: Alignment) : this(
-        builder.create().toAdventureComponent(),
-        alignment
-    )
     
     enum class Alignment {
         LEFT,
