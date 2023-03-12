@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar
 
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.minecraft.network.chat.Component
+import net.kyori.adventure.text.Component
+import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -10,7 +10,9 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status
+import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitTask
+import xyz.xenondevs.inventoryaccess.util.ReflectionRegistry
 import xyz.xenondevs.nmsutils.bossbar.BossBar
 import xyz.xenondevs.nmsutils.bossbar.operation.AddBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.RemoveBossBarOperation
@@ -20,11 +22,18 @@ import xyz.xenondevs.nmsutils.bossbar.operation.UpdatePropertiesBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.UpdateStyleBossBarOperation
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
-import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
+import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
+import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
+import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
+import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlay
+import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlayCompound
+import xyz.xenondevs.nova.ui.overlay.character.MovedFonts
+import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -32,7 +41,10 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.unregisterEvents
 import xyz.xenondevs.nova.util.unregisterPacketListener
 import java.util.*
+import kotlin.math.max
+import net.minecraft.network.chat.Component as MojangComponent
 
+private val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.enabled") }
 private val BAR_AMOUNT by configReloadable { DEFAULT_CONFIG.getInt("overlay.bossbar.amount") }
 private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.send_bars_after_resource_pack_loaded") }
 
@@ -43,11 +55,12 @@ object BossBarOverlayManager : Initializable(), Listener {
     
     private var tickTask: BukkitTask? = null
     private val bars = HashMap<UUID, Array<BossBar>>()
-    private val overlays = HashMap<UUID, ArrayList<BossBarOverlay>>()
+    private val overlays = HashMap<UUID, ArrayList<BossBarOverlayCompound>>()
     private val changes = HashSet<UUID>()
     
-    internal val trackedBars = HashMap<Player, LinkedHashMap<UUID, BossBar>>()
-    internal val isEnabled by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.enabled") }
+    private val trackedOrigins = HashMap<UUID, BarOrigin>()
+    private val trackedBars = HashMap<Player, LinkedHashMap<UUID, BossBar>>()
+    private val vanillaBarOverlays = HashMap<BossBar, VanillaBossBarOverlayCompound>()
     
     override fun init() = reload()
     
@@ -59,18 +72,23 @@ object BossBarOverlayManager : Initializable(), Listener {
             Bukkit.getOnlinePlayers().forEach(::removeBars)
             tickTask?.cancel()
             tickTask = null
+            
+            if (!ENABLED) {
+                // re-add tracked boss bars as real boss bars
+                trackedBars.forEach { (player, bars) ->
+                    bars.values.forEach { bar -> player.send(bar.addPacket) }
+                }
+                
+                // clear tracked bars to prevent them from being sent again
+                trackedBars.clear()
+            }
         }
         
-        if (isEnabled) {
+        if (ENABLED) {
             registerEvents()
             registerPacketListener()
             tickTask = runTaskTimer(0, 1, ::handleTick)
             Bukkit.getOnlinePlayers().forEach(::sendBars)
-        } else {
-            // re-add tracked boss bars as real boss bars
-            trackedBars.forEach { (player, bars) ->
-                bars.values.forEach { bar -> player.send(bar.addPacket) }
-            }
         }
     }
     
@@ -78,59 +96,21 @@ object BossBarOverlayManager : Initializable(), Listener {
         Bukkit.getOnlinePlayers().forEach(::removeBars)
     }
     
-    fun registerOverlay(player: Player, overlay: BossBarOverlay) {
+    fun registerOverlay(player: Player, overlay: BossBarOverlayCompound) {
         val uuid = player.uniqueId
         overlays.getOrPut(uuid, ::ArrayList) += overlay
         changes += uuid
     }
     
-    fun registerBackgroundOverlay(player: Player, overlay: BossBarOverlay) {
-        val uuid = player.uniqueId
-        overlays.getOrPut(uuid, ::ArrayList).add(0, overlay)
-        changes += uuid
-    }
-    
-    fun registerOverlays(player: Player, overlays: Iterable<BossBarOverlay>) {
-        val uuid = player.uniqueId
-        this.overlays.getOrPut(uuid, ::ArrayList) += overlays
-        changes += uuid
-    }
-    
-    fun unregisterOverlay(player: Player, overlay: BossBarOverlay) {
+    fun unregisterOverlay(player: Player, overlay: BossBarOverlayCompound) {
         val uuid = player.uniqueId
         val changed = overlays.getOrPut(uuid, ::ArrayList).remove(overlay)
         if (changed) changes += uuid
     }
     
-    fun unregisterOverlays(player: Player, overlays: Iterable<BossBarOverlay>) {
-        val uuid = player.uniqueId
-        val changed = this.overlays.getOrPut(uuid, ::ArrayList).removeAll(overlays.toSet())
-        if (changed) changes += uuid
-    }
-    
-    fun unregisterOverlayIf(player: Player, predicate: (BossBarOverlay) -> Boolean) {
-        val uuid = player.uniqueId
-        val changed = overlays[uuid]?.removeIf(predicate) ?: false
-        if (changed) changes += uuid
-    }
-    
-    fun getEndY(player: Player): Int {
-        val overlays = overlays[player.uniqueId] ?: return 0
-        var endY = 0
-        overlays.asSequence()
-            .filter { it !is FakeBossBarOverlay }
-            .forEach {
-                val curEndY = it.barLevel * -19 + it.getEndY(player.locale)
-                if (curEndY < endY)
-                    endY = curEndY
-            }
-        
-        return endY
-    }
-    
     private fun handleTick() {
         overlays.forEach { (uuid, overlays) ->
-            if (uuid in changes || overlays.any { it.changed }) {
+            if (uuid in changes || overlays.any { it.hasChanged }) {
                 if (remakeBars(uuid)) changes -= uuid
             }
         }
@@ -140,39 +120,120 @@ object BossBarOverlayManager : Initializable(), Listener {
         val overlays = overlays[playerUUID] ?: return false
         val bars = bars[playerUUID] ?: return false
         val player = Bukkit.getPlayer(playerUUID) ?: return false
+        val locale = player.locale
         
         // clear bars
-        bars.forEach { it.nmsName = Component.literal("") }
+        bars.forEach { it.name = MojangComponent.literal("") }
         
-        overlays
-            .groupBy { it.barLevel }
-            .forEach { (barLevel, overlays) ->
-                val builder = ComponentBuilder()
-                overlays.forEach {
-                    // reset changed state
-                    it.changed = false
+        // group sorted fixed bars by bar level
+        val groupedFixedOverlays = groupOverlaysByBarLevel(
+            overlays.asSequence()
+                .filter { it.positioning is BarPositioning.Fixed }
+                .toList().let(BarPositioning::sort).reversed().asSequence()
+        ) { (it.positioning as BarPositioning.Fixed).offset }
+        
+        // group sorted dynamic bars by bar level
+        val dynamicOffsets = calculateDynamicOverlayCompoundOffsets(overlays, locale)
+        val groupedDynamicOverlays = groupOverlaysByBarLevel(
+            overlays.asSequence().filter { it.positioning is BarPositioning.Dynamic }
+        ) { dynamicOffsets[it] ?: throw NoSuchElementException("Could not find calculated dynamic offset for: $it") }
+        
+        // build new bars
+        bars.forEachIndexed { barLevel, bar ->
+            val barLevelOverlays = (groupedFixedOverlays[barLevel] ?: emptyList()) + (groupedDynamicOverlays[barLevel] ?: emptyList())
+            if (barLevelOverlays.isEmpty())
+                return@forEachIndexed
+            
+            val builder = Component.text()
+            barLevelOverlays.forEach { (overlay, offset) ->
+                
+                val centerX = overlay.centerX
+                var width = overlay.getWidth(player.locale)
+                if (centerX != null) {
+                    val preMove = centerX - width / 2
+                    builder.move(preMove)
                     
-                    val centerX = it.centerX
-                    var width = it.getWidth(player.locale)
-                    if (centerX != null) {
-                        val preMove = centerX - width / 2
-                        builder.append(MoveCharacters.getMovingComponent(preMove))
-                        
-                        width += preMove
-                    }
-                    
-                    builder
-                        .append(it.components)
-                        .append(MoveCharacters.getMovingComponent(-width))
+                    width += preMove
                 }
                 
-                bars[barLevel].name = builder.create()
+                builder
+                    .append(MovedFonts.moveVertically(overlay.component, offset, true))
+                    .move(-width)
             }
+            
+            bar.adventureName = builder.build()
+        }
+        
+        // reset changed state
+        overlays.forEach { it.hasChanged = false }
         
         // send update
         bars.forEach { player.send(it.updateNamePacket) }
         
         return true
+    }
+    
+    private fun calculateDynamicOverlayCompoundOffsets(
+        overlays: ArrayList<BossBarOverlayCompound>,
+        locale: String
+    ): Map<BossBarOverlayCompound, Int> {
+        // dynamic overlay compounds, sorted by positioning (from top to bottom)
+        val sortedDynamicOverlays = overlays.asSequence()
+            .filter { it.positioning is BarPositioning.Dynamic } // only include dynamic overlays
+            .toList()
+            .let(BarPositioning::sort)
+        
+        val offsets = HashMap<BossBarOverlayCompound, Int>()
+        
+        var offset = 0
+        var prevPositioning: BarPositioning.Dynamic? = null
+        var prevVerticalRange: IntRange? = null
+        for (compound in sortedDynamicOverlays) {
+            val positioning = compound.positioning as BarPositioning.Dynamic
+            val verticalRange = compound.getVerticalRange(locale)
+            
+            if (prevPositioning != null && prevVerticalRange != null) {
+                // move the offset just below the previous overlay
+                offset += prevVerticalRange.last + 1
+                
+                // move the offset down by the amount of pixels that it draws upwards to prevent it from overlapping with the previous overlay
+                // this is intentionally only done if this is not the first overlay in order to not have awkward gaps at the top
+                offset += 0 - verticalRange.first
+                
+                // apply margin
+                val marginTop = positioning.marginTop
+                val prevMarginBottom = prevPositioning.marginBottom
+                
+                offset += max(marginTop, prevMarginBottom)
+            }
+            
+            // set offset for this overlay
+            offsets[compound] = offset
+            
+            prevPositioning = positioning
+            prevVerticalRange = verticalRange
+        }
+        
+        return offsets
+    }
+    
+    private fun groupOverlaysByBarLevel(
+        overlays: Sequence<BossBarOverlayCompound>,
+        offsetReceiver: (BossBarOverlayCompound) -> Int
+    ): Map<Int, List<Pair<BossBarOverlay, Int>>> {
+        val groupedOverlays = HashMap<Int, ArrayList<Pair<BossBarOverlay, Int>>>()
+        
+        for (compound in overlays) {
+            for (overlay in compound.overlays) {
+                val totalOffset = offsetReceiver(compound) + overlay.offset
+                val barLevel = (totalOffset / 19.0).toInt()
+                val inBarOffset = totalOffset % 19
+                
+                groupedOverlays.getOrPut(barLevel, ::ArrayList) += overlay to inBarOffset
+            }
+        }
+        
+        return groupedOverlays
     }
     
     private fun sendBars(player: Player) {
@@ -204,8 +265,13 @@ object BossBarOverlayManager : Initializable(), Listener {
     @EventHandler
     private fun handleQuit(event: PlayerQuitEvent) {
         val player = event.player
-        trackedBars -= player
-        unregisterOverlayIf(player) { it is FakeBossBarOverlay }
+        
+        // remove tracked bars and associated fake bar overlays
+        trackedBars.remove(player)?.forEach { (_, bar) ->
+            val compound = vanillaBarOverlays.remove(bar)
+            if (compound != null)
+                unregisterOverlay(player, compound)
+        }
     }
     
     @PacketHandler(ignoreIfCancelled = true)
@@ -219,45 +285,68 @@ object BossBarOverlayManager : Initializable(), Listener {
                 is AddBossBarOperation -> {
                     val bar = BossBar.of(id, operation)
                     // add the bar to the tracked bar map
-                    trackedBars.getOrPut(player, ::LinkedHashMap)[id] = bar
+                    val trackedPlayerBars = trackedBars.getOrPut(player, ::LinkedHashMap)
+                    trackedPlayerBars[id] = bar
+                    
                     // create a fake bar for rendering
-                    registerOverlay(player, FakeBossBarOverlay(player, bar))
+                    val fakeBarOverlay = VanillaBossBarOverlay(player, bar)
+                    val matchInfo = BarMatchInfo(bar, trackedPlayerBars.values.indexOf(bar), trackedOrigins[id] ?: BarOrigin.Minecraft)
+                    val compound = VanillaBossBarOverlayCompound(fakeBarOverlay, matchInfo)
+                    vanillaBarOverlays[bar] = compound
+                    registerOverlay(player, compound)
                 }
                 
                 is RemoveBossBarOperation -> {
                     // remove from tracked bars map
                     val bar = trackedBars[player]?.remove(id)
-                    // remove the fake bar associated with it
-                    unregisterOverlayIf(player) { it is FakeBossBarOverlay && it.bar == bar }
+                    
+                    // remove associated fake bar overlay
+                    val compound = vanillaBarOverlays.remove(bar)
+                    if (compound != null) unregisterOverlay(player, compound)
                 }
                 
                 else -> {
                     // update the values in the boss bar
-                    val bossBar = trackedBars[player]?.get(id) ?: return
+                    val bar = trackedBars[player]?.get(id) ?: return
                     when (operation) {
-                        is UpdateNameBossBarOperation -> bossBar.nmsName = operation.name
-                        is UpdateProgressBossBarOperation -> bossBar.progress = operation.progress
+                        is UpdateNameBossBarOperation -> bar.name = operation.name
+                        is UpdateProgressBossBarOperation -> bar.progress = operation.progress
                         
                         is UpdateStyleBossBarOperation -> {
-                            bossBar.color = operation.color
-                            bossBar.overlay = operation.overlay
+                            bar.color = operation.color
+                            bar.overlay = operation.overlay
                         }
                         
                         is UpdatePropertiesBossBarOperation -> {
-                            bossBar.darkenScreen = operation.darkenScreen
-                            bossBar.playMusic = operation.playMusic
-                            bossBar.createWorldFog = operation.createWorldFog
+                            bar.darkenScreen = operation.darkenScreen
+                            bar.playMusic = operation.playMusic
+                            bar.createWorldFog = operation.createWorldFog
                         }
                         
                         else -> throw UnsupportedOperationException()
                     }
                     
                     // mark fake bar overlay changes
-                    overlays[player.uniqueId]
-                        ?.first { it is FakeBossBarOverlay && it.bar == bossBar }
-                        ?.changed = true
+                    val compound = vanillaBarOverlays[bar] ?: return
+                    compound.matchInfo = compound.matchInfo.copy(barIndex = trackedBars[player]?.values?.indexOf(bar))
+                    compound.overlay.update()
+                    compound.hasChanged = true
                 }
             }
+        }
+    }
+    
+    internal fun handleBossBarAddPacketCreation(event: BossEvent) {
+        var plugin: Plugin? = null
+        StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).forEach {
+            val classLoader = it.declaringClass.classLoader
+            if (classLoader?.javaClass == ReflectionRegistry.PLUGIN_CLASS_LOADER_CLASS) {
+                plugin = ReflectionRegistry.PLUGIN_CLASS_LOADER_PLUGIN_FIELD.get(classLoader) as Plugin
+            }
+        }
+        
+        if (plugin != null && plugin != NOVA.loader) {
+            trackedOrigins[event.id] = BarOrigin.Plugin(plugin!!)
         }
     }
     

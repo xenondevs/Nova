@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.waila.info
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.NamespacedId
@@ -81,8 +81,8 @@ object WailaInfoProviderRegistry {
         val blockName = CustomItemServiceManager.getName(block, player.locale) ?: return null
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(ComponentBuilder().append(blockName).create(), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(ComponentBuilder(blockId.toString()).color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(blockName, WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.text(blockId.toString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getCustomItemServiceToolLine(player, block)
         
         return WailaInfo(blockId, lines)

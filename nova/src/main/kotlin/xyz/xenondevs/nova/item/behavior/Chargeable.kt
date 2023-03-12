@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.item.behavior
 
-import net.md_5.bungee.api.chat.TextComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
@@ -88,7 +89,7 @@ class Chargeable(
     override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
         val energy = getEnergy(data)
         
-        itemData.addLore(TextComponent.fromLegacyText("§7" + NumberFormatUtils.getEnergyString(energy, options.maxEnergy)))
+        itemData.addLore(Component.text(NumberFormatUtils.getEnergyString(energy, options.maxEnergy), NamedTextColor.GRAY))
         
         if (affectsItemDurability)
             itemData.durabilityBar = energy.toDouble() / options.maxEnergy.toDouble()

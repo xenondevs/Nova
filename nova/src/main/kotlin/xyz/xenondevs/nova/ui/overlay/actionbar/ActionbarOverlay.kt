@@ -1,19 +1,19 @@
 package xyz.xenondevs.nova.ui.overlay.actionbar
 
-import net.md_5.bungee.api.chat.BaseComponent
+import net.kyori.adventure.text.Component
 import xyz.xenondevs.nova.data.resources.CharSizes
 
 interface ActionbarOverlay {
     
     /**
-     * The components to display.
+     * The component to display.
      */
-    val components: Array<BaseComponent>
+    val component: Component
     
     /**
-     * The width of the [components] in pixels.
+     * The width of the [component] in pixels.
      */
     fun getWidth(locale: String): Int =
-        CharSizes.calculateComponentWidth(components, locale)
+        CharSizes.calculateComponentWidth(component, locale)
     
 }

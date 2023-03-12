@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.config.side
 
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -8,6 +8,7 @@ import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkType
@@ -117,7 +118,7 @@ class SideConfigMenu(
     fun openWindow(player: Player) {
         Window.single {
             it.setViewer(player)
-            it.setTitle(arrayOf(TranslatableComponent("menu.nova.side_config")))
+            it.setTitle(Component.translatable("menu.nova.side_config"))
             it.setGui(mainGui)
         }.open()
     }

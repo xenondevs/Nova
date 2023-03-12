@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.command.impl
 
 import com.mojang.brigadier.context.CommandContext
-import net.md_5.bungee.api.ChatColor
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.commands.CommandSourceStack
 import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.executesCatching
@@ -10,7 +11,6 @@ import xyz.xenondevs.nova.command.requiresPlayerPermission
 import xyz.xenondevs.nova.command.sendFailure
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.ui.menu.item.recipes.showRecipes
-import xyz.xenondevs.nova.util.data.localized
 
 internal object NovaRecipeCommand : Command("nvrecipe") {
     
@@ -30,8 +30,8 @@ internal object NovaRecipeCommand : Command("nvrecipe") {
         val item = player.inventory.itemInMainHand
         if (!item.type.isAir) {
             if (!player.showRecipes(item))
-                ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.recipe.no-recipe"))
-        } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.no-item-in-hand"))
+                ctx.source.sendFailure(Component.translatable("command.nova.recipe.no-recipe", NamedTextColor.RED))
+        } else ctx.source.sendFailure(Component.translatable("command.nova.no-item-in-hand", NamedTextColor.RED))
     }
     
 }

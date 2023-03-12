@@ -4,14 +4,10 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
+import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProviderRegistry
-import xyz.xenondevs.nova.ui.waila.info.WailaLine
-import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
-import xyz.xenondevs.nova.ui.waila.overlay.WailaImageOverlay
-import xyz.xenondevs.nova.ui.waila.overlay.WailaLineOverlay
+import xyz.xenondevs.nova.ui.waila.overlay.WailaOverlayCompound
 import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
@@ -32,8 +28,9 @@ internal class Waila(val player: Player) {
     private var lookingAt: BlockPos? = null
     
     private var active = false
-    private val imageOverlay = WailaImageOverlay()
-    private val lineOverlays = Array(10, ::WailaLineOverlay).toList()
+    private val overlay = WailaOverlayCompound(player)
+    
+    private var prevInfo: WailaInfo? = null
     
     fun setActive(active: Boolean) {
         if (this.active == active)
@@ -42,9 +39,9 @@ internal class Waila(val player: Player) {
         this.active = active
         
         if (active) {
-            BossBarOverlayManager.registerBackgroundOverlay(player, imageOverlay)
+            BossBarOverlayManager.registerOverlay(player, overlay)
         } else {
-            BossBarOverlayManager.unregisterOverlayIf(player) { it == imageOverlay || it in lineOverlays }
+            BossBarOverlayManager.unregisterOverlay(player, overlay)
         }
     }
     
@@ -75,53 +72,18 @@ internal class Waila(val player: Player) {
             if (blockId in BLACKLISTED_BLOCKS)
                 return false
             
-            val info = WailaInfoProviderRegistry.getInfo(player, pos) ?: return false
-            val lines = info.lines
-            require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
+            val info = WailaInfoProviderRegistry.getInfo(player, pos)
+                ?: return false
             
-            val icon = Resources.getWailaIconCharOrNull(info.icon)
-            val (beginX, centerX) = imageOverlay.update(icon, lines.size, lines.maxOf { CharSizes.calculateComponentWidth(it.components, player.locale) })
-            
-            BossBarOverlayManager.unregisterOverlays(player, lineOverlays)
-            lineOverlays.forEachIndexed { idx, overlay ->
-                if (lines.size <= idx) {
-                    overlay.clear()
-                    return@forEachIndexed
-                }
-                
-                val (text, alignment) = lines[idx]
-                overlay.text = text
-                overlay.centered = alignment == Alignment.CENTERED
-                overlay.x = when (alignment) {
-                    Alignment.LEFT -> beginX
-                    Alignment.CENTERED -> centerX
-                    Alignment.FIRST_LINE -> getBeginX(lines, 0, beginX, centerX)
-                    Alignment.PREVIOUS_LINE -> getBeginX(lines, idx - 1, beginX, centerX)
-                }
-                overlay.changed = true
-                
-                BossBarOverlayManager.registerOverlay(player, overlay)
+            if (info != prevInfo) {
+                prevInfo = info
+                overlay.update(info.icon, info.lines)
             }
             
             return true
         }
         
         return false
-    }
-    
-    private fun getBeginX(lines: List<WailaLine>, lineNumber: Int, beginX: Int, centerX: Int): Int {
-        var currentLineNumber = lineNumber
-        while (true) {
-            val line = lines[currentLineNumber]
-            
-            when (line.alignment) {
-                Alignment.LEFT -> return beginX
-                Alignment.CENTERED -> return centerX - CharSizes.calculateComponentWidth(line.components, player.locale) / 2
-                
-                Alignment.FIRST_LINE -> currentLineNumber = 0
-                Alignment.PREVIOUS_LINE -> currentLineNumber--
-            }
-        }
     }
     
 }

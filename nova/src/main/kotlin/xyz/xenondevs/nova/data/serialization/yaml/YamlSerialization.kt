@@ -7,6 +7,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.configuration.serialization.ConfigurationSerialization
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.commons.reflection.classifierClass
+import xyz.xenondevs.nova.data.serialization.yaml.serializer.BarMatcherSerializer
 import xyz.xenondevs.nova.data.serialization.yaml.serializer.PotionEffectSerializer
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -41,6 +42,7 @@ internal object YamlSerialization {
     
     init {
         registerSerializer(PotionEffectSerializer)
+        registerSerializer(BarMatcherSerializer)
     }
     
     inline fun <reified T> registerSerializer(serializer: YamlSerializer<T>) {

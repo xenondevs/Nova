@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.item.impl
 
+import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.ChatMessageType
-import net.md_5.bungee.api.chat.TranslatableComponent
 import org.bukkit.NamespacedKey
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
+import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.swingHand
@@ -75,7 +76,7 @@ internal object WrenchBehavior : ItemBehavior() {
             val currentMode = itemStack.wrenchMode
             val newMode = NETWORK_TYPES[(NETWORK_TYPES.indexOf(currentMode) + 1) % NETWORK_TYPES.size]
             itemStack.wrenchMode = newMode
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TranslatableComponent("item.nova.wrench.mode.${newMode.id.toString(".")}"))
+            player.sendMessage(ChatMessageType.ACTION_BAR, Component.translatable("item.nova.wrench.mode.${newMode.id.toString(".")}"))
         }
     }
     

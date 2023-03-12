@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.ibm.icu.impl.CurrencyData.provider
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import xyz.xenondevs.commons.gson.addAll
@@ -63,11 +64,7 @@ internal class BitmapFontGenerator(
         val textureTemplate = provider.getStringOrNull("template")!!
         
         val glyphSizes: ByteBuf = Unpooled.wrappedBuffer(sizesPath.findInAssets().readBytes())
-        val unicodePages: Array<BufferedImage?> = Array(256) {
-            val hexPageNum = UNICODE_PAGE_FORMAT.format(it)
-            val path = ResourcePath.of(textureTemplate.format(hexPageNum)).findInAssetsOrNull("textures")
-            path?.let(Path::readImage)
-        }
+        val unicodePages = getUnicodePages(textureTemplate)
         
         val sortedGlyphs = extractAndSortGlyphs(glyphSizes, unicodePages)
         return sortedGlyphs.map { (width, glyphs) ->
@@ -163,6 +160,63 @@ internal class BitmapFontGenerator(
         }
         
         return provider
+    }
+ 
+    // TODO: deduplicate code
+    companion object {
+    
+        /**
+         * Retrieves an array of all unicode pages used by that font.
+         */
+        fun getUnicodePages(template: String): Array<BufferedImage?> {
+            return Array(256) {
+                val hexPageNum = UNICODE_PAGE_FORMAT.format(it)
+                val path = ResourcePath.of(template.format(hexPageNum)).findInAssetsOrNull("textures")
+                path?.let(Path::readImage)
+            }
+        }
+    
+        /**
+         * Reads all glyphs defined in the `legacy_unicode` font [provider] and extracts them from their unicode pages.
+         * 
+         * @return A map in the format `Map<Char Code, Glyph Image>`
+         */
+        fun extractGlyphs(legacyUnicodeProvider: JsonObject): Map<Int, BufferedImage> {
+            val sizesPath = ResourcePath.of(legacyUnicodeProvider.getStringOrNull("sizes")!!, "minecraft")
+            val textureTemplate = legacyUnicodeProvider.getStringOrNull("template")!!
+    
+            val glyphSizes: ByteBuf = Unpooled.wrappedBuffer(sizesPath.findInAssets().readBytes())
+            val unicodePages = getUnicodePages(textureTemplate)
+            
+            return extractGlyphs(glyphSizes, unicodePages)
+        }
+    
+        /**
+         * Reads all glyphs present in the [glyphSizes] buffer and extracts them from their [unicodePage][unicodePages].
+         *
+         * @return A map in the format `Map<Char Code, Glyph Image>`
+         */
+        fun extractGlyphs(glyphSizes: ByteBuf, unicodePages: Array<BufferedImage?>): Map<Int, BufferedImage> {
+            val glyphs = HashMap<Int, BufferedImage>()
+        
+            for (c in 0..0xFFFF) {
+                val pageNumber = c shr 8
+                val row = c shr 4 and 0xF
+                val colum = c and 0xF
+            
+                val size = glyphSizes.readUnsignedByte().toInt()
+                val start = size shr 4 and 0xF
+                val end = size and 0xF
+                val width = end - start + 1
+            
+                val page = unicodePages[pageNumber] ?: continue
+            
+                glyphs[c] = page.getSubimage(colum * 16 + start, row * 16, width, 16)
+            }
+        
+            return glyphs
+        }
+        
     }
     
 }

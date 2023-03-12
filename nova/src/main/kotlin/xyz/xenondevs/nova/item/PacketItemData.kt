@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.item
 
-import net.md_5.bungee.api.chat.BaseComponent
+import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 
@@ -15,17 +15,17 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * The displayed name of this item.
      */
-    var name: Array<BaseComponent>? = null
+    var name: Component? = null
     
     /**
      * The displayed lore of this item.
      */
-    var lore: MutableList<Array<BaseComponent>>? = null
+    var lore: MutableList<Component>? = null
     
     /**
      * The advanced tooltips lore of this item which is displayed when Nova's advanced tooltips are enabled.
      */
-    var advancedTooltipsLore: MutableList<Array<BaseComponent>>? = null
+    var advancedTooltipsLore: MutableList<Component>? = null
     
     /**
      * The durability percentage of this item from 0 to 1.
@@ -40,7 +40,7 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * Adds multiple lore lines to the current lore.
      */
-    fun addLore(lore: List<Array<BaseComponent>>) {
+    fun addLore(lore: List<Component>) {
         if (this.lore == null)
             this.lore = ArrayList()
         
@@ -50,17 +50,17 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * Adds one lore line to the current lore.
      */
-    fun addLore(lore: Array<BaseComponent>) {
+    fun addLore(vararg lore: Component) {
         if (this.lore == null)
             this.lore = ArrayList()
         
-        this.lore!!.add(lore)
+        this.lore!!.addAll(lore)
     }
     
     /**
      * Adds multiple lore lines to the advanced tooltips lore.
      */
-    fun addAdvancedTooltipsLore(lore: List<Array<BaseComponent>>) {
+    fun addAdvancedTooltipsLore(lore: List<Component>) {
         if (this.advancedTooltipsLore == null)
             this.advancedTooltipsLore = ArrayList()
         
@@ -70,11 +70,11 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     /**
      * Adds one lore line to the advanced tooltips lore.
      */
-    fun addAdvancedTooltipsLore(lore: Array<BaseComponent>) {
+    fun addAdvancedTooltipsLore(vararg lore: Component) {
         if (this.advancedTooltipsLore == null)
             this.advancedTooltipsLore = ArrayList()
         
-        this.advancedTooltipsLore!!.add(lore)
+        this.advancedTooltipsLore!!.addAll(lore)
     }
     
     /**
