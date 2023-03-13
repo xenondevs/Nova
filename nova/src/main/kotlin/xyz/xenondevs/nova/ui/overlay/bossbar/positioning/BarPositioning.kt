@@ -106,19 +106,16 @@ abstract class BarPositioning(
                         } else if (res == 1) {
                             // place oldEntry directly below newEntry
                             out.add(i + 1, newEntry)
-                            self = i
+                            self = i + 1
                             ++i
                         }
                     } else {
-                        // newEntry has been added to out, now we rearrange other entries around it
-                        if (res == -1) {
-                            // move oldEntry directly below newEntry
-                            out.removeAt(i)
-                            out.add(self + 1, oldEntry)
-                        } else if (res == 1) {
-                            // move oldEntry directly above newEntry
+                        // newEntry has been added to out, now we rearrange other entries that are below but should be above
+                        if (res == 1) {
+                            // move oldEntry directly above self
                             out.removeAt(i)
                             out.add(self, oldEntry)
+                            ++self
                         }
                     }
                     
