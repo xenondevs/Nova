@@ -100,6 +100,7 @@ waila:
   # Updating the overlay under these circumstances is still required for displaying the tool matching, energy, etc. properly.
   data_update_interval: 5
   # A list of namespaced ids representing the blocks that should not be shown in WAILA.
+  # Allows wildcard patterns, e.g. "minecraft:*_ore" or "minecraft:*"
   blacklisted_blocks: [ ]
 
 world:

@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProviderRegistry
 import xyz.xenondevs.nova.ui.waila.overlay.WailaOverlayCompound
+import xyz.xenondevs.nova.util.data.WildcardUtils
 import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
@@ -17,8 +18,14 @@ private val POS_UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getInt("wai
 private val DATA_UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getInt("waila.data_update_interval") }
 
 private val BLACKLISTED_BLOCKS by configReloadable {
-    DEFAULT_CONFIG.getStringList("waila.blacklisted_blocks")
-        .mapTo(HashSet()) { NamespacedId.of(it, "minecraft") }
+    DEFAULT_CONFIG.getStringList("waila.blacklisted_blocks").map {
+        val parts = it.split(':')
+        if (parts.size == 1) {
+            Regex("minecraft") to WildcardUtils.toRegex(it)
+        } else {
+            WildcardUtils.toRegex(parts[0]) to WildcardUtils.toRegex(parts[1])
+        }
+    }
 }
 
 internal class Waila(val player: Player) {
@@ -69,7 +76,7 @@ internal class Waila(val player: Player) {
     private fun tryUpdate(pos: BlockPos?): Boolean {
         if (pos != null) {
             val blockId = pos.block.id
-            if (blockId in BLACKLISTED_BLOCKS)
+            if (isBlacklisted(blockId))
                 return false
             
             val info = WailaInfoProviderRegistry.getInfo(player, pos)
@@ -85,5 +92,10 @@ internal class Waila(val player: Player) {
         
         return false
     }
+    
+    private fun isBlacklisted(id: NamespacedId) =
+        BLACKLISTED_BLOCKS.any { (namespaceRegex, nameRegex) ->
+            namespaceRegex.matches(id.namespace) && nameRegex.matches(id.name)
+        }
     
 }
