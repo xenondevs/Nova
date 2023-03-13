@@ -55,7 +55,10 @@ object BossBarOverlayManager : Initializable(), Listener {
     
     private var tickTask: BukkitTask? = null
     private val bars = HashMap<UUID, Array<BossBar>>()
+    
     private val overlays = HashMap<UUID, ArrayList<BossBarOverlayCompound>>()
+    private val sortedFixedOverlays = HashMap<UUID, List<BossBarOverlayCompound>>()
+    private val sortedDynamicOverlays = HashMap<UUID, List<BossBarOverlayCompound>>()
     private val changes = HashSet<UUID>()
     
     private val trackedOrigins = HashMap<UUID, BarOrigin>()
@@ -100,12 +103,18 @@ object BossBarOverlayManager : Initializable(), Listener {
         val uuid = player.uniqueId
         overlays.getOrPut(uuid, ::ArrayList) += overlay
         changes += uuid
+        sortedFixedOverlays.remove(uuid)
+        sortedDynamicOverlays.remove(uuid)
     }
     
     fun unregisterOverlay(player: Player, overlay: BossBarOverlayCompound) {
         val uuid = player.uniqueId
         val changed = overlays.getOrPut(uuid, ::ArrayList).remove(overlay)
-        if (changed) changes += uuid
+        if (changed) {
+            changes += uuid
+            sortedFixedOverlays.remove(uuid)
+            sortedDynamicOverlays.remove(uuid)
+        }
     }
     
     private fun handleTick() {
@@ -127,16 +136,21 @@ object BossBarOverlayManager : Initializable(), Listener {
         
         // group sorted fixed bars by bar level
         val groupedFixedOverlays = groupOverlaysByBarLevel(
-            overlays.asSequence()
-                .filter { it.positioning is BarPositioning.Fixed }
-                .toList().let(BarPositioning::sort).reversed().asSequence()
+            sortedFixedOverlays.getOrPut(playerUUID) {
+                overlays.filter { it.positioning is BarPositioning.Fixed }.let(BarPositioning::sort).reversed()
+            }
         ) { (it.positioning as BarPositioning.Fixed).offset }
         
         // group sorted dynamic bars by bar level
-        val dynamicOffsets = calculateDynamicOverlayCompoundOffsets(overlays, locale)
-        val groupedDynamicOverlays = groupOverlaysByBarLevel(
-            overlays.asSequence().filter { it.positioning is BarPositioning.Dynamic }
-        ) { dynamicOffsets[it] ?: throw NoSuchElementException("Could not find calculated dynamic offset for: $it") }
+        val dynamicOffsets = calculateDynamicOverlayCompoundOffsets(
+            sortedDynamicOverlays.getOrPut(playerUUID) {
+                overlays.filter { it.positioning is BarPositioning.Dynamic }.let(BarPositioning::sort)
+            },
+            locale
+        )
+        val groupedDynamicOverlays = groupOverlaysByBarLevel(dynamicOffsets.keys) {
+            dynamicOffsets[it] ?: throw NoSuchElementException("Could not find calculated dynamic offset for: $it")
+        }
         
         // build new bars
         bars.forEachIndexed { barLevel, bar ->
@@ -174,15 +188,9 @@ object BossBarOverlayManager : Initializable(), Listener {
     }
     
     private fun calculateDynamicOverlayCompoundOffsets(
-        overlays: ArrayList<BossBarOverlayCompound>,
+        sortedDynamicOverlays: Iterable<BossBarOverlayCompound>,
         locale: String
     ): Map<BossBarOverlayCompound, Int> {
-        // dynamic overlay compounds, sorted by positioning (from top to bottom)
-        val sortedDynamicOverlays = overlays.asSequence()
-            .filter { it.positioning is BarPositioning.Dynamic } // only include dynamic overlays
-            .toList()
-            .let(BarPositioning::sort)
-        
         val offsets = HashMap<BossBarOverlayCompound, Int>()
         
         var offset = 0
@@ -218,7 +226,7 @@ object BossBarOverlayManager : Initializable(), Listener {
     }
     
     private fun groupOverlaysByBarLevel(
-        overlays: Sequence<BossBarOverlayCompound>,
+        overlays: Iterable<BossBarOverlayCompound>,
         offsetReceiver: (BossBarOverlayCompound) -> Int
     ): Map<Int, List<Pair<BossBarOverlay, Int>>> {
         val groupedOverlays = HashMap<Int, ArrayList<Pair<BossBarOverlay, Int>>>()
