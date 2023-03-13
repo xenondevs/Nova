@@ -89,10 +89,12 @@ waila:
     # The minimum distance from the overlay below, in pixels (affected by gui scale).
     margin_bottom: 5
     # The matchers for bars that should be below WAILA.
-    # See: TODO: documentation page
-    above: [ ]
+    # See: https://xenondevs.xyz/docs/nova/admin/configuration/#waila-positioning
+    above:
+      - type: index
+        index: 0
     # The matchers for bars that should be above WAILA.
-    # See: TODO: documentation page
+    # See: https://xenondevs.xyz/docs/nova/admin/configuration/#waila-positioning
     below: [ ]
   # The interval for checking if a player is looking at a new block.
   pos_update_interval: 1
