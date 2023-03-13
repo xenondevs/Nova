@@ -223,7 +223,7 @@ internal object NovaCommand : Command("nova") {
                     "command.nova.give.success",
                     NamedTextColor.GRAY,
                     Component.text(amount).color(NamedTextColor.AQUA),
-                    Component.text(itemName).color(NamedTextColor.AQUA),
+                    Component.translatable(itemName).color(NamedTextColor.AQUA),
                     Component.text(player.name).color(NamedTextColor.AQUA)
                 ))
             }
@@ -316,7 +316,7 @@ internal object NovaCommand : Command("nova") {
             val novaCompound = item.novaCompoundOrNull
             if (novaCompound != null) {
                 ctx.source.sendSuccess(Component.translatable(
-                    "command.nova.show_item_data.nbt",
+                    "command.nova.show_item_data.success",
                     NamedTextColor.GRAY,
                     Component.translatable(item.localizedName ?: item.type.name.lowercase(), NamedTextColor.AQUA),
                     Component.text(novaCompound.toString(), NamedTextColor.WHITE)
