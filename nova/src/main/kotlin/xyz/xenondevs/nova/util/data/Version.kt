@@ -12,7 +12,7 @@ private val RELEASE_STAGES = HashBiMap.create<String, Int>().apply {
     this["snapshot"] = -4
 }
 
-private val VERSION_REGEX = Regex("""^([\d.]+)(?:-(snapshot|alpha|beta|rc)(?:\.([\d.]+))?)?$""")
+private val VERSION_REGEX = Regex("""^([\d.]+)(?:-(snapshot|alpha|beta|rc)(?:\.?([\d.]+))?)?$""")
 
 class Version : Comparable<Version> {
     
@@ -48,14 +48,14 @@ class Version : Comparable<Version> {
     fun toString(separator: String = ".", omitZeros: Boolean = false): String {
         val sb = StringBuilder()
         
-        fun allZeros(start: Int, array: IntArray) =
+        fun isAllZeros(start: Int, array: IntArray) =
             array.copyOfRange(start, array.size).all { it == 0 }
         
         fun appendVersion(start: Int, array: IntArray) {
             for (i in start..array.lastIndex) {
                 sb.append(array[i])
                 if (i < array.lastIndex) {
-                    if (omitZeros && allZeros(0, array))
+                    if (omitZeros && isAllZeros(i + 1, array))
                         break
                     sb.append(separator)
                 }
@@ -67,7 +67,7 @@ class Version : Comparable<Version> {
         if (stageVersion.isNotEmpty()) {
             sb.append("-")
             sb.append(RELEASE_STAGES.inverse()[stageVersion[0]])
-            if (stageVersion.size > 1) {
+            if (stageVersion.size > 1 && (!omitZeros || !isAllZeros(1, stageVersion))) {
                 sb.append(".")
                 appendVersion(1, stageVersion)
             }
