@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.recipe.impl
 
+import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.inventory.CraftingContainer
@@ -43,7 +44,7 @@ internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(i
             || (b.novaMaterial == null && a.item == b.item)
     }
     
-    override fun assemble(container: CraftingContainer): ItemStack {
+    override fun assemble(container: CraftingContainer, registryAccess: RegistryAccess): ItemStack {
         val items = container.contents.filterNot(ItemStack::isEmpty)
         require(items.size == 2) { "Item size is not 2" }
         val novaMaterial = items[0].novaMaterial
@@ -78,7 +79,7 @@ internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(i
         }
         
         // use the super method to repair non-Nova items
-        return super.assemble(container)
+        return super.assemble(container, registryAccess)
     }
     
 }

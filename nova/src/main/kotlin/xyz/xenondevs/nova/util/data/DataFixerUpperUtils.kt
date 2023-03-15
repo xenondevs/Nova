@@ -69,11 +69,11 @@ fun <F : Any, S : Any> DataResult<MojangPair<Holder<F>, S>>.getFirstValueOrThrow
 
 fun <R> Result<R>.asDataResult() : DataResult<R> {
     return if (isSuccess) DataResult.success(getOrThrow())
-    else DataResult.error(toString())
+    else DataResult.error { toString() }
 }
 
 fun <R: Any> R?.asDataResult(error: String): DataResult<R> =
-    if (this != null) DataResult.success(this) else DataResult.error(error)
+    if (this != null) DataResult.success(this) else DataResult.error { error }
 
 class ElementLocationOrTagKey<T>(internal val either: Either<ResourceLocation, TagKey<T>>) {
     

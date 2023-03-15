@@ -121,6 +121,10 @@ object LocaleManager : Initializable() {
             return getTranslationOrNull("en_us", key) ?: delegate.getOrDefault(key)
         }
         
+        override fun getOrDefault(key: String, fallback: String): String {
+            return getTranslationOrNull("en_us", key) ?: delegate.getOrDefault(key, fallback)
+        }
+        
         override fun has(key: String): Boolean {
             return hasTranslation("en_us", key) || delegate.has(key)
         }

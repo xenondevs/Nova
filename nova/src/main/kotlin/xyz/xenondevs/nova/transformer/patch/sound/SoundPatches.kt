@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.level.Level
 import org.objectweb.asm.Opcodes
 import xyz.xenondevs.bytebase.asm.buildInsnList
@@ -175,7 +176,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
             return SoundEvent.createVariableRangeEvent(ResourceLocation.tryParse(soundEventName))
         }
         
-        return itemStack.item.equipSound
+        return (itemStack.item as? ArmorItem)?.material?.equipSound
     }
     
     private fun transformLivingEntityPlayEquipSound() {
@@ -192,7 +193,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         if (itemStack.isEmpty || entity.isSpectator)
             return
         
-        val equipSound = itemStack.equipSound
+        val equipSound = (itemStack.item as? ArmorItem)?.material?.equipSound
             ?: return
         
         forcePacketBroadcast { entity.playSound(equipSound, 1f, 1f) }

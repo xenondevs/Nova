@@ -42,7 +42,7 @@ internal object WearablePatch : MethodTransformer(LIVING_ENTITY_GET_EQUIPMENT_SL
     @JvmStatic
     fun getEquipmentSlot(itemStack: ItemStack): EquipmentSlot {
         val novaMaterial = itemStack.novaMaterial
-            ?: return (itemStack.item as ArmorItem).slot
+            ?: return (itemStack.item as ArmorItem).type.slot
         
         return novaMaterial.novaItem.getBehavior(Wearable::class)!!.options.armorType.equipmentSlot.nmsEquipmentSlot
     }

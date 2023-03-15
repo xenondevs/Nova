@@ -9,12 +9,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
+import net.minecraft.world.item.ArmorItem
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Tag
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -123,7 +124,7 @@ val ItemStack.equipSound: String?
         if (novaMaterial != null)
             return novaMaterial.novaItem.getBehavior(Wearable::class)?.options?.equipSound
         
-        return CraftMagicNumbers.getItem(type).equipSound?.location?.toString()
+        return (CraftMagicNumbers.getItem(type) as? ArmorItem)?.material?.equipSound?.location?.toString()
     }
 
 fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {

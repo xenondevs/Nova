@@ -16,7 +16,7 @@ import org.bukkit.Material
 import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockExpEvent
