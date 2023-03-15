@@ -49,6 +49,7 @@ internal object AutoUploadManager : Initializable() {
         }
     
     override fun init() {
+        reloadForceResourcePackSettings()
         enable(fromReload = false)
         
         if (url != null)
@@ -116,6 +117,7 @@ internal object AutoUploadManager : Initializable() {
     
     fun reload() {
         disable()
+        reloadForceResourcePackSettings()
         enable(fromReload = true)
     }
     
@@ -133,6 +135,27 @@ internal object AutoUploadManager : Initializable() {
         
         forceResourcePack()
         return url
+    }
+    
+    @Suppress("LiftReturnOrAssignment")
+    private fun reloadForceResourcePackSettings() {
+        ForceResourcePack.getInstance().apply { 
+            setPrompt(TextComponent.fromLegacyText(DEFAULT_CONFIG.getString("resource_pack.prompt.message")))
+            isForced = DEFAULT_CONFIG.getBoolean("resource_pack.prompt.force")
+            
+            if (DEFAULT_CONFIG.getBoolean("resource_pack.prompt.enableForceBypassPermission")) {
+                forceBypassPermission = "nova.misc.resourcePack.bypass.force"
+            } else {
+                forceBypassPermission = null
+            }
+            
+            if (DEFAULT_CONFIG.getBoolean("resource_pack.prompt.enablePromptBypassPermission")) {
+                promptBypassPermission = DEFAULT_CONFIG.getString("nova.misc.resourcePack.bypass.prompt")
+            } else {
+                promptBypassPermission = null
+            }
+            
+        }
     }
     
     private fun forceResourcePack() {
@@ -154,11 +177,7 @@ internal object AutoUploadManager : Initializable() {
             return
         }
         try {
-            ForceResourcePack.getInstance().setResourcePack(
-                url,
-                TextComponent.fromLegacyText(DEFAULT_CONFIG.getString("resource_pack.message")),
-                true
-            )
+            ForceResourcePack.getInstance().setResourcePack(url, true)
         } catch (e: Exception) {
             LOGGER.log(Level.SEVERE, "Failed to download the resource pack! Is the server down?", e)
         }

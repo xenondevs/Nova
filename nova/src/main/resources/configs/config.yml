@@ -1,16 +1,27 @@
 # Configuration options for the resource pack
 # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#step-2-resourcepack-hosting
 resource_pack:
-  # The resource pack prompt message
-  message: §bNova Resource Pack
   # The auto uploader automatically uploads the resource pack after generation.
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:
     enabled: false
+    
+  # Settings affecting the resource pack prompt
+  prompt:
+    # The resource pack prompt message
+    message: §bNova Resource Pack
+    # Whether players are forced to accept the resource pack
+    force: true
+    # Activates the 'nova.misc.resourcePack.bypass.force' permission, with which players will still get the resource pack prompt, but won't be forced to accept it.
+    # This permission is disabled by default, so players with *-permissions will not accidentally bypass it.
+    enableForceBypassPermission: false
+    # Activates the 'nova.misc.resourcePack.bypass.prompt' permission, with which players will not get the resource pack prompt.
+    # This permission is disabled by default, so players with *-permissions will not accidentally bypass the prompt.
+    enablePromptBypassPermission: false
   # Settings affecting how the resource pack is generated.
   generation:
     # The resource pack description.
-    description: "Nova (%s asset pack(s), %s base pack(s))"
+    description: Nova (%s asset pack(s), %s base pack(s))
     # Resource packs that should be merged with Nova's resource pack.
     # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
     base_packs: [ ]
