@@ -150,7 +150,7 @@ internal object AutoUploadManager : Initializable() {
             }
             
             if (DEFAULT_CONFIG.getBoolean("resource_pack.prompt.enablePromptBypassPermission")) {
-                promptBypassPermission = DEFAULT_CONFIG.getString("nova.misc.resourcePack.bypass.prompt")
+                promptBypassPermission = "nova.misc.resourcePack.bypass.prompt"
             } else {
                 promptBypassPermission = null
             }
