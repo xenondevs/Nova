@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.resources.upload.service
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.jetty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bukkit.configuration.ConfigurationSection
@@ -28,7 +28,7 @@ internal object SelfHost : UploadService {
     override val name = "SelfHost"
     internal val startedLatch = Latch()
     
-    private lateinit var server: NettyApplicationEngine
+    private lateinit var server: JettyApplicationEngine
     
     private lateinit var host: String
     private var port = 38519
@@ -53,7 +53,7 @@ internal object SelfHost : UploadService {
         appendPort = cfg.getBooleanOrNull("append_port") ?: cfg.getBooleanOrNull("portNeeded") ?: (configuredHost == null)
         
         thread(name = "ResourcePack Server", isDaemon = true) {
-            server = embeddedServer(Netty, port = this.port) {
+            server = embeddedServer(Jetty, port = this.port) {
                 routing {
                     get("*") {
                         val packFile = ResourcePackBuilder.RESOURCE_PACK_FILE
@@ -61,9 +61,8 @@ internal object SelfHost : UploadService {
                         else call.respond(HttpStatusCode.NotFound)
                     }
                 }
-                environment.monitor.subscribe(ApplicationStarted) {
+                environment.monitor.subscribe(ServerReady) {
                     thread(isDaemon = true) {
-                        Thread.sleep(SELF_HOST_DELAY) // https://youtrack.jetbrains.com/issue/KTOR-4259
                         startedLatch.open()
                     }
                 }

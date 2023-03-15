@@ -155,5 +155,3 @@ debug:
   watch_chunk_reloads: false
   # If other plugins should be allowed to overwrite the results of Nova recipes.
   allow_craft_result_overwrite: false
-  # The delay in ms to wait after the ApplicationStarted event has been fired (https://youtrack.jetbrains.com/issue/KTOR-4259)
-  self_host_delay: 1000
