@@ -4,7 +4,6 @@ plugins {
     `kotlin-dsl`
     `maven-publish`
     kotlin("jvm") version libs.versions.kotlin
-    id("com.gradle.plugin-publish") version "0.14.0"
 }
 
 dependencies {
