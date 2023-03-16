@@ -16,6 +16,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEventPacket
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket
+import net.minecraft.network.protocol.game.ClientboundChunksBiomesPacket
 import net.minecraft.network.protocol.game.ClientboundClearTitlesPacket
 import net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket
@@ -26,6 +27,7 @@ import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundCooldownPacket
 import net.minecraft.network.protocol.game.ClientboundCustomChatCompletionsPacket
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket
+import net.minecraft.network.protocol.game.ClientboundDamageEventPacket
 import net.minecraft.network.protocol.game.ClientboundDeleteChatPacket
 import net.minecraft.network.protocol.game.ClientboundDisconnectPacket
 import net.minecraft.network.protocol.game.ClientboundDisguisedChatPacket
@@ -34,6 +36,7 @@ import net.minecraft.network.protocol.game.ClientboundExplodePacket
 import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket
 import net.minecraft.network.protocol.game.ClientboundHorseScreenOpenPacket
+import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket
 import net.minecraft.network.protocol.game.ClientboundKeepAlivePacket
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
@@ -334,6 +337,9 @@ object PacketIdRegistry {
     val CLIENTBOUND_PLAYER_CHAT_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundPlayerChatPacket::class)
     val CLIENTBOUND_LEVEL_PARTICLES_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundLevelParticlesPacket::class)
     val CLIENTBOUND_FORGET_LEVEL_CHUNK_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundForgetLevelChunkPacket::class)
+    val CLIENTBOUND_HURT_ANIMATION_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundHurtAnimationPacket::class)
+    val CLIENTBOUND_CHUNKS_BIOMES_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundChunksBiomesPacket::class)
+    val CLIENTBOUND_DAMAGE_EVENT_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundDamageEventPacket::class)
     val SERVERBOUND_STATUS_REQUEST_PACKET = getPacketId(ConnectionProtocol.STATUS, PacketFlow.SERVERBOUND, ServerboundStatusRequestPacket::class)
     val SERVERBOUND_PING_REQUEST_PACKET = getPacketId(ConnectionProtocol.STATUS, PacketFlow.SERVERBOUND, ServerboundPingRequestPacket::class)
     val CLIENTBOUND_STATUS_RESPONSE_PACKET = getPacketId(ConnectionProtocol.STATUS, PacketFlow.CLIENTBOUND, ClientboundStatusResponsePacket::class)
