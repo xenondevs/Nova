@@ -9,9 +9,10 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.server.network.ServerConnectionListener
+import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent.BossBarColor
 import net.minecraft.world.BossEvent.BossBarOverlay
-import org.bukkit.craftbukkit.v1_19_R2.tag.CraftTag
+import org.bukkit.craftbukkit.v1_19_R3.tag.CraftTag
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getClass
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getConstructor
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getField
@@ -52,6 +53,7 @@ internal object ReflectionRegistry {
     // Fields
     val CRAFT_TAG_TAG_KEY_FIELD = getField(CraftTag::class.java, true, "tag")
     val SERVER_CONNECTION_LISTENER_CHANNELS_FIELD = getField(ServerConnectionListener::class.java, true, "SRF(net.minecraft.server.network.ServerConnectionListener channels)")
+    val SERVER_GAME_PACKET_LISTENER_IMPL_CONNECTION_FIELD = getField(ServerGamePacketListenerImpl::class.java, true, "SRF(net.minecraft.server.network.ServerGamePacketListenerImpl connection)")
     val CLIENTBOUND_BOSS_EVENT_PACKET_ID_FIELD = getField(ClientboundBossEventPacket::class.java, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket id)")
     val CLIENTBOUND_BOSS_EVENT_PACKET_OPERATION_FIELD = getField(ClientboundBossEventPacket::class.java, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket operation)")
     val CLIENTBOUND_BOSS_EVENT_PACKET_REMOVE_OPERATION_FIELD = getField(ClientboundBossEventPacket::class.java, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket REMOVE_OPERATION)")

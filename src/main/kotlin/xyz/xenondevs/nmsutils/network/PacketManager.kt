@@ -4,6 +4,7 @@ import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.channel.ChannelInitializer
+import net.minecraft.network.Connection
 import net.minecraft.network.FriendlyByteBuf
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -15,8 +16,8 @@ import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nmsutils.LOGGER
 import xyz.xenondevs.nmsutils.PLUGIN
 import xyz.xenondevs.nmsutils.internal.util.DEDICATED_SERVER
+import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry
 import xyz.xenondevs.nmsutils.internal.util.channels
-import xyz.xenondevs.nmsutils.internal.util.connection
 import xyz.xenondevs.nmsutils.internal.util.serverPlayer
 import net.minecraft.world.entity.player.Player as MojangPlayer
 
@@ -33,7 +34,7 @@ fun Player.send(vararg bufs: FriendlyByteBuf, retain: Boolean = true, flush: Boo
         packetHandler.queueByteBuf(it)
     }
     
-    if (flush) connection.connection.channel.flush()
+    if (flush) packetHandler.channel.flush()
 }
 
 internal object PacketManager : Listener {
@@ -117,12 +118,14 @@ internal object PacketManager : Listener {
     }
     
     private fun registerHandler(player: Player) {
-        val channel = player.serverPlayer.connection.connection.channel
+        val connection = ReflectionRegistry.SERVER_GAME_PACKET_LISTENER_IMPL_CONNECTION_FIELD.get(player.serverPlayer.connection) as Connection
+        val channel = connection.channel
         channel.pipeline().addBefore("packet_handler", "${PLUGIN.name}_packet_handler", PacketHandler(channel, player))
     }
     
     private fun unregisterHandler(player: Player) {
-        val pipeline = player.serverPlayer.connection.connection.channel.pipeline()
+        val connection = ReflectionRegistry.SERVER_GAME_PACKET_LISTENER_IMPL_CONNECTION_FIELD.get(player.serverPlayer.connection) as Connection
+        val pipeline = connection.channel.pipeline()
         pipeline.context("${PLUGIN.name}_packet_handler")?.handler()?.run(pipeline::remove)
     }
     

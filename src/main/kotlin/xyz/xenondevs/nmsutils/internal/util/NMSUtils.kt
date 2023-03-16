@@ -19,12 +19,12 @@ import net.minecraft.world.item.alchemy.Potion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import org.bukkit.*
-import org.bukkit.craftbukkit.v1_19_R2.CraftServer
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R2.potion.CraftPotionUtil
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionUtil
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -92,4 +92,8 @@ internal val Player.connection: ServerGamePacketListenerImpl
 internal fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
     packets.forEach { connection.send(it) }
+}
+
+internal fun <T> TagKey(key: ResourceKey<T>): TagKey<T> {
+    return TagKey.create(ResourceKey.createRegistryKey(key.registry()), key.location())
 }

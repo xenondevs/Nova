@@ -6,7 +6,7 @@
 
     <groupId>xyz.xenondevs</groupId>
     <artifactId>nms-utilities</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -15,7 +15,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
         <kotlin.version>1.7.20</kotlin.version>
-        <spigot.version>1.19.3-R0.1-SNAPSHOT</spigot.version>
+        <spigot.version>1.19.4-R0.1-SNAPSHOT</spigot.version>
     </properties>
 
     <repositories>

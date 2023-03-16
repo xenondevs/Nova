@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.chat.ComponentSerializer
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftChatMessage
 import net.minecraft.network.chat.Component as MojangComponent
 
 internal fun MojangComponent.toBaseComponentArray(): Array<out BaseComponent> {

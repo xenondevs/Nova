@@ -26,7 +26,7 @@ private class IndefinitePacketDropRequest(override val condition: PacketConditio
 
 private class LimitedPacketDropRequest(override val condition: PacketCondition, var n: Int) : PacketDropRequest
 
-class PacketHandler internal constructor(private val channel: Channel) : ChannelDuplexHandler() {
+class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHandler() {
     
     private val queue = ConcurrentLinkedQueue<FriendlyByteBuf>()
     private val incomingDropQueue = CopyOnWriteArrayList<PacketDropRequest>()
