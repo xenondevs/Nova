@@ -43,8 +43,6 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         transformEntityPlayStepSound()
         transformLivingEntityPlayBlockFallSound()
         transformBlockPlayerWillDestroy()
-        transformItemStackGetEquipSound()
-        transformLivingEntityPlayEquipSound()
     }
     
     private fun transformEntityPlayStepSound() {
@@ -159,14 +157,6 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         }
     }
     
-    private fun transformItemStackGetEquipSound() {
-        VirtualClassPath[ReflectionRegistry.ITEM_STACK_GET_EQUIP_SOUND_METHOD].instructions = buildInsnList {
-            aLoad(0)
-            invokeStatic(ReflectionUtils.getMethodByName(SoundPatches::class.java, false, "getEquipSound"))
-            areturn()
-        }
-    }
-    
     @JvmStatic
     fun getEquipSound(itemStack: MojangStack): SoundEvent? {
         val novaMaterial = itemStack.novaMaterial
@@ -177,15 +167,6 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         }
         
         return (itemStack.item as? ArmorItem)?.material?.equipSound
-    }
-    
-    private fun transformLivingEntityPlayEquipSound() {
-        VirtualClassPath[ReflectionRegistry.LIVING_ENTITY_PLAY_EQUIP_SOUND_METHOD].instructions = buildInsnList {
-            aLoad(0)
-            aLoad(1)
-            invokeStatic(ReflectionUtils.getMethodByName(SoundPatches::class.java, false, "playEquipSound"))
-            _return()
-        }
     }
     
     @JvmStatic
