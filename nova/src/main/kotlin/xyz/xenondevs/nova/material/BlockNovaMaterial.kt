@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
@@ -50,7 +50,7 @@ open class BlockNovaMaterial internal constructor(
     
     internal val vanillaBlockMaterial: Material
         get() = when (val block = block) {
-            is ArmorStandBlockModelData -> block.hitboxType
+            is DisplayEntityBlockModelData -> block.hitboxType
             is BlockStateBlockModelData -> block[0].type.material
         }
     

@@ -1,15 +1,16 @@
 package xyz.xenondevs.nova.world.block.logic.`break`
 
-import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.CoreBlockOverlay
-import xyz.xenondevs.nova.util.center
+import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.sendDestructionPacket
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeArmorStand
+import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 
@@ -21,7 +22,7 @@ internal interface BreakMethod {
     
     companion object {
         
-        private val INVISIBLE = object: BreakMethod {
+        private val INVISIBLE = object : BreakMethod {
             override val hasClientsidePrediction = false
             override var breakStage: Int = 0
             override fun stop() {}
@@ -37,7 +38,7 @@ internal interface BreakMethod {
             entityId: Int = predictionPlayer?.entityId ?: Random.nextInt()
         ): BreakMethod {
             return if (material.showBreakAnimation)
-                if (block.type == Material.BARRIER) ArmorStandBreakMethod(block.pos)
+                if (block.type == Material.BARRIER) DisplayEntityBreakMethod(block.pos)
                 else PacketBreakMethod(block.pos, entityId, predictionPlayer)
             else INVISIBLE
         }
@@ -46,7 +47,7 @@ internal interface BreakMethod {
     
 }
 
-internal abstract class VisibleBreakMethod(val pos: BlockPos, val predictionPlayer: Player? = null): BreakMethod {
+internal abstract class VisibleBreakMethod(val pos: BlockPos, val predictionPlayer: Player? = null) : BreakMethod {
     override val hasClientsidePrediction = predictionPlayer != null
     val block = pos.block
 }
@@ -78,11 +79,10 @@ internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Rand
     
 }
 
-internal class ArmorStandBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos) {
+internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos) {
     
-    private val armorStand = FakeArmorStand(pos.location.center(), true) { _, data ->
-        data.isInvisible = true
-        data.isMarker = true
+    private val itemDisplay = FakeItemDisplay(pos.location.add(.5, .5, .5), true) { _, data ->
+        data.itemDisplay = ItemDisplayContext.HEAD
     }
     
     override var breakStage: Int = -1
@@ -90,15 +90,15 @@ internal class ArmorStandBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos) {
             if (field == stage) return
             
             field = stage
-            if (stage in 0..9) {
-                armorStand.setEquipment(EquipmentSlot.HEAD, CoreBlockOverlay.BREAK_STAGE_OVERLAY.clientsideProviders[stage].get(), true)
-            } else {
-                armorStand.setEquipment(EquipmentSlot.HEAD, null, true)
+            itemDisplay.updateEntityData(true) {
+                itemStack = if (stage in 0..9)
+                    CoreBlockOverlay.BREAK_STAGE_OVERLAY.clientsideProviders[stage].get().nmsCopy
+                else ItemStack.EMPTY
             }
         }
     
     override fun stop() {
-        armorStand.remove()
+        itemDisplay.remove()
     }
     
 }

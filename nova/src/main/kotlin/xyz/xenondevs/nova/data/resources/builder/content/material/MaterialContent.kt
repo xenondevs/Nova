@@ -22,7 +22,7 @@ import xyz.xenondevs.nova.data.resources.builder.content.material.info.Registere
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
@@ -123,7 +123,7 @@ internal class MaterialContent(
                     val material = VanillaMaterialTypes.DEFAULT_MATERIAL
                     val registeredModels = customItemModels.getOrPut(material, ::HashMap)
                     val dataArray = info.models.mapToIntArray { registeredModels.getOrPut(it) { getNextCustomModelData(material) } }
-                    blockModelData = ArmorStandBlockModelData(id, info.hitboxType, dataArray)
+                    blockModelData = DisplayEntityBlockModelData(id, info.hitboxType, dataArray)
                     
                     // note hitbox type as used material for sound overrides
                     builder.soundOverrides.useMaterial(info.hitboxType)
