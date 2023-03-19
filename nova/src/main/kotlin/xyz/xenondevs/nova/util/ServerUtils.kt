@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_19_R2.CraftServer
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.ServerSoftware.*
 import java.util.concurrent.ConcurrentHashMap

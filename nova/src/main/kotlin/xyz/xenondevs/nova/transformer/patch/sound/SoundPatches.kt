@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.level.Level
 import org.objectweb.asm.Opcodes
 import xyz.xenondevs.bytebase.asm.buildInsnList
@@ -42,8 +43,6 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         transformEntityPlayStepSound()
         transformLivingEntityPlayBlockFallSound()
         transformBlockPlayerWillDestroy()
-        transformItemStackGetEquipSound()
-        transformLivingEntityPlayEquipSound()
     }
     
     private fun transformEntityPlayStepSound() {
@@ -158,14 +157,6 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         }
     }
     
-    private fun transformItemStackGetEquipSound() {
-        VirtualClassPath[ReflectionRegistry.ITEM_STACK_GET_EQUIP_SOUND_METHOD].instructions = buildInsnList {
-            aLoad(0)
-            invokeStatic(ReflectionUtils.getMethodByName(SoundPatches::class.java, false, "getEquipSound"))
-            areturn()
-        }
-    }
-    
     @JvmStatic
     fun getEquipSound(itemStack: MojangStack): SoundEvent? {
         val novaMaterial = itemStack.novaMaterial
@@ -175,16 +166,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
             return SoundEvent.createVariableRangeEvent(ResourceLocation.tryParse(soundEventName))
         }
         
-        return itemStack.item.equipSound
-    }
-    
-    private fun transformLivingEntityPlayEquipSound() {
-        VirtualClassPath[ReflectionRegistry.LIVING_ENTITY_PLAY_EQUIP_SOUND_METHOD].instructions = buildInsnList {
-            aLoad(0)
-            aLoad(1)
-            invokeStatic(ReflectionUtils.getMethodByName(SoundPatches::class.java, false, "playEquipSound"))
-            _return()
-        }
+        return (itemStack.item as? ArmorItem)?.material?.equipSound
     }
     
     @JvmStatic
@@ -192,7 +174,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         if (itemStack.isEmpty || entity.isSpectator)
             return
         
-        val equipSound = itemStack.equipSound
+        val equipSound = (itemStack.item as? ArmorItem)?.material?.equipSound
             ?: return
         
         forcePacketBroadcast { entity.playSound(equipSound, 1f, 1f) }

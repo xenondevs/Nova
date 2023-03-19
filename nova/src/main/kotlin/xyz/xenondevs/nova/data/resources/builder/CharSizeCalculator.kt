@@ -1,13 +1,14 @@
 package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonObject
-import io.netty.buffer.Unpooled
 import xyz.xenondevs.commons.gson.getAllStrings
 import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.CharSizeTable
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
@@ -24,19 +25,18 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.pathString
-import kotlin.io.path.readBytes
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.math.roundToInt
 
 private val FONT_NAME_REGEX = Regex("""^([a-z0-9._-]+)/font/([a-z0-9/._-]+)$""")
+private val FORCE_UNICODE_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.font.force_unicode_font") }
 
 internal class CharSizeCalculator {
     
     private val fontHashes: HashMap<String, String> = PermanentStorage.retrieve("fontHashes", ::HashMap)
     
     private val bitmaps = HashMap<ResourcePath, BufferedImage>()
-    private val glyphSizes = HashMap<ResourcePath, ByteArray>()
     
     fun calculateCharSizes() {
         val fontDirs = ArrayList<Path>()
@@ -81,7 +81,18 @@ internal class CharSizeCalculator {
     private fun calculateCharSizes(file: Path, table: CharSizeTable) {
         try {
             val obj = file.parseJson() as JsonObject
-            val providers = obj.getAsJsonArray("providers")
+            val providers = obj.getAsJsonArray("providers").asSequence()
+            
+            // if unicode font is forced, read legacy_unicode providers first
+            if (FORCE_UNICODE_FONT) {
+                providers.sortedBy {
+                    when (it.asJsonObject.getStringOrNull("type")) {
+                        "legacy_unicode" -> -1
+                        else -> 1
+                    }
+                }
+            }
+            
             providers.forEach { provider ->
                 provider as JsonObject
                 when (val type = provider.getStringOrNull("type")) {
@@ -125,16 +136,36 @@ internal class CharSizeCalculator {
                 if (char !in table) {
                     val subimage = bitmap.getSubimage(charIdx * subimageWidth, lineIdx * subimageHeight, subimageWidth, subimageHeight)
                     
+                    val yRange = calculateBitmapCharYRange(height, ascent, subimage)
                     table.setSizes(
                         char,
                         intArrayOf(
                             calculateBitmapCharWidth(height, subimage) + 1, // +1 to include space between characters
                             height,
-                            ascent
+                            ascent,
+                            yRange.first,
+                            yRange.last
                         )
                     )
                 }
             }
+        }
+    }
+    
+    private fun readUnicodeProvider(obj: JsonObject, table: CharSizeTable) {
+        for ((char, glyph) in BitmapFontGenerator.extractGlyphs(obj)) {
+            if (char in table)
+                continue
+            
+            val yRange = calculateBitmapCharYRange(glyph.height, 15, glyph)
+            // divide values by 2 because legacy_unicode fonts are made for gui scale 2, but we're calculating with gui scale 1 values
+            table.setSizes(char, intArrayOf(
+                (calculateBitmapCharWidth(glyph.height, glyph) / 2) + 1, // +1 to include space between characters
+                glyph.height / 2,
+                7, // == floor(15.0 / 2.0), same ascent as ascii bitmap characters
+                yRange.first / 2,
+                yRange.last / 2
+            ))
         }
     }
     
@@ -155,23 +186,24 @@ internal class CharSizeCalculator {
         return ((maxX + 1) * rescale).roundToInt()
     }
     
-    private fun readUnicodeProvider(obj: JsonObject, table: CharSizeTable) {
-        val sizes = getGlyphSizes(ResourcePath.of(obj.getStringOrNull("sizes")!!))
-        val buffer = Unpooled.wrappedBuffer(sizes)
+    private fun calculateBitmapCharYRange(fontHeight: Int, ascent: Int, image: BufferedImage): IntRange {
+        var minY = Int.MAX_VALUE
+        var maxY = Int.MIN_VALUE
         
-        // legacy_unicode can only have codepoints from U+0000 to U+FFFF
-        for (c in 0..0xFFFF) {
-            val charInfo = buffer.readUnsignedByte().toInt()
-            
-            if (c in table)
-                continue
-            
-            val start = charInfo shr 4 and 0xF
-            val end = charInfo and 0xF
-            val width = end - start + 1
-            
-            table.setWidth(c, width + 1) // +1 to include space between characters
+        for (x in 0 until image.width) {
+            for (y in 0 until image.height) {
+                val rgba = image.getRGB(x, y)
+                if (rgba ushr 24 != 0) {
+                    if (y < minY) minY = y
+                    if (y > maxY) maxY = y
+                }
+            }
         }
+        
+        val rescale = fontHeight / image.height.toDouble()
+        minY = ((minY - ascent) * rescale).roundToInt()
+        maxY = ((maxY - ascent) * rescale).roundToInt()
+        return minY..maxY
     }
     
     private fun readChars(str: String): IntArray {
@@ -215,13 +247,6 @@ internal class CharSizeCalculator {
         return bitmaps.getOrPut(path) {
             val file = getAssetFile("${path.namespace}/textures/${path.path}")
             return@getOrPut file.readImage()
-        }
-    }
-    
-    private fun getGlyphSizes(path: ResourcePath): ByteArray {
-        return glyphSizes.getOrPut(path) {
-            val file = getAssetFile("${path.namespace}/${path.path}")
-            return@getOrPut file.readBytes()
         }
     }
     

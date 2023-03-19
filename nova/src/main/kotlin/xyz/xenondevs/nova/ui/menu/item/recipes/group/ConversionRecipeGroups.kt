@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.menu.item.recipes.group
 
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.BlastingRecipe
 import org.bukkit.inventory.CampfireRecipe
@@ -13,6 +13,7 @@ import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
@@ -49,7 +50,7 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
             builder.addIngredient(
                 't', CoreGuiMaterial.TP_STOPWATCH
                 .createClientsideItemBuilder()
-                .setDisplayName(TranslatableComponent("menu.nova.recipe.time", time / 20.0))
+                .setDisplayName(Component.translatable("menu.nova.recipe.time", Component.text(time / 20.0)))
             )
         }
         

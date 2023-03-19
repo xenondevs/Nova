@@ -1,8 +1,7 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.PistonHead
@@ -21,12 +20,11 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
         val material = block.type
         val mainMaterial = getMainMaterial(block)
         
-        val translate = TranslatableComponent(mainMaterial.localizedName ?: "block.minecraft.${mainMaterial.name.lowercase()}")
-        translate.color = ChatColor.WHITE
+        val translate = mainMaterial.localizedName ?: "block.minecraft.${mainMaterial.name.lowercase()}"
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(ComponentBuilder("minecraft:${material.name.lowercase()}").color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.translatable(translate), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.text("minecraft:${material.name.lowercase()}", NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block)
         
         return WailaInfo(NamespacedId("minecraft", mainMaterial.name.lowercase()), lines)

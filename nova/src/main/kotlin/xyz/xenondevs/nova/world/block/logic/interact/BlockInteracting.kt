@@ -74,7 +74,7 @@ internal object BlockInteracting : Listener {
         val pos = event.block.pos
         val state = BlockManager.getBlock(pos)
         if (state != null && Material.AIR == event.block.type) {
-            BlockManager.breakBlock(BlockBreakContext(pos, null, null, null, null))
+            BlockManager.breakBlock(BlockBreakContext(pos, null, null, null, null), false)
         }
     }
     

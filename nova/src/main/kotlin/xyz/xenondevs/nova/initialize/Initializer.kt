@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
@@ -80,7 +81,7 @@ internal object Initializer : Listener {
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
         BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser, WorldEditIntegration, ResourceGeneration.PreWorld,
-        ResourceGeneration.PostWorld
+        ResourceGeneration.PostWorld, CharSizes
     ), Initializable::dependsOn)
     
     val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())

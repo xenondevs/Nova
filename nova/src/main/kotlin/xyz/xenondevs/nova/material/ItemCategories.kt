@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.material
 
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -117,7 +118,7 @@ internal data class ItemCategory(val name: String, val icon: ItemProvider, val i
             try {
                 val name = element.getString("name")!!
                 val icon = ItemUtils.getItemBuilder(element.getString("icon")!!, true)
-                    .setDisplayName(TranslatableComponent(name))
+                    .setDisplayName(Component.translatable(name))
                     .get()
                 val items = element.getStringList("items").map(::CategorizedItem)
                 

@@ -21,21 +21,22 @@ public final class BlockNovaMaterialDecoder {
         var materialName = location.toString();
         var material = NovaMaterialRegistry.INSTANCE.getOrNull(materialName);
         if (material == null)
-            return DataResult.error("Unknown material: " + materialName);
+            return DataResult.error(() -> "Unknown material: " + materialName);
         if (material instanceof BlockNovaMaterial blockMaterial)
             return DataResult.success(Pair.of(Holder.direct(new WrapperBlock(blockMaterial)), second), Lifecycle.stable());
-        return DataResult.error("Material is not a block: " + materialName);
+        return DataResult.error(() -> "Material is not a block: " + materialName);
     }
     
     public static DataResult<Block> decodeToBlock(ResourceLocation location) {
         var materialName = location.toString();
         var material = NovaMaterialRegistry.INSTANCE.getOrNull(materialName);
         if (material == null)
-            return DataResult.error("Unknown material: " + materialName);
+            return DataResult.error(() -> "Unknown material: " + materialName);
         if (material instanceof BlockNovaMaterial blockMaterial) {
             return DataResult.success(new WrapperBlock(blockMaterial), Lifecycle.stable());
         }
-        return DataResult.error("Material is not a block: " + materialName);
+        return DataResult.error(() -> "Material is not a block: " + materialName);
     }
+    
 }
 

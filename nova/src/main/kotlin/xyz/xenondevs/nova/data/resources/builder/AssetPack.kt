@@ -2,8 +2,6 @@
 
 package xyz.xenondevs.nova.data.resources.builder
 
-import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.model.FileHeader
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
@@ -12,36 +10,81 @@ import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.GuisIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MaterialsIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MovedFontsIndexDeserializer
-import xyz.xenondevs.nova.util.data.get
 import java.io.InputStream
+import java.nio.file.Path
+import kotlin.io.path.CopyActionResult
+import kotlin.io.path.copyTo
+import kotlin.io.path.copyToRecursively
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.inputStream
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isDirectory
+import kotlin.io.path.outputStream
+import kotlin.io.path.relativeTo
 
-internal class AssetPack(val namespace: String, val zip: ZipFile, val assetsPath: String) {
+internal class AssetPack(val namespace: String, val assetsDir: Path) {
     
-    val modelsDir: FileHeader? = zip[assetsPath, "models/"]
-    val texturesDir: FileHeader? = zip[assetsPath, "textures/"]
-    val fontsDir: FileHeader? = zip[assetsPath, "fonts/"]
-    val langDir: FileHeader? = zip[assetsPath, "lang/"]
-    val soundsDir: FileHeader? = zip[assetsPath, "sounds/"]
-    val soundsFile: FileHeader? = zip[assetsPath, "sounds.json"]
-    val wailaTexturesDir: FileHeader? = zip[assetsPath, "textures/waila/"]
-    val atlasesDir: FileHeader? = zip[assetsPath, "atlases/"]
+    val modelsDir: Path? = assetsDir.resolve("models/").takeIf(Path::exists)
+    val texturesDir: Path? = assetsDir.resolve("textures/").takeIf(Path::exists)
+    val fontsDir: Path? = assetsDir.resolve("fonts/").takeIf(Path::exists)
+    val langDir: Path? = assetsDir.resolve("lang/").takeIf(Path::exists)
+    val soundsDir: Path? = assetsDir.resolve("sounds/").takeIf(Path::exists)
+    val soundsFile: Path? = assetsDir.resolve("sounds.json").takeIf(Path::exists)
+    val wailaTexturesDir: Path? = assetsDir.resolve("textures/waila/").takeIf(Path::exists)
+    val atlasesDir: Path? = assetsDir.resolve("atlases/").takeIf(Path::exists)
     
-    val materialsIndex: List<RegisteredMaterial>? = zip[assetsPath, "materials.json"]
-        ?.let { MaterialsIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
+    val materialsIndex: List<RegisteredMaterial>? = assetsDir.resolve("materials.json")
+        .takeIf(Path::exists)
+        ?.let { MaterialsIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    val guisIndex: Map<String, ResourcePath>? = zip[assetsPath, "guis.json"]
-        ?.let { GuisIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
+    val guisIndex: Map<String, ResourcePath>? = assetsDir.resolve("guis.json")
+        .takeIf(Path::exists)
+        ?.let { GuisIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    val armorIndex: List<RegisteredArmor>? = zip[assetsPath, "armor.json"]
-        ?.let { ArmorIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
+    val armorIndex: List<RegisteredArmor>? = assetsDir.resolve("armor.json")
+        .takeIf(Path::exists)
+        ?.let { ArmorIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    val movedFontsIndex: Map<ResourcePath, Set<Int>>? = zip[assetsPath, "moved_fonts.json"]
-        ?.let { MovedFontsIndexDeserializer.deserialize(namespace, zip.getInputStream(it).parseJson()) }
-    
-    fun getFileHeader(path: String): FileHeader? =
-        zip[assetsPath, path]
+    val movedFontsIndex: Map<ResourcePath, Set<Int>>? = assetsDir.resolve("moved_fonts.json")
+        .takeIf(Path::exists)
+        ?.let { MovedFontsIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
     fun getInputStream(path: String): InputStream? =
-        getFileHeader(path)?.let(zip::getInputStream)
+        assetsDir.resolve(path).takeIf(Path::exists)?.inputStream()
+    
+    fun extract(namespaceDir: Path, fileFilter: (String) -> Boolean) {
+        fun extractDir(sourceDir: Path, dirName: String) {
+            sourceDir.copyToRecursively(
+                target = namespaceDir.resolve("$dirName/"),
+                followLinks = false,
+            ) { source, target ->
+                if (source.isDirectory())
+                    return@copyToRecursively CopyActionResult.CONTINUE
+                
+                val relPath = source.relativeTo(sourceDir).invariantSeparatorsPathString
+                if (!fileFilter(relPath))
+                    return@copyToRecursively CopyActionResult.SKIP_SUBTREE
+                
+                source.inputStream().use { ins ->
+                    target.parent.createDirectories()
+                    target.outputStream().use { out ->
+                        if (source.extension.equals("png", true))
+                            PNGMetadataRemover.remove(ins, out)
+                        else ins.transferTo(out)
+                    }
+                }
+                
+                return@copyToRecursively CopyActionResult.CONTINUE
+            }
+        }
+        
+        texturesDir?.let { extractDir(it, "textures") }
+        modelsDir?.let { extractDir(it, "models") }
+        fontsDir?.let { extractDir(it, "font") }
+        soundsDir?.let { extractDir(it, "sounds") }
+        soundsFile?.copyTo(namespaceDir.resolve("sounds.json"))
+    }
     
 }

@@ -15,7 +15,7 @@ import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.serialization.json.GSON
@@ -30,7 +30,7 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
     override fun serialize(src: BlockModelData, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         val result = JsonObject()
         when (src) {
-            is ArmorStandBlockModelData -> {
+            is DisplayEntityBlockModelData -> {
                 result.addProperty("id", src.id.toString())
                 result.addProperty("hitboxType", src.hitboxType.name)
                 result.add("dataArray", GSON.toJsonTree(src.dataArray))
@@ -78,7 +78,7 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
             val hitboxType = Material.valueOf(json.getStringOrNull("hitboxType")!!)
             val dataArray = json.getAsJsonArray("dataArray").getAllInts().toIntArray()
             
-            return ArmorStandBlockModelData(NamespacedId.of(id), hitboxType, dataArray)
+            return DisplayEntityBlockModelData(NamespacedId.of(id), hitboxType, dataArray)
         }
     }
     

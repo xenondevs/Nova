@@ -9,6 +9,7 @@ import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
+import net.minecraft.core.RegistryAccess
 import net.minecraft.core.Rotations
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.RegistryOps
@@ -36,12 +37,12 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_19_R2.CraftServer
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -218,6 +219,8 @@ fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
 
 val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).server
+
+val registryAccess: RegistryAccess = minecraftServer.registryAccess()
 
 val serverTick: Int
     get() = minecraftServer.tickCount

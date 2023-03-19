@@ -11,6 +11,7 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.RandomAccessFile
+import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -250,6 +251,15 @@ internal fun Path.readImage(): BufferedImage {
 
 internal fun Path.writeImage(image: RenderedImage, formatName: String) {
     outputStream().use { ImageIO.write(image, formatName, it) }
+}
+
+internal fun File.openZip(): Path {
+    return toPath().openZip()
+}
+
+internal fun Path.openZip(): Path {
+    val fs = FileSystems.newFileSystem(this)
+    return fs.rootDirectories.first()
 }
 
 //<editor-fold desc="Legacy functions" defaultstate="collapsed">

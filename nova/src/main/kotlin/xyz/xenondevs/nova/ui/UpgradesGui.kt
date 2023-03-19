@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -10,9 +10,11 @@ import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.material.CoreGuiMaterial
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
@@ -20,7 +22,6 @@ import xyz.xenondevs.nova.ui.item.BackItem
 import xyz.xenondevs.nova.ui.item.ScrollLeftItem
 import xyz.xenondevs.nova.ui.item.ScrollRightItem
 import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 
@@ -65,7 +66,7 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
     fun openWindow(player: Player) {
         val window = Window.single {
             it.setViewer(player)
-            it.setTitle(arrayOf(TranslatableComponent("menu.nova.upgrades")))
+            it.setTitle(Component.translatable("menu.nova.upgrades"))
             it.setGui(gui)
         }
         
@@ -86,11 +87,11 @@ class UpgradesGui(val upgradeHolder: UpgradeHolder, openPrevious: (Player) -> Un
         override fun getItemProvider(): ItemProvider {
             val builder = type.icon.createClientsideItemBuilder()
             val typeId = type.id
-            builder.setDisplayName(localized(
-                ChatColor.GRAY,
+            builder.setDisplayName(Component.translatable(
                 "menu.${typeId.namespace}.upgrades.type.${typeId.name}",
-                upgradeHolder.upgrades[type] ?: 0,
-                upgradeHolder.getLimit(type)
+                NamedTextColor.GRAY,
+                Component.text(upgradeHolder.upgrades[type] ?: 0),
+                Component.text(upgradeHolder.getLimit(type))
             ))
             
             return builder

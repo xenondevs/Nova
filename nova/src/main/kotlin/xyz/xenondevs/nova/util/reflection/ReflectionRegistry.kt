@@ -13,11 +13,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.TagType
 import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.resources.RegistryFileCodec
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.players.PlayerList
 import net.minecraft.util.RandomSource
+import net.minecraft.world.BossEvent
 import net.minecraft.world.Container
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.ExperienceOrb
@@ -27,6 +29,7 @@ import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.inventory.ItemCombinerMenu
+import net.minecraft.world.item.Equipable
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.BannerDuplicateRecipe
 import net.minecraft.world.item.crafting.BookCloningRecipe
@@ -66,7 +69,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
-import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
@@ -83,7 +86,6 @@ import java.security.ProtectionDomain
 import java.util.*
 import java.util.function.Consumer
 import kotlin.jvm.internal.CallableReference
-import kotlin.reflect.KProperty1
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
@@ -117,7 +119,6 @@ internal object ReflectionRegistry {
     val FEATURE_SORTER_BUILD_FEATURES_PER_STEP_METHOD = getMethod(FeatureSorter::class, true, "SRM(net.minecraft.world.level.biome.FeatureSorter buildFeaturesPerStep)", List::class, JavaFunction::class, Boolean::class)
     val STATE_HOLDER_CODEC_METHOD = getMethod(StateHolder::class, true, "SRM(net.minecraft.world.level.block.state.StateHolder codec)", Codec::class, JavaFunction::class)
     val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class, true, "SRM(net.minecraft.world.level.chunk.LevelChunkSection setBlockState)", Int::class, Int::class, Int::class, BlockState::class, Boolean::class)
-    val K_PROPERTY_1_GET_DELEGATE_METHOD = getMethod(KProperty1::class, false, "getDelegate", Any::class)
     val CRAFT_BLOCK_DATA_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlockData::class, true, "isPreferredTool", BlockState::class, MojangStack::class)
     val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class)
     val ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getAttributeModifiers)", MojangEquipmentSlot::class)
@@ -158,11 +159,8 @@ internal object ReflectionRegistry {
     val BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD = getMethod(BrewingStandBlockEntity::class, true, "SRM(net.minecraft.world.level.block.entity.BrewingStandBlockEntity doBrew)", Level::class, BlockPos::class, NonNullList::class, BrewingStandBlockEntity::class)
     val ITEM_ENTITY_FIRE_IMMUNE_METHOD = getMethod(ItemEntity::class, false, "SRM(net.minecraft.world.entity.item.ItemEntity fireImmune)")
     val ITEM_IS_FIRE_RESISTANT_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item isFireResistant)")
-    val ITEM_STACK_GET_EQUIP_SOUND_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getEquipSound)")
-    val LIVING_ENTITY_PLAY_EQUIP_SOUND_METHOD = getMethod(LivingEntity::class, true, "SRM(net.minecraft.world.entity.LivingEntity playEquipSound)", MojangStack::class)
     val SIMPLE_PLUGIN_MANAGER_FIRE_EVENT_METHOD = getMethod(SimplePluginManager::class, true, "fireEvent", Event::class)
     val ITEM_STACK_LOAD_METHOD = getMethod(MojangStack::class, true, "load", CompoundTag::class)
-    val LIVING_ENTITY_GET_EQUIPMENT_SLOT_FOR_ITEM_METHOD = getMethod(LivingEntity::class, false, "getEquipmentSlotForItem", MojangStack::class)
     val RULE_PROCESSOR_PROCESS_BLOCK_METHOD = getMethod(RuleProcessor::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.RuleProcessor processBlock)", LevelReader::class, BlockPos::class, BlockPos::class, StructureTemplate.StructureBlockInfo::class, StructureTemplate.StructureBlockInfo::class, StructurePlaceSettings::class)
     val PROCESSOR_RULE_TEST_METHOD = getMethod(ProcessorRule::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule test)", BlockState::class, BlockState::class, BlockPos::class, BlockPos::class, BlockPos::class, RandomSource::class)
     val ORE_FEATURE_CAN_PLACE_ORE_METHOD = getMethod(OreFeature::class, true, "SRM(net.minecraft.world.level.levelgen.feature.OreFeature canPlaceOre)", BlockState::class, JavaFunction::class, RandomSource::class, OreConfiguration::class, TargetBlockState::class, MutableBlockPos::class)
@@ -171,6 +169,8 @@ internal object ReflectionRegistry {
     val RULE_TEST_TEST_METHOD = getMethod(RuleTest::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest test)", BlockState::class, RandomSource::class)
     val BLOCK_GETTER_GET_BLOCK_STATE_METHOD = getMethod(BlockGetter::class, false, "SRM(net.minecraft.world.level.BlockGetter getBlockState)", BlockPos::class)
     val FEATURE_PLACE_CONTEXT_RANDOM_METHOD = getMethod(FeaturePlaceContext::class, false, "SRM(net.minecraft.world.level.levelgen.feature.FeaturePlaceContext random)")
+    val CLIENTBOUND_BOSS_EVENT_PACKET_CREATE_ADD_PACKET_METHOD = getMethod(ClientboundBossEventPacket::class, false, "SRM(net.minecraft.network.protocol.game.ClientboundBossEventPacket createAddPacket)", BossEvent::class)
+    val EQUIPABLE_GET_METHOD = getMethod(Equipable::class, false, "SRM(net.minecraft.world.item.Equipable get)", MojangStack::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

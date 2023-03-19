@@ -50,16 +50,16 @@ internal class MovedFontContent : PackContent {
             
             val bitmapFont = BitmapFontGenerator(font, font == DEFAULT_FONT && FORCE_UNICODE_FONT).generateBitmapFont()
             
-            variants.forEach { ascent ->
+            variants.forEach { y ->
                 val fontCopy = bitmapFont.deepCopy()
                 val providers = fontCopy.getAsJsonArray("providers")
                 providers.forEach { provider ->
                     require(provider is JsonObject)
                     val currentAscent = provider.getIntOrNull("ascent") ?: 0
-                    provider.addProperty("ascent", currentAscent + ascent)
+                    provider.addProperty("ascent", currentAscent - y)
                 }
                 
-                val file = ResourcePackBuilder.ASSETS_DIR.resolve("${font.namespace}/font/${font.path}/$ascent.json")
+                val file = ResourcePackBuilder.ASSETS_DIR.resolve("${font.namespace}/font/${font.path}/$y.json")
                 file.parent.createDirectories()
                 fontCopy.writeToFile(file)
             }

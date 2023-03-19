@@ -11,8 +11,8 @@ import io.th0rgal.oraxen.mechanics.provided.gameplay.noteblock.NoteBlockMechanic
 import io.th0rgal.oraxen.mechanics.provided.gameplay.stringblock.StringBlockMechanic
 import io.th0rgal.oraxen.utils.blocksounds.BlockSounds
 import io.th0rgal.oraxen.utils.drops.Drop
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.TextComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -150,12 +150,15 @@ internal object Oraxen : CustomItemService {
         return "oraxen:$name"
     }
     
-    override fun getName(item: ItemStack, locale: String): Array<BaseComponent>? {
-        return if (OraxenItems.getIdByItem(item) != null) TextComponent.fromLegacyText(item.displayName) else null
+    override fun getName(item: ItemStack, locale: String): Component? {
+        return if (OraxenItems.getIdByItem(item) != null)
+            item.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
+        else null
     }
     
-    override fun getName(block: Block, locale: String): Array<BaseComponent>? {
-        return getId(block)?.let(::getItemById)?.displayName?.let(TextComponent::fromLegacyText)
+    override fun getName(block: Block, locale: String): Component? {
+        val item = getId(block)?.let(::getItemById) ?: return null
+        return item.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {

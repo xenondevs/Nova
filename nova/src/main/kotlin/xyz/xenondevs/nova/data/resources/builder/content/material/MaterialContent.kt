@@ -13,8 +13,6 @@ import xyz.xenondevs.nova.data.resources.ModelData
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.SoundOverrides
-import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockDirection
@@ -24,7 +22,7 @@ import xyz.xenondevs.nova.data.resources.builder.content.material.info.Registere
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
@@ -40,8 +38,7 @@ import kotlin.io.path.writeText
 private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks") }
 
 internal class MaterialContent(
-    private val basePacks: BasePacks,
-    private val soundOverrides: SoundOverrides
+    private val builder: ResourcePackBuilder
 ) : PackContent {
     
     override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
@@ -126,10 +123,10 @@ internal class MaterialContent(
                     val material = VanillaMaterialTypes.DEFAULT_MATERIAL
                     val registeredModels = customItemModels.getOrPut(material, ::HashMap)
                     val dataArray = info.models.mapToIntArray { registeredModels.getOrPut(it) { getNextCustomModelData(material) } }
-                    blockModelData = ArmorStandBlockModelData(id, info.hitboxType, dataArray)
+                    blockModelData = DisplayEntityBlockModelData(id, info.hitboxType, dataArray)
                     
                     // note hitbox type as used material for sound overrides
-                    soundOverrides.useMaterial(info.hitboxType)
+                    builder.soundOverrides.useMaterial(info.hitboxType)
                 } else {
                     val configs = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
                     info.models.forEach { model ->
@@ -143,7 +140,7 @@ internal class MaterialContent(
                             faceList += blockConfig
                             
                             // note block type as used material for sound overrides
-                            soundOverrides.useMaterial(blockConfig.type.material)
+                            builder.soundOverrides.useMaterial(blockConfig.type.material)
                         }
                     }
                     
@@ -194,7 +191,7 @@ internal class MaterialContent(
     private fun getNextCustomModelData(material: Material): Int {
         var pos = modelDataPosition.getOrPut(material) { 0 } + 1
         
-        val occupiedSet = basePacks.occupiedModelData[material]
+        val occupiedSet = builder.basePacks.occupiedModelData[material]
         if (occupiedSet != null) {
             while (pos in occupiedSet) {
                 pos++
@@ -214,7 +211,7 @@ internal class MaterialContent(
     private fun getNextBlockConfig(type: BlockStateConfigType<*>): BlockStateConfig {
         var pos = blockStatePosition.getOrPut(type) { -1 } + 1
         
-        val occupiedSet = basePacks.occupiedSolidIds[type]
+        val occupiedSet = builder.basePacks.occupiedSolidIds[type]
         val blockedSet = type.blockedIds
         
         while (pos in blockedSet || (occupiedSet != null && pos in occupiedSet)) {
@@ -237,7 +234,7 @@ internal class MaterialContent(
         return remainingBlockStates.getOrPut(type) {
             var count = 0
             
-            val occupiedSet = basePacks.occupiedSolidIds[type]
+            val occupiedSet = builder.basePacks.occupiedSolidIds[type]
             val blockedSet = type.blockedIds
             
             for (pos in 0..type.maxId) {

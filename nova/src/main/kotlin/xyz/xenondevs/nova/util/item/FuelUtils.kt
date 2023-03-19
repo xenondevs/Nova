@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.util.item
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.item.behavior.Fuel

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.item.behavior
 
-import net.md_5.bungee.api.ChatColor
+import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.DamageableOptions
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.item.novaCompound
 import kotlin.math.min
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -93,7 +92,7 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
         itemData.durabilityBar = durability / options.durability.toDouble()
         
         itemData.addAdvancedTooltipsLore(
-            arrayOf(localized(ChatColor.WHITE, "item.durability", durability, options.durability))
+            Component.translatable("item.durability", Component.text(durability), Component.text(options.durability))
         )
     }
     

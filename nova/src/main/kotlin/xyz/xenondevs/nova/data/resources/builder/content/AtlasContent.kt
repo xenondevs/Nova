@@ -7,10 +7,11 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.util.data.walk
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.walk
 
 internal class AtlasContent : PackContent {
     
@@ -19,11 +20,10 @@ internal class AtlasContent : PackContent {
     private val sources = HashMap<String, JsonArray>()
     
     override fun includePack(pack: AssetPack) {
-        val atlasesDir = pack.atlasesDir ?: return
-        pack.zip.walk(atlasesDir, false).forEach {
-            val atlasName = it.fileName.substringAfterLast('/').substringBefore('.')
+        pack.atlasesDir?.walk()?.forEach { atlas ->
+            val atlasName = atlas.nameWithoutExtension
             val atlasSources = sources.getOrPut(atlasName, ::JsonArray)
-            atlasSources.addAll((pack.zip.getInputStream(it).parseJson() as JsonObject).getAsJsonArray("sources"))
+            atlasSources.addAll((atlas.parseJson() as JsonObject).getAsJsonArray("sources"))
         }
     }
     

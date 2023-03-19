@@ -2,14 +2,13 @@ package xyz.xenondevs.nova.data.resources.builder.content.font
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.TextComponent
+import net.kyori.adventure.text.Component
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.serialization.json.GSON
+import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.data.readImageDimensions
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
@@ -55,7 +54,7 @@ internal abstract class FontContent(
                 val dataList = entries.map { it.value }
                 val file = ResourcePackBuilder.FONT_DIR.resolve("${font.substringAfter(':')}.json")
                 writeFont(file, dataList)
-                movedFontContent?.requestMovedFonts(ResourcePath.of(font), -19..-1)
+                movedFontContent?.requestMovedFonts(ResourcePath.of(font), 1..19)
             }
     }
     
@@ -100,7 +99,10 @@ class FontChar internal constructor(val font: String, val char: Char) {
     val height by lazy { CharSizes.getCharHeight(font, char) }
     val ascent by lazy { CharSizes.getCharAscent(font, char) }
     
-    val component: BaseComponent
-        get() = TextComponent(char.toString()).also { it.font = font; it.color = ChatColor.WHITE }
+    val component: Component
+        get() = Component.text()
+            .content(char.toString())
+            .font(font)
+            .build()
     
 }

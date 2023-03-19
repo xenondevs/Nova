@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.util
 
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -60,8 +60,8 @@ fun obtainNovaItemAdvancement(
         display {
             icon(item.clientsideProvider.get())
             frame(frameType)
-            title(TranslatableComponent("advancement.${id.namespace}.${id.name}.title"))
-            description(TranslatableComponent("advancement.${id.namespace}.${id.name}.description"))
+            title(Component.translatable("advancement.${id.namespace}.${id.name}.title"))
+            description(Component.translatable("advancement.${id.namespace}.${id.name}.description"))
         }
         
         criteria { obtainNovaItem(item) }
@@ -84,8 +84,8 @@ fun obtainNovaItemsAdvancement(
         display {
             icon(items[0].clientsideProvider.get())
             frame(frameType)
-            title(TranslatableComponent("advancement.$namespace.$name.title"))
-            description(TranslatableComponent("advancement.$namespace.$name.description"))
+            title(Component.translatable("advancement.$namespace.$name.title"))
+            description(Component.translatable("advancement.$namespace.$name.description"))
         }
         
         val criteria = ArrayList<Criterion>()

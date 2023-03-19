@@ -8,10 +8,10 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // versions
-            version("kotlin", "1.8.0")
+            version("kotlin", "1.8.20-RC")
             version("dokka", "1.7.20")
-            version("ktor", "2.2.2")
-            version("spigot", "1.19.3-R0.1-SNAPSHOT")
+            version("ktor", "2.2.4")
+            version("spigot", "1.19.4-R0.1-SNAPSHOT")
             version("cbf", "0.4")
             version("xenondevs-commons", "1.0-SNAPSHOT")
             
@@ -25,7 +25,7 @@ dependencyResolutionManagement {
             
             // lib - ktor
             library("ktor-server-core-jvm", "io.ktor", "ktor-server-core-jvm").versionRef("ktor")
-            library("ktor-server-netty-jvm", "io.ktor", "ktor-server-netty-jvm").versionRef("ktor")
+            library("ktor-server-jetty-jvm", "io.ktor", "ktor-server-jetty-jvm").versionRef("ktor")
             library("ktor-client-core-jvm", "io.ktor", "ktor-client-core-jvm").versionRef("ktor")
             library("ktor-client-cio-jvm", "io.ktor", "ktor-client-cio-jvm").versionRef("ktor")
             library("ktor-client-content-negotiation", "io.ktor", "ktor-client-content-negotiation").versionRef("ktor")
@@ -58,14 +58,21 @@ dependencyResolutionManagement {
             // lib - zip4j
             library("zip4j", "net.lingala.zip4j:zip4j:2.11.2")
             
+            // lib - kyori adventure
+            library("adventure-api", "net.kyori:adventure-api:4.12.0")
+            library("adventure-text-serializer-gson", "net.kyori:adventure-text-serializer-gson:4.12.0")
+            library("adventure-text-serializer-plain", "net.kyori:adventure-text-serializer-plain:4.12.0")
+            library("adventure-platform-bukkit", "net.kyori:adventure-platform-bukkit:4.2.0")
+            
             // bundles
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("kotlin-test-junit", "junit-jupiter"))
-            bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-netty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
+            bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-jetty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
             bundle("cbf", listOf("cosmic-binary-format", "cosmic-binary-format-netty-adapter"))
             bundle("xenondevs-commons", listOf("commons-collections", "commons-gson", "commons-provider", "commons-reflection"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
             bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer", "resource-pack-obfuscator"))
+            bundle("kyori-adventure", listOf("adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-plain", "adventure-platform-bukkit"))
             
             // plugins
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")

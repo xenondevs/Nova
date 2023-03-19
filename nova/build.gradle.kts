@@ -19,16 +19,16 @@ dependencies {
     spigotLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
-    novaLoaderApi("xyz.xenondevs.invui:invui:1.0-SNAPSHOT") { for (i in 1..12) exclude("xyz.xenondevs.invui", "inventory-access-r$i") }
-    novaLoaderApi("xyz.xenondevs.invui:inventory-access-r12:1.0-SNAPSHOT:remapped-mojang")
+    novaLoaderApi(libs.bundles.kyori.adventure)
+    novaLoaderApi("xyz.xenondevs.invui:invui:1.0-SNAPSHOT") { for (i in 1..13) exclude("xyz.xenondevs.invui", "inventory-access-r$i") }
+    novaLoaderApi("xyz.xenondevs.invui:inventory-access-r13:1.0-SNAPSHOT:remapped-mojang")
     novaLoaderApi("xyz.xenondevs.invui:invui-kotlin:1.0-SNAPSHOT")
-    novaLoaderApi("xyz.xenondevs:nms-utilities:0.6:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs:nms-utilities:0.8:remapped-mojang")
     
     // internal dependencies
     compileOnly(project(":nova-loader"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
-    novaLoader(libs.zip4j)
     novaLoader("xyz.xenondevs.invui:invui-resourcepack:1.0-SNAPSHOT") { exclude("xyz.xenondevs.invui", "invui") }
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.4")
@@ -46,7 +46,6 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Core:6.10.5") { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Bukkit:6.10.5") { isTransitive = false }
-    compileOnly("com.griefdefender:api:2.0.0-SNAPSHOT") { isTransitive = false }
     compileOnly("com.github.LoneDev6:API-ItemsAdder:3.2.4") { isTransitive = false }
     compileOnly("com.github.TownyAdvanced:Towny:0.97.2.0") { isTransitive = false }
     compileOnly("io.th0rgal:oraxen:1.151.0") { isTransitive = false }

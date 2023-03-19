@@ -2,7 +2,9 @@ package xyz.xenondevs.nova.world.fakeentity.metadata
 
 import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.syncher.EntityDataSerializer
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
+import java.util.*
 
 abstract class Metadata internal constructor() {
     
@@ -40,8 +42,14 @@ abstract class Metadata internal constructor() {
         return buf
     }
     
-    internal fun <T> entry(index: Int, serializer: MetadataSerializer<T>, default: T): MetadataEntry<T> {
-        val entry = MetadataEntry(index, serializer, default)
+    internal fun <T> entry(index: Int, serializer: EntityDataSerializer<T>, default: T): MetadataEntry<T> {
+        val entry = NonNullMetadataEntry(index, serializer, default)
+        entries += entry
+        return entry
+    }
+    
+    internal fun <T> optional(index: Int, serializer: EntityDataSerializer<Optional<T & Any>>, default: T?): MetadataEntry<T?> {
+        val entry = NullableMetadataEntry(index, serializer, default)
         entries += entry
         return entry
     }

@@ -10,7 +10,7 @@ import kotlin.io.path.copyTo
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
 
-internal class FontFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/lang") {
+internal class FontFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/font") {
     
     override fun merge(source: Path, destination: Path) {
         if (!destination.exists()) {

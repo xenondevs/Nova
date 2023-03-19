@@ -8,8 +8,6 @@ import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.data.listFileHeaders
-import xyz.xenondevs.nova.util.data.path
 import java.util.logging.Level
 import kotlin.io.path.createDirectories
 import kotlin.io.path.extension
@@ -39,15 +37,14 @@ internal class LanguageContent : PackContent {
     
     override fun includePack(pack: AssetPack) {
         val langDir = pack.langDir ?: return
-        pack.zip.listFileHeaders(langDir)
-            .filter { !it.isDirectory }
-            .forEach { lang ->
-                if (lang.path.extension == "json") {
-                    val langObj = pack.zip.getInputStream(lang).parseJson() as JsonObject
-                    val langMap = languageLookup.getOrPut(lang.path.nameWithoutExtension, ::HashMap)
-                    langObj.entrySet().forEach { (key, value) -> langMap[key] = value.asString }
-                }
+        
+        langDir.walk().forEach { lang ->
+            if (lang.extension.equals("json", true)) {
+                val langObj = lang.parseJson() as JsonObject
+                val langMap = languageLookup.getOrPut(lang.nameWithoutExtension, ::HashMap)
+                langObj.entrySet().forEach { (key, value) -> langMap[key] = value.asString }
             }
+        }
     }
     
     override fun write() {

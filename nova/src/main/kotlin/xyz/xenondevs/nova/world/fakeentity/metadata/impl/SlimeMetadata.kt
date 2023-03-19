@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
-import xyz.xenondevs.nova.world.fakeentity.metadata.MetadataSerializers
+import net.minecraft.network.syncher.EntityDataSerializers
 
 class SlimeMetadata : MobMetadata() {
     
-    var size by entry(16, MetadataSerializers.VAR_INT, 1)
+    var size by entry(16, EntityDataSerializers.INT, 1)
     
 }

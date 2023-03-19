@@ -2,13 +2,13 @@ package xyz.xenondevs.nova.ui.waila.overlay
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TextComponent
+import net.kyori.adventure.text.Component
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
-import xyz.xenondevs.nova.util.data.MovingComponentBuilder
+import xyz.xenondevs.nova.util.component.adventure.append
+import xyz.xenondevs.nova.util.component.adventure.font
+import xyz.xenondevs.nova.util.component.adventure.move
+import xyz.xenondevs.nova.util.component.adventure.moveTo
 import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 
@@ -34,16 +34,17 @@ private val overlayCache: Cache<OverlayCacheKey, OverlayData> = CacheBuilder.new
     .build()
 
 private data class OverlayCacheKey(val icon: FontChar?, val lines: Int, val longestLineLength: Int)
-private typealias OverlayData = Triple<Array<BaseComponent>, Int, Int>
+private data class OverlayData(val component: Component, val textBeginX: Int, val textCenterX: Int)
 
-internal class WailaImageOverlay : BossBarOverlay() {
+/**
+ * Responsible for rendering the waila block icon and background.
+ */
+internal class WailaImageOverlay : BossBarOverlay {
     
-    override val barLevel = 0
     override val centerX = null
+    override val offset = 0
     
-    private var endY = 0
-    
-    override var components: Array<BaseComponent> = ComponentBuilder("").create()
+    override var component: Component = Component.empty()
         private set
     
     /**
@@ -66,7 +67,7 @@ internal class WailaImageOverlay : BossBarOverlay() {
             val actualWidth = START_TEXTURE_SIZE + partAmount * PART_SIZE + END_TEXTURE_SIZE
             val halfWidth = actualWidth / 2
             
-            val builder = MovingComponentBuilder()
+            val builder = Component.text()
                 .move(-halfWidth)
                 .append(getComponent(lines, 0)) // start texture
                 .move(-1)
@@ -86,7 +87,7 @@ internal class WailaImageOverlay : BossBarOverlay() {
             
             builder.moveTo(0)
             
-            val components = builder.create()
+            val component = builder.build()
             
             // the min x position for text to be displayed
             var textMin = -halfWidth + TEXT_MARGIN_LEFT
@@ -97,27 +98,15 @@ internal class WailaImageOverlay : BossBarOverlay() {
             // the middle between textMin and textMax, which is the center point of text
             val textCenterX = (textMin + textMax) / 2
             
-            return@get Triple(components, textMin, textCenterX)
+            return@get OverlayData(component, textMin, textCenterX)
         }
         
-        this.components = components
-        this.endY = -getTextureHeight(lines) + 1
+        this.component = components
         
         return textBeginX to textCenterX
     }
     
     override fun getWidth(locale: String): Int = 0
-    override fun getEndY(locale: String): Int = endY
-    
-    /**
-     * Gets the height of the background texture for the given amount of lines.
-     */
-    private fun getTextureHeight(lines: Int): Int =
-        when {
-            lines < 0 -> throw UnsupportedOperationException()
-            lines in 0..2 -> 40
-            else -> 8 + lines * 12
-        }
     
     /**
      * Gets the correct background texture char for the given [line amount][lines] and [type].
@@ -132,11 +121,8 @@ internal class WailaImageOverlay : BossBarOverlay() {
      * Gets the correct background texture base component for the given [line amount][lines] and [type].
      * Valid [types][type] are 0: start, 1: part, 2: end.
      */
-    private fun getComponent(lines: Int, type: Int): BaseComponent {
-        return TextComponent(getChar(lines, type)).apply {
-            font = WAILA_FONT
-            color = ChatColor.WHITE
-        }
+    private fun getComponent(lines: Int, type: Int): Component {
+        return Component.text(getChar(lines, type)).font(WAILA_FONT)
     }
     
 }

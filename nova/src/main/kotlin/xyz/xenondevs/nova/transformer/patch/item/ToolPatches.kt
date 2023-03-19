@@ -4,7 +4,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.TypeInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
