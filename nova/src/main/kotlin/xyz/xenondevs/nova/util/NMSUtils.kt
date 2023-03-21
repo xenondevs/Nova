@@ -127,6 +127,12 @@ val EquipmentSlot.interactionHand: InteractionHand
         else -> throw UnsupportedOperationException()
     }
 
+val InteractionHand.equipmentSlot: EquipmentSlot
+    get() = when (this) {
+        InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
+        InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
+    }
+
 val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
     get() = when (this) {
         EquipmentSlot.HAND -> MojangEquipmentSlot.MAINHAND

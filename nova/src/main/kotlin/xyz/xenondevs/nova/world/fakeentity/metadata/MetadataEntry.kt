@@ -52,6 +52,45 @@ internal open class NonNullMetadataEntry<T>(
     
 }
 
+internal class MappedNonNullMetadataEntry<C, T>(
+    private val index: Int,
+    private val serializer: EntityDataSerializer<T>,
+    private val mapper: (C) -> T,
+    private val default: C
+) : MetadataEntry<C> {
+    
+    private val serializerId = EntityDataSerializers.getSerializedId(serializer)
+    
+    override var value: C = default
+        private set
+    private var mappedValue: T? = null
+    
+    override var dirty: Boolean = false
+    
+    override operator fun getValue(thisRef: Any, property: KProperty<*>): C {
+        return value
+    }
+    
+    override operator fun setValue(thisRef: Any, property: KProperty<*>, value: C) {
+        this.value = value
+        dirty = true
+        mappedValue = null
+    }
+    
+    override fun write(buf: FriendlyByteBuf) {
+        if (mappedValue == null)
+            mappedValue = mapper(value)
+        
+        buf.writeByte(index)
+        buf.writeVarInt(serializerId)
+        serializer.write(buf, mappedValue!!)
+    }
+    
+    override fun isNotDefault(): Boolean =
+        value != default
+    
+}
+
 internal class NullableMetadataEntry<T>(
     private val index: Int,
     private val serializer: EntityDataSerializer<Optional<T & Any>>,
@@ -61,7 +100,7 @@ internal class NullableMetadataEntry<T>(
     private val serializerId = EntityDataSerializers.getSerializedId(serializer)
     
     override var value: T? = default
-        protected set
+        private set
     override var dirty: Boolean = false
     
     override fun getValue(thisRef: Any, property: KProperty<*>): T? {

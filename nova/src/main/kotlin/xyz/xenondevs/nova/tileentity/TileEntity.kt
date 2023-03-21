@@ -106,7 +106,6 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     var isValid: Boolean = true
         private set
     
-    internal val multiModels = ArrayList<MultiModel>()
     internal val packetTasks = ArrayList<TileEntityPacketTask>()
     private val regions = HashMap<String, ReloadableRegion>()
     
@@ -215,7 +214,6 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRemoved(unload: Boolean) {
         isValid = false
-        multiModels.forEach { it.close() }
         packetTasks.forEach { it.stop() }
         regions.values.forEach { VisualRegion.removeRegion(it.uuid) }
         if (::menuContainer.isInitialized) menuContainer.closeWindows()
@@ -460,15 +458,6 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         regions[name] = region
         
         return region
-    }
-    
-    /**
-     * Creates a new [MultiModel] for this [TileEntity].
-     * When the [TileEntity] is removed, all [Models][Model] belonging
-     * to this [MultiModel] will be removed.
-     */
-    fun createMultiModel(): MultiModel {
-        return MultiModel().also(multiModels::add)
     }
     
     /**

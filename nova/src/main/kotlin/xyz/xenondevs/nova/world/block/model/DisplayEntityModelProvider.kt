@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block.model
 
+import net.minecraft.util.Brightness
 import net.minecraft.world.item.ItemDisplayContext
 import org.bukkit.Material
 import org.joml.Quaternionf
@@ -58,7 +59,7 @@ class DisplayEntityModelProvider(blockState: NovaBlockState) : BlockModelProvide
     private fun setDataValues(data: ItemDisplayMetadata, directional: Directional?, subId: Int = 0) {
         // TODO: proper light level
         if (modelData.hitboxType.requiresLight)
-            data.brightness = 0x00F000F0 // 15 block, 15 sky
+            data.brightness = Brightness(15, 15)
         
         data.itemDisplay = ItemDisplayContext.HEAD
         data.itemStack = modelData[subId].get().nmsCopy
