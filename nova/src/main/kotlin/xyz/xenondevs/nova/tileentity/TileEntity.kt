@@ -215,10 +215,10 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRemoved(unload: Boolean) {
         isValid = false
-        menuContainer?.closeWindows()
         multiModels.forEach { it.close() }
         packetTasks.forEach { it.stop() }
         regions.values.forEach { VisualRegion.removeRegion(it.uuid) }
+        if (::menuContainer.isInitialized) menuContainer.closeWindows()
         if (this is Upgradable) upgradeHolder.handleRemoved()
     }
     
