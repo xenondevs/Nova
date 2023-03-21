@@ -231,7 +231,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRightClick(ctx: BlockInteractContext): Boolean {
         val player = ctx.source as? Player ?: return false
-        if (menuContainer != null && !player.hasInventoryOpen) {
+        if (::menuContainer.isInitialized && !player.hasInventoryOpen) {
             menuContainer.openWindow(player)
             return true
         }
@@ -239,7 +239,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder {
-        check(menuContainer != null) { "A TileEntityMenu class must be present to create an UpgradeHolder" }
+        check(::menuContainer.isInitialized) { "A TileEntityMenu class must be present to create an UpgradeHolder" }
         return UpgradeHolder(this, menuContainer, ::reload, allowed.toHashSet())
     }
     
