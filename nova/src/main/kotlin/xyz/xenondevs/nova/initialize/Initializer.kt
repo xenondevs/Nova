@@ -62,7 +62,6 @@ internal object Initializer : Listener {
                 val stage = enumValueOf<InitializationStage>(stageName)
                 val dependsOn = (annotation["dependsOn"] as List<Type>?)?.mapTo(ObjectOpenHashSet()) { it.internalName } ?: ObjectSets.emptySet()
                 
-                println("Found class $clazz with stage $stage and dependencies $dependsOn")
                 return@map InitializableClass(clazz, stage, dependsOn)
             }.toMutableList()
         
