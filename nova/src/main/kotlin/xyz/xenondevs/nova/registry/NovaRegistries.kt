@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.player.attachment.AttachmentType
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
-import xyz.xenondevs.nova.world.generation.ExperimentalLevelGen
+import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 
 object NovaRegistries {
@@ -38,7 +38,7 @@ object NovaRegistries {
     
     val RECIPE = registerSimple<NovaRecipe>("recipe")
     
-    @ExperimentalLevelGen
+    @ExperimentalWorldGen
     val BIOME_INJECTION = registerSimple<BiomeInjection>("biome_injection")
     
     val WAILA_INFO_PROVIDER = registerSimple<WailaInfoProvider<*>>("waila_info_provider")
