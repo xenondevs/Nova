@@ -14,28 +14,29 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
 private val ABILITIES_KEY = NamespacedKey(NOVA, "abilities1")
 
-object AbilityManager : Initializable(), Listener {
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+object AbilityManager : Listener {
     
     internal val activeAbilities = HashMap<Player, HashMap<AbilityType<*>, Ability>>()
     
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
-    
-    override fun init() {
+    fun init() {
         registerEvents()
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerJoin)
         runTaskTimer(0, 1) { activeAbilities.values.flatMap(Map<*, Ability>::values).forEach(Ability::handleTick) }
     }
     
-    override fun disable() {
+    fun disable() {
         LOGGER.info("Removing active abilities")
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerQuit)
     }

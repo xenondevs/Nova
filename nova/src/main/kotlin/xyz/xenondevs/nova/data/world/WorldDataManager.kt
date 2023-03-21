@@ -22,8 +22,8 @@ import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -45,10 +45,17 @@ import kotlin.concurrent.write
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.level.Level as MojangWorld
 
-internal object WorldDataManager : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer, LegacyFileConverter, TileEntityManager, VanillaTileEntityManager, NetworkManager)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [
+        AddonsInitializer::class,
+        LegacyFileConverter::class,
+        TileEntityManager::class,
+        VanillaTileEntityManager::class,
+        NetworkManager.Companion::class
+    ]
+)
+internal object WorldDataManager : Listener {
     
     private val worlds: MutableMap<UUID, WorldDataStorage> = Collections.synchronizedMap(HashMap()) // TODO: removing entries of unloaded worlds
     
@@ -58,7 +65,7 @@ internal object WorldDataManager : Initializable(), Listener {
     
     private val pendingOrphanBlocks = Object2ObjectOpenHashMap<ChunkPos, MutableMap<BlockPos, BlockNovaMaterial>>()
     
-    override fun init() {
+    fun init() {
         LOGGER.info("Initializing WorldDataManager")
         registerEvents()
         Bukkit.getWorlds().forEach(::queueWorldLoad)
@@ -100,7 +107,7 @@ internal object WorldDataManager : Initializable(), Listener {
         }
     }
     
-    override fun disable() {
+    fun disable() {
         Bukkit.getWorlds().forEach(::saveWorld)
     }
     

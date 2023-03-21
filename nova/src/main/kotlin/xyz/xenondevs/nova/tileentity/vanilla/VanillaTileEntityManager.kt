@@ -10,8 +10,8 @@ import org.bukkit.event.block.BlockPlaceEvent
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
@@ -23,15 +23,16 @@ import java.util.*
 /**
  * Manages wrappers for vanilla TileEntities
  */
-internal object VanillaTileEntityManager : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+internal object VanillaTileEntityManager : Listener {
     
     private val tileEntityMap: MutableMap<ChunkPos, MutableMap<BlockPos, VanillaTileEntity>> =
         Collections.synchronizedMap(HashMap())
     
-    override fun init() {
+    fun init() {
         registerEvents()
     }
     

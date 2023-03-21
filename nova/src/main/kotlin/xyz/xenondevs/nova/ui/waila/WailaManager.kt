@@ -15,8 +15,8 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unregisterEvents
@@ -30,10 +30,11 @@ private val UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getLong("waila.
 private val Player.isWailaEnabled: Boolean
     get() = persistentDataContainer.get<Boolean>(WAILA_ENABLED_KEY) != false
 
-internal object WailaManager : Initializable(), Listener, IWailaManager {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(ResourceGeneration.PostWorld, AddonsInitializer)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [ResourceGeneration.PostWorld::class, AddonsInitializer::class]
+)
+internal object WailaManager : Listener, IWailaManager {
     
     private var tickTask: BukkitTask? = null
     private val overlays = HashMap<Player, Waila>()
@@ -50,7 +51,7 @@ internal object WailaManager : Initializable(), Listener, IWailaManager {
     }
     //</editor-fold>
     
-    override fun init() {
+    fun init() {
         reload()
     }
     
@@ -85,7 +86,7 @@ internal object WailaManager : Initializable(), Listener, IWailaManager {
         return true
     }
     
-    override fun disable() {
+    fun disable() {
         overlays.values.forEach { it.setActive(false) }
     }
     

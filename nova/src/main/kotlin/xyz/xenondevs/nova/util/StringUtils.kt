@@ -61,6 +61,12 @@ fun String.startsWithAny(vararg prefixes: String): Boolean {
     return false
 }
 
+fun String.equalsAny(vararg strings: String, ignoreCase: Boolean = false): Boolean {
+    for (string in strings)
+        if (equals(string, ignoreCase)) return true
+    return false
+}
+
 operator fun Any.plus(other: String) = this.toString() + other
 
 object StringUtils {

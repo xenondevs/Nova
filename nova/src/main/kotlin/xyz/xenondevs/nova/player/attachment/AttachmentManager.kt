@@ -18,8 +18,8 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -27,22 +27,23 @@ import kotlin.collections.set
 
 private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments1")
 
-object AttachmentManager : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+object AttachmentManager :  Listener {
     
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()
     private val inactiveAttachments = HashMap<Player, HashSet<NamespacedId>>()
     
-    override fun init() {
+    fun init() {
         registerEvents()
         PacketEventManager.registerListener(this)
         Bukkit.getOnlinePlayers().forEach(::loadAttachments)
         runTaskTimer(0, 1) { activeAttachments.values.flatMap(Map<*, Attachment>::values).forEach(Attachment::handleTick) }
     }
     
-    override fun disable() {
+    fun disable() {
         LOGGER.info("Saving attachments")
         Bukkit.getOnlinePlayers().forEach { saveAndRemoveAttachments(it) }
     }

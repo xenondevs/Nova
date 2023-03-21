@@ -12,26 +12,24 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.net.URL
 
-internal object UpdateReminder : Initializable(), Listener {
+@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC, dependsOn = [NovaConfig::class])
+internal object UpdateReminder : Listener {
     
     private const val NOVA_RESOURCE_ID = 93648
-    
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = setOf(NovaConfig)
     
     private var task: BukkitTask? = null
     private val needsUpdate = ArrayList<Addon?>()
     private val alreadyNotified = ArrayList<Addon?>()
     
-    override fun init() {
+    fun init() {
         reload()
     }
     

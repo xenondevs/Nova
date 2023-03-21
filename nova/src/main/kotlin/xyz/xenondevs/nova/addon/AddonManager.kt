@@ -8,31 +8,30 @@ import xyz.xenondevs.nova.addon.loader.LibraryLoaderPools
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.transformer.Patcher
 import java.io.File
 import java.util.logging.Level
 
-internal object AddonsLoader : Initializable() {
+@InternalInit(stage = InitializationStage.PRE_WORLD)
+internal object AddonsLoader {
     
-    override val initializationStage = InitializationStage.PRE_WORLD
-    override val dependsOn = emptySet<Initializable>()
-    
-    override fun init() {
+    fun init() {
         LOGGER.info("Loading Addons...")
         AddonManager.loadAddons()
     }
     
 }
 
-internal object AddonsInitializer : Initializable() {
+@InternalInit(
+    stage = InitializationStage.PRE_WORLD,
+    dependsOn = [NovaConfig::class, ResourceGeneration.PreWorld::class, Patcher::class]
+)
+internal object AddonsInitializer {
     
-    override val initializationStage = InitializationStage.PRE_WORLD
-    override val dependsOn = setOf(NovaConfig, ResourceGeneration.PreWorld, Patcher)
-    
-    override fun init() {
+    fun init() {
         LOGGER.info("Initializing Addons...")
         AddonManager.initializeAddons()
     }

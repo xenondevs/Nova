@@ -1,7 +1,9 @@
-@file:Suppress("UnstableApiUsage")
-
 package xyz.xenondevs.nova.initialize
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ObjectLists
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+import it.unimi.dsi.fastutil.objects.ObjectSets
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
 import org.bukkit.Bukkit
@@ -10,8 +12,10 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
+import org.bukkit.inventory.ItemStack
+import org.objectweb.asm.Type
 import xyz.xenondevs.commons.collections.CollectionUtils
-import xyz.xenondevs.inventoryaccess.component.i18n.Languages
+import xyz.xenondevs.commons.reflection.hasEmptyArguments
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.util.InventoryUtils
 import xyz.xenondevs.invui.virtualinventory.StackSizeProvider
@@ -19,100 +23,77 @@ import xyz.xenondevs.nmsutils.NMSUtilities
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
-import xyz.xenondevs.nova.command.CommandManager
-import xyz.xenondevs.nova.data.DataFileParser
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.recipe.RecipeManager
-import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
-import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
-import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.integration.worldedit.WorldEditIntegration
-import xyz.xenondevs.nova.item.ItemListener
 import xyz.xenondevs.nova.material.CoreItems
-import xyz.xenondevs.nova.material.ItemCategories
-import xyz.xenondevs.nova.material.PacketItems
-import xyz.xenondevs.nova.player.PlayerFreezer
-import xyz.xenondevs.nova.player.ability.AbilityManager
-import xyz.xenondevs.nova.player.attachment.AttachmentManager
-import xyz.xenondevs.nova.player.equipment.ArmorEquipListener
-import xyz.xenondevs.nova.tileentity.ChunkLoadManager
-import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.transformer.Patcher
-import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.setGlobalIngredients
-import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.callEvent
+import xyz.xenondevs.nova.util.data.JarUtils
+import xyz.xenondevs.nova.util.equalsAny
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
-import xyz.xenondevs.nova.world.ChunkReloadWatcher
-import xyz.xenondevs.nova.world.block.BlockManager
-import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
-import xyz.xenondevs.nova.world.generation.WorldGenManager
-import xyz.xenondevs.nova.world.loot.LootConfigHandler
-import xyz.xenondevs.nova.world.loot.LootGeneration
-import java.util.*
+import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
+import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.jvmName
+import xyz.xenondevs.inventoryaccess.component.i18n.Languages as InvUILanguages
 
 internal object Initializer : Listener {
     
-    private val INITIALIZABLES = CollectionUtils.sortDependencies(listOf(
-        LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager,
-        CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeEntityManager,
-        RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
-        NetworkManager, ItemListener, AttachmentManager, CommandManager, ArmorEquipListener,
-        AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
-        BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
-        BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser, WorldEditIntegration, ResourceGeneration.PreWorld,
-        ResourceGeneration.PostWorld, CharSizes
-    ), Initializable::dependsOn)
+    private val toInit = ObjectArrayList<InitializableClass>()
     
-    val initialized: MutableList<Initializable> = Collections.synchronizedList(ArrayList())
+    val initialized: MutableList<InitializableClass> = ObjectLists.synchronize(ObjectArrayList())
     var isDone = false
         private set
     
     private var failedPreWorld = false
+    
+    // Map structure: https://i.imgur.com/VHLkAtM.png (stage instead of initializationStage)
+    @Suppress("UNCHECKED_CAST")
+    fun searchClasses() {
+        var classes: List<InitializableClass> = JarUtils.searchForAnnotatedClasses(NOVA.pluginFile, InternalInit::class).asSequence()
+            .map { (clazz, annotation) ->
+                val stageName = (annotation["stage"] as Array<String>?)?.get(1)
+                    ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
+                val stage = enumValueOf<InitializationStage>(stageName)
+                val dependsOn = (annotation["dependsOn"] as List<Type>?)?.mapTo(ObjectOpenHashSet()) { it.internalName } ?: ObjectSets.emptySet()
+                
+                println("Found class $clazz with stage $stage and dependencies $dependsOn")
+                return@map InitializableClass(clazz, stage, dependsOn)
+            }.toMutableList()
+        
+        classes = CollectionUtils.sortDependenciesMapped(classes, InitializableClass::dependsOn, InitializableClass::className)
+        toInit.addAll(classes)
+    }
     
     fun initPreWorld() {
         registerEvents()
         
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
-        Languages.getInstance().enableServerSideTranslations(false)
+        InvUILanguages.getInstance().enableServerSideTranslations(false)
         
         CBFAdapters.register()
-        InventoryUtils.stackSizeProvider = StackSizeProvider { it.novaMaxStackSize }
+        InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
         CoreItems.init()
         
-        val toInit = INITIALIZABLES.filter { it.initializationStage == InitializationStage.PRE_WORLD }
+        val preWorldInit = toInit.filter { it.stage == InitializationStage.PRE_WORLD }
+        val lookup = toInit.associateBy(InitializableClass::className)
         
-        toInit.forEach { initializable ->
-            if (!waitForDependencies(initializable))
+        preWorldInit.forEach { initializable ->
+            if (!waitForDependencies(initializable, lookup))
                 return@forEach
             
             initializable.initialize()
         }
         
-        toInit.forEach { it.initialization.get() }
+        preWorldInit.forEach { it.initialization.get() }
         
-        if (initialized.size != toInit.size) {
+        if (initialized.size != preWorldInit.size) {
             failedPreWorld = true
             performAppropriateShutdown()
         }
@@ -120,14 +101,15 @@ internal object Initializer : Listener {
     
     private fun initPostWorld() {
         runAsyncTask {
-            val toInit = INITIALIZABLES.filter { it.initializationStage != InitializationStage.PRE_WORLD }
+            val postWorldInit = toInit.filter { it.stage != InitializationStage.PRE_WORLD }
+            val lookup = toInit.associateBy(InitializableClass::className)
             
-            toInit.forEach { initializable ->
+            postWorldInit.forEach { initializable ->
                 runAsyncTask initializableTask@{
-                    if (!waitForDependencies(initializable))
+                    if (!waitForDependencies(initializable, lookup))
                         return@initializableTask
                     
-                    if (initializable.initializationStage == InitializationStage.POST_WORLD) {
+                    if (initializable.stage == InitializationStage.POST_WORLD) {
                         runTask { initializable.initialize() }
                     } else {
                         runAsyncTask { initializable.initialize() }
@@ -136,9 +118,9 @@ internal object Initializer : Listener {
                 }
             }
             
-            toInit.forEach { it.initialization.get() }
+            postWorldInit.forEach { it.initialization.get() }
             
-            if (initialized.size == INITIALIZABLES.size) {
+            if (initialized.size == toInit.size) {
                 isDone = true
                 callEvent(NovaLoadDataEvent())
                 
@@ -155,9 +137,21 @@ internal object Initializer : Listener {
         }
     }
     
-    private fun waitForDependencies(initializable: Initializable): Boolean {
-        val dependencies = initializable.dependsOn
-        if (initializable.initializationStage == InitializationStage.PRE_WORLD && dependencies.any { it.initializationStage != InitializationStage.PRE_WORLD })
+    fun disable() {
+        CollectionUtils.sortDependenciesMapped(initialized, InitializableClass::dependsOn, InitializableClass::className).reversed().forEach {
+            try {
+                it.disable()
+            } catch (e: Exception) {
+                LOGGER.log(Level.SEVERE, "An exception occurred trying to disable $it", e)
+            }
+        }
+        
+        NMSUtilities.disable()
+    }
+    
+    private fun waitForDependencies(initializable: InitializableClass, lookup: Map<String, InitializableClass>): Boolean {
+        val dependencies = initializable.dependsOn.map { lookup[it] ?: throw IllegalStateException("Dependency $it of $initializable not found (Missing @InternalInit annotation?)") }
+        if (initializable.stage == InitializationStage.PRE_WORLD && dependencies.any { it.stage != InitializationStage.PRE_WORLD })
             throw IllegalStateException("Initializable ${initializable::class.jvmName} has incompatible dependencies!")
         
         dependencies.forEach { dependency ->
@@ -169,18 +163,6 @@ internal object Initializer : Listener {
             }
         }
         return true
-    }
-    
-    fun disable() {
-        CollectionUtils.sortDependencies(initialized, Initializable::dependsOn).reversed().forEach {
-            try {
-                it.disable()
-            } catch (e: Exception) {
-                LOGGER.log(Level.SEVERE, "An exception occurred trying to disable $it", e)
-            }
-        }
-        
-        NMSUtilities.disable()
     }
     
     private fun performAppropriateShutdown() {
@@ -214,5 +196,46 @@ internal object Initializer : Listener {
             return@DrilldownPie map
         })
     }
+    
+}
+
+internal class InitializableClass(
+    val className: String,
+    val stage: InitializationStage,
+    val dependsOn: Set<String>
+) {
+    
+    internal val initialization = CompletableFuture<Boolean>()
+    internal var isInitialized = false
+    
+    private val clazz by lazy { Class.forName(className.replace('/', '.')).kotlin }
+    
+    internal fun initialize() {
+        try {
+            val initMethod = clazz.declaredFunctions.firstOrNull { it.name.equalsAny("init", "initialize", "onEnable") && it.hasEmptyArguments() }
+            if (initMethod != null) {
+                val instance = clazz.objectInstance ?: throw InitializationException("Initializable class $className is not a singleton!")
+                initMethod.call(instance)
+            }
+            isInitialized = true
+            Initializer.initialized += this
+            initialization.complete(true)
+        } catch (e: InitializationException) {
+            LOGGER.severe(e.message)
+        } catch (e: Exception) {
+            LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $this", e)
+        }
+        initialization.complete(false)
+    }
+    
+    internal fun disable() {
+        val disableMethod = clazz.declaredFunctions.firstOrNull { it.name.equalsAny("disable", "onDisable") && it.parameters.isEmpty() }
+        if (disableMethod != null) {
+            val instance = clazz.objectInstance ?: throw InitializationException("Initializable class $className is not a singleton!")
+            disableMethod.call(instance)
+        }
+    }
+    
+    override fun toString() = "Initializable | $className"
     
 }

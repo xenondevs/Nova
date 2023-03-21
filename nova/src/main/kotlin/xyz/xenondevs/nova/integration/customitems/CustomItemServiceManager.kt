@@ -8,21 +8,19 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.customitems.plugin.ItemsAdder
 import xyz.xenondevs.nova.integration.customitems.plugin.MMOItems
 import xyz.xenondevs.nova.integration.customitems.plugin.Oraxen
 
-object CustomItemServiceManager : Initializable() {
+@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
+object CustomItemServiceManager {
     
     internal val PLUGINS: List<CustomItemService> by lazy { listOf(ItemsAdder, Oraxen, MMOItems).filter(InternalIntegration::isInstalled) }
     
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = emptySet<Initializable>()
-    
-    override fun init() {
+    fun init() {
         PLUGINS.forEach(CustomItemService::awaitLoad)
     }
     

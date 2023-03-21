@@ -17,8 +17,8 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isPlayerView
 import xyz.xenondevs.nova.util.isRightClick
@@ -29,12 +29,10 @@ private fun ItemStack?.getNullIfAir(): ItemStack? {
     return if (this?.type != Material.AIR) this else null
 }
 
-internal object ArmorEquipListener : Initializable(), Listener {
+@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
+internal object ArmorEquipListener : Listener {
     
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = emptySet<Initializable>()
-    
-    override fun init() {
+    fun init() {
         registerEvents()
     }
     

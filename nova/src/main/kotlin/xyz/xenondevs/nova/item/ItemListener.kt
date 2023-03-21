@@ -18,8 +18,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
@@ -32,14 +32,12 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
-internal object ItemListener : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = emptySet<Initializable>()
+@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
+internal object ItemListener : Listener {
     
     private val usedItems = HashMap<Player, ItemStack>()
     
-    override fun init() {
+    fun init() {
         registerEvents()
         registerPacketListener()
     }

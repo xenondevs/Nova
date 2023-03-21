@@ -17,8 +17,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -64,7 +64,11 @@ interface NetworkManager {
     
     fun reloadNetworks()
     
-    companion object : Initializable(), Listener {
+    @InternalInit(
+        stage = InitializationStage.POST_WORLD,
+        dependsOn = [LegacyFileConverter::class]
+    )
+    companion object : Listener {
         
         /**
          * Schedules loading the network in that chunk
@@ -124,16 +128,13 @@ interface NetworkManager {
             }
         }
         
-        override val initializationStage = InitializationStage.POST_WORLD
-        override val dependsOn = setOf(LegacyFileConverter)
-        
-        override fun init() {
+        fun init() {
             LOGGER.info("Starting network threads")
             NETWORK_MANAGER.init()
             registerEvents()
         }
         
-        override fun disable() {
+        fun disable() {
             LOGGER.info("Unloading networks")
             PermanentStorage.store("legacyNetworkChunks", NETWORK_MANAGER.legacyNetworkChunks)
             Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach { unloadChunk(it.pos) }

@@ -71,6 +71,7 @@ class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by lo
         
         NovaConfig.loadDefaultConfig()
         if (checkStartup()) {
+            Initializer.searchClasses()
             Initializer.initPreWorld()
         }
     }

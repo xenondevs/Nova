@@ -12,8 +12,8 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.PreVarIntConverter
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
@@ -27,16 +27,14 @@ import java.util.logging.Level
 
 private val WORLD_VERSION_KEY = NamespacedKey(NOVA, "regionVersion")
 
-internal object LegacyFileConverter : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer, VanillaTileEntityManager)
-    
+@InternalInit(stage = InitializationStage.POST_WORLD, dependsOn = [AddonsInitializer::class, VanillaTileEntityManager::class])
+internal object LegacyFileConverter : Listener {
+
     private val converters = TreeMap<VersionRange, VersionConverter>()
     
     private val futures: MutableMap<World, CompletableFuture<Unit>> = Collections.synchronizedMap(HashMap())
     
-    override fun init() {
+    fun init() {
         registerEvents()
         registerConverters()
         LOGGER.info("Running legacy conversions...")

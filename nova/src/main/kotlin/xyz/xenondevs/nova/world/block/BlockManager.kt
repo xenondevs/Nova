@@ -17,8 +17,8 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.getBreakParticlesPacket
@@ -41,12 +41,13 @@ import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
 
-object BlockManager : Initializable(), IBlockManager {
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class, WorldDataManager::class]
+)
+object BlockManager : IBlockManager {
     
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer, WorldDataManager)
-    
-    override fun init() {
+    fun init() {
         BlockPlacing.init()
         BlockBreaking.init()
         BlockInteracting.init()

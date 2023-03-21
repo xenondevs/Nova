@@ -6,8 +6,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.loader.AddonLoader
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
@@ -15,15 +15,16 @@ import xyz.xenondevs.nova.util.insertAfter
 import java.io.File
 import java.io.FileFilter
 
-internal object DataFileParser : Initializable() {
+@InternalInit(
+    stage = InitializationStage.PRE_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+internal object DataFileParser {
     
     private val FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
     private val DATA_DIR = File(NOVA.dataFolder, "data")
     
-    override val initializationStage = InitializationStage.PRE_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
-    
-    override fun init() {
+    fun init() {
         val existingPaths = ObjectArrayList<String>()
         
         // Extract data files

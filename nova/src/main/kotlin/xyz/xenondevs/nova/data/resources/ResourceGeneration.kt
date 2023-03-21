@@ -11,8 +11,8 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.update
@@ -37,12 +37,13 @@ internal object ResourceGeneration {
     private lateinit var resourcesHash: String
     private var builder: ResourcePackBuilder? = null
     
-    object PreWorld : Initializable() {
+    @InternalInit(
+        stage = InitializationStage.PRE_WORLD,
+        dependsOn = [AddonsLoader::class]
+    )
+    object PreWorld {
         
-        override val initializationStage = InitializationStage.PRE_WORLD
-        override val dependsOn = setOf(AddonsLoader)
-        
-        override fun init() {
+        fun init() {
             resourcesHash = calculateResourcesHash()
             if (
                 PermanentStorage.retrieveOrNull<String>(RESOURCES_HASH) == resourcesHash
@@ -72,12 +73,13 @@ internal object ResourceGeneration {
         
     }
     
-    object PostWorld : Initializable() {
-        
-        override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-        override val dependsOn = setOf(CustomItemServiceManager)
-        
-        override fun init() {
+    @InternalInit(
+        stage = InitializationStage.POST_WORLD_ASYNC,
+        dependsOn = [CustomItemServiceManager::class]
+    )
+    object PostWorld {
+    
+        fun init() {
             val builder = builder
             if (builder != null) {
                 LOGGER.info("Continuing to build resource pack")

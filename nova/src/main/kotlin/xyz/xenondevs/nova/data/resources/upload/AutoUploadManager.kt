@@ -15,17 +15,18 @@ import xyz.xenondevs.nova.data.resources.upload.service.OraxenUpload
 import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.data.hash
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import java.io.File
 import java.util.logging.Level
 
-internal object AutoUploadManager : Initializable() {
-    
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = setOf(NovaConfig, ResourceGeneration.PostWorld)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD_ASYNC,
+    dependsOn = [NovaConfig::class, ResourceGeneration.PostWorld::class]
+)
+internal object AutoUploadManager {
     
     private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost, CustomMultiPart, S3, OraxenUpload)
     
@@ -48,7 +49,7 @@ internal object AutoUploadManager : Initializable() {
             PermanentStorage.store("lastUploadConfig", value)
         }
     
-    override fun init() {
+    fun init() {
         reloadForceResourcePackSettings()
         enable(fromReload = false)
         
@@ -110,7 +111,7 @@ internal object AutoUploadManager : Initializable() {
         }
     }
     
-    override fun disable() {
+    fun disable() {
         selectedService?.disable()
         selectedService = null
     }

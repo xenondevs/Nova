@@ -32,8 +32,8 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
 import xyz.xenondevs.nova.util.containsAll
 import xyz.xenondevs.nova.util.data.clientsideCopy
@@ -130,7 +130,11 @@ annotation class HardcodedRecipes
 
 private val ALLOW_RESULT_OVERWRITE by configReloadable { DEFAULT_CONFIG.getBoolean("debug.allow_craft_result_overwrite") }
 
-object RecipeManager : Initializable(), Listener {
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+object RecipeManager : Listener {
     
     private val INTERNAL_RECIPES: Map<ResourceLocation, (ResourceLocation) -> MojangRecipe<*>> = mapOf(
         ResourceLocation("minecraft", "repair_item") to ::RepairItemRecipe
@@ -153,10 +157,7 @@ object RecipeManager : Initializable(), Listener {
     val novaRecipes: Map<RecipeType<*>, Map<NamespacedKey, NovaRecipe>>
         get() = _novaRecipes
     
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
-    
-    override fun init() {
+    fun init() {
         LOGGER.info("Loading recipes")
         registerEvents()
         registerPacketListener()

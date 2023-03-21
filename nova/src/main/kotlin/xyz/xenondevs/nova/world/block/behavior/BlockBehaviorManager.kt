@@ -16,8 +16,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.nmsState
@@ -39,10 +39,11 @@ import kotlin.random.Random
 
 private val CHUNK_SEARCH_ID_KEY = NamespacedKey(NOVA, "chunkSearchId")
 
-internal object BlockBehaviorManager : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(WorldDataManager, Patcher)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [WorldDataManager::class, Patcher::class]
+)
+internal object BlockBehaviorManager :  Listener {
     
     private val chunkSearchQueue = ConcurrentLinkedQueue<ChunkPos>()
     
@@ -62,7 +63,7 @@ internal object BlockBehaviorManager : Initializable(), Listener {
     private val behaviorQueries: List<ChunkSearchQuery> =
         behaviors.map { it.blockStatePredicate }
     
-    override fun init() {
+    fun init() {
         if (!DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks"))
             return
         

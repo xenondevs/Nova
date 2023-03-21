@@ -9,25 +9,26 @@ import xyz.xenondevs.nova.command.impl.NovaCommand
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
 private val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher
 
-object CommandManager : Initializable() {
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [ItemCategories::class, RecipeRegistry::class]
+)
+object CommandManager {
     
     private val registeredCommands = ArrayList<String>()
     
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(ItemCategories, RecipeRegistry)
-    
-    override fun init() {
+    fun init() {
         registerCommands()
     }
     
-    override fun disable() {
+    fun disable() {
         registeredCommands.forEach { unregisterCommand(it) }
     }
     

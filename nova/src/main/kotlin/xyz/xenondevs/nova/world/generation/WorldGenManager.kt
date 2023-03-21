@@ -4,8 +4,8 @@ import net.minecraft.core.registries.Registries
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
@@ -19,10 +19,11 @@ import xyz.xenondevs.nova.world.generation.registry.NoiseRegistry
 import xyz.xenondevs.nova.world.generation.registry.StructureRegistry
 
 @OptIn(ExperimentalWorldGen::class)
-internal object WorldGenManager : Initializable() {
-    
-    override val initializationStage = InitializationStage.PRE_WORLD
-    override val dependsOn = setOf(Patcher, ResourceGeneration.PreWorld, AddonsInitializer, DataFileParser)
+@InternalInit(
+    stage = InitializationStage.PRE_WORLD,
+    dependsOn = [Patcher::class, ResourceGeneration.PreWorld::class, AddonsInitializer::class, DataFileParser::class]
+)
+internal object WorldGenManager {
     
     private val WORLD_GEN_REGISTRIES by lazy {
         listOf(
@@ -36,7 +37,7 @@ internal object WorldGenManager : Initializable() {
             .map { REGISTRY_ACCESS.registry(it).get() }
     }
     
-    override fun init() {
+    fun init() {
         WORLD_GEN_REGISTRIES.forEach {
             it.registerDefaults()
             it.register()

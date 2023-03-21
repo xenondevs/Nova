@@ -29,8 +29,8 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeMo
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.util.bukkitMirror
@@ -67,16 +67,17 @@ private val SHULKER_BOX_ITEMS = setOf(
     Items.YELLOW_SHULKER_BOX
 )
 
-internal object PacketItems : Initializable(), Listener {
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [ResourceGeneration.PreWorld::class]
+)
+internal object PacketItems : Listener {
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
     val SERVER_SIDE_ITEM_ID = BuiltInRegistries.ITEM.getKey(SERVER_SIDE_ITEM).toString()
     
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(ResourceGeneration.PreWorld)
-    
-    override fun init() {
+    fun init() {
         registerEvents()
         registerPacketListener()
     }

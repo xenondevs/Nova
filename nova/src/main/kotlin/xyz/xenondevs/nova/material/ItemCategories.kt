@@ -16,8 +16,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.UpdatableFile
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
@@ -27,20 +27,21 @@ import java.io.File
 import java.io.InputStream
 import java.util.logging.Level
 
-internal object ItemCategories : Initializable() {
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+internal object ItemCategories {
     
     private const val PATH_IN_JAR = "item_categories.yml"
     private val CATEGORIES_FILE = File(NOVA.dataFolder, "configs/item_categories.yml").apply { parentFile.mkdirs() }
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
     
     lateinit var CATEGORIES: List<ItemCategory>
         private set
     lateinit var OBTAINABLE_ITEMS: List<CategorizedItem>
         private set
     
-    override fun init() {
+    fun init() {
         LOGGER.info("Loading item categories")
         reload()
     }

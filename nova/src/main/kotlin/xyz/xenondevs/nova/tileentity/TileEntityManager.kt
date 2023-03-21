@@ -4,8 +4,8 @@ import org.bukkit.Location
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -20,16 +20,17 @@ import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 val Material?.requiresLight: Boolean
     get() = this != null && !isTransparent && isOccluding
 
-object TileEntityManager : Initializable(), ITileEntityManager {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(CustomItemServiceManager)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [CustomItemServiceManager::class]
+)
+object TileEntityManager : ITileEntityManager {
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, TileEntity>>()
     val tileEntities: Sequence<TileEntity>
         get() = tileEntityMap.asSequence().filter { it.key.isLoaded() }.flatMap { it.value.values }
     
-    override fun init() {
+    fun init() {
         fun handleTick(tickHandler: (TileEntity) -> Unit) {
             val tileEntities = synchronized(this) { tileEntities.toList() }
             tileEntities.forEach { tileEntity ->

@@ -10,8 +10,8 @@ import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.loader.NovaClassLoader
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.bossbar.BossBarOriginPatch
@@ -49,10 +49,8 @@ import java.lang.reflect.Field
 import java.util.logging.Level
 import kotlin.reflect.jvm.jvmName
 
-internal object Patcher : Initializable() {
-    
-    override val initializationStage = InitializationStage.PRE_WORLD
-    override val dependsOn = emptySet<Initializable>()
+@InternalInit(stage = InitializationStage.PRE_WORLD)
+internal object Patcher {
     
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
@@ -72,7 +70,7 @@ internal object Patcher : Initializable() {
     
     private lateinit var classLoaderParentField: Field
     
-    override fun init() {
+    fun init() {
         try {
             LOGGER.info("Applying patches...")
             VirtualClassPath.classLoaders += NOVA.loader.javaClass.classLoader.parent
@@ -87,7 +85,7 @@ internal object Patcher : Initializable() {
         }
     }
     
-    override fun disable() {
+    fun disable() {
         removePatchedLoader()
     }
     

@@ -2,21 +2,22 @@ package xyz.xenondevs.nova.integration.worldedit
 
 import com.sk89q.worldedit.WorldEdit
 import org.bukkit.Bukkit
-import xyz.xenondevs.nova.initialize.Initializable
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.worldedit.WorldEditIntegration.WorldEditType.*
 import xyz.xenondevs.nova.integration.worldedit.fawe.FAWEListener
 import xyz.xenondevs.nova.integration.worldedit.normal.WEListener
 import xyz.xenondevs.nova.world.block.BlockManager
 
-internal object WorldEditIntegration : Initializable() {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(BlockManager)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [BlockManager::class]
+)
+internal object WorldEditIntegration {
     
     private val WORLD_EDIT_TYPE = WorldEditType.getInstalledType()
     
-    override fun init() {
+    fun init() {
         if (WORLD_EDIT_TYPE != NONE) {
             val worldEdit = WorldEdit.getInstance()
             worldEdit.blockFactory.register(NovaBlockInputParser(worldEdit))
