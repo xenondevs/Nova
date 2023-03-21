@@ -55,7 +55,7 @@ internal object Initializer : Listener {
     // Map structure: https://i.imgur.com/VHLkAtM.png (stage instead of initializationStage)
     @Suppress("UNCHECKED_CAST")
     fun searchClasses() {
-        var classes: List<InitializableClass> = JarUtils.searchForAnnotatedClasses(NOVA.pluginFile, InternalInit::class).asSequence()
+        var classes: List<InitializableClass> = JarUtils.findAnnotatedClasses(NOVA.pluginFile, InternalInit::class).asSequence()
             .map { (clazz, annotation) ->
                 val stageName = (annotation["stage"] as Array<String>?)?.get(1)
                     ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")

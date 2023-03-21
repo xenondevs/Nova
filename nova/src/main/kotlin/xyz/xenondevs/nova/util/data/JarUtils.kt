@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
 
 object JarUtils {
     
-    fun <A : Annotation> searchForAnnotatedClasses(file: File, annotationClass: KClass<A>): Map<String, Map<String, Any?>> {
+    fun <A : Annotation> findAnnotatedClasses(file: File, annotationClass: KClass<A>): Map<String, Map<String, Any?>> {
         val result = Object2ObjectOpenHashMap<String, Map<String, Any?>>()
         val classDesc = Type.getDescriptor(annotationClass.java)
         
