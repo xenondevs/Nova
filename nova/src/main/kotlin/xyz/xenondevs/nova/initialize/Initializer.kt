@@ -92,6 +92,7 @@ internal object Initializer : Listener {
     fun initPreWorld() {
         registerEvents()
         
+        System.setProperty("net.kyori.adventure.serviceLoadFailuresAreFatal", "false")
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
         Languages.getInstance().enableServerSideTranslations(false)
