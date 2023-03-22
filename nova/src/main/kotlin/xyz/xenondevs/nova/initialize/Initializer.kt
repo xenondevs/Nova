@@ -46,7 +46,6 @@ import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.player.PlayerFreezer
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.player.attachment.AttachmentManager
-import xyz.xenondevs.nova.player.equipment.ArmorEquipListener
 import xyz.xenondevs.nova.tileentity.ChunkLoadManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -77,7 +76,7 @@ internal object Initializer : Listener {
         LegacyFileConverter, UpdateReminder, AddonsInitializer, NovaConfig, AutoUploadManager,
         CustomItemServiceManager, PacketItems, LocaleManager, ChunkReloadWatcher, FakeEntityManager,
         RecipeManager, RecipeRegistry, ChunkLoadManager, VanillaTileEntityManager,
-        NetworkManager, ItemListener, AttachmentManager, CommandManager, ArmorEquipListener,
+        NetworkManager, ItemListener, AttachmentManager, CommandManager,
         AbilityManager, LootConfigHandler, LootGeneration, AddonsLoader, ItemCategories,
         BlockManager, WorldDataManager, TileEntityManager, BlockBehaviorManager, Patcher, PlayerFreezer,
         BossBarOverlayManager, WailaManager, WorldGenManager, DataFileParser, WorldEditIntegration, ResourceGeneration.PreWorld,

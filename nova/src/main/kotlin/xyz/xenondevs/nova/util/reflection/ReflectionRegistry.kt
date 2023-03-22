@@ -25,7 +25,6 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.item.ItemEntity
-import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.inventory.ItemCombinerMenu
@@ -89,6 +88,7 @@ import kotlin.jvm.internal.CallableReference
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
+import net.minecraft.world.entity.player.Inventory as MojangInventory
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -113,6 +113,7 @@ internal object ReflectionRegistry {
     val SECTION_PATH_DATA_CONSTRUCTOR = getConstructor(SECTION_PATH_DATA_CLASS, true, Any::class)
     val ITEM_STACK_CONSTRUCTOR = getConstructor(MojangStack::class, false, ItemLike::class)
     val CHUNK_ACCESS_CONSTRUCTOR = getConstructor(ChunkAccess::class, false, ChunkPos::class, UpgradeData::class, LevelHeightAccessor::class, Registry::class, Long::class, Array<LevelChunkSection>::class, BlendingData::class)
+    val INVENTORY_CONSTRUCTOR = getConstructor(MojangInventory::class, false, MojangPlayer::class)
     
     // Methods
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class)
@@ -139,7 +140,7 @@ internal object ReflectionRegistry {
     val ITEM_STACK_GET_MAX_STACK_SIZE_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getMaxStackSize)")
     val PLAYER_LIST_BROADCAST_METHOD = getMethod(PlayerList::class, false, "SRM(net.minecraft.server.players.PlayerList broadcast)", MojangPlayer::class, Double::class, Double::class, Double::class, Double::class, ResourceKey::class, Packet::class)
     val BLOCK_PLAYER_WILL_DESTROY_METHOD = getMethod(MojangBlock::class, false, "SRM(net.minecraft.world.level.block.Block playerWillDestroy)", Level::class, BlockPos::class, BlockState::class, MojangPlayer::class)
-    val INVENTORY_HURT_ARMOR_METHOD = getMethod(Inventory::class, false, "SRM(net.minecraft.world.entity.player.Inventory hurtArmor)", DamageSource::class, Float::class, IntArray::class)
+    val INVENTORY_HURT_ARMOR_METHOD = getMethod(MojangInventory::class, false, "SRM(net.minecraft.world.entity.player.Inventory hurtArmor)", DamageSource::class, Float::class, IntArray::class)
     val ITEM_GET_DEFAULT_ATTRIBUTE_MODIFIERS_METHOD = getMethod(MojangItem::class, false, "SRM(net.minecraft.world.item.Item getDefaultAttributeModifiers)", MojangEquipmentSlot::class)
     val REGISTRY_FILE_CODEC_DECODE_METHOD = getMethod(RegistryFileCodec::class, false, "SRM(net.minecraft.resources.RegistryFileCodec decode)", DynamicOps::class, Any::class)
     val REGISTRY_BY_NAME_CODEC_METHOD = getMethod(Registry::class, true, "SRM(net.minecraft.core.Registry lambda\$byNameCodec\$1)", ResourceLocation::class)
@@ -171,6 +172,7 @@ internal object ReflectionRegistry {
     val FEATURE_PLACE_CONTEXT_RANDOM_METHOD = getMethod(FeaturePlaceContext::class, false, "SRM(net.minecraft.world.level.levelgen.feature.FeaturePlaceContext random)")
     val CLIENTBOUND_BOSS_EVENT_PACKET_CREATE_ADD_PACKET_METHOD = getMethod(ClientboundBossEventPacket::class, false, "SRM(net.minecraft.network.protocol.game.ClientboundBossEventPacket createAddPacket)", BossEvent::class)
     val EQUIPABLE_GET_METHOD = getMethod(Equipable::class, false, "SRM(net.minecraft.world.item.Equipable get)", MojangStack::class)
+    val LIVING_ENTITY_ON_EQUIP_ITEM_METHOD = getMethod(LivingEntity::class, false, "SRM(net.minecraft.world.entity.LivingEntity onEquipItem)", MojangEquipmentSlot::class, MojangStack::class, MojangStack::class, Boolean::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -204,5 +206,6 @@ internal object ReflectionRegistry {
     val PROCESSOR_RULE_LOC_PREDICATE_FIELD = getField(ProcessorRule::class, true, "SRF(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule locPredicate)")
     val PROCESSOR_RULE_POS_PREDICATE_FIELD = getField(ProcessorRule::class, true, "SRF(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule posPredicate)")
     val TARGET_BLOCK_STATE_TARGET_FIELD = getField(TargetBlockState::class, false, "SRF(net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration\$TargetBlockState target)")
+    val INVENTORY_ARMOR_FIELD = getField(MojangInventory::class, true, "SRF(net.minecraft.world.inventory.Inventory armor)")
     
 }
