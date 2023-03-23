@@ -106,7 +106,6 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     var isValid: Boolean = true
         private set
     
-    internal val multiModels = ArrayList<MultiModel>()
     internal val packetTasks = ArrayList<TileEntityPacketTask>()
     private val regions = HashMap<String, ReloadableRegion>()
     
@@ -215,10 +214,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRemoved(unload: Boolean) {
         isValid = false
-        menuContainer?.closeWindows()
-        multiModels.forEach { it.close() }
         packetTasks.forEach { it.stop() }
         regions.values.forEach { VisualRegion.removeRegion(it.uuid) }
+        if (::menuContainer.isInitialized) menuContainer.closeWindows()
         if (this is Upgradable) upgradeHolder.handleRemoved()
     }
     
@@ -231,7 +229,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRightClick(ctx: BlockInteractContext): Boolean {
         val player = ctx.source as? Player ?: return false
-        if (menuContainer != null && !player.hasInventoryOpen) {
+        if (::menuContainer.isInitialized && !player.hasInventoryOpen) {
             menuContainer.openWindow(player)
             return true
         }
@@ -239,7 +237,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder {
-        check(menuContainer != null) { "A TileEntityMenu class must be present to create an UpgradeHolder" }
+        check(::menuContainer.isInitialized) { "A TileEntityMenu class must be present to create an UpgradeHolder" }
         return UpgradeHolder(this, menuContainer, ::reload, allowed.toHashSet())
     }
     
@@ -460,15 +458,6 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         regions[name] = region
         
         return region
-    }
-    
-    /**
-     * Creates a new [MultiModel] for this [TileEntity].
-     * When the [TileEntity] is removed, all [Models][Model] belonging
-     * to this [MultiModel] will be removed.
-     */
-    fun createMultiModel(): MultiModel {
-        return MultiModel().also(multiModels::add)
     }
     
     /**

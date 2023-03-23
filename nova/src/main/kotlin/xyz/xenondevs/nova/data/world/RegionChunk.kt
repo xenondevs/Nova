@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.material.BlockNovaMaterial
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.material.TileEntityNovaMaterial
-import xyz.xenondevs.nova.tileentity.MultiModel
 import xyz.xenondevs.nova.tileentity.TileEntityPacketTask
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
@@ -138,7 +137,6 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
                     state.legacyData = legacyCompound
                     val tileEntity = (material as TileEntityNovaMaterial).tileEntityConstructor(state)
                     state.tileEntity = tileEntity
-                    tileEntity.multiModels.forEach(MultiModel::close)
                     tileEntity.packetTasks.forEach(TileEntityPacketTask::stop)
                     runCatching { tileEntity.handleRemoved(true) }
                 } else {

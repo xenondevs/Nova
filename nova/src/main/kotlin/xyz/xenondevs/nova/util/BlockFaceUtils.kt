@@ -7,6 +7,7 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
+import org.joml.Quaternionf
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -76,6 +77,17 @@ val BlockFace.pitch: Float
         UP -> 90f
         DOWN -> 270f
         else -> 0f
+    }
+
+val BlockFace.rotation: Quaternionf
+    get() = when (this) {
+        NORTH -> Quaternionf()
+        EAST -> Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 0f, 1f, 0f)
+        SOUTH -> Quaternionf().setAngleAxis(Math.PI.toFloat(), 0f, 1f, 0f)
+        WEST -> Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 0f, 1f, 0f)
+        UP -> Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 1f, 0f, 0f)
+        DOWN -> Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 1f, 0f, 0f)
+        else -> throw UnsupportedOperationException("Unsupported facing")
     }
 
 fun BlockFace.getYaw(default: BlockFace): Float =

@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.player.attachment
 
 import org.bukkit.Bukkit
@@ -52,13 +54,17 @@ object AttachmentManager :  Listener {
         check(!player.isDead) { "Attachments cannot be added to dead players" }
         
         val attachmentsMap = activeAttachments.getOrPut(player, ::HashMap)
-        check(type !in attachmentsMap) { "An attachment with that type is already active" }
+        if (type in attachmentsMap)
+            return attachmentsMap[type] as A
         
         val attachment = type.constructor(player)
         attachmentsMap[type] = attachment
         
         return attachment
     }
+    
+    fun hasAttachment(player: Player, type: AttachmentType<*>): Boolean =
+        activeAttachments[player]?.contains(type) ?: false || inactiveAttachments[player]?.contains(type.id) ?: false
     
     fun removeAttachment(player: Player, type: AttachmentType<*>) {
         val inactiveAttachmentsMap = inactiveAttachments[player]

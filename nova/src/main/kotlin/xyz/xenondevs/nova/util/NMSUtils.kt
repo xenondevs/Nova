@@ -114,7 +114,7 @@ val NamespacedKey.resourceLocation: ResourceLocation
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
 
-val InteractionHand.bukkitSlot: EquipmentSlot
+val InteractionHand.bukkitEquipmentSlot: EquipmentSlot
     get() = when (this) {
         InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
         InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
@@ -127,6 +127,12 @@ val EquipmentSlot.interactionHand: InteractionHand
         else -> throw UnsupportedOperationException()
     }
 
+val InteractionHand.equipmentSlot: EquipmentSlot
+    get() = when (this) {
+        InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
+        InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
+    }
+
 val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
     get() = when (this) {
         EquipmentSlot.HAND -> MojangEquipmentSlot.MAINHAND
@@ -135,6 +141,16 @@ val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
         EquipmentSlot.LEGS -> MojangEquipmentSlot.LEGS
         EquipmentSlot.CHEST -> MojangEquipmentSlot.CHEST
         EquipmentSlot.HEAD -> MojangEquipmentSlot.HEAD
+    }
+
+val MojangEquipmentSlot.bukkitEquipmentSlot: EquipmentSlot
+    get() = when (this) {
+        MojangEquipmentSlot.MAINHAND -> EquipmentSlot.HAND
+        MojangEquipmentSlot.OFFHAND -> EquipmentSlot.OFF_HAND
+        MojangEquipmentSlot.FEET -> EquipmentSlot.FEET
+        MojangEquipmentSlot.LEGS -> EquipmentSlot.LEGS
+        MojangEquipmentSlot.CHEST -> EquipmentSlot.CHEST
+        MojangEquipmentSlot.HEAD -> EquipmentSlot.HEAD
     }
 
 val BlockFace.nmsDirection: Direction

@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -23,15 +22,14 @@ import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.material.options.WearableOptions
-import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.ArmorType
-import xyz.xenondevs.nova.player.equipment.EquipMethod
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.swingHand
 
 fun Wearable(type: ArmorType, equipSound: Sound): ItemBehaviorFactory<Wearable> =
     Wearable(type, equipSound.key.toString())
@@ -100,25 +98,25 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
     }
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
-        if ((action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable()))
-            && player.inventory.getItem(options.armorType.equipmentSlot)?.takeUnlessEmpty() == null
-            && !callArmorEquipEvent(player, EquipMethod.RIGHT_CLICK_EQUIP, null, itemStack)
-        ) {
+        if (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable())) {
             event.isCancelled = true
-            player.inventory.setItem(options.armorType.equipmentSlot, itemStack)
-            if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(event.hand!!, null)
-            callLivingEntityOnEquip(player, null, itemStack)
+            
+            val hand = event.hand!!
+            val equipmentSlot = options.armorType.equipmentSlot
+            val previous = player.inventory.getItem(equipmentSlot)?.takeUnlessEmpty()
+            if (previous != null) {
+                // swap armor
+                player.inventory.setItem(equipmentSlot, itemStack)
+                player.inventory.setItem(hand, previous)
+            } else {
+                // equip armor
+                player.inventory.setItem(equipmentSlot, itemStack)
+                if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(hand, null)
+            }
+            
+            player.swingHand(hand)
+            player.serverPlayer.onEquipItem(options.armorType.equipmentSlot.nmsEquipmentSlot, previous.nmsCopy, itemStack.nmsCopy)
         }
-    }
-    
-    private fun callArmorEquipEvent(player: Player, method: EquipMethod, previous: ItemStack?, now: ItemStack?): Boolean {
-        val event = ArmorEquipEvent(player, method, previous, now)
-        Bukkit.getPluginManager().callEvent(event)
-        return event.isCancelled
-    }
-    
-    private fun callLivingEntityOnEquip(player: Player, previous: ItemStack?, now: ItemStack?) {
-        player.serverPlayer.onEquipItem(options.armorType.equipmentSlot.nmsEquipmentSlot, previous.nmsCopy, now.nmsCopy)
     }
     
     override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {

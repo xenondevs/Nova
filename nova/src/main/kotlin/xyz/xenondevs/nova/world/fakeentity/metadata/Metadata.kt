@@ -48,6 +48,12 @@ abstract class Metadata internal constructor() {
         return entry
     }
     
+    internal fun <C, T> entry(index: Int, serializer: EntityDataSerializer<T>, default: C, mapper: (C) -> T): MetadataEntry<C> {
+        val entry = MappedNonNullMetadataEntry(index, serializer, mapper, default)
+        entries += entry
+        return entry
+    }
+    
     internal fun <T> optional(index: Int, serializer: EntityDataSerializer<Optional<T & Any>>, default: T?): MetadataEntry<T?> {
         val entry = NullableMetadataEntry(index, serializer, default)
         entries += entry

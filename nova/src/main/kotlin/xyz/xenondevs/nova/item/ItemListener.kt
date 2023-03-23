@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
-import xyz.xenondevs.nova.util.bukkitSlot
+import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -88,8 +88,8 @@ internal object ItemListener : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleEquip(event: ArmorEquipEvent) {
         val player = event.player
-        val unequippedItem = event.previousArmorItem
-        val equippedItem = event.newArmorItem
+        val unequippedItem = event.previous
+        val equippedItem = event.now
         
         findBehaviors(unequippedItem)?.forEach { it.handleEquip(player, unequippedItem!!, false, event) }
         findBehaviors(equippedItem)?.forEach { it.handleEquip(player, equippedItem!!, true, event) }
@@ -122,7 +122,7 @@ internal object ItemListener : Listener {
     @PacketHandler(priority = EventPriority.HIGHEST, ignoreIfCancelled = true)
     private fun handleUseItem(event: ServerboundUseItemPacketEvent) {
         val player = event.player
-        val item = player.inventory.getItem(event.hand.bukkitSlot)?.takeUnlessEmpty()
+        val item = player.inventory.getItem(event.hand.bukkitEquipmentSlot)?.takeUnlessEmpty()
         if (item != null)
             usedItems[player] = item
         else usedItems -= player

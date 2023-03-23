@@ -43,7 +43,8 @@ object AbilityManager : Listener {
     
     fun giveAbility(player: Player, type: AbilityType<*>) {
         val abilityMap = activeAbilities.getOrPut(player) { HashMap() }
-        check(type !in abilityMap) { "An ability of this type is already set" }
+        if (type in abilityMap)
+            return
         
         val ability = type.createAbility(player)
         abilityMap[type] = ability
@@ -51,9 +52,13 @@ object AbilityManager : Listener {
         saveActiveAbilities(player)
     }
     
+    fun hasAbility(player: Player, type: AbilityType<*>): Boolean =
+        activeAbilities[player]?.contains(type) ?: false
+    
     fun takeAbility(player: Player, type: AbilityType<*>) {
         val abilityMap = activeAbilities[player]
-        check(abilityMap != null && type in abilityMap) { "No ability of this type is set" }
+        if (abilityMap == null || type !in abilityMap)
+            return
         
         val ability = abilityMap[type]
         ability?.handleRemove()
