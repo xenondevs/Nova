@@ -376,7 +376,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): StaticRegion {
         check(name !in regions) { "Another region is already registered under the name $name." }
         
-        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val uuid = uuid.salt(name)
         val region = StaticRegion(uuid, size, createRegion)
         regions[name] = region
         
@@ -411,7 +411,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): DynamicRegion {
         check(name !in regions) { "Another region is already registered under the name $name." }
         
-        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val uuid = uuid.salt(name)
         val size = retrieveDataOrNull<Int>("region.$name") ?: defaultSize
         val region = DynamicRegion(uuid, minSize, maxSize, size, createRegion)
         regions[name] = region
@@ -452,7 +452,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         check(name !in regions) { "Another region is already registered under the name $name." }
         check(this is Upgradable) { "Can't create an UpgradableRegion for a TileEntity that isn't Upgradable" }
         
-        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val uuid = uuid.salt(name)
         val size = retrieveDataOrNull<Int>("region.$name") ?: defaultSize
         val region = UpgradableRegion(uuid, upgradeHolder, upgradeType, minSize, maxSize, size, createRegion)
         regions[name] = region
@@ -537,8 +537,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getSurroundingRegion(size: Int): Region {
         val d = size + 0.5
         return Region(
-            location.clone().center().subtract(d, d, d),
-            location.clone().center().add(d, d, d)
+            location.clone().add(.5, .5, .5).subtract(d, d, d),
+            location.clone().add(.5, .5, .5).add(d, d, d)
         )
     }
     

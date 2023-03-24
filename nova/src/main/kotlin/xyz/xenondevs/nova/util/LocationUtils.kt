@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util
 import com.google.common.base.Preconditions
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Axis
 import org.bukkit.Chunk
 import org.bukkit.Location
@@ -12,6 +13,8 @@ import org.bukkit.block.BlockFace.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import org.joml.Vector3d
+import org.joml.Vector3f
 import xyz.xenondevs.nmsutils.particle.ParticleBuilder
 import xyz.xenondevs.nmsutils.particle.color
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -74,6 +77,15 @@ fun Location.getCoordinate(axis: Axis): Double {
 }
 //</editor-fold>
 
+//<editor-fold desc="location components", defaultstate="collapsed">
+operator fun Location.component1() = world
+operator fun Location.component2() = x
+operator fun Location.component3() = y
+operator fun Location.component4() = z
+operator fun Location.component5() = yaw
+operator fun Location.component6() = pitch
+//</editor-fold>
+
 //<editor-fold desc="location info", defaultstate="collapsed">
 fun Location.positionEquals(other: Location): Boolean =
     world == other.world
@@ -133,6 +145,36 @@ fun Vector(yaw: Float, pitch: Float): Vector {
     val z = sin(pitchRadians)
     return Vector(-y, z, x)
 }
+
+fun Location.toVector3d(): Vector3d =
+    Vector3d(x, y, z)
+
+fun Location.toVector3f(): Vector3f =
+    Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
+
+fun Location.toVec3(): Vec3 =
+    Vec3(x, y, z)
+
+fun Vector3d.toLocation(world: World? = null): Location =
+    Location(world, x, y, z)
+
+fun Vector3d.toVec3(): Vec3 =
+    Vec3(x, y, z)
+
+fun Vector3f.toLocation(world: World? = null): Location =
+    Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+
+fun Vector3f.toVec3(): Vec3 =
+    Vec3(x.toDouble(), y.toDouble(), z.toDouble())
+
+fun Vector.toVector3d(): Vector3d =
+    Vector3d(x, y, z)
+
+fun Vector.toVector3f(): Vector3f =
+    Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
+
+fun Vector.toVec3(): Vec3 =
+    Vec3(x, y, z)
 //</editor-fold>
 
 //<editor-fold desc="surrounding blocks / entities / etc.", defaultstate="collapsed">

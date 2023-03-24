@@ -68,6 +68,9 @@ data class Model(
             data.width = width
             data.height = height
             data.glowColor = glowColor
+            
+            if (data.glowColor != -1)
+                data.isGlowing = true
         }
     
 }

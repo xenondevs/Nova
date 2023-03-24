@@ -148,5 +148,6 @@
             }
         }
     },
+    "transparent_block": "block/transparent",
     "wrench": "item/wrench"
 }
