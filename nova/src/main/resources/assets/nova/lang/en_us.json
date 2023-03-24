@@ -83,6 +83,7 @@
   "command.nova.network_debug.nova.energy": "Toggled debug-view for Energy-Networks.",
   "command.nova.network_debug.nova.item": "Toggled debug-view for Item-Networks.",
   "command.nova.network_debug.nova.fluid": "Toggled debug-view for Fluid-Networks.",
+  "command.nova.hitbox_debug": "Toggled debug-view for virtual hitboxes.",
   "command.nova.render_distance": "Your render distance has been set to %s.",
   "command.nova.show_tile_entity_data.success": "This %s has the following tile-entity data:\n%s",
   "command.nova.show_tile_entity_data.failure": "Please look at a tile entity and try again.",

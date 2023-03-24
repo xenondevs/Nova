@@ -19,7 +19,9 @@ private fun Iterable<FakeItemDisplay>.spawn(viewers: Iterable<Player>) = forEach
 private fun Iterable<FakeItemDisplay>.despawn(viewer: Player) = forEach { it.despawn(viewer) }
 private fun Iterable<FakeItemDisplay>.despawn(viewers: Iterable<Player>) = forEach { display -> viewers.forEach { display.despawn(it) } }
 
-private const val MIN_SCALE = 0.05f
+private const val MIN_LINE_WIDTH = 0.005
+private const val MAX_LINE_WIDTH = 0.05
+private const val DIAGONAL_THRESHOLD = 10.0
 
 object VisualRegion {
     
@@ -84,35 +86,41 @@ object VisualRegion {
         val (world, minX, minY, minZ) = min
         val (_, maxX, maxY, maxZ) = max
         
+        // linearly weighted line width between MIN_LINE_WIDTH and MAX_LINE_WIDTH, depending on the diagonal length of the region
+        val lineWidth = (min.distance(max) / DIAGONAL_THRESHOLD).coerceIn(0.0, 1.0) * (MAX_LINE_WIDTH - MIN_LINE_WIDTH) + MIN_LINE_WIDTH
+        
+        fun createLine(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2: Double) =
+            createLine(Location(world, x1, y1, z1), Location(world, x2, y2, z2), lineWidth, color)
+        
         return listOf(
             // minX -> maxX
-            createLine(Location(world, minX, minY, minZ), Location(world, maxX, minY, minZ), color),
-            createLine(Location(world, minX, minY, maxZ), Location(world, maxX, minY, maxZ), color),
-            createLine(Location(world, minX, maxY, minZ), Location(world, maxX, maxY, minZ), color),
-            createLine(Location(world, minX, maxY, maxZ), Location(world, maxX, maxY, maxZ), color),
+            createLine(minX, minY, minZ, maxX, minY, minZ),
+            createLine(minX, minY, maxZ, maxX, minY, maxZ),
+            createLine(minX, maxY, minZ, maxX, maxY, minZ),
+            createLine(minX, maxY, maxZ, maxX, maxY, maxZ),
             // minY -> maxY
-            createLine(Location(world, minX, minY, minZ), Location(world, minX, maxY, minZ), color),
-            createLine(Location(world, minX, minY, maxZ), Location(world, minX, maxY, maxZ), color),
-            createLine(Location(world, maxX, minY, minZ), Location(world, maxX, maxY, minZ), color),
-            createLine(Location(world, maxX, minY, maxZ), Location(world, maxX, maxY, maxZ), color),
+            createLine(minX, minY, minZ, minX, maxY, minZ),
+            createLine(minX, minY, maxZ, minX, maxY, maxZ),
+            createLine(maxX, minY, minZ, maxX, maxY, minZ),
+            createLine(maxX, minY, maxZ, maxX, maxY, maxZ),
             // minZ -> maxZ
-            createLine(Location(world, minX, minY, minZ), Location(world, minX, minY, maxZ), color),
-            createLine(Location(world, minX, maxY, minZ), Location(world, minX, maxY, maxZ), color),
-            createLine(Location(world, maxX, minY, minZ), Location(world, maxX, minY, maxZ), color),
-            createLine(Location(world, maxX, maxY, minZ), Location(world, maxX, maxY, maxZ), color),
+            createLine(minX, minY, minZ, minX, minY, maxZ),
+            createLine(minX, maxY, minZ, minX, maxY, maxZ),
+            createLine(maxX, minY, minZ, maxX, minY, maxZ),
+            createLine(maxX, maxY, minZ, maxX, maxY, maxZ),
         )
     }
     
-    private fun createLine(from: Location, to: Location, color: Int): FakeItemDisplay {
+    private fun createLine(from: Location, to: Location, lineWidth: Double, color: Int): FakeItemDisplay {
         val center = from.clone().add(to).multiply(0.5)
         
         return FakeItemDisplay(center, false) { _, data ->
             data.itemDisplay = ItemDisplayContext.HEAD
             data.itemStack = CoreBlockOverlay.TRANSPARENT_BLOCK.clientsideProvider.get().nmsCopy
             data.scale = Vector3f(
-                (to.x - from.x + MIN_SCALE).toFloat(),
-                (to.y - from.y + MIN_SCALE).toFloat(),
-                (to.z - from.z + MIN_SCALE).toFloat(),
+                (to.x - from.x + lineWidth).toFloat(),
+                (to.y - from.y + lineWidth).toFloat(),
+                (to.z - from.z + lineWidth).toFloat(),
             )
             data.isGlowing = true
             data.glowColor = color

@@ -48,6 +48,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
@@ -100,7 +101,10 @@ internal object NovaCommand : Command("nova") {
                                 .executesCatching { toggleNetworkDebugging(it, type) })
                         }
                     }
-                ))
+                )
+                .then(literal("showHitboxes")
+                    .requiresPlayer()
+                    .executesCatching(::toggleHitboxDebugging)))
             .then(literal("items")
                 .requiresPlayerPermission("nova.command.items")
                 .executesCatching(::openItemInventory))
@@ -301,7 +305,7 @@ internal object NovaCommand : Command("nova") {
         
         ctx.source.sendSuccess(Component.translatable(
             "command.nova.list_blocks.success",
-            NamedTextColor.GRAY, 
+            NamedTextColor.GRAY,
             Component.text(states.size, NamedTextColor.AQUA)
         ))
         states.forEach { ctx.source.sendSuccess(Component.text(it.key.toString(), NamedTextColor.GRAY)) }
@@ -331,6 +335,16 @@ internal object NovaCommand : Command("nova") {
         
         ctx.source.sendSuccess(Component.translatable(
             "command.nova.network_debug." + type.id.toString("."),
+            NamedTextColor.GRAY
+        ))
+    }
+    
+    private fun toggleHitboxDebugging(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        HitboxManager.toggleVisualizer(player)
+        
+        ctx.source.sendSuccess(Component.translatable(
+            "command.nova.hitbox_debug",
             NamedTextColor.GRAY
         ))
     }
