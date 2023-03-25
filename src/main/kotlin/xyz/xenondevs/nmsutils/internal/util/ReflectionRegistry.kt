@@ -8,6 +8,7 @@ import net.minecraft.network.ConnectionProtocol
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.server.network.ServerConnectionListener
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent.BossBarColor
@@ -33,6 +34,8 @@ internal object ReflectionRegistry {
     val BOSS_BAR_UPDATE_NAME_OPERATION_CLASS = getClass("SRC(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdateNameOperation)")
     val BOSS_BAR_UPDATE_STYLE_OPERATION_CLASS = getClass("SRC(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdateStyleOperation)")
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS = getClass("SRC(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdatePropertiesOperation)")
+    val SERVERBOUND_INTERACT_PACKET_INTERACTION_ACTION_CLASS = getClass("SRC(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAction)")
+    val SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_CLASS = getClass("SRC(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAtLocationAction)")
     
     // Constructors
     val ADVANCEMENT_BUILDER_CONSTRUCTOR = getConstructor(Advancement.Builder::class.java, true)
@@ -72,5 +75,10 @@ internal object ReflectionRegistry {
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_DARKEN_SCREEN_FIELD = getField(BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdatePropertiesOperation darkenScreen)")
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_PLAY_MUSIC_FIELD = getField(BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdatePropertiesOperation playMusic)")
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CREATE_WORLD_FOG_FIELD = getField(BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ClientboundBossEventPacket\$UpdatePropertiesOperation createWorldFog)")
+    val SERVERBOUND_INTERACT_PACKET_ENTITY_ID_FIELD = getField(ServerboundInteractPacket::class.java, true, "SRF(net.minecraft.network.protocol.game.ServerboundInteractPacket entityId)")
+    val SERVERBOUND_INTERACT_PACKET_ACTION_FIELD = getField(ServerboundInteractPacket::class.java, true, "SRF(net.minecraft.network.protocol.game.ServerboundInteractPacket action)")
+    val SERVERBOUND_INTERACT_PACKET_INTERACTION_ACTION_HAND_FIELD = getField(SERVERBOUND_INTERACT_PACKET_INTERACTION_ACTION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAction hand)")
+    val SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_HAND_FIELD = getField(SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAtLocationAction hand)")
+    val SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_LOCATION_FIELD = getField(SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAtLocationAction location)")
     
 }

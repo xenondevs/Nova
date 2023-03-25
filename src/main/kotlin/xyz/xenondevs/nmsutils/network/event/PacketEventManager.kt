@@ -22,6 +22,7 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundEntityPa
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
+import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
@@ -71,6 +72,7 @@ object PacketEventManager {
         registerPlayerEventType(::ServerboundSetCreativeModeSlotPacketEvent)
         registerPlayerEventType(::ServerboundPlayerActionPacketEvent)
         registerPlayerEventType(::ServerboundUseItemPacketEvent)
+        registerPlayerEventType(::ServerboundInteractPacketEvent)
     }
     
     private inline fun <reified P : Packet<*>, reified E : PlayerPacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {

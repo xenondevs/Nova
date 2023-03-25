@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
@@ -17,6 +18,7 @@ import net.minecraft.sounds.SoundSource
 import xyz.xenondevs.nmsutils.bossbar.operation.BossBarOperation
 import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry
 import xyz.xenondevs.nmsutils.internal.util.toPackedByte
+import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacketEvent
 import java.util.*
 
 fun ClientboundPlaceGhostRecipePacket(containerId: Int, resourceLocation: String): ClientboundPlaceGhostRecipePacket {
@@ -70,9 +72,36 @@ fun ClientboundSoundEntityPacket(sound: Holder<SoundEvent>, source: SoundSource,
 }
 
 fun ServerboundPlaceRecipePacket(containerId: Int, recipe: ResourceLocation, shiftDown: Boolean): ServerboundPlaceRecipePacket {
-    val buffer = FriendlyByteBuf(Unpooled.buffer())
-    buffer.writeByte(containerId)
-    buffer.writeResourceLocation(recipe)
-    buffer.writeBoolean(shiftDown)
-    return ServerboundPlaceRecipePacket(buffer)
+    val buf = FriendlyByteBuf(Unpooled.buffer())
+    buf.writeByte(containerId)
+    buf.writeResourceLocation(recipe)
+    buf.writeBoolean(shiftDown)
+    return ServerboundPlaceRecipePacket(buf)
+}
+
+fun ServerboundInteractPacket(entityId: Int, action: ServerboundInteractPacketEvent.Action, isUsingSecondaryAction: Boolean): ServerboundInteractPacket {
+    val buf = FriendlyByteBuf(Unpooled.buffer())
+    
+    buf.writeVarInt(entityId)
+    when (action) {
+        is ServerboundInteractPacketEvent.Action.Interact -> {
+            buf.writeVarInt(0)
+            buf.writeVarInt(action.hand.ordinal)
+        }
+        
+        is ServerboundInteractPacketEvent.Action.InteractAtLocation -> {
+            buf.writeVarInt(2)
+            buf.writeFloat(action.location.x.toFloat())
+            buf.writeFloat(action.location.y.toFloat())
+            buf.writeFloat(action.location.z.toFloat())
+            buf.writeVarInt(action.hand.ordinal)
+        }
+        
+        is ServerboundInteractPacketEvent.Action.Attack -> {
+            buf.writeVarInt(1)
+        }
+    }
+    buf.writeBoolean(isUsingSecondaryAction)
+    
+    return ServerboundInteractPacket(buf)
 }
