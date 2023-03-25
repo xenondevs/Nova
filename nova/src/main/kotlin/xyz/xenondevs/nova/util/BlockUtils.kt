@@ -481,7 +481,7 @@ fun Block.spawnExpOrb(exp: Int, location: Location = this.location.add(.5, .5, .
  */
 fun Block.playBreakEffects() {
     val packet = ClientboundLevelEventPacket(2001, pos.nmsPos, MojangBlock.getId(nmsState), false)
-    minecraftServer.playerList.broadcast(null as MojangPlayer?, this, 64.0, packet)
+    MINECRAFT_SERVER.playerList.broadcast(null as MojangPlayer?, this, 64.0, packet)
 }
 
 /**
@@ -500,7 +500,7 @@ fun Block.showBreakParticles() {
 @Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated("Not real break particles. Consider using Block#playBreakEffects.")
 fun Material.showBreakParticles(location: Location) {
-    minecraftServer.playerList.broadcast(location, 64.0, getBreakParticlesPacket(location))
+    MINECRAFT_SERVER.playerList.broadcast(location, 64.0, getBreakParticlesPacket(location))
 }
 
 /**
@@ -553,7 +553,7 @@ fun Block.setBreakStage(entityId: Int, stage: Int) {
  */
 fun Block.sendDestructionPacket(entityId: Int, stage: Int) {
     val packet = ClientboundBlockDestructionPacket(entityId, location.blockPos, stage)
-    minecraftServer.playerList.broadcast(location, 32.0, packet)
+    MINECRAFT_SERVER.playerList.broadcast(location, 32.0, packet)
 }
 
 /**
@@ -568,7 +568,7 @@ fun Block.sendDestructionPacket(entityId: Int, stage: Int) {
  */
 fun Block.sendDestructionPacket(player: Player, stage: Int) {
     val packet = ClientboundBlockDestructionPacket(player.entityId, location.blockPos, stage)
-    minecraftServer.playerList.broadcast(player, location, 32.0, packet)
+    MINECRAFT_SERVER.playerList.broadcast(player, location, 32.0, packet)
 }
 
 // endregion
@@ -584,7 +584,7 @@ object BlockUtils {
     internal fun getVanillaFurnaceExp(furnace: AbstractFurnaceBlockEntity): Int {
         return furnace.recipesUsed.object2IntEntrySet().sumOf { entry ->
             val amount = entry.intValue
-            val expPerRecipe = (minecraftServer.recipeManager.byKey(entry.key).orElse(null) as? AbstractCookingRecipe)?.experience?.toDouble() ?: 0.0
+            val expPerRecipe = (MINECRAFT_SERVER.recipeManager.byKey(entry.key).orElse(null) as? AbstractCookingRecipe)?.experience?.toDouble() ?: 0.0
             
             // Minecraft's logic to calculate the furnace exp
             var exp = floor(amount * expPerRecipe).toInt()

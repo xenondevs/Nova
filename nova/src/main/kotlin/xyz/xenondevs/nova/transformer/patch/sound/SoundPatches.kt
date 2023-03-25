@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.forcePacketBroadcast
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.soundGroup
-import xyz.xenondevs.nova.util.minecraftServer
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.soundGroup
@@ -117,7 +117,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
             level.random.nextLong()
         )
         
-        minecraftServer.playerList.broadcast(player, entity.x, entity.y, entity.z, 16.0, level.dimension(), packet)
+        MINECRAFT_SERVER.playerList.broadcast(player, entity.x, entity.y, entity.z, 16.0, level.dimension(), packet)
     }
     
     private fun transformBlockPlayerWillDestroy() {
@@ -139,7 +139,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         if (SoundEngine.overridesSound(oldSound)) {
             val pitch = soundGroup.breakPitch
             val volume = soundGroup.breakVolume
-            minecraftServer.playerList.broadcast(
+            MINECRAFT_SERVER.playerList.broadcast(
                 null,
                 pos.x + 0.5, pos.y + 0.5, pos.z + 0.5,
                 if (volume > 1.0) 16.0 * volume else 16.0,

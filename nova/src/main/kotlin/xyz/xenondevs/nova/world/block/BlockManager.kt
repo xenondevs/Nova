@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.util.getBreakParticlesPacket
 import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.soundGroup
-import xyz.xenondevs.nova.util.minecraftServer
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.world.BlockPos
@@ -141,7 +141,7 @@ object BlockManager : Initializable(), IBlockManager {
         val nmsPos = pos.nmsPos
         
         fun broadcast(packet: Packet<*>, sendEffectsToBreaker: Boolean) {
-            minecraftServer.playerList.broadcast(
+            MINECRAFT_SERVER.playerList.broadcast(
                 if (sendEffectsToBreaker) null else player?.serverPlayer,
                 pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(),
                 64.0,
