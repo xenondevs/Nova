@@ -93,7 +93,6 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
     private val previousStacks = Array<ItemStack>(4) { ItemStack.EMPTY }
     
     override fun set(index: Int, element: ItemStack?): ItemStack {
-        println("setting $index to $element")
         val item = element ?: ItemStack.EMPTY
         if (initialized) {
             if (player != null) {
