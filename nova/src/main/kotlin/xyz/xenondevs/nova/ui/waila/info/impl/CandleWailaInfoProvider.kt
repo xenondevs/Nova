@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.Candle
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 
@@ -23,7 +23,7 @@ internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
         return info
     }
     
-    private fun getCandleId(block: Block): NamespacedId {
+    private fun getCandleId(block: Block): ResourceLocation {
         val name = block.type.name.lowercase()
         val candle = block.blockData as Candle
         val amount = when (candle.candles) {
@@ -34,7 +34,7 @@ internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
             else -> IllegalStateException("Invalid amount of candles")
         }
         
-        return NamespacedId("minecraft", "${name}_${amount}")
+        return ResourceLocation("minecraft", "${name}_${amount}")
     }
     
 }

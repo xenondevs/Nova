@@ -14,12 +14,13 @@ import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.ItemCategories
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.player.PlayerFreezer
 import xyz.xenondevs.nova.player.ability.AbilityManager
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.tileentity.upgrade.UpgradeTypeRegistry
 import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -85,7 +86,7 @@ object NovaConfig {
     internal fun reload() {
         loadDefaultConfig()
         init()
-        UpgradeTypeRegistry.types.forEach(Reloadable::reload)
+        NovaRegistries.UPGRADE_TYPE.forEach(Reloadable::reload)
         reloadables.sorted().forEach(Reloadable::reload)
         TileEntityManager.tileEntities.forEach(Reloadable::reload)
         NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
@@ -105,6 +106,9 @@ object NovaConfig {
         configs[name] ?: throw IllegalArgumentException("Config not found: $name")
     
     operator fun get(material: NovaItem): YamlConfiguration =
+        configs[material.id.toString()] ?: throw IllegalArgumentException("Config not found: ${material.id}")
+    
+    operator fun get(material: NovaBlock): YamlConfiguration =
         configs[material.id.toString()] ?: throw IllegalArgumentException("Config not found: ${material.id}")
     
     fun getOrNull(name: String): YamlConfiguration? =

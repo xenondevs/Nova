@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.ui.waila
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
 import xyz.xenondevs.nova.ui.waila.overlay.WailaOverlayCompound
 import xyz.xenondevs.nova.util.data.WildcardUtils
 import xyz.xenondevs.nova.util.id
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -125,7 +126,7 @@ internal class Waila(val player: Player) {
     }
     
     private fun getCustomItemServiceInfo(player: Player, block: Block): WailaInfo? {
-        val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { NamespacedId.of(it) }.getOrNull() } ?: return null
+        val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { ResourceLocation.of(it, ':') }.getOrNull() } ?: return null
         val blockName = CustomItemServiceManager.getName(block, player.locale) ?: return null
         
         val lines = ArrayList<WailaLine>()
@@ -136,7 +137,7 @@ internal class Waila(val player: Player) {
         return WailaInfo(blockId, lines)
     }
     
-    private fun isBlacklisted(id: NamespacedId) =
+    private fun isBlacklisted(id: ResourceLocation) =
         BLACKLISTED_BLOCKS.any { (namespaceRegex, nameRegex) ->
             namespaceRegex.matches(id.namespace) && nameRegex.matches(id.name)
         }

@@ -1,17 +1,18 @@
 package xyz.xenondevs.nova.world.block.context
 
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.world.block.state.BlockState
-import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.pos
 import java.util.*
+import xyz.xenondevs.nova.api.block.NovaBlock as INovaBlock
 
 private fun getSourceLocation(source: Any?): Location? =
     when (source) {
@@ -47,11 +48,11 @@ data class BlockPlaceContext(
     
     internal companion object {
         
-        fun forAPI(location: Location, material: NovaBlock, source: Any?): BlockPlaceContext {
+        fun forAPI(location: Location, material: INovaBlock, source: Any?): BlockPlaceContext {
             val pos = location.pos
             return BlockPlaceContext(
                 pos,
-                material.createItemStack(1),
+                material.item?.createItemStack(1) ?: ItemStack(Material.AIR),
                 source,
                 getSourceLocation(source) ?: location,
                 getOwnerUUID(source) ?: UUID(0L, 0L),

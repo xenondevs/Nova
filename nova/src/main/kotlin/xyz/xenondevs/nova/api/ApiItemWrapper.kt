@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.material.api
+package xyz.xenondevs.nova.api
 
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.block.NovaBlock

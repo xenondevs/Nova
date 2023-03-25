@@ -2,12 +2,12 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.block.data.type.TechnicalPiston
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
@@ -27,7 +27,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
         lines += WailaLine(Component.text("minecraft:${material.name.lowercase()}", NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block)
         
-        return WailaInfo(NamespacedId("minecraft", mainMaterial.name.lowercase()), lines)
+        return WailaInfo(ResourceLocation("minecraft", mainMaterial.name.lowercase()), lines)
     }
     
     private fun getMainMaterial(block: Block): Material {

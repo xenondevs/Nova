@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 typealias TileEntityConstructor = ((NovaTileEntityState) -> TileEntity)
 
 @Suppress("UNCHECKED_CAST")
-class TileEntityNovaBlock internal constructor(
+class NovaTileEntityBlock internal constructor(
     id: ResourceLocation,
     localizedName: String,
     logic: BlockLogic<NovaTileEntityState>,

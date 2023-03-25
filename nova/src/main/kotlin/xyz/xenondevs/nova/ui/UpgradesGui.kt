@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.ui.item.BackItem
 import xyz.xenondevs.nova.ui.item.ScrollLeftItem
 import xyz.xenondevs.nova.ui.item.ScrollRightItem
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 

@@ -7,6 +7,8 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.serialization.yaml.getLazilyEvaluated
 import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.material.NovaTileEntityBlock
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.name
 import kotlin.reflect.KType
 
@@ -18,25 +20,25 @@ class UpgradeType<T> internal constructor(
 ) : Reloadable {
     
     private val listValueType = createType(List::class, valueType)
-    private val valueListProviders = HashMap<NovaItem, ValueListProvider>()
-    private val valueProviders = HashMap<NovaItem, HashMap<Int, ValueProvider>>()
+    private val valueListProviders = HashMap<NovaTileEntityBlock, ValueListProvider>()
+    private val valueProviders = HashMap<NovaTileEntityBlock, HashMap<Int, ValueProvider>>()
     
-    fun getValue(material: NovaItem, level: Int): T {
+    fun getValue(material: NovaTileEntityBlock, level: Int): T {
         val values = getValueList(material)
         return values[level.coerceIn(0..values.lastIndex)]
     }
     
-    fun getValueProvider(material: NovaItem, level: Int): Provider<T> {
+    fun getValueProvider(material: NovaTileEntityBlock, level: Int): Provider<T> {
         return valueProviders
             .getOrPut(material, ::HashMap)
             .getOrPut(level) { ValueProvider(getValueListProvider(material), level) }
     }
     
-    fun getValueList(material: NovaItem): List<T> {
+    fun getValueList(material: NovaTileEntityBlock): List<T> {
         return getValueListProvider(material).value
     }
     
-    fun getValueListProvider(material: NovaItem): Provider<List<T>> {
+    fun getValueListProvider(material: NovaTileEntityBlock): Provider<List<T>> {
         return valueListProviders.getOrPut(material) { ValueListProvider(material) }
     }
     
@@ -45,7 +47,7 @@ class UpgradeType<T> internal constructor(
     }
     
     private inner class ValueListProvider(
-        private val material: NovaItem
+        private val material: NovaTileEntityBlock
     ) : Provider<List<T>>() {
         
         override fun loadValue(): List<T> {
@@ -69,6 +71,14 @@ class UpgradeType<T> internal constructor(
             val valueList = listProvider.value
             return valueList[level.coerceIn(0..valueList.lastIndex)]
         }
+        
+    }
+    
+    companion object {
+        
+        @Suppress("UNCHECKED_CAST")
+        fun <T> of(item: NovaItem): UpgradeType<T>? =
+            NovaRegistries.UPGRADE_TYPE.firstOrNull { it.item == item } as? UpgradeType<T>
         
     }
     

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.upgrade
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.mapKeysNotNullTo
@@ -7,7 +8,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.virtualinventory.VirtualInventory
 import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
 import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
-import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
@@ -17,7 +18,7 @@ import kotlin.math.min
 
 private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
     val novaMaterial = novaMaterial ?: return null
-    return UpgradeTypeRegistry.of<UpgradeType<*>>(novaMaterial)
+    return UpgradeType.of<UpgradeType<*>>(novaMaterial)
 }
 
 class UpgradeHolder internal constructor(
@@ -32,8 +33,8 @@ class UpgradeHolder internal constructor(
     
     internal val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handlePreInvUpdate); setInventoryUpdatedHandler(::handlePostInvUpdate) }
     internal val upgrades: HashMap<UpgradeType<*>, Int> =
-        tileEntity.retrieveData<Map<NamespacedId, Int>>("upgrades", ::HashMap)
-            .mapKeysNotNullTo(HashMap()) { UpgradeTypeRegistry.of<UpgradeType<*>>(it.key) }
+        tileEntity.retrieveData<Map<ResourceLocation, Int>>("upgrades", ::HashMap)
+            .mapKeysNotNullTo(HashMap()) { NovaRegistries.UPGRADE_TYPE[it.key] }
     
     val gui by lazy { UpgradesGui(this) { menuContainer.openWindow(it) } }
     

@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.world.block.limits
 
+import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.material.TileEntityNovaBlock
+import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
@@ -15,11 +15,11 @@ import java.util.*
 
 internal object TileEntityTracker {
     
-    private val BLOCK_COUNTER: HashMap<UUID, HashMap<NamespacedId, Int>> =
+    private val BLOCK_COUNTER: HashMap<UUID, HashMap<ResourceLocation, Int>> =
         PermanentStorage.retrieve("block_counter", ::HashMap)
-    private val BLOCK_WORLD_COUNTER: HashMap<UUID, HashMap<UUID, HashMap<NamespacedId, Int>>> =
+    private val BLOCK_WORLD_COUNTER: HashMap<UUID, HashMap<UUID, HashMap<ResourceLocation, Int>>> =
         PermanentStorage.retrieve("block_world_counter", ::HashMap)
-    private val BLOCK_CHUNK_COUNTER: HashMap<UUID, HashMap<ChunkPos, HashMap<NamespacedId, Int>>> =
+    private val BLOCK_CHUNK_COUNTER: HashMap<UUID, HashMap<ChunkPos, HashMap<ResourceLocation, Int>>> =
         PermanentStorage.retrieve("block_chunk_counter", ::HashMap)
     
     init {
@@ -33,7 +33,7 @@ internal object TileEntityTracker {
         PermanentStorage.store("block_chunk_counter", BLOCK_CHUNK_COUNTER)
     }
     
-    internal fun handleBlockPlace(material: TileEntityNovaBlock, ctx: BlockPlaceContext) {
+    internal fun handleBlockPlace(material: NovaTileEntityBlock, ctx: BlockPlaceContext) {
         if (ctx.ownerUUID != null)
             modifyCounters(ctx.ownerUUID, ctx.pos, material.id, 1)
     }
@@ -43,7 +43,7 @@ internal object TileEntityTracker {
             modifyCounters(tileEntity.ownerUUID, ctx.pos, tileEntity.material.id, -1)
     }
     
-    private fun modifyCounters(player: UUID, pos: BlockPos, id: NamespacedId, add: Int) {
+    private fun modifyCounters(player: UUID, pos: BlockPos, id: ResourceLocation, add: Int) {
         val playerMap = BLOCK_COUNTER.getOrPut(player, ::HashMap)
         playerMap[id] = max(0, (playerMap[id] ?: 0) + add)
         
@@ -54,15 +54,15 @@ internal object TileEntityTracker {
         playerChunkMap[id] = max(0, (playerChunkMap[id] ?: 0) + add)
     }
     
-    fun getBlocksPlacedAmount(player: UUID, blockId: NamespacedId): Int {
+    fun getBlocksPlacedAmount(player: UUID, blockId: ResourceLocation): Int {
         return BLOCK_COUNTER[player]?.get(blockId) ?: 0
     }
     
-    fun getBlocksPlacedAmount(player: UUID, world: UUID, blockId: NamespacedId): Int {
+    fun getBlocksPlacedAmount(player: UUID, world: UUID, blockId: ResourceLocation): Int {
         return BLOCK_WORLD_COUNTER[player]?.get(world)?.get(blockId) ?: 0
     }
     
-    fun getBlocksPlacedAmount(player: UUID, chunk: ChunkPos, blockId: NamespacedId): Int {
+    fun getBlocksPlacedAmount(player: UUID, chunk: ChunkPos, blockId: ResourceLocation): Int {
         return BLOCK_CHUNK_COUNTER[player]?.get(chunk)?.get(blockId) ?: 0
     }
     

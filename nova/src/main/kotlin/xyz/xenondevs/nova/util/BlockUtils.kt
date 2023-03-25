@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
@@ -44,7 +45,7 @@ import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.material.NovaBlock
-import xyz.xenondevs.nova.material.TileEntityNovaBlock
+import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
@@ -73,7 +74,7 @@ import net.minecraft.world.level.block.Block as MojangBlock
 /**
  * The [NamespacedId] of this block.
  */
-val Block.id: NamespacedId
+val Block.id: ResourceLocation
     get() {
         val pos = pos
         val novaMaterial = BlockManager.getBlock(pos)
@@ -81,8 +82,8 @@ val Block.id: NamespacedId
             return novaMaterial.id
         }
         
-        return CustomItemServiceManager.getId(this)?.let(NamespacedId::of)
-            ?: NamespacedId("minecraft", type.name.lowercase())
+        return CustomItemServiceManager.getId(this)?.let { ResourceLocation.of(it, ':')}
+            ?: ResourceLocation("minecraft", type.name.lowercase())
     }
 
 /**
@@ -182,7 +183,7 @@ fun Block.place(ctx: BlockPlaceContext, playSound: Boolean = true): Boolean {
     val item = ctx.item
     val novaMaterial = item.novaMaterial?.block
     if (novaMaterial is NovaBlock) {
-        if (novaMaterial is TileEntityNovaBlock && !TileEntityLimits.canPlace(ctx).allowed)
+        if (novaMaterial is NovaTileEntityBlock && !TileEntityLimits.canPlace(ctx).allowed)
             return false
         
         BlockManager.placeBlock(novaMaterial, ctx, playSound)

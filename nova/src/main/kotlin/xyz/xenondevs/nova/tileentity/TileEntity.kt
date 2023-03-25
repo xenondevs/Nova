@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.material.TileEntityNovaBlock
+import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -63,10 +63,9 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.reflect.full.hasAnnotation
-import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 import xyz.xenondevs.nova.tileentity.menu.TileEntityMenuClass as TileEntityMenuAnnotation
 
-abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), Reloadable, ITileEntity {
+abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), Reloadable {
     
     companion object {
         val SELF_UPDATE_REASON = object : UpdateReason {}
@@ -78,11 +77,11 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val uuid: UUID = blockState.uuid
     val ownerUUID: UUID? = blockState.ownerUUID
     final override val data: Compound = blockState.data
-    final override val material: TileEntityNovaBlock = blockState.material
+    val material: NovaTileEntityBlock = blockState.material
     
-    override val owner: OfflinePlayer? by lazy { ownerUUID?.let(Bukkit::getOfflinePlayer) }
+    val owner: OfflinePlayer? by lazy { ownerUUID?.let(Bukkit::getOfflinePlayer) }
     
-    final override val location: Location
+    val location: Location
         get() = Location(pos.world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), facing.getYaw(BlockFace.NORTH), 0f)
     val centerLocation: Location
         get() = location.center()
@@ -156,17 +155,19 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     /**
      * Gets a list of [ItemStacks][ItemStack] to be dropped when this [TileEntity] is destroyed.
      */
-    override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
+    open fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
         val drops = ArrayList<ItemStack>()
         if (includeSelf) {
             saveData()
             
-            val item = material.createItemStack()
-            if (globalData.isNotEmpty()) {
-                item.novaCompound[TILE_ENTITY_DATA_KEY] = globalData
+            val item = material.item?.createItemStack()
+            if (item != null) {
+                if (globalData.isNotEmpty()) {
+                    item.novaCompound[TILE_ENTITY_DATA_KEY] = globalData
+                }
+                
+                drops += item
             }
-            
-            drops += item
         }
         
         if (this is Upgradable) drops += this.upgradeHolder.getUpgradeItems()

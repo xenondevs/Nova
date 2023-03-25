@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.api.block
 
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.api.material.NovaMaterial
 
 interface BlockManager {
     
@@ -29,7 +28,7 @@ interface BlockManager {
      * @param material The material of the block.
      * @throws IllegalArgumentException If the [material] is not a block.
      */
-    fun placeBlock(location: Location, material: NovaMaterial) = placeBlock(location, material, null)
+    fun placeBlock(location: Location, material: NovaBlock) = placeBlock(location, material, null)
     
     /**
      * Places the [material] at that [location].
@@ -39,7 +38,7 @@ interface BlockManager {
      * @param source The source of this block placement. Could be a player, tile-entity or similar.
      * @throws IllegalArgumentException If the [material] is not a block.
      */
-    fun placeBlock(location: Location, material: NovaMaterial, source: Any?) = placeBlock(location, material, source, true)
+    fun placeBlock(location: Location, material: NovaBlock, source: Any?) = placeBlock(location, material, source, true)
     
     /**
      * Places the [material] at that [location].
@@ -47,7 +46,7 @@ interface BlockManager {
      * @param source The source of this block placement. Could be a player, tile-entity or similar.
      * @param playSound If block breaking sounds should be placed.
      */
-    fun placeBlock(location: Location, material: NovaMaterial, source: Any?, playSound: Boolean)
+    fun placeBlock(location: Location, material: NovaBlock, source: Any?, playSound: Boolean)
     
     /**
      * Gets the drops of the Nova block at that [location] or null if there is no Nova block there.

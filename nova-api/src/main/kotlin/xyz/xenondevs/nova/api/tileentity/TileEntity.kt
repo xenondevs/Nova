@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.api.tileentity
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.api.material.NovaMaterial
+import xyz.xenondevs.nova.api.block.NovaBlock
 
 interface TileEntity {
     
@@ -15,7 +15,7 @@ interface TileEntity {
     /**
      * The material of this [TileEntity]
      */
-    val material: NovaMaterial
+    val material: NovaBlock
     
     /**
      * The location of this [TileEntity]

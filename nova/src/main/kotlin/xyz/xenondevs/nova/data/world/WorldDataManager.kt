@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.data.world
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
@@ -13,6 +14,7 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.event.world.WorldUnloadEvent
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.pollFirstWhere
 import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
@@ -241,7 +243,7 @@ internal object WorldDataManager : Listener {
     
     @Synchronized
     private fun placeOrphanBlock(pos: BlockPos, material: NovaBlock) {
-        val ctx = BlockPlaceContext(pos, material.clientsideProvider.get(), null, null, null, pos.below, BlockFace.UP)
+        val ctx = BlockPlaceContext(pos, material.item?.createItemStack(0) ?: ItemStack(Material.AIR), null, null, null, pos.below, BlockFace.UP)
         val state = material.createNewBlockState(ctx)
         setBlockState(pos, state)
         state.handleInitialized(true)

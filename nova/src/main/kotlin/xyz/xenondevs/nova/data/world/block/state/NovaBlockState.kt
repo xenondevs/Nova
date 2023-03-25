@@ -14,17 +14,16 @@ import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
-import xyz.xenondevs.nova.api.block.NovaBlockState as INovaBlockState
 
 @Suppress("CanBePrimaryConstructorProperty", "UNCHECKED_CAST")
-open class NovaBlockState(override val pos: BlockPos, material: NovaBlock) : BlockState(), INovaBlockState {
+open class NovaBlockState(override val pos: BlockPos, material: NovaBlock) : BlockState() {
     
     override val id = material.id
-    override val material = material
+    open val material = material
     val modelProvider by lazy { material.block.modelProviderType.create(this) }
     internal val properties = material.properties.associateWithTo(LinkedHashMap(), BlockPropertyType<*>::create)
     
-    override val location: Location
+    val location: Location
         get() = pos.location
     
     @Volatile

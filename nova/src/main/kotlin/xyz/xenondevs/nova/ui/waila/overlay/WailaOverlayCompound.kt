@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.overlay
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
@@ -37,7 +38,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
     private val imageOverlay = WailaImageOverlay()
     private val lineOverlays = Array(10, ::WailaLineOverlay)
     
-    fun update(icon: NamespacedId, lines: List<WailaLine>) {
+    fun update(icon: ResourceLocation, lines: List<WailaLine>) {
         require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
         
         // reset line overlays

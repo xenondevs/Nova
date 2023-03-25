@@ -11,6 +11,7 @@ import com.sk89q.worldedit.world.block.BlockState
 import com.sk89q.worldedit.world.block.BlockTypes
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.contains
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.util.stream.Stream
 

@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.material.NovaItem
-import xyz.xenondevs.nova.material.TileEntityNovaBlock
+import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.set
@@ -86,7 +86,7 @@ class NovaItemBuilder internal constructor(private val id: ResourceLocation) {
             return NovaItemBuilder(block.id).apply {
                 this.block = block
                 localizedName(block.localizedName)
-                if (block is TileEntityNovaBlock)
+                if (block is NovaTileEntityBlock)
                     behaviors(TileEntityItemBehavior())
             }
         }

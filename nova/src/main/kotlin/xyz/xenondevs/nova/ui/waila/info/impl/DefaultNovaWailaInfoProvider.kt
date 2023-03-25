@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.line.EnergyHolderLine
 import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
+import xyz.xenondevs.nova.util.name
 
 object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
     
@@ -42,7 +43,7 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
         var id = material.id
         val subId = block.modelProvider.currentSubId
         if (subId > 0) {
-            val subIdTexture = NamespacedId(id.namespace, "${id.name}_$subId")
+            val subIdTexture = ResourceLocation(id.namespace, "${id.name}_$subId")
             if (Resources.getWailaIconCharOrNull(subIdTexture) != null)
                 id = subIdTexture
         }

@@ -7,11 +7,9 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
-import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.api.material.NovaMaterial
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
@@ -37,15 +35,13 @@ import xyz.xenondevs.nova.world.block.logic.interact.BlockInteracting
 import xyz.xenondevs.nova.world.block.logic.place.BlockPlacing
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
-import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
-import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
 
 @InternalInit(
     stage = InitializationStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class, WorldDataManager::class]
 )
-object BlockManager : IBlockManager {
+object BlockManager {
     
     fun init() {
         BlockPlacing.init()
@@ -198,35 +194,6 @@ object BlockManager : IBlockManager {
     @Deprecated("Break sound and particles are not independent from one another", ReplaceWith("breakBlock(ctx, playSound || showParticles)"))
     fun breakBlock(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true): Boolean =
         breakBlock(ctx, playSound || showParticles)
-    //</editor-fold>
-    
-    //<editor-fold desc="NovaAPI methods">
-    
-    override fun hasBlock(location: Location): Boolean {
-        return hasBlock(location.pos, true)
-    }
-    
-    override fun getBlock(location: Location): NovaBlockState? {
-        return getBlock(location.pos, true)
-    }
-    
-    override fun placeBlock(location: Location, material: NovaMaterial, source: Any?, playSound: Boolean) {
-        require(material is NovaBlock)
-        
-        val ctx = BlockPlaceContext.forAPI(location, material, source)
-        placeBlock(material, ctx, playSound)
-    }
-    
-    override fun getDrops(location: Location, source: Any?, tool: ItemStack?): List<ItemStack>? {
-        val ctx = BlockBreakContext.forAPI(location, source, tool)
-        return getDrops(ctx)
-    }
-    
-    override fun removeBlock(location: Location, source: Any?, breakEffects: Boolean): Boolean {
-        val ctx = BlockBreakContext.forAPI(location, source, null)
-        return removeBlock(ctx, breakEffects)
-    }
-    
     //</editor-fold>
     
 }

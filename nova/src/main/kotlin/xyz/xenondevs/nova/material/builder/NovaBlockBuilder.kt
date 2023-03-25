@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.material.MultiBlockLoader
 import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.material.PlaceCheckFun
 import xyz.xenondevs.nova.material.TileEntityConstructor
-import xyz.xenondevs.nova.material.TileEntityNovaBlock
+import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.material.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.set
@@ -102,8 +102,8 @@ class TileEntityNovaBlockBuilder internal constructor(
         return this
     }
 
-    override fun register(): TileEntityNovaBlock {
-        val block = TileEntityNovaBlock(
+    override fun register(): NovaTileEntityBlock {
+        val block = NovaTileEntityBlock(
             id,
             localizedName,
             BlockLogic(logic),

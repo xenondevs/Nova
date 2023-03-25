@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.world.block.state
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteBuffer
-import xyz.xenondevs.nova.material.TileEntityNovaBlock
+import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.UUIDUtils
@@ -11,11 +11,10 @@ import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
-import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 
-class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
+class NovaTileEntityState : NovaBlockState {
     
-    override val material: TileEntityNovaBlock
+    override val material: NovaTileEntityBlock
     
     @Volatile
     lateinit var uuid: UUID
@@ -28,17 +27,17 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     
     @Volatile
     private var _tileEntity: TileEntity? = null
-    override var tileEntity: TileEntity
+    var tileEntity: TileEntity
         get() = _tileEntity ?: throw IllegalStateException("TileEntity is not initialized")
         internal set(value) {
             _tileEntity = value
         }
     
-    constructor(pos: BlockPos, material: TileEntityNovaBlock) : super(pos, material) {
+    constructor(pos: BlockPos, material: NovaTileEntityBlock) : super(pos, material) {
         this.material = material
     }
     
-    constructor(material: TileEntityNovaBlock, ctx: BlockPlaceContext) : super(material, ctx) {
+    constructor(material: NovaTileEntityBlock, ctx: BlockPlaceContext) : super(material, ctx) {
         this.material = material
         this.uuid = UUID.randomUUID()
         this.ownerUUID = ctx.ownerUUID

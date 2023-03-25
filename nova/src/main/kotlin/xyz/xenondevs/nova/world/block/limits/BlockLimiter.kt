@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.world.block.limits
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.configuration.ConfigurationSection
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
@@ -46,7 +46,7 @@ internal abstract class SimpleBlockLimiter(denyMessage: String) : BlockLimiter {
 
 internal class TypeBlacklist(blacklist: List<String>) : SimpleBlockLimiter("nova.tile_entity_limits.type_blacklist.deny") {
     
-    private val blacklist = blacklist.mapTo(HashSet(), NamespacedId::of)
+    private val blacklist = blacklist.mapTo(HashSet()) { ResourceLocation.of(it, ':') }
     
     override fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean {
         return material.id !in blacklist
@@ -66,8 +66,8 @@ internal class WorldBlacklist(blacklist: List<String>) : SimpleBlockLimiter("nov
 
 internal class TypeWorldBlacklist(cfg: ConfigurationSection) : SimpleBlockLimiter("nova.tile_entity_limits.type_world_blacklist.deny") {
     
-    private val blacklist: Map<String, Set<NamespacedId>> =
-        cfg.getKeys(false).associateWithTo(HashMap()) { world -> cfg.getStringList(world).mapTo(HashSet(), NamespacedId::of) }
+    private val blacklist: Map<String, Set<ResourceLocation>> =
+        cfg.getKeys(false).associateWithTo(HashMap()) { world -> cfg.getStringList(world).mapTo(HashSet()) { ResourceLocation.of(it, ':') } }
     
     override fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean {
         val id = material.id
@@ -78,8 +78,8 @@ internal class TypeWorldBlacklist(cfg: ConfigurationSection) : SimpleBlockLimite
 
 internal class AmountLimiter(cfg: ConfigurationSection, private val type: Type) : BlockLimiter {
     
-    private val limits: Map<NamespacedId?, Int> =
-        cfg.getKeys(false).associateTo(HashMap()) { id -> (if (id == "*") null else NamespacedId.of(id)) to cfg.getInt(id) }
+    private val limits: Map<ResourceLocation?, Int> =
+        cfg.getKeys(false).associateTo(HashMap()) { id -> (if (id == "*") null else ResourceLocation.of(id, ':')) to cfg.getInt(id) }
     
     private val deniedSpecific = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}.deny")
     private val deniedTotal = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}_total.deny")

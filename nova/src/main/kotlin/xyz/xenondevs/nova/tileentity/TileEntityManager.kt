@@ -14,7 +14,6 @@ import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 import java.util.logging.Level
-import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
 @Suppress("DEPRECATION")
 val Material?.requiresLight: Boolean
@@ -24,7 +23,7 @@ val Material?.requiresLight: Boolean
     stage = InitializationStage.POST_WORLD,
     dependsOn = [CustomItemServiceManager::class]
 )
-object TileEntityManager : ITileEntityManager {
+object TileEntityManager {
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, TileEntity>>()
     val tileEntities: Sequence<TileEntity>
@@ -58,7 +57,7 @@ object TileEntityManager : ITileEntityManager {
         tileEntityMap[state.pos.chunkPos]?.remove(state.pos)
     }
     
-    override fun getTileEntity(location: Location): TileEntity? {
+    fun getTileEntity(location: Location): TileEntity? {
         return getTileEntity(location, true)
     }
     

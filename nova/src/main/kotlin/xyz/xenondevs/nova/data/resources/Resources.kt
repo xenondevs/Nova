@@ -138,7 +138,7 @@ object Resources {
         return wailaDataLookup[id]!!
     }
     
-    fun getWailaIconCharOrNull(id: NamespacedId): FontChar? {
+    fun getWailaIconCharOrNull(id: ResourceLocation): FontChar? {
         return wailaDataLookup[id.toString()]
     }
     

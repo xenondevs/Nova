@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import kotlin.math.roundToInt
@@ -31,7 +31,7 @@ internal object CropWailaInfoProvider : VanillaWailaInfoProvider(
         val ageable = block.blockData as Ageable
         val stage = ((ageable.age / ageable.maximumAge.toDouble()) * MAX_TEXTURE_STAGE[block.type]!!).roundToInt()
         
-        info.icon = NamespacedId("minecraft", block.type.name.lowercase() + "_stage$stage")
+        info.icon = ResourceLocation("minecraft", block.type.name.lowercase() + "_stage$stage")
         return info
     }
 
