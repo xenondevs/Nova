@@ -8,11 +8,7 @@ import kotlin.reflect.KProperty
 
 internal interface MetadataEntry<T> {
     
-    val value: T
     var dirty: Boolean
-    
-    operator fun getValue(thisRef: Any, property: KProperty<*>): T
-    operator fun setValue(thisRef: Any, property: KProperty<*>, value: T)
     
     fun write(buf: FriendlyByteBuf)
     
@@ -28,15 +24,14 @@ internal open class NonNullMetadataEntry<T>(
     
     private val serializerId = EntityDataSerializers.getSerializedId(serializer)
     
-    override var value: T = default
-        protected set
+    protected var value: T = default
     override var dirty: Boolean = false
     
-    override operator fun getValue(thisRef: Any, property: KProperty<*>): T {
+    operator fun getValue(thisRef: Any, property: KProperty<*>): T {
         return value
     }
     
-    override operator fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
+    operator fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
         this.value = value
         dirty = true
     }
@@ -52,42 +47,60 @@ internal open class NonNullMetadataEntry<T>(
     
 }
 
-internal class MappedNonNullMetadataEntry<C, T>(
+internal class MappedNonNullMetadataEntry<T, R>(
     private val index: Int,
-    private val serializer: EntityDataSerializer<T>,
-    private val mapper: (C) -> T,
-    private val default: C
-) : MetadataEntry<C> {
+    private val serializer: EntityDataSerializer<R>,
+    private val toRaw: (T) -> R,
+    private val fromRaw: (R) -> T,
+    private val default: T
+) : MetadataEntry<T> {
     
     private val serializerId = EntityDataSerializers.getSerializedId(serializer)
     
-    override var value: C = default
-        private set
-    private var mappedValue: T? = null
+    private var mappedValue: T = default
+    private var rawValue: R = toRaw(default)
     
     override var dirty: Boolean = false
     
-    override operator fun getValue(thisRef: Any, property: KProperty<*>): C {
-        return value
-    }
-    
-    override operator fun setValue(thisRef: Any, property: KProperty<*>, value: C) {
-        this.value = value
-        dirty = true
-        mappedValue = null
-    }
+    val rawDelegate = RawDelegate()
+    val mappedDelegate = MappedDelegate()
     
     override fun write(buf: FriendlyByteBuf) {
-        if (mappedValue == null)
-            mappedValue = mapper(value)
-        
         buf.writeByte(index)
         buf.writeVarInt(serializerId)
-        serializer.write(buf, mappedValue!!)
+        serializer.write(buf, rawValue!!)
     }
     
     override fun isNotDefault(): Boolean =
-        value != default
+        mappedValue != default
+    
+    inner class RawDelegate {
+        
+        operator fun getValue(thisRef: Any, property: KProperty<*>): R {
+            return rawValue
+        }
+        
+        operator fun setValue(thisRef: Any, property: KProperty<*>, value: R) {
+            rawValue = value
+            mappedValue = fromRaw(value)
+            dirty = true
+        }
+        
+    }
+    
+    inner class MappedDelegate {
+        
+        operator fun getValue(thisRef: Any, property: KProperty<*>): T {
+            return mappedValue
+        }
+        
+        operator fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
+            this@MappedNonNullMetadataEntry.mappedValue = value
+            rawValue = toRaw(value)
+            dirty = true
+        }
+        
+    }
     
 }
 
@@ -99,15 +112,14 @@ internal class NullableMetadataEntry<T>(
     
     private val serializerId = EntityDataSerializers.getSerializedId(serializer)
     
-    override var value: T? = default
-        private set
+    private var value: T? = default
     override var dirty: Boolean = false
     
-    override fun getValue(thisRef: Any, property: KProperty<*>): T? {
+    operator fun getValue(thisRef: Any, property: KProperty<*>): T? {
         return value
     }
     
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: T?) {
+    operator fun setValue(thisRef: Any, property: KProperty<*>, value: T?) {
         this.value = value
         dirty = true
     }
@@ -138,14 +150,14 @@ internal class SharedFlagsMetadataEntry(
     }
     
     inner class SharedFlag(private val bit: Int) {
-
+        
         var booleanValue: Boolean
             get() = (value.toInt() and (1 shl bit)) != 0
             set(booleanValue) {
                 val intValue = if (booleanValue)
                     value.toInt() or (1 shl bit)
                 else value.toInt() and (1 shl bit).inv()
-    
+                
                 value = intValue.toByte()
             }
         
