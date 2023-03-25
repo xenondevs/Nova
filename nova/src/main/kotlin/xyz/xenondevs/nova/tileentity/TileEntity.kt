@@ -5,7 +5,6 @@ import net.minecraft.network.protocol.Packet
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
-import org.bukkit.NamespacedKey
 import org.bukkit.OfflinePlayer
 import org.bukkit.Sound
 import org.bukkit.World
@@ -28,8 +27,7 @@ import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.nova.material.TileEntityNovaBlock
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -51,7 +49,7 @@ import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.TileEntityBlock
+import xyz.xenondevs.nova.world.block.TileEntityBlockBehavior
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.region.DynamicRegion
@@ -73,19 +71,14 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     companion object {
         val SELF_UPDATE_REASON = object : UpdateReason {}
         
-        @Deprecated("Legacy value")
-        val LEGACY_TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntityData")
-        
         val TILE_ENTITY_DATA_KEY = NamespacedId(NOVA, "tileentity")
     }
-    
-    override var legacyData: LegacyCompound? = blockState.legacyData
     
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid
     val ownerUUID: UUID? = blockState.ownerUUID
     final override val data: Compound = blockState.data
-    final override val material: TileEntityNovaMaterial = blockState.material
+    final override val material: TileEntityNovaBlock = blockState.material
     
     override val owner: OfflinePlayer? by lazy { ownerUUID?.let(Bukkit::getOfflinePlayer) }
     
@@ -221,7 +214,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     /**
-     * Called when a [TileEntityBlock] is interacted with.
+     * Called when a [TileEntityBlockBehavior] is interacted with.
      *
      * Might be called twice for each hand.
      *
@@ -304,15 +297,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         val storedAmount: Long?
         val storedType: FluidType?
         
-        if (legacyData != null) {
-            val fluidData = retrieveDataOrNull<LegacyCompound>("fluidContainer.$uuid")
-            storedAmount = fluidData?.get<Long>("amount")
-            storedType = fluidData?.get<FluidType>("type")
-        } else {
-            val fluidData = retrieveDataOrNull<Compound>("fluidContainer.$uuid")
-            storedAmount = fluidData?.get<Long>("amount")
-            storedType = fluidData?.get<FluidType>("type")
-        }
+        val fluidData = retrieveDataOrNull<Compound>("fluidContainer.$uuid")
+        storedAmount = fluidData?.get<Long>("amount")
+        storedType = fluidData?.get<FluidType>("type")
         
         val container = NovaFluidContainer(
             uuid,

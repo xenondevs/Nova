@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
@@ -66,7 +67,7 @@ interface NetworkManager {
     
     @InternalInit(
         stage = InitializationStage.POST_WORLD,
-        dependsOn = [LegacyFileConverter::class]
+        dependsOn = [LegacyFileConverter::class, DefaultNetworkTypes::class]
     )
     companion object : Listener {
         
@@ -449,7 +450,7 @@ private class NetworkManagerImpl : NetworkManager {
         // add endPoint to nodesById
         nodesById[endPoint.uuid] = endPoint
         
-        return NetworkTypeRegistry.types.mapToAllFuture networks@{ networkType ->
+        return NETWORK_TYPE.mapToAllFuture networks@{ networkType ->
             val allowedFaces = endPoint.allowedFaces[networkType]
             if (allowedFaces != null) { // does the endpoint want to have any connections?
                 // loop over all bridges nearby to possibly connect to

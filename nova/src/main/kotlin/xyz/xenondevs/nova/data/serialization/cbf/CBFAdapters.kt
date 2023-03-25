@@ -14,9 +14,11 @@ import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemStackBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.LocationBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedIdBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedKeyBinaryAdapter
-import xyz.xenondevs.nova.data.serialization.cbf.adapter.NetworkTypeBinaryAdapter
-import xyz.xenondevs.nova.data.serialization.cbf.adapter.UpgradeTypeBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.ResourceLocationBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.VirtualInventoryBinaryAdapter
+import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
+import xyz.xenondevs.nova.registry.NovaRegistries.UPGRADE_TYPE
+import xyz.xenondevs.nova.util.byNameBinaryAdapter
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
@@ -29,8 +31,9 @@ internal object CBFAdapters {
         registerBinaryAdapter(LocationBinaryAdapter)
         registerBinaryAdapter(NamespacedKeyBinaryAdapter)
         registerBinaryAdapter(NamespacedIdBinaryAdapter)
-        registerBinaryAdapter(NetworkTypeBinaryAdapter)
-        registerBinaryAdapter(UpgradeTypeBinaryAdapter)
+        registerBinaryAdapter(ResourceLocationBinaryAdapter)
+        registerBinaryAdapter(NETWORK_TYPE.byNameBinaryAdapter())
+        registerBinaryAdapter(UPGRADE_TYPE.byNameBinaryAdapter())
         registerBinaryAdapter(VirtualInventoryBinaryAdapter)
         registerBinaryAdapter(ItemFilterBinaryAdapter)
         

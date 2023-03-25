@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.material.options
 
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 
 @HardcodedMaterialOptions
 fun ChargeableOptions(
@@ -14,7 +14,7 @@ sealed interface ChargeableOptions {
     
     companion object {
         
-        fun configurable(material: ItemNovaMaterial): ChargeableOptions =
+        fun configurable(material: NovaItem): ChargeableOptions =
             ConfigurableChargeableOptions(material)
         
         fun configurable(path: String): ChargeableOptions =
@@ -33,6 +33,6 @@ private class ConfigurableChargeableOptions : ConfigAccess, ChargeableOptions {
     override val maxEnergy by getEntry<Long>("max_energy")
     
     constructor(path: String) : super(path)
-    constructor(material: ItemNovaMaterial) : super(material)
+    constructor(material: NovaItem) : super(material)
     
 }

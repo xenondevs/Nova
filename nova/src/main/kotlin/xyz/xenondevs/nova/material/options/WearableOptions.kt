@@ -4,7 +4,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.player.equipment.ArmorType
 
 @HardcodedMaterialOptions
@@ -37,7 +37,7 @@ sealed interface WearableOptions {
     
     companion object {
         
-        fun configurable(armorType: ArmorType, equipSound: String?, material: ItemNovaMaterial): WearableOptions =
+        fun configurable(armorType: ArmorType, equipSound: String?, material: NovaItem): WearableOptions =
             ConfigurableWearableOptions(armorType, equipSound, material)
         
         fun configurable(armorType: ArmorType, equipSound: String?, path: String): WearableOptions =
@@ -74,7 +74,7 @@ private class ConfigurableWearableOptions : ConfigAccess, WearableOptions {
         this.equipSoundProvider = provider(soundEvent)
     }
     
-    constructor(armorType: ArmorType, soundEvent: String?, material: ItemNovaMaterial) : super(material) {
+    constructor(armorType: ArmorType, soundEvent: String?, material: NovaItem) : super(material) {
         this.armorTypeProvider = provider(armorType)
         this.equipSoundProvider = provider(soundEvent)
     }

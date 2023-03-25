@@ -6,7 +6,7 @@ import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.options.DamageableOptions
 import xyz.xenondevs.nova.util.item.novaCompound
 import kotlin.math.min
@@ -97,7 +97,7 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
     }
     
     companion object : ItemBehaviorFactory<Damageable>() {
-        override fun create(material: ItemNovaMaterial) =
+        override fun create(material: NovaItem) =
             Damageable(DamageableOptions.configurable(material))
     }
     

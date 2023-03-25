@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
-import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.energy.holder.BufferEnergyHolder
 import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.ui.waila.info.NovaWailaInfoProvider
@@ -30,7 +30,7 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
         if (block is NovaTileEntityState) {
             val tileEntity = block.tileEntity
             if (tileEntity is NetworkedTileEntity) {
-                val energyHolder = tileEntity.holders[NetworkType.ENERGY] as? NovaEnergyHolder
+                val energyHolder = tileEntity.holders[DefaultNetworkTypes.ENERGY] as? NovaEnergyHolder
                 if (energyHolder != null && (energyHolder !is BufferEnergyHolder || !energyHolder.infiniteEnergy)) {
                     lines += EnergyHolderLine.getEnergyBarLine(energyHolder)
                     lines += EnergyHolderLine.getEnergyAmountLine(energyHolder)

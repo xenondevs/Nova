@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.player.ability
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -11,11 +12,11 @@ import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.registry.NovaRegistries.ABILITY_TYPE
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
@@ -93,10 +94,10 @@ object AbilityManager : Listener {
     
     private fun handlePlayerJoin(player: Player) {
         val dataContainer = player.persistentDataContainer
-        val ids = dataContainer.get<List<NamespacedId>>(ABILITIES_KEY)
+        val ids = dataContainer.get<List<ResourceLocation>>(ABILITIES_KEY)
         
         ids?.forEach {
-            val abilityType = AbilityTypeRegistry.of<AbilityType<*>>(it)
+            val abilityType = ABILITY_TYPE[it]
             if (abilityType != null)
                 giveAbility(player, abilityType)
         }

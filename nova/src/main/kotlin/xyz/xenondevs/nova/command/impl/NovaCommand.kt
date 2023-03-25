@@ -29,13 +29,13 @@ import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.material.AdvancedTooltips
-import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
-import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
@@ -62,7 +62,7 @@ internal object NovaCommand : Command("nova") {
                 .requiresPermission("nova.command.give")
                 .then(argument("player", EntityArgument.players())
                     .apply {
-                        NovaMaterialRegistry.values.asSequence()
+                        NovaRegistries.ITEM.asSequence()
                             .filterNot { it.isHidden }
                             .forEach { material ->
                                 then(literal(material.id.toString())
@@ -95,7 +95,7 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("showNetwork")
                     .requiresPlayer()
                     .apply {
-                        NetworkTypeRegistry.types.forEach { type ->
+                        NETWORK_TYPE.forEach { type ->
                             then(literal(type.id.toString())
                                 .executesCatching { toggleNetworkDebugging(it, type) })
                         }
@@ -206,10 +206,10 @@ internal object NovaCommand : Command("nova") {
         }
     }
     
-    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial) =
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: NovaItem) =
         giveTo(ctx, material, ctx["amount"])
     
-    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial, amount: Int) {
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: NovaItem, amount: Int) {
         val itemName = material.localizedName.ifBlank { material.id.toString() }
         
         val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
@@ -330,7 +330,7 @@ internal object NovaCommand : Command("nova") {
         NetworkDebugger.toggleDebugger(type, player)
         
         ctx.source.sendSuccess(Component.translatable(
-            "command.nova.network_debug." + type.id.toString("."),
+            "command.nova.network_debug." + type.id.toLanguageKey(),
             NamedTextColor.GRAY
         ))
     }

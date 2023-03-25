@@ -6,7 +6,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.world.block.state.BlockState
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.world.BlockPos
@@ -47,7 +47,7 @@ data class BlockPlaceContext(
     
     internal companion object {
         
-        fun forAPI(location: Location, material: BlockNovaMaterial, source: Any?): BlockPlaceContext {
+        fun forAPI(location: Location, material: NovaBlock, source: Any?): BlockPlaceContext {
             val pos = location.pos
             return BlockPlaceContext(
                 pos,

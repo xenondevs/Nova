@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.material.options
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 
 @HardcodedMaterialOptions
 fun EnchantableOptions(
@@ -18,7 +18,7 @@ sealed interface EnchantableOptions {
     
     companion object {
         
-        fun configurable(material: ItemNovaMaterial): EnchantableOptions =
+        fun configurable(material: NovaItem): EnchantableOptions =
             ConfigurableEnchantableOptions(material)
         
         fun configurable(path: String): EnchantableOptions =
@@ -40,6 +40,6 @@ private class ConfigurableEnchantableOptions : ConfigAccess, EnchantableOptions 
         .map { list -> list.map { EnchantmentCategory.valueOf(it.uppercase()) } }
     
     constructor(path: String) : super(path)
-    constructor(material: ItemNovaMaterial) : super(material)
+    constructor(material: NovaItem) : super(material)
     
 }

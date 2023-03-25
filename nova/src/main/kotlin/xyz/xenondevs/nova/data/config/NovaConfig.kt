@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.ItemCategories
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.player.PlayerFreezer
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.tileentity.TileEntityManager
@@ -104,13 +104,13 @@ object NovaConfig {
     operator fun get(name: String): YamlConfiguration =
         configs[name] ?: throw IllegalArgumentException("Config not found: $name")
     
-    operator fun get(material: ItemNovaMaterial): YamlConfiguration =
+    operator fun get(material: NovaItem): YamlConfiguration =
         configs[material.id.toString()] ?: throw IllegalArgumentException("Config not found: ${material.id}")
     
     fun getOrNull(name: String): YamlConfiguration? =
         configs[name]
     
-    fun getOrNull(material: ItemNovaMaterial): YamlConfiguration? =
+    fun getOrNull(material: NovaItem): YamlConfiguration? =
         configs[material.id.toString()]
     
     fun save(name: String) {

@@ -10,7 +10,7 @@ class RecipeContainer(val recipe: Any) {
         else -> throw IllegalArgumentException("Could not find a recipe key")
     }
     
-    val type = RecipeTypeRegistry.getType(recipe)
+    val type = RecipeType.of(recipe)
     
     override fun equals(other: Any?): Boolean {
         return other is RecipeContainer && key == other.key

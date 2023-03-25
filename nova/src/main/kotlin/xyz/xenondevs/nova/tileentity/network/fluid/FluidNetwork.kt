@@ -4,6 +4,7 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkBridge
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
@@ -15,7 +16,7 @@ import java.util.*
 
 class FluidNetwork(override val uuid: UUID) : Network {
     
-    override val type = NetworkType.FLUID
+    override val type = DefaultNetworkTypes.FLUID
     
     override val nodes: Set<NetworkNode>
         get() = _nodes
@@ -69,7 +70,7 @@ class FluidNetwork(override val uuid: UUID) : Network {
     private fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace, createDistributor: Boolean): FluidNetworkChannel? {
         if (endPoint in _nodes) return null
         
-        val fluidHolder = endPoint.holders[NetworkType.FLUID]
+        val fluidHolder = endPoint.holders[DefaultNetworkTypes.FLUID]
         require(fluidHolder is FluidHolder) { "Illegal NetworkEndPoint Type" }
         
         val channel = channels.getOrSet(fluidHolder.channels[face]!!) { FluidNetworkChannel() }
@@ -83,7 +84,7 @@ class FluidNetwork(override val uuid: UUID) : Network {
     override fun removeNode(node: NetworkNode) {
         _nodes -= node
         if (node is NetworkEndPoint) {
-            val fluidHolder = node.holders[NetworkType.FLUID]
+            val fluidHolder = node.holders[DefaultNetworkTypes.FLUID]
             require(fluidHolder is FluidHolder) { "Illegal NetworkEndPoint Type" }
             
             fluidHolder.channels.values.toSet().asSequence()
@@ -100,7 +101,7 @@ class FluidNetwork(override val uuid: UUID) : Network {
         nodes.forEach { node ->
             _nodes -= node
             if (node is NetworkEndPoint) {
-                val fluidHolder = node.holders[NetworkType.FLUID]
+                val fluidHolder = node.holders[DefaultNetworkTypes.FLUID]
                 require(fluidHolder is FluidHolder) { "Illegal NetworkEndPoint Type" }
     
                 fluidHolder.channels.values.toSet().asSequence()

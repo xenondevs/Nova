@@ -62,7 +62,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     fun canEnchantItemWith(category: EnchantmentCategory, itemStack: MojangStack): Boolean {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) {
-            val categories = itemStack.novaMaterial?.novaItem?.getBehavior(Enchantable::class)?.options?.enchantmentCategories
+            val categories = itemStack.novaMaterial?.itemLogic?.getBehavior(Enchantable::class)?.options?.enchantmentCategories
             return categories != null && category in categories
         }
         
@@ -73,7 +73,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     fun getEnchantmentValue(itemStack: MojangStack): Int {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) {
-            return novaMaterial.novaItem.getBehavior(Enchantable::class)?.options?.enchantmentValue ?: 0
+            return novaMaterial.itemLogic.getBehavior(Enchantable::class)?.options?.enchantmentValue ?: 0
         }
         
         return itemStack.item.enchantmentValue
@@ -83,7 +83,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     fun isEnchantable(itemStack: MojangStack, item: MojangItem): Boolean {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) {
-            return novaMaterial.novaItem.hasBehavior(Enchantable::class)
+            return novaMaterial.itemLogic.hasBehavior(Enchantable::class)
         }
         
         return item.maxStackSize == 1 && item.canBeDepleted()
@@ -105,7 +105,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
         val itemStack = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player) {
             val novaMaterial = it.novaMaterial
             if (novaMaterial != null) {
-                val damage = novaMaterial.novaItem.getBehavior(Damageable::class)?.getDamage(it.novaCompound)
+                val damage = novaMaterial.itemLogic.getBehavior(Damageable::class)?.getDamage(it.novaCompound)
                 return@getRandomItemWith damage != null && damage > 0
             }
             
@@ -113,7 +113,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
         }?.value
         
         if (itemStack != null) {
-            val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(Damageable::class)
+            val damageable = itemStack.novaMaterial?.itemLogic?.getBehavior(Damageable::class)
             
             val repair: Int
             if (damageable != null) {

@@ -7,7 +7,7 @@ import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
 
 /**
@@ -81,7 +81,7 @@ sealed interface FoodOptions {
     
     companion object {
         
-        fun configurable(material: ItemNovaMaterial): FoodOptions =
+        fun configurable(material: NovaItem): FoodOptions =
             ConfigurableFoodOptions(material)
         
         fun configurable(path: String): FoodOptions =
@@ -119,6 +119,6 @@ private class ConfigurableFoodOptions : ConfigAccess, FoodOptions {
     override val effectsProvider = getOptionalEntry<List<PotionEffect>>("effects")
     
     constructor(path: String) : super(path)
-    constructor(material: ItemNovaMaterial) : super(material)
+    constructor(material: NovaItem) : super(material)
     
 }

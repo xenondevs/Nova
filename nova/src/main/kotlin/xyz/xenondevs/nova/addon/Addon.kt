@@ -10,6 +10,8 @@ abstract class Addon {
     lateinit var dataFolder: File
     lateinit var description: AddonDescription
     
+    val registry = AddonRegistryHolder(this)
+    
     open fun init() = Unit
     open fun onEnable() = Unit
     open fun onDisable() = Unit

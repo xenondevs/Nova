@@ -8,7 +8,7 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.options.ChargeableOptions
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.item.novaCompound
@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack as MojangStack
 @Suppress("FunctionName")
 fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable> =
     object : ItemBehaviorFactory<Chargeable>() {
-        override fun create(material: ItemNovaMaterial): Chargeable =
+        override fun create(material: NovaItem): Chargeable =
             Chargeable(ChargeableOptions.configurable(material), affectsItemDurability)
     }
 
@@ -96,7 +96,7 @@ class Chargeable(
     }
     
     companion object : ItemBehaviorFactory<Chargeable>() {
-        override fun create(material: ItemNovaMaterial): Chargeable =
+        override fun create(material: NovaItem): Chargeable =
             Chargeable(ChargeableOptions.configurable(material), true)
     }
     

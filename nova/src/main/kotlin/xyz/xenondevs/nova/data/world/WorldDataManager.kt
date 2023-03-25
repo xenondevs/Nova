@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
@@ -63,7 +63,7 @@ internal object WorldDataManager : Listener {
     private val chunkTasks: MutableMap<ChunkPos, Boolean> = Collections.synchronizedMap(HashMap())
     private val chunkLocks: MutableMap<ChunkPos, Latch> = Collections.synchronizedMap(HashMap())
     
-    private val pendingOrphanBlocks = Object2ObjectOpenHashMap<ChunkPos, MutableMap<BlockPos, BlockNovaMaterial>>()
+    private val pendingOrphanBlocks = Object2ObjectOpenHashMap<ChunkPos, MutableMap<BlockPos, NovaBlock>>()
     
     fun init() {
         LOGGER.info("Initializing WorldDataManager")
@@ -226,11 +226,11 @@ internal object WorldDataManager : Listener {
         writeChunk(pos.chunkPos) { it.blockStates -= pos }
     
     @Synchronized
-    internal fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: BlockNovaMaterial) {
+    internal fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: NovaBlock) {
         return addOrphanBlock(BlockPos(world.world, x, y, z), material)
     }
     
-    internal fun addOrphanBlock(pos: BlockPos, material: BlockNovaMaterial) {
+    internal fun addOrphanBlock(pos: BlockPos, material: NovaBlock) {
         val chunk = pos.chunkPos
         if (chunk.isLoaded()) {
             placeOrphanBlock(pos, material)
@@ -240,16 +240,16 @@ internal object WorldDataManager : Listener {
     }
     
     @Synchronized
-    private fun placeOrphanBlock(pos: BlockPos, material: BlockNovaMaterial) {
+    private fun placeOrphanBlock(pos: BlockPos, material: NovaBlock) {
         val ctx = BlockPlaceContext(pos, material.clientsideProvider.get(), null, null, null, pos.below, BlockFace.UP)
         val state = material.createNewBlockState(ctx)
         setBlockState(pos, state)
         state.handleInitialized(true)
-        material.novaBlock.handlePlace(state, ctx)
+        material.blockLogic.handlePlace(state, ctx)
     }
     
     @Synchronized
-    internal fun getWorldGenMaterial(pos: MojangBlockPos, world: MojangWorld): BlockNovaMaterial? {
+    internal fun getWorldGenMaterial(pos: MojangBlockPos, world: MojangWorld): NovaBlock? {
         val novaPos = pos.toNovaPos(world.world)
         val chunk = novaPos.chunkPos
         return if (chunk.isLoaded()) (getBlockState(novaPos) as? NovaBlockState)?.material else pendingOrphanBlocks[chunk]?.get(novaPos)

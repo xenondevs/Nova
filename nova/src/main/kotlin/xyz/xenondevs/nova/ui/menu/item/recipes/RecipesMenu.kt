@@ -24,7 +24,7 @@ import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.data.recipe.RecipeContainer
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.material.CoreGuiMaterial
+import xyz.xenondevs.nova.material.DefaultGuiMaterial
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.component.adventure.font
@@ -192,7 +192,7 @@ private class RecipesWindow(
     private inner class PageBackItem : ControlItem<PagedGui<*>>() {
         
         override fun getItemProvider(gui: PagedGui<*>) =
-            (if (gui.hasPreviousPage()) CoreGuiMaterial.TP_ARROW_LEFT_BTN_ON else CoreGuiMaterial.TP_ARROW_LEFT_BTN_OFF)
+            (if (gui.hasPreviousPage()) DefaultGuiMaterial.TP_ARROW_LEFT_BTN_ON else DefaultGuiMaterial.TP_ARROW_LEFT_BTN_OFF)
                 .clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -208,7 +208,7 @@ private class RecipesWindow(
     private inner class PageForwardItem : ControlItem<PagedGui<*>>() {
         
         override fun getItemProvider(gui: PagedGui<*>) =
-            (if (gui.hasNextPage()) CoreGuiMaterial.TP_ARROW_RIGHT_BTN_ON else CoreGuiMaterial.TP_ARROW_RIGHT_BTN_OFF)
+            (if (gui.hasNextPage()) DefaultGuiMaterial.TP_ARROW_RIGHT_BTN_ON else DefaultGuiMaterial.TP_ARROW_RIGHT_BTN_OFF)
                 .clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -233,7 +233,7 @@ private class LastRecipeItem(private val viewerUUID: UUID) : AbstractItem() {
     
     override fun getItemProvider(): ItemProvider {
         return if (ItemMenu.hasHistory(viewerUUID)) {
-            CoreGuiMaterial.LIGHT_ARROW_1_LEFT.clientsideProvider
+            DefaultGuiMaterial.LIGHT_ARROW_1_LEFT.clientsideProvider
         } else ItemWrapper(ItemStack(Material.AIR))
     }
     

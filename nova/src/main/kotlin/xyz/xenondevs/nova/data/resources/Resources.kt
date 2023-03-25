@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.resources
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
@@ -53,7 +54,7 @@ object Resources {
         PermanentStorage.store("languageLookup", languageLookup)
     }
     
-    fun getModelData(id: NamespacedId): ModelData {
+    fun getModelData(id: ResourceLocation): ModelData {
         return modelDataLookup[id.toString()]!!
     }
     

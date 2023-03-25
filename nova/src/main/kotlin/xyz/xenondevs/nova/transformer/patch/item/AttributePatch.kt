@@ -33,7 +33,7 @@ internal object AttributePatch : MethodTransformer(ReflectionRegistry.ITEM_STACK
     fun getDefaultAttributeModifiers(itemStack: ItemStack, slot: EquipmentSlot): Multimap<Attribute, AttributeModifier> {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) {
-            val attributeModifiers = novaMaterial.novaItem.attributeModifiers[slot]?.takeUnless(List<*>::isEmpty)
+            val attributeModifiers = novaMaterial.itemLogic.attributeModifiers[slot]?.takeUnless(List<*>::isEmpty)
             val novaModifiers = Multimaps.newListMultimap<Attribute, AttributeModifier>(HashMap(), ::ArrayList)
             attributeModifiers?.forEach {
                 novaModifiers.put(

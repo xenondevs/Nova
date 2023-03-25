@@ -6,8 +6,8 @@ import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import xyz.xenondevs.nova.material.BlockNovaMaterial;
-import xyz.xenondevs.nova.material.NovaMaterialRegistry;
+import xyz.xenondevs.nova.registry.NovaRegistries;
+import xyz.xenondevs.nova.util.NMSUtilsKt;
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock;
 
 @SuppressWarnings("unused")
@@ -19,24 +19,17 @@ public final class BlockNovaMaterialDecoder {
     
     public static <T> DataResult<Pair<Holder<Block>, T>> decodeToPair(ResourceLocation location, T second) {
         var materialName = location.toString();
-        var material = NovaMaterialRegistry.INSTANCE.getOrNull(materialName);
+        var material = NMSUtilsKt.get(NovaRegistries.BLOCK, materialName);
         if (material == null)
             return DataResult.error(() -> "Unknown material: " + materialName);
-        if (material instanceof BlockNovaMaterial blockMaterial)
-            return DataResult.success(Pair.of(Holder.direct(new WrapperBlock(blockMaterial)), second), Lifecycle.stable());
-        return DataResult.error(() -> "Material is not a block: " + materialName);
+        return DataResult.success(Pair.of(Holder.direct(new WrapperBlock(material)), second), Lifecycle.stable());
     }
     
     public static DataResult<Block> decodeToBlock(ResourceLocation location) {
         var materialName = location.toString();
-        var material = NovaMaterialRegistry.INSTANCE.getOrNull(materialName);
+        var material = NMSUtilsKt.get(NovaRegistries.BLOCK, materialName);
         if (material == null)
             return DataResult.error(() -> "Unknown material: " + materialName);
-        if (material instanceof BlockNovaMaterial blockMaterial) {
-            return DataResult.success(new WrapperBlock(blockMaterial), Lifecycle.stable());
-        }
-        return DataResult.error(() -> "Material is not a block: " + materialName);
+        return DataResult.success(new WrapperBlock(material), Lifecycle.stable());
     }
-    
 }
-

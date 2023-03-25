@@ -25,7 +25,7 @@ internal object AgentNoteBlockBehavior {
             vnb.powered = shouldBePowered
             
             if (shouldBePowered)
-                NoteBlockBehavior.playNote(vnb)
+                NoteBackingState.playNote(vnb)
         }
     }
     
@@ -33,7 +33,7 @@ internal object AgentNoteBlockBehavior {
     fun use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, result: BlockHitResult): InteractionResult {
         val vnb = VanillaTileEntityManager.getTileEntityAt(pos.toNovaPos(level.world)) as? VanillaNoteBlockTileEntity ?: return InteractionResult.FAIL
         
-        NoteBlockBehavior.cycleNote(vnb)
+        NoteBackingState.cycleNote(vnb)
         player.awardStat(Stats.TUNE_NOTEBLOCK)
         
         return InteractionResult.CONSUME
@@ -43,7 +43,7 @@ internal object AgentNoteBlockBehavior {
     fun attack(state: BlockState, level: Level, pos: BlockPos, player: Player) {
         val vnb = VanillaTileEntityManager.getTileEntityAt(pos.toNovaPos(level.world)) as? VanillaNoteBlockTileEntity ?: return
         
-        NoteBlockBehavior.playNote(vnb)
+        NoteBackingState.playNote(vnb)
         player.awardStat(Stats.PLAY_NOTEBLOCK)
     }
     

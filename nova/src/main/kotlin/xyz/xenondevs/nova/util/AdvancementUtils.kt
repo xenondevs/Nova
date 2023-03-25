@@ -14,7 +14,7 @@ import xyz.xenondevs.nmsutils.advancement.advancement
 import xyz.xenondevs.nmsutils.advancement.predicate.ItemPredicate
 import xyz.xenondevs.nmsutils.advancement.predicate.NbtPredicate
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 
 fun ItemPredicate.Builder.nbt(compound: CompoundTag) {
     nbt(NbtPredicate(compound))
@@ -26,11 +26,11 @@ fun ItemPredicate.Builder.nbt(init: CompoundTag.() -> Unit) {
     nbt(tag)
 }
 
-fun Display.Builder.icon(icon: ItemNovaMaterial) {
+fun Display.Builder.icon(icon: NovaItem) {
     icon(icon.clientsideProvider.get())
 }
 
-fun CriteriaBuilder.obtainNovaItem(item: ItemNovaMaterial): Criterion {
+fun CriteriaBuilder.obtainNovaItem(item: NovaItem): Criterion {
     return inventoryChanged("obtain_${item.id}") {
         item {
             nbt {
@@ -48,7 +48,7 @@ fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit
 fun obtainNovaItemAdvancement(
     addon: Addon,
     parent: Advancement?,
-    item: ItemNovaMaterial,
+    item: NovaItem,
     frameType: FrameType = FrameType.TASK
 ): Advancement {
     require(addon.description.id == item.id.namespace) { "The specified item is from a different addon" }
@@ -72,7 +72,7 @@ fun obtainNovaItemsAdvancement(
     addon: Addon,
     name: String,
     parent: Advancement?,
-    items: List<ItemNovaMaterial>, requireAll: Boolean,
+    items: List<NovaItem>, requireAll: Boolean,
     frameType: FrameType = FrameType.TASK
 ): Advancement {
     require(items.all { it.id.namespace == addon.description.id }) { "At least one of the specified items is from a different addon" }

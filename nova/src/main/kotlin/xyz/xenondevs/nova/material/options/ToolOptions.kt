@@ -6,10 +6,12 @@ import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
 import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.ToolCategoryRegistry
 import xyz.xenondevs.nova.item.tool.ToolTier
-import xyz.xenondevs.nova.item.tool.ToolTierRegistry
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.item.tool.VanillaToolCategories
+import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
+import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_TIER
+import xyz.xenondevs.nova.util.get
 
 @HardcodedMaterialOptions
 fun ToolOptions(
@@ -20,7 +22,7 @@ fun ToolOptions(
     attackSpeed: Double?,
     knockbackBonus: Int,
     canSweepAttack: Boolean = false,
-    canBreakBlocksInCreative: Boolean = category != ToolCategory.SWORD
+    canBreakBlocksInCreative: Boolean = category != VanillaToolCategories.SWORD
 ): ToolOptions = HardcodedToolOptions(tier, category, breakSpeed, attackDamage, attackSpeed, knockbackBonus, canSweepAttack, canBreakBlocksInCreative)
 
 sealed interface ToolOptions {
@@ -53,7 +55,7 @@ sealed interface ToolOptions {
     
     companion object {
         
-        fun configurable(material: ItemNovaMaterial): ToolOptions =
+        fun configurable(material: NovaItem): ToolOptions =
             ConfigurableToolOptions(material)
         
         fun configurable(path: String): ToolOptions =
@@ -87,8 +89,8 @@ private class HardcodedToolOptions(
 
 private class ConfigurableToolOptions : ConfigAccess, ToolOptions {
     
-    override val tierProvider = getEntry<String>("tool_tier", "tool_level").map { ToolTierRegistry.of(it)!! }
-    override val categoryProvider = getEntry<String>("tool_category").map { ToolCategoryRegistry.of(it)!! }
+    override val tierProvider = getEntry<String>("tool_tier", "tool_level").map { TOOL_TIER[it]!! }
+    override val categoryProvider = getEntry<String>("tool_category").map { TOOL_CATEGORY[it]!! }
     override val breakSpeedProvider = getEntry<Double>("break_speed")
     override val attackDamageProvider = getOptionalEntry<Double>("attack_damage")
     override val attackSpeedProvider = getOptionalEntry<Double>("attack_speed")
@@ -97,6 +99,6 @@ private class ConfigurableToolOptions : ConfigAccess, ToolOptions {
     override val canBreakBlocksInCreativeProvider = getOptionalEntry<Boolean>("can_break_blocks_in_creative").orElse(true)
     
     constructor(path: String) : super(path)
-    constructor(material: ItemNovaMaterial) : super(material)
+    constructor(material: NovaItem) : super(material)
     
 }

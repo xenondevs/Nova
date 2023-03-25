@@ -9,8 +9,8 @@ import com.sk89q.worldedit.internal.registry.InputParser
 import com.sk89q.worldedit.world.block.BaseBlock
 import com.sk89q.worldedit.world.block.BlockState
 import com.sk89q.worldedit.world.block.BlockTypes
-import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.contains
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.util.stream.Stream
 
@@ -20,13 +20,13 @@ internal class NovaBlockInputParser(worldEdit: WorldEdit) : InputParser<BaseBloc
     private val blockState = BlockTypes.BARRIER!!.defaultState
     
     override fun getSuggestions(input: String): Stream<String> {
-        return NovaMaterialRegistry.values.stream()
-            .filter { it is BlockNovaMaterial && (it.id.toString().startsWith(input) || it.id.name.startsWith(input)) }
+        return NovaRegistries.BLOCK.stream()
+            .filter { it.id.toString().startsWith(input) || it.id.name.startsWith(input) }
             .map { it.id.toString() }
     }
     
     override fun parseFromInput(input: String, context: ParserContext): BaseBlock? {
-        if (NovaMaterialRegistry.getOrNull(input) !is BlockNovaMaterial)
+        if (input !in NovaRegistries.BLOCK)
             return null
         
         val compoundTag = CompoundTag(hashMapOf("nova" to StringTag(input)) as Map<String, Tag>)

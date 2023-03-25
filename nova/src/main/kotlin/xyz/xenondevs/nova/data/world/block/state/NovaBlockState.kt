@@ -1,17 +1,13 @@
 package xyz.xenondevs.nova.data.world.block.state
 
-import io.netty.buffer.ByteBuf
 import org.bukkit.Location
-import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.property.BlockProperty
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
-import xyz.xenondevs.nova.data.world.block.property.Directional
-import xyz.xenondevs.nova.data.world.block.property.LegacyDirectional
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
@@ -21,7 +17,7 @@ import kotlin.reflect.full.superclasses
 import xyz.xenondevs.nova.api.block.NovaBlockState as INovaBlockState
 
 @Suppress("CanBePrimaryConstructorProperty", "UNCHECKED_CAST")
-open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMaterial) : BlockState(), INovaBlockState {
+open class NovaBlockState(override val pos: BlockPos, material: NovaBlock) : BlockState(), INovaBlockState {
     
     override val id = material.id
     override val material = material
@@ -35,7 +31,7 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
     final override var isLoaded = false
         private set
     
-    constructor(material: BlockNovaMaterial, ctx: BlockPlaceContext) : this(ctx.pos, material) {
+    constructor(material: NovaBlock, ctx: BlockPlaceContext) : this(ctx.pos, material) {
         properties.values.forEach { it.init(ctx) }
     }
     
@@ -76,17 +72,4 @@ open class NovaBlockState(override val pos: BlockPos, material: BlockNovaMateria
         CBF.write(compound, buf)
     }
     
-    //<editor-fold desc="Legacy" defaultstate="collapsed">
-    
-    internal fun readPropertiesLegacy(buf: ByteBuf) {
-        properties.forEach { (_, property) ->
-            if (property is LegacyDirectional) {
-                buf.readByte()
-            } else if (property is Directional) {
-                property.facing = BlockFace.values()[buf.readByte().toInt()]
-            }
-        }
-    }
-    
-    //</editor-fold>
 }

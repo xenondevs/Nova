@@ -3,10 +3,8 @@ package xyz.xenondevs.nova.data.serialization
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
 import xyz.xenondevs.nova.tileentity.TileEntity
 import kotlin.reflect.KType
-import kotlin.reflect.jvm.javaType
 
 abstract class DataHolder internal constructor(includeGlobal: Boolean) {
     
@@ -19,15 +17,7 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
         val global = data.get<Compound>("global")
         global ?: Compound().also { if (includeGlobal) data["global"] = it }
     }
-    
-    @PublishedApi
-    internal open var legacyData: LegacyCompound? = null
-    @PublishedApi
-    internal val legacyGlobalData: LegacyCompound by lazy {
-        val global = legacyData?.get<LegacyCompound>("global")
-        global ?: LegacyCompound().also { if (includeGlobal) legacyData?.set("global", it) }
-    }
-    
+
     /**
      * Retrieves data from the data [Compound] of this TileEntity.
      * If it can't find anything under the given key, the result of the
@@ -51,8 +41,6 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
      * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
      */
     inline fun <reified T> retrieveDataOrNull(key: String): T? {
-        if (legacyData != null)
-            return legacyData!!.get<T>(key) ?: legacyGlobalData.get<T>(key)
         return data[key] ?: globalData[key]
     }
     
@@ -70,8 +58,6 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
      * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
      */
     fun <T> retrieveDataOrNull(type: KType, key: String): T? {
-        if (legacyData != null)
-            return legacyData!!.get(type.javaType, key) ?: legacyGlobalData.get(type.javaType, key)
         return data.get(type, key) ?: globalData.get(type, key)
     }
     

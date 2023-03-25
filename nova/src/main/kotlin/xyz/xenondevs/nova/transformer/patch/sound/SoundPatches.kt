@@ -161,7 +161,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
     fun getEquipSound(itemStack: MojangStack): SoundEvent? {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null) {
-            val soundEventName = novaMaterial.novaItem.getBehavior(Wearable::class)?.options?.equipSound
+            val soundEventName = novaMaterial.itemLogic.getBehavior(Wearable::class)?.options?.equipSound
                 ?: return null
             return SoundEvent.createVariableRangeEvent(ResourceLocation.tryParse(soundEventName))
         }

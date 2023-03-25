@@ -4,7 +4,6 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.serialization.persistentdata.getLegacy
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter.Companion.ITEM_FILTER_KEY
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.retrieveData
@@ -13,17 +12,6 @@ import xyz.xenondevs.nova.util.item.storeData
 private val LEGACY_ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
 
 fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
-    val itemMeta = itemMeta!!
-    val container = itemMeta.persistentDataContainer
-    
-    val legacyFilter = container.getLegacy<ItemFilter>(LEGACY_ITEM_FILTER_KEY)
-    if (legacyFilter != null) {
-        container.remove(LEGACY_ITEM_FILTER_KEY)
-        setItemMeta(itemMeta)
-        saveFilterConfig(legacyFilter)
-        return legacyFilter
-    }
-    
     return retrieveData(ITEM_FILTER_KEY)
 }
 

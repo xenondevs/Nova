@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
-import xyz.xenondevs.nova.material.CoreItems
+import xyz.xenondevs.nova.material.DefaultItems
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
@@ -72,13 +72,14 @@ internal object Initializer : Listener {
     fun initPreWorld() {
         registerEvents()
         
+        System.setProperty("net.kyori.adventure.serviceLoadFailuresAreFatal", "false")
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         
         CBFAdapters.register()
         InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
-        CoreItems.init()
+        DefaultItems.init()
         
         val preWorldInit = toInit.filter { it.stage == InitializationStage.PRE_WORLD }
         val lookup = toInit.associateBy(InitializableClass::className)

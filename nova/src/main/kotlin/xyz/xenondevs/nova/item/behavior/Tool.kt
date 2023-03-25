@@ -7,7 +7,7 @@ import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.options.ToolOptions
 import java.util.*
 
@@ -56,7 +56,7 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
         val BASE_ATTACK_DAMAGE_UUID: UUID = UUID.fromString("e63e979b-a109-4519-8b20-2ce3962e490c")
         val BASE_ATTACK_SPEED_UUID: UUID = UUID.fromString("54277290-d821-4616-936b-eee88e98bc0b")
         
-        override fun create(material: ItemNovaMaterial) =
+        override fun create(material: NovaItem) =
             Tool(ToolOptions.configurable(material))
     }
     

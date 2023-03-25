@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.api
 
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.api.block.BlockManager
+import xyz.xenondevs.nova.api.block.NovaBlockRegistry
+import xyz.xenondevs.nova.api.item.NovaItemRegistry
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry
 import xyz.xenondevs.nova.api.player.WailaManager
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
@@ -30,7 +32,18 @@ interface Nova {
     /**
      * To look up nova materials
      */
+    @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     val materialRegistry: NovaMaterialRegistry
+    
+    /**
+     * To look up nova blocks
+     */
+    val blockRegistry: NovaBlockRegistry
+    
+    /**
+     * To look up nova items
+     */
+    val itemRegistry: NovaItemRegistry
     
     /**
      * Manages the WAILA overlay

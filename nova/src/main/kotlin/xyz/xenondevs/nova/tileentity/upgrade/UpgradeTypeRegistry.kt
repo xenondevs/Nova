@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.tileentity.upgrade
 
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -15,7 +15,7 @@ object UpgradeTypeRegistry {
     
     fun <T> register(
         addon: Addon, name: String,
-        item: ItemNovaMaterial, icon: ItemNovaMaterial,
+        item: NovaItem, icon: NovaItem,
         valueType: KType
     ): UpgradeType<T> {
         val id = NamespacedId(addon.description.id, name)
@@ -26,13 +26,13 @@ object UpgradeTypeRegistry {
     
     inline fun <reified T> register(
         addon: Addon, name: String,
-        item: ItemNovaMaterial, icon: ItemNovaMaterial
+        item: NovaItem, icon: NovaItem
     ) = register<T>(addon, name, item, icon, typeOf<T>())
     
     fun <T> of(id: NamespacedId): UpgradeType<T>? =
         _types[id] as? UpgradeType<T>
     
-    fun <T> of(item: ItemNovaMaterial): UpgradeType<T>? =
+    fun <T> of(item: NovaItem): UpgradeType<T>? =
         types.firstOrNull { it.item == item } as? UpgradeType<T>
     
 }

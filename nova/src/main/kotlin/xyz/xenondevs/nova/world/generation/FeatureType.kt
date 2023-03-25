@@ -13,12 +13,12 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.util.item.nmsBlock
 import java.util.function.Predicate
 
 /**
- * An extension class of Minecraft's [Feature] that allows to use Bukkit's [Material] and [BlockNovaMaterial]s via
+ * An extension class of Minecraft's [Feature] that allows to use Bukkit's [Material] and [NovaBlock]s via
  * protected `setBlock` functions.
  */
 @Suppress("MemberVisibilityCanBePrivate")
@@ -42,11 +42,11 @@ abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Featur
     }
     
     /**
-     * Sets the block at the given position to the given [BlockNovaMaterial].
+     * Sets the block at the given position to the given [NovaBlock].
      *
      * **Note: Nova blocks won't be properly placed/loaded until the chunk is loaded! (i.e. the chunk finished generating)**
      */
-    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, material: BlockNovaMaterial) {
+    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, material: NovaBlock) {
         WorldDataManager.addOrphanBlock(level.level, pos.x, pos.y, pos.z, material)
     }
     

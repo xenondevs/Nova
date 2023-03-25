@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkException
 import xyz.xenondevs.nova.tileentity.network.NetworkNode
-import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.sumOfNoOverflow
 import java.util.*
@@ -25,7 +25,7 @@ private val DEFAULT_TRANSFER_RATE by configReloadable { DEFAULT_CONFIG.getLong("
  */
 class EnergyNetwork(override val uuid: UUID) : Network {
     
-    override val type = NetworkType.ENERGY
+    override val type = DefaultNetworkTypes.ENERGY
     
     override val nodes: Set<NetworkNode>
         get() = _nodes
@@ -70,7 +70,7 @@ class EnergyNetwork(override val uuid: UUID) : Network {
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
-        val holder = endPoint.holders[NetworkType.ENERGY] as EnergyHolder
+        val holder = endPoint.holders[DefaultNetworkTypes.ENERGY] as EnergyHolder
         
         when (val connectionType = holder.connectionConfig[face]!!) {
             
@@ -111,7 +111,7 @@ class EnergyNetwork(override val uuid: UUID) : Network {
     override fun removeNode(node: NetworkNode) {
         _nodes -= node
         if (node is NetworkEndPoint) {
-            val holder = node.holders[NetworkType.ENERGY] as EnergyHolder
+            val holder = node.holders[DefaultNetworkTypes.ENERGY] as EnergyHolder
             providers -= holder
             consumers -= holder
             buffers -= holder

@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.component.adventure.sendMessage
@@ -72,7 +72,7 @@ internal object BlockPlacing : Listener {
             
             if (!block.type.isActuallyInteractable() || player.isSneaking) {
                 val material = handItem?.novaMaterial
-                if (material is BlockNovaMaterial) {
+                if (material is NovaBlock) {
                     placeNovaBlock(event, material)
                 } else if (
                     BlockManager.hasBlock(block.pos) // the block placed against is from Nova
@@ -84,7 +84,7 @@ internal object BlockPlacing : Listener {
         }
     }
     
-    private fun placeNovaBlock(event: PlayerInteractEvent, material: BlockNovaMaterial) {
+    private fun placeNovaBlock(event: PlayerInteractEvent, material: NovaBlock) {
         event.isCancelled = true
         
         val player = event.player

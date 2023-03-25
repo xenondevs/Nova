@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.util.formatSafely
 import xyz.xenondevs.nova.util.runAsyncTask
 
@@ -105,12 +105,12 @@ object LocaleManager {
     }
     
     @Synchronized
-    fun getTranslatedName(lang: String, material: ItemNovaMaterial): String {
+    fun getTranslatedName(lang: String, material: NovaItem): String {
         return getTranslation(lang, material.localizedName)
     }
     
     @Synchronized
-    fun getTranslatedName(player: Player, material: ItemNovaMaterial): String {
+    fun getTranslatedName(player: Player, material: NovaItem): String {
         return getTranslation(player, material.localizedName)
     }
     

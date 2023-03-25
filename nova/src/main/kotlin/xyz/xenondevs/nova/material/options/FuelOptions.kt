@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.material.options
 
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 
 @HardcodedMaterialOptions
 fun FuelOptions(
@@ -17,7 +17,7 @@ sealed interface FuelOptions {
     
     companion object {
         
-        fun configurable(material: ItemNovaMaterial): FuelOptions =
+        fun configurable(material: NovaItem): FuelOptions =
             ConfigurableFuelOptions(material)
         
         fun configurable(path: String): FuelOptions =
@@ -36,6 +36,6 @@ private class ConfigurableFuelOptions : ConfigAccess, FuelOptions {
     override val burnTime by getEntry<Int>("burn_time")
     
     constructor(path: String) : super(path)
-    constructor(material: ItemNovaMaterial) : super(material)
+    constructor(material: NovaItem) : super(material)
     
 }

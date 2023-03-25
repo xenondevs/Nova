@@ -8,7 +8,7 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.material.CoreGuiMaterial
+import xyz.xenondevs.nova.material.DefaultGuiMaterial
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 
@@ -41,7 +41,7 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     
     override fun getItemProvider(): ItemProvider {
         val number = getNumber().coerceIn(0..999)
-        val builder = CoreGuiMaterial.NUMBER.item.createClientsideItemBuilder(subId = number)
+        val builder = DefaultGuiMaterial.NUMBER.model.createClientsideItemBuilder(modelId = number)
         if (localizedName != null)
             builder.setDisplayName(Component.translatable(localizedName, Component.text(number)))
         
@@ -64,9 +64,9 @@ class AddNumberItem(
     getNumber,
     setNumber,
     localizedName
-        ?.let { CoreGuiMaterial.PLUS_BTN_ON.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
-        ?: CoreGuiMaterial.PLUS_BTN_ON.clientsideProvider,
-    CoreGuiMaterial.PLUS_BTN_OFF.clientsideProvider
+        ?.let { DefaultGuiMaterial.PLUS_BTN_ON.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
+        ?: DefaultGuiMaterial.PLUS_BTN_ON.clientsideProvider,
+    DefaultGuiMaterial.PLUS_BTN_OFF.clientsideProvider
 )
 
 class RemoveNumberItem(
@@ -81,9 +81,9 @@ class RemoveNumberItem(
     getNumber,
     setNumber,
     localizedName
-        ?.let { CoreGuiMaterial.MINUS_BTN_ON.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) } 
-        ?: CoreGuiMaterial.MINUS_BTN_ON.clientsideProvider,
-    CoreGuiMaterial.MINUS_BTN_OFF.clientsideProvider
+        ?.let { DefaultGuiMaterial.MINUS_BTN_ON.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
+        ?: DefaultGuiMaterial.MINUS_BTN_ON.clientsideProvider,
+    DefaultGuiMaterial.MINUS_BTN_OFF.clientsideProvider
 )
 
 open class AioNumberItem(

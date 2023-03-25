@@ -43,8 +43,8 @@ import xyz.xenondevs.nmsutils.particle.block
 import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.material.BlockNovaMaterial
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
+import xyz.xenondevs.nova.material.TileEntityNovaBlock
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
@@ -86,9 +86,9 @@ val Block.id: NamespacedId
     }
 
 /**
- * The [BlockNovaMaterial] of this block.
+ * The [NovaBlock] of this block.
  */
-val Block.novaMaterial: BlockNovaMaterial?
+val Block.novaMaterial: NovaBlock?
     get() = BlockManager.getBlock(pos)?.material
 
 /**
@@ -113,13 +113,13 @@ inline val Block.center: Location
  * The hardness of this block, also considering the custom hardness of Nova blocks.
  */
 val Block.hardness: Double
-    get() = BlockManager.getBlock(pos)?.material?.hardness ?: type.hardness.toDouble()
+    get() = BlockManager.getBlock(pos)?.material?.options?.hardness ?: type.hardness.toDouble()
 
 /**
  * The break texture for this block, also considering custom break textures of Nova blocks.
  */
 val Block.breakTexture: Material
-    get() = BlockManager.getBlock(pos)?.material?.breakParticles ?: type
+    get() = BlockManager.getBlock(pos)?.material?.options?.breakParticles ?: type
 
 /**
  * The sound group of this block, also considering custom sound groups of Nova blocks.
@@ -128,7 +128,7 @@ val Block.soundGroup: SoundGroup?
     get() {
         val novaMaterial = BlockManager.getBlock(pos)?.material
         if (novaMaterial != null) {
-            return novaMaterial.soundGroup
+            return novaMaterial.options.soundGroup
         }
         
         return SoundGroup.from(type.soundGroup)
@@ -180,9 +180,9 @@ val Block.sourceFluidType: FluidType?
  */
 fun Block.place(ctx: BlockPlaceContext, playSound: Boolean = true): Boolean {
     val item = ctx.item
-    val novaMaterial = item.novaMaterial
-    if (novaMaterial is BlockNovaMaterial) {
-        if (novaMaterial is TileEntityNovaMaterial && !TileEntityLimits.canPlace(ctx).allowed)
+    val novaMaterial = item.novaMaterial?.block
+    if (novaMaterial is NovaBlock) {
+        if (novaMaterial is TileEntityNovaBlock && !TileEntityLimits.canPlace(ctx).allowed)
             return false
         
         BlockManager.placeBlock(novaMaterial, ctx, playSound)
@@ -385,7 +385,7 @@ fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
     
     val novaBlockState = BlockManager.getBlock(pos)
     if (novaBlockState != null)
-        return novaBlockState.material.novaBlock.getDrops(novaBlockState, ctx)
+        return novaBlockState.material.blockLogic.getDrops(novaBlockState, ctx)
     
     val drops = ArrayList<ItemStack>()
     val state = state
@@ -442,7 +442,7 @@ private fun Block.getMainHalf(): Block {
 fun Block.getExp(ctx: BlockBreakContext): Int {
     val novaState = BlockManager.getBlock(ctx.pos)
     if (novaState != null)
-        return novaState.material.novaBlock.getExp(novaState, ctx)
+        return novaState.material.blockLogic.getExp(novaState, ctx)
     
     val serverLevel = ctx.pos.world.serverLevel
     val mojangPos = ctx.pos.nmsPos

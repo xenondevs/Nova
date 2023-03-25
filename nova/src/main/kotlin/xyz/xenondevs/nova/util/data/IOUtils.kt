@@ -261,17 +261,3 @@ internal fun Path.openZip(): Path {
     val fs = FileSystems.newFileSystem(this)
     return fs.rootDirectories.first()
 }
-
-//<editor-fold desc="Legacy functions" defaultstate="collapsed">
-
-internal fun RandomAccessFile.readStringLegacy(): String {
-    val bytes = ByteArray(readUnsignedShort())
-    read(bytes)
-    return bytes.decodeToString()
-}
-
-internal fun RandomAccessFile.readStringListLegacy(): List<String> {
-    return Array(readInt()) { readStringLegacy() }.asList()
-}
-
-//</editor-fold>

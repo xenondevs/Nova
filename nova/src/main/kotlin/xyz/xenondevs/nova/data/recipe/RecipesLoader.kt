@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
+import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
@@ -67,10 +68,9 @@ internal object RecipesLoader {
     }
     
     fun loadRecipes(): List<Any> {
-        return RecipeTypeRegistry.types.flatMap {
-            val dirName = it.dirName
+        return RECIPE_TYPE.flatMap {
             val deserializer = it.deserializer
-            if (dirName != null && deserializer != null) {
+            if (deserializer != null) {
                 loadRecipes(it.dirName, it.deserializer)
             } else emptyList()
         }

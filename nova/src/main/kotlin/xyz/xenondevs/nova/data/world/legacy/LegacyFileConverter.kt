@@ -11,7 +11,6 @@ import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.PreVarIntConverter
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
@@ -43,7 +42,6 @@ internal object LegacyFileConverter : Listener {
     }
     
     private fun registerConverters() {
-        register(Version("0.9")..Version("0.9.11"), PreVarIntConverter)
     }
     
     private fun register(versionRange: VersionRange, converter: VersionConverter) {

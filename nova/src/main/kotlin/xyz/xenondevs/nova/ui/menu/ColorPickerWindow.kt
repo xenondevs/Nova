@@ -10,7 +10,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.material.CoreGuiMaterial
+import xyz.xenondevs.nova.material.DefaultGuiMaterial
 import xyz.xenondevs.nova.ui.item.AioNumberItem
 import xyz.xenondevs.nova.ui.item.BackItem
 import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
@@ -98,7 +98,7 @@ abstract class ColorPreviewItem(color: Color) : AbstractItem() {
     
 }
 
-class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(CoreGuiMaterial.TP_COLOR_PICKER.clientsideProvider) {
+class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(DefaultGuiMaterial.TP_COLOR_PICKER.clientsideProvider) {
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         window.openWindow(player)
     }

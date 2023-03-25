@@ -143,7 +143,7 @@ internal object ItemListener : Listener {
     }
     
     private fun findBehaviors(item: ItemStack?): List<ItemBehavior>? =
-        item?.novaMaterial?.novaItem?.behaviors
+        item?.novaMaterial?.itemLogic?.behaviors
     
 }
 

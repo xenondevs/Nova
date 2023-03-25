@@ -4,7 +4,12 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.tileentity.network.*
+import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
+import xyz.xenondevs.nova.tileentity.network.Network
+import xyz.xenondevs.nova.tileentity.network.NetworkBridge
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
+import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.NetworkNode
 import xyz.xenondevs.nova.tileentity.network.item.channel.ItemNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
@@ -12,7 +17,7 @@ import java.util.*
 
 class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network {
     
-    override val type = NetworkType.ITEMS
+    override val type = DefaultNetworkTypes.ITEMS
     
     override val nodes: Set<NetworkNode>
         get() = _nodes
@@ -64,7 +69,7 @@ class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network
     }
     
     private fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace, createDistributor: Boolean): ItemNetworkChannel? {
-        val itemHolder = endPoint.holders[NetworkType.ITEMS]
+        val itemHolder = endPoint.holders[DefaultNetworkTypes.ITEMS]
         require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
         
         val connectionType = if (local && endPoint is VanillaTileEntity)
@@ -82,7 +87,7 @@ class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network
     override fun removeNode(node: NetworkNode) {
         _nodes -= node
         if (node is NetworkEndPoint) {
-            val itemHolder = node.holders[NetworkType.ITEMS]
+            val itemHolder = node.holders[DefaultNetworkTypes.ITEMS]
             require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
             
             itemHolder.channels.values.toSet().asSequence()
@@ -99,7 +104,7 @@ class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network
         nodes.forEach { node ->
             _nodes -= node
             if (node is NetworkEndPoint) {
-                val itemHolder = node.holders[NetworkType.ITEMS]
+                val itemHolder = node.holders[DefaultNetworkTypes.ITEMS]
                 require(itemHolder is ItemHolder) { "Illegal NetworkEndPoint Type" }
                 
                 itemHolder.channels.values.toSet().asSequence()

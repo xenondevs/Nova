@@ -67,7 +67,7 @@ internal object WearablePatch : MultiTransformer(setOf(Equipable::class, LivingE
     }
     
     fun getNovaEquipable(itemStack: ItemStack): Equipable? {
-        val wearable = itemStack.novaMaterial?.novaItem?.getBehavior(Wearable::class)
+        val wearable = itemStack.novaMaterial?.itemLogic?.getBehavior(Wearable::class)
             ?: return null
         
         return object : Equipable {

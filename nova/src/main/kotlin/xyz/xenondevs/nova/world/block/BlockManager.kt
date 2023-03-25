@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.getBreakParticlesPacket
 import xyz.xenondevs.nova.util.id
@@ -70,12 +70,12 @@ object BlockManager : IBlockManager {
         return getBlock(pos, useLinkedStates) != null
     }
     
-    fun placeBlock(material: BlockNovaMaterial, ctx: BlockPlaceContext, playSound: Boolean = true) {
+    fun placeBlock(material: NovaBlock, ctx: BlockPlaceContext, playSound: Boolean = true) {
         val state = material.createNewBlockState(ctx)
         WorldDataManager.setBlockState(ctx.pos, state)
         state.handleInitialized(true)
         
-        material.novaBlock.handlePlace(state, ctx)
+        material.blockLogic.handlePlace(state, ctx)
         
         if (playSound)
             playPlaceSound(state, ctx)
@@ -99,7 +99,7 @@ object BlockManager : IBlockManager {
         }
         
         val material = state.material
-        material.novaBlock.handleBreak(state, ctx)
+        material.blockLogic.handleBreak(state, ctx)
         
         WorldDataManager.removeBlockState(state.pos)
         state.handleRemoved(true)
@@ -124,7 +124,7 @@ object BlockManager : IBlockManager {
     
     fun getDrops(ctx: BlockBreakContext): List<ItemStack>? {
         val state = getBlock(ctx.pos) ?: return null
-        return state.material.novaBlock.getDrops(state, ctx)
+        return state.material.blockLogic.getDrops(state, ctx)
     }
     
     fun breakBlock(ctx: BlockBreakContext, breakEffects: Boolean = true): Boolean {
@@ -166,7 +166,7 @@ object BlockManager : IBlockManager {
             broadcast(soundPacket, true)
         }
         
-        val soundGroup = state.material.soundGroup
+        val soundGroup = state.material.options.soundGroup
         if (material.block is BlockStateBlockModelData) {
             // use the level event packet for blocks that use block states
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
@@ -178,13 +178,13 @@ object BlockManager : IBlockManager {
         } else {
             // send sound and break particles manually for armor stand blocks
             if (soundGroup != null) broadcastBreakSound(soundGroup)
-            val breakParticles = state.material.breakParticles?.getBreakParticlesPacket(pos.location)
+            val breakParticles = state.material.options.breakParticles?.getBreakParticlesPacket(pos.location)
             if (breakParticles != null) broadcast(breakParticles, sendEffectsToBreaker || pos.block.type.hasNoBreakParticles())
         }
     }
     
     private fun playPlaceSound(state: NovaBlockState, ctx: BlockPlaceContext) {
-        val soundGroup = state.material.soundGroup
+        val soundGroup = state.material.options.soundGroup
         if (soundGroup != null) {
             ctx.pos.playSound(soundGroup.placeSound, soundGroup.placeVolume, soundGroup.placePitch)
         }
@@ -211,7 +211,7 @@ object BlockManager : IBlockManager {
     }
     
     override fun placeBlock(location: Location, material: NovaMaterial, source: Any?, playSound: Boolean) {
-        require(material is BlockNovaMaterial)
+        require(material is NovaBlock)
         
         val ctx = BlockPlaceContext.forAPI(location, material, source)
         placeBlock(material, ctx, playSound)

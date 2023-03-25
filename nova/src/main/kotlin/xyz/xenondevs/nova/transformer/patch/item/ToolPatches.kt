@@ -66,7 +66,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
         val novaMaterial = itemStack.novaMaterial
         
         return if (novaMaterial != null) {
-            novaMaterial.novaItem.getBehavior(Tool::class)?.options?.canSweepAttack ?: false
+            novaMaterial.itemLogic.getBehavior(Tool::class)?.options?.canSweepAttack ?: false
         } else {
             (ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory)?.canSweepAttack ?: false
         }
@@ -86,7 +86,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
     @JvmStatic
     fun getKnockbackBonus(entity: LivingEntity): Int {
         return EnchantmentHelper.getEnchantmentLevel(Enchantments.KNOCKBACK, entity) +
-            (entity.mainHandItem.novaMaterial?.novaItem?.getBehavior(Tool::class)?.options?.knockbackBonus ?: 0)
+            (entity.mainHandItem.novaMaterial?.itemLogic?.getBehavior(Tool::class)?.options?.knockbackBonus ?: 0)
     }
     
 }

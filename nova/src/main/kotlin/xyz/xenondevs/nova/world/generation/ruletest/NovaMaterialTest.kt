@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
 import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import net.minecraft.world.level.block.state.BlockState as MojangState
 
@@ -16,6 +16,6 @@ abstract class NovaMaterialTest : NovaRuleTest() {
         return test(material, level, pos, state, random)
     }
     
-    abstract fun test(material: BlockNovaMaterial, level: Level, pos: BlockPos, state: MojangState, random: RandomSource): Boolean
+    abstract fun test(material: NovaBlock, level: Level, pos: BlockPos, state: MojangState, random: RandomSource): Boolean
     
 }

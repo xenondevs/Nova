@@ -34,6 +34,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
 import xyz.xenondevs.nova.util.containsAll
 import xyz.xenondevs.nova.util.data.clientsideCopy
@@ -132,7 +133,7 @@ private val ALLOW_RESULT_OVERWRITE by configReloadable { DEFAULT_CONFIG.getBoole
 
 @InternalInit(
     stage = InitializationStage.POST_WORLD,
-    dependsOn = [AddonsInitializer::class]
+    dependsOn = [AddonsInitializer::class, VanillaRecipeTypes::class]
 )
 object RecipeManager : Listener {
     
@@ -311,7 +312,7 @@ object RecipeManager : Listener {
         
         loadRecipes()
         RecipeRegistry.init()
-        RecipeTypeRegistry.types.forEach { it.group?.invalidateCache() }
+        RECIPE_TYPE.forEach { it.group?.invalidateCache() }
     }
     
     @EventHandler

@@ -5,7 +5,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.material.CoreGuiMaterial
+import xyz.xenondevs.nova.material.DefaultGuiMaterial
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
@@ -19,8 +19,8 @@ class VisualizeRegionItem(
     
     override fun getItemProvider(): ItemProvider {
         val visible = VisualRegion.isVisible(player, regionUUID)
-        return if (visible) CoreGuiMaterial.AREA_BTN_ON.clientsideProvider
-        else CoreGuiMaterial.AREA_BTN_OFF.clientsideProvider
+        return if (visible) DefaultGuiMaterial.AREA_BTN_ON.clientsideProvider
+        else DefaultGuiMaterial.AREA_BTN_OFF.clientsideProvider
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

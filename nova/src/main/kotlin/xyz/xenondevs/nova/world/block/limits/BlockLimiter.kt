@@ -2,14 +2,14 @@ package xyz.xenondevs.nova.world.block.limits
 
 import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits.PlaceResult
 
 internal interface BlockLimiter {
     
-    fun canPlace(material: BlockNovaMaterial, ctx: BlockPlaceContext): PlaceResult
+    fun canPlace(material: NovaBlock, ctx: BlockPlaceContext): PlaceResult
     
     companion object {
         
@@ -36,11 +36,11 @@ internal abstract class SimpleBlockLimiter(denyMessage: String) : BlockLimiter {
     
     private val denied = PlaceResult(false, denyMessage)
     
-    final override fun canPlace(material: BlockNovaMaterial, ctx: BlockPlaceContext): PlaceResult {
+    final override fun canPlace(material: NovaBlock, ctx: BlockPlaceContext): PlaceResult {
         return if (testPlace(material, ctx)) ALLOWED else denied
     }
     
-    abstract fun testPlace(material: BlockNovaMaterial, ctx: BlockPlaceContext): Boolean
+    abstract fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean
     
 }
 
@@ -48,7 +48,7 @@ internal class TypeBlacklist(blacklist: List<String>) : SimpleBlockLimiter("nova
     
     private val blacklist = blacklist.mapTo(HashSet(), NamespacedId::of)
     
-    override fun testPlace(material: BlockNovaMaterial, ctx: BlockPlaceContext): Boolean {
+    override fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean {
         return material.id !in blacklist
     }
     
@@ -58,7 +58,7 @@ internal class WorldBlacklist(blacklist: List<String>) : SimpleBlockLimiter("nov
     
     private val blacklist = blacklist.toHashSet()
     
-    override fun testPlace(material: BlockNovaMaterial, ctx: BlockPlaceContext): Boolean {
+    override fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean {
         return !blacklist.contains("*") && ctx.pos.world.name !in blacklist
     }
     
@@ -69,7 +69,7 @@ internal class TypeWorldBlacklist(cfg: ConfigurationSection) : SimpleBlockLimite
     private val blacklist: Map<String, Set<NamespacedId>> =
         cfg.getKeys(false).associateWithTo(HashMap()) { world -> cfg.getStringList(world).mapTo(HashSet(), NamespacedId::of) }
     
-    override fun testPlace(material: BlockNovaMaterial, ctx: BlockPlaceContext): Boolean {
+    override fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean {
         val id = material.id
         return blacklist["*"]?.contains(id) != true && blacklist[ctx.pos.world.name]?.contains(id) != true
     }
@@ -84,7 +84,7 @@ internal class AmountLimiter(cfg: ConfigurationSection, private val type: Type) 
     private val deniedSpecific = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}.deny")
     private val deniedTotal = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}_total.deny")
     
-    override fun canPlace(material: BlockNovaMaterial, ctx: BlockPlaceContext): PlaceResult {
+    override fun canPlace(material: NovaBlock, ctx: BlockPlaceContext): PlaceResult {
         val id = material.id
         val owner = ctx.ownerUUID ?: return ALLOWED
         

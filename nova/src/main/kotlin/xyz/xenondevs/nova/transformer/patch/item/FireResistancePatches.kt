@@ -43,7 +43,7 @@ internal object FireResistancePatches : MultiTransformer(setOf(ItemEntity::class
     fun isFireResistant(itemStack: ItemStack): Boolean {
         val novaMaterial = itemStack.novaMaterial
         if (novaMaterial != null)
-            return novaMaterial.novaItem.hasBehavior(FireResistant::class)
+            return novaMaterial.itemLogic.hasBehavior(FireResistant::class)
         
         return itemStack.item.isFireResistant
     }

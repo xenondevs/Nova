@@ -13,10 +13,10 @@ internal object RailWailaInfoProvider : VanillaWailaInfoProvider(
 ) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
-        val defaultInfo = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
         val rail = block.blockData as RedstoneRail
-        defaultInfo.icon = NamespacedId("minecraft", block.type.name.lowercase() + if (rail.isPowered) "_on" else "")
-        return defaultInfo
+        info.icon = NamespacedId("minecraft", block.type.name.lowercase() + if (rail.isPowered) "_on" else "")
+        return info
     }
     
 }

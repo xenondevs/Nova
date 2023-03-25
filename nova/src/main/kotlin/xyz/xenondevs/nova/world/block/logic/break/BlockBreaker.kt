@@ -64,7 +64,7 @@ internal class NovaBlockBreaker(
 ) : BlockBreaker(player, block, sequence, blockedUntil) {
     
     val material = blockState.material
-    override val requiresToolForDrops: Boolean = material.requiresToolForDrops
+    override val requiresToolForDrops: Boolean = material.options.requiresToolForDrops
     
     override fun createBreakMethod(clientsidePrediction: Boolean): BreakMethod =
         BreakMethod.of(block, material, if (clientsidePrediction) player else null)
@@ -76,7 +76,7 @@ internal class NovaBlockBreaker(
     }
     
     private fun spawnHitParticles() {
-        val texture = material.breakParticles ?: return
+        val texture = material.options.breakParticles ?: return
         val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.UP
         
         val particlePacket = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5).advance(side, 0.6)) {
@@ -233,7 +233,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val event = BlockBreakEvent(block, player)
         if (drops) {
             event.expToDrop = when (this) {
-                is NovaBlockBreaker -> material.novaBlock.getExp(blockState, ctx)
+                is NovaBlockBreaker -> material.blockLogic.getExp(blockState, ctx)
                 is VanillaBlockBreaker -> BlockUtils.getVanillaBlockExp(level, blockPos, tool.nmsCopy)
             }
         }

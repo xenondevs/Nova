@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
 import com.mojang.serialization.JsonOps
+import com.mojang.serialization.Lifecycle
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
@@ -11,6 +12,7 @@ import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.Rotations
+import net.minecraft.core.WritableRegistry
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
@@ -48,6 +50,10 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import xyz.xenondevs.cbf.adapter.BinaryAdapter
+import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -114,6 +120,12 @@ val NamespacedKey.resourceLocation: ResourceLocation
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
 
+val ResourceLocation.namespacedId: NamespacedId
+    get() = NamespacedId(namespace, path)
+
+internal val ResourceLocation.name: String
+    get() = path
+
 val InteractionHand.bukkitEquipmentSlot: EquipmentSlot
     get() = when (this) {
         InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
@@ -175,7 +187,7 @@ val Direction.blockFace: BlockFace
     }
 
 val Attribute.nmsAttribute: MojangAttribute
-    get() = when(this) {
+    get() = when (this) {
         Attribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
         Attribute.GENERIC_FOLLOW_RANGE -> Attributes.FOLLOW_RANGE
         Attribute.GENERIC_KNOCKBACK_RESISTANCE -> Attributes.KNOCKBACK_RESISTANCE
@@ -192,7 +204,7 @@ val Attribute.nmsAttribute: MojangAttribute
     }
 
 val AttributeModifier.Operation.nmsOperation: MojangAttributeModifier.Operation
-    get() = when(this) {
+    get() = when (this) {
         AttributeModifier.Operation.ADD_NUMBER -> MojangAttributeModifier.Operation.ADDITION
         AttributeModifier.Operation.ADD_SCALAR -> MojangAttributeModifier.Operation.MULTIPLY_BASE
         AttributeModifier.Operation.MULTIPLY_SCALAR_1 -> MojangAttributeModifier.Operation.MULTIPLY_TOTAL
@@ -324,6 +336,34 @@ fun PlayerList.broadcast(exclude: Player?, location: Location, maxDistance: Doub
 
 fun PlayerList.broadcast(exclude: Player?, block: Block, maxDistance: Double, packet: Packet<*>) =
     broadcast(exclude?.serverPlayer, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
+
+fun <T> Registry<T>.byNameBinaryAdapter(): BinaryAdapter<T> {
+    return RegistryBinaryAdapter(this)
+}
+
+operator fun <T> Registry<T>.get(key: String): T? {
+    return get(ResourceLocation.of(key, ':'))
+}
+
+operator fun Registry<*>.contains(key: String): Boolean {
+    return contains(ResourceLocation.of(key, ':'))
+}
+
+internal operator fun <T> WritableRegistry<T>.set(name: String, value: T) {
+    register(ResourceKey.create(key(), ResourceLocation.of(name, ':')), value, Lifecycle.stable())
+}
+
+internal operator fun <T> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
+    register(ResourceKey.create(key(), id), value, Lifecycle.stable())
+}
+
+operator fun <T> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
+    register(ResourceKey.create(key(), ResourceLocation(addon.description.id, key)), value, Lifecycle.stable())
+}
+
+fun ResourceLocation.toString(separator: String): String {
+    return namespace + separator + path
+}
 
 fun preventPacketBroadcast(run: () -> Unit) {
     BroadcastPacketPatch.dropAll = true

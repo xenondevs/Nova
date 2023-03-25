@@ -5,7 +5,7 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 
 abstract class NovaMaterialBuilder<S: NovaMaterialBuilder<S>> internal constructor(addon: Addon, name: String) {
     
@@ -31,7 +31,7 @@ abstract class NovaMaterialBuilder<S: NovaMaterialBuilder<S>> internal construct
         return getThis()
     }
     
-    fun craftingRemainingItem(material: ItemNovaMaterial): S {
+    fun craftingRemainingItem(material: NovaItem): S {
         this.craftingRemainingItem = material.createItemBuilder()
         return getThis()
     }
@@ -52,6 +52,6 @@ abstract class NovaMaterialBuilder<S: NovaMaterialBuilder<S>> internal construct
     }
     
     abstract fun getThis(): S
-    abstract fun register(): ItemNovaMaterial
+    abstract fun register(): NovaItem
     
 }

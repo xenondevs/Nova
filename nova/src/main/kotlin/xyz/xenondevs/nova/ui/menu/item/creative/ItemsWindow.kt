@@ -19,7 +19,7 @@ import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.changeTitle
 import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.material.CoreGuiMaterial
+import xyz.xenondevs.nova.material.DefaultGuiMaterial
 import xyz.xenondevs.nova.material.ItemCategories
 import xyz.xenondevs.nova.material.ItemCategory
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
@@ -45,12 +45,12 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     private var currentWindow: Window? = null
     
     private val openSearchItem = clickableItem(
-        CoreGuiMaterial.TP_SEARCH.createClientsideItemBuilder()
+        DefaultGuiMaterial.TP_SEARCH.createClientsideItemBuilder()
             .setDisplayName(Component.translatable("menu.nova.items.search-item"))
     ) { openSearchWindow() }
     
     private val openMainWindowItem = clickableItem(
-        CoreGuiMaterial.ARROW_1_UP.createClientsideItemBuilder()
+        DefaultGuiMaterial.ARROW_1_UP.createClientsideItemBuilder()
             .setDisplayName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
     ) { openMainWindow() }
     
@@ -100,7 +100,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         .addIngredient('s', openMainWindowItem)
         .build()
     
-    private val textItem = AnvilTextItem(CoreGuiMaterial.INVISIBLE_ITEM.createClientsideItemBuilder(), "")
+    private val textItem = AnvilTextItem(DefaultGuiMaterial.INVISIBLE_ITEM.createClientsideItemBuilder(), "")
     
     private var filteredItems: List<Item>? = null
     private var filter = ""
@@ -170,7 +170,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         val anvilGui = Gui.empty(3, 1).apply {
             setItem(0, textItem)
             setItem(2, clickableItem(
-                CoreGuiMaterial.X.createClientsideItemBuilder()
+                DefaultGuiMaterial.X.createClientsideItemBuilder()
                     .setDisplayName(Component.translatable("menu.nova.items.search.clear", NamedTextColor.GRAY))
             ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
         }
@@ -230,8 +230,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasPreviousPage())
-                CoreGuiMaterial.TP_PIXEL_ARROW_LEFT_ON.clientsideProvider
-            else CoreGuiMaterial.TP_PIXEL_ARROW_LEFT_OFF.clientsideProvider
+                DefaultGuiMaterial.TP_PIXEL_ARROW_LEFT_ON.clientsideProvider
+            else DefaultGuiMaterial.TP_PIXEL_ARROW_LEFT_OFF.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -247,8 +247,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasNextPage())
-                CoreGuiMaterial.TP_PIXEL_ARROW_RIGHT_ON.clientsideProvider
-            else CoreGuiMaterial.TP_PIXEL_ARROW_RIGHT_OFF.clientsideProvider
+                DefaultGuiMaterial.TP_PIXEL_ARROW_RIGHT_ON.clientsideProvider
+            else DefaultGuiMaterial.TP_PIXEL_ARROW_RIGHT_OFF.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

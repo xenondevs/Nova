@@ -27,10 +27,10 @@ import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.util.world.ChunkSearchQuery
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.behavior.impl.BrownMushroomBlockBehavior
-import xyz.xenondevs.nova.world.block.behavior.impl.MushroomStemBlockBehavior
-import xyz.xenondevs.nova.world.block.behavior.impl.RedMushroomBlockBehavior
-import xyz.xenondevs.nova.world.block.behavior.impl.noteblock.NoteBlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.impl.BrownMushroomBackingState
+import xyz.xenondevs.nova.world.block.behavior.impl.MushroomStemBackingState
+import xyz.xenondevs.nova.world.block.behavior.impl.RedMushroomBackingState
+import xyz.xenondevs.nova.world.block.behavior.impl.noteblock.NoteBackingState
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.logging.Level
@@ -53,11 +53,11 @@ internal object BlockBehaviorManager :  Listener {
             PermanentStorage.store("chunkSearchId", value)
         }
     
-    private val behaviors: List<BlockBehavior> = listOf(
-        NoteBlockBehavior,
-        RedMushroomBlockBehavior,
-        BrownMushroomBlockBehavior,
-        MushroomStemBlockBehavior
+    private val behaviors: List<BackingState> = listOf(
+        NoteBackingState,
+        RedMushroomBackingState,
+        BrownMushroomBackingState,
+        MushroomStemBackingState
     )
     
     private val behaviorQueries: List<ChunkSearchQuery> =
@@ -73,7 +73,7 @@ internal object BlockBehaviorManager :  Listener {
             updateChunkSearchId()
         
         registerEvents()
-        behaviors.forEach(BlockBehavior::init)
+        behaviors.forEach(BackingState::init)
         
         startChunkSearcher()
         Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach(::handleChunkLoad)

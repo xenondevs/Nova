@@ -17,21 +17,21 @@ open class ItemModelData(val id: NamespacedId, val material: Material, val dataA
     val data: Int
         get() = dataArray[0]
     
-    fun createItemBuilder(subId: Int = 0): ItemBuilder =
+    fun createItemBuilder(modelId: Int = 0): ItemBuilder =
         ItemBuilder(PacketItems.SERVER_SIDE_MATERIAL)
-            .addModifier { modifyNBT(it, subId) }
+            .addModifier { modifyNbt(it, modelId) }
     
-    fun createClientsideItemBuilder(name: Component? = null, lore: List<Component>? = null, subId: Int = 0): ItemBuilder =
+    fun createClientsideItemBuilder(name: Component? = null, lore: List<Component>? = null, modelId: Int = 0): ItemBuilder =
         ItemBuilder(material)
             .setDisplayName(name ?: Component.empty())
-            .setCustomModelData(dataArray[subId])
+            .setCustomModelData(dataArray[modelId])
             .addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
             .apply { if (lore != null) setLore(lore) }
     
-    private fun modifyNBT(itemStack: ItemStack, subId: Int): ItemStack {
+    private fun modifyNbt(itemStack: ItemStack, modelId: Int): ItemStack {
         val novaCompound = CompoundTag()
         novaCompound.putString("id", id.toString())
-        novaCompound.putInt("subId", subId)
+        novaCompound.putInt("subId", modelId)
         
         val meta = itemStack.itemMeta!!
         meta.unhandledTags["nova"] = novaCompound

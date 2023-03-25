@@ -20,7 +20,7 @@ import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.options.WearableOptions
 import xyz.xenondevs.nova.player.equipment.ArmorType
 import xyz.xenondevs.nova.util.data.getOrPut
@@ -39,7 +39,7 @@ fun Wearable(type: ArmorType, equipSound: SoundEvent): ItemBehaviorFactory<Weara
 
 fun Wearable(type: ArmorType, equipSound: String? = null): ItemBehaviorFactory<Wearable> =
     object : ItemBehaviorFactory<Wearable>() {
-        override fun create(material: ItemNovaMaterial): Wearable =
+        override fun create(material: NovaItem): Wearable =
             Wearable(WearableOptions.configurable(type, equipSound, material))
     }
 

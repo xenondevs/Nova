@@ -33,6 +33,7 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.toJson
 import xyz.xenondevs.nova.util.component.adventure.toNBT
@@ -40,6 +41,7 @@ import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
+import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
@@ -191,9 +193,9 @@ internal object PacketItems : Listener {
             ?: throw IllegalArgumentException("The provided ItemStack is not a Nova item.")
         
         val id = novaTag.getString("id") ?: return getUnknownItem(itemStack, null)
-        val material = NovaMaterialRegistry.getOrNull(id) ?: return getUnknownItem(itemStack, id)
+        val material = NovaRegistries.ITEM[id] ?: return getUnknownItem(itemStack, id)
         val subId = novaTag.getInt("subId")
-        val novaItem = material.novaItem
+        val novaItem = material.itemLogic
         
         val itemModelDataMap = Resources.getModelDataOrNull(id)?.item
         val data = itemModelDataMap?.get(novaItem.vanillaMaterial)

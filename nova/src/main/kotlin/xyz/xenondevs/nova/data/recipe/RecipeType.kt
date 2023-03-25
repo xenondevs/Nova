@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.BlastingRecipe
 import org.bukkit.inventory.CampfireRecipe
 import org.bukkit.inventory.FurnaceRecipe
@@ -8,8 +9,6 @@ import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.SmithingRecipe
 import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
-import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.recipe.RecipeTypeRegistry.register
 import xyz.xenondevs.nova.data.serialization.json.serializer.BlastingRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.CampfireRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.FurnaceRecipeDeserializer
@@ -19,6 +18,10 @@ import xyz.xenondevs.nova.data.serialization.json.serializer.ShapelessRecipeDese
 import xyz.xenondevs.nova.data.serialization.json.serializer.SmithingRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.SmokingRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.StonecutterRecipeDeserializer
+import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.BlastingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.CampfireRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
@@ -27,57 +30,47 @@ import xyz.xenondevs.nova.ui.menu.item.recipes.group.SmithingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.SmokingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.StonecutterRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.TableRecipeGroup
+import xyz.xenondevs.nova.util.set
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
-object RecipeTypeRegistry {
+class RecipeType<T : Any> internal constructor(
+    val id: ResourceLocation,
+    val recipeClass: KClass<T>,
+    val group: RecipeGroup<in T>,
+    val deserializer: RecipeDeserializer<T>?
+) {
     
-    @Suppress("ObjectPropertyName")
-    private val _types = ArrayList<RecipeType<*>>()
-    val types: List<RecipeType<*>>
-        get() = _types
+    val dirName get() = id.namespace + "/" + id.path
     
-    init {
-        RecipeType.init() // Loads the default recipe types
-    }
-    
-    fun <T : NovaRecipe> register(addon: Addon, dirName: String?, recipeClass: KClass<T>, group: RecipeGroup<in T>?, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
-        val name = "${addon.description.id}/$dirName"
-        return register(name, recipeClass, group, deserializer)
-    }
-    
-    internal fun <T : Any> register(dirName: String?, recipeClass: KClass<T>, group: RecipeGroup<in T>?, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
-        val recipeType = RecipeType(dirName, recipeClass, group, deserializer)
-        _types += recipeType
-        return recipeType
-    }
-    
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Any> getType(recipe: T): RecipeType<out T> {
-        val clazz = recipe::class
-        return types.first { clazz == it.recipeClass || clazz.superclasses.contains(it.recipeClass) } as RecipeType<out T>
+    companion object {
+        
+        fun <T : Any> of(recipe: T): RecipeType<out T> {
+            val clazz = recipe::class
+            return RECIPE_TYPE.first { clazz == it.recipeClass || clazz.superclasses.contains(it.recipeClass) } as RecipeType<out T>
+        }
+        
     }
     
 }
 
-class RecipeType<T : Any> internal constructor(
-    val dirName: String?,
-    val recipeClass: KClass<T>,
-    val group: RecipeGroup<in T>?,
-    val deserializer: RecipeDeserializer<T>?
-) {
+@InternalInit(stage = InitializationStage.PRE_WORLD)
+object VanillaRecipeTypes {
     
-    companion object {
-        val SHAPED = register("minecraft/shaped", ShapedRecipe::class, TableRecipeGroup, ShapedRecipeDeserializer)
-        val SHAPELESS = register("minecraft/shapeless", ShapelessRecipe::class, TableRecipeGroup, ShapelessRecipeDeserializer)
-        val FURNACE = register("minecraft/furnace", FurnaceRecipe::class, SmeltingRecipeGroup, FurnaceRecipeDeserializer)
-        val BLAST_FURNACE = register("minecraft/blast_furnace", BlastingRecipe::class, BlastingRecipeGroup, BlastingRecipeDeserializer)
-        val SMOKER = register("minecraft/smoker", SmokingRecipe::class, SmokingRecipeGroup, SmokingRecipeDeserializer)
-        val CAMPFIRE = register("minecraft/campfire", CampfireRecipe::class, CampfireRecipeGroup, CampfireRecipeDeserializer)
-        val STONECUTTER = register("minecraft/stonecutter", StonecuttingRecipe::class, StonecutterRecipeGroup, StonecutterRecipeDeserializer)
-        val SMITHING = register("minecraft/smithing", SmithingRecipe::class, SmithingRecipeGroup, SmithingRecipeDeserializer)
-        
-        internal fun init() = Unit
+    val SHAPED = register("shaped", ShapedRecipe::class, TableRecipeGroup, ShapedRecipeDeserializer)
+    val SHAPELESS = register("shapeless", ShapelessRecipe::class, TableRecipeGroup, ShapelessRecipeDeserializer)
+    val FURNACE = register("furnace", FurnaceRecipe::class, SmeltingRecipeGroup, FurnaceRecipeDeserializer)
+    val BLAST_FURNACE = register("blast_furnace", BlastingRecipe::class, BlastingRecipeGroup, BlastingRecipeDeserializer)
+    val SMOKER = register("smoker", SmokingRecipe::class, SmokingRecipeGroup, SmokingRecipeDeserializer)
+    val CAMPFIRE = register("campfire", CampfireRecipe::class, CampfireRecipeGroup, CampfireRecipeDeserializer)
+    val STONECUTTER = register("stonecutter", StonecuttingRecipe::class, StonecutterRecipeGroup, StonecutterRecipeDeserializer)
+    val SMITHING = register("smithing", SmithingRecipe::class, SmithingRecipeGroup, SmithingRecipeDeserializer)
+    
+    private fun <T : Any> register(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
+        val id = ResourceLocation("minecraft", name)
+        val recipeType = RecipeType(id, recipeClass, group, deserializer)
+        NovaRegistries.RECIPE_TYPE[id] = recipeType
+        return recipeType
     }
     
 }

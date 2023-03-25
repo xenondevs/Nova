@@ -7,12 +7,12 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.addLoreLines
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
-import xyz.xenondevs.nova.material.CoreGuiMaterial
+import xyz.xenondevs.nova.material.DefaultGuiMaterial
 
 class PageBackItem : PageItem(false) {
     
     override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-        val itemBuilder = (if (gui.hasPreviousPage()) CoreGuiMaterial.ARROW_1_LEFT else CoreGuiMaterial.LIGHT_ARROW_1_LEFT).createClientsideItemBuilder()
+        val itemBuilder = (if (gui.hasPreviousPage()) DefaultGuiMaterial.ARROW_1_LEFT else DefaultGuiMaterial.LIGHT_ARROW_1_LEFT).createClientsideItemBuilder()
         itemBuilder.setDisplayName(Component.translatable("menu.nova.paged.back", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {
@@ -37,7 +37,7 @@ class PageBackItem : PageItem(false) {
 class PageForwardItem : PageItem(true) {
     
     override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-        val itemBuilder = (if (gui.hasNextPage()) CoreGuiMaterial.ARROW_1_RIGHT else CoreGuiMaterial.LIGHT_ARROW_1_RIGHT).createClientsideItemBuilder()
+        val itemBuilder = (if (gui.hasNextPage()) DefaultGuiMaterial.ARROW_1_RIGHT else DefaultGuiMaterial.LIGHT_ARROW_1_RIGHT).createClientsideItemBuilder()
         itemBuilder.setDisplayName(Component.translatable("menu.nova.paged.forward", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {

@@ -3,11 +3,8 @@ package xyz.xenondevs.nova.data.world.block.state
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteBuffer
-import xyz.xenondevs.nova.data.serialization.persistentdata.get
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.nova.material.TileEntityNovaBlock
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.TileEntity.Companion.LEGACY_TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
@@ -18,7 +15,7 @@ import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 
 class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     
-    override val material: TileEntityNovaMaterial
+    override val material: TileEntityNovaBlock
     
     @Volatile
     lateinit var uuid: UUID
@@ -30,9 +27,6 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     lateinit var data: Compound
     
     @Volatile
-    internal var legacyData: LegacyCompound? = null
-    
-    @Volatile
     private var _tileEntity: TileEntity? = null
     override var tileEntity: TileEntity
         get() = _tileEntity ?: throw IllegalStateException("TileEntity is not initialized")
@@ -40,28 +34,17 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
             _tileEntity = value
         }
     
-    constructor(pos: BlockPos, material: TileEntityNovaMaterial) : super(pos, material) {
+    constructor(pos: BlockPos, material: TileEntityNovaBlock) : super(pos, material) {
         this.material = material
     }
     
-    constructor(material: TileEntityNovaMaterial, ctx: BlockPlaceContext) : super(material, ctx) {
+    constructor(material: TileEntityNovaBlock, ctx: BlockPlaceContext) : super(material, ctx) {
         this.material = material
         this.uuid = UUID.randomUUID()
         this.ownerUUID = ctx.ownerUUID
         this.data = Compound()
         
         val item = ctx.item
-        val itemMeta = item.itemMeta!!
-        val dataContainer = itemMeta.persistentDataContainer
-        
-        //<editor-fold desc="legacy support", defaultstate="collapsed">
-        val legacyGlobalData = dataContainer.get<Compound>(LEGACY_TILE_ENTITY_KEY)
-        if (legacyGlobalData != null) {
-            data["global"] = legacyGlobalData
-            return
-        }
-        //</editor-fold>
-        
         val globalData = item.novaCompoundOrNull?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
         if (globalData != null) {
             data["global"] = globalData

@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.block.limits
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.nova.material.TileEntityNovaBlock
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
@@ -33,7 +33,7 @@ internal object TileEntityTracker {
         PermanentStorage.store("block_chunk_counter", BLOCK_CHUNK_COUNTER)
     }
     
-    internal fun handleBlockPlace(material: TileEntityNovaMaterial, ctx: BlockPlaceContext) {
+    internal fun handleBlockPlace(material: TileEntityNovaBlock, ctx: BlockPlaceContext) {
         if (ctx.ownerUUID != null)
             modifyCounters(ctx.ownerUUID, ctx.pos, material.id, 1)
     }

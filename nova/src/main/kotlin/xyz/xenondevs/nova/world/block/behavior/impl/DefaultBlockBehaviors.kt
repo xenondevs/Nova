@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.world.block.behavior.impl
 import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.RedMushroomBlockStateConfig
-import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.BackingState
 
-internal object RedMushroomBlockBehavior : BlockBehavior(RedMushroomBlockStateConfig, true)
-internal object BrownMushroomBlockBehavior : BlockBehavior(BrownMushroomBlockStateConfig, true)
-internal object MushroomStemBlockBehavior : BlockBehavior(MushroomStemBlockStateConfig, true)
+internal object RedMushroomBackingState : BackingState(RedMushroomBlockStateConfig, true)
+internal object BrownMushroomBackingState : BackingState(BrownMushroomBlockStateConfig, true)
+internal object MushroomStemBackingState : BackingState(MushroomStemBlockStateConfig, true)

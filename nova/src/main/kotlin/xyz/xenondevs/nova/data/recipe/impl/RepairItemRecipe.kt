@@ -49,7 +49,7 @@ internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(i
         require(items.size == 2) { "Item size is not 2" }
         val novaMaterial = items[0].novaMaterial
         if (novaMaterial != null) {
-            val damageable = novaMaterial.novaItem.getBehavior(Damageable::class)!!
+            val damageable = novaMaterial.itemLogic.getBehavior(Damageable::class)!!
             val maxDurability = damageable.options.durability
             
             val itemStackA = items[0]

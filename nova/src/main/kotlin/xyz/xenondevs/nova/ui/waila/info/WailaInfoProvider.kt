@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.material.BlockNovaMaterial
+import xyz.xenondevs.nova.material.NovaBlock
 
 data class WailaLine(val text: Component, val alignment: Alignment) {
     
@@ -29,14 +29,14 @@ sealed interface WailaInfoProvider<T> {
 abstract class NovaWailaInfoProvider : WailaInfoProvider<NovaBlockState> {
     
     val addon: Addon?
-    val materials: Set<BlockNovaMaterial>?
+    val materials: Set<NovaBlock>?
     
     constructor(addon: Addon) {
         this.addon = addon
         this.materials = null
     }
     
-    constructor(materials: Set<BlockNovaMaterial>?) {
+    constructor(materials: Set<NovaBlock>?) {
         this.addon = null
         this.materials = materials
     }

@@ -9,12 +9,16 @@ import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.api.block.NovaBlockRegistry
+import xyz.xenondevs.nova.api.item.NovaItemRegistry
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.material.api.ApiBlockRegistry
+import xyz.xenondevs.nova.material.api.ApiItemRegistry
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
@@ -58,6 +62,8 @@ class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by lo
     override val blockManager: IBlockManager = BlockManager
     override val tileEntityManager: ITileEntityManager = TileEntityManager
     override val materialRegistry: INovaMaterialRegistry = NovaMaterialRegistry
+    override val blockRegistry: NovaBlockRegistry = ApiBlockRegistry
+    override val itemRegistry: NovaItemRegistry = ApiItemRegistry
     override val wailaManager: IWailaManager = WailaManager
     
     internal val disableHandlers = ArrayList<() -> Unit>()

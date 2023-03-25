@@ -12,30 +12,33 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.ContainerEndPointDataHolder
+import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
-import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
+import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.swingHand
+import xyz.xenondevs.nova.util.toString
 import xyz.xenondevs.nova.world.pos
 
 internal object WrenchBehavior : ItemBehavior() {
     
     private val WRENCH_MODE_KEY = NamespacedKey(NOVA, "wrench_mode")
-    private val NETWORK_TYPES = arrayOf(NetworkType.ENERGY, NetworkType.ITEMS, NetworkType.FLUID)
+    private val NETWORK_TYPES = arrayOf(DefaultNetworkTypes.ENERGY, DefaultNetworkTypes.ITEMS, DefaultNetworkTypes.FLUID)
     
     private var ItemStack.wrenchMode: NetworkType
         get() = itemMeta?.persistentDataContainer
             ?.get(WRENCH_MODE_KEY, PersistentDataType.STRING)
-            ?.let(NetworkTypeRegistry::of)
-            ?: NetworkType.ITEMS
+            ?.let(NETWORK_TYPE::get)
+            ?: DefaultNetworkTypes.ITEMS
         set(mode) {
             val itemMeta = itemMeta!!
             itemMeta.persistentDataContainer.set(WRENCH_MODE_KEY, PersistentDataType.STRING, mode.id.toString())
@@ -60,8 +63,8 @@ internal object WrenchBehavior : ItemBehavior() {
                             it.removeEndPoint(endPoint, false)
                             
                             when (mode) {
-                                NetworkType.ENERGY -> cycleEnergyConfig(holder as EnergyHolder, face)
-                                NetworkType.ITEMS, NetworkType.FLUID -> cycleContainerConfig(holder as ContainerEndPointDataHolder<*>, face)
+                                DefaultNetworkTypes.ENERGY -> cycleEnergyConfig(holder as EnergyHolder, face)
+                                DefaultNetworkTypes.ITEMS, DefaultNetworkTypes.FLUID -> cycleContainerConfig(holder as ContainerEndPointDataHolder<*>, face)
                             }
                             
                             it.addEndPoint(endPoint, false).thenRun {

@@ -7,7 +7,7 @@ import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
 import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 
 @HardcodedMaterialOptions
 fun DamageableOptions(
@@ -35,7 +35,7 @@ sealed interface DamageableOptions {
     
     companion object {
         
-        fun configurable(material: ItemNovaMaterial): DamageableOptions =
+        fun configurable(material: NovaItem): DamageableOptions =
             ConfigurableDamageableOptions(material)
         
         fun configurable(path: String): DamageableOptions =
@@ -72,6 +72,6 @@ private class ConfigurableDamageableOptions : ConfigAccess, DamageableOptions {
     }
     
     constructor(path: String) : super(path)
-    constructor(material: ItemNovaMaterial) : super(material)
+    constructor(material: NovaItem) : super(material)
     
 }

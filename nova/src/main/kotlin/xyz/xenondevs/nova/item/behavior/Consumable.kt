@@ -16,7 +16,7 @@ import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nmsutils.util.removeIf
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
 import xyz.xenondevs.nova.util.getPlayersNearby
@@ -149,7 +149,7 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
     }
     
     companion object : ItemBehaviorFactory<Consumable>() {
-        override fun create(material: ItemNovaMaterial): Consumable =
+        override fun create(material: NovaItem): Consumable =
             Consumable(FoodOptions.configurable(material))
     }
     

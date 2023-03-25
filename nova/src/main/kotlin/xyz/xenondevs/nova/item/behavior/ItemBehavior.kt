@@ -19,13 +19,13 @@ import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
 abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     
-    lateinit var novaMaterial: ItemNovaMaterial
+    lateinit var novaMaterial: NovaItem
         internal set
     
     open val vanillaMaterialProperties: Provider<List<VanillaMaterialProperty>> = provider(emptyList())
@@ -47,12 +47,12 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     open fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) = Unit
     
-    final override fun get(material: ItemNovaMaterial): ItemBehavior {
+    final override fun get(material: NovaItem): ItemBehavior {
         setMaterial(material)
         return this
     }
     
-    internal fun setMaterial(material: ItemNovaMaterial) {
+    internal fun setMaterial(material: NovaItem) {
         if (::novaMaterial.isInitialized)
             throw IllegalStateException("The same item behavior instance cannot be used for multiple materials")
         
@@ -62,10 +62,10 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
 }
 
 abstract class ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder<T>() {
-    abstract fun create(material: ItemNovaMaterial): T
-    final override fun get(material: ItemNovaMaterial) = create(material).apply { setMaterial(material) }
+    abstract fun create(material: NovaItem): T
+    final override fun get(material: NovaItem) = create(material).apply { setMaterial(material) }
 }
 
 abstract class ItemBehaviorHolder<T : ItemBehavior> internal constructor() {
-    internal abstract fun get(material: ItemNovaMaterial): T
+    internal abstract fun get(material: NovaItem): T
 }

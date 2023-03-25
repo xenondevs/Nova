@@ -7,7 +7,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.requireNonNull
 import xyz.xenondevs.nova.data.serialization.yaml.getLazilyEvaluated
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.material.NovaItem
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -18,7 +18,7 @@ abstract class ConfigAccess(private val configReceiver: () -> YamlConfiguration)
     
     constructor(path: String) : this({ NovaConfig[path] })
     
-    constructor(material: ItemNovaMaterial) : this({ NovaConfig[material] })
+    constructor(material: NovaItem) : this({ NovaConfig[material] })
     
     protected inline fun <reified T : Any> getEntry(key: String): Provider<T> {
         return RequiredConfigEntryAccessor<T>(key, typeOf<T>()).also(ConfigEntryAccessor<*>::reload)
