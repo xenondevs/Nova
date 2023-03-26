@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.tileentity
 
 import net.kyori.adventure.text.Component
 import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
@@ -21,8 +22,6 @@ import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
 import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.world.block.property.Directional
@@ -70,7 +69,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     companion object {
         val SELF_UPDATE_REASON = object : UpdateReason {}
         
-        val TILE_ENTITY_DATA_KEY = NamespacedId(NOVA, "tileentity")
+        val TILE_ENTITY_DATA_KEY = ResourceLocation("nova", "tileentity")
     }
     
     val pos: BlockPos = blockState.pos

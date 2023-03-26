@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.data.resources.model.data
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.util.data.LazyArray
@@ -13,12 +13,12 @@ import xyz.xenondevs.nova.world.block.model.BlockStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.model.DisplayEntityModelProvider
 
 sealed interface BlockModelData {
-    val id: NamespacedId
+    val id: ResourceLocation
     val modelProviderType: BlockModelProviderType<*>
 }
 
 class DisplayEntityBlockModelData(
-    id: NamespacedId,
+    id: ResourceLocation,
     val hitboxType: Material,
     dataArray: IntArray
 ) : ItemModelData(id, VanillaMaterialTypes.DEFAULT_MATERIAL, dataArray), BlockModelData {
@@ -36,7 +36,7 @@ class DisplayEntityBlockModelData(
 }
 
 class BlockStateBlockModelData(
-    override val id: NamespacedId,
+    override val id: ResourceLocation,
     val data: Map<BlockFace, List<BlockStateConfig>>
 ) : BlockModelData {
     

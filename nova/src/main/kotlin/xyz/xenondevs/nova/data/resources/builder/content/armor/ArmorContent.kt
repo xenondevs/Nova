@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.resources.builder.content.armor
 
+import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredAr
 import xyz.xenondevs.nova.util.data.readImage
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.intValue
+import xyz.xenondevs.nova.util.name
 import java.awt.Color
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
@@ -25,7 +26,7 @@ import kotlin.math.roundToInt
 private val EMPTY_TEXTURE = BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB)
 
 internal class ArmorData(
-    val id: NamespacedId,
+    val id: ResourceLocation,
     val color: Int,
     val textureLayers: Array<List<BufferedImage>?>,
     val emissivityMapsLayers: Array<List<BufferedImage>?>,

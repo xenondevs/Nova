@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.builder.index
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import xyz.xenondevs.commons.gson.getAllInts
 import xyz.xenondevs.commons.gson.getAllStrings
@@ -30,8 +31,8 @@ internal object MaterialsIndexDeserializer {
         json.entrySet().forEach { (name, element) ->
             val itemInfo: ItemModelInformation?
             val blockInfo: BlockModelInformation?
-            val armorInfo: NamespacedId?
-            val id = NamespacedId(namespace, name)
+            val armorInfo: ResourceLocation?
+            val id = ResourceLocation(namespace, name)
             
             if (element is JsonObject) {
                 val item = element.get("item")
@@ -64,7 +65,7 @@ internal object MaterialsIndexDeserializer {
                         }
                 } else null
                 
-                armorInfo = element.getStringOrNull("armor")?.let { NamespacedId.of(it, namespace) }
+                armorInfo = element.getStringOrNull("armor")?.let { NamespacedId.of(it, namespace).resourceLocation }
                 
             } else if (element.isString()) {
                 itemInfo = ItemModelInformation(id, listOf(element.asString.addNamespace(namespace)))

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.resources.builder.content.armor.info
 
-import xyz.xenondevs.nova.data.NamespacedId
+import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.resources.ResourcePath
 
 @JvmInline
@@ -10,7 +10,7 @@ internal value class ArmorTexturePath(val resourcePath: ResourcePath)
 internal value class ArmorEmissivityMapPath(val resourcePath: ResourcePath)
 
 internal data class RegisteredArmor(
-    val id: NamespacedId,
+    val id: ResourceLocation,
     val layer1: ArmorTexturePath?,
     val layer2: ArmorTexturePath?,
     val layer1EmissivityMap: ArmorEmissivityMapPath?,

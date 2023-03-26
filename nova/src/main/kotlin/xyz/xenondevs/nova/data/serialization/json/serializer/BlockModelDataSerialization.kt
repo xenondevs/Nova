@@ -7,17 +7,17 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.gson.getAllInts
 import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.commons.gson.getStringOrNull
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.data.serialization.json.getDeserializedOrNull
 import java.lang.reflect.Type
@@ -72,13 +72,13 @@ internal object BlockModelDataSerialization : JsonSerializer<BlockModelData>, Js
                 data.getOrPut(face, ::ArrayList) += type.of(blockStateId)
             }
             
-            return BlockStateBlockModelData(NamespacedId.of(id), data)
+            return BlockStateBlockModelData(ResourceLocation.of(id, ':'), data)
         } else {
             val id = json.getStringOrNull("id")!!
             val hitboxType = Material.valueOf(json.getStringOrNull("hitboxType")!!)
             val dataArray = json.getAsJsonArray("dataArray").getAllInts().toIntArray()
             
-            return DisplayEntityBlockModelData(NamespacedId.of(id), hitboxType, dataArray)
+            return DisplayEntityBlockModelData(ResourceLocation.of(id, ':'), hitboxType, dataArray)
         }
     }
     

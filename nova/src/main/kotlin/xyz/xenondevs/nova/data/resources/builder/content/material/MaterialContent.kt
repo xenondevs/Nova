@@ -2,11 +2,11 @@ package xyz.xenondevs.nova.data.resources.builder.content.material
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ModelData
@@ -22,9 +22,9 @@ import xyz.xenondevs.nova.data.resources.builder.content.material.info.Registere
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.nio.file.Path
@@ -43,7 +43,7 @@ internal class MaterialContent(
     
     override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
     
-    private val novaMaterials = HashMap<NamespacedId, RegisteredMaterial>()
+    private val novaMaterials = HashMap<ResourceLocation, RegisteredMaterial>()
     
     private val modelDataPosition = HashMap<Material, Int>()
     
@@ -86,7 +86,7 @@ internal class MaterialContent(
     @Suppress("ReplaceWithEnumMap")
     override fun write() {
         // the general lookup later passed to Resources
-        val modelDataLookup = HashMap<NamespacedId, ModelData>()
+        val modelDataLookup = HashMap<ResourceLocation, ModelData>()
         
         // stores the custom model id overrides, used to prevent duplicate registration of armor stand models and for writing to the respective file
         val customItemModels = HashMap<Material, HashMap<String, Int>>()

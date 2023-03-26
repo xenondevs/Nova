@@ -42,6 +42,7 @@ import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.getCBFCompoundTag
 import xyz.xenondevs.nova.util.data.getOrPutCBFCompoundTag
 import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -107,7 +108,7 @@ val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
 val ItemStack.canDestroy: List<Material>
     get() {
         val tag = itemMeta?.unhandledTags?.get("CanDestroy") as? ListTag ?: return emptyList()
-        return tag.mapNotNull { runCatching { NamespacedId.of(it.asString) }.getOrNull()?.let { Material.valueOf(it.name) } }
+        return tag.mapNotNull { runCatching { ResourceLocation.of(it.asString, ':') }.getOrNull()?.let { Material.valueOf(it.name) } }
     }
 
 val ItemStack.craftingRemainingItem: ItemStack?
@@ -192,8 +193,8 @@ inline fun <reified T : Any> ItemStack.retrieveData(key: NamespacedKey): T? {
     return retrieveData(key.namespace, key.key)
 }
 
-inline fun <reified T : Any> ItemStack.retrieveData(id: NamespacedId): T? {
-    return retrieveData(id.namespace, id.name)
+inline fun <reified T : Any> ItemStack.retrieveData(id: ResourceLocation): T? {
+    return retrieveData(id.namespace, id.path)
 }
 
 inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? {
@@ -220,8 +221,8 @@ inline fun <reified T : Any> ItemStack.storeData(key: NamespacedKey, data: T?) {
     storeData(key.namespace, key.key, data)
 }
 
-inline fun <reified T : Any> ItemStack.storeData(id: NamespacedId, data: T?) {
-    storeData(id.namespace, id.name, data)
+inline fun <reified T : Any> ItemStack.storeData(id: ResourceLocation, data: T?) {
+    storeData(id.namespace, id.path, data)
 }
 
 inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) {
@@ -240,8 +241,8 @@ inline fun <reified T : Any> MojangStack.retrieveData(key: NamespacedKey): T? {
     return retrieveData(key.namespace, key.key)
 }
 
-inline fun <reified T : Any> MojangStack.retrieveData(id: NamespacedId): T? {
-    return retrieveData(id.namespace, id.name)
+inline fun <reified T : Any> MojangStack.retrieveData(id: ResourceLocation): T? {
+    return retrieveData(id.namespace, id.path)
 }
 
 inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? {
@@ -261,8 +262,8 @@ inline fun <reified T : Any> MojangStack.storeData(key: NamespacedKey, data: T?)
     storeData(key.namespace, key.key, data)
 }
 
-inline fun <reified T : Any> MojangStack.storeData(id: NamespacedId, data: T?) {
-    storeData(id.namespace, id.name, data)
+inline fun <reified T : Any> MojangStack.storeData(id: ResourceLocation, data: T?) {
+    storeData(id.namespace, id.path, data)
 }
 
 inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) {

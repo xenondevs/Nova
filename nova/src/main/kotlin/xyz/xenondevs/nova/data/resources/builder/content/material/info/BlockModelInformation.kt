@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.resources.builder.content.material.info
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.NamespacedId
@@ -41,7 +42,7 @@ internal enum class BlockDirection(val char: Char, val x: Int, val y: Int) {
 }
 
 internal class BlockModelInformation(
-    override val id: NamespacedId,
+    override val id: ResourceLocation,
     type: BlockModelType?,
     hitboxType: Material?,
     override val models: List<String>,

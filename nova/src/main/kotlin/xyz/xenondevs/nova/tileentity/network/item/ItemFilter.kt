@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter.Companion.ITEM_FILTER_KEY
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.retrieveData
@@ -48,7 +48,7 @@ class ItemFilter(
     }
     
     companion object {
-        val ITEM_FILTER_KEY = NamespacedId(NOVA, "itemfilter1")
+        val ITEM_FILTER_KEY = ResourceLocation("nova", "itemfilter1")
         lateinit var creatorFun: (ItemFilter) -> ItemStack
     }
     

@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.serialization.yaml.serializer
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.yaml.YamlSerializer
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
@@ -70,7 +70,7 @@ internal object BarMatcherSerializer : YamlSerializer<BarMatcher> {
             "overlay" -> {
                 val id = map["id"] as? String
                     ?: throw NoSuchElementException("Missing value 'id'")
-                val namespacedId = NamespacedId.of(id)
+                val namespacedId = ResourceLocation.of(id, ':')
                 
                 return BarMatcher.Origin(BarOrigin.Addon(namespacedId))
             }

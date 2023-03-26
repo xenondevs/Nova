@@ -21,7 +21,7 @@ internal object ArmorIndexDeserializer {
         
         val armor = ArrayList<RegisteredArmor>()
         json.entrySet().forEach { (idStr, element) ->
-            val id = NamespacedId.of(idStr, namespace)
+            val id = NamespacedId.of(idStr, namespace).resourceLocation
             require(id.namespace == namespace) { "Illegal namespace" }
             
             val layer1: String?

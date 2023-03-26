@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 
+import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorData
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor.InterpolationMode
@@ -111,7 +111,7 @@ internal class FancyPantsArmorFileMerger(basePacks: BasePacks) : FileMerger(base
         val armor = basePacks.customArmor.getOrPut(color) {
             val colorObj = color.asColor()
             ArmorData(
-                NamespacedId("base_pack", "armor_${colorObj.red}_${colorObj.green}_${colorObj.blue}"),
+                ResourceLocation("base_pack", "armor_${colorObj.red}_${colorObj.green}_${colorObj.blue}"),
                 color,
                 arrayOfNulls(2),
                 arrayOfNulls(2),

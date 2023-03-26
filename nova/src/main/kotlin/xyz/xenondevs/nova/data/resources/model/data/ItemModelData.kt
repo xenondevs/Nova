@@ -2,17 +2,17 @@ package xyz.xenondevs.nova.data.resources.model.data
 
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.builder.setLore
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.material.PacketItems
 import xyz.xenondevs.nova.util.item.unhandledTags
 
-open class ItemModelData(val id: NamespacedId, val material: Material, val dataArray: IntArray) {
+open class ItemModelData(val id: ResourceLocation, val material: Material, val dataArray: IntArray) {
     
     val data: Int
         get() = dataArray[0]
