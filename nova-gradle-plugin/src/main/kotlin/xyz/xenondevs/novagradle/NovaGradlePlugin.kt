@@ -8,6 +8,7 @@ import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.register
 import xyz.xenondevs.novagradle.task.AddonExtension
 import xyz.xenondevs.novagradle.task.AddonTask
+import xyz.xenondevs.novagradle.task.GenerateLanguageFilesTask
 import xyz.xenondevs.novagradle.task.GenerateWailaTexturesExtension
 import xyz.xenondevs.novagradle.task.GenerateWailaTexturesTask
 import xyz.xenondevs.novagradle.util.AddonUtils
@@ -42,6 +43,8 @@ class NovaGradlePlugin : Plugin<Project> {
             addonId.set(wailaExt.addonId.orElse(addonExt.id).orElse(resourcesDir.map { AddonUtils.getAddonId(project, it) }))
             filter.set(wailaExt.filter.orElse { true })
         }
+        
+        project.tasks.register<GenerateLanguageFilesTask>("generateLanguageFiles")
         
         val novaCfg = project.configurations.create("nova")
         project.configurations.getByName("implementation").extendsFrom(novaCfg)
