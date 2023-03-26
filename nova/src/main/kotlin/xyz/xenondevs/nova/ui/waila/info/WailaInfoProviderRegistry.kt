@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.RedstoneLampWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RepeaterWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RespawnAnchorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.SeaPickleWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.impl.SuspiciousSandWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -49,6 +50,7 @@ object WailaInfoProviderRegistry {
         registerProvider(DaylightDetectorWailaInfoProvider)
         registerProvider(CocoaWailaInfoProvider)
         registerProvider(RedstoneLampWailaInfoProvider)
+        registerProvider(SuspiciousSandWailaInfoProvider)
     }
     
     fun registerProvider(provider: WailaInfoProvider<*>) {

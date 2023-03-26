@@ -15,15 +15,11 @@ private val MAX_TEXTURE_STAGE = mapOf(
     Material.NETHER_WART to 2,
     Material.POTATOES to 3,
     Material.WHEAT to 7,
-    Material.SWEET_BERRY_BUSH to 3
+    Material.SWEET_BERRY_BUSH to 3,
+    Material.TORCHFLOWER_CROP to 2
 )
 
-internal object CropWailaInfoProvider : VanillaWailaInfoProvider(
-    setOf(
-        Material.BEETROOTS, Material.CARROTS, Material.NETHER_WART, Material.POTATOES,
-        Material.SWEET_BERRY_BUSH, Material.WHEAT
-    )
-) {
+internal object CropWailaInfoProvider : VanillaWailaInfoProvider(MAX_TEXTURE_STAGE.keys) {
     
     override fun getInfo(player: Player, block: Block): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
