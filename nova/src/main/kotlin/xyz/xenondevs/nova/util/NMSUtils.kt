@@ -345,6 +345,19 @@ operator fun <T> Registry<T>.get(key: String): T? {
     return get(ResourceLocation.of(key, ':'))
 }
 
+fun <T> Registry<T>.getOrCreateHolder(id: ResourceLocation): Holder<T> {
+    val key = ResourceKey.create(key(), id)
+    val holder = getHolder(key)
+    
+    if (holder.isPresent)
+        return holder.get()
+    
+    if (this !is MappedRegistry<T>)
+        throw IllegalStateException("Can't create holder for non MappedRegistry ${this.key()}")
+    
+    return this.createRegistrationLookup().getOrThrow(key)
+}
+
 operator fun Registry<*>.contains(key: String): Boolean {
     return contains(ResourceLocation.of(key, ':'))
 }

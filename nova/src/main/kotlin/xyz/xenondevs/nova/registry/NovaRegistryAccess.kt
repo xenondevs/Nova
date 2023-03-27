@@ -62,4 +62,9 @@ object NovaRegistryAccess : RegistryAccess {
         registryName: ResourceLocation
     ): FuzzyMappedRegistry<E> = addRegistry(registryName, ::FuzzyMappedRegistry)
     
+    
+    internal fun freezeAll() {
+        registries.forEach { it.value.freeze() }
+    }
+    
 }

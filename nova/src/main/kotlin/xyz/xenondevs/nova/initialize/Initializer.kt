@@ -28,6 +28,8 @@ import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
 import xyz.xenondevs.nova.material.DefaultItems
+import xyz.xenondevs.nova.registry.NovaRegistryAccess
+import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
@@ -70,6 +72,7 @@ internal object Initializer : Listener {
     }
     
     fun initPreWorld() {
+        VanillaRegistryAccess.unfreezeAll()
         registerEvents()
         
         System.setProperty("net.kyori.adventure.serviceLoadFailuresAreFatal", "false")
@@ -121,6 +124,8 @@ internal object Initializer : Listener {
             postWorldInit.forEach { it.initialization.get() }
             
             if (initialized.size == toInit.size) {
+                NovaRegistryAccess.freezeAll()
+                VanillaRegistryAccess.freezeAll()
                 isDone = true
                 callEvent(NovaLoadDataEvent())
                 
