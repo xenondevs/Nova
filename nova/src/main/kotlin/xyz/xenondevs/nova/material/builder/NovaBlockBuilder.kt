@@ -9,25 +9,26 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.material.MultiBlockLoader
 import xyz.xenondevs.nova.material.NovaBlock
+import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.material.PlaceCheckFun
 import xyz.xenondevs.nova.material.TileEntityConstructor
-import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.material.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.registry.RegistryElementBuilder
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.BlockBehavior
 import xyz.xenondevs.nova.world.block.BlockLogic
 import xyz.xenondevs.nova.world.block.TileEntityBlockBehavior
 
 private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0)
 
-abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T>, T : NovaBlockState> internal constructor(
-    val addon: Addon,
-    val name: String
-) {
+abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T, B>, T : NovaBlockState, B : NovaBlock> internal constructor(
+    id: ResourceLocation
+) : RegistryElementBuilder<B>(NovaRegistries.BLOCK, id) {
     
-    protected val id = ResourceLocation(addon.description.id, name)
-    protected var localizedName = "block.${id.namespace}.$name"
+    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon.description.id, name))
+    
+    protected var localizedName = "block.${id.namespace}.${id.name}"
     protected abstract var logic: MutableList<BlockBehavior<T>>
     protected val properties = ArrayList<BlockPropertyType<*>>()
     protected var options: BlockOptions = EMPTY_BLOCK_OPTIONS
@@ -64,16 +65,16 @@ abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T>, T : 
         return this as S
     }
     
-    abstract fun register(): NovaBlock
-    
 }
 
-class NovaBlockBuilder internal constructor(addon: Addon, name: String) : AbstractNovaBlockBuilder<NovaBlockBuilder, NovaBlockState>(addon, name) {
+class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNovaBlockBuilder<NovaBlockBuilder, NovaBlockState, NovaBlock>(id) {
+    
+    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon.description.id, name))
     
     override var logic: MutableList<BlockBehavior<NovaBlockState>> = mutableListOf(BlockBehavior.Default)
     
-    override fun register(): NovaBlock {
-        val novaBlock = NovaBlock(
+    override fun build(): NovaBlock {
+        return NovaBlock(
             id,
             localizedName,
             BlockLogic(logic),
@@ -82,18 +83,21 @@ class NovaBlockBuilder internal constructor(addon: Addon, name: String) : Abstra
             placeCheck,
             multiBlockLoader
         )
-        NovaRegistries.BLOCK[id] = novaBlock
-        return novaBlock
     }
     
 }
 
 class TileEntityNovaBlockBuilder internal constructor(
-    addon: Addon,
-    name: String,
+    id: ResourceLocation,
     private val tileEntity: TileEntityConstructor
-) : AbstractNovaBlockBuilder<TileEntityNovaBlockBuilder, NovaTileEntityState>(addon, name) {
-
+) : AbstractNovaBlockBuilder<TileEntityNovaBlockBuilder, NovaTileEntityState, NovaTileEntityBlock>(id) {
+    
+    internal constructor(
+        addon: Addon,
+        name: String,
+        tileEntity: TileEntityConstructor
+    ) : this(ResourceLocation(addon.description.id, name), tileEntity)
+    
     override var logic: MutableList<BlockBehavior<NovaTileEntityState>> = mutableListOf(TileEntityBlockBehavior.INTERACTIVE)
     
     fun interactive(interactive: Boolean): TileEntityNovaBlockBuilder {
@@ -101,9 +105,9 @@ class TileEntityNovaBlockBuilder internal constructor(
         logic += if (interactive) TileEntityBlockBehavior.INTERACTIVE else TileEntityBlockBehavior.NON_INTERACTIVE
         return this
     }
-
-    override fun register(): NovaTileEntityBlock {
-        val block = NovaTileEntityBlock(
+    
+    override fun build(): NovaTileEntityBlock {
+        return NovaTileEntityBlock(
             id,
             localizedName,
             BlockLogic(logic),
@@ -114,8 +118,6 @@ class TileEntityNovaBlockBuilder internal constructor(
             multiBlockLoader
         )
         
-        NovaRegistries.BLOCK[id] = block
-        return block
     }
     
 }

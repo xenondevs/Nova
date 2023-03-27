@@ -11,10 +11,10 @@ import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.util.name
-import xyz.xenondevs.nova.util.set
 
-class NovaItemBuilder internal constructor(private val id: ResourceLocation) {
+class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElementBuilder<NovaItem>(NovaRegistries.ITEM, id) {
     
     private var logic: MutableList<ItemBehaviorHolder<*>> = ArrayList()
     private var localizedName = "item.${id.namespace}.${id.name}"
@@ -65,7 +65,7 @@ class NovaItemBuilder internal constructor(private val id: ResourceLocation) {
         return this
     }
     
-    fun register(): NovaItem {
+    override fun build(): NovaItem {
         val item = NovaItem(
             id,
             localizedName,
@@ -76,7 +76,6 @@ class NovaItemBuilder internal constructor(private val id: ResourceLocation) {
             block
         )
         block?.item = item
-        NovaRegistries.ITEM[id] = item
         return item
     }
     

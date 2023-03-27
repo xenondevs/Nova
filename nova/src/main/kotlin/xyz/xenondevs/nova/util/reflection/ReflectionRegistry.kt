@@ -42,8 +42,14 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelHeightAccessor
 import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.WorldGenLevel
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.biome.Biome.ClimateSettings
+import net.minecraft.world.level.biome.Biome.TemperatureModifier
 import net.minecraft.world.level.biome.BiomeGenerationSettings
+import net.minecraft.world.level.biome.BiomeSpecialEffects
+import net.minecraft.world.level.biome.BiomeSpecialEffects.GrassColorModifier
 import net.minecraft.world.level.biome.FeatureSorter
+import net.minecraft.world.level.biome.MobSpawnSettings
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
@@ -114,6 +120,11 @@ internal object ReflectionRegistry {
     val ITEM_STACK_CONSTRUCTOR = getConstructor(MojangStack::class, false, ItemLike::class)
     val CHUNK_ACCESS_CONSTRUCTOR = getConstructor(ChunkAccess::class, false, ChunkPos::class, UpgradeData::class, LevelHeightAccessor::class, Registry::class, Long::class, Array<LevelChunkSection>::class, BlendingData::class)
     val INVENTORY_CONSTRUCTOR = getConstructor(MojangInventory::class, false, MojangPlayer::class)
+    val BIOME_CLIMATE_SETTINGS_CONSTRUCTOR = getConstructor(ClimateSettings::class, true, Boolean::class, Float::class, TemperatureModifier::class, Float::class)
+    val BIOME_SPECIAL_EFFECTS_CONSTRUCTOR = getConstructor(BiomeSpecialEffects::class, true, Int::class, Int::class, Int::class, Int::class, Optional::class, Optional::class, GrassColorModifier::class, Optional::class, Optional::class, Optional::class, Optional::class, Optional::class)
+    val BIOME_GENERATION_SETTINGS_CONSTRUCTOR = getConstructor(BiomeGenerationSettings::class, true, Map::class, List::class)
+    val MOB_SPAWN_SETTINGS_CONSTRUCTOR = getConstructor(MobSpawnSettings::class, true, Float::class, Map::class, Map::class)
+    val BIOME_CONSTRUCTOR = getConstructor(Biome::class, true, ClimateSettings::class, BiomeSpecialEffects::class, BiomeGenerationSettings::class, MobSpawnSettings::class)
     
     // Methods
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class)
