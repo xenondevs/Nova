@@ -16,17 +16,23 @@ public class NovaClassLoader extends URLClassLoader {
     
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        Class<?> c;
+        Class<?> c = null;
         
-        // check if the class is already loaded
-        synchronized (getClassLoadingLock(name)) {
-            // check in jvm
-            c = findLoadedClass(name);
-            
-            // check Nova classes and libraries before parent to prevent it from using old patch classes
-            // (which stay in memory after reloading because patched code references them)
-            if (c == null && !injectedClasses.contains(name) ) {
-                c = findClassOrNull(name);
+        // workaround library conflict for kyori-adventure on paper servers (fixme)
+        if (name.startsWith("net.kyori.adventure")) {
+            c = getParent().loadClass(name);
+        }
+        
+        if (c == null) {
+            synchronized (getClassLoadingLock(name)) {
+                // check in jvm
+                c = findLoadedClass(name);
+        
+                // check Nova classes and libraries before parent to prevent it from using old patch classes
+                // (which stay in memory after reloading because patched code references them)
+                if (c == null && !injectedClasses.contains(name) ) {
+                    c = findClassOrNull(name);
+                }
             }
         }
         
