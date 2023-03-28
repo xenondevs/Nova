@@ -57,6 +57,8 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.plugin.SimplePluginManager
+import xyz.xenondevs.nova.util.ServerSoftware
+import xyz.xenondevs.nova.util.ServerUtils.SERVER_SOFTWARE
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCBClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getClass
@@ -144,7 +146,7 @@ internal object ReflectionRegistry {
     val MAPPED_REGISTRY_FROZEN_FIELD = getField(MappedRegistry::class, true, "SRF(net.minecraft.core.MappedRegistry frozen)")
     val BIOME_GENERATION_SETTINGS_FEATURES_FIELD = getField(BiomeGenerationSettings::class, true, "SRF(net.minecraft.world.level.biome.BiomeGenerationSettings features)")
     val LEVEL_CHUNK_SECTION_STATES_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection states)")
-    val LEVEL_CHUNK_SECTION_J_FIELD = getField(LevelChunkSection::class, true, "j")
+    val LEVEL_CHUNK_SECTION_BIOMES_FIELD = getField(LevelChunkSection::class, true, if (SERVER_SOFTWARE == ServerSoftware.SPIGOT) "j" else "biomes")
     val HOLDER_SET_DIRECT_CONTENTS_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contents)")
     val HOLDER_SET_DIRECT_CONTENTS_SET_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contentsSet)")
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
