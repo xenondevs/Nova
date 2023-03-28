@@ -9,7 +9,7 @@ plugins {
     id("org.jetbrains.dokka") version libs.versions.dokka
     id("xyz.xenondevs.jar-loader-gradle-plugin")
     id("xyz.xenondevs.specialsource-gradle-plugin") version "1.0.0"
-    id("xyz.xenondevs.string-remapper-gradle-plugin") version "1.0.0"
+    id("xyz.xenondevs.string-remapper-gradle-plugin") version "1.0"
     `maven-publish`
 }
 
@@ -68,10 +68,6 @@ sourceSets {
 }
 
 tasks {
-    named<Jar>("jar") {
-        dependsOn("remapStrings")
-    }
-    
     register("finalJar") {
         group = "build"
         dependsOn(if (mojangMapped) "jar" else "remapObfToSpigot")

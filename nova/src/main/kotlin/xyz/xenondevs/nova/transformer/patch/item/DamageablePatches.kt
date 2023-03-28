@@ -12,6 +12,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.TypeInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.isClass
 import xyz.xenondevs.bytebase.util.replaceEvery
 import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.behavior.Wearable
@@ -22,11 +23,10 @@ import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.DamageableUtils
 import xyz.xenondevs.nova.util.item.ItemDamageResult
 import xyz.xenondevs.nova.util.item.novaMaterial
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD
 import java.util.function.Consumer
 
-internal object DamageablePatches : MultiTransformer(setOf(ItemStack::class, Item::class, Inventory::class), computeFrames = true) {
+internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::class, Inventory::class) {
     
     override fun transform() {
         transformItemStackHurtAndBreak()
@@ -38,12 +38,12 @@ internal object DamageablePatches : MultiTransformer(setOf(ItemStack::class, Ite
      * Patches the ItemStack#hurtAndBreak method to properly damage Nova's tools.
      */
     private fun transformItemStackHurtAndBreak() {
-        VirtualClassPath[ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD].instructions = buildInsnList {
+        VirtualClassPath[ITEM_STACK_HURT_AND_BREAK_METHOD].instructions = buildInsnList {
             aLoad(0)
             iLoad(1)
             aLoad(2)
             aLoad(3)
-            invokeStatic(ReflectionUtils.getMethodByName(DamageablePatches::class, false, "hurtAndBreak"))
+            invokeStatic(::hurtAndBreak)
             _return()
         }
     }
@@ -59,10 +59,10 @@ internal object DamageablePatches : MultiTransformer(setOf(ItemStack::class, Ite
      * Patches the ItemStack#hurtEnemy method to properly damage Nova's tools and with the proper damage values.
      */
     private fun transformItemStackHurtEnemy() {
-        VirtualClassPath[ReflectionRegistry.ITEM_STACK_HURT_ENTITY_METHOD].instructions = buildInsnList {
+        VirtualClassPath[ItemStack::hurtEnemy].instructions = buildInsnList {
                 aLoad(0)
                 aLoad(2)
-                invokeStatic(ReflectionUtils.getMethodByName(DamageablePatches::class, false, "hurtEnemy"))
+                invokeStatic(::hurtEnemy)
                 _return()
             }
     }
@@ -89,9 +89,9 @@ internal object DamageablePatches : MultiTransformer(setOf(ItemStack::class, Ite
      * Patches the Inventory#hurtArmor method to recognize Nova's armor.
      */
     private fun transformInventoryHurtArmor() {
-        VirtualClassPath[ReflectionRegistry.INVENTORY_HURT_ARMOR_METHOD].replaceEvery(1, 0, buildInsnList { 
-            invokeStatic(ReflectionUtils.getMethodByName(DamageablePatches::class, false, "isArmorItem"))
-        }) { it.opcode == Opcodes.INSTANCEOF && (it as TypeInsnNode).desc == "SRC/(net.minecraft.world.item.ArmorItem)"}
+        VirtualClassPath[Inventory::hurtArmor].replaceEvery(1, 0, buildInsnList { 
+            invokeStatic(::isArmorItem)
+        }) { it.opcode == Opcodes.INSTANCEOF && (it as TypeInsnNode).isClass(ArmorItem::class) }
     }
     
     @JvmStatic

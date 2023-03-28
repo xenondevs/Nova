@@ -14,11 +14,10 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTagType
 import xyz.xenondevs.nova.transformer.ClassTransformer
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.io.DataInput
 import java.io.IOException
 
-internal object CBFCompoundTagPatch : ClassTransformer(CompoundTag::class, computeFrames = true) {
+internal object CBFCompoundTagPatch : ClassTransformer(CompoundTag::class) {
     
     override fun transform() {
         transformReadNamedTagData()
@@ -35,7 +34,7 @@ internal object CBFCompoundTagPatch : ClassTransformer(CompoundTag::class, compu
             aLoad(2)
             iLoad(3)
             aLoad(4)
-            invokeStatic(ReflectionUtils.getMethodByName(CBFCompoundTagPatch::class, false, "readNamedTagData"))
+            invokeStatic(::readNamedTagData)
             areturn()
         }
     }

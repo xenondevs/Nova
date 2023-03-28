@@ -17,13 +17,12 @@ import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethodByName
 import kotlin.math.min
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 
 @Suppress("unused")
-internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::class, MojangItem::class, ExperienceOrb::class), computeFrames = true) {
+internal object EnchantmentPatches : MultiTransformer(EnchantmentHelper::class, MojangItem::class, ExperienceOrb::class) {
     
     override fun transform() {
         patchEnchantmentTableEnchanting()
@@ -31,29 +30,29 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     }
     
     private fun patchEnchantmentTableEnchanting() {
-        VirtualClassPath[ReflectionRegistry.ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD]!!
+        VirtualClassPath[EnchantmentHelper::getAvailableEnchantmentResults]
             .replaceFirst(1, 0, buildInsnList {
                 aLoad(1)
-                invokeStatic(getMethodByName(EnchantmentPatches::class.java, false, "canEnchantItemWith"))
-            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ReflectionRegistry.ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD) }
+                invokeStatic(::canEnchantItemWith)
+            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(EnchantmentCategory::canEnchant) }
         
         val enchantmentValueAccessingMethods = mapOf(
-            VirtualClassPath[ReflectionRegistry.ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD] to 3,
-            VirtualClassPath[ReflectionRegistry.ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD] to 1
+            VirtualClassPath[EnchantmentHelper::getEnchantmentCost] to 3,
+            VirtualClassPath[EnchantmentHelper::selectEnchantment] to 1
         )
         
         enchantmentValueAccessingMethods.forEach { (method, localIdx) ->
             method.replaceFirst(1, 0, buildInsnList {
                 aLoad(localIdx)
-                invokeStatic(getMethodByName(EnchantmentPatches::class.java, false, "getEnchantmentValue"))
-            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ReflectionRegistry.ITEM_GET_ENCHANTMENT_VALUE_METHOD) }
+                invokeStatic(::getEnchantmentValue)
+            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangItem::getEnchantmentValue) }
         }
     
-        VirtualClassPath[ReflectionRegistry.ITEM_IS_ENCHANTABLE_METHOD]
+        VirtualClassPath[MojangItem::isEnchantable]
             .instructions = buildInsnList {
             aLoad(1)
             aLoad(0)
-            invokeStatic(getMethodByName(EnchantmentPatches::class.java, false, "isEnchantable"))
+            invokeStatic(::isEnchantable)
             ireturn()
         }
     }
@@ -95,7 +94,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
             aLoad(0)
             aLoad(1)
             iLoad(2)
-            invokeStatic(getMethodByName(EnchantmentPatches::class.java, false, "repairPlayerItems"))
+            invokeStatic(::repairPlayerItems)
             ireturn()
         }
     }

@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.transformer.patch.item
 
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.BannerDuplicateRecipe
 import net.minecraft.world.item.crafting.BookCloningRecipe
 import net.minecraft.world.item.crafting.Recipe
@@ -25,44 +26,28 @@ import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ABSTRACT_FURNACE_BLOCK_ENTITY_SERVER_TICK_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BANNER_DUPLICATE_RECIPE_GET_REMAINING_ITEMS_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BOOK_CLONING_RECIPE_GET_REMAINING_ITEMS_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_GET_CRAFTING_REMAINING_ITEM_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_HAS_CRAFTING_REMAINING_ITEM_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_CONSTRUCTOR
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_GET_ITEM_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.NON_NULL_LIST_SET_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.RECIPE_GET_REMAINING_ITEMS_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import java.io.File
-import kotlin.reflect.jvm.javaMethod
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal object RemainingItemPatches : MultiTransformer(
-    setOf(
-        BannerDuplicateRecipe::class, BookCloningRecipe::class, Recipe::class,
-        AbstractFurnaceBlockEntity::class, BrewingStandBlockEntity::class, CraftServer::class
-    ),
-    computeFrames = true
+    BannerDuplicateRecipe::class, BookCloningRecipe::class, Recipe::class,
+    AbstractFurnaceBlockEntity::class, BrewingStandBlockEntity::class, CraftServer::class
 ) {
     
     override fun transform() {
         listOf(
-            VirtualClassPath[BANNER_DUPLICATE_RECIPE_GET_REMAINING_ITEMS_METHOD],
-            VirtualClassPath[BOOK_CLONING_RECIPE_GET_REMAINING_ITEMS_METHOD],
+            VirtualClassPath[BannerDuplicateRecipe::getRemainingItems],
+            VirtualClassPath[BookCloningRecipe::getRemainingItems],
             VirtualClassPath[BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD]
         ).forEach(::patchUsualGetAndConstructNewStackPattern)
         
         patchRecipeGetRemainingItems()
         patchAbstractFurnaceBlockEntityServerTick()
         patchCraftServerCraftItem()
-        
-        File("out.class").writeBytes(
-            VirtualClassPath[BrewingStandBlockEntity::class].assemble(false)
-        )
     }
     
     /**
@@ -84,7 +69,7 @@ internal object RemainingItemPatches : MultiTransformer(
             0, 0,
             buildInsnList {
                 aLoad(4)
-                invokeStatic(ReflectionUtils.getMethodByName(RemainingItemPatches::class, false, "getRemainingItemStack"))
+                invokeStatic(::getRemainingItemStack)
             }
         )
     }
@@ -98,8 +83,8 @@ internal object RemainingItemPatches : MultiTransformer(
      */
     private fun patchHasCraftingRemainingItem(node: MethodNode) {
         node.replaceEvery(1, 0, buildInsnList {
-            invokeStatic(ReflectionUtils.getMethodByName(RemainingItemPatches::class, false, "hasCraftingRemainingItem"))
-        }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ITEM_HAS_CRAFTING_REMAINING_ITEM_METHOD) }
+            invokeStatic(::hasCraftingRemainingItem)
+        }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::hasCraftingRemainingItem) }
     }
     
     /**
@@ -110,11 +95,11 @@ internal object RemainingItemPatches : MultiTransformer(
         val methodNode = VirtualClassPath[RECIPE_GET_REMAINING_ITEMS_METHOD]
         methodNode.localVariables.clear()
         methodNode.replaceEveryRange(
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ITEM_STACK_GET_ITEM_METHOD) },
+            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangStack::getItem) },
             { it.opcode == Opcodes.INVOKESPECIAL && (it as MethodInsnNode).calls(ITEM_STACK_CONSTRUCTOR) },
             0, 0,
             buildInsnList {
-                invokeStatic(ReflectionUtils.getMethodByName(RemainingItemPatches::class, false, "getRemainingItemStack"))
+                invokeStatic(::getRemainingItemStack)
                 aLoad(2) // NonNullList
                 swap()
                 iLoad(3) // for loop index
@@ -127,17 +112,17 @@ internal object RemainingItemPatches : MultiTransformer(
      * Replaces this code: https://i.imgur.com/YeHuixV.png with a call to [getRemainingItemStack].
      */
     private fun patchAbstractFurnaceBlockEntityServerTick() {
-        val methodNode = VirtualClassPath[ABSTRACT_FURNACE_BLOCK_ENTITY_SERVER_TICK_METHOD]
+        val methodNode = VirtualClassPath[AbstractFurnaceBlockEntity::serverTick]
         methodNode.localVariables.clear()
         methodNode.replaceEveryRange(
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ITEM_GET_CRAFTING_REMAINING_ITEM_METHOD) },
+            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::getCraftingRemainingItem) },
             { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(NON_NULL_LIST_SET_METHOD) },
             1, -1,
             buildInsnList {
                 aLoad(3) // AbstractFurnaceBlockEntity
                 getField(ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD)
                 aLoad(6) // ItemStack
-                invokeStatic(ReflectionUtils.getMethodByName(RemainingItemPatches::class, false, "getRemainingItemStack"))
+                invokeStatic(::getRemainingItemStack)
                 ldc(1) // slot
                 swap()
             }
@@ -148,14 +133,14 @@ internal object RemainingItemPatches : MultiTransformer(
      * Replaces this range: https://i.imgur.com/HTZXwHp.png with a call to [getRemainingBukkitItemStack].
      */
     private fun patchCraftServerCraftItem() {
-        val methodNode = VirtualClassPath[CraftServer::craftItem.javaMethod!!]
+        val methodNode = VirtualClassPath[CraftServer::craftItem]
         methodNode.localVariables.clear()
         methodNode.replaceEveryRange(
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ITEM_STACK_GET_ITEM_METHOD) },
+            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangStack::getItem) },
             { it.opcode == Opcodes.INVOKESTATIC && (it as MethodInsnNode).calls(CraftItemStack::asBukkitCopy) },
             0, 3,
             buildInsnList {
-                invokeStatic(ReflectionUtils.getMethodByName(RemainingItemPatches::class, false, "getRemainingBukkitItemStack"))
+                invokeStatic(::getRemainingBukkitItemStack)
                 aLoad(1) // ItemStack[]
                 swap()
                 iLoad(12) // for loop index

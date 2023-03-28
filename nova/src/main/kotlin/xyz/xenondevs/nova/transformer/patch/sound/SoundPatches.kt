@@ -12,18 +12,18 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 import org.objectweb.asm.Opcodes
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.transformer.MultiTransformer
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.forcePacketBroadcast
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.soundGroup
-import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
@@ -37,7 +37,7 @@ import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
 import net.minecraft.world.level.block.state.BlockState as MojangBlockState
 
-internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, MojangLivingEntity::class, MojangBlock::class, MojangStack::class), computeFrames = true) {
+internal object SoundPatches : MultiTransformer(MojangEntity::class, MojangLivingEntity::class, MojangBlock::class, MojangStack::class) {
     
     override fun transform() {
         transformEntityPlayStepSound()
@@ -51,7 +51,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
             aLoad(0)
             aLoad(1)
             aLoad(2)
-            invokeStatic(ReflectionUtils.getMethodByName(SoundPatches::class.java, false, "playStepSound"))
+            invokeStatic(::playStepSound)
             _return()
         }
     }
@@ -76,7 +76,7 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
         VirtualClassPath[ReflectionRegistry.LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD]
             .instructions = buildInsnList {
             aLoad(0)
-            invokeStatic(ReflectionUtils.getMethodByName(SoundPatches::class.java, false, "playFallSound"))
+            invokeStatic(::playFallSound)
             _return()
         }
     }
@@ -121,10 +121,10 @@ internal object SoundPatches : MultiTransformer(setOf(MojangEntity::class, Mojan
     }
     
     private fun transformBlockPlayerWillDestroy() {
-        VirtualClassPath[ReflectionRegistry.BLOCK_PLAYER_WILL_DESTROY_METHOD].instructions.replaceFirst(0, 0, buildInsnList {
+        VirtualClassPath[Block::playerWillDestroy].instructions.replaceFirst(0, 0, buildInsnList {
             aLoad(1)
             aLoad(2)
-            invokeStatic(ReflectionUtils.getMethodByName(SoundPatches::class.java, false, "playBreakSound"))
+            invokeStatic(::playBreakSound)
             _return()
         }) { it.opcode == Opcodes.RETURN }
     }
