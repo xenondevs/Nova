@@ -23,15 +23,35 @@ private val NUMBER_CONVERTER_MAP: Map<KClass<*>, (Number) -> Number> = mapOf(
     Double::class to { it.toDouble() }
 )
 
-internal fun ConfigurationSection.setLazilyEvaluated(path: String, value: Any) {
-    set(path, YamlSerialization.serialize(value) ?: value)
+/**
+ * Serializes the given [value] of the reified type [T] to a [Map] and sets it under
+ * the given [path] in the [ConfigurationSection].
+ */
+inline fun <reified T : Any> ConfigurationSection.setSerialized(path: String, value: T) {
+    setSerialized(path, value, typeOf<T>())
 }
 
-internal inline fun <reified T : Any> ConfigurationSection.getLazilyEvaluated(path: String): T? {
-    return getLazilyEvaluated(path, typeOf<T>())
+/**
+ * Serializes the given [value] of [type] to a [Map] and sets it under the given [path]
+ * in the [ConfigurationSection].
+ */
+fun ConfigurationSection.setSerialized(path: String, value: Any, type: KType) {
+    set(path, YamlSerialization.serialize(value, type) ?: value)
 }
 
-internal fun <T : Any> ConfigurationSection.getLazilyEvaluated(path: String, type: KType): T? {
+/**
+ * Retrieves the value at the given [path] in the [ConfigurationSection] and deserializes it
+ * to the reified type [T].
+ */
+inline fun <reified T : Any> ConfigurationSection.getDeserialized(path: String): T? {
+    return getDeserialized(path, typeOf<T>())
+}
+
+/**
+ * Retrieves the value at the given [path] in the [ConfigurationSection] and deserializes it
+ * to the given [type].
+ */
+fun <T : Any> ConfigurationSection.getDeserialized(path: String, type: KType): T? {
     val value = get(path) ?: return null
     return YamlSerialization.deserialize(value, type)
 }
@@ -45,12 +65,17 @@ internal object YamlSerialization {
         registerSerializer(BarMatcherSerializer)
     }
     
-    inline fun <reified T> registerSerializer(serializer: YamlSerializer<T>) {
+    private inline fun <reified T> registerSerializer(serializer: YamlSerializer<T>) {
         serializers[T::class] = serializer
     }
     
-    fun <T : Any> serialize(value: T): Map<String, Any>? {
-        val serializer = getSerializer<T>(value::class)
+    inline fun <reified T : Any> serialize(value: T): Map<String, Any>? {
+        return serialize(value, typeOf<T>())
+    }
+    
+    fun serialize(value: Any, type: KType): Map<String, Any>? {
+        // TODO: improved type support
+        val serializer = getSerializer<Any>(type.classifierClass!!)
         if (serializer != null) {
             return serializer.serialize(value)
         }
@@ -62,7 +87,7 @@ internal object YamlSerialization {
         return null
     }
     
-    inline fun <reified T : Any> deserialize(value: Any): T {
+    inline fun <reified T : Any> deserialize(value: T): T {
         return deserialize(value, typeOf<T>())
     }
     
