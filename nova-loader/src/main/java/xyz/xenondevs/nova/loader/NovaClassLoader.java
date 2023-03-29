@@ -20,7 +20,11 @@ public class NovaClassLoader extends URLClassLoader {
         
         // workaround library conflict for kyori-adventure on paper servers (fixme)
         if (name.startsWith("net.kyori.adventure")) {
-            c = getParent().loadClass(name);
+            try {
+                c = getParent().loadClass(name);
+            } catch(ClassNotFoundException e) {
+                // ignored
+            }
         }
         
         if (c == null) {
