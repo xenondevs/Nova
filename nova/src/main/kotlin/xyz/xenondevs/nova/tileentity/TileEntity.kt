@@ -614,7 +614,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         
         open fun openWindow(player: Player) {
             val window = windowBuilder.build(player)
-            menuContainer!!.registerWindow(window)
+            menuContainer.registerWindow(window)
             window.open()
         }
         
@@ -634,7 +634,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         
         open fun openWindow() {
             val window = windowBuilder.build(player)
-            menuContainer!!.registerWindow(window)
+            menuContainer.registerWindow(window)
             window.open()
         }
         

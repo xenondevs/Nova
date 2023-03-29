@@ -50,7 +50,7 @@ import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.soundGroup
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
@@ -400,7 +400,7 @@ fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
             drops += state.inventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
         
         state is Jukebox ->
-            state.record.takeUnlessAir()?.clone()?.also(drops::add)
+            state.record.takeUnlessEmpty()?.clone()?.also(drops::add)
         
         state is Campfire ->
             repeat(4) { state.getItem(it)?.clone()?.also(drops::add) }
