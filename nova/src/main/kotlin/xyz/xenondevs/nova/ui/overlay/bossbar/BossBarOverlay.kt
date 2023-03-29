@@ -16,6 +16,9 @@ interface BossBarOverlay {
      */
     val centerX: Int?
     
+    /**
+     * The [Component] of this [BossBarOverlay].
+     */
     val component: Component
     
     /**

@@ -7,10 +7,24 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
  */
 interface BossBarOverlayCompound {
     
+    /**
+     * The [BossBarOverlays][BossBarOverlay] of this [BossBarOverlayCompound].
+     */
     val overlays: List<BossBarOverlay>
+    
+    /**
+     * The [BarPositioning] that specifies at which position this [BossBarOverlayCompound] should be rendered.
+     */
     val positioning: BarPositioning
+    
+    /**
+     * Whether the components in the [overlays] have changed and should be re-rendered.
+     */
     var hasChanged: Boolean
     
+    /**
+     * Gets the vertical range that the [overlays] of this [BossBarOverlayCompound] draw at.
+     */
     fun getVerticalRange(locale: String): IntRange {
         var min: Int? = null
         var max: Int? = null
