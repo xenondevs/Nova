@@ -112,12 +112,6 @@ internal object BlockBreaking : Listener {
         
         val serverPlayer = player.serverPlayer
         
-        // pass packet to vanilla packet handler if the player is in creative mode
-        if (player.gameMode == GameMode.CREATIVE) {
-            serverPlayer.connection.handlePlayerAction(packet)
-            return
-        }
-        
         // call interact event
         val event = CraftEventFactory.callPlayerInteractEvent(
             serverPlayer,
@@ -145,7 +139,13 @@ internal object BlockBreaking : Listener {
             NovaBlockBreaker(player, block, novaBlockState, sequence, breakCooldowns[player] ?: 0)
         else VanillaBlockBreaker(player, block, sequence, breakCooldowns[player] ?: 0)
         
-        playerBreakers[player] = breaker
+        // creative breakers should not be added to the playerBreakers map because players in creative mode
+        // do not send an abort or stop packet and therefore the breaker would never be removed
+        if (player.gameMode != GameMode.CREATIVE) {
+            playerBreakers[player] = breaker
+        }
+        
+        // handle initial tick
         breaker.handleTick()
     }
     
