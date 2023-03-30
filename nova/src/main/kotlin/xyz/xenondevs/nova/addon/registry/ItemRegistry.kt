@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.addon.registry
 
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.item.ItemLogic
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.builder.NovaItemBuilder
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 
 interface ItemRegistry : AddonGetter {
@@ -26,7 +26,7 @@ interface ItemRegistry : AddonGetter {
         isHidden: Boolean = false
     ): NovaItem {
         val item = NovaItem(
-            ResourceLocation(addon.description.id, name),
+            ResourceLocation(addon, name),
             localizedName,
             ItemLogic(*behaviors),
             isHidden = isHidden
@@ -57,7 +57,7 @@ interface ItemRegistry : AddonGetter {
         isHidden: Boolean = false
     ): NovaItem {
         val item = NovaItem(
-            ResourceLocation(addon.description.id, name),
+            ResourceLocation(addon, name),
             "",
             ItemLogic(),
             isHidden = isHidden
@@ -70,7 +70,7 @@ interface ItemRegistry : AddonGetter {
         name: String
     ): NovaItem {
         val item = NovaItem(
-            ResourceLocation(addon.description.id, name),
+            ResourceLocation(addon, name),
             "",
             ItemLogic(),
             isHidden = true

@@ -371,11 +371,15 @@ internal operator fun <T> WritableRegistry<T>.set(id: ResourceLocation, value: T
 }
 
 operator fun <T> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
-    register(ResourceKey.create(key(), ResourceLocation(addon.description.id, key)), value, Lifecycle.stable())
+    register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, Lifecycle.stable())
 }
 
 fun ResourceLocation.toString(separator: String): String {
     return namespace + separator + path
+}
+
+fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
+    return ResourceLocation(addon.description.id, name)
 }
 
 fun preventPacketBroadcast(run: () -> Unit) {

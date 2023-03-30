@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
+import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 
 class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElementBuilder<NovaItem>(NovaRegistries.ITEM, id) {
@@ -23,7 +24,7 @@ class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElemen
     private var isHidden = false
     private var block: NovaBlock? = null
     
-    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon.description.id, name))
+    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
     fun localizedName(localizedName: String): NovaItemBuilder {
         this.localizedName = localizedName

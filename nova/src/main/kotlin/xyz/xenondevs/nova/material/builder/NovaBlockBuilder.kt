@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.material.TileEntityConstructor
 import xyz.xenondevs.nova.material.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
+import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.BlockBehavior
 import xyz.xenondevs.nova.world.block.BlockLogic
@@ -26,7 +27,7 @@ abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T, B>, T
     id: ResourceLocation
 ) : RegistryElementBuilder<B>(NovaRegistries.BLOCK, id) {
     
-    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon.description.id, name))
+    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
     protected var localizedName = "block.${id.namespace}.${id.name}"
     protected abstract var logic: MutableList<BlockBehavior<T>>
@@ -69,7 +70,7 @@ abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T, B>, T
 
 class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNovaBlockBuilder<NovaBlockBuilder, NovaBlockState, NovaBlock>(id) {
     
-    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon.description.id, name))
+    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
     override var logic: MutableList<BlockBehavior<NovaBlockState>> = mutableListOf(BlockBehavior.Default)
     
@@ -96,7 +97,7 @@ class TileEntityNovaBlockBuilder internal constructor(
         addon: Addon,
         name: String,
         tileEntity: TileEntityConstructor
-    ) : this(ResourceLocation(addon.description.id, name), tileEntity)
+    ) : this(ResourceLocation(addon, name), tileEntity)
     
     override var logic: MutableList<BlockBehavior<NovaTileEntityState>> = mutableListOf(TileEntityBlockBehavior.INTERACTIVE)
     

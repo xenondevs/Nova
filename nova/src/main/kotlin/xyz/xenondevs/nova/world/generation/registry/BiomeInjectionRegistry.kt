@@ -24,8 +24,8 @@ object BiomeInjectionRegistry : WorldGenRegistry(NMSUtils.REGISTRY_ACCESS) {
         return injection
     }
     
-    fun registerBiomeInjection(addon: Addon, name: String, builder: BiomeInjectionBuilder.() -> Unit) =
-        registerBiomeInjection(addon, name, BiomeInjectionBuilder().apply(builder).build())
+    fun registerBiomeInjection(addon: Addon, name: String, builder: BiomeInjectionBuilder.() -> Unit) = Unit
+//        registerBiomeInjection(addon, name, BiomeInjectionBuilder().apply(builder).build())
     
     override fun register() {
         loadFiles("inject/biome", BiomeInjection.CODEC, biomeInjections)
