@@ -40,6 +40,7 @@ import xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatc
 import xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.getResourceData
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.reflection.defineClass
 import java.lang.System.getProperty
@@ -68,8 +69,6 @@ internal object Patcher {
         "xyz/xenondevs/nova/transformer/patch/worldgen/chunksection/LevelChunkSectionWrapper"
     )
     
-    private lateinit var classLoaderParentField: Field
-    
     fun init() {
         try {
             LOGGER.info("Applying patches...")
@@ -77,7 +76,6 @@ internal object Patcher {
             redefineModule()
             defineInjectedClasses()
             runTransformers()
-            classLoaderParentField = ReflectionUtils.getField(ClassLoader::class.java, true, "parent")
             insertPatchedLoader()
             undoReversiblePatches()
         } catch (t: Throwable) {
@@ -166,12 +164,12 @@ internal object Patcher {
     
     private fun insertPatchedLoader() {
         val spigotLoader = NOVA.loader.javaClass.classLoader.parent
-        ReflectionUtils.setFinalField(classLoaderParentField, spigotLoader, PatchedClassLoader())
+        ReflectionUtils.setFinalField(CLASS_LOADER_PARENT_FIELD, spigotLoader, PatchedClassLoader())
     }
     
     private fun removePatchedLoader() {
         val spigotLoader = NOVA.loader.javaClass.classLoader.parent
-        ReflectionUtils.setFinalField(classLoaderParentField, spigotLoader, spigotLoader.parent.parent)
+        ReflectionUtils.setFinalField(CLASS_LOADER_PARENT_FIELD, spigotLoader, spigotLoader.parent.parent)
     }
     
 }

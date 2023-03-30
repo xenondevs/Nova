@@ -127,12 +127,13 @@ internal object ReflectionRegistry {
     val BIOME_CONSTRUCTOR = getConstructor(Biome::class, true, ClimateSettings::class, BiomeSpecialEffects::class, BiomeGenerationSettings::class, MobSpawnSettings::class)
     
     // Methods
+    val CLASS_LOADER_PARENT_FIELD by lazy { getField(ClassLoader::class.java, true, "parent") }
+    val CLASS_LOADER_DEFINE_CLASS_METHOD by lazy { getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class) }
     val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class)
     val FEATURE_SORTER_BUILD_FEATURES_PER_STEP_METHOD = getMethod(FeatureSorter::class, true, "SRM(net.minecraft.world.level.biome.FeatureSorter buildFeaturesPerStep)", List::class, JavaFunction::class, Boolean::class)
     val STATE_HOLDER_CODEC_METHOD = getMethod(StateHolder::class, true, "SRM(net.minecraft.world.level.block.state.StateHolder codec)", Codec::class, JavaFunction::class)
     val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class, true, "SRM(net.minecraft.world.level.chunk.LevelChunkSection setBlockState)", Int::class, Int::class, Int::class, BlockState::class, Boolean::class)
     val CRAFT_BLOCK_DATA_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlockData::class, true, "isPreferredTool", BlockState::class, MojangStack::class)
-    val CLASS_LOADER_DEFINE_CLASS_METHOD = getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class)
     val ITEM_STACK_GET_ATTRIBUTE_MODIFIERS_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack getAttributeModifiers)", MojangEquipmentSlot::class)
     val ITEM_STACK_HURT_AND_BREAK_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack hurtAndBreak)", Int::class, MojangLivingEntity::class, Consumer::class)
     val ITEM_STACK_HURT_ENTITY_METHOD = getMethod(MojangStack::class, false, "SRM(net.minecraft.world.item.ItemStack hurtEnemy)", MojangLivingEntity::class, MojangPlayer::class)
