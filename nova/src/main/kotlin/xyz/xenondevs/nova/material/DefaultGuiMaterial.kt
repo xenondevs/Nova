@@ -1,8 +1,11 @@
 package xyz.xenondevs.nova.material
 
+import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.NovaMaterialRegistry.registerUnnamedHiddenCoreItem
 
 @Suppress("unused")
+@InternalInit(stage = InitializationStage.PRE_WORLD)
 object DefaultGuiMaterial {
     
     val ANVIL_OVERLAY_ARROW = registerUnnamedHiddenCoreItem("gui_anvil_overlay_arrow")

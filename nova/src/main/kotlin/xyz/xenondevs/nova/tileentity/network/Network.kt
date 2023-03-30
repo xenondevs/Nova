@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.tileentity.network
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.Reloadable
+import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidNetwork
@@ -98,6 +100,7 @@ class NetworkType internal constructor(val id: ResourceLocation, val networkCons
     
 }
 
+@InternalInit(stage = InitializationStage.PRE_WORLD)
 object DefaultNetworkTypes {
     
     val ENERGY = register("energy") { uuid, _ -> EnergyNetwork(uuid) }

@@ -99,7 +99,11 @@ internal object Initializer : Listener {
         if (initialized.size != preWorldInit.size) {
             failedPreWorld = true
             performAppropriateShutdown()
+            return
         }
+        
+        NovaRegistryAccess.freezeAll()
+        VanillaRegistryAccess.freezeAll()
     }
     
     private fun initPostWorld() {
@@ -124,8 +128,6 @@ internal object Initializer : Listener {
             postWorldInit.forEach { it.initialization.get() }
             
             if (initialized.size == toInit.size) {
-                NovaRegistryAccess.freezeAll()
-                VanillaRegistryAccess.freezeAll()
                 isDone = true
                 callEvent(NovaLoadDataEvent())
                 
