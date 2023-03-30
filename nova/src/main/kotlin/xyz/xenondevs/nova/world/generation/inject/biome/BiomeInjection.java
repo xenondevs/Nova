@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -53,16 +52,6 @@ public record BiomeInjection(
             } else throw new IllegalStateException("BiomeInjection has neither a tag nor a resource location!");
         }
         return out;
-    }
-    
-    public static BiomeInjectionBuilder builder() {
-        return new BiomeInjectionBuilder();
-    }
-    
-    public static BiomeInjection builder(Consumer<BiomeInjectionBuilder> builder) {
-        var biomeInjectionBuilder = new BiomeInjectionBuilder();
-        builder.accept(biomeInjectionBuilder);
-        return biomeInjectionBuilder.build();
     }
     
 }
