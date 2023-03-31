@@ -104,7 +104,7 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
     
     @JvmStatic
     fun getNovaArmorDispenseMethod(itemStack: ItemStack): DispenseItemBehavior? {
-        if (itemStack.novaMaterial?.novaItem?.hasBehavior(Wearable::class) == true)
+        if (itemStack.novaMaterial?.itemLogic?.hasBehavior(Wearable::class) == true)
             return ArmorItem.DISPENSE_ITEM_BEHAVIOR
         
         return null
