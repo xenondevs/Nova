@@ -4,10 +4,10 @@ import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceKey
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.NMSUtils
-import xyz.xenondevs.nova.util.minecraftServer
 
-object VanillaRegistryAccess : RegistryAccess by minecraftServer.registryAccess() {
+object VanillaRegistryAccess : RegistryAccess by MINECRAFT_SERVER.registryAccess() {
     
     internal fun freezeAll() {
         registries().forEach { NMSUtils.freezeRegistry(it.value) }
