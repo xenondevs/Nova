@@ -3,19 +3,23 @@
 package xyz.xenondevs.nova.transformer.patch.item
 
 import net.minecraft.core.NonNullList
+import net.minecraft.core.dispenser.DispenseItemBehavior
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Equipable
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.DispenserBlock
 import org.bukkit.Bukkit
 import org.bukkit.inventory.EquipmentSlot
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.FieldInsnNode
+import org.objectweb.asm.tree.LabelNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.puts
@@ -27,14 +31,17 @@ import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_ARMOR_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_CONSTRUCTOR
 
-internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class) {
+internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class, DispenserBlock::class) {
     
     override fun transform() {
+        // makes nova wearables equipable
         Equipable::get.replaceWith(::getEquipable)
         
+        // patches the armor inventory to fire the ArmorEquipEvent
         VirtualClassPath[INVENTORY_CONSTRUCTOR].replaceFirst(3, -1, buildInsnList {
             new(WatchedArmorList::class)
             dup()
@@ -42,6 +49,22 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
             invokeSpecial(WatchedArmorList::class.java.constructors[0])
             checkCast(NonNullList::class)
         }) { it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).puts(INVENTORY_ARMOR_FIELD) }
+        
+        // patches dispense behavior for nova wearables
+        VirtualClassPath[DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD].instructions.insert(buildInsnList {
+            // val method = getNovaArmorDispenseMethod(itemStack)
+            // if (method != null) return method
+            // ... default body
+            
+            val defaultBody = LabelNode()
+            addLabel()
+            aLoad(1) // itemStack
+            invokeStatic(::getNovaArmorDispenseMethod)
+            dup()
+            ifnull(defaultBody)
+            areturn()
+            add(defaultBody)
+        })
     }
     
     @JvmStatic
@@ -77,6 +100,14 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
             } ?: SoundEvents.ARMOR_EQUIP_GENERIC
             
         }
+    }
+    
+    @JvmStatic
+    fun getNovaArmorDispenseMethod(itemStack: ItemStack): DispenseItemBehavior? {
+        if (itemStack.novaMaterial?.novaItem?.hasBehavior(Wearable::class) == true)
+            return ArmorItem.DISPENSE_ITEM_BEHAVIOR
+        
+        return null
     }
     
 }

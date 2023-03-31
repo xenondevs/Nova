@@ -29,6 +29,7 @@ import net.minecraft.world.level.WorldGenLevel
 import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.biome.FeatureSorter
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.DispenserBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
 import net.minecraft.world.level.block.state.BlockState
@@ -125,6 +126,7 @@ internal object ReflectionRegistry {
     val RULE_TEST_TEST_METHOD = getMethod(RuleTest::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest test)", BlockState::class, RandomSource::class)
     val BLOCK_GETTER_GET_BLOCK_STATE_METHOD = getMethod(BlockGetter::class, false, "SRM(net.minecraft.world.level.BlockGetter getBlockState)", BlockPos::class)
     val FEATURE_PLACE_CONTEXT_RANDOM_METHOD = getMethod(FeaturePlaceContext::class, false, "SRM(net.minecraft.world.level.levelgen.feature.FeaturePlaceContext random)")
+    val DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD = getMethod(DispenserBlock::class, true, "SRM(net.minecraft.world.level.block.DispenserBlock getDispenseMethod)", MojangStack::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
