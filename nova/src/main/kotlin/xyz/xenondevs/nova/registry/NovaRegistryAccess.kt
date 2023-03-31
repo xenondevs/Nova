@@ -9,6 +9,7 @@ import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.util.ResourceLocation
 import java.util.*
 import java.util.stream.Stream
 import kotlin.streams.asStream
@@ -29,18 +30,18 @@ object NovaRegistryAccess : RegistryAccess {
     fun <E : Any> addRegistry(
         addon: Addon,
         registryName: String
-    ): WritableRegistry<E> = addRegistry(ResourceLocation("${addon.description.id}:$registryName"))
+    ): WritableRegistry<E> = addRegistry(ResourceLocation(addon, registryName))
     
     fun <E : Any> addFuzzyRegistry(
         addon: Addon,
         registryName: String
-    ): FuzzyMappedRegistry<E> = addRegistry(ResourceLocation("${addon.description.id}:$registryName"), ::FuzzyMappedRegistry)
+    ): FuzzyMappedRegistry<E> = addRegistry(ResourceLocation(addon, registryName), ::FuzzyMappedRegistry)
     
     fun <E: Any, R : Registry<E>> addRegistry(
         addon: Addon,
         registryName: String,
         registryConstructor: (ResourceKey<out R>, Lifecycle) -> R
-    ): R = addRegistry(ResourceLocation("${addon.description.id}:$registryName"), registryConstructor)
+    ): R = addRegistry(ResourceLocation(addon, registryName), registryConstructor)
     
     internal fun <E : Any, R : Registry<E>> addRegistry(
         registryName: ResourceLocation,

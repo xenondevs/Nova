@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.NMSUtils
 object VanillaRegistryAccess : RegistryAccess by MINECRAFT_SERVER.registryAccess() {
     
     internal fun freezeAll() {
-        registries().forEach { NMSUtils.freezeRegistry(it.value) }
+        registries().forEach { it.value.freeze() }
     }
     
     internal fun unfreezeAll() {
