@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.item.behavior
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
@@ -25,10 +24,6 @@ class Chargeable(
     val options: ChargeableOptions,
     private val affectsItemDurability: Boolean = true
 ) : ItemBehavior() {
-    
-    override val vanillaMaterialProperties = if (affectsItemDurability)
-        provider(listOf(VanillaMaterialProperty.DAMAGEABLE))
-    else provider(emptyList())
     
     @Deprecated("Replaced by ChargeableOptions", ReplaceWith("options.maxEnergy"))
     val maxEnergy: Long
@@ -93,6 +88,12 @@ class Chargeable(
         
         if (affectsItemDurability)
             itemData.durabilityBar = energy.toDouble() / options.maxEnergy.toDouble()
+    }
+    
+    override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
+        return if (affectsItemDurability)
+            listOf(VanillaMaterialProperty.DAMAGEABLE)
+        else emptyList()
     }
     
     companion object : ItemBehaviorFactory<Chargeable>() {

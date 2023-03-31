@@ -11,8 +11,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
@@ -28,8 +26,8 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     lateinit var novaMaterial: NovaItem
         internal set
     
-    open val vanillaMaterialProperties: Provider<List<VanillaMaterialProperty>> = provider(emptyList())
-    open val attributeModifiers: Provider<List<AttributeModifier>> = provider(emptyList())
+    open fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> = emptyList()
+    open fun getAttributeModifiers(): List<AttributeModifier> = emptyList()
     
     open fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) = Unit
     open fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit

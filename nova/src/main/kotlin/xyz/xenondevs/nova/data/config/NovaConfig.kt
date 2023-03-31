@@ -88,6 +88,7 @@ object NovaConfig {
         init()
         NovaRegistries.UPGRADE_TYPE.forEach(Reloadable::reload)
         reloadables.sorted().forEach(Reloadable::reload)
+        NovaRegistries.ITEM.forEach { it.itemLogic.reload() }
         TileEntityManager.tileEntities.forEach(Reloadable::reload)
         NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
         AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)

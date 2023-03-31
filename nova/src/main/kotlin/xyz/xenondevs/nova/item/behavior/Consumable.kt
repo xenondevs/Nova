@@ -11,12 +11,12 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.material.options.FoodOptions
 import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
 import xyz.xenondevs.nova.util.getPlayersNearby
@@ -38,8 +38,6 @@ data class Eater(val itemStack: ItemStack, val hand: EquipmentSlot, val startTim
 
 class Consumable(private val options: FoodOptions) : ItemBehavior() {
     
-    override val vanillaMaterialProperties = options.typeProvider.map { listOf(it.vanillaMaterialProperty) }
-    
     private val eaters = HashMap<Player, Eater>()
     
     init {
@@ -53,6 +51,10 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
                 return@removeIf false
             }
         }
+    }
+    
+    override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
+        return listOf(options.type.vanillaMaterialProperty)
     }
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {

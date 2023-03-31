@@ -12,8 +12,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.provider.immutable.combinedProvider
-import xyz.xenondevs.commons.provider.immutable.lazyProviderWrapper
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.PacketItemData
@@ -50,11 +48,11 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
             ?.let { Resources.getArmorData(it) }?.color
     }
     
-    override val vanillaMaterialProperties = lazyProviderWrapper {
+    override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
         if (textureColor == null)
-            return@lazyProviderWrapper emptyList()
+            return emptyList()
         
-        return@lazyProviderWrapper listOf(
+        return listOf(
             when (options.armorType) {
                 ArmorType.HELMET -> VanillaMaterialProperty.HELMET
                 ArmorType.CHESTPLATE -> VanillaMaterialProperty.CHESTPLATE
@@ -64,17 +62,14 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         )
     }
     
-    override val attributeModifiers = combinedProvider(
-        options.armorTypeProvider, options.armorProvider, options.armorToughnessProvider, options.knockbackResistanceProvider
-    ) { armorType, armor, armorToughness, knockbackResistance ->
-        val equipmentSlot = armorType.equipmentSlot.nmsEquipmentSlot
-        
-        listOf(
+    override fun getAttributeModifiers(): List<AttributeModifier> {
+        val equipmentSlot = options.armorType.equipmentSlot.nmsEquipmentSlot
+        return listOf(
             AttributeModifier(
                 "Nova Armor (${novaMaterial.id}})",
                 Attributes.ARMOR,
                 Operation.ADDITION,
-                armor,
+                options.armor,
                 true,
                 equipmentSlot
             ),
@@ -82,7 +77,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 "Nova Armor Toughness (${novaMaterial.id}})",
                 Attributes.ARMOR_TOUGHNESS,
                 Operation.ADDITION,
-                armorToughness,
+                options.armorToughness,
                 true,
                 equipmentSlot
             ),
@@ -90,7 +85,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 "Nova Knockback Resistance (${novaMaterial.id}})",
                 Attributes.KNOCKBACK_RESISTANCE,
                 Operation.ADDITION,
-                knockbackResistance,
+                options.knockbackResistance,
                 true,
                 equipmentSlot
             )

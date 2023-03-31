@@ -2,8 +2,6 @@ package xyz.xenondevs.nova.material
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.provider.immutable.lazyProvider
-import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
@@ -11,24 +9,27 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.ItemLogic
+import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.util.nmsCopy
 import kotlin.math.min
+import kotlin.reflect.KClass
 
 @Suppress("MemberVisibilityCanBePrivate", "LeakingThis")
 open class NovaItem internal constructor(
     val id: ResourceLocation,
     val localizedName: String,
-    val itemLogic: ItemLogic,
-    maxStackSize: Int = 64,
+    internal val itemLogic: ItemLogic,
+    private val _maxStackSize: Int = 64,
     val craftingRemainingItem: ItemBuilder? = null,
     val isHidden: Boolean = false,
     val block: NovaBlock? = null
 ) {
     
-    val maxStackSize: Int by lazyProvider { itemLogic.vanillaMaterialProvider.map { min(maxStackSize, it.maxStackSize) } }
+    val maxStackSize: Int
+        get() = min(_maxStackSize, itemLogic.vanillaMaterial.maxStackSize)
     
     val model: ItemModelData by lazy {
         val itemModelData = Resources.getModelData(id).item!!
@@ -38,6 +39,7 @@ open class NovaItem internal constructor(
         return@lazy itemModelData[itemLogic.vanillaMaterial]!!
     }
     
+    //<editor-fold desc="ItemProviders">
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(model.dataArray.size) { subId ->
             ItemWrapper(
@@ -66,6 +68,7 @@ open class NovaItem internal constructor(
     
     val basicClientsideProvider: ItemProvider by lazy { basicClientsideProviders[0] }
     val clientsideProvider: ItemProvider by lazy { clientsideProviders[0] }
+    //</editor-fold>
     
     init {
         this.itemLogic.setMaterial(this)
@@ -92,6 +95,18 @@ open class NovaItem internal constructor(
     
     fun getLocalizedName(locale: String): String =
         LocaleManager.getTranslatedName(locale, this)
+    
+    inline fun <reified T: ItemBehavior> hasBehavior(): Boolean =
+        hasBehavior(T::class)
+    
+    fun <T: ItemBehavior> hasBehavior(behavior: KClass<T>): Boolean =
+        itemLogic.hasBehavior(behavior)
+    
+    inline fun <reified T : ItemBehavior> getBehavior(): T? =
+        getBehavior(T::class)
+    
+    fun <T : ItemBehavior> getBehavior(behavior: KClass<T>): T? =
+        itemLogic.getBehavior(behavior)
     
     override fun toString() = id.toString()
     

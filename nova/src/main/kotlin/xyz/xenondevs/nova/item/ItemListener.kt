@@ -12,7 +12,6 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
@@ -21,7 +20,6 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacket
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
@@ -31,11 +29,12 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
+import java.util.*
 
 @InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
 internal object ItemListener : Listener {
     
-    private val usedItems = HashMap<Player, ItemStack>()
+    private val usedItems = WeakHashMap<Player, ItemStack>()
     
     fun init() {
         registerEvents()
@@ -52,37 +51,38 @@ internal object ItemListener : Listener {
         if (event.isCompletelyDenied() || item == null || !ProtectionManager.canUseItem(player, item, location).get())
             return
         
-        findBehaviors(event.item)?.forEach { it.handleInteract(event.player, event.item!!, event.action, event) }
+        item.logic?.handleInteract(event.player, item, event.action, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
         val item = event.player.inventory.getItem(event.hand)
-        findBehaviors(item)?.forEach { it.handleEntityInteract(event.player, item!!, event.rightClicked, event) }
+        item?.logic?.handleEntityInteract(event.player, item, event.rightClicked, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleEntityAttack(event: EntityDamageByEntityEvent) {
         val player = event.damager as? Player ?: return
         val item = player.inventory.getItem(EquipmentSlot.HAND)
-        findBehaviors(item)?.forEach { it.handleAttackEntity(player, item!!, event.entity, event) }
+        item?.logic?.handleAttackEntity(player, item, event.entity, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleBlockBreak(event: BlockBreakEvent) {
         val item = event.player.inventory.getItem(EquipmentSlot.HAND)
-        findBehaviors(item)?.forEach { it.handleBreakBlock(event.player, item!!, event) }
+        item?.logic?.handleBreakBlock(event.player, item, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleDamage(event: PlayerItemDamageEvent) {
         val item = event.item
-        findBehaviors(item)?.forEach { it.handleDamage(event.player, item, event) }
+        item.logic?.handleDamage(event.player, item, event)
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private fun handleBreak(event: PlayerItemBreakEvent) {
-        findBehaviors(event.brokenItem)?.forEach { it.handleBreak(event.player, event.brokenItem, event) }
+        val item = event.brokenItem
+        item.logic?.handleBreak(event.player, item, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -91,8 +91,8 @@ internal object ItemListener : Listener {
         val unequippedItem = event.previous
         val equippedItem = event.now
         
-        findBehaviors(unequippedItem)?.forEach { it.handleEquip(player, unequippedItem!!, false, event) }
-        findBehaviors(equippedItem)?.forEach { it.handleEquip(player, equippedItem!!, true, event) }
+        unequippedItem?.logic?.handleEquip(player, unequippedItem, false, event)
+        equippedItem?.logic?.handleEquip(player, equippedItem, true, event)
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -101,12 +101,12 @@ internal object ItemListener : Listener {
         val clickedItem = event.currentItem
         val cursorItem = event.cursor
         
-        findBehaviors(clickedItem)?.forEach { it.handleInventoryClick(player, clickedItem!!, event) }
-        findBehaviors(cursorItem)?.forEach { it.handleInventoryClickOnCursor(player, cursorItem!!, event) }
+        clickedItem?.logic?.handleInventoryClick(player, clickedItem, event)
+        cursorItem?.logic?.handleInventoryClickOnCursor(player, cursorItem, event)
         
         if (event.click == ClickType.NUMBER_KEY) {
             val hotbarItem = player.inventory.getItem(event.hotbarButton)
-            findBehaviors(hotbarItem)?.forEach { it.handleInventoryHotbarSwap(player, hotbarItem!!, event) }
+            hotbarItem?.logic?.handleInventoryHotbarSwap(player, hotbarItem, event)
         }
     }
     
@@ -115,7 +115,7 @@ internal object ItemListener : Listener {
         val player = event.player
         val item = event.player.inventory.itemInMainHand
         
-        findBehaviors(item)?.forEach { it.handleBlockBreakAction(player, item, event) }
+        item.logic?.handleBlockBreakAction(player, item, event)
     }
     
     // This method stores the last used item for the RELEASE_USE_ITEM action below
@@ -128,22 +128,17 @@ internal object ItemListener : Listener {
         else usedItems -= player
     }
     
-    @EventHandler
-    private fun handlePlayerQuit(event: PlayerQuitEvent) {
-        usedItems -= event.player
-    }
-    
     @PacketHandler(priority = EventPriority.HIGHEST, ignoreIfCancelled = true)
     private fun handleAction(event: ServerboundPlayerActionPacketEvent) {
         if (event.action == ServerboundPlayerActionPacket.Action.RELEASE_USE_ITEM) {
             val player = event.player
             val item = usedItems[player]
-            findBehaviors(item)?.forEach { it.handleRelease(player, item!!, event) }
+            item?.logic?.handleRelease(player, item, event)
         }
     }
     
-    private fun findBehaviors(item: ItemStack?): List<ItemBehavior>? =
-        item?.novaMaterial?.itemLogic?.behaviors
+    private val ItemStack.logic: ItemLogic?
+        get() = novaMaterial?.itemLogic
     
 }
 
