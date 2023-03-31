@@ -115,7 +115,7 @@ object ActionbarOverlayManager {
         // append custom overlays
         overlays[uuid]!!.forEach {
             builder.append(it.component)
-            builder.move(it.getWidth(player.locale))
+            builder.move(-it.getWidth(player.locale))
         }
         
         // append intercepted actionbar text
