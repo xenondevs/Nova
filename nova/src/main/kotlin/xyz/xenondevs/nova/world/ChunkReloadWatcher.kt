@@ -6,6 +6,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
@@ -19,10 +20,7 @@ internal object ChunkReloadWatcher : Listener {
     
     private val CHUNK_LOADS = HashMap<ChunkPos, Pair<Long, Int>>()
     
-    fun init() {
-        reload()
-    }
-    
+    @InitFun
     fun reload() {
         HandlerList.unregisterAll(this)
         if (DEFAULT_CONFIG.getBoolean("debug.watch_chunk_reloads"))

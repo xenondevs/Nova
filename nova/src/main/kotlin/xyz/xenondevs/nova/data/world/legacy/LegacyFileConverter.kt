@@ -11,6 +11,7 @@ import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
@@ -33,7 +34,8 @@ internal object LegacyFileConverter : Listener {
     
     private val futures: MutableMap<World, CompletableFuture<Unit>> = Collections.synchronizedMap(HashMap())
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         registerConverters()
         LOGGER.info("Running legacy conversions...")

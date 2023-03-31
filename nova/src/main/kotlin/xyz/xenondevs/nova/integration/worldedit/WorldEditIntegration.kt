@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.integration.worldedit
 
 import com.sk89q.worldedit.WorldEdit
 import org.bukkit.Bukkit
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.worldedit.WorldEditIntegration.WorldEditType.*
@@ -17,7 +18,8 @@ internal object WorldEditIntegration {
     
     private val WORLD_EDIT_TYPE = WorldEditType.getInstalledType()
     
-    fun init() {
+    @InitFun
+    private fun init() {
         if (WORLD_EDIT_TYPE != NONE) {
             val worldEdit = WorldEdit.getInstance()
             worldEdit.blockFactory.register(NovaBlockInputParser(worldEdit))

@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.InternalIntegration
@@ -20,7 +21,8 @@ object CustomItemServiceManager {
     
     internal val PLUGINS: List<CustomItemService> by lazy { listOf(ItemsAdder, Oraxen, MMOItems).filter(InternalIntegration::isInstalled) }
     
-    fun init() {
+    @InitFun
+    private fun init() {
         PLUGINS.forEach(CustomItemService::awaitLoad)
     }
     

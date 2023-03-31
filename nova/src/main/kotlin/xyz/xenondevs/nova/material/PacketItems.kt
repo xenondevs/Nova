@@ -29,6 +29,7 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeMo
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -79,7 +80,8 @@ internal object PacketItems : Listener {
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
     val SERVER_SIDE_ITEM_ID = BuiltInRegistries.ITEM.getKey(SERVER_SIDE_ITEM).toString()
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         registerPacketListener()
     }

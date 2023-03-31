@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.component.adventure.chars
@@ -158,7 +159,8 @@ object CharSizes {
         return ComponentSize(width, yRangeMin..yRangeMax)
     }
     
-    fun init() {
+    @InitFun
+    private fun init() {
         if (LOAD_CHAR_SIZES_ON_STARTUP) {
             val service = Executors.newCachedThreadPool()
             

@@ -14,6 +14,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.ABILITY_TYPE
@@ -31,13 +33,15 @@ object AbilityManager : Listener {
     
     internal val activeAbilities = HashMap<Player, HashMap<AbilityType<*>, Ability>>()
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerJoin)
         runTaskTimer(0, 1) { activeAbilities.values.flatMap(Map<*, Ability>::values).forEach(Ability::handleTick) }
     }
     
-    fun disable() {
+    @DisableFun
+    private fun disable() {
         LOGGER.info("Removing active abilities")
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerQuit)
     }

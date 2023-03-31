@@ -25,6 +25,8 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
@@ -63,8 +65,7 @@ object BossBarOverlayManager : Listener {
     private val trackedBars = HashMap<Player, LinkedHashMap<UUID, BossBar>>()
     private val vanillaBarOverlays = HashMap<BossBar, VanillaBossBarOverlayCompound>()
     
-    fun init() = reload()
-    
+    @InitFun
     internal fun reload() {
         // was previously enabled?
         if (tickTask != null) {
@@ -93,7 +94,8 @@ object BossBarOverlayManager : Listener {
         }
     }
     
-    fun disable() {
+    @DisableFun
+    private fun disable() {
         Bukkit.getOnlinePlayers().forEach(::removeBars)
     }
     

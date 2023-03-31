@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.component.adventure.sendMessage
@@ -29,10 +30,7 @@ internal object UpdateReminder : Listener {
     private val needsUpdate = ArrayList<Addon?>()
     private val alreadyNotified = ArrayList<Addon?>()
     
-    fun init() {
-        reload()
-    }
-    
+    @InitFun
     fun reload() {
         val enabled = DEFAULT_CONFIG.getBoolean("update_reminder.enabled")
         if (task == null && enabled) {

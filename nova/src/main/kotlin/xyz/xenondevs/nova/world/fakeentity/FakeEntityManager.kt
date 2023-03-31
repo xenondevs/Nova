@@ -16,6 +16,8 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
@@ -50,7 +52,8 @@ internal object FakeEntityManager : Listener {
     private val chunkViewers = HashMap<ChunkPos, CopyOnWriteArrayList<Player>>()
     private val chunkEntities = HashMap<ChunkPos, MutableList<FakeEntity<*>>>()
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         
         Bukkit.getOnlinePlayers().forEach { player ->
@@ -59,7 +62,8 @@ internal object FakeEntityManager : Listener {
         }
     }
     
-    fun disable() {
+    @DisableFun
+    private fun disable() {
         LOGGER.info("Despawning fake entities")
         synchronized(FakeEntityManager) {
             chunkEntities.forEach { (chunk, entities) ->

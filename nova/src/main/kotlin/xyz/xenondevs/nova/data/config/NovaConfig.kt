@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.ItemCategories
@@ -53,7 +54,8 @@ object NovaConfig {
         )
     }
     
-    fun init() {
+    @InitFun
+    private fun init() {
         LOGGER.info("Loading configs")
         
         getResources("configs/nova/")

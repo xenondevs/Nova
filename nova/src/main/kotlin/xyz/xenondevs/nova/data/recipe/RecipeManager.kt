@@ -32,6 +32,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
@@ -158,7 +159,8 @@ object RecipeManager : Listener {
     val novaRecipes: Map<RecipeType<*>, Map<NamespacedKey, NovaRecipe>>
         get() = _novaRecipes
     
-    fun init() {
+    @InitFun
+    private fun init() {
         LOGGER.info("Loading recipes")
         registerEvents()
         registerPacketListener()
@@ -311,7 +313,7 @@ object RecipeManager : Listener {
         _novaRecipes.clear()
         
         loadRecipes()
-        RecipeRegistry.init()
+        RecipeRegistry.indexRecipes()
         RECIPE_TYPE.forEach { it.group.invalidateCache() }
     }
     

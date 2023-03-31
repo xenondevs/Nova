@@ -9,6 +9,4 @@ object DefaultItems {
     
     val WRENCH = NovaMaterialRegistry.registerCoreItem("wrench", WrenchBehavior)
     
-    fun init() = Unit
-    
 }

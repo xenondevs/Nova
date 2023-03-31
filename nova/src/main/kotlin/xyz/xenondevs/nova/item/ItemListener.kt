@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -36,7 +37,8 @@ internal object ItemListener : Listener {
     
     private val usedItems = WeakHashMap<Player, ItemStack>()
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         registerPacketListener()
     }

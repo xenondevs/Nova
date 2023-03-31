@@ -9,6 +9,8 @@ import xyz.xenondevs.nova.command.impl.NovaCommand
 import xyz.xenondevs.nova.command.impl.NovaRecipeCommand
 import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.ItemCategories
@@ -24,18 +26,16 @@ object CommandManager {
     
     private val registeredCommands = ArrayList<String>()
     
-    fun init() {
-        registerCommands()
-    }
-    
-    fun disable() {
-        registeredCommands.forEach { unregisterCommand(it) }
-    }
-    
+    @InitFun
     private fun registerCommands() {
         registerCommand(NovaCommand)
         registerCommand(NovaRecipeCommand)
         registerCommand(NovaUsageCommand)
+    }
+    
+    @DisableFun
+    private fun unregisterCommands() {
+        registeredCommands.forEach { unregisterCommand(it) }
     }
     
     fun registerCommand(command: Command) {

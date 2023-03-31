@@ -17,6 +17,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -129,13 +131,15 @@ interface NetworkManager {
             }
         }
         
-        fun init() {
+        @InitFun
+        private fun init() {
             LOGGER.info("Starting network threads")
             NETWORK_MANAGER.init()
             registerEvents()
         }
         
-        fun disable() {
+        @DisableFun
+        private fun disable() {
             LOGGER.info("Unloading networks")
             PermanentStorage.store("legacyNetworkChunks", NETWORK_MANAGER.legacyNetworkChunks)
             Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach { unloadChunk(it.pos) }

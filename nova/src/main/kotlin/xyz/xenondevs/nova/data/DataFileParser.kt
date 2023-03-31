@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.loader.AddonLoader
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.data.HashUtils
@@ -24,7 +25,8 @@ internal object DataFileParser {
     private val FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
     private val DATA_DIR = File(NOVA.dataFolder, "data")
     
-    fun init() {
+    @InitFun
+    private fun init() {
         val existingPaths = ObjectArrayList<String>()
         
         // Extract data files

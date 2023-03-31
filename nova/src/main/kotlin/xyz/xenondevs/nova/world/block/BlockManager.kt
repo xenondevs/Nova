@@ -15,15 +15,16 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.NovaBlock
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.dropItems
 import xyz.xenondevs.nova.util.getBreakParticlesPacket
 import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.soundGroup
-import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.world.BlockPos
@@ -43,7 +44,8 @@ import kotlin.random.Random
 )
 object BlockManager {
     
-    fun init() {
+    @InitFun
+    private fun init() {
         BlockPlacing.init()
         BlockBreaking.init()
         BlockInteracting.init()

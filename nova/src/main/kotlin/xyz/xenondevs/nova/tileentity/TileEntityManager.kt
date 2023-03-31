@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -29,7 +30,8 @@ object TileEntityManager {
     val tileEntities: Sequence<TileEntity>
         get() = tileEntityMap.asSequence().filter { it.key.isLoaded() }.flatMap { it.value.values }
     
-    fun init() {
+    @InitFun
+    private fun init() {
         fun handleTick(tickHandler: (TileEntity) -> Unit) {
             val tileEntities = synchronized(this) { tileEntities.toList() }
             tileEntities.forEach { tileEntity ->

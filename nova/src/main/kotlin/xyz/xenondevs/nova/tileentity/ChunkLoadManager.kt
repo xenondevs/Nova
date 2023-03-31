@@ -4,6 +4,8 @@ import org.bukkit.Bukkit
 import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.world.ChunkPos
@@ -14,12 +16,14 @@ object ChunkLoadManager {
     
     private val forceLoadedChunks = PermanentStorage.retrieve("forceLoadedChunks") { HashMap<ChunkPos, HashSet<UUID>>() }
     
-    fun init() {
+    @InitFun
+    private fun init() {
         Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false }
         forceLoadedChunks.removeIf { it.key.chunk?.apply { isForceLoaded = true } == null }
     }
     
-    fun disable() {
+    @DisableFun
+    private fun disable() {
         LOGGER.info("Saving force-loaded chunks")
         PermanentStorage.store("forceLoadedChunks", forceLoadedChunks)
     }

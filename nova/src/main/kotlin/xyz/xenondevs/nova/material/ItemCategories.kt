@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.UpdatableFile
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
@@ -41,7 +42,8 @@ internal object ItemCategories {
     lateinit var OBTAINABLE_ITEMS: List<CategorizedItem>
         private set
     
-    fun init() {
+    @InitFun
+    private fun init() {
         LOGGER.info("Loading item categories")
         reload()
     }

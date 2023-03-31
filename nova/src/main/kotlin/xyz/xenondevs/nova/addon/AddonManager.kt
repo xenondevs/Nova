@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.addon.loader.LibraryLoaderPools
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -18,7 +19,8 @@ import java.util.logging.Level
 @InternalInit(stage = InitializationStage.PRE_WORLD)
 internal object AddonsLoader {
     
-    fun init() {
+    @InitFun
+    private fun init() {
         LOGGER.info("Loading Addons...")
         AddonManager.loadAddons()
     }
@@ -31,7 +33,8 @@ internal object AddonsLoader {
 )
 internal object AddonsInitializer {
     
-    fun init() {
+    @InitFun
+    private fun init() {
         LOGGER.info("Initializing Addons...")
         AddonManager.initializeAddons()
     }

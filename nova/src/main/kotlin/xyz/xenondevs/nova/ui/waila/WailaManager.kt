@@ -15,6 +15,8 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
@@ -51,10 +53,7 @@ internal object WailaManager : Listener, IWailaManager {
     }
     //</editor-fold>
     
-    fun init() {
-        reload()
-    }
-    
+    @InitFun
     fun reload() {
         unregisterEvents()
         overlays.values.forEach { it.setActive(false) }
@@ -65,6 +64,11 @@ internal object WailaManager : Listener, IWailaManager {
             Bukkit.getOnlinePlayers().forEach(::tryAddWailaOverlay)
             tickTask = runTaskTimer(0, UPDATE_INTERVAL) { overlays.values.forEach(Waila::handleTick) }
         }
+    }
+    
+    @DisableFun
+    private fun disable() {
+        overlays.values.forEach { it.setActive(false) }
     }
     
     fun toggle(player: Player, state: Boolean): Boolean {
@@ -84,10 +88,6 @@ internal object WailaManager : Listener, IWailaManager {
         }
         
         return true
-    }
-    
-    fun disable() {
-        overlays.values.forEach { it.setActive(false) }
     }
     
     private fun tryAddWailaOverlay(player: Player) {

@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.transformer
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap
 import net.minecraft.server.MinecraftServer
+import org.bukkit.Bukkit
 import xyz.xenondevs.bytebase.ClassWrapperLoader
 import xyz.xenondevs.bytebase.INSTRUMENTATION
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
@@ -10,6 +11,8 @@ import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.loader.NovaClassLoader
@@ -67,7 +70,8 @@ internal object Patcher {
         "xyz/xenondevs/nova/transformer/patch/worldgen/chunksection/LevelChunkSectionWrapper"
     )
     
-    fun init() {
+    @InitFun
+    private fun init() {
         try {
             LOGGER.info("Applying patches...")
             VirtualClassPath.classLoaders += NOVA.loader.javaClass.classLoader.parent
@@ -79,10 +83,6 @@ internal object Patcher {
         } catch (t: Throwable) {
             throw PatcherException(t)
         }
-    }
-    
-    fun disable() {
-        removePatchedLoader()
     }
     
     private fun redefineModule() {
@@ -161,12 +161,13 @@ internal object Patcher {
     }
     
     private fun insertPatchedLoader() {
-        val spigotLoader = NOVA.loader.javaClass.classLoader.parent
+        val spigotLoader = Bukkit::class.java.classLoader
         ReflectionUtils.setFinalField(CLASS_LOADER_PARENT_FIELD, spigotLoader, PatchedClassLoader())
     }
     
+    @DisableFun
     private fun removePatchedLoader() {
-        val spigotLoader = NOVA.loader.javaClass.classLoader.parent
+        val spigotLoader = Bukkit::class.java.classLoader
         ReflectionUtils.setFinalField(CLASS_LOADER_PARENT_FIELD, spigotLoader, spigotLoader.parent.parent)
     }
     

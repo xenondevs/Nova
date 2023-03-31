@@ -20,6 +20,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.ATTACHMENT_TYPE
@@ -39,14 +41,16 @@ object AttachmentManager :  Listener {
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()
     private val inactiveAttachments = HashMap<Player, HashSet<ResourceLocation>>()
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         PacketEventManager.registerListener(this)
         Bukkit.getOnlinePlayers().forEach(::loadAttachments)
         runTaskTimer(0, 1) { activeAttachments.values.flatMap(Map<*, Attachment>::values).forEach(Attachment::handleTick) }
     }
     
-    fun disable() {
+    @DisableFun
+    private fun disable() {
         LOGGER.info("Saving attachments")
         Bukkit.getOnlinePlayers().forEach { saveAndRemoveAttachments(it) }
     }

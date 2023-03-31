@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.data.serialization.json.GSON
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.data.HashUtils
@@ -24,7 +25,8 @@ private val LOOT_FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
 )
 internal object LootConfigHandler {
     
-    fun init() {
+    @InitFun
+    private fun init() {
         extractLootTables()
         loadLootTables()
     }

@@ -15,6 +15,8 @@ import xyz.xenondevs.nova.data.resources.upload.service.OraxenUpload
 import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.data.hash
@@ -49,7 +51,8 @@ internal object AutoUploadManager {
             PermanentStorage.store("lastUploadConfig", value)
         }
     
-    fun init() {
+    @InitFun
+    private fun init() {
         reloadForceResourcePackSettings()
         enable(fromReload = false)
         
@@ -111,7 +114,8 @@ internal object AutoUploadManager {
         }
     }
     
-    fun disable() {
+    @DisableFun
+    private fun disable() {
         selectedService?.disable()
         selectedService = null
     }

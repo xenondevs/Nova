@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.NovaItem
@@ -27,7 +28,8 @@ object LocaleManager {
     
     private lateinit var translationProviders: MutableMap<String, HashMap<String, String>>
     
-    fun init() {
+    @InitFun
+    private fun init() {
         translationProviders = Resources.languageLookup.entries.associateTo(HashMap()) { (key, value) -> key to HashMap(value) }
         loadLang("en_us")
         Language.inject(NovaLanguage)

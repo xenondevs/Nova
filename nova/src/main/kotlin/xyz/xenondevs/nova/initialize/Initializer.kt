@@ -27,13 +27,11 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
-import xyz.xenondevs.nova.material.DefaultItems
 import xyz.xenondevs.nova.registry.NovaRegistryAccess
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.ui.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
-import xyz.xenondevs.nova.util.equalsAny
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
@@ -41,6 +39,8 @@ import xyz.xenondevs.nova.util.runTask
 import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
 import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmName
 import xyz.xenondevs.inventoryaccess.component.i18n.Languages as InvUILanguages
 
@@ -82,7 +82,6 @@ internal object Initializer : Listener {
         
         CBFAdapters.register()
         InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
-        DefaultItems.init()
         
         val preWorldInit = toInit.filter { it.stage == InitializationStage.PRE_WORLD }
         val lookup = toInit.associateBy(InitializableClass::className)
@@ -212,19 +211,22 @@ internal class InitializableClass(
     val dependsOn: Set<String>
 ) {
     
-    internal val initialization = CompletableFuture<Boolean>()
-    internal var isInitialized = false
-    
     private val clazz by lazy { Class.forName(className.replace('/', '.')).kotlin }
+    internal val initialization = CompletableFuture<Boolean>()
     
     internal fun initialize() {
         try {
-            val initMethod = clazz.declaredFunctions.firstOrNull { it.name.equalsAny("init", "initialize", "onEnable") && it.hasEmptyArguments() }
-            if (initMethod != null) {
-                val instance = clazz.objectInstance ?: throw InitializationException("Initializable class $className is not a singleton!")
-                initMethod.call(instance)
-            }
-            isInitialized = true
+            // load class, call init method(s)
+            clazz.declaredFunctions.asSequence()
+                .filter { it.hasAnnotation<InitFun>() && it.hasEmptyArguments() }
+                .forEach {
+                    val instance = clazz.objectInstance
+                        ?: throw InitializationException("Initializable class $className is not a singleton")
+                    
+                    it.isAccessible = true
+                    it.call(instance)
+                }
+            
             Initializer.initialized += this
             initialization.complete(true)
         } catch (e: InitializationException) {
@@ -236,11 +238,16 @@ internal class InitializableClass(
     }
     
     internal fun disable() {
-        val disableMethod = clazz.declaredFunctions.firstOrNull { it.name.equalsAny("disable", "onDisable") && it.parameters.isEmpty() }
-        if (disableMethod != null) {
-            val instance = clazz.objectInstance ?: throw InitializationException("Initializable class $className is not a singleton!")
-            disableMethod.call(instance)
-        }
+        // call disable method(s)
+        clazz.declaredFunctions.asSequence()
+            .filter { it.hasAnnotation<DisableFun>() && it.hasEmptyArguments() }
+            .forEach { 
+                val instance = clazz.objectInstance
+                    ?: throw InitializationException("Initializable class $className is not a singleton")
+                
+                it.isAccessible = true
+                it.call(instance)
+            }
     }
     
     override fun toString() = "Initializable | $className"

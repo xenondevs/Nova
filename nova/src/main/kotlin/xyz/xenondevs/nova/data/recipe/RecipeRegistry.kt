@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.recipe
 import org.bukkit.Bukkit
 import org.bukkit.inventory.Recipe
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
@@ -51,7 +52,8 @@ object RecipeRegistry {
         usageInfo += info
     }
     
-    fun init() {
+    @InitFun
+    internal fun indexRecipes() {
         LOGGER.info("Indexing recipes")
         BUKKIT_RECIPES = loadBukkitRecipes()
         CREATION_RECIPES = loadCreationRecipes()

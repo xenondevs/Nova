@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.WorldDataManager
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -61,7 +62,8 @@ internal object BackingStateManager : Listener {
     private val queries: List<ChunkSearchQuery> =
         backingStates.map { it.blockStatePredicate }
     
-    fun init() {
+    @InitFun
+    private fun init() {
         if (!DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks"))
             return
         

@@ -24,6 +24,8 @@ import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.material.NovaBlock
@@ -67,7 +69,8 @@ internal object WorldDataManager : Listener {
     
     private val pendingOrphanBlocks = Object2ObjectOpenHashMap<ChunkPos, MutableMap<BlockPos, NovaBlock>>()
     
-    fun init() {
+    @InitFun
+    private fun init() {
         LOGGER.info("Initializing WorldDataManager")
         registerEvents()
         Bukkit.getWorlds().forEach(::queueWorldLoad)
@@ -109,7 +112,8 @@ internal object WorldDataManager : Listener {
         }
     }
     
-    fun disable() {
+    @DisableFun
+    private fun disable() {
         Bukkit.getWorlds().forEach(::saveWorld)
     }
     

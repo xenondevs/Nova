@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -43,7 +44,8 @@ internal object ResourceGeneration {
     )
     object PreWorld {
         
-        fun init() {
+        @InitFun
+        private fun init() {
             resourcesHash = calculateResourcesHash()
             if (
                 PermanentStorage.retrieveOrNull<String>(RESOURCES_HASH) == resourcesHash
@@ -79,7 +81,8 @@ internal object ResourceGeneration {
     )
     object PostWorld {
     
-        fun init() {
+        @InitFun
+        private fun init() {
             val builder = builder
             if (builder != null) {
                 LOGGER.info("Continuing to build resource pack")
