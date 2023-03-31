@@ -105,6 +105,7 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*
         
         this.material = material
         this.name = Component.translatable(material.localizedName)
+        reload()
     }
     
     fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
