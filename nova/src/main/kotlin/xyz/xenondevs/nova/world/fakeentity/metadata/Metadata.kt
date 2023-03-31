@@ -15,7 +15,7 @@ abstract class Metadata internal constructor() {
         buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_ENTITY_DATA_PACKET)
         buf.writeVarInt(entityId)
         
-        entries.forEach { 
+        entries.forEach {
             if (it.dirty) {
                 it.write(buf)
                 it.dirty = false
@@ -31,7 +31,7 @@ abstract class Metadata internal constructor() {
         buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_ENTITY_DATA_PACKET)
         buf.writeVarInt(entityId)
         
-        entries.forEach { 
+        entries.forEach {
             if (it.isNotDefault()) {
                 it.write(buf)
                 it.dirty = false
@@ -42,19 +42,25 @@ abstract class Metadata internal constructor() {
         return buf
     }
     
-    internal fun <T> entry(index: Int, serializer: EntityDataSerializer<T>, default: T): MetadataEntry<T> {
+    internal fun <T> entry(index: Int, serializer: EntityDataSerializer<T>, default: T): NonNullMetadataEntry<T> {
         val entry = NonNullMetadataEntry(index, serializer, default)
         entries += entry
         return entry
     }
     
-    internal fun <C, T> entry(index: Int, serializer: EntityDataSerializer<T>, default: C, mapper: (C) -> T): MetadataEntry<C> {
-        val entry = MappedNonNullMetadataEntry(index, serializer, mapper, default)
+    internal fun <T, R> entry(index: Int, serializer: EntityDataSerializer<R>, default: T, toRaw: (T) -> R): MappedNonNullMetadataEntry<T, R>.MappedDelegate {
+        val entry = MappedNonNullMetadataEntry(index, serializer, toRaw, { default }, default)
+        entries += entry
+        return entry.mappedDelegate
+    }
+    
+    internal fun <T, R> entry(index: Int, serializer: EntityDataSerializer<R>, default: T, toRaw: (T) -> R, fromRaw: (R) -> T): MappedNonNullMetadataEntry<T, R> {
+        val entry = MappedNonNullMetadataEntry(index, serializer, toRaw, fromRaw, default)
         entries += entry
         return entry
     }
     
-    internal fun <T> optional(index: Int, serializer: EntityDataSerializer<Optional<T & Any>>, default: T?): MetadataEntry<T?> {
+    internal fun <T> optional(index: Int, serializer: EntityDataSerializer<Optional<T & Any>>, default: T?): NullableMetadataEntry<T> {
         val entry = NullableMetadataEntry(index, serializer, default)
         entries += entry
         return entry

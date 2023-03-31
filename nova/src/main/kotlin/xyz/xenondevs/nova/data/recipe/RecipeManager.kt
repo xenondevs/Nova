@@ -35,6 +35,7 @@ import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
 import xyz.xenondevs.nova.util.containsAll
 import xyz.xenondevs.nova.util.data.clientsideCopy
@@ -43,7 +44,6 @@ import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.unhandledTags
-import xyz.xenondevs.nova.util.minecraftServer
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.registerEvents
@@ -218,7 +218,7 @@ object RecipeManager : Listener {
                         shapedRecipes[key] = optimizedRecipe
                         
                         val nmsRecipe = NovaShapedRecipe(optimizedRecipe)
-                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
                         
                         _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                     }
@@ -227,7 +227,7 @@ object RecipeManager : Listener {
                         shapelessRecipes[key] = recipe
                         
                         val nmsRecipe = NovaShapelessRecipe(recipe)
-                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
                         
                         _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                     }
@@ -236,7 +236,7 @@ object RecipeManager : Listener {
                         furnaceRecipes[key] = recipe
                         
                         val nmsRecipe = NovaFurnaceRecipe(recipe)
-                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
                         
                         _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                     }
@@ -245,7 +245,7 @@ object RecipeManager : Listener {
                         blastFurnaceRecipes[key] = recipe
                         
                         val nmsRecipe = NovaBlastFurnaceRecipe(recipe)
-                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
                         
                         _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                     }
@@ -254,7 +254,7 @@ object RecipeManager : Listener {
                         smokerRecipes[key] = recipe
                         
                         val nmsRecipe = NovaSmokerRecipe(recipe)
-                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
                         
                         _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                     }
@@ -263,7 +263,7 @@ object RecipeManager : Listener {
                         campfireRecipes[key] = recipe
                         
                         val nmsRecipe = NovaCampfireRecipe(recipe)
-                        minecraftServer.recipeManager.addRecipe(nmsRecipe)
+                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
                         
                         _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
                     }
@@ -291,7 +291,7 @@ object RecipeManager : Listener {
     }
     
     private fun loadInternalRecipes() {
-        val recipeManager = minecraftServer.recipeManager
+        val recipeManager = MINECRAFT_SERVER.recipeManager
         INTERNAL_RECIPES.forEach { (resourceLocation, recipeConstructor) ->
             recipeManager.removeRecipe(resourceLocation)
             recipeManager.addRecipe(recipeConstructor(resourceLocation))
@@ -301,7 +301,7 @@ object RecipeManager : Listener {
     }
     
     internal fun reload() {
-        customVanillaRecipeKeys.forEach { minecraftServer.recipeManager.removeRecipe(it.resourceLocation) }
+        customVanillaRecipeKeys.forEach { MINECRAFT_SERVER.recipeManager.removeRecipe(it.resourceLocation) }
         
         shapedRecipes.clear()
         shapelessRecipes.clear()
@@ -312,7 +312,7 @@ object RecipeManager : Listener {
         
         loadRecipes()
         RecipeRegistry.init()
-        RECIPE_TYPE.forEach { it.group?.invalidateCache() }
+        RECIPE_TYPE.forEach { it.group.invalidateCache() }
     }
     
     @EventHandler

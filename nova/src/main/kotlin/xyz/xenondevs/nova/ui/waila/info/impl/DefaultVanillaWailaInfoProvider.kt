@@ -52,6 +52,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.CRIMSON_WALL_SIGN -> Material.CRIMSON_SIGN
             Material.WARPED_WALL_SIGN -> Material.WARPED_SIGN
             Material.BAMBOO_WALL_SIGN -> Material.BAMBOO_SIGN
+            Material.CHERRY_WALL_SIGN -> Material.CHERRY_SIGN
             Material.OAK_WALL_HANGING_SIGN -> Material.OAK_HANGING_SIGN
             Material.SPRUCE_WALL_HANGING_SIGN -> Material.SPRUCE_HANGING_SIGN
             Material.BIRCH_WALL_HANGING_SIGN -> Material.BIRCH_HANGING_SIGN
@@ -62,6 +63,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.CRIMSON_WALL_HANGING_SIGN -> Material.CRIMSON_HANGING_SIGN
             Material.WARPED_WALL_HANGING_SIGN -> Material.WARPED_HANGING_SIGN
             Material.BAMBOO_WALL_HANGING_SIGN -> Material.BAMBOO_HANGING_SIGN
+            Material.CHERRY_WALL_HANGING_SIGN -> Material.CHERRY_HANGING_SIGN
             
             // plant
             Material.WEEPING_VINES_PLANT -> Material.WEEPING_VINES

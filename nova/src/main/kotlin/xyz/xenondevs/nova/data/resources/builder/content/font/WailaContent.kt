@@ -46,6 +46,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.CRIMSON_SIGN to "item/crimson_sign",
     Material.WARPED_SIGN to "item/warped_sign",
     Material.BAMBOO_SIGN to "item/bamboo_sign",
+    Material.CHERRY_SIGN to "item/cherry_sign",
     
     // hanging signs
     Material.OAK_HANGING_SIGN to "item/oak_hanging_sign",
@@ -58,6 +59,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.CRIMSON_HANGING_SIGN to "item/crimson_hanging_sign",
     Material.WARPED_HANGING_SIGN to "item/warped_hanging_sign",
     Material.BAMBOO_HANGING_SIGN to "item/bamboo_hanging_sign",
+    Material.CHERRY_HANGING_SIGN to "item/cherry_hanging_sign",
     
     // foliage
     Material.OAK_SAPLING to "block/oak_sapling",
@@ -99,6 +101,8 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.LILAC to "block/lilac_top",
     Material.ROSE_BUSH to "block/rose_bush_top",
     Material.PEONY to "block/peony_top",
+    Material.TORCHFLOWER to "block/torchflower",
+    Material.PINK_PETALS to "item/pink_petals",
     
     // mushrooms
     Material.BROWN_MUSHROOM to "block/brown_mushroom",
@@ -180,6 +184,7 @@ private val TEXTURES = setOf(
     "potatoes_stage0", "potatoes_stage1", "potatoes_stage2", "potatoes_stage3",
     "sweet_berry_bush_stage0", "sweet_berry_bush_stage1", "sweet_berry_bush_stage2", "sweet_berry_bush_stage3",
     "wheat_stage0", "wheat_stage1", "wheat_stage2", "wheat_stage3", "wheat_stage4", "wheat_stage5", "wheat_stage6", "wheat_stage7",
+    "torchflower_crop_stage0", "torchflower_crop_stage1", "torchflower_crop_stage2",
     "activator_rail", "activator_rail_on", "detector_rail", "detector_rail_on", "powered_rail", "powered_rail_on"
 )
 //</editor-fold>

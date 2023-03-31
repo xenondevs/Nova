@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.util.addSuffix
 import java.io.File
 import kotlin.reflect.KClass
 
-internal abstract class ClassTransformer(val clazz: KClass<*>, override val computeFrames: Boolean = false) : Transformer {
+internal abstract class ClassTransformer(val clazz: KClass<*>, override val computeFrames: Boolean = true) : Transformer {
     
     override val classes = setOf(clazz)
     

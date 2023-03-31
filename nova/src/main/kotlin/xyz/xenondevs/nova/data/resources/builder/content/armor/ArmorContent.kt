@@ -103,6 +103,7 @@ internal class ArmorContent(
         layer2File.writeImage(layer2, "PNG")
     }
     
+    @Suppress("USELESS_CAST")
     // Nova uses a modified version of the "Fancy Pants" shader by Ancientkingg: https://github.com/Ancientkingg/fancyPants
     private fun buildTexture(defaultLayer: BufferedImage, layer: Int): BufferedImage {
         //<editor-fold desc="loading and creating empty texture", defaultstate="collapsed">

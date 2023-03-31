@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.requireNonNull
-import xyz.xenondevs.nova.data.serialization.yaml.getLazilyEvaluated
+import xyz.xenondevs.nova.data.serialization.yaml.getDeserialized
 import xyz.xenondevs.nova.material.NovaItem
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -47,13 +47,13 @@ abstract class ConfigAccess(private val configReceiver: () -> YamlConfiguration)
     protected inner class RequiredConfigEntryAccessor<T : Any>(key: String, type: KType) : ConfigEntryAccessor<T>(key, type) {
         override fun loadValue(): T {
             check(key in cfg) { "No such config entry: $key" }
-            return cfg.getLazilyEvaluated(key, type)!!
+            return cfg.getDeserialized(key, type)!!
         }
     }
     
     protected inner class NullableConfigEntryAccessor<T : Any>(key: String, type: KType) : ConfigEntryAccessor<T?>(key, type) {
         override fun loadValue(): T? {
-            return cfg.getLazilyEvaluated(key, type)
+            return cfg.getDeserialized(key, type)
         }
     }
     

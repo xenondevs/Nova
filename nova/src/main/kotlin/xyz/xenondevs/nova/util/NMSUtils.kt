@@ -10,7 +10,6 @@ import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
-import net.minecraft.core.RegistryAccess
 import net.minecraft.core.Rotations
 import net.minecraft.core.WritableRegistry
 import net.minecraft.network.protocol.Packet
@@ -246,12 +245,10 @@ fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
 fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
 
-val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).server
-
-val registryAccess: RegistryAccess = minecraftServer.registryAccess()
+val MINECRAFT_SERVER: DedicatedServer = (Bukkit.getServer() as CraftServer).server
 
 val serverTick: Int
-    get() = minecraftServer.tickCount
+    get() = MINECRAFT_SERVER.tickCount
 
 @Suppress("FunctionName")
 fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
@@ -417,7 +414,7 @@ object NMSUtils {
         "SRF(net.minecraft.world.entity.Entity ENTITY_COUNTER)"
     ).get(null) as AtomicInteger
     
-    val REGISTRY_ACCESS = minecraftServer.registryAccess()!!
+    val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()!!
     val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, REGISTRY_ACCESS)!!
     
     fun freezeRegistry(registry: Registry<*>) {

@@ -288,8 +288,8 @@ internal object PacketItems : Listener {
         // remove custom model data
         tag.putInt("CustomModelData", 0)
         
-        // store serversideTag
-        tag.getCompound("nova").put("serversideTag", itemStack.tag!!)
+        // save server-side nbt data
+        tag.put("NovaServerSideTag", itemStack.tag!!)
         
         // overwrite display tag with "missing model" name
         val displayTag = CompoundTag().also { tag.put("display", it) }

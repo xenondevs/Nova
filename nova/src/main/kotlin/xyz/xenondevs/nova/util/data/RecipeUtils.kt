@@ -7,9 +7,9 @@ import org.bukkit.inventory.*
 import org.bukkit.inventory.recipe.CookingBookCategory
 import org.bukkit.inventory.recipe.CraftingBookCategory
 import xyz.xenondevs.nova.material.PacketItems
+import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.nmsCopy
-import xyz.xenondevs.nova.util.registryAccess
 import xyz.xenondevs.nova.util.resourceLocation
 import net.minecraft.world.item.crafting.BlastingRecipe as MojangBlastFurnaceRecipe
 import net.minecraft.world.item.crafting.CampfireCookingRecipe as MojangCampfireRecipe
@@ -72,37 +72,37 @@ internal fun Ingredient.clientsideCopy(): Ingredient {
 }
 
 internal fun MojangShapedRecipe.clientsideCopy(): MojangShapedRecipe {
-    val result = PacketItems.getClientSideStack(null, getResultItem(registryAccess))
+    val result = PacketItems.getClientSideStack(null, getResultItem(REGISTRY_ACCESS))
     val ingredients = NonNullList(ingredients.map { it.clientsideCopy() })
     return MojangShapedRecipe(id, group, category(), width, height, ingredients, result)
 }
 
 internal fun MojangShapelessRecipe.clientsideCopy(): MojangShapelessRecipe {
-    val result = PacketItems.getClientSideStack(null, getResultItem(registryAccess))
+    val result = PacketItems.getClientSideStack(null, getResultItem(REGISTRY_ACCESS))
     val ingredients = NonNullList(ingredients.map { it.clientsideCopy() })
     return MojangShapelessRecipe(id, group, category(), result, ingredients)
 }
 
 internal fun MojangFurnaceRecipe.clientsideCopy(): MojangFurnaceRecipe {
-    val result = PacketItems.getClientSideStack(null, getResultItem(registryAccess))
+    val result = PacketItems.getClientSideStack(null, getResultItem(REGISTRY_ACCESS))
     val ingredient = ingredients.first().clientsideCopy()
     return MojangFurnaceRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }
 
 internal fun MojangBlastFurnaceRecipe.clientsideCopy(): MojangBlastFurnaceRecipe {
-    val result = PacketItems.getClientSideStack(null, getResultItem(registryAccess))
+    val result = PacketItems.getClientSideStack(null, getResultItem(REGISTRY_ACCESS))
     val ingredient = ingredients.first().clientsideCopy()
     return MojangBlastFurnaceRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }
 
 internal fun MojangSmokerRecipe.clientsideCopy(): MojangSmokerRecipe {
-    val result = PacketItems.getClientSideStack(null, getResultItem(registryAccess))
+    val result = PacketItems.getClientSideStack(null, getResultItem(REGISTRY_ACCESS))
     val ingredient = ingredients.first().clientsideCopy()
     return MojangSmokerRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }
 
 internal fun MojangCampfireRecipe.clientsideCopy(): MojangCampfireRecipe {
-    val result = PacketItems.getClientSideStack(null, getResultItem(registryAccess))
+    val result = PacketItems.getClientSideStack(null, getResultItem(REGISTRY_ACCESS))
     val ingredient = ingredients.first().clientsideCopy()
     return MojangCampfireRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }

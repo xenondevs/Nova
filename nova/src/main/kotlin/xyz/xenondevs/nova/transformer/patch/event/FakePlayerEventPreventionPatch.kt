@@ -8,18 +8,17 @@ import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.FakePlayer
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.serverPlayer
-import kotlin.reflect.jvm.javaMethod
 
 /**
  * Patches the fireEvent method in SimplePluginManager to prevent fake players from triggering events.
  */
-internal object FakePlayerEventPreventionPatch : MethodTransformer(ReflectionRegistry.SIMPLE_PLUGIN_MANAGER_FIRE_EVENT_METHOD, computeFrames = true) {
+internal object FakePlayerEventPreventionPatch : MethodTransformer(ReflectionRegistry.SIMPLE_PLUGIN_MANAGER_FIRE_EVENT_METHOD) {
     
     override fun transform() {
         val instructions = methodNode.instructions
         instructions.insertBefore(instructions.first, buildInsnList {
             aLoad(1)
-            invokeStatic(::shouldPreventEvent.javaMethod!!)
+            invokeStatic(::shouldPreventEvent)
             val label = LabelNode()
             ifeq(label) // if not shouldFireEvent, jump to label node
             addLabel()

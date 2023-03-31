@@ -4,7 +4,7 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
 import kotlin.reflect.KClass
 
-internal abstract class ReversibleClassTransformer(val clazz: KClass<*>, override val computeFrames: Boolean = false): Transformer {
+internal abstract class ReversibleClassTransformer(val clazz: KClass<*>, override val computeFrames: Boolean = true): Transformer {
     
     override val classes = setOf(clazz)
     

@@ -5,11 +5,11 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.reflection.createType
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.data.serialization.yaml.getLazilyEvaluated
 import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.name
+import xyz.xenondevs.nova.data.serialization.yaml.getDeserialized
 import kotlin.reflect.KType
 
 class UpgradeType<T> internal constructor(
@@ -51,8 +51,8 @@ class UpgradeType<T> internal constructor(
     ) : Provider<List<T>>() {
         
         override fun loadValue(): List<T> {
-            return NovaConfig[material].getLazilyEvaluated("upgrade_values.${id.name}", listValueType)
-                ?: NovaConfig["${id.namespace}:upgrade_values"].getLazilyEvaluated(id.name, listValueType)
+            return NovaConfig[material].getDeserialized("upgrade_values.${id.name}", listValueType)
+                ?: NovaConfig["${id.namespace}:upgrade_values"].getDeserialized(id.name, listValueType)
                 ?: throw IllegalStateException("No upgrade values present for $id")
         }
         

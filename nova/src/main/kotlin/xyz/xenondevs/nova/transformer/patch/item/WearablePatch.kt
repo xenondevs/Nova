@@ -27,15 +27,13 @@ import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.EQUIPABLE_GET_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_ARMOR_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_CONSTRUCTOR
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 
-internal object WearablePatch : MultiTransformer(setOf(Equipable::class, LivingEntity::class), computeFrames = true) {
+internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class) {
     
     override fun transform() {
-        EQUIPABLE_GET_METHOD.replaceWith(ReflectionUtils.getMethodByName(WearablePatch::class, false, "getEquipable"))
+        Equipable::get.replaceWith(::getEquipable)
         
         VirtualClassPath[INVENTORY_CONSTRUCTOR].replaceFirst(3, -1, buildInsnList {
             new(WatchedArmorList::class)
@@ -93,7 +91,6 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
     private val previousStacks = Array<ItemStack>(4) { ItemStack.EMPTY }
     
     override fun set(index: Int, element: ItemStack?): ItemStack {
-        println("setting $index to $element")
         val item = element ?: ItemStack.EMPTY
         if (initialized) {
             if (player != null) {

@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaNoteBlockTileEntity
@@ -17,7 +18,7 @@ import xyz.xenondevs.nova.util.toNovaPos
 internal object AgentNoteBlockBehavior {
     
     @JvmStatic
-    fun neighborChanged(state: BlockState, level: Level, pos: BlockPos, block: Block, neighborPos: BlockPos, flag: Boolean) {
+    fun neighborChanged(thisRef: NoteBlock, state: BlockState, level: Level, pos: BlockPos, block: Block, neighborPos: BlockPos, flag: Boolean) {
         val vnb = VanillaTileEntityManager.getTileEntityAt(pos.toNovaPos(level.world)) as? VanillaNoteBlockTileEntity ?: return
         
         val shouldBePowered = level.hasNeighborSignal(pos)
@@ -30,7 +31,7 @@ internal object AgentNoteBlockBehavior {
     }
     
     @JvmStatic
-    fun use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, result: BlockHitResult): InteractionResult {
+    fun use(thisRef: NoteBlock, state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, result: BlockHitResult): InteractionResult {
         val vnb = VanillaTileEntityManager.getTileEntityAt(pos.toNovaPos(level.world)) as? VanillaNoteBlockTileEntity ?: return InteractionResult.FAIL
         
         NoteBackingState.cycleNote(vnb)
@@ -40,7 +41,7 @@ internal object AgentNoteBlockBehavior {
     }
     
     @JvmStatic
-    fun attack(state: BlockState, level: Level, pos: BlockPos, player: Player) {
+    fun attack(thisRef: NoteBlock, state: BlockState, level: Level, pos: BlockPos, player: Player) {
         val vnb = VanillaTileEntityManager.getTileEntityAt(pos.toNovaPos(level.world)) as? VanillaNoteBlockTileEntity ?: return
         
         NoteBackingState.playNote(vnb)

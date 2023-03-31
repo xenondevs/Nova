@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.loader.NovaClassLoader
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
+import xyz.xenondevs.nova.transformer.patch.block.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.transformer.patch.event.FakePlayerEventPreventionPatch
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
@@ -28,7 +29,6 @@ import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.item.WearablePatch
 import xyz.xenondevs.nova.transformer.patch.nbt.CBFCompoundTagPatch
-import xyz.xenondevs.nova.transformer.patch.noteblock.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
 import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
@@ -47,8 +47,6 @@ import java.lang.System.getProperty
 import java.lang.instrument.ClassDefinition
 import java.lang.management.ManagementFactory
 import java.lang.reflect.Field
-import java.util.logging.Level
-import kotlin.reflect.jvm.jvmName
 
 @InternalInit(stage = InitializationStage.PRE_WORLD)
 internal object Patcher {
@@ -137,28 +135,28 @@ internal object Patcher {
     }
     
     private fun redefineClasses(definitions: Array<ClassDefinition>) {
-        try {
-            INSTRUMENTATION.redefineClasses(*definitions)
-        } catch (ex: LinkageError) {
-            val errorMessages = ArrayList<String>()
-            
-            // tries to get more information by loading the classes using the ClassWrapperLoader instead of the instrumentation
-            val classLoader = ClassWrapperLoader(javaClass.classLoader)
-            definitions.forEach {
+        // I don't know why, but when redefining all classes at once and one fails to load, the extra information retrieved
+        // using the ClassWrapperLoader is completely different and consists of errors that don't happen when using the instrumentation.
+        // Looping over all class definitions individually seems to fix this issue.
+        for (definition in definitions) {
+            try {
+                INSTRUMENTATION.redefineClasses(definition)
+            } catch (ex: LinkageError) {
+                val defClass = definition.definitionClass
+                val relatedPatches = transformers.filter { tf -> tf.classes.any { tfClass -> tfClass.internalName == defClass.internalName } }
+                
+                // tries to get more information by loading the classes using the ClassWrapperLoader instead of the instrumentation
+                val classLoader = ClassWrapperLoader(javaClass.classLoader)
                 try {
-                    classLoader.loadClass(VirtualClassPath[it.definitionClass]).methods
+                    classLoader.loadClass(VirtualClassPath[defClass]).methods
                 } catch (e: LinkageError) {
-                    if (e.message?.contains(ClassWrapperLoader::class.jvmName) != true) {
-                        errorMessages += "${e::class.simpleName} for class ${it.definitionClass.internalName}:\n${e.message}"
-                    }
-                } catch (t: Throwable) {
-                    LOGGER.log(Level.SEVERE, "Failed to load class while trying to obtain more information: ${it.definitionClass.internalName}", t)
+                    throw PatchingException(defClass, relatedPatches, "Type: ${e::class.simpleName}\n${e.message}")
+                } catch (e: Throwable) {
+                    // throws generic patching exception below
                 }
+                
+                throw PatchingException(defClass, relatedPatches, ex)
             }
-            
-            if (errorMessages.size > 0) {
-                throw PatchingException(errorMessages)
-            } else throw PatchingException(ex)
         }
     }
     
@@ -183,7 +181,10 @@ private class PatcherException(t: Throwable) : Exception("""
 
 private class PatchingException : Exception {
     
-    constructor(messages: List<String>) : super("Failed to apply patches:\n${messages.joinToString("\n\n")}")
-    constructor(t: Throwable) : super("Failed to apply patches. Could not get more information.", t)
+    constructor(defClass: Class<*>, transformers: List<Transformer>, message: String) : this("Failed to apply patches", defClass, transformers, message)
+    constructor(defClass: Class<*>, transformers: List<Transformer>, t: Throwable) : this("Failed to apply patches. Could not get more information.", defClass, transformers, "", t)
+    
+    private constructor(m1: String, defClass: Class<*>, transformers: List<Transformer>, m2: String, t: Throwable? = null) :
+        super("$m1\nClass: ${defClass.internalName}\nRelated transformers: ${transformers.joinToString()}\n$m2", t)
     
 }

@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.data.ArrayKey
 import xyz.xenondevs.nova.util.isBetweenXZ
-import xyz.xenondevs.nova.util.minecraftServer
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.CompletableFuture
@@ -161,7 +161,7 @@ object ProtectionManager {
     
     @Suppress("UNCHECKED_CAST")
     private fun checkIntegrations(check: ProtectionIntegration.() -> Boolean): MutableList<CompletableFuture<Boolean>> {
-        val isMainThread = Thread.currentThread() == minecraftServer.serverThread
+        val isMainThread = Thread.currentThread() == MINECRAFT_SERVER.serverThread
         val futures = ArrayList<CompletableFuture<Boolean>>()
         
         integrations.forEach { integration ->

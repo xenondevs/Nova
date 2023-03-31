@@ -22,7 +22,7 @@ internal object BarMatcherSerializer : YamlSerializer<BarMatcher> {
             "uuid" -> {
                 val uuidStr = map["uuid"] as? String
                     ?: throw NoSuchElementException("Missing value 'id'")
-                val uuid = kotlin.runCatching { UUID.fromString(uuidStr) }
+                val uuid = runCatching { UUID.fromString(uuidStr) }
                     .getOrElse { throw IllegalArgumentException("Invalid uuid '$uuidStr'") }
                 
                 return BarMatcher.Id(uuid)

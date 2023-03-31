@@ -33,8 +33,9 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     protected abstract val entityType: EntityType<*>
     
     private var registered = false
-    val viewers: List<Player>
-        get() = FakeEntityManager.getChunkViewers(chunk)
+    private val _viewers = Collections.newSetFromMap<Player>(WeakHashMap())
+    val viewers: Set<Player>
+        get() = _viewers
     
     val entityId = NMSUtils.ENTITY_COUNTER.incrementAndGet()
     private val uuid = UUID.randomUUID()
@@ -91,6 +92,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
             player.send(spawnBuf, dataBuf, equipmentBuf)
         }
         
+        _viewers += player
         spawnHandler?.invoke(player)
     }
     
@@ -99,6 +101,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
      */
     fun despawn(player: Player) {
         player.send(despawnBuf)
+        _viewers -= player
         despawnHandler?.invoke(player)
     }
     

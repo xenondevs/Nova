@@ -15,7 +15,9 @@ abstract class DisplayMetadata : EntityMetadata() {
     var leftRotation: Quaternionf by entry(12, EntityDataSerializers.QUATERNION, Quaternionf())
     var rightRotation: Quaternionf by entry(13, EntityDataSerializers.QUATERNION, Quaternionf())
     var billboardConstraints: BillboardConstraints by entry(14, EntityDataSerializers.BYTE, BillboardConstraints.FIXED) { it.ordinal.toByte() }
-    var brightness: Brightness? by entry(15, EntityDataSerializers.INT, null) { it?.pack() ?: -1 }
+    private val brightnessEntry = entry<Brightness?, Int>(15, EntityDataSerializers.INT, null, { it?.pack() ?: -1 }, { Brightness.unpack(it) })
+    var rawBrightness: Int by brightnessEntry.rawDelegate
+    var brightness: Brightness? by brightnessEntry.mappedDelegate
     var viewRange: Float by entry(16, EntityDataSerializers.FLOAT, 1f)
     var shadowRadius: Float by entry(17, EntityDataSerializers.FLOAT, 0f)
     var shadowStrength: Float by entry(18, EntityDataSerializers.FLOAT, 1f)

@@ -34,7 +34,7 @@ private val FORCE_UNICODE_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("
 
 internal class CharSizeCalculator {
     
-    private val fontHashes: HashMap<String, String> = PermanentStorage.retrieve("fontHashes", ::HashMap)
+    private val fontHashes: HashMap<String, String> = PermanentStorage.retrieve("fontHashes0.13", ::HashMap)
     
     private val bitmaps = HashMap<ResourcePath, BufferedImage>()
     

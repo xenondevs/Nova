@@ -1,17 +1,17 @@
 package xyz.xenondevs.nova.util.concurrent
 
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.util.minecraftServer
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.runTask
 import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
 
 fun CompletableFuture<Boolean>.runIfTrue(run: () -> Unit) {
-    val mainThread = minecraftServer.serverThread == Thread.currentThread()
+    val mainThread = MINECRAFT_SERVER.serverThread == Thread.currentThread()
     thenRun {
         try {
             if (get()) {
-                if (mainThread && minecraftServer.serverThread != Thread.currentThread())
+                if (mainThread && MINECRAFT_SERVER.serverThread != Thread.currentThread())
                     runTask(run)
                 else run()
             }

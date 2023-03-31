@@ -1,82 +1,130 @@
 package xyz.xenondevs.nova.world.region
 
-import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
-import org.bukkit.Bukkit
+import net.minecraft.world.item.ItemDisplayContext
+import org.bukkit.Location
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.nova.util.createColoredParticle
-import xyz.xenondevs.nova.util.getBoxOutline
-import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.util.send
+import org.joml.Vector3f
+import xyz.xenondevs.nova.material.CoreBlockOverlay
+import xyz.xenondevs.nova.util.component1
+import xyz.xenondevs.nova.util.component2
+import xyz.xenondevs.nova.util.component3
+import xyz.xenondevs.nova.util.component4
+import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import java.awt.Color
 import java.util.*
 
+private fun Iterable<FakeItemDisplay>.spawn(viewer: Player) = forEach { it.spawn(viewer) }
+private fun Iterable<FakeItemDisplay>.spawn(viewers: Iterable<Player>) = forEach { display -> viewers.forEach { display.spawn(it) } }
+private fun Iterable<FakeItemDisplay>.despawn(viewer: Player) = forEach { it.despawn(viewer) }
+private fun Iterable<FakeItemDisplay>.despawn(viewers: Iterable<Player>) = forEach { display -> viewers.forEach { display.despawn(it) } }
+
+private const val MIN_LINE_WIDTH = 0.005
+private const val MAX_LINE_WIDTH = 0.05
+private const val DIAGONAL_THRESHOLD = 10.0
+
 object VisualRegion {
     
-    private val tasks = HashMap<UUID, BukkitTask>()
-    private val viewers = HashMap<UUID, MutableList<UUID>>()
+    private val regions = HashMap<UUID, Pair<List<FakeItemDisplay>, MutableSet<Player>>>()
     
-    fun showRegion(player: Player, regionUUID: UUID, region: Region) {
-        getViewerList(regionUUID, region).add(player.uniqueId)
+    fun isVisible(player: Player, regionId: UUID) =
+        regions[regionId]?.second?.contains(player) ?: false
+    
+    fun toggleView(player: Player, regionId: UUID, region: Region) {
+        if (isVisible(player, regionId)) {
+            hideRegion(player, regionId)
+        } else showRegion(player, regionId, region)
     }
     
-    fun toggleView(player: Player, regionUUID: UUID, region: Region) {
-        val viewerList = getViewerList(regionUUID, region)
-        if (viewerList.contains(player.uniqueId)) {
-            viewerList.remove(player.uniqueId)
-            if (viewerList.isEmpty()) removeRegion(regionUUID)
-        } else viewerList.add(player.uniqueId)
-    }
-    
-    fun isVisible(player: Player, regionUUID: UUID) =
-        isVisible(player.uniqueId, regionUUID)
-    
-    fun isVisible(playerUUID: UUID, regionUUID: UUID) =
-        viewers[regionUUID]?.contains(playerUUID) ?: false
-    
-    fun hideRegion(player: Player, regionUUID: UUID) {
-        val viewerList = viewers[regionUUID]
-        if (viewerList != null) {
-            viewerList.remove(player.uniqueId)
-            if (viewerList.isEmpty()) removeRegion(regionUUID)
+    fun showRegion(player: Player, regionId: UUID, region: Region) {
+        val (outline, viewers) = getOrCreateVisualRegion(regionId, region)
+        if (player !in viewers) {
+            outline.spawn(player)
+            viewers.add(player)
         }
     }
     
-    fun removeRegion(regionUUID: UUID) {
-        tasks.remove(regionUUID)?.cancel()
-        viewers.remove(regionUUID)
+    fun hideRegion(player: Player, regionId: UUID) {
+        val (outline, viewers) = regions[regionId] ?: return
+        outline.despawn(player)
+        viewers.remove(player)
+        
+        if (viewers.isEmpty())
+            removeRegion(regionId)
     }
     
-    fun updateRegion(regionUUID: UUID, region: Region) {
-        val task = tasks[regionUUID]
-        if (task != null) {
-            task.cancel()
-            startShowingRegion(regionUUID, region)
+    fun removeRegion(regionId: UUID) {
+        val (outline, viewers) = regions.remove(regionId) ?: return
+        outline.despawn(viewers)
+    }
+    
+    fun updateRegion(regionId: UUID, region: Region) {
+        val (outline, viewers) = regions[regionId] ?: return
+        outline.despawn(viewers)
+        val newOutline = createOutline(regionId, region)
+        newOutline.spawn(viewers)
+        regions[regionId] = newOutline to viewers
+    }
+    
+    private fun getOrCreateVisualRegion(regionId: UUID, region: Region): Pair<List<FakeItemDisplay>, MutableSet<Player>> {
+        return regions.getOrPut(regionId) {
+            val outline = createOutline(regionId, region)
+            val viewers = Collections.newSetFromMap<Player>(WeakHashMap())
+            outline to viewers
         }
     }
     
-    private fun getViewerList(regionUUID: UUID, region: Region): MutableList<UUID> {
-        if (regionUUID in viewers)
-            return viewers[regionUUID]!!
-        startShowingRegion(regionUUID, region)
-        return viewers[regionUUID]!!
+    private fun createOutline(regionId: UUID, region: Region): List<FakeItemDisplay> {
+        val min = region.min
+        val max = region.max
+        val color = Color(regionId.hashCode()).rgb
+        
+        return getEdgeDisplays(min, max, color)
     }
     
-    private fun startShowingRegion(regionUUID: UUID, region: Region) {
-        val packets = getParticlePackets(regionUUID, region)
-        viewers.computeIfAbsent(regionUUID) { ArrayList() }
-        tasks[regionUUID] = runTaskTimer(0, 3) {
-            viewers[regionUUID]
-                ?.asSequence()
-                ?.mapNotNull(Bukkit::getPlayer)
-                ?.filter { it.location.world == region.world }
-                ?.forEach { it.send(packets) }
+    private fun getEdgeDisplays(min: Location, max: Location, color: Int): List<FakeItemDisplay> {
+        val (world, minX, minY, minZ) = min
+        val (_, maxX, maxY, maxZ) = max
+        
+        // linearly weighted line width between MIN_LINE_WIDTH and MAX_LINE_WIDTH, depending on the diagonal length of the region
+        val lineWidth = (min.distance(max) / DIAGONAL_THRESHOLD).coerceIn(0.0, 1.0) * (MAX_LINE_WIDTH - MIN_LINE_WIDTH) + MIN_LINE_WIDTH
+        
+        fun createLine(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2: Double) =
+            createLine(Location(world, x1, y1, z1), Location(world, x2, y2, z2), lineWidth, color)
+        
+        return listOf(
+            // minX -> maxX
+            createLine(minX, minY, minZ, maxX, minY, minZ),
+            createLine(minX, minY, maxZ, maxX, minY, maxZ),
+            createLine(minX, maxY, minZ, maxX, maxY, minZ),
+            createLine(minX, maxY, maxZ, maxX, maxY, maxZ),
+            // minY -> maxY
+            createLine(minX, minY, minZ, minX, maxY, minZ),
+            createLine(minX, minY, maxZ, minX, maxY, maxZ),
+            createLine(maxX, minY, minZ, maxX, maxY, minZ),
+            createLine(maxX, minY, maxZ, maxX, maxY, maxZ),
+            // minZ -> maxZ
+            createLine(minX, minY, minZ, minX, minY, maxZ),
+            createLine(minX, maxY, minZ, minX, maxY, maxZ),
+            createLine(maxX, minY, minZ, maxX, minY, maxZ),
+            createLine(maxX, maxY, minZ, maxX, maxY, maxZ),
+        )
+    }
+    
+    private fun createLine(from: Location, to: Location, lineWidth: Double, color: Int): FakeItemDisplay {
+        val center = from.clone().add(to).multiply(0.5)
+        
+        return FakeItemDisplay(center, false) { _, data ->
+            data.itemDisplay = ItemDisplayContext.HEAD
+            data.itemStack = CoreBlockOverlay.TRANSPARENT_BLOCK.clientsideProvider.get().nmsCopy
+            data.scale = Vector3f(
+                (to.x - from.x + lineWidth).toFloat(),
+                (to.y - from.y + lineWidth).toFloat(),
+                (to.z - from.z + lineWidth).toFloat(),
+            )
+            data.isGlowing = true
+            data.glowColor = color
         }
-    }
-    
-    private fun getParticlePackets(regionUUID: UUID, region: Region): List<ClientboundLevelParticlesPacket> {
-        val color = Color(regionUUID.hashCode())
-        return region.min.getBoxOutline(region.max, false).map { it.createColoredParticle(color) }
     }
     
 }

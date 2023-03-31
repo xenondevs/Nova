@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.transformer.patch.item
 
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.SwordItem
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.block.state.BlockState
@@ -9,6 +10,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.TypeInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.isClass
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.tool.ToolCategory
@@ -19,12 +21,11 @@ import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethodByName
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 
 @Suppress("unused")
-internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPlayer::class), true) {
+internal object ToolPatches : MultiTransformer(CraftBlock::class, MojangPlayer::class) {
     
     override fun transform() {
         transformCraftBlockIsPreferredTool()
@@ -41,7 +42,7 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
             aLoad(0)
             aLoad(1)
             aLoad(2)
-            invokeStatic(getMethodByName(ToolPatches::class.java, false, "isPreferredTool"))
+            invokeStatic(::isPreferredTool)
             ireturn()
         }
     }
@@ -55,10 +56,10 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
      * Patches the Player#attack method to use properly perform sweep attacks.
      */
     private fun transformPlayerAttack() {
-        VirtualClassPath[ReflectionRegistry.PLAYER_ATTACK_METHOD]
+        VirtualClassPath[MojangPlayer::attack]
             .replaceFirst(1, 0, buildInsnList {
-                invokeStatic(getMethodByName(ToolPatches::class.java, false, "canDoSweepAttack"))
-            }) { it.opcode == Opcodes.INSTANCEOF && (it as TypeInsnNode).desc == "SRC/(net.minecraft.world.item.SwordItem)" }
+                invokeStatic(::canDoSweepAttack)
+            }) { it.opcode == Opcodes.INSTANCEOF && (it as TypeInsnNode).isClass(SwordItem::class) }
     }
     
     @JvmStatic
@@ -76,9 +77,9 @@ internal object ToolPatches : MultiTransformer(setOf(CraftBlock::class, MojangPl
      * Patches the EnchantmentHelper#getKnockbackBonus method to add the knockback bonus from Nova's tools.
      */
     private fun transformEnchantmentHelperGetKnockbackBonus() {
-        VirtualClassPath[ReflectionRegistry.ENCHANTMENT_HELPER_GET_KNOCKBACK_BONUS_METHOD].instructions = buildInsnList {
+        VirtualClassPath[EnchantmentHelper::getKnockbackBonus].instructions = buildInsnList {
             aLoad(0)
-            invokeStatic(getMethodByName(ToolPatches::class.java, false, "getKnockbackBonus"))
+            invokeStatic(::getKnockbackBonus)
             ireturn()
         }
     }

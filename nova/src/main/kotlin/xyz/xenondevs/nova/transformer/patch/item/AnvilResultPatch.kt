@@ -25,12 +25,11 @@ import xyz.xenondevs.nova.util.item.DamageableUtils.setDamage
 import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.util.item.novaMaterial
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import kotlin.math.max
 import kotlin.math.min
 
 @Suppress("unused")
-internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_MENU_CREATE_RESULT_METHOD, computeFrames = true) {
+internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     
     override fun transform() {
         methodNode.instructions = buildInsnList {
@@ -39,7 +38,7 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
             getField(ReflectionRegistry.ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD)
             aLoad(0)
             getField(ReflectionRegistry.ITEM_COMBINER_MENU_PLAYER_FIELD)
-            invokeStatic(ReflectionUtils.getMethodByName(AnvilResultPatch::class.java, false, "createResult"))
+            invokeStatic(::createResult)
             _return()
         }
         methodNode.localVariables.clear()

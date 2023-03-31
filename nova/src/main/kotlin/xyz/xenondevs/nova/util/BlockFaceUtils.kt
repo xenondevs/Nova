@@ -79,14 +79,17 @@ val BlockFace.pitch: Float
         else -> 0f
     }
 
+/**
+ * The rotation that needs to be applied to make something face the given [BlockFace], assuming it is facing SOUTH by default.
+ */
 val BlockFace.rotation: Quaternionf
     get() = when (this) {
-        NORTH -> Quaternionf()
-        EAST -> Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 0f, 1f, 0f)
-        SOUTH -> Quaternionf().setAngleAxis(Math.PI.toFloat(), 0f, 1f, 0f)
-        WEST -> Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 0f, 1f, 0f)
-        UP -> Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 1f, 0f, 0f)
-        DOWN -> Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 1f, 0f, 0f)
+        SOUTH -> Quaternionf()
+        EAST -> Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 0f, 1f, 0f)
+        NORTH -> Quaternionf().setAngleAxis(Math.PI.toFloat(), 0f, 1f, 0f)
+        WEST -> Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 0f, 1f, 0f)
+        UP -> Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 1f, 0f, 0f)
+        DOWN -> Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 1f, 0f, 0f)
         else -> throw UnsupportedOperationException("Unsupported facing")
     }
 

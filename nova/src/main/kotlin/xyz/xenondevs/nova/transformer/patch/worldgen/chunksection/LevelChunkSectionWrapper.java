@@ -36,7 +36,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
         super(
             delegate.bottomBlockY() >> 4,
             (PalettedContainer<BlockState>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_STATES_FIELD().get(delegate),
-            (PalettedContainer<Holder<Biome>>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_J_FIELD().get(delegate)
+            (PalettedContainer<Holder<Biome>>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_BIOMES_FIELD().get(delegate)
         );
         this.level = level;
         this.chunkPos = chunkPos;
