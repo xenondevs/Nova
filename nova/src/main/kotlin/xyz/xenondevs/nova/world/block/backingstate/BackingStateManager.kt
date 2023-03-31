@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.block.behavior
+package xyz.xenondevs.nova.world.block.backingstate
 
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -27,10 +27,10 @@ import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.util.world.ChunkSearchQuery
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.behavior.impl.BrownMushroomBackingState
-import xyz.xenondevs.nova.world.block.behavior.impl.MushroomStemBackingState
-import xyz.xenondevs.nova.world.block.behavior.impl.RedMushroomBackingState
-import xyz.xenondevs.nova.world.block.behavior.impl.noteblock.NoteBackingState
+import xyz.xenondevs.nova.world.block.backingstate.impl.BrownMushroomBlockBackingState
+import xyz.xenondevs.nova.world.block.backingstate.impl.MushroomStemBackingState
+import xyz.xenondevs.nova.world.block.backingstate.impl.NoteBlockBackingState
+import xyz.xenondevs.nova.world.block.backingstate.impl.RedMushroomBlockBackingState
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.logging.Level
@@ -43,7 +43,7 @@ private val CHUNK_SEARCH_ID_KEY = NamespacedKey(NOVA, "chunkSearchId")
     stage = InitializationStage.POST_WORLD,
     dependsOn = [WorldDataManager::class, Patcher::class]
 )
-internal object BlockBehaviorManager :  Listener {
+internal object BackingStateManager : Listener {
     
     private val chunkSearchQueue = ConcurrentLinkedQueue<ChunkPos>()
     
@@ -53,27 +53,25 @@ internal object BlockBehaviorManager :  Listener {
             PermanentStorage.store("chunkSearchId", value)
         }
     
-    private val behaviors: List<BackingState> = listOf(
-        NoteBackingState,
-        RedMushroomBackingState,
-        BrownMushroomBackingState,
-        MushroomStemBackingState
+    private val backingStates: List<BackingState> = listOf(
+        NoteBlockBackingState,
+        RedMushroomBlockBackingState, BrownMushroomBlockBackingState, MushroomStemBackingState
     )
     
-    private val behaviorQueries: List<ChunkSearchQuery> =
-        behaviors.map { it.blockStatePredicate }
+    private val queries: List<ChunkSearchQuery> =
+        backingStates.map { it.blockStatePredicate }
     
     fun init() {
         if (!DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks"))
             return
         
-        LOGGER.info("Using block behaviors: ${behaviors.joinToString { it::class.simpleName!! }}")
+        LOGGER.info("Using block behaviors: ${backingStates.joinToString { it::class.simpleName!! }}")
         
         if (chunkSearchId == -1)
             updateChunkSearchId()
         
         registerEvents()
-        behaviors.forEach(BackingState::init)
+        backingStates.forEach(BackingState::init)
         
         startChunkSearcher()
         Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach(::handleChunkLoad)
@@ -89,13 +87,13 @@ internal object BlockBehaviorManager :  Listener {
                         if (!chunkPos.isLoaded())
                             continue
                         
-                        BlockStateSearcher.searchChunk(chunkPos, behaviorQueries)
+                        BlockStateSearcher.searchChunk(chunkPos, queries)
                             .withIndex()
                             .forEach { (idx, result) ->
                                 if (result == null)
                                     return@forEach
                                 
-                                behaviors[idx].handleQueryResult(result)
+                                backingStates[idx].handleQueryResult(result)
                             }
                         
                         runTask {
@@ -133,7 +131,7 @@ internal object BlockBehaviorManager :  Listener {
             return
         
         val blockState = block.nmsState
-        val behavior = behaviors.firstOrNull { blockState.block == it.defaultState.block } ?: return
+        val behavior = backingStates.firstOrNull { blockState.block == it.defaultState.block } ?: return
         val pos = block.pos
         
         val task = {

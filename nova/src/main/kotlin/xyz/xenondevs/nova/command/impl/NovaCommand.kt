@@ -46,7 +46,7 @@ import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.block.BlockManager
-import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
+import xyz.xenondevs.nova.world.block.backingstate.BackingStateManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
 import xyz.xenondevs.nova.world.chunkPos
@@ -144,7 +144,7 @@ internal object NovaCommand : Command("nova") {
     }
     
     private fun updateChunkSearchId(ctx: CommandContext<CommandSourceStack>) {
-        BlockBehaviorManager.updateChunkSearchId()
+        BackingStateManager.updateChunkSearchId()
         ctx.source.sendSuccess(Component.translatable("command.nova.update_chunk_search_id.success", NamedTextColor.GRAY))
     }
     

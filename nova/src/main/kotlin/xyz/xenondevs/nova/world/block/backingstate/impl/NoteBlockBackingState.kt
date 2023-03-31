@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.block.behavior.impl.noteblock
+package xyz.xenondevs.nova.world.block.backingstate.impl
 
 import net.minecraft.core.Holder
 import net.minecraft.core.particles.ParticleTypes
@@ -22,7 +22,7 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.behavior.BackingState
+import xyz.xenondevs.nova.world.block.backingstate.BackingState
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
@@ -33,7 +33,7 @@ private val PITCH_TABLE: FloatArray = floatArrayOf(
     1.59f, 1.68f, 1.78f, 1.89f, 2.0f
 )
 
-internal object NoteBackingState : BackingState(NoteBlockStateConfig, false), Listener {
+internal object NoteBlockBackingState : BackingState(NoteBlockStateConfig, false), Listener {
     
     override fun init() {
         registerEvents()
@@ -65,7 +65,7 @@ internal object NoteBackingState : BackingState(NoteBlockStateConfig, false), Li
         val instrument = vnb.instrument
         val soundEvent: Holder<SoundEvent> =
             if (instrument == Instrument.CUSTOM_HEAD) {
-                val sound = (pos.world.serverLevel.getBlockEntity(pos.add(0, 1, 0).nmsPos) as? SkullBlockEntity)?.noteBlockSound 
+                val sound = (pos.world.serverLevel.getBlockEntity(pos.add(0, 1, 0).nmsPos) as? SkullBlockEntity)?.noteBlockSound
                     ?: return false
                 Holder.direct(SoundEvent.createVariableRangeEvent(sound))
             } else instrument.soundEvent

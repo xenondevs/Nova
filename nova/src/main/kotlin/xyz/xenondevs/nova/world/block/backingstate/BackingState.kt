@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.block.behavior
+package xyz.xenondevs.nova.world.block.backingstate
 
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.event.Listener
