@@ -94,6 +94,10 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
         val item = element ?: ItemStack.EMPTY
         if (initialized) {
             if (player != null) {
+                val currentItem = get(index)
+                if (ItemStack.matches(currentItem, item))
+                    return item
+                
                 val previous = previousStacks[index]
                 val equipAction = when {
                     previous.isEmpty && !item.isEmpty -> EquipAction.EQUIP
