@@ -71,6 +71,16 @@ internal class CBFCompoundTag(val compound: NamespacedCompound) : Tag {
         visitor.visitString(StringTag.valueOf(compound.toString())) // TODO
     }
     
+    override fun equals(other: Any?): Boolean {
+        if (other === this)
+            return true
+        
+        return other is CBFCompoundTag && compoundToByteArray().contentEquals(other.compoundToByteArray())
+    }
+    
+    override fun hashCode(): Int =
+        compoundToByteArray().contentHashCode()
+    
     override fun sizeInBytes(): Int {
         throw UnsupportedOperationException()
     }
