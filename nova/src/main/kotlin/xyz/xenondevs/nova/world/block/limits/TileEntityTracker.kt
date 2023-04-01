@@ -3,11 +3,11 @@ package xyz.xenondevs.nova.world.block.limits
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.lang.Integer.max

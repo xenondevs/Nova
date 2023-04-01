@@ -4,11 +4,12 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.block.NovaBlock
 import xyz.xenondevs.nova.api.data.NamespacedId
 import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.namespacedId
 import xyz.xenondevs.nova.api.item.NovaItem as INovaItem
 
 internal class ApiItemWrapper(private val item: NovaItem): INovaItem {
+    
     /**
      * The [NamespacedId] of this [NovaItem].
      */
@@ -46,4 +47,5 @@ internal class ApiItemWrapper(private val item: NovaItem): INovaItem {
     override fun createClientsideItemStack(amount: Int): ItemStack {
         return item.createClientsideItemStack(amount)
     }
+    
 }

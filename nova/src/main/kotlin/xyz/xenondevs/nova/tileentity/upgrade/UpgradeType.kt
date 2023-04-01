@@ -5,11 +5,11 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.reflection.createType
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.material.NovaItem
-import xyz.xenondevs.nova.material.NovaTileEntityBlock
+import xyz.xenondevs.nova.data.serialization.yaml.getDeserialized
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.name
-import xyz.xenondevs.nova.data.serialization.yaml.getDeserialized
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import kotlin.reflect.KType
 
 class UpgradeType<T> internal constructor(

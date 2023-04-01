@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 
 internal class ApiNovaTileEntityStateWrapper(state: NovaTileEntityState): INovaTileEntityState {
+    
     /**
      * The tile-entity represented by this [NovaTileEntityState].
      */
@@ -21,4 +22,5 @@ internal class ApiNovaTileEntityStateWrapper(state: NovaTileEntityState): INovaT
      * The location of this [NovaBlockState].
      */
     override val location: Location = state.location
+    
 }

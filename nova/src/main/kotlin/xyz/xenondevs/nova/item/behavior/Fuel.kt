@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.item.behavior
 
-import xyz.xenondevs.nova.material.NovaItem
-import xyz.xenondevs.nova.material.options.FuelOptions
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.options.FuelOptions
 
 class Fuel(val options: FuelOptions) : ItemBehavior() {
     

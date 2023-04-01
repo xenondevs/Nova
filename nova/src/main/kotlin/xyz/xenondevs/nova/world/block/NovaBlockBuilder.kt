@@ -1,25 +1,17 @@
 @file:Suppress("unused", "UNCHECKED_CAST")
 
-package xyz.xenondevs.nova.material.builder
+package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.material.MultiBlockLoader
-import xyz.xenondevs.nova.material.NovaBlock
-import xyz.xenondevs.nova.material.NovaTileEntityBlock
-import xyz.xenondevs.nova.material.PlaceCheckFun
-import xyz.xenondevs.nova.material.TileEntityConstructor
-import xyz.xenondevs.nova.material.options.BlockOptions
+import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
-import xyz.xenondevs.nova.world.block.BlockBehavior
-import xyz.xenondevs.nova.world.block.BlockLogic
-import xyz.xenondevs.nova.world.block.TileEntityBlockBehavior
 
 private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0)
 

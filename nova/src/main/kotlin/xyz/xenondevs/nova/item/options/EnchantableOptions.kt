@@ -1,9 +1,9 @@
-package xyz.xenondevs.nova.material.options
+package xyz.xenondevs.nova.item.options
 
 import net.minecraft.world.item.enchantment.EnchantmentCategory
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 
 @HardcodedMaterialOptions
 fun EnchantableOptions(

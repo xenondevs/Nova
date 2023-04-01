@@ -13,7 +13,7 @@ import xyz.xenondevs.invui.item.impl.AutoCycleItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.item.ItemUtils
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
     val itemProviders = if (recipeChoice is RecipeChoice.MaterialChoice) recipeChoice.choices.map { ItemWrapper(ItemStack(it)) }
@@ -42,7 +42,7 @@ fun handleRecipeChoiceItemClick(player: Player, clickType: ClickType, event: Inv
         player.showUsages(id)
     } else if (player.gameMode == GameMode.CREATIVE) {
         val itemStack = itemProvider.get().clone().apply { 
-            amount = novaMaterial?.maxStackSize ?: type.maxStackSize
+            amount = novaItem?.maxStackSize ?: type.maxStackSize
         }
         
         if (clickType == ClickType.MIDDLE) {

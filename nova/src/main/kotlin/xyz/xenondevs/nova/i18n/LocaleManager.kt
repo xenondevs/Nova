@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.formatSafely
 import xyz.xenondevs.nova.util.runAsyncTask
 

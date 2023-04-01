@@ -14,7 +14,7 @@ import xyz.xenondevs.invui.item.builder.addLoreLines
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.nova.data.world.block.property.Directional
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType

@@ -1,7 +1,7 @@
-package xyz.xenondevs.nova.material.options
+package xyz.xenondevs.nova.item.options
 
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 
 @HardcodedMaterialOptions
 fun FuelOptions(

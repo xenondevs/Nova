@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.item
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
 
 class ScrollUpItem : ScrollItem(-1) {
     

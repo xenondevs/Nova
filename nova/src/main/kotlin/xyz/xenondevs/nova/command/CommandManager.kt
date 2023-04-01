@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.material.ItemCategories
+import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 
 private val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher

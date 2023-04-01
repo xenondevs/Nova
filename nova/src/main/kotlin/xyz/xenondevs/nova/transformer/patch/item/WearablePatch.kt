@@ -29,7 +29,7 @@ import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.EquipAction
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitCopy
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_ARMOR_FIELD
@@ -88,7 +88,7 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
     }
     
     fun getNovaEquipable(itemStack: ItemStack): Equipable? {
-        val wearable = itemStack.novaMaterial?.itemLogic?.getBehavior(Wearable::class)
+        val wearable = itemStack.novaItem?.itemLogic?.getBehavior(Wearable::class)
             ?: return null
         
         return object : Equipable {
@@ -104,7 +104,7 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
     
     @JvmStatic
     fun getNovaArmorDispenseMethod(itemStack: ItemStack): DispenseItemBehavior? {
-        if (itemStack.novaMaterial?.itemLogic?.hasBehavior(Wearable::class) == true)
+        if (itemStack.novaItem?.itemLogic?.hasBehavior(Wearable::class) == true)
             return ArmorItem.DISPENSE_ITEM_BEHAVIOR
         
         return null

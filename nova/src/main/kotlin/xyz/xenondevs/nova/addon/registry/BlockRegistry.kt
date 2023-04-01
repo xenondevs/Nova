@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.nova.material.TileEntityConstructor
-import xyz.xenondevs.nova.material.builder.NovaBlockBuilder
-import xyz.xenondevs.nova.material.builder.TileEntityNovaBlockBuilder
+import xyz.xenondevs.nova.world.block.NovaBlockBuilder
+import xyz.xenondevs.nova.world.block.TileEntityConstructor
+import xyz.xenondevs.nova.world.block.TileEntityNovaBlockBuilder
 
 interface BlockRegistry : AddonGetter {
     

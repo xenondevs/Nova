@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
 import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.material.NovaBlock
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import net.minecraft.world.level.block.state.BlockState as MojangState
 

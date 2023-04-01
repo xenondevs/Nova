@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION", "MemberVisibilityCanBePrivate")
 
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.item.logic
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor

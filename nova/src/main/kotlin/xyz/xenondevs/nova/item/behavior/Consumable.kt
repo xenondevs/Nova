@@ -15,10 +15,10 @@ import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nmsutils.util.removeIf
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.options.FoodOptions
+import xyz.xenondevs.nova.item.options.FoodOptions.FoodType
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.options.FoodOptions
-import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.util.isRightClick

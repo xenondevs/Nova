@@ -34,9 +34,9 @@ import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTag
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
-import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.getCBFCompoundTag
@@ -52,18 +52,18 @@ import net.minecraft.nbt.Tag as NBTTag
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
 
-val ItemStack.novaMaterial: NovaItem?
+val ItemStack.novaItem: NovaItem?
     get() = (itemMeta?.unhandledTags?.get("nova") as? CompoundTag)
         ?.getString("id")
         ?.let(NovaRegistries.ITEM::get)
 
-val MojangStack.novaMaterial: NovaItem?
+val MojangStack.novaItem: NovaItem?
     get() = tag?.getCompound("nova")
         ?.getString("id")
         ?.let(NovaRegistries.ITEM::get)
 
 val ItemStack.novaMaxStackSize: Int
-    get() = novaMaterial?.maxStackSize ?: type.maxStackSize
+    get() = novaItem?.maxStackSize ?: type.maxStackSize
 
 val ItemStack.customModelData: Int
     get() {
@@ -86,7 +86,7 @@ val ItemStack.displayName: String?
     }
 
 val ItemStack.localizedName: String?
-    get() = novaMaterial?.localizedName ?: type.localizedName
+    get() = novaItem?.localizedName ?: type.localizedName
 
 val ItemStack.namelessCopyOrSelf: ItemStack
     get() {
@@ -113,7 +113,7 @@ val ItemStack.canDestroy: List<Material>
 
 val ItemStack.craftingRemainingItem: ItemStack?
     get() {
-        val novaMaterial = novaMaterial
+        val novaMaterial = novaItem
         if (novaMaterial != null)
             return novaMaterial.craftingRemainingItem?.get()
         
@@ -122,7 +122,7 @@ val ItemStack.craftingRemainingItem: ItemStack?
 
 val ItemStack.equipSound: String?
     get() {
-        val novaMaterial = novaMaterial
+        val novaMaterial = novaItem
         if (novaMaterial != null)
             return novaMaterial.itemLogic.getBehavior(Wearable::class)?.options?.equipSound
         
@@ -409,7 +409,7 @@ object ItemUtils {
     }
     
     fun getId(itemStack: ItemStack): String {
-        val novaMaterial = itemStack.novaMaterial
+        val novaMaterial = itemStack.novaItem
         if (novaMaterial != null) return novaMaterial.id.toString()
         
         val customNameKey = CustomItemServiceManager.getId(itemStack)

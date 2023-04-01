@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
 internal class ApiTileEntityWrapper(private val tileEntity: TileEntity): ITileEntity {
+    
     /**
      * The owner of this [TileEntity]
      */
@@ -29,4 +30,5 @@ internal class ApiTileEntityWrapper(private val tileEntity: TileEntity): ITileEn
     override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
         return tileEntity.getDrops(includeSelf)
     }
+    
 }

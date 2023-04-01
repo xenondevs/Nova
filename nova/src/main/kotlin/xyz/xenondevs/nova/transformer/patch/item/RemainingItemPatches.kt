@@ -23,7 +23,7 @@ import xyz.xenondevs.bytebase.util.isClass
 import xyz.xenondevs.bytebase.util.replaceEvery
 import xyz.xenondevs.bytebase.util.replaceEveryRange
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD
@@ -151,7 +151,7 @@ internal object RemainingItemPatches : MultiTransformer(
     
     @JvmStatic
     fun hasCraftingRemainingItem(itemStack: MojangStack): Boolean {
-        val novaMaterial = itemStack.novaMaterial
+        val novaMaterial = itemStack.novaItem
         if (novaMaterial != null)
             return novaMaterial.craftingRemainingItem != null
         
@@ -160,7 +160,7 @@ internal object RemainingItemPatches : MultiTransformer(
     
     @JvmStatic
     fun getRemainingItemStack(itemStack: MojangStack): MojangStack {
-        val novaMaterial = itemStack.novaMaterial
+        val novaMaterial = itemStack.novaItem
         if (novaMaterial != null)
             return novaMaterial.craftingRemainingItem?.get()?.nmsCopy ?: MojangStack.EMPTY
         
@@ -169,7 +169,7 @@ internal object RemainingItemPatches : MultiTransformer(
     
     @JvmStatic
     fun getRemainingBukkitItemStack(itemStack: MojangStack): BukkitStack? {
-        val novaMaterial = itemStack.novaMaterial
+        val novaMaterial = itemStack.novaItem
         if (novaMaterial != null)
             return novaMaterial.craftingRemainingItem?.get()
         

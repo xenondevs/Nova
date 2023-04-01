@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui
 
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.gui.structure.Structure.addGlobalIngredient
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
 import xyz.xenondevs.nova.ui.item.PageBackItem
 import xyz.xenondevs.nova.ui.item.PageForwardItem
 import xyz.xenondevs.nova.ui.item.ScrollDownItem

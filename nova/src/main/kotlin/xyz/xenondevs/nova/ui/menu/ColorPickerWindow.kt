@@ -10,7 +10,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
 import xyz.xenondevs.nova.ui.item.AioNumberItem
 import xyz.xenondevs.nova.ui.item.BackItem
 import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture

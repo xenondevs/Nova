@@ -75,7 +75,7 @@ object DamageableUtils {
         if (unbreakingLevel > 0 && Random.nextInt(0, unbreakingLevel + 1) > 0)
             return itemStack
         
-        val novaDamageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val novaDamageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (novaDamageable != null) {
             val newDamage = novaDamageable.getDamage(itemStack) + damage
             novaDamageable.setDamage(itemStack, newDamage)
@@ -108,7 +108,7 @@ object DamageableUtils {
             return ItemDamageResult.UNDAMAGED
         
         // check if the item is damageable
-        val novaDamageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val novaDamageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (novaDamageable == null && !itemStack.isDamageableItem)
             return ItemDamageResult.UNDAMAGED
         
@@ -166,7 +166,7 @@ object DamageableUtils {
     }
     
     fun isDamageable(itemStack: ItemStack): Boolean {
-        val novaDamageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val novaDamageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (novaDamageable != null)
             return true
         
@@ -174,7 +174,7 @@ object DamageableUtils {
     }
     
     fun getMaxDurability(itemStack: ItemStack): Int {
-        val damageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val damageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
             return damageable.options.durability
         }
@@ -183,7 +183,7 @@ object DamageableUtils {
     }
     
     fun getDamage(itemStack: ItemStack): Int {
-        val damageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val damageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
             return damageable.getDamage(itemStack)
         }
@@ -192,7 +192,7 @@ object DamageableUtils {
     }
     
     fun setDamage(itemStack: ItemStack, damage: Int) {
-        val damageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val damageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
             damageable.setDamage(itemStack, damage)
         } else {
@@ -203,7 +203,7 @@ object DamageableUtils {
     }
     
     fun isValidRepairItem(first: ItemStack, second: ItemStack): Boolean {
-        val damageable = first.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val damageable = first.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
             return damageable.options.repairIngredient?.test(second) ?: false
         }
@@ -212,7 +212,7 @@ object DamageableUtils {
     }
     
     internal fun isDamageable(itemStack: MojangStack): Boolean {
-        val novaDamageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val novaDamageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (novaDamageable != null)
             return true
         
@@ -220,7 +220,7 @@ object DamageableUtils {
     }
     
     internal fun getMaxDurability(itemStack: MojangStack): Int {
-        val damageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val damageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
             return damageable.options.durability
         }
@@ -229,7 +229,7 @@ object DamageableUtils {
     }
     
     internal fun getDamage(itemStack: MojangStack): Int {
-        val damageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val damageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
             return damageable.getDamage(itemStack)
         }
@@ -238,7 +238,7 @@ object DamageableUtils {
     }
     
     internal fun setDamage(itemStack: MojangStack, damage: Int) {
-        val damageable = itemStack.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val damageable = itemStack.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
             damageable.setDamage(itemStack, damage)
         } else {
@@ -247,7 +247,7 @@ object DamageableUtils {
     }
     
     internal fun isValidRepairItem(first: MojangStack, second: MojangStack): Boolean {
-        val damageable = first.novaMaterial?.itemLogic?.getBehavior(NovaDamageable::class)
+        val damageable = first.novaItem?.itemLogic?.getBehavior(NovaDamageable::class)
         if (damageable != null) {
             return damageable.options.repairIngredient?.test(second.bukkitMirror) ?: false
         }

@@ -7,7 +7,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.requireNonNull
 import xyz.xenondevs.nova.data.serialization.yaml.getDeserialized
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 

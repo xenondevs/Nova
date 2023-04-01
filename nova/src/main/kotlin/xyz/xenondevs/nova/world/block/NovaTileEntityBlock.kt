@@ -1,13 +1,12 @@
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.material.options.BlockOptions
+import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.BlockLogic
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 
 typealias TileEntityConstructor = ((NovaTileEntityState) -> TileEntity)

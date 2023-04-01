@@ -5,7 +5,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 import kotlin.math.roundToInt
 
 open class ProgressItem(val material: NovaItem, private val maxState: Int) : AbstractItem() {

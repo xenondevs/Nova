@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.util.item.DamageableUtils.isDamageable
 import xyz.xenondevs.nova.util.item.DamageableUtils.isValidRepairItem
 import xyz.xenondevs.nova.util.item.DamageableUtils.setDamage
 import xyz.xenondevs.nova.util.item.localizedName
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import kotlin.math.max
 import kotlin.math.min
@@ -215,7 +215,7 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     }
     
     private fun getLocalizedNovaName(player: Player, itemStack: ItemStack): String? {
-        val novaMaterial = itemStack.novaMaterial ?: return null
+        val novaMaterial = itemStack.novaItem ?: return null
         return LocaleManager.getTranslationOrNull((player as? ServerPlayer)?.locale ?: "en_us", novaMaterial.localizedName)
     }
     
@@ -230,9 +230,9 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     }
     
     private fun isSameItemType(first: ItemStack, second: ItemStack): Boolean {
-        val novaMaterial = first.novaMaterial
+        val novaMaterial = first.novaItem
         if (novaMaterial != null) {
-            return novaMaterial == second.novaMaterial
+            return novaMaterial == second.novaItem
         }
         
         return first.item == second.item

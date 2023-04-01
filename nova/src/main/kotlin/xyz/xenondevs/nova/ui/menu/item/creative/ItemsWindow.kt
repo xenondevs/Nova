@@ -19,9 +19,9 @@ import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.changeTitle
 import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
-import xyz.xenondevs.nova.material.ItemCategories
-import xyz.xenondevs.nova.material.ItemCategory
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.ItemCategories
+import xyz.xenondevs.nova.item.ItemCategory
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu

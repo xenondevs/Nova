@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.item.behavior
 
-import xyz.xenondevs.nova.material.NovaItem
-import xyz.xenondevs.nova.material.options.EnchantableOptions
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.options.EnchantableOptions
 
 class Enchantable(val options: EnchantableOptions) : ItemBehavior() {
     

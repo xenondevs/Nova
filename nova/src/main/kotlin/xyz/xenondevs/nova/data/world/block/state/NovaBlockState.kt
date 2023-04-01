@@ -7,9 +7,9 @@ import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.property.BlockProperty
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
-import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import kotlin.reflect.KClass

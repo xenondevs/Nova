@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.item
 
 import net.kyori.adventure.text.Component
 import org.bukkit.configuration.ConfigurationSection
@@ -77,7 +77,7 @@ internal object ItemCategories {
         
         CATEGORIES = YamlConfiguration.loadConfiguration(CATEGORIES_FILE.reader())
             .getConfigurationSectionList("categories")
-            .mapNotNull(ItemCategory::deserialize)
+            .mapNotNull(ItemCategory.Companion::deserialize)
         
         OBTAINABLE_ITEMS = CATEGORIES.flatMap { it.items }
     }

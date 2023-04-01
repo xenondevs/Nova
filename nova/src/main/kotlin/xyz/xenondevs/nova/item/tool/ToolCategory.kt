@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.item.behavior.Tool
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 
@@ -33,7 +33,7 @@ open class ToolCategory internal constructor(
             if (item == null)
                 return null
             
-            val novaCategory = item.novaMaterial?.itemLogic?.getBehavior(Tool::class)?.options?.category
+            val novaCategory = item.novaItem?.itemLogic?.getBehavior(Tool::class)?.options?.category
             if (novaCategory != null)
                 return novaCategory
             

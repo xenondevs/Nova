@@ -43,7 +43,7 @@ import xyz.xenondevs.nova.util.data.clientsideCopy
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -327,7 +327,7 @@ object RecipeManager : Listener {
         val recipe = event.recipe ?: return
         
         var requiresContainer = recipe.key in registeredVanillaRecipeKeys
-        if (!requiresContainer && event.inventory.contents.any { it.novaMaterial != null }) {
+        if (!requiresContainer && event.inventory.contents.any { it.novaItem != null }) {
             // prevent non-Nova recipes from using Nova items
             event.inventory.result = ItemStack(Material.AIR)
             requiresContainer = true

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.item.logic
 
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -20,7 +20,7 @@ internal object AdvancedTooltips : Listener {
     
     init {
         registerEvents()
-        Bukkit.getOnlinePlayers().forEach(::loadPlayer)
+        Bukkit.getOnlinePlayers().forEach(AdvancedTooltips::loadPlayer)
     }
     
     fun setType(player: Player, type: Type): Boolean {

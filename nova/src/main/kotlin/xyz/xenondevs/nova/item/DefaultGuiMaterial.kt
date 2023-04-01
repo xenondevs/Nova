@@ -1,8 +1,8 @@
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.item
 
+import xyz.xenondevs.nova.api.NovaMaterialRegistry.registerUnnamedHiddenCoreItem
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.registerUnnamedHiddenCoreItem
 
 @Suppress("unused")
 @InternalInit(stage = InitializationStage.PRE_WORLD)

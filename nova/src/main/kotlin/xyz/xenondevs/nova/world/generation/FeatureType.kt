@@ -13,8 +13,8 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.util.item.nmsBlock
+import xyz.xenondevs.nova.world.block.NovaBlock
 import java.util.function.Predicate
 
 /**

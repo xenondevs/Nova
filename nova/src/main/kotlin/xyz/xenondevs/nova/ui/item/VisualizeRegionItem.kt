@@ -5,7 +5,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion

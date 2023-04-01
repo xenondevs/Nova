@@ -1,14 +1,14 @@
-package xyz.xenondevs.nova.material.options
+package xyz.xenondevs.nova.item.options
 
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.item.tool.VanillaToolCategories
-import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_TIER
 import xyz.xenondevs.nova.util.get

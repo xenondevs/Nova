@@ -5,11 +5,11 @@ import net.minecraft.world.item.ItemStack
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.material.DefaultBlockOverlay
-import xyz.xenondevs.nova.material.NovaBlock
+import xyz.xenondevs.nova.item.DefaultBlockOverlay
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.sendDestructionPacket
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random

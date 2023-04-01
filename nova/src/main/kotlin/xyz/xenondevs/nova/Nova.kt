@@ -10,6 +10,10 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.ApiBlockManager
+import xyz.xenondevs.nova.api.ApiBlockRegistry
+import xyz.xenondevs.nova.api.ApiItemRegistry
+import xyz.xenondevs.nova.api.ApiTileEntityManager
+import xyz.xenondevs.nova.api.NovaMaterialRegistry
 import xyz.xenondevs.nova.api.block.NovaBlockRegistry
 import xyz.xenondevs.nova.api.item.NovaItemRegistry
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
@@ -17,15 +21,9 @@ import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
-import xyz.xenondevs.nova.api.ApiBlockRegistry
-import xyz.xenondevs.nova.api.ApiItemRegistry
-import xyz.xenondevs.nova.api.ApiTileEntityManager
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.nova.world.block.BlockManager
 import java.io.File
 import java.util.logging.Level
 import java.util.logging.Logger

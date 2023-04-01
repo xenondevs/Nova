@@ -9,7 +9,7 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.item.behavior.Tool
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.novaMaterial
 
 class ToolTier(
@@ -52,7 +52,7 @@ class ToolTier(
             if (item == null)
                 return null
             
-            val novaLevel = item.novaMaterial?.itemLogic?.getBehavior(Tool::class)?.options?.tier
+            val novaLevel = item.novaItem?.itemLogic?.getBehavior(Tool::class)?.options?.tier
             if (novaLevel != null)
                 return novaLevel
             

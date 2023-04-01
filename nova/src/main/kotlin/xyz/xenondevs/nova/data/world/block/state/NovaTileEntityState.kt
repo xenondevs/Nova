@@ -3,12 +3,12 @@ package xyz.xenondevs.nova.data.world.block.state
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteBuffer
-import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
 

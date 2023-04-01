@@ -15,7 +15,7 @@ import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
 import xyz.xenondevs.nova.util.data.getInputStacks

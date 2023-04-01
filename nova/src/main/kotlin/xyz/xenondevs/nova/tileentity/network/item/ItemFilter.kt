@@ -5,7 +5,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter.Companion.ITEM_FILTER_KEY
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.util.item.storeData
 
@@ -37,8 +37,8 @@ class ItemFilter(
     
     private fun ItemStack.checkFilterSimilarity(other: ItemStack): Boolean {
         return if (!nbt) {
-            val novaMaterial = novaMaterial
-            if (novaMaterial != null) novaMaterial == other.novaMaterial
+            val novaMaterial = novaItem
+            if (novaMaterial != null) novaMaterial == other.novaItem
             else type == other.type
         } else isSimilar(other)
     }

@@ -44,16 +44,16 @@ import xyz.xenondevs.nmsutils.particle.block
 import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.material.NovaBlock
-import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.ToolUtils
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
@@ -181,7 +181,7 @@ val Block.sourceFluidType: FluidType?
  */
 fun Block.place(ctx: BlockPlaceContext, playSound: Boolean = true): Boolean {
     val item = ctx.item
-    val novaMaterial = item.novaMaterial?.block
+    val novaMaterial = item.novaItem?.block
     if (novaMaterial is NovaBlock) {
         if (novaMaterial is NovaTileEntityBlock && !TileEntityLimits.canPlace(ctx).allowed)
             return false

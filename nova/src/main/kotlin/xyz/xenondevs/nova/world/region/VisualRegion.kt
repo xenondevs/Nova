@@ -4,7 +4,7 @@ import net.minecraft.world.item.ItemDisplayContext
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.joml.Vector3f
-import xyz.xenondevs.nova.material.DefaultBlockOverlay
+import xyz.xenondevs.nova.item.DefaultBlockOverlay
 import xyz.xenondevs.nova.util.component1
 import xyz.xenondevs.nova.util.component2
 import xyz.xenondevs.nova.util.component3

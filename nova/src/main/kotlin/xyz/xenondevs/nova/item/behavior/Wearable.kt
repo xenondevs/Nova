@@ -14,12 +14,12 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
-import xyz.xenondevs.nova.item.PacketItemData
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.logic.PacketItemData
+import xyz.xenondevs.nova.item.options.WearableOptions
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.NovaItem
-import xyz.xenondevs.nova.material.options.WearableOptions
 import xyz.xenondevs.nova.player.equipment.ArmorType
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.item.isActuallyInteractable

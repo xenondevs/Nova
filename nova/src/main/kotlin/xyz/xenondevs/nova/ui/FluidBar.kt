@@ -7,8 +7,8 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.util.InventoryUtils
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder

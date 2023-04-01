@@ -22,7 +22,7 @@ import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.DamageableUtils
 import xyz.xenondevs.nova.util.item.ItemDamageResult
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD
 import java.util.function.Consumer
 
@@ -69,7 +69,7 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
     
     @JvmStatic
     fun hurtEnemy(itemStack: ItemStack, player: Player) {
-        val novaMaterial = itemStack.novaMaterial
+        val novaMaterial = itemStack.novaItem
         
         val damage = if (novaMaterial != null) {
             val damageable = novaMaterial.itemLogic.getBehavior(Damageable::class) ?: return
@@ -96,7 +96,7 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
     
     @JvmStatic
     fun isArmorItem(itemStack: ItemStack): Boolean {
-        val novaMaterial = itemStack.novaMaterial ?: return itemStack.item is ArmorItem
+        val novaMaterial = itemStack.novaItem ?: return itemStack.item is ArmorItem
         val novaItem = novaMaterial.itemLogic
         return novaItem.hasBehavior(Wearable::class) && novaItem.hasBehavior(Damageable::class)
     }

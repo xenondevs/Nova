@@ -14,7 +14,7 @@ import xyz.xenondevs.nmsutils.advancement.advancement
 import xyz.xenondevs.nmsutils.advancement.predicate.ItemPredicate
 import xyz.xenondevs.nmsutils.advancement.predicate.NbtPredicate
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 
 fun ItemPredicate.Builder.nbt(compound: CompoundTag) {
     nbt(NbtPredicate(compound))

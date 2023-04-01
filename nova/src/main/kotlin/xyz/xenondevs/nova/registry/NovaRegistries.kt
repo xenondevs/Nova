@@ -3,15 +3,15 @@ package xyz.xenondevs.nova.registry
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.recipe.RecipeType
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
-import xyz.xenondevs.nova.material.NovaBlock
-import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.player.ability.AbilityType
 import xyz.xenondevs.nova.player.attachment.AttachmentType
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 

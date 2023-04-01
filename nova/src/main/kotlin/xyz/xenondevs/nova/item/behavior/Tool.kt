@@ -3,10 +3,10 @@ package xyz.xenondevs.nova.item.behavior
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.options.ToolOptions
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.NovaItem
-import xyz.xenondevs.nova.material.options.ToolOptions
 import java.util.*
 
 private const val PLAYER_ATTACK_SPEED = 4.0

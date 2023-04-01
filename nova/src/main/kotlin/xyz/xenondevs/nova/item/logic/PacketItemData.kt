@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.item
+package xyz.xenondevs.nova.item.logic
 
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag

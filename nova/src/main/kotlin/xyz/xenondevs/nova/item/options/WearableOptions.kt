@@ -1,10 +1,10 @@
-package xyz.xenondevs.nova.material.options
+package xyz.xenondevs.nova.item.options
 
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.ConfigAccess
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.player.equipment.ArmorType
 
 @HardcodedMaterialOptions

@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.builder.setLore
-import xyz.xenondevs.nova.material.PacketItems
+import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.util.item.unhandledTags
 
 open class ItemModelData(val id: ResourceLocation, val material: Material, val dataArray: IntArray) {

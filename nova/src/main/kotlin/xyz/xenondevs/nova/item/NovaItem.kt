@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.item
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
@@ -8,12 +8,14 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.item.ItemLogic
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.item.logic.ItemLogic
+import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.world.block.NovaBlock
 import kotlin.math.min
 import kotlin.reflect.KClass
 

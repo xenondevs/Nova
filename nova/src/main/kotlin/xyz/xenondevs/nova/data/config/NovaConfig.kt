@@ -14,9 +14,8 @@ import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.material.ItemCategories
-import xyz.xenondevs.nova.material.NovaBlock
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.ItemCategories
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.player.PlayerFreezer
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -27,6 +26,7 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import java.io.File
 import kotlin.collections.component1

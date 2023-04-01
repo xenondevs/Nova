@@ -7,7 +7,7 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.material.NovaBlock
+import xyz.xenondevs.nova.world.block.NovaBlock
 
 data class WailaLine(val text: Component, val alignment: Alignment) {
     

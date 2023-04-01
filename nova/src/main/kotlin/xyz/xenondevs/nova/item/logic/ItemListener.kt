@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.item
+package xyz.xenondevs.nova.item.logic
 
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import org.bukkit.entity.Player
@@ -25,7 +25,7 @@ import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.isCompletelyDenied
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
@@ -140,7 +140,7 @@ internal object ItemListener : Listener {
     }
     
     private val ItemStack.logic: ItemLogic?
-        get() = novaMaterial?.itemLogic
+        get() = novaItem?.itemLogic
     
 }
 

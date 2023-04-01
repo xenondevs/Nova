@@ -1,11 +1,11 @@
-package xyz.xenondevs.nova.item.impl
+package xyz.xenondevs.nova.item.behavior.impl
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
-import xyz.xenondevs.nova.item.PacketItemData
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.NumberFormatUtils

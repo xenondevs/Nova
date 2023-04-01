@@ -13,11 +13,11 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.ui.UpgradesGui
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import kotlin.math.min
 
 private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
-    val novaMaterial = novaMaterial ?: return null
+    val novaMaterial = novaItem ?: return null
     return UpgradeType.of<UpgradeType<*>>(novaMaterial)
 }
 

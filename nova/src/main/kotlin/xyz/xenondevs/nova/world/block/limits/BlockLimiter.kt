@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.block.limits
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.configuration.ConfigurationSection
-import xyz.xenondevs.nova.material.NovaBlock
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits.PlaceResult

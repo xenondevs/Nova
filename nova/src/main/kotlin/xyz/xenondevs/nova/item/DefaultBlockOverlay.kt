@@ -1,6 +1,6 @@
-package xyz.xenondevs.nova.material
+package xyz.xenondevs.nova.item
 
-import xyz.xenondevs.nova.material.NovaMaterialRegistry.registerUnnamedHiddenCoreItem
+import xyz.xenondevs.nova.api.NovaMaterialRegistry.registerUnnamedHiddenCoreItem
 
 object DefaultBlockOverlay {
     

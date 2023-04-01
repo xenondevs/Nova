@@ -26,7 +26,6 @@ import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.material.NovaTileEntityBlock
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
@@ -48,6 +47,7 @@ import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.TileEntityBlockBehavior
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager

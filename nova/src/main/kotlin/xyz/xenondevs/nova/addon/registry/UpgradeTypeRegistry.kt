@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.nova.material.NovaItem
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.util.ResourceLocation

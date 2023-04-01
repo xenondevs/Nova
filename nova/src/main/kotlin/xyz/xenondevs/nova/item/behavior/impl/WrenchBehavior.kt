@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.item.impl
+package xyz.xenondevs.nova.item.behavior.impl
 
 import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.ChatMessageType

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.material.options
+package xyz.xenondevs.nova.item.options
 
 import org.bukkit.Material
 import xyz.xenondevs.nova.item.tool.ToolCategory

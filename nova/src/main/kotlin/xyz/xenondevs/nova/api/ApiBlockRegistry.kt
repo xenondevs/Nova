@@ -9,9 +9,8 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 internal object ApiBlockRegistry: NovaBlockRegistry {
     
     override fun getOrNull(id: String): NovaBlock? {
-        val id = ResourceLocation.of(id, ':')
-        
-        return NovaRegistries.BLOCK[id]?.let(::ApiBlockWrapper)
+        val loc = ResourceLocation.of(id, ':')
+        return NovaRegistries.BLOCK[loc]?.let(::ApiBlockWrapper)
     }
     
     override fun getOrNull(id: NamespacedId) = getOrNull(id.toString())

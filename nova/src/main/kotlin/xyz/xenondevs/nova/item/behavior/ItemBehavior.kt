@@ -14,10 +14,10 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
-import xyz.xenondevs.nova.item.PacketItemData
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.NovaItem
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 

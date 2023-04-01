@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.material.options
+package xyz.xenondevs.nova.item.options
 
 /**
  * It is generally recommended to make your material options configurable.

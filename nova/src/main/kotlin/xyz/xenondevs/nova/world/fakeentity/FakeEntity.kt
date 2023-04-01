@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.material.PacketItems
+import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.fromFixedPoint
 import xyz.xenondevs.nova.util.nmsCopy

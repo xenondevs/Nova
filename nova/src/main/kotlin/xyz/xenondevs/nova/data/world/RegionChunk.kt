@@ -9,11 +9,11 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
-import xyz.xenondevs.nova.material.NovaBlock
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.block.NovaBlock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.logging.Level
 

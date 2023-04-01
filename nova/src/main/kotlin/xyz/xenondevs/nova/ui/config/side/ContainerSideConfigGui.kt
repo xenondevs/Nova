@@ -12,7 +12,7 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.addLoreLines
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.material.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiMaterial
 import xyz.xenondevs.nova.tileentity.network.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.EndPointContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType

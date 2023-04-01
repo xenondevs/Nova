@@ -1,13 +1,13 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.nova.item.ItemLogic
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.material.NovaBlock
-import xyz.xenondevs.nova.material.NovaItem
-import xyz.xenondevs.nova.material.builder.NovaItemBuilder
+import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.world.block.NovaBlock
 
 interface ItemRegistry : AddonGetter {
     
