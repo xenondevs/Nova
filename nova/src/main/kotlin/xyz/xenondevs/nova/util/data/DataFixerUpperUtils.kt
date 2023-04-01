@@ -16,7 +16,7 @@ import com.mojang.datafixers.util.Pair as MojangPair
 fun <T> Codec<T>.decodeJsonFile(file: File) =
     decode(NMSUtils.REGISTRY_OPS, file.reader().use(JsonParser::parseReader))!!
 
-inline fun <reified T : S, S: Any> Codec<S>.subType(): Codec<T> =
+inline fun <reified T : S, S : Any> Codec<S>.subType(): Codec<T> =
     this.comapFlatMap({ (it as? T).asDataResult("Expected subtype ${T::class.simpleName} but got ${it::class.simpleName}") }, { it })
 
 fun <R> DataResult<R>.resultOrNull(): R? = result().orElse(null)
@@ -67,17 +67,17 @@ fun <F : Any, S : Any> DataResult<MojangPair<Holder<F>, S>>.getFirstValueOrThrow
     else throw IllegalArgumentException(error().get().toString())
 }
 
-fun <R> Result<R>.asDataResult() : DataResult<R> {
+fun <R> Result<R>.asDataResult(): DataResult<R> {
     return if (isSuccess) DataResult.success(getOrThrow())
     else DataResult.error { toString() }
 }
 
-fun <R: Any> R?.asDataResult(error: String): DataResult<R> =
+fun <R : Any> R?.asDataResult(error: String): DataResult<R> =
     if (this != null) DataResult.success(this) else DataResult.error { error }
 
-class ElementLocationOrTagKey<T>(internal val either: Either<ResourceLocation, TagKey<T>>) {
+class ResourceLocationOrTagKey<T> internal constructor(internal val either: Either<ResourceLocation, TagKey<T>>) {
     
-    val element: ResourceLocation
+    val location: ResourceLocation
         get() = either.left().get()
     
     val tag: TagKey<T>
@@ -94,17 +94,25 @@ class ElementLocationOrTagKey<T>(internal val either: Either<ResourceLocation, T
         return either.map({ it.toString() }, { it.location.toString() })
     }
     
-}
-
-object DataFixerUpperUtils {
-    
-    @JvmStatic
-    fun <T, R : Registry<T>> tagOrElementCodec(registry: ResourceKey<R>): Codec<ElementLocationOrTagKey<T>> {
-        val tagKeyCodec = TagKey.hashedCodec(registry)
-        return Codec.either(ResourceLocation.CODEC, tagKeyCodec).xmap(
-            { either -> ElementLocationOrTagKey(either) },
-            { tagKeyOrElementLocation -> tagKeyOrElementLocation.either }
-        )
+    companion object {
+        
+        fun <T> ofTag(tag: TagKey<T>): ResourceLocationOrTagKey<T> {
+            return ResourceLocationOrTagKey(Either.right(tag))
+        }
+        
+        fun <T> ofLocation(location: ResourceLocation): ResourceLocationOrTagKey<T> {
+            return ResourceLocationOrTagKey(Either.left(location))
+        }
+        
+        @JvmStatic
+        fun <T, R : Registry<T>> codec(registry: ResourceKey<R>): Codec<ResourceLocationOrTagKey<T>> {
+            val tagKeyCodec = TagKey.hashedCodec(registry)
+            return Codec.either(ResourceLocation.CODEC, tagKeyCodec).xmap(
+                { either -> ResourceLocationOrTagKey(either) },
+                { tagKeyOrElementLocation -> tagKeyOrElementLocation.either }
+            )
+        }
+        
     }
     
 }
