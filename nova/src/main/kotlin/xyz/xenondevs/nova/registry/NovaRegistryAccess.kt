@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.registry
 
 import com.mojang.serialization.Lifecycle
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.WritableRegistry
@@ -57,7 +56,7 @@ object NovaRegistryAccess : RegistryAccess {
     
     internal fun <E : Any> addRegistry(
         registryName: ResourceLocation
-    ): WritableRegistry<E> = addRegistry(registryName, ::MappedRegistry)
+    ): WritableRegistry<E> = addRegistry(registryName, ::InstantBindMappedRegistry)
     
     internal fun <E: Any> addFuzzyRegistry(
         registryName: ResourceLocation

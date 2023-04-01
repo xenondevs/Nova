@@ -5,6 +5,7 @@ import com.mojang.serialization.DynamicOps
 import com.mojang.serialization.Lifecycle
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
+import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
@@ -139,6 +140,7 @@ internal object ReflectionRegistry {
     val BLOCK_GETTER_GET_BLOCK_STATE_METHOD = getMethod(BlockGetter::class, false, "SRM(net.minecraft.world.level.BlockGetter getBlockState)", BlockPos::class)
     val FEATURE_PLACE_CONTEXT_RANDOM_METHOD = getMethod(FeaturePlaceContext::class, false, "SRM(net.minecraft.world.level.levelgen.feature.FeaturePlaceContext random)")
     val DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD = getMethod(DispenserBlock::class, true, "SRM(net.minecraft.world.level.block.DispenserBlock getDispenseMethod)", MojangStack::class)
+    val HOLDER_REFERENCE_BIND_VALUE_METHOD = getMethod(Holder.Reference::class, true, "SRM(net.minecraft.util.Holder\$Reference bindValue)", Any::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
