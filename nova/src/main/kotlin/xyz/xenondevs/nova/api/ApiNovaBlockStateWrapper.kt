@@ -10,7 +10,7 @@ internal class ApiNovaBlockStateWrapper(private val state: NovaBlockState): INov
     /**
      * The material of this [NovaBlockState].
      */
-    override val material: NovaBlock = ApiBlockWrapper(state.material)
+    override val material: NovaBlock get() = ApiBlockWrapper(state.material)
     
     /**
      * The location of this [NovaBlockState].

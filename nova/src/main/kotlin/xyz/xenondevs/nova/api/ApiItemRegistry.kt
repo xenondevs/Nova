@@ -9,9 +9,8 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 internal object ApiItemRegistry: NovaItemRegistry {
     
     override fun getOrNull(id: String): NovaItem? {
-        val id = ResourceLocation.of(id, ':')
-        
-        return NovaRegistries.ITEM[id]?.let(::ApiItemWrapper)
+        val loc = ResourceLocation.of(id, ':')
+        return NovaRegistries.ITEM[loc]?.let(::ApiItemWrapper)
     }
     
     override fun getOrNull(id: NamespacedId) = getOrNull(id.toString())

@@ -18,12 +18,12 @@ internal class ApiItemWrapper(private val item: NovaItem): INovaItem {
     /**
      * The [NovaBlock] of this [NovaItem] or null if there is none.
      */
-    override val block: NovaBlock? = item.block?.let(::ApiBlockWrapper)
+    override val block: NovaBlock? get() = item.block?.let(::ApiBlockWrapper)
     
     /**
      * The maximum stack size for items of this [NovaItem].
      */
-    override val maxStackSize = item.maxStackSize
+    override val maxStackSize get() = item.maxStackSize
     
     /**
      * Gets the localized name for this [NovaItem].

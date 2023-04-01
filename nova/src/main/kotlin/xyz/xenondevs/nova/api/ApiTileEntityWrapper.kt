@@ -12,17 +12,17 @@ internal class ApiTileEntityWrapper(private val tileEntity: TileEntity): ITileEn
     /**
      * The owner of this [TileEntity]
      */
-    override val owner: OfflinePlayer? = tileEntity.owner
+    override val owner: OfflinePlayer? get() = tileEntity.owner
     
     /**
      * The material of this [TileEntity]
      */
-    override val material: NovaBlock = ApiBlockWrapper(tileEntity.material)
+    override val material: NovaBlock get() = ApiBlockWrapper(tileEntity.material)
     
     /**
      * The location of this [TileEntity]
      */
-    override val location: Location = tileEntity.location
+    override val location: Location get() = tileEntity.location
     
     /**
      * Retrieves a list of all [ItemStacks][ItemStack] this [TileEntity] would drop

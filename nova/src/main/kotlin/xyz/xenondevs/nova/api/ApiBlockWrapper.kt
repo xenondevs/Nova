@@ -12,12 +12,12 @@ internal class ApiBlockWrapper(val block: NovaBlock): INovaBlock {
     /**
      * The [NamespacedId] of this [NovaMaterial].
      */
-    override val id = block.id.namespacedId
+    override val id get() = block.id.namespacedId
     
     /**
      * The [NovaItem] of this [NovaBlock] or null if there is none.
      */
-    override val item: NovaItem? = block.item?.let(::ApiItemWrapper)
+    override val item: NovaItem? get() = block.item?.let(::ApiItemWrapper)
     
     /**
      * Gets the localized name for this [NovaBlock].
