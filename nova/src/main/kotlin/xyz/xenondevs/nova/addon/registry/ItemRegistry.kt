@@ -46,8 +46,10 @@ interface ItemRegistry : AddonGetter {
             block.id,
             localizedName,
             ItemLogic(*behaviors),
-            isHidden = isHidden
+            isHidden = isHidden,
+            block = block
         )
+        block.item = item
         NovaRegistries.ITEM[item.id] = item
         return item
     }
