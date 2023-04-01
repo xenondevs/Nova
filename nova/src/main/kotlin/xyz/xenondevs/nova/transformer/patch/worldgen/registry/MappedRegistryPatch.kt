@@ -16,11 +16,11 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MAPPED_REGISTRY_REG
 
 /**
  * Mojang no longer binds the value of holders when registering something to a registry. So we wrap all values passed to
- * [MappedRegistry.registerMapping] in a [ValueWrapper] and inject a check to unwrap and bind the value.
+ * [MappedRegistry.registerMapping] in a [InstantBindValue] and inject a check to unwrap and bind the value.
  */
 internal object MappedRegistryPatch : MethodTransformer(MAPPED_REGISTRY_REGISTER_MAPPING_METHOD) {
     
-    private val VALUE_WRAPPER_NAME = ValueWrapper::class.internalName
+    private val VALUE_WRAPPER_NAME = InstantBindValue::class.internalName
     
     override fun transform() {
         methodNode.insertBeforeFirst(buildInsnList {

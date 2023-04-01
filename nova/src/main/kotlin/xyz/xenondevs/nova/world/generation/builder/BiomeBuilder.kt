@@ -44,7 +44,7 @@ import java.awt.Color
 import java.util.*
 
 /**
- * Builder for [Biome]s. Use [build] to get the [Biome] instance or [register] to register it. Check out the
+ * Builder for [Biomes][Biome]. Use [build] to get the [Biome] instance or [register] to register it. Check out the
  * [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/biome/) on biomes for more information.
  *
  * @see [BiomeRegistry]

@@ -10,7 +10,7 @@ import net.minecraft.core.RegistryAccess
 import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.transformer.patch.worldgen.registry.ValueWrapper
+import xyz.xenondevs.nova.transformer.patch.worldgen.registry.InstantBindValue
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.data.decodeJsonFile
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
@@ -68,7 +68,7 @@ abstract class WorldGenRegistry internal constructor(private val registryAccess:
     
     protected fun <T : Any> registerAll(registryKey: ResourceKey<Registry<T>>, map: Map<NamespacedId, T>) {
         val registry = registryAccess.registry(registryKey).get() as Registry<Any>
-        map.forEach { (id, value) -> Registry.register(registry, id.toString(":"), ValueWrapper(value)) }
+        map.forEach { (id, value) -> Registry.register(registry, id.toString(":"), InstantBindValue(value)) }
     }
     
     internal abstract fun register()

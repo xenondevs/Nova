@@ -5,11 +5,11 @@ import xyz.xenondevs.nova.world.generation.registry.WorldGenRegistry;
 /**
  * Used in {@link MappedRegistryPatch} and {@link WorldGenRegistry} to disinguish Nova registry entries from vanilla ones.
  */
-public class ValueWrapper {
+public class InstantBindValue {
     
     public Object value;
     
-    public ValueWrapper(Object value) {
+    public InstantBindValue(Object value) {
         this.value = value;
     }
     

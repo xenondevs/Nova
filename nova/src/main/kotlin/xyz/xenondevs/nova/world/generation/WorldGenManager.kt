@@ -11,13 +11,7 @@ import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjector
-import xyz.xenondevs.nova.world.generation.registry.BiomeInjectionRegistry
-import xyz.xenondevs.nova.world.generation.registry.BiomeRegistry
-import xyz.xenondevs.nova.world.generation.registry.CarverRegistry
-import xyz.xenondevs.nova.world.generation.registry.DimensionRegistry
-import xyz.xenondevs.nova.world.generation.registry.FeatureRegistry
-import xyz.xenondevs.nova.world.generation.registry.NoiseRegistry
-import xyz.xenondevs.nova.world.generation.registry.StructureRegistry
+import xyz.xenondevs.nova.world.generation.registry.WorldGenRegistry
 
 @OptIn(ExperimentalWorldGen::class)
 @InternalInit(
@@ -27,9 +21,9 @@ import xyz.xenondevs.nova.world.generation.registry.StructureRegistry
 internal object WorldGenManager {
     
     private val WORLD_GEN_REGISTRIES by lazy {
-        listOf(
-            FeatureRegistry, NoiseRegistry, CarverRegistry, StructureRegistry, BiomeRegistry, BiomeInjectionRegistry,
-            DimensionRegistry
+        listOf<WorldGenRegistry>(
+//            FeatureRegistry, NoiseRegistry, CarverRegistry, StructureRegistry, BiomeRegistry, BiomeInjectionRegistry,
+//            DimensionRegistry
         )
     }
     private val NMS_REGISTRIES  by lazy {

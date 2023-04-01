@@ -10,29 +10,29 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import xyz.xenondevs.nova.util.NMSUtils;
-import xyz.xenondevs.nova.util.data.DataFixerUpperUtils;
-import xyz.xenondevs.nova.util.data.ElementLocationOrTagKey;
+import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries;
+import xyz.xenondevs.nova.util.data.ResourceLocationOrTagKey;
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-
 @ExperimentalWorldGen
 public record BiomeInjection(
-    Either<List<ElementLocationOrTagKey<Biome>>, ElementLocationOrTagKey<Biome>> biomes,
+    Either<List<ResourceLocationOrTagKey<Biome>>, ResourceLocationOrTagKey<Biome>> biomes,
     List<HolderSet<PlacedFeature>> features
 ) {
     
-    private static final Registry<Biome> BIOME_REGISTRY = NMSUtils.INSTANCE.getRegistry(Registries.BIOME);
-    private static final Codec<ElementLocationOrTagKey<Biome>> BIOME_CODEC = DataFixerUpperUtils.tagOrElementCodec(Registries.BIOME);
+    private static final Registry<Biome> BIOME_REGISTRY = VanillaRegistries.BIOME;
+    private static final Codec<ResourceLocationOrTagKey<Biome>> BIOME_CODEC = ResourceLocationOrTagKey.codec(Registries.BIOME);
     
-    public static final Codec<BiomeInjection> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Codec.either(BIOME_CODEC.listOf(), BIOME_CODEC).fieldOf("biomes").forGetter(BiomeInjection::biomes),
-        PlacedFeature.LIST_OF_LISTS_CODEC.fieldOf("features").forGetter(BiomeInjection::features)
-    ).apply(instance, BiomeInjection::new));
+    public static final Codec<BiomeInjection> CODEC = RecordCodecBuilder.create(
+        instance -> instance.group(
+            Codec.either(BIOME_CODEC.listOf(), BIOME_CODEC).fieldOf("biomes").forGetter(BiomeInjection::biomes),
+            PlacedFeature.LIST_OF_LISTS_CODEC.fieldOf("features").forGetter(BiomeInjection::features)
+        ).apply(instance, BiomeInjection::new)
+    );
     
     public Set<ResourceLocation> getBiomes() {
         var list = biomes.map(Function.identity(), List::of);
@@ -45,10 +45,10 @@ public record BiomeInjection(
                     throw new IllegalStateException("Biome tag " + tagKey + " does not exist!");
                 biomes.get().stream().forEach(holder -> out.add(BIOME_REGISTRY.getKey(holder.value())));
             } else if (tagOrElement.isElement()) {
-                var resourceLocation = tagOrElement.getElement();
-                if (!BIOME_REGISTRY.containsKey(resourceLocation))
-                    throw new IllegalArgumentException("Biome " + resourceLocation + " does not exist!");
-                out.add(resourceLocation);
+                var location = tagOrElement.getLocation();
+                if (!BIOME_REGISTRY.containsKey(location))
+                    throw new IllegalArgumentException("Biome " + location + " does not exist!");
+                out.add(location);
             } else throw new IllegalStateException("BiomeInjection has neither a tag nor a resource location!");
         }
         return out;

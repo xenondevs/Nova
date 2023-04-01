@@ -8,8 +8,8 @@ import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.builder.BiomeBuilder
+import xyz.xenondevs.nova.world.generation.builder.BiomeInjectionBuilder
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
-import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjectionBuilder
 
 interface BiomeRegistry : AddonGetter {
     
