@@ -15,7 +15,6 @@ plugins {
 
 dependencies {
     // api dependencies
-    api(project(":nova-api"))
     spigotLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
@@ -26,6 +25,7 @@ dependencies {
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.8:remapped-mojang")
     
     // internal dependencies
+    compileOnly(project(":nova-api"))
     compileOnly(project(":nova-loader"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
