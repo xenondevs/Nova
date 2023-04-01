@@ -158,7 +158,7 @@ internal object Initializer : Listener {
         dependencies.forEach { dependency ->
             // wait for all dependencies to load and skip own initialization if one of them failed
             if (!dependency.initialization.get()) {
-                LOGGER.warning("Skipping initialization: ${initializable::class.jvmName}")
+                LOGGER.warning("Skipping initialization: $initializable")
                 initializable.initialization.complete(false)
                 return false
             }
