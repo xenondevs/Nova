@@ -1,5 +1,8 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.addon
 
+import org.objectweb.asm.Type
 import xyz.xenondevs.commons.collections.CollectionUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -8,11 +11,14 @@ import xyz.xenondevs.nova.addon.loader.LibraryLoaderPools
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
+import xyz.xenondevs.nova.initialize.Init
 import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InitializableClass
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.transformer.Patcher
+import xyz.xenondevs.nova.util.data.JarUtils
 import java.io.File
 import java.util.logging.Level
 
@@ -48,6 +54,7 @@ object AddonManager {
     internal val addonsDir = File(NOVA.dataFolder, "addons/")
     internal val loaders = HashMap<String, AddonLoader>()
     internal val addons = LinkedHashMap<String, Addon>()
+    private val addonInitializables = HashMap<Addon, List<InitializableClass>>()
     
     init {
         addonsDir.mkdirs()
@@ -107,11 +114,25 @@ object AddonManager {
                 loader.classLoader.setDependencyClassLoaders()
                 val addon = loader.load()
                 addons[addon.description.id] = addon
-                addon.init()
+                initializeAddon(loader, addon)
             } catch (t: Throwable) {
                 throw AddonInitializeException(loader, t)
             }
         }
+    }
+    
+    private fun initializeAddon(loader: AddonLoader, addon: Addon) {
+        // addon initializables
+        val initClasses = JarUtils.findAnnotatedClasses(addon.addonFile, Init::class).map { (clazz, annotation) ->
+            val dependsOn = (annotation["dependsOn"] as List<Type>?)
+                ?.mapTo(HashSet()) { it.internalName } ?: emptySet()
+            InitializableClass(loader.classLoader, clazz, dependsOn)
+        }.let { CollectionUtils.sortDependenciesMapped(it, InitializableClass::dependsOn, InitializableClass::className) }
+        addonInitializables[addon] = initClasses
+        initClasses.forEach(InitializableClass::initialize)
+        
+        // init fun
+        addon.init()
     }
     
     internal fun enableAddons() {
@@ -131,6 +152,7 @@ object AddonManager {
             try {
                 addon.logger.info("Disabling ${getAddonString(addon.description)}")
                 addon.onDisable()
+                addonInitializables[addon]?.forEach(InitializableClass::disable)
             } catch (t: Throwable) {
                 addon.logger.log(Level.SEVERE, "An exception occurred trying to disable ${getAddonString(addon.description)}", t)
             }

@@ -8,9 +8,10 @@ import xyz.xenondevs.nova.addon.registry.NetworkTypeRegistry
 import xyz.xenondevs.nova.addon.registry.RecipeTypeRegistry
 import xyz.xenondevs.nova.addon.registry.ToolCategoryRegistry
 import xyz.xenondevs.nova.addon.registry.ToolTierRegistry
+import xyz.xenondevs.nova.addon.registry.UpgradeTypeRegistry
 import xyz.xenondevs.nova.addon.registry.WailaInfoProviderRegistry
 
 class AddonRegistryHolder internal constructor(
     override val addon: Addon
 ) : AbilityTypeRegistry, AttachmentTypeRegistry, BlockRegistry, ItemRegistry, NetworkTypeRegistry, RecipeTypeRegistry,
-    ToolCategoryRegistry,  ToolTierRegistry, WailaInfoProviderRegistry
+    ToolCategoryRegistry, ToolTierRegistry, UpgradeTypeRegistry, WailaInfoProviderRegistry

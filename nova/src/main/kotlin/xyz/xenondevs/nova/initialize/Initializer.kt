@@ -15,7 +15,6 @@ import org.bukkit.event.server.ServerLoadEvent
 import org.bukkit.inventory.ItemStack
 import org.objectweb.asm.Type
 import xyz.xenondevs.commons.collections.CollectionUtils
-import xyz.xenondevs.commons.reflection.hasEmptyArguments
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.util.InventoryUtils
 import xyz.xenondevs.invui.virtualinventory.StackSizeProvider
@@ -36,19 +35,15 @@ import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
-import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
-import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.hasAnnotation
-import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmName
 import xyz.xenondevs.inventoryaccess.component.i18n.Languages as InvUILanguages
 
 internal object Initializer : Listener {
     
-    private val toInit = ObjectArrayList<InitializableClass>()
+    private val toInit = ObjectArrayList<InternalInitializableClass>()
     
-    val initialized: MutableList<InitializableClass> = ObjectLists.synchronize(ObjectArrayList())
+    val initialized: MutableList<InternalInitializableClass> = ObjectLists.synchronize(ObjectArrayList())
     var isDone = false
         private set
     
@@ -57,17 +52,17 @@ internal object Initializer : Listener {
     // Map structure: https://i.imgur.com/VHLkAtM.png (stage instead of initializationStage)
     @Suppress("UNCHECKED_CAST")
     fun searchClasses() {
-        var classes: List<InitializableClass> = JarUtils.findAnnotatedClasses(NOVA.pluginFile, InternalInit::class).asSequence()
+        var classes: List<InternalInitializableClass> = JarUtils.findAnnotatedClasses(NOVA.pluginFile, InternalInit::class).asSequence()
             .map { (clazz, annotation) ->
                 val stageName = (annotation["stage"] as Array<String>?)?.get(1)
                     ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
                 val stage = enumValueOf<InitializationStage>(stageName)
                 val dependsOn = (annotation["dependsOn"] as List<Type>?)?.mapTo(ObjectOpenHashSet()) { it.internalName } ?: ObjectSets.emptySet()
                 
-                return@map InitializableClass(clazz, stage, dependsOn)
+                return@map InternalInitializableClass(clazz, stage, dependsOn)
             }.toMutableList()
         
-        classes = CollectionUtils.sortDependenciesMapped(classes, InitializableClass::dependsOn, InitializableClass::className)
+        classes = CollectionUtils.sortDependenciesMapped(classes, InternalInitializableClass::dependsOn, InternalInitializableClass::className)
         toInit.addAll(classes)
     }
     
@@ -84,7 +79,7 @@ internal object Initializer : Listener {
         InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
         
         val preWorldInit = toInit.filter { it.stage == InitializationStage.PRE_WORLD }
-        val lookup = toInit.associateBy(InitializableClass::className)
+        val lookup = toInit.associateBy(InternalInitializableClass::className)
         
         preWorldInit.forEach { initializable ->
             if (!waitForDependencies(initializable, lookup))
@@ -108,7 +103,7 @@ internal object Initializer : Listener {
     private fun initPostWorld() {
         runAsyncTask {
             val postWorldInit = toInit.filter { it.stage != InitializationStage.PRE_WORLD }
-            val lookup = toInit.associateBy(InitializableClass::className)
+            val lookup = toInit.associateBy(InternalInitializableClass::className)
             
             postWorldInit.forEach { initializable ->
                 runAsyncTask initializableTask@{
@@ -144,7 +139,7 @@ internal object Initializer : Listener {
     }
     
     fun disable() {
-        CollectionUtils.sortDependenciesMapped(initialized, InitializableClass::dependsOn, InitializableClass::className).reversed().forEach {
+        CollectionUtils.sortDependenciesMapped(initialized, InternalInitializableClass::dependsOn, InternalInitializableClass::className).reversed().forEach {
             try {
                 it.disable()
             } catch (e: Exception) {
@@ -155,7 +150,7 @@ internal object Initializer : Listener {
         NMSUtilities.disable()
     }
     
-    private fun waitForDependencies(initializable: InitializableClass, lookup: Map<String, InitializableClass>): Boolean {
+    private fun waitForDependencies(initializable: InternalInitializableClass, lookup: Map<String, InternalInitializableClass>): Boolean {
         val dependencies = initializable.dependsOn.map { lookup[it] ?: throw IllegalStateException("Dependency $it of $initializable not found (Missing @InternalInit annotation?)") }
         if (initializable.stage == InitializationStage.PRE_WORLD && dependencies.any { it.stage != InitializationStage.PRE_WORLD })
             throw IllegalStateException("Initializable ${initializable::class.jvmName} has incompatible dependencies!")
@@ -205,51 +200,14 @@ internal object Initializer : Listener {
     
 }
 
-internal class InitializableClass(
-    val className: String,
+internal class InternalInitializableClass(
+    className: String,
     val stage: InitializationStage,
-    val dependsOn: Set<String>
-) {
+    dependsOn: Set<String>
+) : InitializableClass(Initializer::class.java.classLoader, className, dependsOn) {
     
-    private val clazz by lazy { Class.forName(className.replace('/', '.')).kotlin }
-    internal val initialization = CompletableFuture<Boolean>()
-    
-    internal fun initialize() {
-        try {
-            // load class, call init method(s)
-            clazz.declaredFunctions.asSequence()
-                .filter { it.hasAnnotation<InitFun>() && it.hasEmptyArguments() }
-                .forEach {
-                    val instance = clazz.objectInstance
-                        ?: throw InitializationException("Initializable class $className is not a singleton")
-                    
-                    it.isAccessible = true
-                    it.call(instance)
-                }
-            
-            Initializer.initialized += this
-            initialization.complete(true)
-        } catch (e: InitializationException) {
-            LOGGER.severe(e.message)
-        } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $this", e)
-        }
-        initialization.complete(false)
+    init {
+        initialization.thenRun { if (initialization.get()) Initializer.initialized += this }
     }
-    
-    internal fun disable() {
-        // call disable method(s)
-        clazz.declaredFunctions.asSequence()
-            .filter { it.hasAnnotation<DisableFun>() && it.hasEmptyArguments() }
-            .forEach { 
-                val instance = clazz.objectInstance
-                    ?: throw InitializationException("Initializable class $className is not a singleton")
-                
-                it.isAccessible = true
-                it.call(instance)
-            }
-    }
-    
-    override fun toString() = "Initializable | $className"
     
 }
