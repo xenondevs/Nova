@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.util.name
 object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
     
     override fun getInfo(player: Player, block: NovaBlockState): WailaInfo {
-        val material = block.material
+        val material = block.block
         
         val lines = ArrayList<WailaLine>()
         lines += WailaLine(Component.translatable(material.localizedName), WailaLine.Alignment.CENTERED)

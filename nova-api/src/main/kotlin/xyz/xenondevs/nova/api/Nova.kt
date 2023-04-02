@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager
 import xyz.xenondevs.nova.loader.NovaLoader
 
+@Suppress("DEPRECATION")
 interface Nova {
     
     companion object : Nova by (Bukkit.getPluginManager().getPlugin("Nova") as NovaLoader).nova as Nova {
@@ -25,7 +26,7 @@ interface Nova {
     val tileEntityManager: TileEntityManager
     
     /**
-     * Used for managing blocks
+     * Used for breaking / placing blocks.
      */
     val blockManager: BlockManager
     

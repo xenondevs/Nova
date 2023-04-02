@@ -40,7 +40,7 @@ internal object TileEntityTracker {
     
     internal fun handleBlockBreak(tileEntity: TileEntity, ctx: BlockBreakContext) {
         if (tileEntity.ownerUUID != null)
-            modifyCounters(tileEntity.ownerUUID, ctx.pos, tileEntity.material.id, -1)
+            modifyCounters(tileEntity.ownerUUID, ctx.pos, tileEntity.block.id, -1)
     }
     
     private fun modifyCounters(player: UUID, pos: BlockPos, id: ResourceLocation, add: Int) {

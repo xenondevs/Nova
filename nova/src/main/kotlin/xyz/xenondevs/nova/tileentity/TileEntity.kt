@@ -76,7 +76,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val uuid: UUID = blockState.uuid
     val ownerUUID: UUID? = blockState.ownerUUID
     final override val data: Compound = blockState.data
-    val material: NovaTileEntityBlock = blockState.material
+    val block: NovaTileEntityBlock = blockState.block
     
     val owner: OfflinePlayer? by lazy { ownerUUID?.let(Bukkit::getOfflinePlayer) }
     
@@ -159,7 +159,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         if (includeSelf) {
             saveData()
             
-            val item = material.item?.createItemStack()
+            val item = block.item?.createItemStack()
             if (item != null) {
                 if (globalData.isNotEmpty()) {
                     item.novaCompound[TILE_ENTITY_DATA_KEY] = globalData
@@ -576,14 +576,14 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     override fun toString(): String {
-        return "${javaClass.name}(Material: $material, Location: ${pos}, UUID: $uuid)"
+        return "${javaClass.name}(Material: $block, Location: ${pos}, UUID: $uuid)"
     }
     
     abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
         
         open fun getTitle(): Component {
-            return texture?.getTitle(material.localizedName)
-                ?: Component.translatable(material.localizedName)
+            return texture?.getTitle(block.localizedName)
+                ?: Component.translatable(block.localizedName)
         }
         
     }

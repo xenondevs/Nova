@@ -77,7 +77,7 @@ import net.minecraft.world.level.block.Block as MojangBlock
 val Block.id: ResourceLocation
     get() {
         val pos = pos
-        val novaMaterial = BlockManager.getBlock(pos)
+        val novaMaterial = BlockManager.getBlockState(pos)
         if (novaMaterial != null) {
             return novaMaterial.id
         }
@@ -90,7 +90,7 @@ val Block.id: ResourceLocation
  * The [NovaBlock] of this block.
  */
 val Block.novaMaterial: NovaBlock?
-    get() = BlockManager.getBlock(pos)?.material
+    get() = BlockManager.getBlockState(pos)?.block
 
 /**
  * The block that is one y-level below the current one.
@@ -114,20 +114,20 @@ inline val Block.center: Location
  * The hardness of this block, also considering the custom hardness of Nova blocks.
  */
 val Block.hardness: Double
-    get() = BlockManager.getBlock(pos)?.material?.options?.hardness ?: type.hardness.toDouble()
+    get() = BlockManager.getBlockState(pos)?.block?.options?.hardness ?: type.hardness.toDouble()
 
 /**
  * The break texture for this block, also considering custom break textures of Nova blocks.
  */
 val Block.breakTexture: Material
-    get() = BlockManager.getBlock(pos)?.material?.options?.breakParticles ?: type
+    get() = BlockManager.getBlockState(pos)?.block?.options?.breakParticles ?: type
 
 /**
  * The sound group of this block, also considering custom sound groups of Nova blocks.
  */
 val Block.soundGroup: SoundGroup?
     get() {
-        val novaMaterial = BlockManager.getBlock(pos)?.material
+        val novaMaterial = BlockManager.getBlockState(pos)?.block
         if (novaMaterial != null) {
             return novaMaterial.options.soundGroup
         }
@@ -186,7 +186,7 @@ fun Block.place(ctx: BlockPlaceContext, playSound: Boolean = true): Boolean {
         if (novaMaterial is NovaTileEntityBlock && !TileEntityLimits.canPlace(ctx).allowed)
             return false
         
-        BlockManager.placeBlock(novaMaterial, ctx, playSound)
+        BlockManager.placeBlockState(novaMaterial, ctx, playSound)
         return true
     }
     
@@ -325,9 +325,9 @@ internal fun Block.removeInternal(ctx: BlockBreakContext, drops: Boolean, breakE
         return itemEntities
     }
     
-    if (BlockManager.getBlock(pos) != null) {
+    if (BlockManager.getBlockState(pos) != null) {
         val itemEntities = BlockManager.getDrops(ctx)!!.let(::createDroppedItemEntities)
-        BlockManager.removeBlockInternal(ctx, breakEffects, sendEffectsToBreaker)
+        BlockManager.removeBlockStateInternal(ctx, breakEffects, sendEffectsToBreaker)
         return itemEntities
     }
     
@@ -384,9 +384,9 @@ fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
     val tool = ctx.item
     CustomItemServiceManager.getDrops(this, tool)?.let { return it }
     
-    val novaBlockState = BlockManager.getBlock(pos)
+    val novaBlockState = BlockManager.getBlockState(pos)
     if (novaBlockState != null)
-        return novaBlockState.material.blockLogic.getDrops(novaBlockState, ctx)
+        return novaBlockState.block.blockLogic.getDrops(novaBlockState, ctx)
     
     val drops = ArrayList<ItemStack>()
     val state = state
@@ -441,9 +441,9 @@ private fun Block.getMainHalf(): Block {
  * Gets the experience that would be dropped if the block were to be broken.
  */
 fun Block.getExp(ctx: BlockBreakContext): Int {
-    val novaState = BlockManager.getBlock(ctx.pos)
+    val novaState = BlockManager.getBlockState(ctx.pos)
     if (novaState != null)
-        return novaState.material.blockLogic.getExp(novaState, ctx)
+        return novaState.block.blockLogic.getExp(novaState, ctx)
     
     val serverLevel = ctx.pos.world.serverLevel
     val mojangPos = ctx.pos.nmsPos
@@ -534,7 +534,7 @@ fun Block.playBreakSound() {
  * A different number will cause the breaking texture to disappear.
  */
 fun Block.setBreakStage(entityId: Int, stage: Int) {
-    val novaBlockState = BlockManager.getBlock(pos)
+    val novaBlockState = BlockManager.getBlockState(pos)
     if (novaBlockState != null) {
         BlockBreaking.setBreakStage(pos, entityId, stage)
     } else {

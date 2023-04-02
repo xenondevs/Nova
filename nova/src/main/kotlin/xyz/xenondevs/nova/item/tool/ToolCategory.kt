@@ -50,7 +50,7 @@ open class ToolCategory internal constructor(
         }
         
         fun ofBlock(block: Block): List<ToolCategory> {
-            val novaCategories = BlockManager.getBlock(block.pos)?.material?.options?.toolCategories
+            val novaCategories = BlockManager.getBlockState(block.pos)?.block?.options?.toolCategories
             if (novaCategories != null)
                 return novaCategories
             

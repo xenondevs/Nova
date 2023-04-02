@@ -14,7 +14,7 @@ import java.util.*
 
 class NovaTileEntityState : NovaBlockState {
     
-    override val material: NovaTileEntityBlock
+    override val block: NovaTileEntityBlock
     
     @Volatile
     lateinit var uuid: UUID
@@ -34,11 +34,11 @@ class NovaTileEntityState : NovaBlockState {
         }
     
     internal constructor(pos: BlockPos, material: NovaTileEntityBlock) : super(pos, material) {
-        this.material = material
+        this.block = material
     }
     
     internal constructor(material: NovaTileEntityBlock, ctx: BlockPlaceContext) : super(material, ctx) {
-        this.material = material
+        this.block = material
         this.uuid = UUID.randomUUID()
         this.ownerUUID = ctx.ownerUUID
         this.data = Compound()
@@ -51,7 +51,7 @@ class NovaTileEntityState : NovaBlockState {
     }
     
     override fun handleInitialized(placed: Boolean) {
-        _tileEntity = material.tileEntityConstructor(this)
+        _tileEntity = block.tileEntityConstructor(this)
         tileEntity.handleInitialized(placed)
         
         TileEntityManager.registerTileEntity(this)

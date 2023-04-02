@@ -238,7 +238,7 @@ internal object NovaCommand : Command("nova") {
         val player = ctx.player
         val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
         val novaBlocks = chunks.flatMap { WorldDataManager.getBlockStates(it.pos).values.filterIsInstance<NovaBlockState>() }
-        novaBlocks.forEach { BlockManager.removeBlock(BlockBreakContext(it.pos)) }
+        novaBlocks.forEach { BlockManager.removeBlockState(BlockBreakContext(it.pos)) }
         
         ctx.source.sendSuccess(Component.translatable(
             "command.nova.remove_tile_entities.success",
@@ -289,7 +289,7 @@ internal object NovaCommand : Command("nova") {
         if (location != null) {
             val tileEntity = TileEntityManager.getTileEntity(location, true)
             if (tileEntity != null) {
-                sendSuccess(tileEntity.material.localizedName, tileEntity.data)
+                sendSuccess(tileEntity.block.localizedName, tileEntity.data)
             } else {
                 val vanillaTileEntity = VanillaTileEntityManager.getTileEntityAt(location)
                 if (vanillaTileEntity != null) sendSuccess(vanillaTileEntity.block.type.name, vanillaTileEntity.data)

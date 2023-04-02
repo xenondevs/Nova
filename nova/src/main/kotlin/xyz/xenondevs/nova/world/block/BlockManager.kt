@@ -51,7 +51,7 @@ object BlockManager {
         SoundEngine.init()
     }
     
-    fun getBlock(pos: BlockPos, useLinkedStates: Boolean = true): NovaBlockState? {
+    fun getBlockState(pos: BlockPos, useLinkedStates: Boolean = true): NovaBlockState? {
         val blockState = WorldDataManager.getBlockState(pos)
         
         if (blockState is NovaBlockState)
@@ -63,11 +63,11 @@ object BlockManager {
         return null
     }
     
-    fun hasBlock(pos: BlockPos, useLinkedStates: Boolean = true): Boolean {
-        return getBlock(pos, useLinkedStates) != null
+    fun hasBlockState(pos: BlockPos, useLinkedStates: Boolean = true): Boolean {
+        return getBlockState(pos, useLinkedStates) != null
     }
     
-    fun placeBlock(material: NovaBlock, ctx: BlockPlaceContext, playSound: Boolean = true) {
+    fun placeBlockState(material: NovaBlock, ctx: BlockPlaceContext, playSound: Boolean = true) {
         val state = material.createNewBlockState(ctx)
         WorldDataManager.setBlockState(ctx.pos, state)
         state.handleInitialized(true)
@@ -78,15 +78,15 @@ object BlockManager {
             playPlaceSound(state, ctx)
         
         if (state is NovaTileEntityState)
-            TileEntityTracker.handleBlockPlace(state.material, ctx)
+            TileEntityTracker.handleBlockPlace(state.block, ctx)
     }
     
-    fun removeBlock(ctx: BlockBreakContext, breakEffects: Boolean = true): Boolean =
-        removeBlockInternal(ctx, breakEffects, true)
+    fun removeBlockState(ctx: BlockBreakContext, breakEffects: Boolean = true): Boolean =
+        removeBlockStateInternal(ctx, breakEffects, true)
     
-    internal fun removeBlockInternal(ctx: BlockBreakContext, breakEffects: Boolean, sendEffectsToBreaker: Boolean): Boolean {
+    internal fun removeBlockStateInternal(ctx: BlockBreakContext, breakEffects: Boolean, sendEffectsToBreaker: Boolean): Boolean {
         val pos = ctx.pos
-        val state = getBlock(pos) ?: return false
+        val state = getBlockState(pos) ?: return false
         
         if (state is NovaTileEntityState)
             TileEntityTracker.handleBlockBreak(state.tileEntity, ctx)
@@ -95,7 +95,7 @@ object BlockManager {
             playBreakEffects(state, ctx, pos, sendEffectsToBreaker)
         }
         
-        val material = state.material
+        val material = state.block
         material.blockLogic.handleBreak(state, ctx)
         
         WorldDataManager.removeBlockState(state.pos)
@@ -104,7 +104,7 @@ object BlockManager {
         return true
     }
     
-    internal fun removeLinkedBlock(ctx: BlockBreakContext, breakEffects: Boolean): Boolean {
+    internal fun removeLinkedBlockState(ctx: BlockBreakContext, breakEffects: Boolean): Boolean {
         val pos = ctx.pos
         val state = WorldDataManager.getBlockState(pos, takeUnloaded = true) as? LinkedBlockState
             ?: return false
@@ -120,12 +120,12 @@ object BlockManager {
     }
     
     fun getDrops(ctx: BlockBreakContext): List<ItemStack>? {
-        val state = getBlock(ctx.pos) ?: return null
-        return state.material.blockLogic.getDrops(state, ctx)
+        val state = getBlockState(ctx.pos) ?: return null
+        return state.block.blockLogic.getDrops(state, ctx)
     }
     
-    fun breakBlock(ctx: BlockBreakContext, breakEffects: Boolean = true): Boolean {
-        if (!removeBlock(ctx, breakEffects)) return false
+    fun breakBlockState(ctx: BlockBreakContext, breakEffects: Boolean = true): Boolean {
+        if (!removeBlockState(ctx, breakEffects)) return false
         getDrops(ctx)?.let { ctx.pos.location.add(0.5, 0.5, 0.5).dropItems(it) }
         
         return true
@@ -133,7 +133,7 @@ object BlockManager {
     
     private fun playBreakEffects(state: NovaBlockState, ctx: BlockBreakContext, pos: BlockPos, sendEffectsToBreaker: Boolean) {
         val player = ctx.source as? Player
-        val material = state.material
+        val material = state.block
         val level = pos.world.serverLevel
         val dimension = level.dimension()
         val nmsPos = pos.nmsPos
@@ -163,7 +163,7 @@ object BlockManager {
             broadcast(soundPacket, true)
         }
         
-        val soundGroup = state.material.options.soundGroup
+        val soundGroup = state.block.options.soundGroup
         if (material.block is BlockStateBlockModelData) {
             // use the level event packet for blocks that use block states
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
@@ -175,13 +175,13 @@ object BlockManager {
         } else {
             // send sound and break particles manually for armor stand blocks
             if (soundGroup != null) broadcastBreakSound(soundGroup)
-            val breakParticles = state.material.options.breakParticles?.getBreakParticlesPacket(pos.location)
+            val breakParticles = state.block.options.breakParticles?.getBreakParticlesPacket(pos.location)
             if (breakParticles != null) broadcast(breakParticles, sendEffectsToBreaker || pos.block.type.hasNoBreakParticles())
         }
     }
     
     private fun playPlaceSound(state: NovaBlockState, ctx: BlockPlaceContext) {
-        val soundGroup = state.material.options.soundGroup
+        val soundGroup = state.block.options.soundGroup
         if (soundGroup != null) {
             ctx.pos.playSound(soundGroup.placeSound, soundGroup.placeVolume, soundGroup.placePitch)
         }
@@ -189,12 +189,12 @@ object BlockManager {
     
     //<editor-fold desc="deprecated methods", defaultstate="collapsed">
     @Deprecated("Break sound and particles are not independent from one another", ReplaceWith("removeBlock(ctx, playSound || showParticles)"))
-    fun removeBlock(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true): Boolean =
-        removeBlock(ctx, playSound || showParticles)
+    fun removeBlockState(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true): Boolean =
+        removeBlockState(ctx, playSound || showParticles)
     
     @Deprecated("Break sound and particles are not independent from one another", ReplaceWith("breakBlock(ctx, playSound || showParticles)"))
-    fun breakBlock(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true): Boolean =
-        breakBlock(ctx, playSound || showParticles)
+    fun breakBlockState(ctx: BlockBreakContext, playSound: Boolean = true, showParticles: Boolean = true): Boolean =
+        breakBlockState(ctx, playSound || showParticles)
     //</editor-fold>
     
 }

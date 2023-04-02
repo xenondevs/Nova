@@ -68,7 +68,7 @@ object TileEntityManager {
     }
     
     fun getTileEntity(pos: BlockPos, additionalHitboxes: Boolean = true): TileEntity? {
-        val blockState = BlockManager.getBlock(pos, additionalHitboxes)
+        val blockState = BlockManager.getBlockState(pos, additionalHitboxes)
         return if (blockState is NovaTileEntityState) blockState.tileEntity else null
     }
     

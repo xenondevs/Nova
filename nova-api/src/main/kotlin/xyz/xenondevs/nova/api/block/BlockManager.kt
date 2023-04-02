@@ -2,7 +2,9 @@ package xyz.xenondevs.nova.api.block
 
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.api.material.NovaMaterial
 
+@Suppress("DEPRECATION")
 interface BlockManager {
     
     /**
@@ -22,13 +24,31 @@ interface BlockManager {
     fun getBlock(location: Location): NovaBlockState?
     
     /**
+     * Places the [block] at that [location].
+     *
+     * @param location The location where the block should be placed.
+     * @param block The material of the block.
+     */
+    fun placeBlock(location: Location, block: NovaBlock) = placeBlock(location, block, null)
+    
+    /**
      * Places the [material] at that [location].
      *
      * @param location The location where the block should be placed.
      * @param material The material of the block.
      * @throws IllegalArgumentException If the [material] is not a block.
      */
-    fun placeBlock(location: Location, material: NovaBlock) = placeBlock(location, material, null)
+    @Deprecated("Use NovaBlock instead", ReplaceWith("placeBlock(location, block)"))
+    fun placeBlock(location: Location, material: NovaMaterial) = placeBlock(location, material, null)
+    
+    /**
+     * Places the [block] at that [location].
+     *
+     * @param location The location where the block should be placed.
+     * @param block The material of the block.
+     * @param source The source of this block placement. Could be a player, tile-entity or similar.
+     */
+    fun placeBlock(location: Location, block: NovaBlock, source: Any?) = placeBlock(location, block, source, true)
     
     /**
      * Places the [material] at that [location].
@@ -38,15 +58,26 @@ interface BlockManager {
      * @param source The source of this block placement. Could be a player, tile-entity or similar.
      * @throws IllegalArgumentException If the [material] is not a block.
      */
-    fun placeBlock(location: Location, material: NovaBlock, source: Any?) = placeBlock(location, material, source, true)
+    @Deprecated("Use NovaBlock instead", ReplaceWith("placeBlock(location, block, source)"))
+    fun placeBlock(location: Location, material: NovaMaterial, source: Any?) = placeBlock(location, material, source, true)
+    
+    /**
+     * Places the [block] at that [location].
+     *
+     * @param source The source of this block placement. Could be a player, tile-entity or similar.
+     * @param playSound If block breaking sounds should be placed.
+     */
+    fun placeBlock(location: Location, block: NovaBlock, source: Any?, playSound: Boolean)
     
     /**
      * Places the [material] at that [location].
      *
      * @param source The source of this block placement. Could be a player, tile-entity or similar.
      * @param playSound If block breaking sounds should be placed.
+     * @throws IllegalArgumentException If the [material] is not a block.
      */
-    fun placeBlock(location: Location, material: NovaBlock, source: Any?, playSound: Boolean)
+    @Deprecated("Use NovaBlock instead", ReplaceWith("placeBlock(location, block, source, playSound)"))
+    fun placeBlock(location: Location, material: NovaMaterial, source: Any?, playSound: Boolean)
     
     /**
      * Gets the drops of the Nova block at that [location] or null if there is no Nova block there.

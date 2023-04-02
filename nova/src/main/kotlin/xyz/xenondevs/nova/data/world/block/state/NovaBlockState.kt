@@ -16,12 +16,12 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
 @Suppress("CanBePrimaryConstructorProperty", "UNCHECKED_CAST")
-open class NovaBlockState internal constructor(override val pos: BlockPos, material: NovaBlock) : BlockState() {
+open class NovaBlockState internal constructor(override val pos: BlockPos, block: NovaBlock) : BlockState() {
     
-    override val id = material.id
-    open val material = material
-    val modelProvider by lazy { material.block.modelProviderType.create(this) }
-    internal val properties = material.properties.associateWithTo(LinkedHashMap(), BlockPropertyType<*>::create)
+    override val id = block.id
+    open val block = block
+    val modelProvider by lazy { block.block.modelProviderType.create(this) }
+    internal val properties = block.properties.associateWithTo(LinkedHashMap(), BlockPropertyType<*>::create)
     
     val location: Location
         get() = pos.location
@@ -43,7 +43,7 @@ open class NovaBlockState internal constructor(override val pos: BlockPos, mater
     override fun handleInitialized(placed: Boolean) {
         modelProvider.load(placed)
         
-        material.multiBlockLoader?.invoke(pos)?.forEach {
+        block.multiBlockLoader?.invoke(pos)?.forEach {
             WorldDataManager.setBlockState(it, LinkedBlockState(it, this))
         }
         
@@ -54,7 +54,7 @@ open class NovaBlockState internal constructor(override val pos: BlockPos, mater
         isLoaded = false
         
         if (broken) {
-            material.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlock(BlockBreakContext(it), breakEffects = true) }
+            block.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlockState(BlockBreakContext(it), breakEffects = true) }
         }
         
         modelProvider.remove(broken)

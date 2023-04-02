@@ -11,7 +11,6 @@ interface NovaMaterial {
      */
     val id: NamespacedId
     
-    
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     /**
      * Gets the localized name for this [NovaMaterial].

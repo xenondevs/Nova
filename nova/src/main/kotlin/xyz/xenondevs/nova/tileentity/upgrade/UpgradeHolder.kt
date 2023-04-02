@@ -28,7 +28,7 @@ class UpgradeHolder internal constructor(
     internal val allowed: Set<UpgradeType<*>>
 ) {
     
-    private val material = tileEntity.material
+    private val material = tileEntity.block
     private val valueProviders: Map<UpgradeType<*>, ModifierProvider<*>> = allowed.associateWithTo(HashMap()) { ModifierProvider(it) }
     
     internal val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handlePreInvUpdate); setInventoryUpdatedHandler(::handlePostInvUpdate) }

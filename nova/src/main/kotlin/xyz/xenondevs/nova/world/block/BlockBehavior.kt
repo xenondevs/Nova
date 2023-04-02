@@ -27,7 +27,7 @@ interface BlockBehavior<T : NovaBlockState> {
             if (ctx.source is Player && ctx.source.gameMode == GameMode.CREATIVE)
                 return emptyList()
             
-            val item = state.material.item ?: return emptyList()
+            val item = state.block.item ?: return emptyList()
             
             return listOf(item.createItemStack())
         }

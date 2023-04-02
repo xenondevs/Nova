@@ -76,7 +76,7 @@ internal object BlockPlacing : Listener {
                 if (novaBlock != null) {
                     placeNovaBlock(event, novaBlock)
                 } else if (
-                    BlockManager.hasBlock(block.pos) // the block placed against is from Nova
+                    BlockManager.hasBlockState(block.pos) // the block placed against is from Nova
                     && block.type.isReplaceable() // and will be replaced without special behavior
                     && novaItem == null
                     && handItem?.type?.isBlock == true // a vanilla block material is used 
@@ -94,7 +94,7 @@ internal object BlockPlacing : Listener {
         
         val clicked = event.clickedBlock!!
         val placeLoc: Location =
-            if (clicked.type.isReplaceable() && !BlockManager.hasBlock(clicked.pos))
+            if (clicked.type.isReplaceable() && !BlockManager.hasBlockState(clicked.pos))
                 clicked.location
             else clicked.location.advance(event.blockFace)
         
@@ -127,7 +127,7 @@ internal object BlockPlacing : Listener {
             
             val result = TileEntityLimits.canPlace(ctx)
             if (result.allowed) {
-                BlockManager.placeBlock(material, ctx)
+                BlockManager.placeBlockState(material, ctx)
                 
                 if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
                 runTask { player.swingHand(event.hand!!) }

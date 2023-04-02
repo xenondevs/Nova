@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+
 package xyz.xenondevs.nova
 
 import io.ktor.client.*
@@ -14,8 +16,6 @@ import xyz.xenondevs.nova.api.ApiBlockRegistry
 import xyz.xenondevs.nova.api.ApiItemRegistry
 import xyz.xenondevs.nova.api.ApiTileEntityManager
 import xyz.xenondevs.nova.api.NovaMaterialRegistry
-import xyz.xenondevs.nova.api.block.NovaBlockRegistry
-import xyz.xenondevs.nova.api.item.NovaItemRegistry
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
@@ -29,16 +29,16 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
+import xyz.xenondevs.nova.api.block.NovaBlockRegistry as INovaBlockRegistry
+import xyz.xenondevs.nova.api.item.NovaItemRegistry as INovaItemRegistry
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
 private val REQUIRED_SERVER_VERSION = Version("1.19.4")..Version("1.19.4")
-
-internal lateinit var NOVA: Nova
-    private set
-
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
+internal lateinit var NOVA: Nova private set
+internal lateinit var LOGGER: Logger private set
 
 internal val HTTP_CLIENT = HttpClient(CIO) {
     install(ContentNegotiation) { gson() }
@@ -49,22 +49,10 @@ internal val HTTP_CLIENT = HttpClient(CIO) {
     expectSuccess = false
 }
 
-internal lateinit var LOGGER: Logger
-    private set
-
-class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by loader, INova {
+internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by loader, INova {
     
     val version = Version(loader.description.version)
     val lastVersion = PermanentStorage.retrieveOrNull<Version>("last_version")?.let { if (it == Version("0.1")) Version("0.10") else it }
-    val isVersionChange = lastVersion != null && lastVersion != version
-    val isDevServer = IS_DEV_SERVER
-    
-    override val blockManager: IBlockManager = ApiBlockManager
-    override val tileEntityManager: ITileEntityManager = ApiTileEntityManager
-    override val materialRegistry: INovaMaterialRegistry = NovaMaterialRegistry
-    override val blockRegistry: NovaBlockRegistry = ApiBlockRegistry
-    override val itemRegistry: NovaItemRegistry = ApiItemRegistry
-    override val wailaManager: IWailaManager = WailaManager
     
     internal val disableHandlers = ArrayList<() -> Unit>()
     
@@ -123,8 +111,17 @@ class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by lo
         }
     }
     
+    //<editor-fold desc="nova-api", defaultstate="collapsed">
+    override val blockManager: IBlockManager = ApiBlockManager
+    override val tileEntityManager: ITileEntityManager = ApiTileEntityManager
+    override val materialRegistry: INovaMaterialRegistry = NovaMaterialRegistry
+    override val blockRegistry: INovaBlockRegistry = ApiBlockRegistry
+    override val itemRegistry: INovaItemRegistry = ApiItemRegistry
+    override val wailaManager: IWailaManager = WailaManager
+    
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {
         ProtectionManager.integrations.add(integration)
     }
+    //</editor-fold>
     
 }

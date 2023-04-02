@@ -68,9 +68,9 @@ private inline fun Player.damageToolInMainHand(damageReceiver: (MojangStack) -> 
 object ToolUtils {
     
     fun isCorrectToolForDrops(block: Block, tool: ItemStack?): Boolean {
-        val novaBlock = BlockManager.getBlock(block.pos)
+        val novaBlock = BlockManager.getBlockState(block.pos)
         if (novaBlock != null) {
-            if (!novaBlock.material.options.requiresToolForDrops)
+            if (!novaBlock.block.options.requiresToolForDrops)
                 return true
         } else if (!requiresCorrectToolForDropsVanilla(block)) return true
         
@@ -234,7 +234,7 @@ object ToolUtils {
         val vanillaToolCategory = ToolCategory.ofItem(itemStack) as? VanillaToolCategory
         if (vanillaToolCategory != null) {
             val itemType = itemStack.type
-            if (BlockManager.getBlock(block.pos) == null) {
+            if (BlockManager.getBlockState(block.pos) == null) {
                 val specialMultiplier = vanillaToolCategory.specialMultipliers[itemType]?.get(block.type)
                 if (specialMultiplier != null)
                     return specialMultiplier

@@ -51,7 +51,7 @@ internal object BlockBreaking : Listener {
     }
     
     fun setBreakStage(pos: BlockPos, entityId: Int, stage: Int) {
-        val blockState = BlockManager.getBlock(pos) ?: return
+        val blockState = BlockManager.getBlockState(pos) ?: return
         
         val block = pos.block
         var method = internalBreakers[entityId]
@@ -72,7 +72,7 @@ internal object BlockBreaking : Listener {
         
         // create a new break method if there isn't one
         if (method == null) {
-            method = BreakMethod.of(block, blockState.material, entityId) as? VisibleBreakMethod ?: return
+            method = BreakMethod.of(block, blockState.block, entityId) as? VisibleBreakMethod ?: return
             internalBreakers[entityId] = method
         }
         
@@ -134,7 +134,7 @@ internal object BlockBreaking : Listener {
         }
         
         // start breaker
-        val novaBlockState = BlockManager.getBlock(pos)
+        val novaBlockState = BlockManager.getBlockState(pos)
         val breaker = if (novaBlockState != null)
             NovaBlockBreaker(player, block, novaBlockState, sequence, breakCooldowns[player] ?: 0)
         else VanillaBlockBreaker(player, block, sequence, breakCooldowns[player] ?: 0)

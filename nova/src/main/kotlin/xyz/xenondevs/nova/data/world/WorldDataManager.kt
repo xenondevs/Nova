@@ -258,7 +258,7 @@ internal object WorldDataManager : Listener {
     internal fun getWorldGenMaterial(pos: MojangBlockPos, world: MojangWorld): NovaBlock? {
         val novaPos = pos.toNovaPos(world.world)
         val chunk = novaPos.chunkPos
-        return if (chunk.isLoaded()) (getBlockState(novaPos) as? NovaBlockState)?.material else pendingOrphanBlocks[chunk]?.get(novaPos)
+        return if (chunk.isLoaded()) (getBlockState(novaPos) as? NovaBlockState)?.block else pendingOrphanBlocks[chunk]?.get(novaPos)
     }
     
     @Synchronized

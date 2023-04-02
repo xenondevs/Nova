@@ -63,7 +63,7 @@ internal class NovaBlockBreaker(
     blockedUntil: Int
 ) : BlockBreaker(player, block, sequence, blockedUntil) {
     
-    val material = blockState.material
+    val material = blockState.block
     override val requiresToolForDrops: Boolean = material.options.requiresToolForDrops
     
     override fun createBreakMethod(clientsidePrediction: Boolean): BreakMethod =

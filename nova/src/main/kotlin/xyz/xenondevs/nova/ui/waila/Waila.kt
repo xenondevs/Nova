@@ -105,9 +105,9 @@ internal class Waila(val player: Player) {
     }
     
     private fun getInfo(player: Player, pos: BlockPos): WailaInfo? {
-        val novaState = BlockManager.getBlock(pos)
+        val novaState = BlockManager.getBlockState(pos)
         if (novaState is NovaBlockState) {
-            val material = novaState.material
+            val material = novaState.block
             
             return WAILA_INFO_PROVIDER.asSequence()
                 .filterIsInstance<NovaWailaInfoProvider>()

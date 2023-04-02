@@ -34,7 +34,7 @@ fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item {
     else StaticRecipeChoiceItem(itemProviders[0])
 }
 
-private fun handleRecipeChoiceItemClick(player: Player, clickType: ClickType, event: InventoryClickEvent, itemProvider: ItemProvider) {
+internal fun handleRecipeChoiceItemClick(player: Player, clickType: ClickType, event: InventoryClickEvent, itemProvider: ItemProvider) {
     val id = ItemUtils.getId(itemProvider.get())
     if (clickType == ClickType.LEFT) {
         player.showRecipes(id)

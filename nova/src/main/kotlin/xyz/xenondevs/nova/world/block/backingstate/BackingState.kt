@@ -26,11 +26,11 @@ internal abstract class BackingState(configType: DefaultingBlockStateConfigType<
     
     fun handleQueryResult(positions: List<BlockPos>) {
         if (CustomItemServiceManager.PLUGINS.isEmpty()) {
-            positions.forEach { if (!BlockManager.hasBlock(it)) it.setBlockStateSilently(defaultState) }
+            positions.forEach { if (!BlockManager.hasBlockState(it)) it.setBlockStateSilently(defaultState) }
         } else {
             runTask {
                 positions.forEach {
-                    if (!BlockManager.hasBlock(it) && CustomItemServiceManager.getBlockType(it.block) == null)
+                    if (!BlockManager.hasBlockState(it) && CustomItemServiceManager.getBlockType(it.block) == null)
                         it.setBlockStateSilently(defaultState)
                 }
             }
