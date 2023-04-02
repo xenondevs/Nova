@@ -9,7 +9,7 @@ dependencyResolutionManagement {
         create("libs") {
             // versions
             version("kotlin", "1.8.20-RC")
-            version("dokka", "1.7.20")
+            version("dokka", "1.8.10")
             version("ktor", "2.2.4")
             version("spigot", "1.19.4-R0.1-SNAPSHOT")
             version("cbf", "0.4")
