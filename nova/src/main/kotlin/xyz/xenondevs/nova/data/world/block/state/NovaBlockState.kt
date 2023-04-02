@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
 @Suppress("CanBePrimaryConstructorProperty", "UNCHECKED_CAST")
-open class NovaBlockState(override val pos: BlockPos, material: NovaBlock) : BlockState() {
+open class NovaBlockState internal constructor(override val pos: BlockPos, material: NovaBlock) : BlockState() {
     
     override val id = material.id
     open val material = material
@@ -30,7 +30,7 @@ open class NovaBlockState(override val pos: BlockPos, material: NovaBlock) : Blo
     final override var isLoaded = false
         private set
     
-    constructor(material: NovaBlock, ctx: BlockPlaceContext) : this(ctx.pos, material) {
+    internal constructor(material: NovaBlock, ctx: BlockPlaceContext) : this(ctx.pos, material) {
         properties.values.forEach { it.init(ctx) }
     }
     

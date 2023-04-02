@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
-class ArmorEquipEvent(
+class ArmorEquipEvent internal constructor(
     player: Player,
     val slot: EquipmentSlot,
     val action: EquipAction,

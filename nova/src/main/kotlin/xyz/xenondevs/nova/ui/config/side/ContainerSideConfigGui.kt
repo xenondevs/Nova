@@ -12,7 +12,7 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.addLoreLines
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.item.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.tileentity.network.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.EndPointContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -146,11 +146,11 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
         override fun getItemProvider(): ItemProvider {
             return if (simple) {
                 if (isSimpleConfiguration()) {
-                    DefaultGuiMaterial.SIMPLE_MODE_BTN_ON.clientsideProvider
-                } else DefaultGuiMaterial.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
+                    DefaultGuiItems.SIMPLE_MODE_BTN_ON.clientsideProvider
+                } else DefaultGuiItems.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
                     .setDisplayName(Component.translatable("menu.nova.side_config.simple_mode"))
                     .addLoreLines(Component.translatable("menu.nova.side_config.simple_mode.unavailable", NamedTextColor.GRAY))
-            } else DefaultGuiMaterial.ADVANCED_MODE_BTN_ON.clientsideProvider
+            } else DefaultGuiItems.ADVANCED_MODE_BTN_ON.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

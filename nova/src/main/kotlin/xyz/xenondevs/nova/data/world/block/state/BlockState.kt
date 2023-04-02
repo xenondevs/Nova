@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.world.BlockPos
 
-abstract class BlockState {
+abstract class BlockState internal constructor() {
     
     abstract val pos: BlockPos
     abstract val id: ResourceLocation

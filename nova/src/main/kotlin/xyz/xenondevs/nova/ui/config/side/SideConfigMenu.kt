@@ -9,7 +9,7 @@ import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.item.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
@@ -93,23 +93,23 @@ class SideConfigMenu(
             .addIngredient('e', ClickyTabItem(0) {
                 (if (energyConfigGui != null) {
                     if (it.currentTab == 0)
-                        DefaultGuiMaterial.ENERGY_BTN_SELECTED
-                    else DefaultGuiMaterial.ENERGY_BTN_ON
-                } else DefaultGuiMaterial.ENERGY_BTN_OFF).clientsideProvider
+                        DefaultGuiItems.ENERGY_BTN_SELECTED
+                    else DefaultGuiItems.ENERGY_BTN_ON
+                } else DefaultGuiItems.ENERGY_BTN_OFF).clientsideProvider
             })
             .addIngredient('i', ClickyTabItem(1) {
                 (if (itemConfigGui != null) {
                     if (it.currentTab == 1)
-                        DefaultGuiMaterial.ITEM_BTN_SELECTED
-                    else DefaultGuiMaterial.ITEM_BTN_ON
-                } else DefaultGuiMaterial.ITEM_BTN_OFF).clientsideProvider
+                        DefaultGuiItems.ITEM_BTN_SELECTED
+                    else DefaultGuiItems.ITEM_BTN_ON
+                } else DefaultGuiItems.ITEM_BTN_OFF).clientsideProvider
             })
             .addIngredient('f', ClickyTabItem(2) {
                 (if (fluidConfigGui != null) {
                     if (it.currentTab == 2)
-                        DefaultGuiMaterial.FLUID_BTN_SELECTED
-                    else DefaultGuiMaterial.FLUID_BTN_ON
-                } else DefaultGuiMaterial.FLUID_BTN_OFF).clientsideProvider
+                        DefaultGuiItems.FLUID_BTN_SELECTED
+                    else DefaultGuiItems.FLUID_BTN_ON
+                } else DefaultGuiItems.FLUID_BTN_OFF).clientsideProvider
             })
             .setTabs(listOf(energyConfigGui, itemConfigGui, fluidConfigGui))
             .build()
@@ -125,7 +125,7 @@ class SideConfigMenu(
     
 }
 
-class OpenSideConfigItem(private val sideConfigMenu: SideConfigMenu) : SimpleItem(DefaultGuiMaterial.SIDE_CONFIG_BTN.clientsideProvider) {
+class OpenSideConfigItem(private val sideConfigMenu: SideConfigMenu) : SimpleItem(DefaultGuiItems.SIDE_CONFIG_BTN.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playClickSound()

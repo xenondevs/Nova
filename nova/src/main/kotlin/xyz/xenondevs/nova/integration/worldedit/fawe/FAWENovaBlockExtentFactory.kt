@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.integration.worldedit.NovaBlockExtent
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.lang.reflect.Constructor
 
-object FAWENovaBlockExtentFactory {
+internal object FAWENovaBlockExtentFactory {
     
     private val SET_NOVA_BLOCK_METHOD = ReflectionUtils.getMethodByName(NovaBlockExtent::class.java, true, "setNovaBlock")
     private val SET_BLOCK_METHOD = ReflectionUtils.getMethod(AbstractDelegateExtent::class.java, true, "setBlock", Int::class.java, Int::class.java, Int::class.java, BlockStateHolder::class.java)

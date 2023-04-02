@@ -6,7 +6,10 @@ import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 
-class NovaChunkLoadedEvent(val chunkPos: ChunkPos, val blockStates: Map<BlockPos, BlockState>) : Event() {
+class NovaChunkLoadedEvent internal constructor(
+    val chunkPos: ChunkPos,
+    val blockStates: Map<BlockPos, BlockState>
+) : Event() {
     
     companion object {
         @JvmStatic

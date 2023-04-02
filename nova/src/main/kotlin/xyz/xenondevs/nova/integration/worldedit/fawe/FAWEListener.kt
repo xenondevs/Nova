@@ -5,7 +5,7 @@ import com.sk89q.worldedit.event.extent.EditSessionEvent
 import com.sk89q.worldedit.util.eventbus.EventHandler.Priority
 import com.sk89q.worldedit.util.eventbus.Subscribe
 
-class FAWEListener {
+internal class FAWEListener {
     
     @Subscribe(priority = Priority.VERY_LATE)
     fun handleEditSession(event: EditSessionEvent) {

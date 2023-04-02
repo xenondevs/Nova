@@ -33,11 +33,11 @@ class NovaTileEntityState : NovaBlockState {
             _tileEntity = value
         }
     
-    constructor(pos: BlockPos, material: NovaTileEntityBlock) : super(pos, material) {
+    internal constructor(pos: BlockPos, material: NovaTileEntityBlock) : super(pos, material) {
         this.material = material
     }
     
-    constructor(material: NovaTileEntityBlock, ctx: BlockPlaceContext) : super(material, ctx) {
+    internal constructor(material: NovaTileEntityBlock, ctx: BlockPlaceContext) : super(material, ctx) {
         this.material = material
         this.uuid = UUID.randomUUID()
         this.ownerUUID = ctx.ownerUUID

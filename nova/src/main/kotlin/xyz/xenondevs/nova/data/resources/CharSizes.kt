@@ -112,18 +112,18 @@ object CharSizes {
      * Calculates the [ComponentSize] of the given [component] under [lang].
      */
     fun calculateComponentSize(component: Component, lang: String): ComponentSize {
-        //return componentCache.get(component to lang) {
-        return calculateComponentSize(
-            component.chars(lang)
-                .map {
-                    CharOptions(
-                        it.char,
-                        it.style.font()?.asString() ?: "minecraft:default",
-                        it.style.hasDecoration(TextDecoration.BOLD)
-                    )
-                }
-        )
-        //}
+        return componentCache.get(component to lang) {
+            calculateComponentSize(
+                component.chars(lang)
+                    .map {
+                        CharOptions(
+                            it.char,
+                            it.style.font()?.asString() ?: "minecraft:default",
+                            it.style.hasDecoration(TextDecoration.BOLD)
+                        )
+                    }
+            )
+        }
     }
     
     /**

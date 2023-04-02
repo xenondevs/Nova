@@ -7,7 +7,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.util.InventoryUtils
-import xyz.xenondevs.nova.item.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
@@ -25,8 +25,8 @@ class FluidBar(
     
     override val barMaterial: NovaItem
         get() = when (fluidContainer.type) {
-            FluidType.WATER -> DefaultGuiMaterial.BAR_BLUE
-            else -> DefaultGuiMaterial.BAR_ORANGE
+            FluidType.WATER -> DefaultGuiItems.BAR_BLUE
+            else -> DefaultGuiItems.BAR_ORANGE
         }
     
     private var amount = 0L
@@ -98,8 +98,8 @@ class StaticFluidBar(
     
     override val barMaterial: NovaItem
         get() = when (type) {
-            FluidType.WATER -> DefaultGuiMaterial.TP_BAR_BLUE
-            else -> DefaultGuiMaterial.TP_BAR_ORANGE
+            FluidType.WATER -> DefaultGuiItems.TP_BAR_BLUE
+            else -> DefaultGuiItems.TP_BAR_ORANGE
         }
     
     init {

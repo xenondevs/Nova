@@ -5,7 +5,7 @@ import net.minecraft.world.item.ItemStack
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.item.DefaultBlockOverlay
+import xyz.xenondevs.nova.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.sendDestructionPacket
 import xyz.xenondevs.nova.world.BlockPos
@@ -92,7 +92,7 @@ internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos)
             field = stage
             itemDisplay.updateEntityData(true) {
                 itemStack = if (stage in 0..9)
-                    DefaultBlockOverlay.BREAK_STAGE_OVERLAY.clientsideProviders[stage].get().nmsCopy
+                    DefaultBlockOverlays.BREAK_STAGE_OVERLAY.clientsideProviders[stage].get().nmsCopy
                 else ItemStack.EMPTY
             }
         }

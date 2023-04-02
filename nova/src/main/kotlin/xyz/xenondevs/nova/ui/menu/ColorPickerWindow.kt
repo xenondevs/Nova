@@ -10,10 +10,10 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.item.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.ui.item.AioNumberItem
 import xyz.xenondevs.nova.ui.item.BackItem
-import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
 import java.awt.Color
 
 class ColorPickerWindow(
@@ -67,7 +67,7 @@ class ColorPickerWindow(
     fun openWindow(player: Player) {
         Window.single { 
             it.setViewer(player)
-            it.setTitle(CoreGuiTexture.COLOR_PICKER.getTitle("menu.nova.color_picker"))
+            it.setTitle(DefaultGuiTextures.COLOR_PICKER.getTitle("menu.nova.color_picker"))
             it.setGui(gui)
         }.open()
     }
@@ -98,7 +98,7 @@ abstract class ColorPreviewItem(color: Color) : AbstractItem() {
     
 }
 
-class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(DefaultGuiMaterial.TP_COLOR_PICKER.clientsideProvider) {
+class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(DefaultGuiItems.TP_COLOR_PICKER.clientsideProvider) {
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         window.openWindow(player)
     }

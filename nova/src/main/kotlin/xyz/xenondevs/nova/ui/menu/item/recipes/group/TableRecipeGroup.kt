@@ -9,13 +9,13 @@ import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.util.SlotUtils
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.character.gui.CoreGuiTexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
 import xyz.xenondevs.nova.util.intValue
 
 internal object TableRecipeGroup : RecipeGroup<Recipe>() {
     
     override val priority = 0
-    override val texture = CoreGuiTexture.RECIPE_CRAFTING
+    override val texture = DefaultGuiTextures.RECIPE_CRAFTING
     override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
     override fun createGui(recipe: Recipe): Gui {

@@ -4,7 +4,7 @@ import net.minecraft.world.item.ItemDisplayContext
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.joml.Vector3f
-import xyz.xenondevs.nova.item.DefaultBlockOverlay
+import xyz.xenondevs.nova.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.util.component1
 import xyz.xenondevs.nova.util.component2
 import xyz.xenondevs.nova.util.component3
@@ -116,7 +116,7 @@ object VisualRegion {
         
         return FakeItemDisplay(center, false) { _, data ->
             data.itemDisplay = ItemDisplayContext.HEAD
-            data.itemStack = DefaultBlockOverlay.TRANSPARENT_BLOCK.clientsideProvider.get().nmsCopy
+            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.clientsideProvider.get().nmsCopy
             data.scale = Vector3f(
                 (to.x - from.x + lineWidth).toFloat(),
                 (to.y - from.y + lineWidth).toFloat(),

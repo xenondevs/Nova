@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 
-class BlockBreakActionEvent(
+class BlockBreakActionEvent internal constructor(
     player: Player,
     val block: Block,
     val action: Action

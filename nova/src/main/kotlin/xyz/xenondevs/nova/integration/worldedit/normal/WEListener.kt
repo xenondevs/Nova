@@ -5,7 +5,7 @@ import com.sk89q.worldedit.event.extent.EditSessionEvent
 import com.sk89q.worldedit.util.eventbus.EventHandler
 import com.sk89q.worldedit.util.eventbus.Subscribe
 
-class WEListener {
+internal class WEListener {
     
     @Subscribe(priority = EventHandler.Priority.VERY_LATE)
     fun handleEditSession(event: EditSessionEvent) {

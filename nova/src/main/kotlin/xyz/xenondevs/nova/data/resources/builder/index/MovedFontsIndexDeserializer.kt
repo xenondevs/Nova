@@ -6,7 +6,7 @@ import xyz.xenondevs.commons.gson.getAllInts
 import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.nova.data.resources.ResourcePath
 
-object MovedFontsIndexDeserializer {
+internal object MovedFontsIndexDeserializer {
     
     fun deserialize(namespace: String, json: JsonElement): Map<ResourcePath, Set<Int>> {
         require(json is JsonObject)

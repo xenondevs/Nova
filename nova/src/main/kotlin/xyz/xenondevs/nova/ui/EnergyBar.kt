@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.addLoreLines
-import xyz.xenondevs.nova.item.DefaultGuiMaterial
+import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
 
@@ -13,7 +13,7 @@ class EnergyBar(
     private val energyHolder: NovaEnergyHolder
 ) : VerticalBar(height) {
     
-    override val barMaterial = DefaultGuiMaterial.BAR_RED
+    override val barMaterial = DefaultGuiItems.BAR_RED
     
     private var energy: Long = 0
     private var maxEnergy: Long = 0

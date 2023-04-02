@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.world.BlockPos
 
-abstract class NovaBlockExtent(private val event: EditSessionEvent) : AbstractDelegateExtent(event.extent) {
+internal abstract class NovaBlockExtent(private val event: EditSessionEvent) : AbstractDelegateExtent(event.extent) {
     
     fun <T : BlockStateHolder<T>?> setNovaBlock(x: Int, y: Int, z: Int, block: T): Boolean {
         val novaId = (block as? BaseBlock)?.nbtData?.getString("nova")
