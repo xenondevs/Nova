@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.data.recipe
 
 import net.minecraft.resources.ResourceLocation
@@ -21,7 +23,6 @@ import xyz.xenondevs.nova.data.serialization.json.serializer.StonecutterRecipeDe
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.BlastingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.CampfireRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
@@ -47,7 +48,7 @@ class RecipeType<T : Any> internal constructor(
         
         fun <T : Any> of(recipe: T): RecipeType<out T> {
             val clazz = recipe::class
-            return RECIPE_TYPE.first { clazz == it.recipeClass || clazz.superclasses.contains(it.recipeClass) } as RecipeType<out T>
+            return NovaRegistries.RECIPE_TYPE.first { clazz == it.recipeClass || clazz.superclasses.contains(it.recipeClass) } as RecipeType<out T>
         }
         
     }

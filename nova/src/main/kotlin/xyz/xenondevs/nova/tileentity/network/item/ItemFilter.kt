@@ -1,25 +1,20 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
 import net.minecraft.resources.ResourceLocation
-import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter.Companion.ITEM_FILTER_KEY
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.util.item.storeData
 
-private val LEGACY_ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
+fun ItemStack.getFilterConfigOrNull(): ItemFilter? =
+    retrieveData(ITEM_FILTER_KEY)
 
-fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
-    return retrieveData(ITEM_FILTER_KEY)
-}
+fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter =
+    getFilterConfigOrNull() ?: ItemFilter(size)
 
-fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter = getFilterConfigOrNull() ?: ItemFilter(size)
-
-fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
+fun ItemStack.saveFilterConfig(itemFilter: ItemFilter): Unit =
     storeData(ITEM_FILTER_KEY, itemFilter)
-}
 
 class ItemFilter(
     var whitelist: Boolean,
@@ -37,8 +32,8 @@ class ItemFilter(
     
     private fun ItemStack.checkFilterSimilarity(other: ItemStack): Boolean {
         return if (!nbt) {
-            val novaMaterial = novaItem
-            if (novaMaterial != null) novaMaterial == other.novaItem
+            val novaItem = novaItem
+            if (novaItem != null) novaItem == other.novaItem
             else type == other.type
         } else isSimilar(other)
     }

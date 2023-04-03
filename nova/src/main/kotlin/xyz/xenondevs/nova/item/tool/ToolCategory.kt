@@ -33,7 +33,7 @@ open class ToolCategory internal constructor(
             if (item == null)
                 return null
             
-            val novaCategory = item.novaItem?.itemLogic?.getBehavior(Tool::class)?.options?.category
+            val novaCategory = item.novaItem?.getBehavior(Tool::class)?.options?.category
             if (novaCategory != null)
                 return novaCategory
             

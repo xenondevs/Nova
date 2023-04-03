@@ -35,8 +35,8 @@ sealed interface DamageableOptions {
     
     companion object {
         
-        fun configurable(material: NovaItem): DamageableOptions =
-            ConfigurableDamageableOptions(material)
+        fun configurable(item: NovaItem): DamageableOptions =
+            ConfigurableDamageableOptions(item)
         
         fun configurable(path: String): DamageableOptions =
             ConfigurableDamageableOptions(path)
@@ -72,6 +72,6 @@ private class ConfigurableDamageableOptions : ConfigAccess, DamageableOptions {
     }
     
     constructor(path: String) : super(path)
-    constructor(material: NovaItem) : super(material)
+    constructor(item: NovaItem) : super(item)
     
 }

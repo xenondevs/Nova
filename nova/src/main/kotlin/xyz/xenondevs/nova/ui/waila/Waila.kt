@@ -111,7 +111,7 @@ internal class Waila(val player: Player) {
             
             return WAILA_INFO_PROVIDER.asSequence()
                 .filterIsInstance<NovaWailaInfoProvider>()
-                .lastOrNull { it.materials == null || material in it.materials }
+                .lastOrNull { it.blocks == null || material in it.blocks }
                 ?.getInfo(player, novaState)
         } else {
             val block = pos.block

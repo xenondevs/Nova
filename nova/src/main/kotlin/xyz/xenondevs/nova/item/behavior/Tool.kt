@@ -59,8 +59,8 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
         val BASE_ATTACK_DAMAGE_UUID: UUID = UUID.fromString("e63e979b-a109-4519-8b20-2ce3962e490c")
         val BASE_ATTACK_SPEED_UUID: UUID = UUID.fromString("54277290-d821-4616-936b-eee88e98bc0b")
         
-        override fun create(material: NovaItem) =
-            Tool(ToolOptions.configurable(material))
+        override fun create(item: NovaItem) =
+            Tool(ToolOptions.configurable(item))
     }
     
 }

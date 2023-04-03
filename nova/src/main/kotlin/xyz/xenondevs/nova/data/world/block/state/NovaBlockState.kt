@@ -20,7 +20,7 @@ open class NovaBlockState internal constructor(override val pos: BlockPos, block
     
     override val id = block.id
     open val block = block
-    val modelProvider by lazy { block.block.modelProviderType.create(this) }
+    val modelProvider by lazy { block.model.modelProviderType.create(this) }
     internal val properties = block.properties.associateWithTo(LinkedHashMap(), BlockPropertyType<*>::create)
     
     val location: Location

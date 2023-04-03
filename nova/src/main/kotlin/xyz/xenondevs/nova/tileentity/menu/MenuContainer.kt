@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.menu
 
 import org.bukkit.entity.Player
-import xyz.xenondevs.commons.reflection.classifierClass
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.GlobalTileEntityMenu

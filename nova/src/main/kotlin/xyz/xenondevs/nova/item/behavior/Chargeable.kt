@@ -16,8 +16,8 @@ import net.minecraft.world.item.ItemStack as MojangStack
 @Suppress("FunctionName")
 fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable> =
     object : ItemBehaviorFactory<Chargeable>() {
-        override fun create(material: NovaItem): Chargeable =
-            Chargeable(ChargeableOptions.configurable(material), affectsItemDurability)
+        override fun create(item: NovaItem): Chargeable =
+            Chargeable(ChargeableOptions.configurable(item), affectsItemDurability)
     }
 
 class Chargeable(
@@ -97,8 +97,8 @@ class Chargeable(
     }
     
     companion object : ItemBehaviorFactory<Chargeable>() {
-        override fun create(material: NovaItem): Chargeable =
-            Chargeable(ChargeableOptions.configurable(material), true)
+        override fun create(item: NovaItem): Chargeable =
+            Chargeable(ChargeableOptions.configurable(item), true)
     }
     
 }

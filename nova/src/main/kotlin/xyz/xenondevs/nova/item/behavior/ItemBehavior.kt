@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
 abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     
-    lateinit var novaMaterial: NovaItem
+    lateinit var item: NovaItem
         internal set
     
     open fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> = emptyList()
@@ -45,25 +45,25 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     open fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) = Unit
     
-    final override fun get(material: NovaItem): ItemBehavior {
-        setMaterial(material)
+    final override fun get(item: NovaItem): ItemBehavior {
+        setMaterial(item)
         return this
     }
     
-    internal fun setMaterial(material: NovaItem) {
-        if (::novaMaterial.isInitialized)
+    internal fun setMaterial(item: NovaItem) {
+        if (this::item.isInitialized)
             throw IllegalStateException("The same item behavior instance cannot be used for multiple materials")
         
-        novaMaterial = material
+        this.item = item
     }
     
 }
 
 abstract class ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder<T>() {
-    abstract fun create(material: NovaItem): T
-    final override fun get(material: NovaItem) = create(material).apply { setMaterial(material) }
+    abstract fun create(item: NovaItem): T
+    final override fun get(item: NovaItem) = create(item).apply { setMaterial(item) }
 }
 
 abstract class ItemBehaviorHolder<T : ItemBehavior> internal constructor() {
-    internal abstract fun get(material: NovaItem): T
+    internal abstract fun get(item: NovaItem): T
 }

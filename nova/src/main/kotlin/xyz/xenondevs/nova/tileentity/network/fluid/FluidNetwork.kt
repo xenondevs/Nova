@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkBridge
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkNode
-import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.fluid.channel.FluidNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import java.util.*

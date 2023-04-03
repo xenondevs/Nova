@@ -285,6 +285,7 @@ internal class ResourcePackBuilder {
             }
     }
     
+    @Suppress("RemoveExplicitTypeArguments")
     private fun loadAssetPacks(): List<AssetPack> {
         return buildList<Triple<String, File, String>> {
             this += AddonManager.loaders.map { (id, loader) -> Triple(id, loader.file, "assets/") }

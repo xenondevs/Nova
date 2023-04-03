@@ -81,8 +81,8 @@ sealed interface FoodOptions {
     
     companion object {
         
-        fun configurable(material: NovaItem): FoodOptions =
-            ConfigurableFoodOptions(material)
+        fun configurable(item: NovaItem): FoodOptions =
+            ConfigurableFoodOptions(item)
         
         fun configurable(path: String): FoodOptions =
             ConfigurableFoodOptions(path)
@@ -119,6 +119,6 @@ private class ConfigurableFoodOptions : ConfigAccess, FoodOptions {
     override val effectsProvider = getOptionalEntry<List<PotionEffect>>("effects")
     
     constructor(path: String) : super(path)
-    constructor(material: NovaItem) : super(material)
+    constructor(item: NovaItem) : super(item)
     
 }

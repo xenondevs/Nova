@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.util.data
 import java.util.logging.Level
 import java.util.logging.Logger
 
-fun Logger.logExceptionMessages(level: Level, message: String, throwable: Throwable) {
+internal fun Logger.logExceptionMessages(level: Level, message: String, throwable: Throwable) {
     log(level, message)
     
     var t: Throwable? = throwable

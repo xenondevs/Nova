@@ -140,7 +140,7 @@ internal object ItemListener : Listener {
     }
     
     private val ItemStack.logic: ItemLogic?
-        get() = novaItem?.itemLogic
+        get() = novaItem?.logic
     
 }
 

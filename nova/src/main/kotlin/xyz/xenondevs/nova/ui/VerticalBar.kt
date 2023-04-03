@@ -15,7 +15,7 @@ import kotlin.math.round
 
 abstract class VerticalBar(height: Int) : Supplier<Item> {
     
-    abstract val barMaterial: NovaItem
+    abstract val barItem: NovaItem
     
     private val barItems = Array(height) { createBarItem(it, height) }
     private var i = 0
@@ -44,7 +44,7 @@ abstract class VerticalBar(height: Int) : Supplier<Item> {
             val displayPercentage = max(min((percentage - displayPercentageStart) * totalSections, 1.0), 0.0)
             val state = round(displayPercentage * 16).toInt()
             
-            return modifyItemBuilder(barMaterial.model.createClientsideItemBuilder(modelId = state))
+            return modifyItemBuilder(barItem.model.createClientsideItemBuilder(modelId = state))
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit

@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.novaMaterial
+import xyz.xenondevs.nova.util.novaBlock
 
 class ToolTier(
     val id: ResourceLocation,
@@ -30,9 +30,9 @@ class ToolTier(
          * This method works for both vanilla and Nova blocks.
          */
         fun ofBlock(block: Block): ToolTier {
-            val novaMaterial = block.novaMaterial
-            if (novaMaterial != null)
-                return novaMaterial.options.toolTier ?: VanillaToolTiers.WOOD
+            val novaBlock = block.novaBlock
+            if (novaBlock != null)
+                return novaBlock.options.toolTier ?: VanillaToolTiers.WOOD
             
             val material = block.type
             return when {
@@ -52,7 +52,7 @@ class ToolTier(
             if (item == null)
                 return null
             
-            val novaLevel = item.novaItem?.itemLogic?.getBehavior(Tool::class)?.options?.tier
+            val novaLevel = item.novaItem?.getBehavior(Tool::class)?.options?.tier
             if (novaLevel != null)
                 return novaLevel
             

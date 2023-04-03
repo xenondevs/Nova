@@ -35,11 +35,11 @@ internal object TileEntityLimits {
     
     
     fun canPlace(ctx: BlockPlaceContext): PlaceResult {
-        val material = ctx.item.novaItem as? NovaTileEntityBlock
+        val block = ctx.item.novaItem?.block as? NovaTileEntityBlock
             ?: return ALLOWED
         
         limiters.forEach {
-            val result = it.canPlace(material, ctx)
+            val result = it.canPlace(block, ctx)
             if (!result.allowed)
                 return result
         }

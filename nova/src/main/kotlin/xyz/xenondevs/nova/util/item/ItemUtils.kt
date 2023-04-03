@@ -113,18 +113,18 @@ val ItemStack.canDestroy: List<Material>
 
 val ItemStack.craftingRemainingItem: ItemStack?
     get() {
-        val novaMaterial = novaItem
-        if (novaMaterial != null)
-            return novaMaterial.craftingRemainingItem?.get()
+        val novaItem = novaItem
+        if (novaItem != null)
+            return novaItem.craftingRemainingItem?.get()
         
         return type.craftingRemainingItem?.let(::ItemStack)
     }
 
 val ItemStack.equipSound: String?
     get() {
-        val novaMaterial = novaItem
-        if (novaMaterial != null)
-            return novaMaterial.itemLogic.getBehavior(Wearable::class)?.options?.equipSound
+        val novaItem = novaItem
+        if (novaItem != null)
+            return novaItem.getBehavior(Wearable::class)?.options?.equipSound
         
         return (CraftMagicNumbers.getItem(type) as? ArmorItem)?.material?.equipSound?.location?.toString()
     }
@@ -317,16 +317,16 @@ object ItemUtils {
                     
                     "nova" -> {
                         val name = id.substringAfter(':')
-                        val novaMaterials = NovaRegistries.ITEM.getByName(name)
-                        if (novaMaterials.isNotEmpty()) {
-                            return@map NovaNameTest(name, novaMaterials.map { it.createItemStack() })
+                        val novaItems = NovaRegistries.ITEM.getByName(name)
+                        if (novaItems.isNotEmpty()) {
+                            return@map NovaNameTest(name, novaItems.map { it.createItemStack() })
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     
                     else -> {
-                        val novaMaterial = NovaRegistries.ITEM[id]
-                        if (novaMaterial != null) {
-                            return@map NovaIdTest(id, novaMaterial.createItemStack())
+                        val novaItems = NovaRegistries.ITEM[id]
+                        if (novaItems != null) {
+                            return@map NovaIdTest(id, novaItems.createItemStack())
                         } else {
                             return@map CustomItemServiceManager.getItemTest(id)!!
                         }
@@ -340,24 +340,23 @@ object ItemUtils {
         return CustomRecipeChoice(tests)
     }
     
-    @Suppress("LiftReturnOrAssignment")
     fun getItemBuilder(id: String, basicClientSide: Boolean = false): ItemBuilder {
         try {
             return when (id.substringBefore(':')) {
                 "minecraft" -> ItemBuilder(toItemStack(id))
                 "nova" -> {
                     val name = id.substringAfter(':')
-                    val novaMaterial = NovaRegistries.ITEM.getByName(name).first()
+                    val novaItems = NovaRegistries.ITEM.getByName(name).first()
                     
-                    if (basicClientSide) novaMaterial.model.createClientsideItemBuilder()
-                    else novaMaterial.createItemBuilder()
+                    if (basicClientSide) novaItems.model.createClientsideItemBuilder()
+                    else novaItems.createItemBuilder()
                 }
                 
                 else -> {
-                    val novaMaterial = NovaRegistries.ITEM[id]
-                    if (novaMaterial != null) {
-                        if (basicClientSide) novaMaterial.model.createClientsideItemBuilder()
-                        else novaMaterial.createItemBuilder()
+                    val novaItem = NovaRegistries.ITEM[id]
+                    if (novaItem != null) {
+                        if (basicClientSide) novaItem.model.createClientsideItemBuilder()
+                        else novaItem.createItemBuilder()
                     } else CustomItemServiceManager.getItemByName(id)!!.let(::ItemBuilder)
                 }
             }
@@ -379,16 +378,16 @@ object ItemUtils {
                 
                 "nova" -> {
                     val name = id.substringAfter(':')
-                    val novaMaterial = NovaRegistries.ITEM.getByName(name).first()
-                    itemStack = novaMaterial.createItemStack()
-                    localizedName = novaMaterial.localizedName
+                    val novaItem = NovaRegistries.ITEM.getByName(name).first()
+                    itemStack = novaItem.createItemStack()
+                    localizedName = novaItem.localizedName
                 }
                 
                 else -> {
-                    val novaMaterial = NovaRegistries.ITEM[id]
-                    if (novaMaterial != null) {
-                        localizedName = novaMaterial.localizedName
-                        itemStack = novaMaterial.createItemStack()
+                    val novaItem = NovaRegistries.ITEM[id]
+                    if (novaItem != null) {
+                        localizedName = novaItem.localizedName
+                        itemStack = novaItem.createItemStack()
                     } else {
                         itemStack = CustomItemServiceManager.getItemByName(id)!!
                         localizedName = itemStack.displayName ?: ""
@@ -409,8 +408,8 @@ object ItemUtils {
     }
     
     fun getId(itemStack: ItemStack): String {
-        val novaMaterial = itemStack.novaItem
-        if (novaMaterial != null) return novaMaterial.id.toString()
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) return novaItem.id.toString()
         
         val customNameKey = CustomItemServiceManager.getId(itemStack)
         if (customNameKey != null) return customNameKey

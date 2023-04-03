@@ -233,7 +233,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val event = BlockBreakEvent(block, player)
         if (drops) {
             event.expToDrop = when (this) {
-                is NovaBlockBreaker -> material.blockLogic.getExp(blockState, ctx)
+                is NovaBlockBreaker -> material.logic.getExp(blockState, ctx)
                 is VanillaBlockBreaker -> BlockUtils.getVanillaBlockExp(level, blockPos, tool.nmsCopy)
             }
         }

@@ -14,8 +14,8 @@ sealed interface ChargeableOptions {
     
     companion object {
         
-        fun configurable(material: NovaItem): ChargeableOptions =
-            ConfigurableChargeableOptions(material)
+        fun configurable(item: NovaItem): ChargeableOptions =
+            ConfigurableChargeableOptions(item)
         
         fun configurable(path: String): ChargeableOptions =
             ConfigurableChargeableOptions(path)
@@ -33,6 +33,6 @@ private class ConfigurableChargeableOptions : ConfigAccess, ChargeableOptions {
     override val maxEnergy by getEntry<Long>("max_energy")
     
     constructor(path: String) : super(path)
-    constructor(material: NovaItem) : super(material)
+    constructor(item: NovaItem) : super(item)
     
 }

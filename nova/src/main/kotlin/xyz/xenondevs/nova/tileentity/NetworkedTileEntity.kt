@@ -9,6 +9,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.reflection.getRuntimeDelegate
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -16,7 +17,6 @@ import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkNode
 import xyz.xenondevs.nova.tileentity.network.NetworkType
-import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder

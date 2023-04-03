@@ -37,14 +37,14 @@ fun Wearable(type: ArmorType, equipSound: SoundEvent): ItemBehaviorFactory<Weara
 
 fun Wearable(type: ArmorType, equipSound: String? = null): ItemBehaviorFactory<Wearable> =
     object : ItemBehaviorFactory<Wearable>() {
-        override fun create(material: NovaItem): Wearable =
-            Wearable(WearableOptions.configurable(type, equipSound, material))
+        override fun create(item: NovaItem): Wearable =
+            Wearable(WearableOptions.configurable(type, equipSound, item))
     }
 
 class Wearable(val options: WearableOptions) : ItemBehavior() {
     
     private val textureColor: Int? by lazy {
-        Resources.getModelData(novaMaterial.id).armor
+        Resources.getModelData(item.id).armor
             ?.let { Resources.getArmorData(it) }?.color
     }
     
@@ -66,7 +66,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
         val equipmentSlot = options.armorType.equipmentSlot.nmsEquipmentSlot
         return listOf(
             AttributeModifier(
-                "Nova Armor (${novaMaterial.id}})",
+                "Nova Armor (${item.id}})",
                 Attributes.ARMOR,
                 Operation.ADDITION,
                 options.armor,
@@ -74,7 +74,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 equipmentSlot
             ),
             AttributeModifier(
-                "Nova Armor Toughness (${novaMaterial.id}})",
+                "Nova Armor Toughness (${item.id}})",
                 Attributes.ARMOR_TOUGHNESS,
                 Operation.ADDITION,
                 options.armorToughness,
@@ -82,7 +82,7 @@ class Wearable(val options: WearableOptions) : ItemBehavior() {
                 equipmentSlot
             ),
             AttributeModifier(
-                "Nova Knockback Resistance (${novaMaterial.id}})",
+                "Nova Knockback Resistance (${item.id}})",
                 Attributes.KNOCKBACK_RESISTANCE,
                 Operation.ADDITION,
                 options.knockbackResistance,

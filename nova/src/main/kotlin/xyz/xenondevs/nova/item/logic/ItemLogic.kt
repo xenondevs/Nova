@@ -1,4 +1,4 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
 
 package xyz.xenondevs.nova.item.logic
 
@@ -66,14 +66,12 @@ private val ATTRIBUTE_DECIMAL_FORMAT = DecimalFormat("#.##")
  */
 internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*>>) : Reloadable {
     
-    private val behaviors: List<ItemBehavior> by lazy { holders.map { it.get(material) } }
-    private lateinit var material: NovaItem
+    private val behaviors: List<ItemBehavior> by lazy { holders.map { it.get(item) } }
+    private lateinit var item: NovaItem
     private lateinit var name: Component
     
-    lateinit var vanillaMaterial: Material
-        private set
-    lateinit var attributeModifiers: Map<EquipmentSlot, List<AttributeModifier>>
-        private set
+    lateinit var vanillaMaterial: Material private set
+    lateinit var attributeModifiers: Map<EquipmentSlot, List<AttributeModifier>> private set
     
     internal constructor(vararg holders: ItemBehaviorHolder<*>) : this(holders.toList())
     
@@ -90,21 +88,18 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*
         attributeModifiers = modifiersBySlot
     }
     
-    @Suppress("UNCHECKED_CAST")
-    fun <T : ItemBehavior> getBehavior(type: KClass<T>): T? {
-        return behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
-    }
+    fun <T : ItemBehavior> getBehavior(type: KClass<T>): T? =
+        behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
     
-    fun hasBehavior(type: KClass<out ItemBehavior>): Boolean {
-        return behaviors.any { it::class == type }
-    }
+    fun hasBehavior(type: KClass<out ItemBehavior>): Boolean =
+        behaviors.any { it::class == type }
     
-    fun setMaterial(material: NovaItem) {
-        if (::material.isInitialized)
+    fun setMaterial(item: NovaItem) {
+        if (this::item.isInitialized)
             throw IllegalStateException("NovaItems cannot be used for multiple materials")
         
-        this.material = material
-        this.name = Component.translatable(material.localizedName)
+        this.item = item
+        this.name = Component.translatable(item.localizedName)
         reload()
     }
     
@@ -175,7 +170,7 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*
     //</editor-fold>
     
     private fun loadConfiguredAttributeModifiers(): List<AttributeModifier> {
-        val section = NovaConfig.getOrNull(material)
+        val section = NovaConfig.getOrNull(item)
             ?.getConfigurationSection("attribute_modifiers")
             ?: return emptyList()
         
@@ -213,11 +208,11 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*
                                 slot
                             )
                         } catch (e: Exception) {
-                            LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $material, $slot with index $idx", e)
+                            LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $item, $slot with index $idx", e)
                         }
                     }
                 } catch (e: Exception) {
-                    LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $material", e)
+                    LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $item", e)
                 }
             }
         

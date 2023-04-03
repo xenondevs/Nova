@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.data.resources.builder.content.material.info
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig

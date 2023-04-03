@@ -197,10 +197,10 @@ internal object PacketItems : Listener {
         val id = novaTag.getString("id") ?: return getUnknownItem(itemStack, null)
         val material = NovaRegistries.ITEM[id] ?: return getUnknownItem(itemStack, id)
         val subId = novaTag.getInt("subId")
-        val novaItem = material.itemLogic
+        val itemLogic = material.logic
         
         val itemModelDataMap = Resources.getModelDataOrNull(id)?.item
-        val data = itemModelDataMap?.get(novaItem.vanillaMaterial)
+        val data = itemModelDataMap?.get(itemLogic.vanillaMaterial)
             ?: itemModelDataMap?.values?.first()
             ?: return getUnknownItem(itemStack, id)
         
@@ -216,7 +216,7 @@ internal object PacketItems : Listener {
         newItemStack.item = CraftMagicNumbers.getItem(data.material)
         newItemTag.putInt("CustomModelData", data.dataArray[subId])
         
-        val packetItemData = novaItem.getPacketItemData(player, newItemStack)
+        val packetItemData = itemLogic.getPacketItemData(player, newItemStack)
         
         //<editor-fold desc="Display", defaultstate="collapsed">
         val displayTag = newItemTag.getOrPut("display", ::CompoundTag)

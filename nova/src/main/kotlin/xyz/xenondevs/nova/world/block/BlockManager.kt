@@ -72,7 +72,7 @@ object BlockManager {
         WorldDataManager.setBlockState(ctx.pos, state)
         state.handleInitialized(true)
         
-        material.blockLogic.handlePlace(state, ctx)
+        material.logic.handlePlace(state, ctx)
         
         if (playSound)
             playPlaceSound(state, ctx)
@@ -96,7 +96,7 @@ object BlockManager {
         }
         
         val material = state.block
-        material.blockLogic.handleBreak(state, ctx)
+        material.logic.handleBreak(state, ctx)
         
         WorldDataManager.removeBlockState(state.pos)
         state.handleRemoved(true)
@@ -121,7 +121,7 @@ object BlockManager {
     
     fun getDrops(ctx: BlockBreakContext): List<ItemStack>? {
         val state = getBlockState(ctx.pos) ?: return null
-        return state.block.blockLogic.getDrops(state, ctx)
+        return state.block.logic.getDrops(state, ctx)
     }
     
     fun breakBlockState(ctx: BlockBreakContext, breakEffects: Boolean = true): Boolean {
@@ -164,7 +164,7 @@ object BlockManager {
         }
         
         val soundGroup = state.block.options.soundGroup
-        if (material.block is BlockStateBlockModelData) {
+        if (material.model is BlockStateBlockModelData) {
             // use the level event packet for blocks that use block states
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
             broadcast(levelEventPacket, sendEffectsToBreaker)

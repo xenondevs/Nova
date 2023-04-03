@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 
-class BlockLogic<T : NovaBlockState>(private val behaviors: List<BlockBehavior<T>>) {
+internal class BlockLogic<T : NovaBlockState>(private val behaviors: List<BlockBehavior<T>>) {
     
     fun handleInteract(state: T, ctx: BlockInteractContext): Boolean {
         var actionPerformed = false

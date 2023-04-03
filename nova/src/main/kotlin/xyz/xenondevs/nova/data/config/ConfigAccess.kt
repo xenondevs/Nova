@@ -1,4 +1,4 @@
-@file:Suppress("unused", "UNCHECKED_CAST")
+@file:Suppress("unused")
 
 package xyz.xenondevs.nova.data.config
 
@@ -18,7 +18,7 @@ abstract class ConfigAccess(private val configReceiver: () -> YamlConfiguration)
     
     constructor(path: String) : this({ NovaConfig[path] })
     
-    constructor(material: NovaItem) : this({ NovaConfig[material] })
+    constructor(item: NovaItem) : this({ NovaConfig[item] })
     
     protected inline fun <reified T : Any> getEntry(key: String): Provider<T> {
         return RequiredConfigEntryAccessor<T>(key, typeOf<T>()).also(ConfigEntryAccessor<*>::reload)

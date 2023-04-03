@@ -76,7 +76,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
                 relX + chunkPos.getMinBlockX(),
                 relY + bottomBlockY(),
                 relZ + chunkPos.getMinBlockZ(),
-                wrappedState.getNovaMaterial());
+                wrappedState.getNovaBlock());
             return Blocks.AIR.defaultBlockState();
         }
         return delegate.setBlockState(relX, relY, relZ, state, sync);

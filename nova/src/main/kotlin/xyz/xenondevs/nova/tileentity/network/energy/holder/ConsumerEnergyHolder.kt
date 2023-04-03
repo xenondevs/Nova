@@ -31,7 +31,7 @@ fun ConsumerEnergyHolder(
     lazyDefaultConfig
 )
 
-@Suppress("UNCHECKED_CAST", "USELESS_CAST") // compiler is confused otherwise
+@Suppress("UNCHECKED_CAST")
 class ConsumerEnergyHolder internal constructor(
     endPoint: NetworkedTileEntity,
     defaultMaxEnergy: Provider<Long>,

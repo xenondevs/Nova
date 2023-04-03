@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate", "LeakingThis", "unused")
+
 package xyz.xenondevs.nova.item
 
 import net.minecraft.resources.ResourceLocation
@@ -7,7 +9,6 @@ import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
-import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.item.logic.PacketItems
@@ -19,34 +20,47 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import kotlin.math.min
 import kotlin.reflect.KClass
 
-@Suppress("MemberVisibilityCanBePrivate", "LeakingThis")
-open class NovaItem internal constructor(
+/**
+ * Represents an item type in Nova.
+ */
+class NovaItem internal constructor(
     val id: ResourceLocation,
     val localizedName: String,
-    internal val itemLogic: ItemLogic,
+    internal val logic: ItemLogic,
     private val _maxStackSize: Int = 64,
     val craftingRemainingItem: ItemBuilder? = null,
     val isHidden: Boolean = false,
     val block: NovaBlock? = null
 ) {
     
+    /**
+     * The maximum stack size of this [NovaItem].
+     */
     val maxStackSize: Int
-        get() = min(_maxStackSize, itemLogic.vanillaMaterial.maxStackSize)
+        get() = min(_maxStackSize, logic.vanillaMaterial.maxStackSize)
     
+    /**
+     * The [ItemModelData] containing all the vanilla material and custom model data to be used for this [NovaItem].
+     */
     val model: ItemModelData by lazy {
         val itemModelData = Resources.getModelData(id).item!!
         if (itemModelData.size == 1)
             return@lazy itemModelData.values.first()
         
-        return@lazy itemModelData[itemLogic.vanillaMaterial]!!
+        return@lazy itemModelData[logic.vanillaMaterial]!!
     }
     
     //<editor-fold desc="ItemProviders">
+    /**
+     * An array of [ItemProviders][ItemProvider] for each subId of this [NovaItem].
+     * 
+     * The items are in client-side format and do not have any other special data except their display name (hence "basic").
+     */
     val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(model.dataArray.size) { subId ->
             ItemWrapper(
                 model.createClientsideItemBuilder(
-                    itemLogic.getPacketItemData(null, null).name,
+                    logic.getPacketItemData(null, null).name,
                     null,
                     subId
                 ).get()
@@ -54,6 +68,11 @@ open class NovaItem internal constructor(
         }
     }
     
+    /**
+     * An array of [ItemProviders][ItemProvider] for each subId of this [NovaItem].
+     * 
+     * The items are in client-side format and have all special data (lore, other nbt tags, etc.) applied.
+     */
     val clientsideProviders: LazyArray<ItemProvider> by lazy {
         LazyArray(model.dataArray.size) { subId ->
             val itemStack = model.createItemBuilder(subId).get()
@@ -68,47 +87,74 @@ open class NovaItem internal constructor(
         }
     }
     
+    /**
+     * The basic client-side provider for the first subId of this [NovaItem].
+     * @see [basicClientsideProviders]
+     */
     val basicClientsideProvider: ItemProvider by lazy { basicClientsideProviders[0] }
+    
+    /**
+     * The client-side provider for the first subId of this [NovaItem].
+     * @see [clientsideProviders]
+     */
     val clientsideProvider: ItemProvider by lazy { clientsideProviders[0] }
     //</editor-fold>
     
     init {
-        this.itemLogic.setMaterial(this)
+        logic.setMaterial(this)
     }
     
     /**
-     * Creates an [ItemBuilder] for this [NovaItem].
+     * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
      */
     fun createItemBuilder(): ItemBuilder =
-        itemLogic.modifyItemBuilder(model.createItemBuilder())
+        logic.modifyItemBuilder(model.createItemBuilder())
     
     /**
-     * Creates a clientside [ItemBuilder] for this [NovaItem].
-     * It does not have a display name, lore, or any special nbt data.
+     * Creates an [ItemStack] of this [NovaItem] in server-side format.
+     * 
+     * Functionally equivalent to: `createItemBuilder().setAmount(amount).get()`
+     */
+    fun createItemStack(amount: Int = 1): ItemStack =
+        createItemBuilder().setAmount(amount).get()
+    
+    /**
+     * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem] in client-side format.
      */
     fun createClientsideItemBuilder(): ItemBuilder =
         model.createClientsideItemBuilder()
     
-    fun createItemStack(amount: Int = 1): ItemStack =
-        createItemBuilder().setAmount(amount).get()
-    
+    /**
+     * Creates an [ItemStack] of this [NovaItem] in client-side format.
+     * 
+     * Functionally equivalent to: `createClientsideItemBuilder().setAmount(amount).get()`
+     */
     fun createClientsideItemStack(amount: Int): ItemStack =
         createClientsideItemBuilder().setAmount(amount).get()
     
-    fun getLocalizedName(locale: String): String =
-        LocaleManager.getTranslatedName(locale, this)
-    
+    /**
+     * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
+     */
     inline fun <reified T: ItemBehavior> hasBehavior(): Boolean =
         hasBehavior(T::class)
     
+    /**
+     * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [behavior], or a subclass of it.
+     */
     fun <T: ItemBehavior> hasBehavior(behavior: KClass<T>): Boolean =
-        itemLogic.hasBehavior(behavior)
+        logic.hasBehavior(behavior)
     
+    /**
+     * Gets the [ItemBehavior] instance of the reified type [T], or a subclass of it.
+     */
     inline fun <reified T : ItemBehavior> getBehavior(): T? =
         getBehavior(T::class)
     
+    /**
+     * Gets the [ItemBehavior] instance of the specified class [behavior], or a subclass of it.
+     */
     fun <T : ItemBehavior> getBehavior(behavior: KClass<T>): T? =
-        itemLogic.getBehavior(behavior)
+        logic.getBehavior(behavior)
     
     override fun toString() = id.toString()
     

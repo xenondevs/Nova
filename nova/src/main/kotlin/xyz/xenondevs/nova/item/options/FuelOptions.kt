@@ -17,8 +17,8 @@ sealed interface FuelOptions {
     
     companion object {
         
-        fun configurable(material: NovaItem): FuelOptions =
-            ConfigurableFuelOptions(material)
+        fun configurable(item: NovaItem): FuelOptions =
+            ConfigurableFuelOptions(item)
         
         fun configurable(path: String): FuelOptions =
             ConfigurableFuelOptions(path)
@@ -36,6 +36,6 @@ private class ConfigurableFuelOptions : ConfigAccess, FuelOptions {
     override val burnTime by getEntry<Int>("burn_time")
     
     constructor(path: String) : super(path)
-    constructor(material: NovaItem) : super(material)
+    constructor(item: NovaItem) : super(item)
     
 }

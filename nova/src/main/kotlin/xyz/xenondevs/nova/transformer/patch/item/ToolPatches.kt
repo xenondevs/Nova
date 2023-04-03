@@ -64,10 +64,10 @@ internal object ToolPatches : MultiTransformer(CraftBlock::class, MojangPlayer::
     
     @JvmStatic
     fun canDoSweepAttack(itemStack: MojangStack): Boolean {
-        val novaMaterial = itemStack.novaItem
+        val novaItem = itemStack.novaItem
         
-        return if (novaMaterial != null) {
-            novaMaterial.itemLogic.getBehavior(Tool::class)?.options?.canSweepAttack ?: false
+        return if (novaItem != null) {
+            novaItem.getBehavior(Tool::class)?.options?.canSweepAttack ?: false
         } else {
             (ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory)?.canSweepAttack ?: false
         }
@@ -87,7 +87,7 @@ internal object ToolPatches : MultiTransformer(CraftBlock::class, MojangPlayer::
     @JvmStatic
     fun getKnockbackBonus(entity: LivingEntity): Int {
         return EnchantmentHelper.getEnchantmentLevel(Enchantments.KNOCKBACK, entity) +
-            (entity.mainHandItem.novaItem?.itemLogic?.getBehavior(Tool::class)?.options?.knockbackBonus ?: 0)
+            (entity.mainHandItem.novaItem?.getBehavior(Tool::class)?.options?.knockbackBonus ?: 0)
     }
     
 }

@@ -99,8 +99,8 @@ class Damageable(val options: DamageableOptions) : ItemBehavior() {
     }
     
     companion object : ItemBehaviorFactory<Damageable>() {
-        override fun create(material: NovaItem) =
-            Damageable(DamageableOptions.configurable(material))
+        override fun create(item: NovaItem) =
+            Damageable(DamageableOptions.configurable(item))
     }
     
 }

@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState
 
 /**
- * Safety patch to prevent [WrapperBlockState]s from being saved in the worlds palette.
+ * Safety patch to prevent [WrapperBlockState]s from being saved in the world's palette.
  */
 internal object LevelChunkSectionPatch : MethodTransformer(ReflectionRegistry.LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD, true) {
     

@@ -1,3 +1,5 @@
+@file:Suppress("LeakingThis")
+
 package xyz.xenondevs.nova.addon
 
 import java.io.File

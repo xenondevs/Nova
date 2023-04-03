@@ -9,6 +9,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
 import xyz.xenondevs.nova.integration.InternalIntegration
@@ -19,12 +20,11 @@ import xyz.xenondevs.nova.integration.protection.plugin.QuickShop
 import xyz.xenondevs.nova.integration.protection.plugin.Residence
 import xyz.xenondevs.nova.integration.protection.plugin.Towny
 import xyz.xenondevs.nova.integration.protection.plugin.WorldGuard
-import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.data.ArrayKey
 import xyz.xenondevs.nova.util.isBetweenXZ
-import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.CompletableFuture
@@ -159,7 +159,6 @@ object ProtectionManager {
         )
     }
     
-    @Suppress("UNCHECKED_CAST")
     private fun checkIntegrations(check: ProtectionIntegration.() -> Boolean): MutableList<CompletableFuture<Boolean>> {
         val isMainThread = Thread.currentThread() == MINECRAFT_SERVER.serverThread
         val futures = ArrayList<CompletableFuture<Boolean>>()

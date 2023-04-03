@@ -24,6 +24,7 @@ class Version : Comparable<Version> {
         this.stageVersion = intArrayOf()
     }
     
+    @Suppress("RemoveExplicitTypeArguments")
     constructor(version: String) {
         val result = VERSION_REGEX.matchEntire(version.lowercase())
             ?: throw IllegalArgumentException("${version.lowercase()} does not match version regex $VERSION_REGEX")

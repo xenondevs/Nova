@@ -10,7 +10,7 @@ class FireResistant : ItemBehavior() {
     }
     
     companion object : ItemBehaviorFactory<FireResistant>() {
-        override fun create(material: NovaItem) = FireResistant()
+        override fun create(item: NovaItem) = FireResistant()
     }
     
 }

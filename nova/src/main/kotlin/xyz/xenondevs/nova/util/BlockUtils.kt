@@ -43,6 +43,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.particle.block
 import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.item.ToolUtils
@@ -72,42 +73,41 @@ import net.minecraft.world.level.block.Block as MojangBlock
 // region block info
 
 /**
- * The [NamespacedId] of this block.
+ * The [NamespacedId] of this block, considering blocks from Nova, custom item services and vanilla.
  */
 val Block.id: ResourceLocation
-    get() {
-        val pos = pos
-        val novaMaterial = BlockManager.getBlockState(pos)
-        if (novaMaterial != null) {
-            return novaMaterial.id
-        }
-        
-        return CustomItemServiceManager.getId(this)?.let { ResourceLocation.of(it, ':')}
-            ?: ResourceLocation("minecraft", type.name.lowercase())
-    }
+    get() = BlockManager.getBlockState(pos)?.id
+        ?: CustomItemServiceManager.getId(this)?.let { ResourceLocation.of(it, ':') }
+        ?: ResourceLocation("minecraft", type.name.lowercase())
 
 /**
- * The [NovaBlock] of this block.
+ * The [NovaBlockState] at the position of this [Block].
  */
-val Block.novaMaterial: NovaBlock?
+val Block.novaBlockState: NovaBlockState?
+    get() = BlockManager.getBlockState(pos)
+
+/**
+ * The [NovaBlock] of the [NovaBlockState] at the position of this [Block].
+ */
+val Block.novaBlock: NovaBlock?
     get() = BlockManager.getBlockState(pos)?.block
 
 /**
  * The block that is one y-level below the current one.
  */
-inline val Block.below: Block
+val Block.below: Block
     get() = world.getBlockAt(x, y - 1, z)
 
 /**
  * The block that is one y-level above the current one.
  */
-inline val Block.above: Block
+val Block.above: Block
     get() = world.getBlockAt(x, y + 1, z)
 
 /**
  * The location at the center of this block.
  */
-inline val Block.center: Location
+val Block.center: Location
     get() = Location(world, x + 0.5, y + 0.5, z + 0.5)
 
 /**
@@ -120,16 +120,23 @@ val Block.hardness: Double
  * The break texture for this block, also considering custom break textures of Nova blocks.
  */
 val Block.breakTexture: Material
-    get() = BlockManager.getBlockState(pos)?.block?.options?.breakParticles ?: type
+    get() {
+        val novaBlock = novaBlock
+        if (novaBlock != null) {
+            return novaBlock.options.breakParticles ?: Material.AIR
+        }
+        
+        return type
+    }
 
 /**
  * The sound group of this block, also considering custom sound groups of Nova blocks.
  */
 val Block.soundGroup: SoundGroup?
     get() {
-        val novaMaterial = BlockManager.getBlockState(pos)?.block
-        if (novaMaterial != null) {
-            return novaMaterial.options.soundGroup
+        val novaBlock = novaBlock
+        if (novaBlock != null) {
+            return novaBlock.options.soundGroup
         }
         
         return SoundGroup.from(type.soundGroup)
@@ -181,12 +188,12 @@ val Block.sourceFluidType: FluidType?
  */
 fun Block.place(ctx: BlockPlaceContext, playSound: Boolean = true): Boolean {
     val item = ctx.item
-    val novaMaterial = item.novaItem?.block
-    if (novaMaterial is NovaBlock) {
-        if (novaMaterial is NovaTileEntityBlock && !TileEntityLimits.canPlace(ctx).allowed)
+    val novaBlock = item.novaItem?.block
+    if (novaBlock != null) {
+        if (novaBlock is NovaTileEntityBlock && !TileEntityLimits.canPlace(ctx).allowed)
             return false
         
-        BlockManager.placeBlockState(novaMaterial, ctx, playSound)
+        BlockManager.placeBlockState(novaBlock, ctx, playSound)
         return true
     }
     
@@ -279,12 +286,12 @@ fun Block.remove(ctx: BlockBreakContext, playSound: Boolean, showParticles: Bool
 
 /**
  * Breaks this block naturally using the given [ctx].
- * 
+ *
  * This method works for vanilla blocks, blocks from Nova and blocks from custom item integrations.
  * Items will be dropped in the world, those drops depend on the source and tool defined in the [ctx].
  * If the source is a player, it will be as if the player broke the block.
  * The tool item stack will not be damaged.
- * 
+ *
  * @param ctx The [BlockBreakContext] to be used
  */
 fun Block.breakNaturally(ctx: BlockBreakContext) {
@@ -312,7 +319,7 @@ fun Block.breakNaturally(ctx: BlockBreakContext) {
 fun Block.remove(ctx: BlockBreakContext, breakEffects: Boolean = true): List<ItemStack> {
     return removeInternal(
         ctx,
-        ToolUtils.isCorrectToolForDrops(this, ctx.item), 
+        ToolUtils.isCorrectToolForDrops(this, ctx.item),
         breakEffects,
         true
     ).map { it.item.bukkitMirror }
@@ -386,7 +393,7 @@ fun Block.getAllDrops(ctx: BlockBreakContext): List<ItemStack> {
     
     val novaBlockState = BlockManager.getBlockState(pos)
     if (novaBlockState != null)
-        return novaBlockState.block.blockLogic.getDrops(novaBlockState, ctx)
+        return novaBlockState.block.logic.getDrops(novaBlockState, ctx)
     
     val drops = ArrayList<ItemStack>()
     val state = state
@@ -443,7 +450,7 @@ private fun Block.getMainHalf(): Block {
 fun Block.getExp(ctx: BlockBreakContext): Int {
     val novaState = BlockManager.getBlockState(ctx.pos)
     if (novaState != null)
-        return novaState.block.blockLogic.getExp(novaState, ctx)
+        return novaState.block.logic.getExp(novaState, ctx)
     
     val serverLevel = ctx.pos.world.serverLevel
     val mojangPos = ctx.pos.nmsPos

@@ -251,7 +251,7 @@ internal object WorldDataManager : Listener {
         val state = material.createNewBlockState(ctx)
         setBlockState(pos, state)
         state.handleInitialized(true)
-        material.blockLogic.handlePlace(state, ctx)
+        material.logic.handlePlace(state, ctx)
     }
     
     @Synchronized

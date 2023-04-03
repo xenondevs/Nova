@@ -37,8 +37,8 @@ sealed interface WearableOptions {
     
     companion object {
         
-        fun configurable(armorType: ArmorType, equipSound: String?, material: NovaItem): WearableOptions =
-            ConfigurableWearableOptions(armorType, equipSound, material)
+        fun configurable(armorType: ArmorType, equipSound: String?, item: NovaItem): WearableOptions =
+            ConfigurableWearableOptions(armorType, equipSound, item)
         
         fun configurable(armorType: ArmorType, equipSound: String?, path: String): WearableOptions =
             ConfigurableWearableOptions(armorType, equipSound, path)
@@ -74,7 +74,7 @@ private class ConfigurableWearableOptions : ConfigAccess, WearableOptions {
         this.equipSoundProvider = provider(soundEvent)
     }
     
-    constructor(armorType: ArmorType, soundEvent: String?, material: NovaItem) : super(material) {
+    constructor(armorType: ArmorType, soundEvent: String?, item: NovaItem) : super(item) {
         this.armorTypeProvider = provider(armorType)
         this.equipSoundProvider = provider(soundEvent)
     }

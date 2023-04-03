@@ -116,7 +116,7 @@ class NetworkedVirtualInventory internal constructor(val virtualInventory: Virtu
     }
     
     override fun isFull(): Boolean {
-        return virtualInventory.isFull()
+        return virtualInventory.isFull
     }
     
     override fun canExchangeItemsWith(other: NetworkedInventory): Boolean {

@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.addon.registry
 
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkType

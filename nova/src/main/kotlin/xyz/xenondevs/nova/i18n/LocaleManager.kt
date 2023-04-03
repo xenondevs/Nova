@@ -107,13 +107,13 @@ object LocaleManager {
     }
     
     @Synchronized
-    fun getTranslatedName(lang: String, material: NovaItem): String {
-        return getTranslation(lang, material.localizedName)
+    fun getTranslatedName(lang: String, item: NovaItem): String {
+        return getTranslation(lang, item.localizedName)
     }
     
     @Synchronized
-    fun getTranslatedName(player: Player, material: NovaItem): String {
-        return getTranslation(player, material.localizedName)
+    fun getTranslatedName(player: Player, item: NovaItem): String {
+        return getTranslation(player, item.localizedName)
     }
     
     private object NovaLanguage : Language() {

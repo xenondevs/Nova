@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package xyz.xenondevs.nova.util.component.adventure
 
 import net.kyori.adventure.key.Key

@@ -14,11 +14,8 @@ internal object ApiItemRegistry: NovaItemRegistry {
     }
     
     override fun getOrNull(id: NamespacedId) = getOrNull(id.toString())
-    
     override fun get(id: String) = getOrNull(id) ?: throw IllegalArgumentException("No block with id $id found!")
-    
     override fun get(id: NamespacedId) = get(id.toString())
-    
     override fun getNonNamespaced(name: String) = NovaRegistries.ITEM.getByName(name).map(::ApiItemWrapper)
     
 }

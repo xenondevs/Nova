@@ -55,8 +55,8 @@ sealed interface ToolOptions {
     
     companion object {
         
-        fun configurable(material: NovaItem): ToolOptions =
-            ConfigurableToolOptions(material)
+        fun configurable(item: NovaItem): ToolOptions =
+            ConfigurableToolOptions(item)
         
         fun configurable(path: String): ToolOptions =
             ConfigurableToolOptions(path)
@@ -99,6 +99,6 @@ private class ConfigurableToolOptions : ConfigAccess, ToolOptions {
     override val canBreakBlocksInCreativeProvider = getOptionalEntry<Boolean>("can_break_blocks_in_creative").orElse(true)
     
     constructor(path: String) : super(path)
-    constructor(material: NovaItem) : super(material)
+    constructor(item: NovaItem) : super(item)
     
 }

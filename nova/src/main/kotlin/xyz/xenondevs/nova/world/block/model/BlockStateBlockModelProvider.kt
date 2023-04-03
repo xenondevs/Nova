@@ -12,7 +12,7 @@ class BlockStateBlockModelProvider(val blockState: NovaBlockState) : BlockModelP
     
     private val pos = blockState.pos
     private val material = blockState.block
-    private val modelData = material.block as BlockStateBlockModelData
+    private val modelData = material.model as BlockStateBlockModelData
     
     override var currentSubId = 0
         private set

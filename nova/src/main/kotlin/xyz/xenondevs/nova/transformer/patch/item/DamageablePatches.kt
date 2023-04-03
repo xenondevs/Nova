@@ -69,10 +69,10 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
     
     @JvmStatic
     fun hurtEnemy(itemStack: ItemStack, player: Player) {
-        val novaMaterial = itemStack.novaItem
+        val novaItem = itemStack.novaItem
         
-        val damage = if (novaMaterial != null) {
-            val damageable = novaMaterial.itemLogic.getBehavior(Damageable::class) ?: return
+        val damage = if (novaItem != null) {
+            val damageable = novaItem.getBehavior(Damageable::class) ?: return
             damageable.options.itemDamageOnAttackEntity
         } else {
             val category = ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory ?: return
@@ -96,8 +96,7 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
     
     @JvmStatic
     fun isArmorItem(itemStack: ItemStack): Boolean {
-        val novaMaterial = itemStack.novaItem ?: return itemStack.item is ArmorItem
-        val novaItem = novaMaterial.itemLogic
+        val novaItem = itemStack.novaItem ?: return itemStack.item is ArmorItem
         return novaItem.hasBehavior(Wearable::class) && novaItem.hasBehavior(Damageable::class)
     }
     

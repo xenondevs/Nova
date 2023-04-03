@@ -215,8 +215,8 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     }
     
     private fun getLocalizedNovaName(player: Player, itemStack: ItemStack): String? {
-        val novaMaterial = itemStack.novaItem ?: return null
-        return LocaleManager.getTranslationOrNull((player as? ServerPlayer)?.locale ?: "en_us", novaMaterial.localizedName)
+        val novaItem = itemStack.novaItem ?: return null
+        return LocaleManager.getTranslationOrNull((player as? ServerPlayer)?.locale ?: "en_us", novaItem.localizedName)
     }
     
     private fun getHoverName(player: Player, itemStack: ItemStack): String {
@@ -230,9 +230,9 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     }
     
     private fun isSameItemType(first: ItemStack, second: ItemStack): Boolean {
-        val novaMaterial = first.novaItem
-        if (novaMaterial != null) {
-            return novaMaterial == second.novaItem
+        val novaItem = first.novaItem
+        if (novaItem != null) {
+            return novaItem == second.novaItem
         }
         
         return first.item == second.item

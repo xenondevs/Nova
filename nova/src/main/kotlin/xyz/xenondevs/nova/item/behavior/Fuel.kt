@@ -7,8 +7,8 @@ class Fuel(val options: FuelOptions) : ItemBehavior() {
     
     companion object : ItemBehaviorFactory<Fuel>() {
         
-        override fun create(material: NovaItem): Fuel {
-            return Fuel(FuelOptions.configurable(material))
+        override fun create(item: NovaItem): Fuel {
+            return Fuel(FuelOptions.configurable(item))
         }
     
     }

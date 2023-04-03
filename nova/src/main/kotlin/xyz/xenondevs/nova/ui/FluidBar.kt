@@ -23,7 +23,7 @@ class FluidBar(
     
     private val allowedConnectionType = fluidHolder.allowedConnectionTypes[fluidContainer]!!
     
-    override val barMaterial: NovaItem
+    override val barItem: NovaItem
         get() = when (fluidContainer.type) {
             FluidType.WATER -> DefaultGuiItems.BAR_BLUE
             else -> DefaultGuiItems.BAR_ORANGE
@@ -96,7 +96,7 @@ class StaticFluidBar(
     height: Int
 ) : VerticalBar(height) {
     
-    override val barMaterial: NovaItem
+    override val barItem: NovaItem
         get() = when (type) {
             FluidType.WATER -> DefaultGuiItems.TP_BAR_BLUE
             else -> DefaultGuiItems.TP_BAR_ORANGE

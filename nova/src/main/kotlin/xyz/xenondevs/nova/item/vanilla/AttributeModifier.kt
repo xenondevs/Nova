@@ -12,7 +12,7 @@ import org.bukkit.attribute.Attribute as BukkitAttribute
 import org.bukkit.attribute.AttributeModifier.Operation as BukkitOperation
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
 
-class AttributeModifier constructor(
+class AttributeModifier(
     val uuid: UUID,
     val name: String,
     val attribute: Attribute,

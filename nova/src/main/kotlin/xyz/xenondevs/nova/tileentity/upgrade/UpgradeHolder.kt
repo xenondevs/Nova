@@ -16,10 +16,8 @@ import xyz.xenondevs.nova.ui.UpgradesGui
 import xyz.xenondevs.nova.util.item.novaItem
 import kotlin.math.min
 
-private fun ItemStack.getUpgradeType(): UpgradeType<*>? {
-    val novaMaterial = novaItem ?: return null
-    return UpgradeType.of<UpgradeType<*>>(novaMaterial)
-}
+private fun ItemStack.getUpgradeType(): UpgradeType<*>? =
+    novaItem?.let { UpgradeType.of<UpgradeType<*>>(it) }
 
 class UpgradeHolder internal constructor(
     tileEntity: TileEntity,

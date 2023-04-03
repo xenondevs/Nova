@@ -5,6 +5,6 @@ import net.minecraft.world.item.ItemStack
 
 class ItemMetadata : EntityMetadata() {
     
-    var item by entry(8, EntityDataSerializers.ITEM_STACK, ItemStack.EMPTY)
+    var item: ItemStack by entry(8, EntityDataSerializers.ITEM_STACK, ItemStack.EMPTY)
     
 }

@@ -6,8 +6,8 @@ import xyz.xenondevs.nova.item.options.EnchantableOptions
 class Enchantable(val options: EnchantableOptions) : ItemBehavior() {
     
     companion object : ItemBehaviorFactory<Enchantable>() {
-        override fun create(material: NovaItem) =
-            Enchantable(EnchantableOptions.configurable(material))
+        override fun create(item: NovaItem) =
+            Enchantable(EnchantableOptions.configurable(item))
     }
     
 }

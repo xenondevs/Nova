@@ -1,3 +1,5 @@
+@file:Suppress("LeakingThis")
+
 package xyz.xenondevs.nova.ui.config.side
 
 import net.kyori.adventure.text.Component

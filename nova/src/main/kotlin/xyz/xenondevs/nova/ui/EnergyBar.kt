@@ -13,7 +13,7 @@ class EnergyBar(
     private val energyHolder: NovaEnergyHolder
 ) : VerticalBar(height) {
     
-    override val barMaterial = DefaultGuiItems.BAR_RED
+    override val barItem = DefaultGuiItems.BAR_RED
     
     private var energy: Long = 0
     private var maxEnergy: Long = 0

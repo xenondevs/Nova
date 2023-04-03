@@ -28,7 +28,7 @@ internal interface BreakMethod {
             override fun stop() {}
         }
         
-        fun of(block: Block, material: NovaBlock, entityId: Int = Random.nextInt()): BreakMethod? =
+        fun of(block: Block, material: NovaBlock, entityId: Int = Random.nextInt()): BreakMethod =
             of(block, material, null, entityId)
         
         fun of(

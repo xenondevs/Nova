@@ -29,16 +29,16 @@ sealed interface WailaInfoProvider<T> {
 abstract class NovaWailaInfoProvider : WailaInfoProvider<NovaBlockState> {
     
     val addon: Addon?
-    val materials: Set<NovaBlock>?
+    val blocks: Set<NovaBlock>?
     
     constructor(addon: Addon) {
         this.addon = addon
-        this.materials = null
+        this.blocks = null
     }
     
-    constructor(materials: Set<NovaBlock>?) {
+    constructor(blocks: Set<NovaBlock>?) {
         this.addon = null
-        this.materials = materials
+        this.blocks = blocks
     }
     
 }

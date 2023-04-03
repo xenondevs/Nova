@@ -27,7 +27,7 @@ internal fun ClassLoader.defineClass(clazz: KClass<*>) =
 internal fun ClassLoader.defineClass(classWrapper: ClassWrapper) =
     defineClass(classWrapper.name.replace('/', '.'), classWrapper.assemble(true), null)
 
-@Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
+@Suppress("MemberVisibilityCanBePrivate")
 object ReflectionUtils {
     
     fun getCB(): String {

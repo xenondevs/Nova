@@ -73,7 +73,7 @@ object RecipeRegistry {
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach {
-            val group = RecipeType.of(it).group ?: return@forEach
+            val group = RecipeType.of(it).group
             val itemKey = getId(it.result)
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(group) { mutableListOf() }
@@ -82,7 +82,7 @@ object RecipeRegistry {
         
         // add all nova machine recipes
         getCreationNovaRecipeSequence().forEach { recipe ->
-            val group = RecipeType.of(recipe).group ?: return@forEach
+            val group = RecipeType.of(recipe).group
             recipe.getAllResults().forEach { resultStack ->
                 val itemKey = getId(resultStack)
                 map.getOrPut(itemKey) { hashMapOf() }
@@ -99,7 +99,7 @@ object RecipeRegistry {
         
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach { recipe ->
-            val group = RecipeType.of(recipe).group ?: return@forEach
+            val group = RecipeType.of(recipe).group
             recipe.getInputStacks().forEach { inputStack ->
                 val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
@@ -110,7 +110,7 @@ object RecipeRegistry {
         
         // add all nova machine recipes
         getUsageNovaRecipeSequence().forEach { recipe ->
-            val group = RecipeType.of(recipe).group ?: return@forEach
+            val group = RecipeType.of(recipe).group
             recipe.getAllInputs().flatMap { it.getInputStacks() }.forEach { inputStack ->
                 val itemKey = getId(inputStack)
                 map.getOrPut(itemKey) { hashMapOf() }
@@ -125,7 +125,7 @@ object RecipeRegistry {
     private fun loadRecipesByGroup(): Map<RecipeGroup<*>, List<RecipeContainer>> {
         val map = HashMap<RecipeGroup<*>, MutableList<RecipeContainer>>()
         (getBukkitRecipeSequence() + getAllNovaRecipes()).forEach {
-            val group = RecipeType.of(it).group ?: return@forEach
+            val group = RecipeType.of(it).group
             map.getOrPut(group) { ArrayList() } += RecipeContainer(it)
         }
         return map

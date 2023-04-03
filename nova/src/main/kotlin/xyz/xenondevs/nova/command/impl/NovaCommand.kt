@@ -210,18 +210,18 @@ internal object NovaCommand : Command("nova") {
         }
     }
     
-    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: NovaItem) =
-        giveTo(ctx, material, ctx["amount"])
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, item: NovaItem) =
+        giveTo(ctx, item, ctx["amount"])
     
-    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: NovaItem, amount: Int) {
-        val itemName = material.localizedName.ifBlank { material.id.toString() }
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, item: NovaItem, amount: Int) {
+        val itemName = item.localizedName.ifBlank { item.id.toString() }
         
         val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
         
         if (targetPlayers.isNotEmpty()) {
             targetPlayers.forEach {
                 val player = it.bukkitEntity
-                player.inventory.addItemCorrectly(material.createItemStack(amount))
+                player.inventory.addItemCorrectly(item.createItemStack(amount))
                 
                 ctx.source.sendSuccess(Component.translatable(
                     "command.nova.give.success",

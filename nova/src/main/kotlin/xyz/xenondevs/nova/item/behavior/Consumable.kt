@@ -151,8 +151,8 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
     }
     
     companion object : ItemBehaviorFactory<Consumable>() {
-        override fun create(material: NovaItem): Consumable =
-            Consumable(FoodOptions.configurable(material))
+        override fun create(item: NovaItem): Consumable =
+            Consumable(FoodOptions.configurable(item))
     }
     
 }

@@ -45,8 +45,8 @@ class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElemen
         return this
     }
     
-    fun craftingRemainingItem(material: NovaItem): NovaItemBuilder {
-        this.craftingRemainingItem = material.createItemBuilder()
+    fun craftingRemainingItem(item: NovaItem): NovaItemBuilder {
+        this.craftingRemainingItem = item.createItemBuilder()
         return this
     }
     

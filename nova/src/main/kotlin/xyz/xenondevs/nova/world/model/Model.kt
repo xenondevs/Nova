@@ -41,7 +41,7 @@ data class Model(
     ) : this(itemStack.nmsCopy, location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
     
     constructor(
-        material: NovaItem,
+        item: NovaItem,
         location: Location,
         subId: Int = 0,
         constraints: Display.BillboardConstraints = Display.BillboardConstraints.FIXED,
@@ -53,7 +53,7 @@ data class Model(
         width: Float = 0f,
         height: Float = 0f,
         glowColor: Int = -1
-    ) : this(material.clientsideProviders[subId].get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
+    ) : this(item.clientsideProviders[subId].get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
     
     fun createFakeItemDisplay(autoRegister: Boolean = true): FakeItemDisplay =
         FakeItemDisplay(location, autoRegister) { _, data ->

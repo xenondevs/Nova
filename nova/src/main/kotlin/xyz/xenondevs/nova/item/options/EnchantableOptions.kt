@@ -18,8 +18,8 @@ sealed interface EnchantableOptions {
     
     companion object {
         
-        fun configurable(material: NovaItem): EnchantableOptions =
-            ConfigurableEnchantableOptions(material)
+        fun configurable(item: NovaItem): EnchantableOptions =
+            ConfigurableEnchantableOptions(item)
         
         fun configurable(path: String): EnchantableOptions =
             ConfigurableEnchantableOptions(path)
@@ -40,6 +40,6 @@ private class ConfigurableEnchantableOptions : ConfigAccess, EnchantableOptions 
         .map { list -> list.map { EnchantmentCategory.valueOf(it.uppercase()) } }
     
     constructor(path: String) : super(path)
-    constructor(material: NovaItem) : super(material)
+    constructor(item: NovaItem) : super(item)
     
 }

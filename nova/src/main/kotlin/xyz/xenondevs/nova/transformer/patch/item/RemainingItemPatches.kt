@@ -151,27 +151,27 @@ internal object RemainingItemPatches : MultiTransformer(
     
     @JvmStatic
     fun hasCraftingRemainingItem(itemStack: MojangStack): Boolean {
-        val novaMaterial = itemStack.novaItem
-        if (novaMaterial != null)
-            return novaMaterial.craftingRemainingItem != null
+        val novaItem = itemStack.novaItem
+        if (novaItem != null)
+            return novaItem.craftingRemainingItem != null
         
         return itemStack.item.hasCraftingRemainingItem()
     }
     
     @JvmStatic
     fun getRemainingItemStack(itemStack: MojangStack): MojangStack {
-        val novaMaterial = itemStack.novaItem
-        if (novaMaterial != null)
-            return novaMaterial.craftingRemainingItem?.get()?.nmsCopy ?: MojangStack.EMPTY
+        val novaItem = itemStack.novaItem
+        if (novaItem != null)
+            return novaItem.craftingRemainingItem?.get()?.nmsCopy ?: MojangStack.EMPTY
         
         return MojangStack(itemStack.item.craftingRemainingItem)
     }
     
     @JvmStatic
     fun getRemainingBukkitItemStack(itemStack: MojangStack): BukkitStack? {
-        val novaMaterial = itemStack.novaItem
-        if (novaMaterial != null)
-            return novaMaterial.craftingRemainingItem?.get()
+        val novaItem = itemStack.novaItem
+        if (novaItem != null)
+            return novaItem.craftingRemainingItem?.get()
         
         return itemStack.item.craftingRemainingItem?.let { ItemStack(CraftMagicNumbers.getMaterial(it)) }
     }

@@ -88,7 +88,7 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
     }
     
     fun getNovaEquipable(itemStack: ItemStack): Equipable? {
-        val wearable = itemStack.novaItem?.itemLogic?.getBehavior(Wearable::class)
+        val wearable = itemStack.novaItem?.getBehavior(Wearable::class)
             ?: return null
         
         return object : Equipable {
@@ -104,7 +104,7 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
     
     @JvmStatic
     fun getNovaArmorDispenseMethod(itemStack: ItemStack): DispenseItemBehavior? {
-        if (itemStack.novaItem?.itemLogic?.hasBehavior(Wearable::class) == true)
+        if (itemStack.novaItem?.hasBehavior(Wearable::class) == true)
             return ArmorItem.DISPENSE_ITEM_BEHAVIOR
         
         return null
