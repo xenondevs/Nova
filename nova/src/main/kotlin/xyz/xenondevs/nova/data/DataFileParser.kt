@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -68,14 +69,14 @@ internal object DataFileParser {
     fun processFiles(
         dirName: String,
         filter: (File) -> Boolean = { it.isFile && it.extension == "json" },
-        fileProcessor: (NamespacedId, File) -> Unit
+        fileProcessor: (ResourceLocation, File) -> Unit
     ) {
         DATA_DIR.listFiles(FileFilter(File::isDirectory))?.forEach { namespaceDir ->
             val namespace = namespaceDir.name
             val dir = File(DATA_DIR, "$namespace/$dirName")
             if (!dir.exists() || dir.isFile) return@forEach
             dir.walkTopDown().filter(filter).forEach { file ->
-                val id = NamespacedId(namespace, file.nameWithoutExtension)
+                val id = ResourceLocation(namespace, file.nameWithoutExtension)
                 fileProcessor.invoke(id, file)
             }
         }

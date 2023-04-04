@@ -12,13 +12,23 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_GENERATION_SETTINGS_FEATURES_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
+import xyz.xenondevs.nova.world.generation.WorldGenManager
 
 @OptIn(ExperimentalWorldGen::class)
+@InternalInit(
+    stage = InitializationStage.PRE_WORLD,
+    dependsOn = [AddonsInitializer::class, WorldGenManager::class]
+)
 internal object BiomeInjector {
     
     private val BIOME_REGISTRY = NMSUtils.getRegistry(Registries.BIOME)
@@ -26,8 +36,9 @@ internal object BiomeInjector {
     private val toInject = Object2ObjectOpenHashMap<ResourceLocation, MutableList<MutableSet<Holder<PlacedFeature>>>>()
     private val patchedBiomes = IntOpenHashSet()
     
-    fun loadInjections(injections: Iterable<BiomeInjection>) {
-        injections.forEach { biomeInjection ->
+    @InitFun
+    fun loadInjections() {
+        NovaRegistries.BIOME_INJECTION.forEach { biomeInjection ->
             // get a list of all biomes that match the injection's tag
             val biomes = biomeInjection.biomes
             // loop through all biomes and add new injections to the toInject map
