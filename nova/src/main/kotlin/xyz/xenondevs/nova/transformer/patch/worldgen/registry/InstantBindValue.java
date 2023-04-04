@@ -1,9 +1,12 @@
 package xyz.xenondevs.nova.transformer.patch.worldgen.registry;
 
-import xyz.xenondevs.nova.world.generation.registry.WorldGenRegistry;
+import net.minecraft.core.Holder;
 
 /**
- * Used in {@link MappedRegistryPatch} and {@link WorldGenRegistry} to disinguish Nova registry entries from vanilla ones.
+ * Can be used to directly bind a {@link Holder Holders} value in Minecraft's registries. Please note that Nova's registries
+ * do this by default, so this class is only needed for Minecraft's registries.
+ *
+ * @see MappedRegistryPatch
  */
 public class InstantBindValue {
     
