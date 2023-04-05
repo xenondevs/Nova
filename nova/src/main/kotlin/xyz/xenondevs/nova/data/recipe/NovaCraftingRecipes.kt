@@ -8,8 +8,10 @@ import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
 import net.minecraft.world.item.crafting.SmokingRecipe
+import net.minecraft.world.item.crafting.StonecutterRecipe
 import net.minecraft.world.level.Level
 import org.bukkit.inventory.Recipe
+import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.commons.collections.removeFirstWhere
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.bukkitCopy
@@ -171,6 +173,25 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
     bukkitRecipe.result.nmsCopy,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
+) {
+    
+    private val choice = bukkitRecipe.inputChoice
+    
+    override fun matches(container: Container, level: Level): Boolean {
+        return choice.test(container.getItem(0).bukkitCopy)
+    }
+    
+    override fun toBukkitRecipe(): Recipe {
+        return bukkitRecipe
+    }
+    
+}
+
+internal class NovaStonecutterRecipe(private val bukkitRecipe: StonecuttingRecipe) : StonecutterRecipe(
+    bukkitRecipe.key.resourceLocation,
+    "",
+    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.result.nmsCopy
 ) {
     
     private val choice = bukkitRecipe.inputChoice

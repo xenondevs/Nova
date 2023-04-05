@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.nmsCopy
-import xyz.xenondevs.nova.util.resourceLocation
 import net.minecraft.world.item.crafting.BlastingRecipe as MojangBlastFurnaceRecipe
 import net.minecraft.world.item.crafting.CampfireCookingRecipe as MojangCampfireRecipe
 import net.minecraft.world.item.crafting.CookingBookCategory as MojangCookingBookCategory
@@ -19,7 +18,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe as MojangShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe as MojangShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe as MojangFurnaceRecipe
 import net.minecraft.world.item.crafting.SmokingRecipe as MojangSmokerRecipe
-import net.minecraft.world.item.crafting.StonecutterRecipe as MojangStonecuttingRecipe
+import net.minecraft.world.item.crafting.StonecutterRecipe as MojangStonecutterRecipe
 
 val Recipe.key: NamespacedKey
     get() = (this as Keyed).key
@@ -107,7 +106,8 @@ internal fun MojangCampfireRecipe.clientsideCopy(): MojangCampfireRecipe {
     return MojangCampfireRecipe(id, group, category(), ingredient, result, experience, cookingTime)
 }
 
-internal fun StonecuttingRecipe.clientsideCopy(): MojangStonecuttingRecipe {
-    val result = PacketItems.getClientSideStack(null, result.nmsCopy)
-    return MojangStonecuttingRecipe(key.resourceLocation, group, inputChoice.nmsIngredient.clientsideCopy(), result)
+internal fun MojangStonecutterRecipe.clientsideCopy(): MojangStonecutterRecipe {
+    val result = PacketItems.getClientSideStack(null, getResultItem(REGISTRY_ACCESS))
+    val ingredient = ingredients.first().clientsideCopy()
+    return MojangStonecutterRecipe(id, group, ingredient, result)
 }
