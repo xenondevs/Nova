@@ -26,17 +26,17 @@ interface WailaToolIconProvider {
 internal object VanillaWailaToolIconProvider : WailaToolIconProvider {
     
     override fun getIcon(category: ToolCategory, tier: ToolTier?): ResourceLocation? {
-        val path = when (category) {
+        val name = when (category) {
             SHEARS -> "shears"
             SHOVEL, PICKAXE, AXE, HOE, SWORD -> when(tier) {
-                WOOD, GOLD -> "item/${tier.id.name}en_${category.id.name}"
-                STONE, IRON, DIAMOND, NETHERITE -> "item/${tier.id.name}_${category.id.name}"
-                else -> "item/wooden_${category.id.name}"
+                WOOD, GOLD -> "${tier.id.name}en_${category.id.name}"
+                STONE, IRON, DIAMOND, NETHERITE -> "${tier.id.name}_${category.id.name}"
+                else -> "wooden_${category.id.name}"
             }
             else -> null
         } ?: return null
         
-        return ResourceLocation("minecraft", path)
+        return ResourceLocation("minecraft", "item/$name")
     }
     
 }
