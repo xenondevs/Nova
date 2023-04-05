@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.util.set
 
 interface AttachmentTypeRegistry : AddonGetter {
     
-    fun <T : Attachment> attachmentType(name: String, constructor: (Player) -> T): AttachmentType<T> {
+    fun <T : Attachment> registerAttachmentType(name: String, constructor: (Player) -> T): AttachmentType<T> {
         val id = ResourceLocation(addon, name)
         val attachmentType = AttachmentType(id, constructor)
         

@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.util.set
 
 interface WailaInfoProviderRegistry: AddonGetter {
     
-    fun <T> register(name: String, provider: WailaInfoProvider<T>): WailaInfoProvider<T> {
+    fun <T> registerWailaInfoProvider(name: String, provider: WailaInfoProvider<T>): WailaInfoProvider<T> {
         val id = addon.description.id + ":" + name
         
         NovaRegistries.WAILA_INFO_PROVIDER[id] = provider

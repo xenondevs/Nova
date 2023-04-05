@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.util.set
 
 interface AbilityTypeRegistry: AddonGetter {
     
-    fun <T : Ability> abilityType(name: String, abilityCreator: (Player) -> T): AbilityType<T> {
+    fun <T : Ability> registerAbilityType(name: String, abilityCreator: (Player) -> T): AbilityType<T> {
         val id = ResourceLocation(addon, name)
         val abilityType = AbilityType(id, abilityCreator)
         

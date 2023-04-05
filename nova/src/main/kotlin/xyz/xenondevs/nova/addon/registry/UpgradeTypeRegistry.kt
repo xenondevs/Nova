@@ -10,7 +10,7 @@ import kotlin.reflect.typeOf
 
 interface UpgradeTypeRegistry : AddonGetter {
     
-    fun <T> upgradeType(name: String, item: NovaItem, icon: NovaItem, valueType: KType): UpgradeType<T> {
+    fun <T> registerUpgradeType(name: String, item: NovaItem, icon: NovaItem, valueType: KType): UpgradeType<T> {
         val id = ResourceLocation(addon, name)
         val upgradeType = UpgradeType<T>(id, item, icon, valueType)
         
@@ -20,6 +20,6 @@ interface UpgradeTypeRegistry : AddonGetter {
     
 }
 
-inline fun <reified T> UpgradeTypeRegistry.upgradeType(name: String, item: NovaItem, icon: NovaItem): UpgradeType<T> {
-    return upgradeType(name, item, icon, typeOf<T>())
+inline fun <reified T> UpgradeTypeRegistry.registerUpgradeType(name: String, item: NovaItem, icon: NovaItem): UpgradeType<T> {
+    return registerUpgradeType(name, item, icon, typeOf<T>())
 }

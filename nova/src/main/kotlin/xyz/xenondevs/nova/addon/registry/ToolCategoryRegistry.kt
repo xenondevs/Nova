@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.util.set
 
 interface ToolCategoryRegistry: AddonGetter {
     
-    fun toolCategory(name: String, iconGetter: (ToolTier?) -> ResourcePath): ToolCategory {
+    fun registerToolCategory(name: String): ToolCategory {
         val id = ResourceLocation(addon, name)
         val category = ToolCategory(id, iconGetter)
         

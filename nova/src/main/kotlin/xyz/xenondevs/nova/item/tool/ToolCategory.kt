@@ -18,8 +18,7 @@ import xyz.xenondevs.nova.world.pos
  * be `minecraft:item/diamond_pickaxe` for the `minecraft:pickaxe` category and `minecraft:diamond` level.
  */
 open class ToolCategory internal constructor(
-    val id: ResourceLocation,
-    val getIcon: (ToolTier?) -> ResourcePath
+    val id: ResourceLocation
 ) {
     
     fun isCorrectToolCategoryForBlock(block: Block): Boolean {
@@ -82,5 +81,5 @@ class VanillaToolCategory internal constructor(
     val itemDamageOnBreakBlock: Int,
     val genericMultipliers: Map<Material, Double>,
     val specialMultipliers: Map<Material, Map<Material, Double>>,
-    getIcon: (ToolTier?) -> ResourcePath
-) : ToolCategory(id, getIcon)
+    val getIcon: (ToolTier?) -> ResourcePath
+) : ToolCategory(id)

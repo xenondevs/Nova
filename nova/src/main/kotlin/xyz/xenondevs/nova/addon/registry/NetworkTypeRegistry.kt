@@ -11,7 +11,7 @@ private typealias NetworkConstructor = (UUID, Boolean) -> Network
 
 interface NetworkTypeRegistry: AddonGetter {
     
-    fun networkType(name: String, networkConstructor: NetworkConstructor): NetworkType {
+    fun registerNetworkType(name: String, networkConstructor: NetworkConstructor): NetworkType {
         val id = ResourceLocation(addon, name)
         val networkType = NetworkType(id, networkConstructor)
         

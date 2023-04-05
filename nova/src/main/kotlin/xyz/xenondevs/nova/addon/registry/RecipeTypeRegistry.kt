@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
 
 interface RecipeTypeRegistry: AddonGetter {
     
-    fun<T: NovaRecipe> recipeType(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
+    fun<T: NovaRecipe> registerRecipeType(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
         val id = ResourceLocation(addon, name)
         val recipeType = RecipeType(id, recipeClass, group, deserializer)
         

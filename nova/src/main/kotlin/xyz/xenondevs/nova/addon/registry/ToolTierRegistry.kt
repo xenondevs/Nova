@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.set
 
 interface ToolTierRegistry: AddonGetter {
     
-    fun toolTier(name: String): ToolTier {
+    fun registerToolTier(name: String): ToolTier {
         val id = ResourceLocation(addon, name)
         val tier = ToolTier(id, configReloadable {
             NovaConfig["${id.namespace}:tool_levels"].getDouble(id.name)
@@ -23,7 +23,7 @@ interface ToolTierRegistry: AddonGetter {
     }
     
     @HardcodedProperties
-    fun toolTier(name: String, level: Double) : ToolTier {
+    fun registerToolTier(name: String, level: Double) : ToolTier {
         val id = ResourceLocation(addon, name)
         val tier = ToolTier(id, provider(level))
         
