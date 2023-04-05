@@ -9,14 +9,15 @@ import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
-private  val CHECK_MARK = Component.text("✔", NamedTextColor.GREEN)
-private  val CROSS = Component.text("❌", NamedTextColor.RED)
+private val CHECK_MARK = Component.text("✔", NamedTextColor.GREEN)
+private val CROSS = Component.text("❌", NamedTextColor.RED)
 
 object ToolLine {
     
@@ -81,8 +82,11 @@ object ToolLine {
         return WailaLine(builder.build(), Alignment.CENTERED)
     }
     
-    private fun getToolIcon(level: ToolTier?, category: ToolCategory): Component {
-        return Resources.getTextureIconChar(category.getIcon(level)).component
-    }
+    private fun getToolIcon(tier: ToolTier?, category: ToolCategory): Component =
+        NovaRegistries.WAILA_TOOL_ICON_PROVIDER
+            .firstNotNullOfOrNull { it.getIcon(category, tier) }
+            ?.let(Resources::getTextureIconChar)
+            ?.component
+            ?: Component.empty()
     
 }

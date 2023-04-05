@@ -6,7 +6,6 @@ import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -80,6 +79,5 @@ class VanillaToolCategory internal constructor(
     val itemDamageOnAttackEntity: Int,
     val itemDamageOnBreakBlock: Int,
     val genericMultipliers: Map<Material, Double>,
-    val specialMultipliers: Map<Material, Map<Material, Double>>,
-    val getIcon: (ToolTier?) -> ResourcePath
+    val specialMultipliers: Map<Material, Map<Material, Double>>
 ) : ToolCategory(id)

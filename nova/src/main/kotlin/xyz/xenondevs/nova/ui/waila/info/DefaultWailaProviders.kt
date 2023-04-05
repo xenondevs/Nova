@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
+import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_TOOL_ICON_PROVIDER
 import xyz.xenondevs.nova.ui.waila.info.impl.CakeWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CampfireWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CandleWailaInfoProvider
@@ -24,7 +25,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.SuspiciousSandWailaInfoProvider
 import xyz.xenondevs.nova.util.set
 
 @InternalInit(stage = InitializationStage.PRE_WORLD)
-object DefaultWailaInfoProviders {
+private object DefaultWailaProviders {
     
     init {
         register("default_vanilla", DefaultVanillaWailaInfoProvider)
@@ -45,11 +46,19 @@ object DefaultWailaInfoProviders {
         register("cocoa", CocoaWailaInfoProvider)
         register("redstone_lamp", RedstoneLampWailaInfoProvider)
         register("suspicious_sand", SuspiciousSandWailaInfoProvider)
+    
+        register("vanilla", VanillaWailaToolIconProvider)
     }
     
     private fun <T> register(name: String, provider: WailaInfoProvider<T>) {
         val id = ResourceLocation("nova", name)
         WAILA_INFO_PROVIDER[id] = provider
     }
+    
+    private fun register(name: String, provider: WailaToolIconProvider) {
+        val id = ResourceLocation("nova", name)
+        WAILA_TOOL_ICON_PROVIDER[id] = provider
+    }
+    
     
 }

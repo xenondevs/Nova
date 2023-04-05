@@ -5,11 +5,9 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import xyz.xenondevs.commons.collections.associateWithNotNullTo
 import xyz.xenondevs.commons.collections.enumMapOf
-import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.set
 import java.util.function.Predicate
 
@@ -108,23 +106,21 @@ object VanillaToolCategories {
                 Predicate<Material> { Tag.LEAVES.isTagged(it) || it == Material.COBWEB } to 15.0
             )
         )
-    ) { ResourcePath.of("minecraft:item/shears") }
+    )
     
     @JvmName("register1")
     private fun register(
         name: String,
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
-        genericMultipliers: Map<Material, Double>,
-        getIcon: ((ToolTier?) -> ResourcePath)? = null
+        genericMultipliers: Map<Material, Double>
     ): VanillaToolCategory {
         return register(
             name,
             canDoSweepAttack, canBreakBlocksInCreative,
             itemDamageOnAttackEntity, itemDamageOnBreakBlock,
             genericMultipliers,
-            emptyMap<Material, Map<Material, Double>>(),
-            getIcon
+            emptyMap<Material, Map<Material, Double>>()
         )
     }
     
@@ -135,8 +131,7 @@ object VanillaToolCategories {
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
         genericMultipliers: Map<Material, Double>,
-        specialMultipliers: Map<Material, Map<Predicate<Material>, Double>>,
-        getIcon: ((ToolTier?) -> ResourcePath)? = null
+        specialMultipliers: Map<Material, Map<Predicate<Material>, Double>>
     ): VanillaToolCategory {
         val flatSpecialMultipliers = specialMultipliers.mapValuesTo(enumMapOf()) { (_, map) ->
             Material.values()
@@ -151,8 +146,7 @@ object VanillaToolCategories {
             canDoSweepAttack, canBreakBlocksInCreative,
             itemDamageOnAttackEntity, itemDamageOnBreakBlock,
             genericMultipliers,
-            flatSpecialMultipliers,
-            getIcon
+            flatSpecialMultipliers
         )
     }
     
@@ -161,8 +155,7 @@ object VanillaToolCategories {
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int,
         genericMultipliers: Map<Material, Double>,
-        specialMultipliers: Map<Material, Map<Material, Double>>,
-        getIcon: ((ToolTier?) -> ResourcePath)? = null
+        specialMultipliers: Map<Material, Map<Material, Double>>
     ): VanillaToolCategory {
         val id = ResourceLocation("minecraft", name)
         val category = VanillaToolCategory(
@@ -170,15 +163,7 @@ object VanillaToolCategories {
             canDoSweepAttack, canBreakBlocksInCreative,
             itemDamageOnAttackEntity, itemDamageOnBreakBlock,
             genericMultipliers,
-            specialMultipliers,
-            getIcon ?: {
-                val path = when (it) {
-                    VanillaToolTiers.WOOD, VanillaToolTiers.GOLD -> "item/${it.id.name}en_$name"
-                    null -> "item/wooden_$name"
-                    else -> "item/${it.id.name}_${name}"
-                }
-                ResourcePath("minecraft", path)
-            }
+            specialMultipliers
         )
         TOOL_CATEGORY[id] = category
         return category

@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.player.attachment.AttachmentType
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
@@ -51,6 +52,8 @@ object NovaRegistries {
     @JvmField
     val WAILA_INFO_PROVIDER = registerSimple<WailaInfoProvider<*>>("waila_info_provider")
     
+    @JvmField
+    val WAILA_TOOL_ICON_PROVIDER = registerSimple<WailaToolIconProvider>("waila_tool_icon_provider")
     
     private fun <E : Any> registerSimple(name: String): WritableRegistry<E> {
         val resourceLocation = ResourceLocation("nova", name)
