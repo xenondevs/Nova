@@ -317,11 +317,11 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun sendBlockDamage(p0: Location, p1: Float, p2: Entity) {
+    override fun sendBlockDamage(location: Location, progress: Float, entity: Entity) {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun sendBlockDamage(p0: Location, p1: Float, p2: Int) {
+    override fun sendBlockDamage(location: Location, progress: Float, sourceId: Int) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -351,7 +351,7 @@ internal class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun sendHurtAnimation(p0: Float) {
+    override fun sendHurtAnimation(yaw: Float) {
         throw UnsupportedOperationException("Player is not online")
     }
     
