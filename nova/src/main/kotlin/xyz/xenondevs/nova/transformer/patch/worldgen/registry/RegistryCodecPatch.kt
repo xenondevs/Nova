@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.transformer.patch.worldgen.registry
 
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.Lifecycle
+import net.minecraft.core.DefaultedMappedRegistry
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
@@ -17,6 +18,7 @@ import xyz.xenondevs.bytebase.util.insertAfterFirst
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.findNthOfType
 import xyz.xenondevs.nova.transformer.MultiTransformer
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.DEFAULTED_MAPPED_REGISTRY_GET_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MAPPED_REGISTRY_LIFECYCLE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_BY_NAME_CODEC_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_FILE_CODEC_DECODE_METHOD
@@ -30,7 +32,7 @@ import com.mojang.datafixers.util.Pair as MojangPair
  * Allows accessing Nova's registry from Minecraft's Block registry.
  */
 @OptIn(ExperimentalWorldGen::class)
-internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::class, Registry::class, MappedRegistry::class), true) {
+internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::class, Registry::class, MappedRegistry::class, DefaultedMappedRegistry::class), true) {
     
     private val RESOURCE_KEY_NAME = ResourceKey::class.internalName
     private val RESOURCE_LOCATION_NAME = ResourceLocation::class.internalName
@@ -39,6 +41,7 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
         patchRegistryFileCodec()
         patchRegistryByNameCodec()
         patchRegistryLifecycleGetter()
+        patchDefaultedMappedRegistry()
     }
     
     /**
@@ -139,6 +142,22 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
             addLabel()
             invokeStatic(lifecycleName, "stable", "()L$lifecycleName;")
             areturn() // return Lifecycle.stable()
+        })
+    }
+    
+    private fun patchDefaultedMappedRegistry() {
+        val instructions = VirtualClassPath[DEFAULTED_MAPPED_REGISTRY_GET_METHOD].instructions
+        instructions.insert(buildInsnList {
+            val continueLabel = instructions.first as LabelNode
+            aLoad(1)
+            invokeVirtual(RESOURCE_LOCATION_NAME, "SRM(net.minecraft.resources.ResourceLocation getNamespace)", "()Ljava/lang/String;")
+            ldc("minecraft")
+            invokeVirtual("java/lang/String", "equals", "(Ljava/lang/Object;)Z")
+            ifne(continueLabel) // if location.namespace != "minecraft" goto continueLabel
+            
+            addLabel()
+            constNull()
+            areturn() // return null
         })
     }
     

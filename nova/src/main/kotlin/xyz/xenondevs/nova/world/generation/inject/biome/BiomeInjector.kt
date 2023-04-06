@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_GENERATION_SETTINGS_FEATURES_FIELD
@@ -52,6 +53,7 @@ internal object BiomeInjector {
                 }
             }
         }
+        VanillaRegistries.LEVEL_STEM.forEach { injectFeatures(it.generator.biomeSource.possibleBiomes().toList()) }
     }
     
     @Suppress("UNCHECKED_CAST", "unused")
@@ -99,7 +101,7 @@ internal object BiomeInjector {
             }
             
             patchedBiomes += hash
-            // println("Patched new biome: $key") TODO: config option
+            // println("Patched new biome: $key")// TODO: config option
         }
     }
     

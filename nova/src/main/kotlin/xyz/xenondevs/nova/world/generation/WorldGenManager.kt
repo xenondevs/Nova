@@ -52,7 +52,7 @@ internal object WorldGenManager {
     
     private fun <T : Any> loadFiles(worldGenDir: WorldGenDir<T>) {
         val errorName = worldGenDir.dir.replace('_', ' ')
-        DataFileParser.processFiles("worldgen/$worldGenDir") { id, file ->
+        DataFileParser.processFiles("worldgen/${worldGenDir.dir}") { id, file ->
             val result = worldGenDir.codec
                 .decodeJsonFile(file)
                 .getFirstOrThrow("Failed to parse $errorName of $id at ${file.absolutePath}")

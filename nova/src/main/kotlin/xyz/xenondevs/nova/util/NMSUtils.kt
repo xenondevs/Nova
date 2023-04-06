@@ -53,6 +53,7 @@ import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
+import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -415,7 +416,7 @@ object NMSUtils {
     ).get(null) as AtomicInteger
     
     val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()!!
-    val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, REGISTRY_ACCESS)!!
+    val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, VanillaRegistryAccess)!!
     
     fun freezeRegistry(registry: Registry<*>) {
         if (registry !is MappedRegistry) return
