@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.initialize
 
 import xyz.xenondevs.commons.reflection.hasEmptyArguments
 import xyz.xenondevs.nova.LOGGER
+import java.lang.reflect.InvocationTargetException
 import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
 import kotlin.reflect.full.declaredFunctions
@@ -34,7 +35,8 @@ internal open class InitializableClass(
         } catch (e: InitializationException) {
             LOGGER.severe(e.message)
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $this", e)
+            val cause = if (e is InvocationTargetException) e.targetException else e
+            LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $this", cause)
         }
         initialization.complete(false)
     }
@@ -43,7 +45,7 @@ internal open class InitializableClass(
         // call disable method(s)
         clazz.declaredFunctions.asSequence()
             .filter { it.hasAnnotation<DisableFun>() && it.hasEmptyArguments() }
-            .forEach { 
+            .forEach {
                 val instance = clazz.objectInstance
                     ?: throw InitializationException("Initializable class $className is not a singleton")
                 
@@ -52,6 +54,6 @@ internal open class InitializableClass(
             }
     }
     
-    override fun toString() = "Initializable | $className"
+    override fun toString() = className
     
 }
