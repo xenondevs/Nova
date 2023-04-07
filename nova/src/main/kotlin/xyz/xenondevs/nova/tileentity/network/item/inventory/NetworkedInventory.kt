@@ -148,10 +148,10 @@ class NetworkedVirtualInventory internal constructor(val virtualInventory: Virtu
 internal class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<VirtualInventory, NetworkConnectionType>>) : NetworkedInventory {
     
     val inventories: List<VirtualInventory> =
-        inventories.map { it.first }.sortedByDescending { it.guiShiftPriority }
+        inventories.map { it.first }.sortedByDescending { it.guiPriority }
     
     private val inventoriesWithConnectionType: List<Pair<VirtualInventory, NetworkConnectionType>> =
-        inventories.sortedByDescending { it.first.guiShiftPriority }
+        inventories.sortedByDescending { it.first.guiPriority }
     
     override val size: Int
         get() = inventories.sumOf { it.size }
