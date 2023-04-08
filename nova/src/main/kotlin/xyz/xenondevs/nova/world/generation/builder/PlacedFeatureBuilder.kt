@@ -191,6 +191,16 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
     }
     
     /**
+     * Adds an [EnvironmentScanPlacement] [PlacementModifier] to this [PlacedFeature], which scans for blocks matching
+     * the given [target BlockPredicate][BlockPredicate] up/down until it finds a matching block or the
+     * [max number of steps][maxSteps] is reached. If no matching block is found, empty is returned.
+     */
+    fun environmentScan(direction: Direction, target: BlockPredicate, maxSteps: Int): PlacedFeatureBuilder {
+        modifiers += EnvironmentScanPlacement.scanningFor(direction, target, maxSteps)
+        return this
+    }
+    
+    /**
      * Adds a [HeightRangePlacement] [PlacementModifier] with the given [provider] to this [PlacedFeature], which takes
      * the input position and sets the y-coordinate to a value provided by the given [HeightProvider].
      */

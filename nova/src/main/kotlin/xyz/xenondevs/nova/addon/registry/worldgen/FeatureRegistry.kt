@@ -56,6 +56,10 @@ interface FeatureRegistry : AddonGetter {
     }
     
     @ExperimentalWorldGen
+    fun <FC: FeatureConfiguration, F: Feature<FC>> registerConfiguredFeature(name: String, feature: F, config: FC): ConfiguredFeature<FC, F> =
+        registerConfiguredFeature(name, ConfiguredFeature(feature, config))
+    
+    @ExperimentalWorldGen
     fun registerPlacedFeature(name: String, placedFeature: PlacedFeature): PlacedFeature {
         val id = ResourceLocation(addon, name)
         VanillaRegistries.PLACED_FEATURE[id] = placedFeature
