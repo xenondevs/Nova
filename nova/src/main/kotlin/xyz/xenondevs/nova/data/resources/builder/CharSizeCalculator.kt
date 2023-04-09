@@ -29,12 +29,14 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.math.roundToInt
 
+private const val FONT_HASHES_STORAGE_KEY = "fontHashes0.13"
+
 private val FONT_NAME_REGEX = Regex("""^([a-z0-9._-]+)/font/([a-z0-9/._-]+)$""")
 private val FORCE_UNICODE_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.font.force_unicode_font") }
 
 internal class CharSizeCalculator {
     
-    private val fontHashes: HashMap<String, String> = PermanentStorage.retrieve("fontHashes0.13", ::HashMap)
+    private val fontHashes: HashMap<String, String> = PermanentStorage.retrieve(FONT_HASHES_STORAGE_KEY, ::HashMap)
     
     private val bitmaps = HashMap<ResourcePath, BufferedImage>()
     
@@ -64,7 +66,7 @@ internal class CharSizeCalculator {
                 }
         }
         
-        PermanentStorage.store("fontHashes", fontHashes)
+        PermanentStorage.store(FONT_HASHES_STORAGE_KEY, fontHashes)
     }
     
     private fun getFontName(base: Path, file: Path): String {
