@@ -16,8 +16,8 @@ import org.bukkit.inventory.ItemStack
 import org.objectweb.asm.Type
 import xyz.xenondevs.commons.collections.CollectionUtils
 import xyz.xenondevs.invui.InvUI
+import xyz.xenondevs.invui.inventory.StackSizeProvider
 import xyz.xenondevs.invui.util.InventoryUtils
-import xyz.xenondevs.invui.virtualinventory.StackSizeProvider
 import xyz.xenondevs.nmsutils.NMSUtilities
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER

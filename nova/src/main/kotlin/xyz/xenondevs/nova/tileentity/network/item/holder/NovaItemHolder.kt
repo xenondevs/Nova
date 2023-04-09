@@ -4,7 +4,7 @@ package xyz.xenondevs.nova.tileentity.network.item.holder
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
+import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter

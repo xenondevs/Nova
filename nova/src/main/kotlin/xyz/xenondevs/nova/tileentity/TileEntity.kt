@@ -16,10 +16,10 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
-import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
-import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
-import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
+import xyz.xenondevs.invui.inventory.VirtualInventory
+import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent
+import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
+import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.data.config.Reloadable
@@ -240,18 +240,16 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getInventory(
         salt: String,
         size: Int,
-        stackSizes: IntArray,
+        maxStackSizes: IntArray,
         global: Boolean = false,
-        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
-        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
+        preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
+        postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
     ): VirtualInventory {
         val invUUID = uuid.salt(salt)
-        val inventory = retrieveData("inventory.$invUUID") {
-            VirtualInventory(invUUID, size, arrayOfNulls(size), stackSizes)
-        }
-        
-        if (preUpdateHandler != null) inventory.setItemUpdateHandler(preUpdateHandler)
-        if (afterUpdateHandler != null) inventory.setInventoryUpdatedHandler(afterUpdateHandler)
+        val inventory = retrieveData("inventory.$invUUID") { VirtualInventory(invUUID, size) }
+        inventory.maxStackSizes = maxStackSizes
+        if (preUpdateHandler != null) inventory.setPreUpdateHandler(preUpdateHandler)
+        if (postUpdateHandler != null) inventory.setPostUpdateHandler(postUpdateHandler)
         
         _inventories[inventory] = global
         return inventory
@@ -263,9 +261,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getInventory(
         salt: String,
         size: Int,
-        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
-        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
-    ) = getInventory(salt, size, IntArray(size) { 64 }, false, preUpdateHandler, afterUpdateHandler)
+        preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
+        postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
+    ): VirtualInventory = getInventory(salt, size, IntArray(size) { 64 }, false, preUpdateHandler, postUpdateHandler)
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
@@ -274,9 +272,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         salt: String,
         size: Int,
         global: Boolean = false,
-        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
-        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
-    ) = getInventory(salt, size, IntArray(size) { 64 }, global, preUpdateHandler, afterUpdateHandler)
+        preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
+        postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
+    ): VirtualInventory = getInventory(salt, size, IntArray(size) { 64 }, global, preUpdateHandler, postUpdateHandler)
     
     /**
      * Gets a [FluidContainer] for this [TileEntity].

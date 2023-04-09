@@ -5,9 +5,9 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.mapKeysNotNullTo
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
-import xyz.xenondevs.invui.virtualinventory.event.InventoryUpdatedEvent
-import xyz.xenondevs.invui.virtualinventory.event.ItemUpdateEvent
+import xyz.xenondevs.invui.inventory.VirtualInventory
+import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent
+import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntity.Companion.SELF_UPDATE_REASON
@@ -29,7 +29,7 @@ class UpgradeHolder internal constructor(
     private val material = tileEntity.block
     private val valueProviders: Map<UpgradeType<*>, ModifierProvider<*>> = allowed.associateWithTo(HashMap()) { ModifierProvider(it) }
     
-    internal val input = VirtualInventory(null, 1).apply { setItemUpdateHandler(::handlePreInvUpdate); setInventoryUpdatedHandler(::handlePostInvUpdate) }
+    internal val input = VirtualInventory(null, 1).apply { setPreUpdateHandler(::handlePreInvUpdate); setPostUpdateHandler(::handlePostInvUpdate) }
     internal val upgrades: HashMap<UpgradeType<*>, Int> =
         tileEntity.retrieveData<Map<ResourceLocation, Int>>("upgrades", ::HashMap)
             .mapKeysNotNullTo(HashMap()) { NovaRegistries.UPGRADE_TYPE[it.key] }
@@ -111,11 +111,11 @@ class UpgradeHolder internal constructor(
         valueProviders.values.forEach(ModifierProvider<*>::update)
     }
     
-    private fun handlePreInvUpdate(event: ItemUpdateEvent) {
-        if (event.updateReason == SELF_UPDATE_REASON || event.isRemove || event.newItemStack == null)
+    private fun handlePreInvUpdate(event: ItemPreUpdateEvent) {
+        if (event.updateReason == SELF_UPDATE_REASON || event.isRemove || event.newItem == null)
             return
         
-        val upgradeType = event.newItemStack.getUpgradeType()
+        val upgradeType = event.newItem.getUpgradeType()
         if (upgradeType == null || upgradeType !in allowed) {
             event.isCancelled = true
             return
@@ -132,19 +132,19 @@ class UpgradeHolder internal constructor(
         var addedAmount = event.addedAmount
         if (addedAmount + currentAmount > limit) {
             addedAmount = limit - currentAmount
-            event.newItemStack.amount = addedAmount
+            event.newItem.amount = addedAmount
         }
     }
     
-    private fun handlePostInvUpdate(event: InventoryUpdatedEvent) {
-        var item = event.newItemStack?.clone()
+    private fun handlePostInvUpdate(event: ItemPostUpdateEvent) {
+        var item = event.newItem?.clone()
         if (item != null) {
             val upgradeType = item.getUpgradeType()!!
             
             val amountLeft = addUpgrade(upgradeType, item.amount)
             if (amountLeft == 0) item = null
             else item.amount = amountLeft
-            input.setItemStack(SELF_UPDATE_REASON, 0, item)
+            input.setItem(SELF_UPDATE_REASON, 0, item)
             
             handleUpgradeUpdates()
         }

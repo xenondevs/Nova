@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.tileentity.network.item.inventory
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.flatMap
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
-import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
+import xyz.xenondevs.invui.inventory.VirtualInventory
+import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.EndPointContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -83,7 +83,7 @@ class NetworkedVirtualInventory internal constructor(val virtualInventory: Virtu
         get() = virtualInventory.items
     
     override fun setItem(slot: Int, item: ItemStack?): Boolean {
-        return virtualInventory.setItemStack(null, slot, item)
+        return virtualInventory.forceSetItem(null, slot, item)
     }
     
     override fun addItem(item: ItemStack): Int {
@@ -91,27 +91,27 @@ class NetworkedVirtualInventory internal constructor(val virtualInventory: Virtu
     }
     
     override fun canDecrementByOne(slot: Int): Boolean {
-        val itemStack = virtualInventory.getUnsafeItemStack(slot)
+        val itemStack = virtualInventory.getUnsafeItem(slot) ?: return false
         val event = virtualInventory.callPreUpdateEvent(
             UPDATE_REASON,
             slot,
-            itemStack,
-            itemStack?.clone()?.apply { amount-- }?.takeUnlessEmpty()
+            itemStack.clone(),
+            itemStack.clone().apply { amount-- }.takeUnlessEmpty()
         )
         
-        return !event.isCancelled && (event.newItemStack?.amount ?: 0) == itemStack.amount - 1
+        return !event.isCancelled && (event.newItem?.amount ?: 0) == itemStack.amount - 1
     }
     
     override fun decrementByOne(slot: Int) {
         if(virtualInventory.addItemAmount(UpdateReason.SUPPRESSED, slot, -1) != -1)
             throwNetworkException()
         
-        val itemStack = virtualInventory.getUnsafeItemStack(slot)
-        virtualInventory.callAfterUpdateEvent(
+        val itemStack = virtualInventory.getUnsafeItem(slot) ?: return
+        virtualInventory.callPostUpdateEvent(
             UPDATE_REASON,
             slot,
-            itemStack,
-            itemStack?.clone()?.apply { amount-- }?.takeUnlessEmpty()
+            itemStack.clone(),
+            itemStack.clone().apply { amount-- }.takeUnlessEmpty()
         )
     }
     
@@ -161,7 +161,7 @@ internal class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<Virtual
     
     override fun setItem(slot: Int, item: ItemStack?): Boolean {
         val (inv, invSlot) = getSlot(slot)
-        return inv.setItemStack(UPDATE_REASON, invSlot, item)
+        return inv.forceSetItem(UPDATE_REASON, invSlot, item)
     }
     
     override fun addItem(item: ItemStack): Int {
@@ -180,15 +180,15 @@ internal class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<Virtual
     
     override fun canDecrementByOne(slot: Int): Boolean {
         val (inv, invSlot) = getSlot(slot)
-        val itemStack = inv.getUnsafeItemStack(invSlot)
+        val itemStack = inv.getUnsafeItem(invSlot) ?: return false
         val event = inv.callPreUpdateEvent(
             UPDATE_REASON,
             invSlot,
-            itemStack,
-            itemStack?.clone()?.apply { amount-- }?.takeUnlessEmpty()
+            itemStack.clone(),
+            itemStack.clone().apply { amount-- }.takeUnlessEmpty()
         )
         
-        return !event.isCancelled && (event.newItemStack?.amount ?: 0) == itemStack.amount - 1
+        return !event.isCancelled && (event.newItem?.amount ?: 0) == itemStack.amount - 1
     }
     
     override fun decrementByOne(slot: Int) {
@@ -196,11 +196,12 @@ internal class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<Virtual
         if (inv.addItemAmount(UpdateReason.SUPPRESSED, invSlot, -1) != -1)
             throwNetworkException(inv)
         
-        inv.callAfterUpdateEvent(
+        val itemStack = inv.getUnsafeItem(invSlot) ?: return
+        inv.callPostUpdateEvent(
             UPDATE_REASON,
             invSlot,
-            inv.getUnsafeItemStack(invSlot),
-            inv.getUnsafeItemStack(invSlot)?.clone()?.apply { amount-- }?.takeUnlessEmpty()
+            itemStack.clone(),
+            itemStack.clone().apply { amount-- }.takeUnlessEmpty()
         )
     }
     
@@ -347,7 +348,7 @@ internal class NetworkedRangedBukkitInventory(
         
         // copy items from temp inv to real inv
         for (slot in 0 until size) {
-            inventory.setItem(slots[slot], tempInventory.getItemStack(slot))
+            inventory.setItem(slots[slot], tempInventory.getItem(slot))
         }
         
         return amount

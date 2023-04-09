@@ -1,8 +1,12 @@
 package xyz.xenondevs.nova.ui
 
+import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.structure.Markers
+import xyz.xenondevs.invui.gui.structure.Structure
 import xyz.xenondevs.invui.gui.structure.Structure.addGlobalIngredient
+import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.nova.item.DefaultGuiItems
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.ui.item.PageBackItem
 import xyz.xenondevs.nova.ui.item.PageForwardItem
 import xyz.xenondevs.nova.ui.item.ScrollDownItem
@@ -26,3 +30,15 @@ internal fun setGlobalIngredients() {
     addGlobalIngredient('<', ::PageBackItem)
     addGlobalIngredient('>', ::PageForwardItem)
 }
+
+fun Structure.addIngredient(char: Char, item: NovaItem) =
+    addIngredient(char, item.clientsideProvider)
+
+fun <G: Gui, B : Gui.Builder<G, B>> Gui.Builder<G, B>.addIngredient(char: Char, item: NovaItem) =
+    addIngredient(char, item.clientsideProvider)
+
+fun Structure.addIngredient(char: Char, inventory: Inventory, background: NovaItem) =
+    addIngredient(char, inventory, background.clientsideProvider)
+
+fun <G: Gui, B : Gui.Builder<G, B>> Gui.Builder<G, B>.addIngredient(char: Char, inventory: Inventory, background: NovaItem) =
+    addIngredient(char, inventory, background.clientsideProvider)

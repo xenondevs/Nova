@@ -9,9 +9,9 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.invui.inventory.VirtualInventory
+import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.util.InventoryUtils
-import xyz.xenondevs.invui.virtualinventory.VirtualInventory
-import xyz.xenondevs.invui.virtualinventory.event.UpdateReason
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 /**
@@ -141,16 +141,10 @@ val Player.hasInventoryOpen: Boolean
  */
 fun InventoryView.isPlayerView() = topInventory is CraftingInventory && topInventory.size == 5
 
+/**
+ * A [VirtualInventory] implementation that does not store any items, but voids them.
+ */
 class VoidingVirtualInventory(size: Int) : VirtualInventory(null, size) {
-    override fun setItemStackSilently(slot: Int, itemStack: ItemStack?) = Unit
-    override fun forceSetItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
-    override fun setItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
-    override fun putItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack) = 0
-    override fun setItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
-    override fun addItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
-    override fun addItem(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
-    override fun collectSimilar(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
-    override fun simulateAdd(itemStacks: MutableList<ItemStack>) = IntArray(itemStacks.size)
-    override fun simulateAdd(itemStack: ItemStack, vararg itemStacks: ItemStack) = IntArray(1 + itemStacks.size)
-    override fun canHold(itemStacks: MutableList<ItemStack>) = true
+    override fun setCloneBackingItem(slot: Int, itemStack: ItemStack?) = Unit
+    override fun setDirectBackingItem(slot: Int, itemStack: ItemStack?) = Unit
 }
