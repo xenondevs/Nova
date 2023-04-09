@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.registry.vanilla
 
+import net.minecraft.core.Holder
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
@@ -26,6 +27,12 @@ object VanillaRegistryAccess : RegistryAccess by MINECRAFT_SERVER.registryAccess
     
     override fun <E : Any> registryOrThrow(key: ResourceKey<out Registry<out E>>): WritableRegistry<E> {
         return super.registryOrThrow(key) as WritableRegistry<E>
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Any> getHolder(key: ResourceKey<T>): Holder.Reference<T> {
+        val registry = registryOrThrow(ResourceKey.createRegistryKey<T>(key.registry()))
+        return registry.getHolderOrThrow(key)
     }
     
 }

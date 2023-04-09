@@ -115,9 +115,19 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
     /**
      * Adds multiple [PlacementModifier]s to this [PlacedFeature].
      *
-     * For more information on placement modifiers, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/placed-feature/#placement-modifiers).
+     * For more information on placement modifiers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/placed-feature/#placement-modifiers).
      */
     fun modifiers(vararg modifiers: PlacementModifier): PlacedFeatureBuilder {
+        this.modifiers += modifiers
+        return this
+    }
+    
+    /**
+     * Adds multiple [PlacementModifier]s to this [PlacedFeature].
+     *
+     * For more information on placement modifiers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/placed-feature/#placement-modifiers).
+     */
+    fun modifiers(modifiers: Collection<PlacementModifier>): PlacedFeatureBuilder {
         this.modifiers += modifiers
         return this
     }

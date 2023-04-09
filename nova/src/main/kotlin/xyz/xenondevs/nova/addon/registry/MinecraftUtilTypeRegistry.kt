@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.addon.registry
 
+import com.mojang.serialization.Codec
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
@@ -13,5 +14,8 @@ interface MinecraftUtilTypeRegistry : AddonGetter {
         VanillaRegistries.RULE_TEST[id] = ruleTestType
         return ruleTestType
     }
+    
+    fun <T : RuleTest> registerRuleTestType(name: String, codec: Codec<T>): RuleTestType<T> =
+        registerRuleTestType(name) { codec }
     
 }
