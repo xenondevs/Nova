@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
+import com.mojang.serialization.Codec
 import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
@@ -56,7 +57,7 @@ interface FeatureRegistry : AddonGetter {
     }
     
     @ExperimentalWorldGen
-    fun <FC: FeatureConfiguration, F: Feature<FC>> registerConfiguredFeature(name: String, feature: F, config: FC): ConfiguredFeature<FC, F> =
+    fun <FC : FeatureConfiguration, F : Feature<FC>> registerConfiguredFeature(name: String, feature: F, config: FC): ConfiguredFeature<FC, F> =
         registerConfiguredFeature(name, ConfiguredFeature(feature, config))
     
     @ExperimentalWorldGen
@@ -67,10 +68,22 @@ interface FeatureRegistry : AddonGetter {
     }
     
     @ExperimentalWorldGen
+    fun registerPlacedFeature(name: String, config: ConfiguredFeature<*, *>, vararg modifiers: PlacementModifier): PlacedFeature =
+        registerPlacedFeature(name, PlacedFeature(Holder.direct(config), modifiers.toList()))
+    
+    @ExperimentalWorldGen
+    fun registerPlacedFeature(name: String, config: ConfiguredFeature<*, *>, modifiers: List<PlacementModifier>): PlacedFeature =
+        registerPlacedFeature(name, PlacedFeature(Holder.direct(config), modifiers))
+    
+    @ExperimentalWorldGen
     fun <P : PlacementModifier> registerPlacementModifierType(name: String, placementModifierType: PlacementModifierType<P>): PlacementModifierType<P> {
         val id = ResourceLocation(addon, name)
         VanillaRegistries.PLACEMENT_MODIFIER_TYPE[id] = placementModifierType
         return placementModifierType
     }
+    
+    @ExperimentalWorldGen
+    fun <P : PlacementModifier> registerPlacementModifierType(name: String, codec: Codec<P>): PlacementModifierType<P> =
+        registerPlacementModifierType(name) { codec }
     
 }
