@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
 import java.util.function.Predicate;
 
-import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD;
+import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
 
 /**
  * Wrapper for {@link LevelChunkSection}s to allow placing {@link WrapperBlockState}s.
@@ -31,6 +31,8 @@ import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.LEVEL_CHUNK_
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     private static final long COUNT_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD);
+    private static final long SPECIAL_COLLIDING_BLOCKS_OFFSET = LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD == null ? - 1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD);
+    private static final long KNOWN_BLOCK_COLLISION_DATA_OFFSET = LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD == null ? - 1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD);
     
     private final Level level;
     private final ChunkPos chunkPos;
@@ -174,6 +176,10 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     private void copyBlockCounts() {
         ReflectionUtils.putInt$nova(this, COUNT_OFFSET, ReflectionUtils.getInt$nova(delegate, COUNT_OFFSET));
+        if (SPECIAL_COLLIDING_BLOCKS_OFFSET != - 1) {
+            ReflectionUtils.putInt$nova(this, SPECIAL_COLLIDING_BLOCKS_OFFSET, ReflectionUtils.getInt$nova(delegate, SPECIAL_COLLIDING_BLOCKS_OFFSET));
+            ReflectionUtils.putReference$nova(this, KNOWN_BLOCK_COLLISION_DATA_OFFSET, ReflectionUtils.getReference$nova(delegate, KNOWN_BLOCK_COLLISION_DATA_OFFSET));
+        }
     }
     
 }

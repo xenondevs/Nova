@@ -45,4 +45,6 @@ enum class ServerSoftware(private val superSoftware: ServerSoftware?) {
     
     fun <K, V> getCorrectMap(): MutableMap<K, V> = if (this == PURPUR) ConcurrentHashMap() else HashMap()
     
+    fun isPaper() = this.tree.contains(PAPER)
+    
 }

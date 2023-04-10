@@ -7,6 +7,8 @@ import org.bukkit.Bukkit
 import xyz.xenondevs.bytebase.jvm.ClassWrapper
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.commons.collections.mapToArray
+import xyz.xenondevs.nova.util.ServerSoftware
+import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CB_PACKAGE_PATH
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_DEFINE_CLASS_METHOD
 import java.lang.reflect.Constructor
@@ -90,6 +92,12 @@ object ReflectionUtils {
         return field
     }
     
+    fun getServerSoftwareField(clazz: KClass<*>, declared: Boolean, name: String, serverSoftware: ServerSoftware): Field? {
+        if (serverSoftware !in ServerUtils.SERVER_SOFTWARE.tree)
+            return null
+        return getField(clazz, declared, name)
+    }
+    
     internal fun setFinalField(field: Field, obj: Any, value: Any?) {
         val unsafe = Unsafe.getUnsafe()
         val offset = unsafe.objectFieldOffset(field)
@@ -119,6 +127,18 @@ object ReflectionUtils {
     internal fun getInt(obj: Any, offset: Long): Int {
         val unsafe = Unsafe.getUnsafe()
         return unsafe.getInt(obj, offset)
+    }
+    
+    @JvmStatic
+    internal fun putReference(obj: Any, offset: Long, value: Any?) {
+        val unsafe = Unsafe.getUnsafe()
+        unsafe.putReference(obj, offset, value)
+    }
+    
+    @JvmStatic
+    internal fun getReference(obj: Any, offset: Long): Any? {
+        val unsafe = Unsafe.getUnsafe()
+        return unsafe.getReference(obj, offset)
     }
     
 }

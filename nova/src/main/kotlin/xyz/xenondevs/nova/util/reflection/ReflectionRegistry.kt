@@ -77,6 +77,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getConstructor
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getServerSoftwareField
 import java.io.DataInput
 import java.security.ProtectionDomain
 import java.util.*
@@ -173,6 +174,10 @@ internal object ReflectionRegistry {
     val LEVEL_CHUNK_SECTION_BIOMES_FIELD = getField(LevelChunkSection::class, true, if (SERVER_SOFTWARE == ServerSoftware.SPIGOT) "j" else "biomes")
     @JvmField
     val LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection nonEmptyBlockCount)")
+    @JvmField
+    val LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "specialCollidingBlocks", ServerSoftware.PAPER)
+    @JvmField
+    val LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "knownBlockCollisionData", ServerSoftware.PAPER)
     val HOLDER_SET_DIRECT_CONTENTS_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contents)")
     val HOLDER_SET_DIRECT_CONTENTS_SET_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contentsSet)")
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
