@@ -40,22 +40,14 @@ import org.bukkit.Color as BukkitColor
 
 class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>) {
     
-    lateinit var options: T
-        private set
-    lateinit var location: Location
-        private set
-    var longDistance: Boolean = true
-        private set
-    var offsetX: Float = 0f
-        private set
-    var offsetY: Float = 0f
-        private set
-    var offsetZ: Float = 0f
-        private set
-    var speed: Float = 1f
-        private set
-    var amount: Int = 0
-        private set
+    private lateinit var options: T
+    private lateinit var location: Location
+    private var longDistance: Boolean = true
+    private var offsetX: Float = 0f
+    private var offsetY: Float = 0f
+    private var offsetZ: Float = 0f
+    private var speed: Float = 1f
+    private var amount: Int = 0
     
     constructor(particle: ParticleType<T>, location: Location) : this(particle) {
         this.location = location
@@ -161,6 +153,8 @@ class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>
         speed,
         amount
     )
+    
+    fun getOptions(): T = options
     
     fun display() {
         val packet = build()
