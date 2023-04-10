@@ -39,7 +39,7 @@ object AdvancementLoader {
                     TreeNodePosition.run(advancement)
             }
         // send advancements to players
-        DEDICATED_SERVER.playerList.reloadResources()
+//        DEDICATED_SERVER.playerList.reloadResources()
     }
     
 }
