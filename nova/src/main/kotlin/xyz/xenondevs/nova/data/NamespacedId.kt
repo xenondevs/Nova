@@ -28,6 +28,7 @@ internal fun NamespacedId.toResourceLocation(): ResourceLocation {
 }
 
 @Suppress("DEPRECATION")
+@Deprecated("Use ResourceLocation instead")
 class NamespacedId(override val namespace: String, override val name: String) : INamespacedId {
     
     private val id = "$namespace:$name"
