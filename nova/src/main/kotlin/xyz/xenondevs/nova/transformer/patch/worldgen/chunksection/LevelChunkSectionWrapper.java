@@ -20,10 +20,12 @@ import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
 import java.util.function.Predicate;
 
+import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
+
 /**
  * Wrapper for {@link LevelChunkSection}s to allow placing {@link WrapperBlockState}s.
  * <p>
- * <h2>!UPDATE {@link Patcher Patcher.injectedClasses} WHEN MOVING THIS CLASS!</h2>
+ * <h2>! UPDATE {@link Patcher Patcher.injectedClasses} WHEN MOVING THIS CLASS !</h2>
  */
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
@@ -41,6 +43,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
         this.level = level;
         this.chunkPos = chunkPos;
         this.delegate = delegate;
+        recalcBlockCounts();
     }
     
     @Override
@@ -109,6 +112,16 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     @Override
     public void recalcBlockCounts() {
+        if (delegate == null) return;
+        delegate.recalcBlockCounts();
+        try {
+            // TODO - Switch to Unsafe putReference calls for better performance
+            LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD.set(this, LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD.get(delegate));
+            LEVEL_CHUNK_SECTION_TICKING_BLOCK_COUNT_FIELD.set(this, LEVEL_CHUNK_SECTION_TICKING_BLOCK_COUNT_FIELD.get(delegate));
+            LEVEL_CHUNK_SECTION_TICKING_FLUID_COUNT_FIELD.set(this, LEVEL_CHUNK_SECTION_TICKING_FLUID_COUNT_FIELD.get(delegate));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     @Override
