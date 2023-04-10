@@ -16,11 +16,12 @@ import net.minecraft.world.level.material.FluidState;
 import xyz.xenondevs.nova.data.world.WorldDataManager;
 import xyz.xenondevs.nova.transformer.Patcher;
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry;
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils;
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
 import java.util.function.Predicate;
 
-import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
+import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD;
 
 /**
  * Wrapper for {@link LevelChunkSection}s to allow placing {@link WrapperBlockState}s.
@@ -28,6 +29,8 @@ import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
  * <h2>! UPDATE {@link Patcher Patcher.injectedClasses} WHEN MOVING THIS CLASS !</h2>
  */
 public class LevelChunkSectionWrapper extends LevelChunkSection {
+    
+    private static final long COUNT_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD);
     
     private final Level level;
     private final ChunkPos chunkPos;
@@ -82,7 +85,9 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
                 wrappedState.getNovaBlock());
             return Blocks.AIR.defaultBlockState();
         }
-        return delegate.setBlockState(relX, relY, relZ, state, sync);
+        var blockState = delegate.setBlockState(relX, relY, relZ, state, sync);
+        copyBlockCounts();
+        return blockState;
     }
     
     @Override
@@ -114,14 +119,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     public void recalcBlockCounts() {
         if (delegate == null) return;
         delegate.recalcBlockCounts();
-        try {
-            // TODO - Switch to Unsafe putReference calls for better performance
-            LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD.set(this, LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD.get(delegate));
-            LEVEL_CHUNK_SECTION_TICKING_BLOCK_COUNT_FIELD.set(this, LEVEL_CHUNK_SECTION_TICKING_BLOCK_COUNT_FIELD.get(delegate));
-            LEVEL_CHUNK_SECTION_TICKING_FLUID_COUNT_FIELD.set(this, LEVEL_CHUNK_SECTION_TICKING_FLUID_COUNT_FIELD.get(delegate));
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        copyBlockCounts();
     }
     
     @Override
@@ -137,6 +135,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     @Override
     public void read(FriendlyByteBuf packetdataserializer) {
         delegate.read(packetdataserializer);
+        copyBlockCounts();
     }
     
     @Override
@@ -171,6 +170,10 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     public Level getLevel() {
         return level;
+    }
+    
+    private void copyBlockCounts() {
+        ReflectionUtils.putInt$nova(this, COUNT_OFFSET, ReflectionUtils.getInt$nova(delegate, COUNT_OFFSET));
     }
     
 }

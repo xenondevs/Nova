@@ -173,10 +173,6 @@ internal object ReflectionRegistry {
     val LEVEL_CHUNK_SECTION_BIOMES_FIELD = getField(LevelChunkSection::class, true, if (SERVER_SOFTWARE == ServerSoftware.SPIGOT) "j" else "biomes")
     @JvmField
     val LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection nonEmptyBlockCount)")
-    @JvmField
-    val LEVEL_CHUNK_SECTION_TICKING_BLOCK_COUNT_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection tickingBlockCount)")
-    @JvmField
-    val LEVEL_CHUNK_SECTION_TICKING_FLUID_COUNT_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection tickingFluidCount)")
     val HOLDER_SET_DIRECT_CONTENTS_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contents)")
     val HOLDER_SET_DIRECT_CONTENTS_SET_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contentsSet)")
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")

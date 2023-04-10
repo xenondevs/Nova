@@ -103,4 +103,22 @@ object ReflectionUtils {
         unsafe.putReference(base, offset, value)
     }
     
+    @JvmStatic
+    internal fun getFieldOffset(field: Field): Long {
+        val unsafe = Unsafe.getUnsafe()
+        return unsafe.objectFieldOffset(field)
+    }
+    
+    @JvmStatic
+    internal fun putInt(obj: Any, offset: Long, value: Int) {
+        val unsafe = Unsafe.getUnsafe()
+        unsafe.putInt(obj, offset, value)
+    }
+    
+    @JvmStatic
+    internal fun getInt(obj: Any, offset: Long): Int {
+        val unsafe = Unsafe.getUnsafe()
+        return unsafe.getInt(obj, offset)
+    }
+    
 }
