@@ -38,8 +38,6 @@ object AdvancementLoader {
                 if (advancement != null)
                     TreeNodePosition.run(advancement)
             }
-        // send advancements to players
-//        DEDICATED_SERVER.playerList.reloadResources()
     }
     
 }
