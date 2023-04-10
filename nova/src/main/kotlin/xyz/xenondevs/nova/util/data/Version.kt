@@ -87,7 +87,7 @@ class Version : Comparable<Version> {
      */
     fun compareTo(other: Version, ignoreIdx: Int): Int {
         val compare = compareVersionArray(version, other.version, ignoreIdx)
-        if (compare != 0)
+        if (compare != 0 || ignoreIdx != -1) // only compare stage version if an exact comparison (ignoreIdx = -1) was requested
             return compare
         
         return compareVersionArray(stageVersion, other.stageVersion, -1)
