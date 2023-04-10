@@ -67,7 +67,7 @@ internal object BackingStateManager : Listener {
         if (!DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks"))
             return
         
-        LOGGER.info("Using block behaviors: ${backingStates.joinToString { it::class.simpleName!! }}")
+        LOGGER.info("Using backing states: ${backingStates.joinToString { it::class.simpleName!! }}")
         
         if (chunkSearchId == -1)
             updateChunkSearchId()
