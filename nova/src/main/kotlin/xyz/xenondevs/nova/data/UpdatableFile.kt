@@ -30,7 +30,7 @@ object UpdatableFile {
                 // Does the file need to be updated?
                 if (!existingFileHash.contentEquals(newFileHash)) {
                     // Replace the file with a newer version
-                    file.write(getStream())
+                    file.writeBytes(newFileData)
                     // Store the new hash
                     fileHashes[file.absolutePath] = newFileHash.encodeWithBase64()
                 }
