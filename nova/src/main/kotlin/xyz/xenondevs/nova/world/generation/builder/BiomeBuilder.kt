@@ -656,7 +656,7 @@ class BiomeSpecialEffectsBuilder {
      * [ParticleBuilder] documentation.
      */
     fun <T : ParticleOptions> ambientParticles(particle: ParticleType<T>, probability: Float, builder: ParticleBuilder<T>.() -> Unit = {}): BiomeSpecialEffectsBuilder {
-        this.ambientParticleSettings = AmbientParticleSettings(ParticleBuilder(particle).apply(builder).options, probability)
+        this.ambientParticleSettings = AmbientParticleSettings(ParticleBuilder(particle).apply(builder).getOptions(), probability)
         return this
     }
     
