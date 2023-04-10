@@ -18,6 +18,7 @@ import net.minecraft.resources.RegistryFileCodec
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.RandomSource
+import net.minecraft.util.ThreadingDetector
 import net.minecraft.world.Container
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.inventory.ItemCombinerMenu
@@ -79,6 +80,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import java.io.DataInput
 import java.security.ProtectionDomain
 import java.util.*
+import java.util.concurrent.Semaphore
 import java.util.function.Consumer
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
@@ -146,6 +148,7 @@ internal object ReflectionRegistry {
     val DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD = getMethod(DispenserBlock::class, true, "SRM(net.minecraft.world.level.block.DispenserBlock getDispenseMethod)", MojangStack::class)
     val HOLDER_REFERENCE_BIND_VALUE_METHOD = getMethod(Holder.Reference::class, true, "SRM(net.minecraft.core.Holder\$Reference bindValue)", Any::class)
     val NOISE_ROUTER_DATA_OVERWORLD_METHOD = getMethod(NoiseRouterData::class, true, "SRM(net.minecraft.world.level.levelgen.NoiseRouterData overworld)", HolderGetter::class, HolderGetter::class, Boolean::class, Boolean::class)
+    val SEMAPHORE_ACQUIRE_METHOD = getMethod(Semaphore::class, false, "acquire")
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -184,5 +187,6 @@ internal object ReflectionRegistry {
     val PROCESSOR_RULE_POS_PREDICATE_FIELD = getField(ProcessorRule::class, true, "SRF(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule posPredicate)")
     val TARGET_BLOCK_STATE_TARGET_FIELD = getField(TargetBlockState::class, false, "SRF(net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration\$TargetBlockState target)")
     val INVENTORY_ARMOR_FIELD = getField(MojangInventory::class, true, "SRF(net.minecraft.world.entity.player.Inventory armor)")
+    val THREADING_DETECTOR_LOCK_FIELD = getField(ThreadingDetector::class, true, "SRF(net.minecraft.util.ThreadingDetector lock)")
     
 }

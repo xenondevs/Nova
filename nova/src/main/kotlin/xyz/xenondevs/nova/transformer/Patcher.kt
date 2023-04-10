@@ -36,6 +36,7 @@ import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
 import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.NovaRuleTestPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.ThreadingDetectorPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.WrapperBlockPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
@@ -61,7 +62,7 @@ internal object Patcher {
             StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
             BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch, LegacyConversionPatch, WearablePatch,
-            NovaRuleTestPatch, BossBarOriginPatch
+            NovaRuleTestPatch, BossBarOriginPatch, ThreadingDetectorPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     
