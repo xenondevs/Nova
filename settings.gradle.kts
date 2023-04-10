@@ -13,7 +13,7 @@ dependencyResolutionManagement {
             version("ktor", "2.2.4")
             version("spigot", "1.19.4-R0.1-SNAPSHOT")
             version("cbf", "0.4")
-            version("xenondevs-commons", "1.0-SNAPSHOT")
+            version("xenondevs-commons", "1.0")
             
             // lib - kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").versionRef("kotlin")
