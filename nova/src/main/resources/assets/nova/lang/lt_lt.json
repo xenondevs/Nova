@@ -58,7 +58,6 @@
   "command.nova.no-players": "Žaidėjai nerasti",
   "command.nova.no-item-in-hand": "Laikyk daiktą rankoje ir bandykite dar kartą",
   "command.nova.give.success": "Duota %s %s %s",
-  "command.nova.advanced_tooltips.already_off": "",
   "item.nova.wrench": "Veržliaraktis",
   "item.nova.wrench.mode.nova.fluid": "Rėžimas: Skysčiai",
   "menu.nova.energy_per_tick": "%s / tiką",

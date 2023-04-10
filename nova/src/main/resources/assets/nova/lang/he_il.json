@@ -58,7 +58,6 @@
   "command.nova.waila.on": "מופעל WAILA.",
   "command.nova.waila.already_on": "WAILA כבר מופעל.",
   "command.nova.remove_invalid_vtes.failure": "לא נמצאו עמדות אריחי וניל לא חוקית.",
-  "waila.nova.required_tool.unknown": "כלי: לא ידוע",
   "nova.tile_entity_limits.amount_per_world.deny": "אינך יכול למקם יותר אריחים מסוג זה בעולם הזה.",
   "nova.tile_entity_limits.amount_per_chunk.deny": "אינך יכול למקם יותר אריחים מסוג זה בסוג זה בנתח זה.",
   "nova.tile_entity_limits.amount_global_total.deny": "אתה לא יכול למקם יותר אריחים.",

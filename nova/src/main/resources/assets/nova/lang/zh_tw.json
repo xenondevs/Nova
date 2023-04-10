@@ -104,9 +104,7 @@
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "你在這個區塊不能再放置更多實體",
   "menu.nova.region.increase": "擴展區域",
   "menu.nova.region.decrease": "縮小區域",
-  "command.nova.advanced_tooltips.off": "關閉進階提示",
   "command.nova.advanced_tooltips.already_off": "進階提示已是關閉狀態",
-  "command.nova.advanced_tooltips.on": "開啟進階提示",
   "command.nova.advanced_tooltips.already_on": "進階提示已是開啟狀態",
   "command.nova.waila.off": "關閉提示窗",
   "command.nova.waila.already_off": "提示窗已是關閉狀態",
@@ -119,6 +117,5 @@
   "nova.tile_entity_limits.amount_per_world_total.deny": "你在這個世界不能再放置更多實體",
   "command.nova.remove_invalid_vtes.success": "成功的移除了 %s 個無效的原版實體",
   "command.nova.remove_invalid_vtes.failure": "未發現無效的原版實體",
-  "waila.nova.required_tool.unknown": "工具: 未知",
   "nova.tile_entity_limits.type_blacklist.deny": "你無法放置任何此類型的實體"
 }
