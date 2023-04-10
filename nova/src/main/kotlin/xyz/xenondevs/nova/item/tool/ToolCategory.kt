@@ -5,16 +5,13 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 
 /**
- * @param id The [NamespacedId] of this [ToolCategory]
- * @param getIcon Retrieves the icon for this [ToolCategory] with a given [ToolTier]. An example id would
- * be `minecraft:item/diamond_pickaxe` for the `minecraft:pickaxe` category and `minecraft:diamond` level.
+ * @param id The [ResourceLocation] of this [ToolCategory]
  */
 open class ToolCategory internal constructor(
     val id: ResourceLocation
